@@ -1,29 +1,12 @@
-use std::{fmt::Debug, env, fs::File, io::{Write, Read}, process::Command, rc::Rc, cell::RefCell, borrow::BorrowMut};
+use std::{ rc::Rc, cell::RefCell};
 use antlr_rust::{InputStream, common_token_stream::CommonTokenStream};
-use petgraph::{dot::{Dot, Config}, Graph, EdgeType, csr::NodeIndex};
+use petgraph::{ Graph,  csr::NodeIndex};
 use crate::{toolkit::{rule_only_walkers::{ASTGraphRcCell, RuleOnlyListener}, nodes::ASTNode}, clang::{cparser::{CTreeWalker, CParser}, clexer::CLexer}};
 
-pub fn save_dot_and_generate_png<N:Debug,E:Debug,Ty :EdgeType>(g:&Graph<N,E,Ty>, name :String){
-    println!("current working dir is {:?}", env::current_dir());
-    let png_name = name.clone()+ ".png";
-    let dot_name = name+ ".dot";
-    let mut f = File::create(dot_name.clone()).expect("无法写入文件");
-    f.write_all(format!("{:?}", Dot::with_config(&g, &[Config::EdgeNoLabel])).as_bytes())
-        .expect("写入失败");
-    let output = Command::new("dot")
-        .args(["-Tpng",dot_name.as_str(), "-o",png_name.as_str()])
-        .output()
-        .expect("执行失败");
-    // println!("{:?}", Command::new("dot") .args(["-Tpng","./graph.dot","-o","./graph.png"]));
-    println!("Transform to png {:?}", output);
-}
-
-pub fn read_file_content(path:String)->String{
-    let mut buf = String::new();
-    File::open(path).expect("文件读取异常").read_to_string(&mut buf).expect("读取失败");
-    buf
-}
-pub fn parse_as_ASTGraph(c_code :String,debug_info:bool)-> ASTGraphRcCell{
+/* 把代码生成为AST树 
+    c_code 为代码文本的字符串
+*/
+pub fn parse_as_ast_graph(c_code :String,debug_info:bool)-> ASTGraphRcCell{
     let g: Graph<ASTNode,(), petgraph::Directed> = Graph::new();
     let g = Rc::new(RefCell::new(g));
     let listener = RuleOnlyListener{
@@ -52,7 +35,7 @@ pub fn parse_as_ASTGraph(c_code :String,debug_info:bool)-> ASTGraphRcCell{
             *is_last_wrap_drop=false;
         }),
         exit_rule_f: Box::new(|ctx,s|{
-            let (node_count_under_depth,is_last_wrap_drop,g) = s;
+            let (node_count_under_depth,is_last_wrap_drop,_g) = s;
             node_count_under_depth.pop();
             *is_last_wrap_drop=true;
             println!("exit rule {}  ",ctx.get_text());

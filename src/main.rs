@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use clap::Parser;
 
-use crate::toolkit::gen_ast::{save_dot_and_generate_png, parse_as_ASTGraph, read_file_content};
+use crate::toolkit::{etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_graph};
 #[derive(Parser)]
 #[command(author, version, about)]
 struct Cli {
@@ -12,11 +12,10 @@ struct Cli {
     #[arg(short, long, value_name = "FILE",default_value = "./demo.c")]
     c_file_path: PathBuf
 }
-
 fn main() {
     let args = Cli::parse();
     let c_code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
-    let g = parse_as_ASTGraph(c_code, true);
-    save_dot_and_generate_png(&*g.borrow(),"graph".to_string());  
+    let g = parse_as_ast_graph(c_code, true);
+    generate_png_by_graph(&*g.borrow(),"graph".to_string());  
     println!("Hello, world!");
 }
