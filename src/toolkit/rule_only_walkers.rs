@@ -2,13 +2,13 @@
 use std::{cell::RefCell, rc::Rc, mem};
 use crate::clang::{self, cvisitor::{CVisitor, CVisitorCompat}};
 
-use super::nodes::Node;
+use super::nodes::ASTNode;
 
 use clang::{clistener::CListener, cparser::{CParserContextType, CParser, CParserContext, CParserExt}};
 use antlr_rust::{tree::{ParseTreeListener, ParseTreeVisitor, ParseTreeVisitorCompat, VisitChildren}, rule_context::RuleContext, parser::ParserNodeType};
 use petgraph::{Graph, dot::{Config, Dot}, EdgeType};
 pub type ParserContext<'input> = <CParserContextType as antlr_rust::parser::ParserNodeType<'input>>::Type;
-pub type ASTGraphRcCell= Rc<RefCell<Graph<Node,(), petgraph::Undirected>>>; 
+pub type ASTGraphRcCell= Rc<RefCell<Graph<ASTNode,(), petgraph::Directed>>>; 
 pub struct TerminalOnlyListener<S>{
     pub st : S,  // status passing through the tree 
     pub visit_term_f: Box<dyn FnMut(& ParserContext,&mut S)->()>,
