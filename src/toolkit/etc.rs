@@ -3,7 +3,7 @@ use std::{fs::File, process::Command, fmt::Debug, env, io::{Write, Read}};
 use petgraph::{dot::{Dot, Config}, EdgeType, Graph};
 
 
-/* 生成树(可以是任何树)对应的png */
+/// 生成树(可以是任何树)对应的png ，将此png 放在命令行*当前*目录下
 pub fn generate_png_by_graph<N:Debug,E:Debug,Ty :EdgeType>(g:&Graph<N,E,Ty>, name :String){
     println!("current working dir is {:?}", env::current_dir());
     let png_name = name.clone()+ ".png";
@@ -19,8 +19,7 @@ pub fn generate_png_by_graph<N:Debug,E:Debug,Ty :EdgeType>(g:&Graph<N,E,Ty>, nam
     println!("Transform to png {:?}", output);
 }
 
-/* 从指定文件中读取所有文本
- */
+/// 从指定文件中读取所有文本
 pub fn read_file_content(path:String)->String{
     let mut buf = String::new();
     File::open(path).expect("文件读取异常").read_to_string(&mut buf).expect("读取失败");

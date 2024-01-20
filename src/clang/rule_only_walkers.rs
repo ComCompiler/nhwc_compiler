@@ -1,17 +1,24 @@
 
 use std::{cell::RefCell, rc::Rc, mem};
-use crate::clang::{self, cvisitor::{CVisitor, CVisitorCompat}};
+use crate::clang::{self, cvisitor::CVisitorCompat};
 
-use super::nodes::ASTNode;
+use crate::toolkit::nodes::ASTNode;
 
-use clang::{clistener::CListener, cparser::{CParserContextType, CParser, CParserContext, CParserExt}};
-use antlr_rust::{tree::{ParseTreeListener, ParseTreeVisitor, ParseTreeVisitorCompat, VisitChildren}, rule_context::RuleContext, parser::ParserNodeType};
-use petgraph::{Graph, dot::{Config, Dot}, EdgeType};
+use clang::{clistener::CListener, cparser::CParserContextType};
+use antlr_rust::{tree::{ParseTreeListener,  ParseTreeVisitorCompat}, parser::ParserNodeType};
+use petgraph::Graph;
+/*
+
+这个文件的所有代码都用于将 antlr 生成的 AST 转化为 petgraph 的 图
+因为我们后期都使用的是 petgraph 的图，一般不需要再次调用这个文件中的代码了。
+
+*/
 pub type ParserContext<'input> = <CParserContextType as antlr_rust::parser::ParserNodeType<'input>>::Type;
 pub type ASTGraphRcCell= Rc<RefCell<Graph<ASTNode,(), petgraph::Directed>>>; 
 pub struct TerminalOnlyListener<S>{
     pub st : S,  // status passing through the tree 
     pub visit_term_f: Box<dyn FnMut(& ParserContext,&mut S)->()>,
+
 }
 
 impl<'input,S> ParseTreeListener<'input,CParserContextType> for TerminalOnlyListener<S>{

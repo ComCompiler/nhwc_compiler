@@ -1,14 +1,14 @@
 use std::{ rc::Rc, cell::RefCell};
 use antlr_rust::{InputStream, common_token_stream::CommonTokenStream};
 use petgraph::{ Graph,  csr::NodeIndex};
-use crate::{toolkit::{rule_only_walkers::{ASTGraphRcCell, RuleOnlyListener}, nodes::ASTNode}, clang::{cparser::{CTreeWalker, CParser}, clexer::CLexer}};
 
-/* 把代码生成为AST树 
-    c_code 为代码文本的字符串
-*/
-pub fn parse_as_ast_graph(c_code :String,debug_info:bool)-> ASTGraphRcCell{
+use crate::{toolkit::nodes::ASTNode, clang::{rule_only_walkers::{ASTGraphRcCell, RuleOnlyListener}, clexer::CLexer, cparser::{CParser, CTreeWalker}}};
+
+/// 把代码生成为AST树 code 为代码文本的字符串
+pub fn parse_as_ast_graph(code :String,debug_info:bool)-> ASTGraphRcCell{
     let g: Graph<ASTNode,(), petgraph::Directed> = Graph::new();
     let g = Rc::new(RefCell::new(g));
+    // 由于 antlr 已经生成了一个 AST 树 但我们需要的是 petgraph 类型，因此我们需要重新遍历一次这个树，生成 petgraph的
     let listener = RuleOnlyListener{
         st: (Vec::<usize>::new(),false,g.clone()),
         enter_rule_f:Box::new(|ctx,s|{
@@ -42,7 +42,7 @@ pub fn parse_as_ast_graph(c_code :String,debug_info:bool)-> ASTGraphRcCell{
         }),
     };
 
-    let lexer = CLexer::new(InputStream::new(c_code.as_str()));
+    let lexer = CLexer::new(InputStream::new(code.as_str()));
     let token_source = CommonTokenStream::new(lexer);
     let mut parser= CParser::new(token_source);
     // let m = *parser;
