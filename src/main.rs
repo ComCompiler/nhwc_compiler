@@ -1,16 +1,12 @@
 mod clang;
 mod toolkit;
 use std::path::PathBuf;
-use std::vec;
 
 use clang::cparser::{RULE_compoundStatement, RULE_functionDefinition};
 use clap::Parser;
 use petgraph::{adj::NodeIndex, visit::Dfs, Graph};
-use toolkit::nodes::ASTNode;
+use toolkit::ast_node::ASTNode;
 
-use petgraph::{csr::NodeIndex, Graph};
-use toolkit::nodes::ASTNode;
-use petgraph::visit::Dfs;
 
 use crate::toolkit::{etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_graph};
 #[derive(Parser)]

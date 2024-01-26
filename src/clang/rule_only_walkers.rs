@@ -2,7 +2,7 @@
 use std::{cell::RefCell, rc::Rc, mem};
 use crate::clang::{self, cvisitor::CVisitorCompat};
 
-use crate::toolkit::nodes::ASTNode;
+use crate::toolkit::ast_node::ASTNode;
 
 use clang::{clistener::CListener, cparser::CParserContextType};
 use antlr_rust::{tree::{ParseTreeListener,  ParseTreeVisitorCompat}, parser::ParserNodeType};
