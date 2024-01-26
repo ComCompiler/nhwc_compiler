@@ -1,11 +1,16 @@
 mod clang;
 mod toolkit;
 use std::path::PathBuf;
+use std::vec;
 
 use clang::cparser::{RULE_compoundStatement, RULE_functionDefinition};
 use clap::Parser;
 use petgraph::{adj::NodeIndex, visit::Dfs, Graph};
 use toolkit::nodes::ASTNode;
+
+use petgraph::{csr::NodeIndex, Graph};
+use toolkit::nodes::ASTNode;
+use petgraph::visit::Dfs;
 
 use crate::toolkit::{etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_graph};
 #[derive(Parser)]
@@ -15,9 +20,11 @@ struct Cli {
     #[arg(short, long, value_name = "FILE",default_value = "./demo.c")]
     c_file_path: PathBuf
 }
-fn dfs_ast(ast_tree:&Graph<ASTNode, (), petgraph::Directed>,current_astn:petgraph::prelude::NodeIndex) ->Vec<String>{
-    let mut dfs=Dfs::new(&ast_tree,current_astn.into());
-    let mut vec:Vec<String> = Vec::new();
+
+///dfs遍历ast树寻找源文件代码块
+fn dfs_ast(ast_tree:&Graph<ASTNode,(), petgraph::Directed>,current_astn:petgraph::prelude::NodeIndex) -> Vec<String>{
+    let mut dfs = Dfs::new(&ast_tree, current_astn);
+    let mut vec:Vec<String> = Vec::new(); 
     while let Some(N) = dfs.next(&ast_tree) {
         if ast_tree[N].rule_id == RULE_functionDefinition {
             for next in ast_tree.neighbors_directed(N, petgraph::Direction::Outgoing){
@@ -46,4 +53,12 @@ fn main() {
         println!("{}",node);
     }
 
+    //dfs遍历ast
+    let mut v = dfs_ast(&*g.borrow(),NodeIndex::from(0));
+    for node in v{
+        println!("{}",node);
+    }
+
+    // test
+    println!("Hello, world!");
 }
