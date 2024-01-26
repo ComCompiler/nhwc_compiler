@@ -1,4 +1,4 @@
-// Generated from /home/mineral/c_ast/src/clang/C.g4 by ANTLR 4.13.1
+// Generated from /home/gulugulu/beginner_compiler/src/clang/C.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
