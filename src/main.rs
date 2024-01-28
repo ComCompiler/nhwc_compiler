@@ -1,8 +1,8 @@
-mod clang;
 mod toolkit;
+mod antlr_parser;
 use std::path::PathBuf;
 
-use clang::{cparser::{RULE_compoundStatement, RULE_functionDefinition}, rule_only_walkers::AstTreeRcCell};
+use antlr_parser::cparser::{RULE_compoundStatement, RULE_functionDefinition} ;
 use clap::Parser;
 use petgraph::{adj::NodeIndex, graph::Node,  visit::{Dfs, Walker}, Graph};
 

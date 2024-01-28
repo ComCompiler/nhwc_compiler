@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use petgraph::{adj::NodeIndex, graph::{self, DiGraph}, visit::IntoNeighbors, Graph};
 
-use crate::clang::cparser::ruleNames;
+use crate::antlr_parser::cparser::ruleNames;
 use petgraph::visit::{Dfs, Walker};
 pub type AstTree = DiGraph<AstNode,(),u32>;
 
@@ -35,4 +35,6 @@ pub fn dfs_ast<'a>(ast_tree:&'a AstTree,current_astn:NodeIndex,aim_index: usize)
     });
     dfs_iter
 }
+
+
 

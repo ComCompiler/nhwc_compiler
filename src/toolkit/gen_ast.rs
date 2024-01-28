@@ -2,7 +2,7 @@ use std::{ rc::Rc, cell::RefCell};
 use antlr_rust::{common_token_stream::CommonTokenStream, rule_context::CustomRuleContext, InputStream};
 use petgraph::{ Graph,  csr::NodeIndex};
 
-use crate::{toolkit::ast_node::AstNode, clang::{rule_only_walkers::{AstTreeRcCell, RuleOnlyListener}, clexer::CLexer, cparser::{CParser, CTreeWalker}}};
+use crate::{toolkit::ast_node::AstNode, antlr_parser::{rule_only_walkers::RuleOnlyListener, clexer::CLexer, cparser::{CParser, CTreeWalker}}};
 
 use super::ast_node::AstTree;
 

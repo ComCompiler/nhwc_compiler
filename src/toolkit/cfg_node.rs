@@ -1,13 +1,10 @@
-use std::cell::Ref;
-use std::fmt::{write, Debug};
+use std::fmt::Debug;
 
-use petgraph::graph::{Edge, Node, UnGraph};
 use petgraph::stable_graph::NodeIndex;
 use petgraph::{Directed, Graph};
 
 use crate::toolkit::ast_node::AstNode;
 
-use super::ast_node;
 pub type Idx = NodeIndex<u32>;
 
 enum CfgNode {
