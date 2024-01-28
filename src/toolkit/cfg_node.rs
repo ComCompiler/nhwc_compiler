@@ -2,10 +2,9 @@ use std::fmt::Debug;
 
 //use petgraph::stable_graph::NodeIndex;
 use petgraph::{Directed, Graph};
-use petgraph::{adj::NodeIndex, graph::{self, DiGraph}, visit::{Dfs, Walker,IntoNeighbors, Graph}};
+use petgraph::{adj::NodeIndex, graph::DiGraph};
 
-use crate::toolkit::ast_node::{AstNode,AstTree,dfs_ast};
-use crate::antlr_parser::cparser::ruleNames;
+use crate::toolkit::ast_node::AstNode;
 
 pub type Idx = NodeIndex<u32>;
 pub type CfgGraph = DiGraph<CfgNode,(),u32>;
