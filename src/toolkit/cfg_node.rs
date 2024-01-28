@@ -5,12 +5,12 @@ use petgraph::graph::{Edge, Node, UnGraph};
 use petgraph::stable_graph::NodeIndex;
 use petgraph::{Directed, Graph};
 
-use crate::ASTNode;
+use crate::toolkit::ast_node::AstNode;
 
 use super::ast_node;
 pub type Idx = NodeIndex<u32>;
 
-enum CFGNode {
+enum CfgNode {
     Entry {
         outgoing: u32 ,
         ast_node_idx: u32,
@@ -29,28 +29,28 @@ enum CFGNode {
         ingoings: u32,
     },
 }
-impl CFGNode {
-    fn get_ast_node_text(&self,ast_g : &Graph<ASTNode,(),Directed>) -> String{
+impl CfgNode {
+    fn get_ast_node_text(&self,ast_g : &Graph<AstNode,(),Directed>) -> String{
         match self {
-            CFGNode::Entry { outgoing, ast_node_idx } =>  ast_g[NodeIndex::from(*ast_node_idx)].text.clone(),
-            CFGNode::Exit { ingoing, ast_node_idx } => ast_g[NodeIndex::from(*ast_node_idx)].text.clone(),
-            CFGNode::Branch { outgoings, ingoings, ast_node_idx } => ast_g[NodeIndex::from(*ast_node_idx)].text.clone(),
-            CFGNode::Gather { outgoings, ingoings } => String::from(" "),
+            CfgNode::Entry { outgoing, ast_node_idx } =>  ast_g[NodeIndex::from(*ast_node_idx)].text.clone(),
+            CfgNode::Exit { ingoing, ast_node_idx } => ast_g[NodeIndex::from(*ast_node_idx)].text.clone(),
+            CfgNode::Branch { outgoings, ingoings, ast_node_idx } => ast_g[NodeIndex::from(*ast_node_idx)].text.clone(),
+            CfgNode::Gather { outgoings, ingoings } => String::from(" "),
         }
     }
 }
 
 
-impl Debug for CFGNode{
+impl Debug for CfgNode{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self{
-            CFGNode::Entry { outgoing: _, ast_node_idx } =>
+            CfgNode::Entry { outgoing: _, ast_node_idx } =>
                 write!(f,"{} {}","Entry",ast_node_idx),
-            CFGNode::Exit { ingoing: _, ast_node_idx } =>
+            CfgNode::Exit { ingoing: _, ast_node_idx } =>
                 write!(f,"{} {}","Exit",ast_node_idx),
-            CFGNode::Branch { outgoings: _, ingoings: _, ast_node_idx } =>
+            CfgNode::Branch { outgoings: _, ingoings: _, ast_node_idx } =>
                 write!(f,"{} {}","Branch",ast_node_idx),
-            CFGNode::Gather { outgoings: _ , ingoings:_ , } =>
+            CfgNode::Gather { outgoings: _ , ingoings:_ , } =>
                 write!(f,"{} ","Gather"),
         }
     }

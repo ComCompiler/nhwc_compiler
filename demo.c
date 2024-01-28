@@ -10,4 +10,10 @@ int main()
 	return 0;
 }
 
+int f(int x){
+	if (x >10) {
+		return 10;
+	}
+	return f(x+1);
+}
 
