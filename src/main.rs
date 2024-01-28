@@ -7,25 +7,8 @@ use clap::Parser;
 use petgraph::{adj::NodeIndex, graph::Node,  visit::{Dfs, Walker}, Graph};
 
 
-use crate::toolkit::{ast_node::dfs_ast, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_graph};
+use crate::toolkit::{ast_node::find_dfs_ast, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_graph};
 
-/// ? 使用这个宏的时候必须确保语境中有ast_tree
-macro_rules! find {
-    (id:ident) => {
-        let mut dfs = 
-        let mut vec:Vec<String> = Vec::new(); 
-        while let Some(N) = dfs.next(&ast_tree) {
-            if ast_tree[N].rule_id == RULE_functionDefinition {
-                for next in ast_tree.neighbors_directed(N, petgraph::Direction::Outgoing){
-                    if ast_tree[next].rule_id == RULE_compoundStatement{
-                        vec.push(ast_tree[next].text.clone());
-                    }
-                }
-            }
-        }
-        vec
-    };
-}
 #[derive(Parser)]
 #[command(author, version, about)]
 struct Cli {
@@ -47,7 +30,7 @@ fn main() {
     // 生成 petgraph 图对应的 png 
     generate_png_by_graph(&g,"graph2".to_string());  
     //dfs遍历ast
-    let mut v= dfs_ast(&g, 0,RULE_functionDefinition );
+    let mut v= find_dfs_ast(&g, 0,RULE_functionDefinition );
     for node in v{
         println!("{}",node);
         println!("{}",g.node_weight(NodeIndex::from(node)).unwrap().text);
@@ -59,8 +42,48 @@ fn main() {
 
 #[cfg(test)]
 mod tests{
+    use std::{path::PathBuf, str::FromStr, vec};
+
+    use clap::Parser;
+    
+    use crate::{antlr_parser::cparser::RULE_functionDefinition, find, find_nodes, toolkit::{ast_node::find_dfs_ast, etc::read_file_content, gen_ast::parse_as_ast_graph}, Cli};
+
     #[test]
     fn add(){
         assert_eq!(3+3 , 6)
     }
+
+    #[test]
+    fn find_dfs_ast_test(){
+        let mut args = Cli::parse();
+        // 设置 path 为 demo.c
+        args.c_file_path = PathBuf::from_str("./demo.c").unwrap();
+        let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
+        let g = parse_as_ast_graph(code, true);
+        //dfs遍历ast
+        let node_ids:Vec<u32> = find_dfs_ast(&g, 0,RULE_functionDefinition ).collect();
+        assert_eq!(node_ids , vec![3,140] ,"找到的 node id 不对");
+    }
+
+    #[test]
+    fn find_compound_of_funcDef(){
+        let mut args = Cli::parse();
+        // 设置 path 为 demo.c
+        args.c_file_path = PathBuf::from_str("./demo.c").unwrap();
+        let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
+        let ast_tree = parse_as_ast_graph(code, true);
+        //dfs遍历ast
+        let node_ids= find!(RULE_functionDefinition);
+        assert_eq!(node_ids , 3 ,"找到的 node id 不对");
+    }
+    // fn find_items_of_itemlists_using_macro_find_nodes(){
+    //     let mut args = Cli::parse();
+    //     // 设置 path 为 demo.c
+    //     args.c_file_path = PathBuf::from_str("./demo.c").unwrap();
+    //     let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
+    //     let ast_tree = parse_as_ast_graph(code, true);
+    //     //dfs遍历ast
+    //     let node_ids:Vec<u32>= find_nodes!(RULE_functionDefinition);
+    //     assert_eq!(node_ids , vec![3,140] ,"找到的 node id 不对");
+    // }
 }
