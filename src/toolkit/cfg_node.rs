@@ -5,10 +5,9 @@ use petgraph::{Directed, Graph};
 use petgraph::{adj::NodeIndex, graph::DiGraph};
 
 use crate::toolkit::ast_node::{AstNode,AstTree,find_dfs_ast,find_neighbors_ast};
-use crate::{RULE_functionDefinition,RULE_compoundStatement};
-use crate::antlr_parser::cparser::{RULE_blockItem,RULE_iterationStatement};
+use crate::{find_nodes, RULE_compoundStatement, RULE_functionDefinition};
+use crate::antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_iterationStatement};
 use crate::find;
-use crate::toolkit::ast_node::AstNode;
 
 pub type Idx = NodeIndex<u32>;
 pub type CfgGraph = DiGraph<CfgNode,(),u32>;
@@ -61,13 +60,14 @@ impl Debug for CfgNode{
 
 
 pub fn ast_to_cfg(ast_tree:&AstTree) {
-    let functionblock= find_dfs_ast(ast_tree,0,RULE_functionDefinition);
-    for funblock in functionblock{
-        let compound = find_neighbors_ast(ast_tree,funblock,RULE_compoundStatement);
-    let blockitem = find_dfs_ast(ast_tree,find!(compound),RULE_blockItem);
-    for block in blockitem{
-        
-    }
+    let functionblock_nodes = find_dfs_ast(ast_tree,0,RULE_functionDefinition);
+    for func_block in functionblock_nodes{
+        let compund_statement = find!(rule RULE_compoundStatement at func_block in ast_tree).unwrap();
+        let blockitemlist = find!(rule RULE_blockItemList at compund_statement in ast_tree).unwrap();
+        let blockitems: Vec<u32>= find_nodes!(rule RULE_blockItem at blockitemlist in ast_tree);
+        for block in blockitems{
+            
+        }
     }
 
 }

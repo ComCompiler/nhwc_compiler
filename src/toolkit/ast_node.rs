@@ -30,7 +30,7 @@ macro_rules! find {
     (rule $id:ident at $node:ident in $ast_tree:ident) => {
         {
             let mut iter  = crate::toolkit::ast_node::find_neighbors_ast($ast_tree,$node,$id);
-            iter.next().unwrap()
+            iter.next()
         }
     };
 }
