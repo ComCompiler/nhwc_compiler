@@ -33,6 +33,13 @@ macro_rules! find {
             iter.next()
         }
     };
+    (rule $($id:ident)then+ finally $fin_id:ident at $node:ident in $ast_tree:ident) => {
+        {
+            let new_node = $node;
+            $(let new_node = find!(rule $id at new_node in $ast_tree).unwrap();)+
+            find!(rule $fin_id at new_node in $ast_tree)
+        }
+    }
 }
 
 /// ? 返回下一层找到的第一个rule_id符合的节点，使用这个宏的时候必须确保语境中有ast_tree和node
@@ -44,6 +51,14 @@ macro_rules! find_nodes {
             iter.collect()
         }
     };
+    (rule $($id:ident)then+ finally $fin_id:ident at $node:ident in $ast_tree:ident) => {
+        {
+            let new_node = $node;
+            $(let new_node = find!(rule $id at new_node in $ast_tree).unwrap();)+
+            find_nodes!(rule $fin_id at new_node in $ast_tree)
+        }
+    };
+
 }
 
 
