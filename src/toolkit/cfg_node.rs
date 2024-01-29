@@ -57,9 +57,9 @@ impl Debug for CfgNode{
 }
 
 
-pub fn ast_to_cfg(ast_tree:&AstTree) -> CfgGraph{
-    let functionblock:impl Iterator<Item = u32> = dfs_ast(ast_tree,0,ruleNames::RULE_functionDefinition)
-    for funblock in functioinblock{
+// pub fn ast_to_cfg(ast_tree:&AstTree) -> CfgGraph{
+//     let functionblock:impl Iterator<Item = u32> = dfs_ast(ast_tree,0,ruleNames::RULE_functionDefinition)
+//     for funblock in functioinblock{
 
-    }
-}
+//     }
+// }
