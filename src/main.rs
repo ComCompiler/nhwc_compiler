@@ -76,14 +76,14 @@ mod tests{
         let node_ids= find!(RULE_functionDefinition);
         assert_eq!(node_ids , 3 ,"找到的 node id 不对");
     }
-    // fn find_items_of_itemlists_using_macro_find_nodes(){
-    //     let mut args = Cli::parse();
-    //     // 设置 path 为 demo.c
-    //     args.c_file_path = PathBuf::from_str("./demo.c").unwrap();
-    //     let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
-    //     let ast_tree = parse_as_ast_graph(code, true);
-    //     //dfs遍历ast
-    //     let node_ids:Vec<u32>= find_nodes!(RULE_functionDefinition);
-    //     assert_eq!(node_ids , vec![3,140] ,"找到的 node id 不对");
-    // }
+    fn find_items_of_itemlists_using_macro_find_nodes(){
+        let mut args = Cli::parse();
+        // 设置 path 为 demo.c
+        args.c_file_path = PathBuf::from_str("./demo.c").unwrap();
+        let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
+        let ast_tree = parse_as_ast_graph(code, true);
+        //dfs遍历ast
+        let node_ids:Vec<u32>= find_nodes!(RULE_functionDefinition);
+        assert_eq!(node_ids , vec![3,140] ,"找到的 node id 不对");
+    }
 }

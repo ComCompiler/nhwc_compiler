@@ -27,7 +27,10 @@ impl Debug for AstNode{
 #[macro_export] 
 macro_rules! find {
     ($id:ident) => {
-        crate::toolkit::ast_node::find_neighbors_ast(&ast_tree,node,$id).next().unwrap()
+        {
+            let iter = crate::toolkit::ast_node::find_neighbors_ast(&ast_tree,node,$id);
+            iter.next().unwrap()
+        }
     };
 }
 

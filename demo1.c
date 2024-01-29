@@ -5,6 +5,12 @@ int main()
 	while( i< 3){
 		i++;
 	}
+	if(i>0){
+		i++;
+	}
+	else{
+		i--;
+	}
 	return 0;
 }
 

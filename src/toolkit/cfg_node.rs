@@ -2,10 +2,12 @@ use std::fmt::Debug;
 
 //use petgraph::stable_graph::NodeIndex;
 use petgraph::{Directed, Graph};
-use petgraph::{adj::NodeIndex, graph::{self, DiGraph}, visit::{Dfs, Walker,IntoNeighbors, Graph}};
+use petgraph::{adj::NodeIndex, graph::DiGraph};
 
-use crate::toolkit::ast_node::{AstNode,AstTree,dfs_ast};
-use crate::antlr_parser::cparser::ruleNames;
+use crate::toolkit::ast_node::{AstNode,AstTree,find_dfs_ast,find_neighbors_ast};
+use crate::{RULE_functionDefinition,RULE_compoundStatement};
+use crate::antlr_parser::cparser::{RULE_blockItem,RULE_iterationStatement};
+use crate::find;
 
 pub type Idx = NodeIndex<u32>;
 pub type CfgGraph = DiGraph<CfgNode,(),u32>;
@@ -57,9 +59,14 @@ impl Debug for CfgNode{
 }
 
 
-// pub fn ast_to_cfg(ast_tree:&AstTree) -> CfgGraph{
-//     let functionblock:impl Iterator<Item = u32> = dfs_ast(ast_tree,0,ruleNames::RULE_functionDefinition)
-//     for funblock in functioinblock{
+pub fn ast_to_cfg(ast_tree:&AstTree) {
+    let functionblock= find_dfs_ast(ast_tree,0,RULE_functionDefinition);
+    for funblock in functionblock{
+        let compound = find_neighbors_ast(ast_tree,funblock,RULE_compoundStatement);
+    let blockitem = find_dfs_ast(ast_tree,find!(compound),RULE_blockItem);
+    for block in blockitem{
+        
+    }
+    }
 
-//     }
-// }
+}
