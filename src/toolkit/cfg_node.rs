@@ -1,13 +1,16 @@
 use std::fmt::Debug;
 
-use petgraph::stable_graph::NodeIndex;
+//use petgraph::stable_graph::NodeIndex;
 use petgraph::{Directed, Graph};
+use petgraph::{adj::NodeIndex, graph::{self, DiGraph}, visit::{Dfs, Walker,IntoNeighbors, Graph}};
 
-use crate::toolkit::ast_node::AstNode;
+use crate::toolkit::ast_node::{AstNode,AstTree,dfs_ast};
+use crate::antlr_parser::cparser::ruleNames;
 
 pub type Idx = NodeIndex<u32>;
+pub type CfgGraph = DiGraph<CfgNode,(),u32>;
 
-enum CfgNode {
+pub enum CfgNode {
     Entry {
         outgoing: u32 ,
         ast_node_idx: u32,
@@ -27,11 +30,11 @@ enum CfgNode {
     },
 }
 impl CfgNode {
-    fn get_ast_node_text(&self,ast_g : &Graph<AstNode,(),Directed>) -> String{
+    fn get_ast_node_text(&self,ast_tree : &Graph<AstNode,(),Directed>) -> String{
         match self {
-            CfgNode::Entry { outgoing, ast_node_idx } =>  ast_g[NodeIndex::from(*ast_node_idx)].text.clone(),
-            CfgNode::Exit { ingoing, ast_node_idx } => ast_g[NodeIndex::from(*ast_node_idx)].text.clone(),
-            CfgNode::Branch { outgoings, ingoings, ast_node_idx } => ast_g[NodeIndex::from(*ast_node_idx)].text.clone(),
+            CfgNode::Entry { outgoing, ast_node_idx } => ast_tree.node_weight(NodeIndex::from(*ast_node_idx)).unwrap().text.clone(),
+            CfgNode::Exit { ingoing, ast_node_idx } => ast_tree.node_weight(NodeIndex::from(*ast_node_idx)).unwrap().text.clone(),
+            CfgNode::Branch { outgoings, ingoings, ast_node_idx } => ast_tree.node_weight(NodeIndex::from(*ast_node_idx)).unwrap().text.clone(),
             CfgNode::Gather { outgoings, ingoings } => String::from(" "),
         }
     }
@@ -50,5 +53,13 @@ impl Debug for CfgNode{
             CfgNode::Gather { outgoings: _ , ingoings:_ , } =>
                 write!(f,"{} ","Gather"),
         }
+    }
+}
+
+
+pub fn ast_to_cfg(ast_tree:&AstTree) -> CfgGraph{
+    let functionblock:impl Iterator<Item = u32> = dfs_ast(ast_tree,0,ruleNames::RULE_functionDefinition)
+    for funblock in functioinblock{
+
     }
 }

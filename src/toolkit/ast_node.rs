@@ -35,6 +35,3 @@ pub fn dfs_ast<'a>(ast_tree:&'a AstTree,current_astn:NodeIndex,aim_index: usize)
     });
     dfs_iter
 }
-
-
-
