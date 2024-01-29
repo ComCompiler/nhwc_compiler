@@ -1,6 +1,6 @@
-use std::{fmt::Debug, thread::current};
+use std::fmt::Debug;
 
-use petgraph::{adj::{Neighbors, NodeIndex}, graph::{self, DiGraph},  visit::{Bfs, IntoNeighbors}, Graph};
+use petgraph::{adj::NodeIndex, graph::DiGraph,  visit::Bfs};
 
 use crate::antlr_parser::cparser::ruleNames;
 use petgraph::visit::{Dfs, Walker};
@@ -8,27 +8,28 @@ pub type AstTree = DiGraph<AstNode,(),u32>;
 
 pub struct AstNode {
     pub rule_id : usize,
+    pub node_index : u32,
     pub text : String,
 }
 impl AstNode { 
     pub fn new(rule_id : usize, text:String) -> Self{
-        Self{ rule_id,text }
+        Self{ rule_id, node_index:0 ,text  }
     }
 }
 
 impl Debug for AstNode{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"{} {}",ruleNames[self.rule_id],self.text)
+        write!(f,"{} {} {}",ruleNames[self.rule_id],self.text, self.node_index)
     }
 }
 
 
-/// ? 返回下一层找到的第一个rule_id符合的节点，使用这个宏的时候必须确保语境中有ast_tree，
+/// ? 返回下一层找到的第一个rule_id符合的节点，使用这个宏的时候必须确保语境中有ast_tree,node
 #[macro_export] 
 macro_rules! find {
-    ($id:ident) => {
+    (rule $id:ident at $node:ident in $ast_tree:ident) => {
         {
-            let iter = crate::toolkit::ast_node::find_neighbors_ast(&ast_tree,node,$id);
+            let mut iter  = crate::toolkit::ast_node::find_neighbors_ast($ast_tree,$node,$id);
             iter.next().unwrap()
         }
     };
@@ -37,8 +38,11 @@ macro_rules! find {
 /// ? 返回下一层找到的第一个rule_id符合的节点，使用这个宏的时候必须确保语境中有ast_tree和node
 #[macro_export] 
 macro_rules! find_nodes {
-    (id:ident) => {
-        crate::toolkit::ast_node::find_neighbors_ast(&ast_tree,node,$id).collect()
+    (rule $id:ident at $node:ident in $ast_tree:ident) => {
+        {
+            let mut iter = crate::toolkit::ast_node::find_neighbors_ast($ast_tree,$node,$id);
+            iter.collect()
+        }
     };
 }
 

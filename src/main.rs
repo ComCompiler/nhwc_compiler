@@ -28,7 +28,7 @@ fn main() {
     // 此时 g 就是我们生成的petgraph 的ast 树
     let g = parse_as_ast_graph(code, true);
     // 生成 petgraph 图对应的 png 
-    generate_png_by_graph(&g,"graph2".to_string());  
+    generate_png_by_graph(&g,"graph".to_string());  
     //dfs遍历ast
     let mut v= find_dfs_ast(&g, 0,RULE_functionDefinition );
     for node in v{
@@ -46,7 +46,7 @@ mod tests{
 
     use clap::Parser;
     
-    use crate::{antlr_parser::cparser::RULE_functionDefinition, find, find_nodes, toolkit::{ast_node::find_dfs_ast, etc::read_file_content, gen_ast::parse_as_ast_graph}, Cli};
+    use crate::{antlr_parser::cparser::{RULE_compoundStatement, RULE_functionDefinition}, find, find_nodes, toolkit::{ast_node::find_dfs_ast, etc::read_file_content, gen_ast::parse_as_ast_graph}, Cli};
 
     #[test]
     fn add(){
@@ -66,24 +66,26 @@ mod tests{
     }
 
     #[test]
-    fn find_compound_of_funcDef(){
+    fn find_compound_of_func_def(){
         let mut args = Cli::parse();
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demo.c").unwrap();
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
-        let ast_tree = parse_as_ast_graph(code, true);
+        let ref ast_tree = parse_as_ast_graph(code, true);
         //dfs遍历ast
-        let node_ids= find!(RULE_functionDefinition);
-        assert_eq!(node_ids , 3 ,"找到的 node id 不对");
+        let node = 3;
+        let node_id= find!(rule RULE_compoundStatement at node in ast_tree);
+        assert_eq!(node_id , 10 ,"找到的 node id 不对");
     }
     fn find_items_of_itemlists_using_macro_find_nodes(){
         let mut args = Cli::parse();
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demo.c").unwrap();
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
-        let ast_tree = parse_as_ast_graph(code, true);
+        let ref ast_tree = parse_as_ast_graph(code, true);
         //dfs遍历ast
-        let node_ids:Vec<u32>= find_nodes!(RULE_functionDefinition);
-        assert_eq!(node_ids , vec![3,140] ,"找到的 node id 不对");
+        let node =11;
+        let node_ids:Vec<u32>= find_nodes!(rule RULE_functionDefinition at node in ast_tree );
+        assert_eq!(node_ids , vec![12,24,119] ,"找到的 node id 不对");
     }
 }
