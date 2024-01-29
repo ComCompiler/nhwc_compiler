@@ -86,7 +86,7 @@ mod tests{
         let ref ast_tree = parse_as_ast_graph(code, true);
         //dfs遍历ast
         let node =11;
-        let node_ids:Vec<u32>= find_nodes!(rule RULE_blockItem at node in ast_tree );
+        let node_ids:Vec<u32>= find_nodes!(rule RULE_blockItem at node in ast_tree);
         assert_eq!(node_ids , vec![119,24,12] ,"找到的 node id 不对");
 
     }
