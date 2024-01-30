@@ -25,6 +25,14 @@ impl Debug for AstNode{
 
 
 /// ? 返回下一层找到的第一个rule_id符合的节点，使用这个宏的时候必须确保语境中有ast_tree,node
+/// ```rust    
+/// let node =3;  // 三号节点是一个 function def 
+///     let node =3;  // 三号节点是一个 function def 
+///     let node_ids= find!(rule RULE_compoundStatement 
+///                             finally RULE_blockItemList
+///                             at node in ast_tree).unwrap();
+/// assert_eq!(node_ids , vec![119,24,12] ,"找到的 node id 不对");
+/// ```
 #[macro_export] 
 macro_rules! find {
     (rule $id:ident at $node:ident in $ast_tree:ident) => {
@@ -43,11 +51,20 @@ macro_rules! find {
 }
 
 /// ? 返回下一层找到的第一个rule_id符合的节点，使用这个宏的时候必须确保语境中有ast_tree和node
+/// ```rust    
+/// let node =3;  // 三号节点是一个 function def 
+/// let node_ids:Vec<u32>= 
+/// find_nodes!(rule RULE_compoundStatement 
+///             then RULE_blockItemList
+///             finally RULE_blockItem
+///             at node in ast_tree);
+/// assert_eq!(node_ids , vec![119,24,12] ,"找到的 node id 不对");
+/// ```
 #[macro_export] 
 macro_rules! find_nodes {
     (rule $id:ident at $node:ident in $ast_tree:ident) => {
         {
-            let mut iter = crate::toolkit::ast_node::find_neighbors_ast($ast_tree,$node,$id);
+            let iter = crate::toolkit::ast_node::find_neighbors_ast($ast_tree,$node,$id);
             iter.collect()
         }
     };
@@ -61,7 +78,56 @@ macro_rules! find_nodes {
 
 }
 
+/// 这个宏返回指定节点下dfs的遍历筛选结果迭代器
+#[macro_export] 
+macro_rules! find_nodes_by_dfs {
+    (rule $id:ident at $node:ident in $ast_tree:ident) => {
+        {
+            let iter = crate::toolkit::ast_node::find_dfs_ast($ast_tree,$node,$id);
+            iter.collect()
+        }
+    };
+}
 
+/// 这个宏返回指定节点直接附属的节点，你必须保证这个节点下只有一个节点
+#[macro_export] 
+macro_rules! direct_node {
+    (at $node:ident in $graph:ident) => {
+        {
+            $graph.neighbors(NodeIndex::from($node)).next()
+            .expect(format!("no direct node of {:?} in {:?}",
+            $graph.node_weight(NodeIndex::from($node)),$graph).as_str()).index() as u32
+        }
+    };
+}
+
+#[macro_export] 
+macro_rules! node {
+    (at $node:ident in $graph:ident) => {
+        {
+            $graph.node_weight(NodeIndex::from($node)).expect("找不到 index 对应的 node ")
+        }
+    };
+}
+
+#[macro_export] 
+macro_rules! node_mut {
+    (at $node:ident in $graph:ident) => {
+        {
+            $graph.node_weight_mut(NodeIndex::from($node)).expect("找不到 index 对应的 node ")
+        }
+    };
+}
+
+/// 这个宏返回指定节点直接附属的节点，你必须保证这个节点下只有一个节点
+#[macro_export] 
+macro_rules! rule_id {
+    (at $node:ident in $ast_tree:ident) => {
+        {
+            node!(at $node in $ast_tree).rule_id
+        }
+    };
+}
 /// 返回 start 所有子节点以dfs序返回的特定rule_id 的迭代器
 pub fn find_dfs_ast<'a>(ast_tree:&'a AstTree,start:NodeIndex,target_rule_id: usize) -> impl Iterator<Item = u32> + 'a{
     // let ast_tree = &*ast_tree_rc.borrow();

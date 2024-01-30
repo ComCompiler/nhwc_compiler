@@ -5,16 +5,16 @@ use std::path::PathBuf;
 
 use antlr_parser::cparser::{RULE_compoundStatement, RULE_functionDefinition} ;
 use clap::Parser;
-use petgraph::{adj::NodeIndex, graph::Node,  visit::{Dfs, Walker}, Graph};
+use petgraph::{adj::NodeIndex, visit::Dfs};
 
 
-use crate::toolkit::{ast_node::find_dfs_ast, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_graph};
+use crate::toolkit::{cfg_node::parse_ast_to_cfg, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree};
 
 #[derive(Parser)]
 #[command(author, version, about)]
 struct Cli {
     ///设置文件地址
-    #[arg(short, long, value_name = "FILE",default_value = "./demo.c")]
+    #[arg(short, long, value_name = "FILE",default_value = "./demos/demo.c")]
     c_file_path: PathBuf
 }
 
@@ -27,15 +27,23 @@ fn main() {
     let args = Cli::parse();
     let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
     // 此时 g 就是我们生成的petgraph 的ast 树
-    let g = parse_as_ast_graph(code, true);
+    let ast_tree = parse_as_ast_tree(code, true);
     // 生成 petgraph 图对应的 png 
-    generate_png_by_graph(&g,"graph".to_string());  
-    //dfs遍历ast
-    let mut v= find_dfs_ast(&g, 0,RULE_functionDefinition );
-    for node in v{
-        println!("{}",node);
-        println!("{}",g.node_weight(NodeIndex::from(node)).unwrap().text);
+    let mut cfg = parse_ast_to_cfg(&ast_tree);
+
+    let mut dfs = Dfs::new(&cfg, NodeIndex::from(0));
+    while let Some(node) =  dfs.next(&cfg){
+        node_mut!(at node in cfg).get_ast_node_text(&ast_tree);
     }
+
+    generate_png_by_graph(&ast_tree,"ast_tree".to_string());  
+    generate_png_by_graph(&cfg,"cfg_graph".to_string());  
+    //dfs遍历ast
+    // // let mut v= find_dfs_ast(&g, 0,RULE_functionDefinition );
+    // // for node in v{
+    // //     println!("{}",node);
+    // //     println!("{}",g.node_weight(NodeIndex::from(node)).unwrap().text);
+    // }
 
     // test
     println!("Hello, world!");
