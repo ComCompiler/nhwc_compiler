@@ -138,18 +138,13 @@ pub fn find_branch(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_node:u32){
 }
 
 pub fn ast_to_cfg(ast_tree:&AstTree) {
-    //建立cfg图和总结点
-    let mut cfg_graph = CfgGraph::new();
-    let grand = CfgNode::Entry {  ast_node_idx: 0 };
-    let grand_node_idx = cfg_graph.add_node(grand);
-    let functionblock_nodes = find_function(&cfg_graph, ast_tree);
-
-    for functionblock_node in functionblock_nodes{
-        let enter = CfgNode::Entry { ast_node_idx: functionblock_node };
-        let entry_node_idx = cfg_graph.add_node(enter);
-        cfg_graph.add_edge(grand_node_idx, entry_node_idx,());
-    }
-    //拆分函数代码块中的语句，对于不同的astnode做成不同的cfgnode
-    
+    let functionblock= find_dfs_ast(ast_tree,0,RULE_functionDefinition);
+    for funblock in functionblock{
+        let compound = find_neighbors_ast(ast_tree,funblock,RULE_compoundStatement);
+    let blockitem = find_dfs_ast(ast_tree,find!(compound),RULE_blockItem);
+    for block in blockitem{
         
+    }
+    }
+
 }
