@@ -29,6 +29,7 @@ fn main() {
     // 此时 g 就是我们生成的petgraph 的ast 树
     let ast_tree = parse_as_ast_tree(code, true);
     // 生成 petgraph 图对应的 png 
+    generate_png_by_graph(&ast_tree,"ast_tree".to_string());  
     let mut cfg = parse_ast_to_cfg(&ast_tree);
 
     let mut dfs = Dfs::new(&cfg, NodeIndex::from(0));
@@ -36,7 +37,6 @@ fn main() {
         node_mut!(at node in cfg).get_ast_node_text(&ast_tree);
     }
 
-    generate_png_by_graph(&ast_tree,"ast_tree".to_string());  
     generate_png_by_graph(&cfg,"cfg_graph".to_string());  
     //dfs遍历ast
     // // let mut v= find_dfs_ast(&g, 0,RULE_functionDefinition );

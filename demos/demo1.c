@@ -14,4 +14,13 @@ int main()
 	return 0;
 }
 
+int f(){
+	int a = 3;
+	if(a<4){
+		if(a>0){
+			a--;
+		}
+	}
+}
+
 

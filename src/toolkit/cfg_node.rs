@@ -8,7 +8,7 @@ use petgraph::{Directed, Graph};
 use petgraph::graph::DiGraph;
 
 use crate::toolkit::ast_node::{AstNode,AstTree};
-use crate::{direct_node, find_nodes_by_dfs, node_mut, rule_id, RULE_compoundStatement, RULE_functionDefinition};
+use crate::{add_edge, add_node, direct_node, find_nodes_by_dfs, node_mut, rule_id, RULE_compoundStatement, RULE_functionDefinition};
 use crate::antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_declaration, RULE_expression, RULE_iterationStatement, RULE_selectionStatement, RULE_statement};
 use crate::{find,find_nodes,node};
 
@@ -117,13 +117,15 @@ pub fn process_statement(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_compo
 
 pub fn process_compound(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_compound_node:u32,cfg_head_node:u32, cfg_tail_node:u32){
     // 简单先插入一个 cfg basic block
-    let mut cfg_current_head_node = cfg_graph.add_node(CfgNode::BasicBlock{ ast_node_idxes:vec![], text: String::new() }).index() as u32;
-    cfg_graph.add_edge(NodeIndex::from(cfg_head_node),NodeIndex::from( cfg_current_head_node), ());
+    let bb_struct = CfgNode::BasicBlock{ ast_node_idxes:vec![], text: String::new() };
+    let mut cfg_current_head_node = add_node!(bb_struct to cfg_graph);
+    add_edge!(cfg_head_node to cfg_current_head_node in cfg_graph);
 
     //查找compoundstatement,下找blocklist以及blockitem
     let blockitemlist_node = find!(rule RULE_blockItemList at current_compound_node in ast_tree).unwrap();
     let blockitem_nodes: Vec<u32>= find_nodes!(rule RULE_blockItem at blockitemlist_node in ast_tree);
 
+    // 这里 rev 是因为 adj 只能返回  rev 的部分  
     for &blockitem_node in blockitem_nodes.iter().rev(){
         //blockitem有statement和declaration，前者为分支语句，后者为赋值语句，做成front_basicblock
         let declare_or_statement_node = direct_node!(at blockitem_node in ast_tree);
@@ -140,11 +142,13 @@ pub fn process_compound(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_compou
                     //循环分支
                     (RULE_iterationStatement, iter_node)=>{
                         //expression做成branch节点
-                        let cfg_branch_node = cfg_graph.add_node(CfgNode::Branch { ast_node_idx:iter_node, text: String::new() }).index() as u32;
-                        cfg_graph.add_edge(NodeIndex::from(cfg_current_head_node), NodeIndex::from(cfg_branch_node), ());
+                        let branch_struct = CfgNode::Branch { ast_node_idx:iter_node, text: String::new() };
+                        let cfg_branch_node = add_node!(branch_struct to cfg_graph);
+                        add_edge!(cfg_current_head_node to cfg_branch_node in cfg_graph);
                         // 转移head到一个新的basicblock,并与上面的 branch 进行连接
-                        cfg_current_head_node = cfg_graph.add_node(CfgNode::BasicBlock{ ast_node_idxes:vec![], text: String::new() }).index() as u32;
-                        cfg_graph.add_edge(NodeIndex::from(cfg_branch_node), NodeIndex::from(cfg_current_head_node), () );
+                        let bb_struct = CfgNode::BasicBlock{ ast_node_idxes:vec![], text: String::new() };
+                        cfg_current_head_node = add_node!(bb_struct to  cfg_graph);
+                        add_edge!(cfg_branch_node to cfg_current_head_node in cfg_graph);
                         
                         //循环中的statement做成behind_basicblock
                         let iter_statement_node= find!(rule RULE_statement at iter_node in ast_tree).unwrap();
@@ -162,22 +166,21 @@ pub fn process_compound(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_compou
                     (RULE_selectionStatement, selection_node)=>{
                         // 一个 seleciotn_node 一定有一个 expression 
                         let select_exprission_node = find!(rule RULE_expression at selection_node in ast_tree).unwrap();
-                        let cfg_branch_node = cfg_graph.add_node(
-                            CfgNode::Branch { ast_node_idx:select_exprission_node, text: String::new() }).index() as u32;
-                        let cfg_gather_node = cfg_graph.add_node(
-                            CfgNode::Gather {  } ).index() as u32;
+                        let branch_struct =CfgNode::Branch { ast_node_idx:select_exprission_node, text: String::new() };
+                        let cfg_branch_node = add_node!(branch_struct to cfg_graph);
 
+                        let gather_struct = CfgNode::Gather {  } ;
+                        let cfg_gather_node = add_node!(gather_struct to cfg_graph);
                         // 把head 转移到新的 branch node
-                        cfg_graph.add_edge(NodeIndex::from(cfg_current_head_node), 
-                                            NodeIndex::from(cfg_branch_node),  ());
+                        add_edge!(cfg_current_head_node to cfg_branch_node in cfg_graph);
                         // 转移head到一个新的BasicBlock，并且与上面的的 gather 连接
-                        cfg_current_head_node = cfg_graph.add_node(CfgNode::BasicBlock{ ast_node_idxes:vec![], text: String::new() }).index() as u32;
-                        cfg_graph.add_edge(NodeIndex::from(cfg_gather_node), NodeIndex::from(cfg_current_head_node), () );
+                        let new_bb_struct = CfgNode::BasicBlock{ ast_node_idxes:vec![], text: String::new() };
+                        cfg_current_head_node = add_node!(new_bb_struct to cfg_graph);
+                        add_edge!(cfg_gather_node to cfg_current_head_node in cfg_graph);
 
                         let statement_nodes_of_selection:Vec<u32>= find_nodes!(rule RULE_statement at selection_node in ast_tree);
                         // 添加这条边是因为 if branch 总有 一条直接连向 gather 的边
-                        cfg_graph.add_edge(NodeIndex::from(cfg_branch_node), 
-                                            NodeIndex::from(cfg_gather_node),  ());
+                        add_edge!(cfg_branch_node to cfg_gather_node in cfg_graph);
                         for statement_node in statement_nodes_of_selection{
                             let which_statement_under = direct_node!(at statement_node in ast_tree);
                             match (rule_id!(at which_statement_under in ast_tree),which_statement_under) {
@@ -215,9 +218,11 @@ pub fn parse_ast_to_cfg(ast_tree:&AstTree) -> CfgGraph{
     // 为每一个function 创建一个共享的根节点
     let cfg_func_parent_node = cfg_graph.add_node(cfg_func_parent);
     for funcdef_node in funcdef_nodes{
-        let cfg_entry_node = cfg_graph.add_node(CfgNode::Entry { ast_node_idx:funcdef_node, text: String::new() }).index() as u32;
-        cfg_graph.add_edge(cfg_func_parent_node, NodeIndex::from(cfg_entry_node), ());
-        let cfg_exit_node = cfg_graph.add_node(CfgNode::Exit  { ast_node_idx:funcdef_node, text: String::new() }).index() as u32;
+        let entry_struct = CfgNode::Entry { ast_node_idx:funcdef_node, text: String::new() };
+        let cfg_entry_node = add_node!(entry_struct to cfg_graph);
+        add_edge!(cfg_func_parent_node to cfg_entry_node in cfg_graph);
+        let exit_struct = CfgNode::Exit  { ast_node_idx:funcdef_node, text: String::new() };
+        let cfg_exit_node = add_node!(exit_struct to cfg_graph);
 
         let current_compound_node = find!(rule RULE_compoundStatement at funcdef_node in ast_tree ).unwrap();
         process_compound(&mut cfg_graph, ast_tree, current_compound_node, cfg_entry_node, cfg_exit_node);

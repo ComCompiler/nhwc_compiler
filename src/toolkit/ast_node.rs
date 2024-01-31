@@ -100,6 +100,18 @@ macro_rules! direct_node {
         }
     };
 }
+#[macro_export] 
+macro_rules! add_edge {
+    ($a:ident to $b:ident in $graph:ident) => {
+        $graph.add_edge(NodeIndex::from($a), NodeIndex::from($b), () )
+    };
+}
+#[macro_export] 
+macro_rules! add_node {
+    ($node_struct:ident to $graph:ident) => {
+        $graph.add_node($node_struct ).index() as u32
+    };
+}
 
 #[macro_export] 
 macro_rules! node {
