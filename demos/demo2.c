@@ -1,18 +1,21 @@
-int main()
-{
-	int a = 2;
-	if (a<3)  a= 5;
-	return 0;
+int none(){
+
 }
 int kill()
+{
+	int a = 2;
+	if (a<3)  none();
+	return 0;
+}
+int main()
 {
 	int choice = 3;
 	switch (choice) {
         case 1:
-            printf("您选择了选项 1\n");
+            kill();
             break;
         case 2:
-            printf("您选择了选项 2\n");
+            none();
             break;
         case 3:
             printf("您选择了选项 3\n");
