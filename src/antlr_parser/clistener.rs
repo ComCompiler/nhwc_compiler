@@ -795,6 +795,36 @@ fn enter_iterationStatement(&mut self, _ctx: &IterationStatementContext<'input>)
  */
 fn exit_iterationStatement(&mut self, _ctx: &IterationStatementContext<'input>) { }
 /**
+ * Enter a parse tree produced by {@link CParser#forIterationStatement}.
+ * @param ctx the parse tree
+ */
+fn enter_forIterationStatement(&mut self, _ctx: &ForIterationStatementContext<'input>) { }
+/**
+ * Exit a parse tree produced by {@link CParser#forIterationStatement}.
+ * @param ctx the parse tree
+ */
+fn exit_forIterationStatement(&mut self, _ctx: &ForIterationStatementContext<'input>) { }
+/**
+ * Enter a parse tree produced by {@link CParser#whileIterationStatement}.
+ * @param ctx the parse tree
+ */
+fn enter_whileIterationStatement(&mut self, _ctx: &WhileIterationStatementContext<'input>) { }
+/**
+ * Exit a parse tree produced by {@link CParser#whileIterationStatement}.
+ * @param ctx the parse tree
+ */
+fn exit_whileIterationStatement(&mut self, _ctx: &WhileIterationStatementContext<'input>) { }
+/**
+ * Enter a parse tree produced by {@link CParser#doWhileIterationStatement}.
+ * @param ctx the parse tree
+ */
+fn enter_doWhileIterationStatement(&mut self, _ctx: &DoWhileIterationStatementContext<'input>) { }
+/**
+ * Exit a parse tree produced by {@link CParser#doWhileIterationStatement}.
+ * @param ctx the parse tree
+ */
+fn exit_doWhileIterationStatement(&mut self, _ctx: &DoWhileIterationStatementContext<'input>) { }
+/**
  * Enter a parse tree produced by {@link CParser#forCondition}.
  * @param ctx the parse tree
  */

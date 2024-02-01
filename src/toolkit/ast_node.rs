@@ -102,8 +102,11 @@ macro_rules! direct_node {
 }
 #[macro_export] 
 macro_rules! add_edge {
-    ($a:ident to $b:ident in $graph:ident) => {
-        $graph.add_edge(NodeIndex::from($a), NodeIndex::from($b), () )
+    ($edge_struct:expr , $a:ident to $b:ident in $cfg_graph:ident) => {
+        $cfg_graph.add_edge(NodeIndex::from($a), NodeIndex::from($b), $edge_struct ).index() as u32 
+    };
+    ($a:ident to $b:ident in $ast_tree:ident) => {
+        $ast_tree.add_edge(NodeIndex::from($a), NodeIndex::from($b),() ).index() as u32 
     };
 }
 #[macro_export] 

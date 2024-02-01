@@ -456,11 +456,18 @@ selectionStatement
     ;
 
 iterationStatement
-    :   While '(' expression ')' statement
-    |   Do statement While '(' expression ')' ';'
-    |   For '(' forCondition ')' statement
+    :   whileIterationStatement |   doWhileIterationStatement
+    |   forIterationStatement
     ;
-
+forIterationStatement
+    :   For '(' forCondition ')' statement
+    ;
+whileIterationStatement
+    :   While '(' expression ')' statement
+    ;
+doWhileIterationStatement
+    :   Do statement While '(' expression ')' ';'
+    ;
 //    |   'for' '(' expression? ';' expression?  ';' forUpdate? ')' statement
 //    |   For '(' declaration  expression? ';' expression? ')' statement
 
