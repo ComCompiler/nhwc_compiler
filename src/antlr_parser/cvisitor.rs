@@ -483,6 +483,24 @@ pub trait CVisitor<'input>: ParseTreeVisitor<'input,CParserContextType>{
 	fn visit_iterationStatement(&mut self, ctx: &IterationStatementContext<'input>) { self.visit_children(ctx) }
 
 	/**
+	 * Visit a parse tree produced by {@link CParser#forIterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	fn visit_forIterationStatement(&mut self, ctx: &ForIterationStatementContext<'input>) { self.visit_children(ctx) }
+
+	/**
+	 * Visit a parse tree produced by {@link CParser#whileIterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	fn visit_whileIterationStatement(&mut self, ctx: &WhileIterationStatementContext<'input>) { self.visit_children(ctx) }
+
+	/**
+	 * Visit a parse tree produced by {@link CParser#doWhileIterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	fn visit_doWhileIterationStatement(&mut self, ctx: &DoWhileIterationStatementContext<'input>) { self.visit_children(ctx) }
+
+	/**
 	 * Visit a parse tree produced by {@link CParser#forCondition}.
 	 * @param ctx the parse tree
 	 */
@@ -1172,6 +1190,30 @@ pub trait CVisitorCompat<'input>:ParseTreeVisitorCompat<'input, Node= CParserCon
 		}
 
 	/**
+	 * Visit a parse tree produced by {@link CParser#forIterationStatement}.
+	 * @param ctx the parse tree
+	 */
+		fn visit_forIterationStatement(&mut self, ctx: &ForIterationStatementContext<'input>) -> Self::Return {
+			self.visit_children(ctx)
+		}
+
+	/**
+	 * Visit a parse tree produced by {@link CParser#whileIterationStatement}.
+	 * @param ctx the parse tree
+	 */
+		fn visit_whileIterationStatement(&mut self, ctx: &WhileIterationStatementContext<'input>) -> Self::Return {
+			self.visit_children(ctx)
+		}
+
+	/**
+	 * Visit a parse tree produced by {@link CParser#doWhileIterationStatement}.
+	 * @param ctx the parse tree
+	 */
+		fn visit_doWhileIterationStatement(&mut self, ctx: &DoWhileIterationStatementContext<'input>) -> Self::Return {
+			self.visit_children(ctx)
+		}
+
+	/**
 	 * Visit a parse tree produced by {@link CParser#forCondition}.
 	 * @param ctx the parse tree
 	 */
@@ -1641,6 +1683,21 @@ where
 
 	fn visit_iterationStatement(&mut self, ctx: &IterationStatementContext<'input>){
 		let result = <Self as CVisitorCompat>::visit_iterationStatement(self, ctx);
+        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
+	}
+
+	fn visit_forIterationStatement(&mut self, ctx: &ForIterationStatementContext<'input>){
+		let result = <Self as CVisitorCompat>::visit_forIterationStatement(self, ctx);
+        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
+	}
+
+	fn visit_whileIterationStatement(&mut self, ctx: &WhileIterationStatementContext<'input>){
+		let result = <Self as CVisitorCompat>::visit_whileIterationStatement(self, ctx);
+        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
+	}
+
+	fn visit_doWhileIterationStatement(&mut self, ctx: &DoWhileIterationStatementContext<'input>){
+		let result = <Self as CVisitorCompat>::visit_doWhileIterationStatement(self, ctx);
         *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
 	}
 

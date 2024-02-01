@@ -44,8 +44,11 @@ pub enum CfgNode {
 
     }
 }
-impl CfgNode {
-    pub fn get_ast_node_text(&mut self,ast_tree : &Graph<AstNode,(),Directed>) -> &str{
+pub trait GetText{
+    fn get_ast_node_text(&mut self,ast_tree : &Graph<AstNode,(),Directed>)->&str;
+}
+impl GetText for CfgNode {
+    fn get_ast_node_text(&mut self,ast_tree : &Graph<AstNode,(),Directed>) -> &str{
         match self {
             CfgNode::Entry {  ast_node, text, calls_in_func:_  } => {
                 if !text.is_empty(){
@@ -154,7 +157,7 @@ pub fn process_compound(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_compou
                         // 转移head到一个新的basicblock,并与上面的 branch 进行连接
                         let bb_struct = CfgNode::BasicBlock{ ast_nodes:vec![], text: String::new() };
                         cfg_current_head_node = add_node!(bb_struct to  cfg_graph);
-                        add_edge!( CfgEdge::Conditioned { ast_node: find!(rule ) },cfg_branch_node to cfg_current_head_node in cfg_graph);
+                        add_edge!( CfgEdge::Direct{},cfg_branch_node to cfg_current_head_node in cfg_graph);
                         
                         //循环中的statement做成behind_basicblock
                         let iter_statement_node= find!(rule RULE_statement at iter_node in ast_tree).unwrap();
