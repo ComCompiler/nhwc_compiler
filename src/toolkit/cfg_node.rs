@@ -104,8 +104,8 @@ impl Debug for CfgNode{
                 write!(f,"{} {} \n{}","Branch",ast_node_idx, text),
             CfgNode::Gather {  } =>
                 write!(f,"{} ","Gather"),
-            CfgNode::BasicBlock { ast_node_idxes, text } => 
-                write!(f,"{} {}","BasicBlock",text),
+            CfgNode::BasicBlock { ast_node_idxes,text } => 
+                write!(f,"{} {:?} \n{}","BasicBlock",ast_node_idxes,text),
             CfgNode::FuncParent {  } => write!(f,"{}","root",),
         }
     }
@@ -229,3 +229,4 @@ pub fn parse_ast_to_cfg(ast_tree:&AstTree) -> CfgGraph{
     }
     cfg_graph
 }
+
