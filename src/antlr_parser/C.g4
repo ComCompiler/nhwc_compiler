@@ -451,10 +451,16 @@ expressionStatement
     ;
 
 selectionStatement
-    :   'if' '(' expression ')' statement ('else' statement)?
-    |   'switch' '(' expression ')' statement
+    :   ifSelection
+    |   switchSelection
     ;
 
+ifSelection
+    :   'if' '(' expression ')' statement ('else' statement)?
+    ;
+switchSelection
+    :   'switch' '(' expression ')' statement
+    ;
 iterationStatement
     :   whileIterationStatement |   doWhileIterationStatement
     |   forIterationStatement

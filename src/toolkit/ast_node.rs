@@ -40,12 +40,22 @@ macro_rules! find {
             let mut iter  = crate::toolkit::ast_node::find_neighbors_ast($ast_tree,$node,$id);
             iter.next()
         }
-    };
+    } ;
     (rule $($id:ident)then+ finally $fin_id:ident at $node:ident in $ast_tree:ident) => {
         {
             let new_node = $node;
             $(let new_node = find!(rule $id at new_node in $ast_tree).unwrap();)+
             find!(rule $fin_id at new_node in $ast_tree)
+        }
+    };
+    (symbol $symbol_name:ident at $scope_depth:ident  in $symtab:ident) => {
+        {
+            $symtab.get_verbose($symbol_name , $scope_depth)
+        }
+    };
+    (field $field_id:ident in $symbol:ident) => {
+        {
+            $symbol.get_field($ident)
         }
     }
 }
@@ -102,7 +112,7 @@ macro_rules! direct_node {
 }
 #[macro_export] 
 macro_rules! add_edge {
-    ($edge_struct:expr , $a:ident to $b:ident in $cfg_graph:ident) => {
+    ($edge_struct:block from  $a:ident to $b:ident in $cfg_graph:ident) => {
         $cfg_graph.add_edge(NodeIndex::from($a), NodeIndex::from($b), $edge_struct ).index() as u32 
     };
     ($a:ident to $b:ident in $ast_tree:ident) => {

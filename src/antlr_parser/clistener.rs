@@ -785,6 +785,26 @@ fn enter_selectionStatement(&mut self, _ctx: &SelectionStatementContext<'input>)
  */
 fn exit_selectionStatement(&mut self, _ctx: &SelectionStatementContext<'input>) { }
 /**
+ * Enter a parse tree produced by {@link CParser#ifSelection}.
+ * @param ctx the parse tree
+ */
+fn enter_ifSelection(&mut self, _ctx: &IfSelectionContext<'input>) { }
+/**
+ * Exit a parse tree produced by {@link CParser#ifSelection}.
+ * @param ctx the parse tree
+ */
+fn exit_ifSelection(&mut self, _ctx: &IfSelectionContext<'input>) { }
+/**
+ * Enter a parse tree produced by {@link CParser#switchSelection}.
+ * @param ctx the parse tree
+ */
+fn enter_switchSelection(&mut self, _ctx: &SwitchSelectionContext<'input>) { }
+/**
+ * Exit a parse tree produced by {@link CParser#switchSelection}.
+ * @param ctx the parse tree
+ */
+fn exit_switchSelection(&mut self, _ctx: &SwitchSelectionContext<'input>) { }
+/**
  * Enter a parse tree produced by {@link CParser#iterationStatement}.
  * @param ctx the parse tree
  */
