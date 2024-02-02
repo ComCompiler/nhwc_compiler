@@ -123,7 +123,7 @@ impl Debug for CfgNode{
 }
 
 ///处理循环过程的cfg节点处理和连接，返回branch和statement的idx
-pub fn process_iterator(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_iteration_node:u32,cfg_head_node:u32) -> u32{
+pub fn process_iterator(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_iteration_node:u32,cfg_head_node:u32){
     //处理branch的构造
     let which_iteration_node = direct_node!(at current_iteration_node in ast_tree);
     match(rule_id!(at which_iteration_node in ast_tree),which_iteration_node){
@@ -186,11 +186,23 @@ pub fn process_iterator(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_iterat
             }
         }
     }
-    statement_node
 }
 
 ///处理选择分支节点，内部区分if，switch
-pub fn process_selection(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_selection_node:u32,cfg_head_node:u32) => u32{
+pub fn process_selection(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_selection_node:u32,cfg_head_node:u32) {
+    let which_select_node = direct_node!(at current_selection_node in ast_tree);
+    match(rule_id!(at which_select_node in ast_tree),which_selection_node){
+        (RULE_ifselectionStatement,if_node) => {
+            let expression_node = find!(rule RULE_expression at which_select_node in ast_tree);
+            let branch_struct = CfgNode::Branch { ast_node:expression_node, text: String::new() };
+            let cfg_branch_node = add_node!(branch_struct to cfg_graph);
+            add_edge!(CfgEdge::Direct {},cfg_head_node to cfg_branch_node in cfg_graph);
+        }
+        (RULE_switchselectionStatement,switch_node) => {
+
+        }
+    }
+
     // 一个 seleciotn_node 一定有一个 expression 
     let select_exprission_node = find!(rule RULE_expression at selection_node in ast_tree).unwrap();
     let branch_struct =CfgNode::Branch { ast_node:select_exprission_node, text: String::new() };
