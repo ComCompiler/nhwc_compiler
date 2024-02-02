@@ -5,7 +5,7 @@ mod tests{
 
     use clap::Parser;
     
-    use crate::{antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_functionDefinition}, find, find_nodes, toolkit::{ast_node::find_dfs_ast, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree}, Cli};
+    use crate::{antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_functionDefinition}, find, find_nodes, toolkit::{ast_node::find_dfs_ast, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, symbol_field::SymbolField, symbol_table::{Symbol, SymbolBehavior, SymbolIndex, SymbolTable}}, Cli};
 
     #[test]
     fn add(){
@@ -92,5 +92,56 @@ mod tests{
         assert_eq!(node_ids , 11 ,"找到的 node id 不对");
 
 
+    }
+    #[test]
+    fn find_symbol(){
+        let mut symtab = SymbolTable::new();
+
+        let x_symbol_index = symtab.add(Symbol::new(0, "x".to_string()) );
+        let y_symbol_index = symtab.add(Symbol::new(0, "y".to_string()) );
+
+        match symtab.get_verbose("x".to_string(), 0){
+            Some(_) => {println!("找到了符号 x")},
+            None => {panic!( "没有找到符号 x ");},
+        }
+        match symtab.get_verbose("y".to_string(), 0){
+            Some(_) => {println!("找到了符号 y")},
+            None => {panic!( "没有找到符号 y ");},
+        }
+        match symtab.get_verbose("z".to_string(), 0){
+            Some(_) => {panic!("找到了符号 y")},
+            None => {println!( "没有找到符号 y ");},
+        }
+        println!("{:?}" , symtab)
+    }
+    #[test]
+    fn find_symbol_field(){
+        let field_name = "type";
+        let mut symtab = SymbolTable::new();
+
+        let x_symbol_index = symtab.add(Symbol::new(0, "x".to_string()) );
+        let y_symbol_index = symtab.add(Symbol::new(0, "y".to_string()) );
+
+        match symtab.get(&x_symbol_index){
+            Some(_) => {println!("找到了符号 x")},
+            None => {panic!( "没有找到符号 x ");},
+        }
+
+        println!("{:?}" , symtab)
+    }
+
+    #[test]
+    fn find_symbol_macro_test(){
+        let field_name = "type";
+        let mut symtab = SymbolTable::new();
+
+        let x_symbol_index = symtab.add(Symbol::new(0, "x".to_string()) );
+        let y_symbol_index = symtab.add(Symbol::new(0, "y".to_string()) );
+
+        match symtab.get_verbose("x".to_string(), 0){
+            Some(_) => {println!("找到了符号 x")},
+            None => {panic!( "没有找到符号 x ");},
+        }
+        println!("{:?}" ,symtab)
     }
 }
