@@ -477,6 +477,18 @@ pub trait CVisitor<'input>: ParseTreeVisitor<'input,CParserContextType>{
 	fn visit_selectionStatement(&mut self, ctx: &SelectionStatementContext<'input>) { self.visit_children(ctx) }
 
 	/**
+	 * Visit a parse tree produced by {@link CParser#ifSelection}.
+	 * @param ctx the parse tree
+	 */
+	fn visit_ifSelection(&mut self, ctx: &IfSelectionContext<'input>) { self.visit_children(ctx) }
+
+	/**
+	 * Visit a parse tree produced by {@link CParser#switchSelection}.
+	 * @param ctx the parse tree
+	 */
+	fn visit_switchSelection(&mut self, ctx: &SwitchSelectionContext<'input>) { self.visit_children(ctx) }
+
+	/**
 	 * Visit a parse tree produced by {@link CParser#iterationStatement}.
 	 * @param ctx the parse tree
 	 */
@@ -1182,6 +1194,22 @@ pub trait CVisitorCompat<'input>:ParseTreeVisitorCompat<'input, Node= CParserCon
 		}
 
 	/**
+	 * Visit a parse tree produced by {@link CParser#ifSelection}.
+	 * @param ctx the parse tree
+	 */
+		fn visit_ifSelection(&mut self, ctx: &IfSelectionContext<'input>) -> Self::Return {
+			self.visit_children(ctx)
+		}
+
+	/**
+	 * Visit a parse tree produced by {@link CParser#switchSelection}.
+	 * @param ctx the parse tree
+	 */
+		fn visit_switchSelection(&mut self, ctx: &SwitchSelectionContext<'input>) -> Self::Return {
+			self.visit_children(ctx)
+		}
+
+	/**
 	 * Visit a parse tree produced by {@link CParser#iterationStatement}.
 	 * @param ctx the parse tree
 	 */
@@ -1678,6 +1706,16 @@ where
 
 	fn visit_selectionStatement(&mut self, ctx: &SelectionStatementContext<'input>){
 		let result = <Self as CVisitorCompat>::visit_selectionStatement(self, ctx);
+        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
+	}
+
+	fn visit_ifSelection(&mut self, ctx: &IfSelectionContext<'input>){
+		let result = <Self as CVisitorCompat>::visit_ifSelection(self, ctx);
+        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
+	}
+
+	fn visit_switchSelection(&mut self, ctx: &SwitchSelectionContext<'input>){
+		let result = <Self as CVisitorCompat>::visit_switchSelection(self, ctx);
         *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
 	}
 

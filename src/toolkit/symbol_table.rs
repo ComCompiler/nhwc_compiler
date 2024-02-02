@@ -62,28 +62,28 @@ impl SymbolTable {
 
 #[derive(Debug)]
 pub struct Symbol{
-    fields :  HashMap<&'static str,SymbolField>,
+    fields :  HashMap<&'static str,Box<dyn SymbolField>>,
     scope_depth :i32 ,
     symbol_name : String
 }
 pub trait SymbolBehavior{
-    fn add_field(&mut self,key :&'static str,sf:SymbolField);
+    fn add_field(&mut self,key :&'static str,sf:Box<dyn SymbolField>);
     fn remove_field(&mut self, field_name : &'static str);
-    fn get_field(&self,key: &str) -> Option<&SymbolField>;
-    fn get_mut_field(&mut self,key: &str) -> Option<&mut SymbolField>;
+    fn get_field(&self,key: &str) -> Option<&Box<dyn SymbolField>>;
+    fn get_mut_field(&mut self,key: &str) -> Option<&mut Box< dyn SymbolField>>;
         
 }
 impl SymbolBehavior for Symbol{
-    fn add_field(&mut self,key :&'static str,sf:SymbolField) {
+    fn add_field(&mut self,key :&'static str,sf:Box<dyn SymbolField>) {
         self.fields.insert(key, sf);
     }
-    fn get_field(&self,key: &str) -> Option<&SymbolField> {
+    fn get_field(&self,key: &str) -> Option<&Box<dyn SymbolField>> {
         self.fields.get(key)
     }
     fn remove_field(&mut self, field_name : &'static str) {
         self.fields.remove(field_name);
     }
-    fn get_mut_field(&mut self,key: &str) -> Option<&mut SymbolField> {
+    fn get_mut_field(&mut self,key: &str) -> Option<&mut Box< dyn SymbolField>> {
         self.fields.get_mut(key)
     }
 }
