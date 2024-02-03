@@ -885,6 +885,36 @@ fn enter_jumpStatement(&mut self, _ctx: &JumpStatementContext<'input>) { }
  */
 fn exit_jumpStatement(&mut self, _ctx: &JumpStatementContext<'input>) { }
 /**
+ * Enter a parse tree produced by {@link CParser#continueStatement}.
+ * @param ctx the parse tree
+ */
+fn enter_continueStatement(&mut self, _ctx: &ContinueStatementContext<'input>) { }
+/**
+ * Exit a parse tree produced by {@link CParser#continueStatement}.
+ * @param ctx the parse tree
+ */
+fn exit_continueStatement(&mut self, _ctx: &ContinueStatementContext<'input>) { }
+/**
+ * Enter a parse tree produced by {@link CParser#breakStatement}.
+ * @param ctx the parse tree
+ */
+fn enter_breakStatement(&mut self, _ctx: &BreakStatementContext<'input>) { }
+/**
+ * Exit a parse tree produced by {@link CParser#breakStatement}.
+ * @param ctx the parse tree
+ */
+fn exit_breakStatement(&mut self, _ctx: &BreakStatementContext<'input>) { }
+/**
+ * Enter a parse tree produced by {@link CParser#returnStatement}.
+ * @param ctx the parse tree
+ */
+fn enter_returnStatement(&mut self, _ctx: &ReturnStatementContext<'input>) { }
+/**
+ * Exit a parse tree produced by {@link CParser#returnStatement}.
+ * @param ctx the parse tree
+ */
+fn exit_returnStatement(&mut self, _ctx: &ReturnStatementContext<'input>) { }
+/**
  * Enter a parse tree produced by {@link CParser#compilationUnit}.
  * @param ctx the parse tree
  */

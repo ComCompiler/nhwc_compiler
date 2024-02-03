@@ -140,12 +140,12 @@ mod tests{
         let x_symbol_index = symtab.add(Symbol::new(0, "x".to_string()) );
         let y_symbol_index = symtab.add(Symbol::new(0, "y".to_string()) );
 
-        let x =match symtab.get_verbose("x".to_string(), 0){
+        let x =match symtab.get_mut_verbose("x".to_string(), 0){
             Some(x) => {println!("找到了符号 x"); x},
             None => {panic!( "没有找到符号 x ");},
         };
-        println!("{:?}" ,symtab);
         x.add_field("text", Box::new(DataType::I32));
+        println!("{:?}" ,symtab);
         
         
         

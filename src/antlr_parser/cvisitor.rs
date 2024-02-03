@@ -537,6 +537,24 @@ pub trait CVisitor<'input>: ParseTreeVisitor<'input,CParserContextType>{
 	fn visit_jumpStatement(&mut self, ctx: &JumpStatementContext<'input>) { self.visit_children(ctx) }
 
 	/**
+	 * Visit a parse tree produced by {@link CParser#continueStatement}.
+	 * @param ctx the parse tree
+	 */
+	fn visit_continueStatement(&mut self, ctx: &ContinueStatementContext<'input>) { self.visit_children(ctx) }
+
+	/**
+	 * Visit a parse tree produced by {@link CParser#breakStatement}.
+	 * @param ctx the parse tree
+	 */
+	fn visit_breakStatement(&mut self, ctx: &BreakStatementContext<'input>) { self.visit_children(ctx) }
+
+	/**
+	 * Visit a parse tree produced by {@link CParser#returnStatement}.
+	 * @param ctx the parse tree
+	 */
+	fn visit_returnStatement(&mut self, ctx: &ReturnStatementContext<'input>) { self.visit_children(ctx) }
+
+	/**
 	 * Visit a parse tree produced by {@link CParser#compilationUnit}.
 	 * @param ctx the parse tree
 	 */
@@ -1274,6 +1292,30 @@ pub trait CVisitorCompat<'input>:ParseTreeVisitorCompat<'input, Node= CParserCon
 		}
 
 	/**
+	 * Visit a parse tree produced by {@link CParser#continueStatement}.
+	 * @param ctx the parse tree
+	 */
+		fn visit_continueStatement(&mut self, ctx: &ContinueStatementContext<'input>) -> Self::Return {
+			self.visit_children(ctx)
+		}
+
+	/**
+	 * Visit a parse tree produced by {@link CParser#breakStatement}.
+	 * @param ctx the parse tree
+	 */
+		fn visit_breakStatement(&mut self, ctx: &BreakStatementContext<'input>) -> Self::Return {
+			self.visit_children(ctx)
+		}
+
+	/**
+	 * Visit a parse tree produced by {@link CParser#returnStatement}.
+	 * @param ctx the parse tree
+	 */
+		fn visit_returnStatement(&mut self, ctx: &ReturnStatementContext<'input>) -> Self::Return {
+			self.visit_children(ctx)
+		}
+
+	/**
 	 * Visit a parse tree produced by {@link CParser#compilationUnit}.
 	 * @param ctx the parse tree
 	 */
@@ -1756,6 +1798,21 @@ where
 
 	fn visit_jumpStatement(&mut self, ctx: &JumpStatementContext<'input>){
 		let result = <Self as CVisitorCompat>::visit_jumpStatement(self, ctx);
+        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
+	}
+
+	fn visit_continueStatement(&mut self, ctx: &ContinueStatementContext<'input>){
+		let result = <Self as CVisitorCompat>::visit_continueStatement(self, ctx);
+        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
+	}
+
+	fn visit_breakStatement(&mut self, ctx: &BreakStatementContext<'input>){
+		let result = <Self as CVisitorCompat>::visit_breakStatement(self, ctx);
+        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
+	}
+
+	fn visit_returnStatement(&mut self, ctx: &ReturnStatementContext<'input>){
+		let result = <Self as CVisitorCompat>::visit_returnStatement(self, ctx);
         *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
 	}
 

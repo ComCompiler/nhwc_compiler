@@ -490,13 +490,25 @@ forExpression
     ;
 
 jumpStatement
-    :   ('goto' Identifier
-    |   'continue'
-    |   'break'
-    |   'return' expression?
-    |   'goto' unaryExpression // GCC extension
-    )
+    // :   ('goto' Identifier
+    :   continueStatement
+    |   breakStatement
+    |   returnStatement
+    // |   'goto' unaryExpression // GCC extension
+    // )
     ';'
+    ;
+
+continueStatement
+    :   'continue' ';'
+    ;
+
+breakStatement
+    :   'continue' ';'
+    ;
+
+returnStatement
+    :   'return' expression? ';'
     ;
 
 compilationUnit
