@@ -1,12 +1,7 @@
 int main()
 {
-	int i, sum ;//= 0;
-
-	for ( i = 1; i <= Last; i++ ) {
-	  sum += i;
-	} /*-for-*/
-	//printf("sum = %d\n", sum);
-
+	int i =0;
+	if(i>=0) while(...)
 	return 0;
 }
 

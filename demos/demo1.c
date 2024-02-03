@@ -9,10 +9,10 @@ int main()
 	if(i>0){
 		i=i+2;
 	}
-	else{
-		int sum = i+j;
-	}
-	return 0;
+	// else{
+	// 	int sum = i+j;
+	// }
+	// return 0;
 }
 
 int f(){
