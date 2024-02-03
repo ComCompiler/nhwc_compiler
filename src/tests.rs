@@ -4,8 +4,10 @@ mod tests{
     use std::{path::PathBuf, str::FromStr, vec};
 
     use clap::Parser;
+    use petgraph::visit::Data;
     
-    use crate::{antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_functionDefinition}, find, find_nodes, toolkit::{ast_node::find_dfs_ast, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, symbol_field::SymbolField, symbol_table::{Symbol, SymbolBehavior, SymbolIndex, SymbolTable}}, Cli};
+    
+    use crate::{antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_functionDefinition}, find, find_nodes, toolkit::{ast_node::find_dfs_ast, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, symbol_field::{DataType, SymbolField}, symbol_table::{Symbol, SymbolBehavior, SymbolIndex, SymbolTable}}, Cli};
 
     #[test]
     fn add(){
@@ -138,10 +140,14 @@ mod tests{
         let x_symbol_index = symtab.add(Symbol::new(0, "x".to_string()) );
         let y_symbol_index = symtab.add(Symbol::new(0, "y".to_string()) );
 
-        match symtab.get_verbose("x".to_string(), 0){
-            Some(_) => {println!("找到了符号 x")},
+        let x =match symtab.get_verbose("x".to_string(), 0){
+            Some(x) => {println!("找到了符号 x"); x},
             None => {panic!( "没有找到符号 x ");},
-        }
-        println!("{:?}" ,symtab)
+        };
+        println!("{:?}" ,symtab);
+        x.add_field("text", Box::new(DataType::I32));
+        
+        
+        
     }
 }

@@ -37,7 +37,7 @@ pub enum CfgNode {
 
     },
     BasicBlock{
-        pub ast_nodes: Vec<u32>,
+        ast_nodes: Vec<u32>,
         text: String,
     },
     FuncParent{
@@ -123,7 +123,7 @@ impl Debug for CfgNode{
 }
 
 ///处理循环过程的cfg节点处理和连接，返回branch和statement的idx
-pub fn process_iterator(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_iteration_node:u32,cfg_head_node:u32) -> u32{
+pub fn process_iterator(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_iteration_node:u32,cfg_head_node:u32) {
     //处理branch的构造
     let which_iteration_node = direct_node!(at current_iteration_node in ast_tree);
     match(rule_id!(at which_iteration_node in ast_tree),which_iteration_node){
@@ -132,7 +132,7 @@ pub fn process_iterator(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_iterat
             let expression_node = find!(rule RULE_expression at which_iteration_node in ast_tree).unwrap();
             let branch_struct = CfgNode::Branch { ast_node:expression_node, text: String::new() };
             let cfg_branch_node = add_node!(branch_struct to cfg_graph);
-            add_edge!(CfgEdge::Direct {},cfg_head_node to cfg_branch_node in cfg_graph);
+            add_edge!({CfgEdge::Direct {}} from cfg_head_node to cfg_branch_node in cfg_graph);
 
             //做一个branch下面的basicblock
             let statement_node = find!(rule RULE_statement at which_iteration_node in ast_tree).unwrap();
@@ -145,8 +145,8 @@ pub fn process_iterator(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_iterat
                 (RULE_expression) => {
                     let bb_struct = CfgNode::BasicBlock{ ast_nodes:vec![statement_node], text: String::new() };
                     let mut cfg_basicblock_node = add_node!(bb_struct to cfg_graph);
-                    add_edge!(CfgEdge::Direct {},cfg_branch_node to bb_struct in cfg_graph);
-                    add_edge!(CfgEdge::Direct {},bb_struct to cfg_branch_node in cfg_graph);
+                    add_edge!( {CfgEdge::Direct {}} from cfg_branch_node to cfg_basicblock_node in cfg_graph);
+                    add_edge!( {CfgEdge::Direct {}} from cfg_basicblock_node to cfg_branch_node in cfg_graph);
                 }
                 (RULE_iterationStatement) => {
                     let inside_iter = process_iterator(cfg_graph, ast_tree,next_blocknode, cfg_head_node);
@@ -161,7 +161,7 @@ pub fn process_iterator(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_iterat
             let condition_node = find!(rule RULE_forCondition at which_iteration_node in ast_tree).unwrap();
             let branch_struct = CfgNode::Branch { ast_node:condition_node, text: String::new() };
             let cfg_branch_node = add_node!(branch_struct to cfg_graph);
-            add_edge!(CfgEdge::Direct {},cfg_head_node to cfg_branch_node in cfg_graph);
+            add_edge!({CfgEdge::Direct {}} from cfg_head_node to cfg_branch_node in cfg_graph);
 
             //做一个branch下面的basicblock
             let statement_node = find!(rule RULE_statement at which_iteration_node in ast_tree).unwrap();
@@ -174,8 +174,8 @@ pub fn process_iterator(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_iterat
                 (RULE_expression,expression_node) => {
                     let bb_struct = CfgNode::BasicBlock{ ast_nodes:vec![statement_node], text: String::new() };
                     let mut cfg_basicblock_node = add_node!(bb_struct to cfg_graph);
-                    add_edge!(CfgEdge::Direct {},cfg_branch_node to bb_struct in cfg_graph);
-                    add_edge!(CfgEdge::Direct {},bb_struct to cfg_branch_node in cfg_graph);
+                    add_edge!({CfgEdge::Direct {}} from cfg_branch_node to cfg_basicblock_node in cfg_graph);
+                    add_edge!({CfgEdge::Direct {}} from cfg_basicblock_node to cfg_branch_node in cfg_graph);
                 }
                 (RULE_iterationStatement,iteration_node) => {
                     let inside_iter = process_iterator(cfg_graph, ast_tree,next_blocknode, cfg_head_node);
@@ -186,7 +186,6 @@ pub fn process_iterator(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_iterat
             }
         }
     }
-    statement_node
 }
 
 ///处理选择分支节点，内部区分if，switch
@@ -200,7 +199,7 @@ pub fn process_selection(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_selec
     let gather_struct = CfgNode::Gather {  } ;
     let cfg_gather_node = add_node!(gather_struct to cfg_graph);
     // 把head 转移到新的 branch node
-    add_edge!(CfgEdge::Direct{},cfg_current_head_node to cfg_branch_node in cfg_graph);
+    add_edge!({CfgEdge::Direct{}} from cfg_current_head_node to cfg_branch_node in cfg_graph);
     // 转移head到一个新的BasicBlock，并且与上面的的 gather 连接
     let new_bb_struct = CfgNode::BasicBlock{ ast_nodes:vec![], text: String::new() };
     cfg_current_head_node = add_node!(new_bb_struct to cfg_graph);
@@ -251,7 +250,6 @@ pub fn process_compound(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_compou
                 match (rule_id!(at which_statement_node in ast_tree),which_statement_node){
                     //循环分支
                     (RULE_iterationStatement, iter_node)=>{
-<<<<<<< HEAD
                         //expression做成branch节点
                         let branch_struct = CfgNode::Branch { ast_node:iter_node, text: String::new() };
                         let cfg_branch_node = add_node!(branch_struct to cfg_graph);
@@ -272,30 +270,6 @@ pub fn process_compound(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_compou
                                 panic!("这个迭代分支里面的statement 不是compound statement,后面再处理这个")
                             }
                         }
-=======
-                        let ast_statement_idx = process_iterator(cfg_graph, ast_tree, which_statement_node, cfg_current_head_node);
-                        let next_blocknode = direct_node!(at ast_statement_idx in ast_tree);
-
-                             
->>>>>>> refs/remotes/origin/master
-                    }
-
-                    //选择分支
-
-
-                    //循环中的statement做成behind_basicblock
-                                let iter_statement_node= find!(rule RULE_statement at iter_node in ast_tree).unwrap();
-                                let which_statement_node = direct_node!(at iter_statement_node in ast_tree);
-                                match (rule_id!(at which_statement_node in ast_tree),which_statement_node) {
-                                    (RULE_compoundStatement, compound_statement_node)=> {
-                                        process_compound(cfg_graph,ast_tree,compound_statement_node,cfg_branch_node,cfg_branch_node);
-                                    }
-                                    _ =>{
-                                        panic!("这个迭代分支里面的statement 不是compound statement,后面再处理这个")
-                                    }
-                                }
-                            }
-                        };
                     }
                         
                     //选择分支

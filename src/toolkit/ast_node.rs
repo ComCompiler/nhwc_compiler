@@ -53,9 +53,30 @@ macro_rules! find {
             $symtab.get_verbose($symbol_name , $scope_depth)
         }
     };
-    (field $field_id:ident in $symbol:ident) => {
+    (field $field_id:ident as $field_type:ident in $symbol:ident) => {
         {
-            $symbol.get_field($ident)
+            {
+                let field = $symbol.get_field(stringify!($field_id)).unwrap();
+                match field.as_any().downcast_mut::<$field_type>(){
+                    Some(data_type) => {
+                        data_type
+                    },
+                    None => panic!(concat!("这个field ",stringify!(field_id), "不是",stringify!($field_type), "类型")),
+                }
+            }
+        }
+    };
+    (mut field $field_id:ident as $field_type:ident in $symbol:ident) => {
+        {
+            {
+                let field = $symbol.get_field_mut(stringify!($field_id)).unwrap();
+                match field.as_any().downcast_mut::<$field_type>(){
+                    Some(data_type) => {
+                        data_type
+                    },
+                    None => panic!(concat!("这个field ",stringify!(field_id), "不是",stringify!($field_type), "类型")),
+                }
+            }
         }
     }
 }
@@ -126,6 +147,7 @@ macro_rules! add_node {
     };
 }
 
+
 #[macro_export] 
 macro_rules! node {
     (at $node:ident in $graph:ident) => {
@@ -185,6 +207,5 @@ pub fn find_bfs_ast<'a>(ast_tree:&'a AstTree,start:NodeIndex,target_rule_id: usi
 pub fn find_neighbors_ast<'a>(ast_tree:&'a AstTree,start:NodeIndex,target_rule_id: usize) ->impl Iterator<Item = u32> + 'a {
     let ns = ast_tree.neighbors(NodeIndex::from(start));
     ns.map(|x| x.index() as u32).filter(move |x| ast_tree.node_weight(NodeIndex::from(*x)).unwrap().rule_id == target_rule_id )
-} 
-
+}
 
