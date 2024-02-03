@@ -5,3 +5,5 @@ pub mod symbol_field;
 pub mod symbol_table;
 pub mod etc;
 pub mod gen_ast;
+pub mod pass_manager;
+pub mod instruction;

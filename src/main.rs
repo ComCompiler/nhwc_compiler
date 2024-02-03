@@ -1,6 +1,7 @@
 mod toolkit;
 mod antlr_parser;
 mod tests;
+mod passes;
 use std::path::PathBuf;
 
 use antlr_parser::cparser::{RULE_compoundStatement, RULE_functionDefinition} ;

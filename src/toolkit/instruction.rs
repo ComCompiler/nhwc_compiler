@@ -1,4 +1,6 @@
-pub enum Instruction{
+use super::symbol_table::SymbolIndex;
+
+pub enum Op{
     Add{
         a : SymbolIndex ,
         b : SymbolIndex ,
@@ -17,7 +19,7 @@ pub enum Instruction{
     },
     Assign{
         a : SymbolIndex ,
-        b : Box<Instruction> ,
+        b : Box<Op> ,
     },
     Jump{
         des_label : u32 , // 这是 cfg blcok 的 索引
@@ -29,6 +31,9 @@ pub enum Instruction{
         t1 : u32 ,
         t2 : u32 ,
     },
+    Phi{
+        syms : Vec<SymbolIndex>
+    },
     Load{
         des: SymbolIndex, 
         src: SymbolIndex,
@@ -38,3 +43,9 @@ pub enum Instruction{
         src: SymbolIndex,
     }
 }
+
+struct Instruction{
+    
+
+}
+
