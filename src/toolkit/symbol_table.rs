@@ -89,7 +89,7 @@ impl SymbolBehavior for Symbol{
 }
 
 impl Symbol {
-    pub fn new( symbol_name: String, scope_depth:i32 ) -> Symbol{
+    pub fn new( scope_depth:i32 ,symbol_name: String) -> Symbol{
         Symbol{
             fields: HashMap::new(),
             symbol_name, 

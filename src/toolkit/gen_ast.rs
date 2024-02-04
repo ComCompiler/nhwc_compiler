@@ -8,7 +8,7 @@ use super::ast_node::AstTree;
 
 /// 把代码生成为AST树 code 为代码文本的字符串
 pub fn parse_as_ast_tree(code :String,debug_info:bool)-> AstTree{
-    let mut ast_tree: Graph<AstNode,(), petgraph::Directed> = Graph::new();
+    let mut ast_tree: AstTree= AstTree::new();
     // 由于 antlr 已经生成了一个 AST 树 但我们需要的是 petgraph 类型，因此我们需要重新遍历一次这个树，生成 petgraph的
     {
     let mut  count = 0 ;

@@ -525,10 +525,16 @@ pub trait CVisitor<'input>: ParseTreeVisitor<'input,CParserContextType>{
 	fn visit_forDeclaration(&mut self, ctx: &ForDeclarationContext<'input>) { self.visit_children(ctx) }
 
 	/**
-	 * Visit a parse tree produced by {@link CParser#forExpression}.
+	 * Visit a parse tree produced by {@link CParser#forEndExpression}.
 	 * @param ctx the parse tree
 	 */
-	fn visit_forExpression(&mut self, ctx: &ForExpressionContext<'input>) { self.visit_children(ctx) }
+	fn visit_forEndExpression(&mut self, ctx: &ForEndExpressionContext<'input>) { self.visit_children(ctx) }
+
+	/**
+	 * Visit a parse tree produced by {@link CParser#forMidExpression}.
+	 * @param ctx the parse tree
+	 */
+	fn visit_forMidExpression(&mut self, ctx: &ForMidExpressionContext<'input>) { self.visit_children(ctx) }
 
 	/**
 	 * Visit a parse tree produced by {@link CParser#jumpStatement}.
@@ -1276,10 +1282,18 @@ pub trait CVisitorCompat<'input>:ParseTreeVisitorCompat<'input, Node= CParserCon
 		}
 
 	/**
-	 * Visit a parse tree produced by {@link CParser#forExpression}.
+	 * Visit a parse tree produced by {@link CParser#forEndExpression}.
 	 * @param ctx the parse tree
 	 */
-		fn visit_forExpression(&mut self, ctx: &ForExpressionContext<'input>) -> Self::Return {
+		fn visit_forEndExpression(&mut self, ctx: &ForEndExpressionContext<'input>) -> Self::Return {
+			self.visit_children(ctx)
+		}
+
+	/**
+	 * Visit a parse tree produced by {@link CParser#forMidExpression}.
+	 * @param ctx the parse tree
+	 */
+		fn visit_forMidExpression(&mut self, ctx: &ForMidExpressionContext<'input>) -> Self::Return {
 			self.visit_children(ctx)
 		}
 
@@ -1791,8 +1805,13 @@ where
         *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
 	}
 
-	fn visit_forExpression(&mut self, ctx: &ForExpressionContext<'input>){
-		let result = <Self as CVisitorCompat>::visit_forExpression(self, ctx);
+	fn visit_forEndExpression(&mut self, ctx: &ForEndExpressionContext<'input>){
+		let result = <Self as CVisitorCompat>::visit_forEndExpression(self, ctx);
+        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
+	}
+
+	fn visit_forMidExpression(&mut self, ctx: &ForMidExpressionContext<'input>){
+		let result = <Self as CVisitorCompat>::visit_forMidExpression(self, ctx);
         *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
 	}
 

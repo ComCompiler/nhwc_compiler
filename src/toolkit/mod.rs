@@ -7,3 +7,4 @@ pub mod etc;
 pub mod gen_ast;
 pub mod pass_manager;
 pub mod instruction;
+pub mod scope_node;

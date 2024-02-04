@@ -1,10 +1,10 @@
 use std::fmt::Debug;
 
-use petgraph::{adj::NodeIndex, graph::DiGraph,  visit::Bfs};
+use petgraph::{adj::NodeIndex, graph::DiGraph, stable_graph::{StableDiGraph, StableGraph}, visit::Bfs};
 
 use crate::antlr_parser::cparser::ruleNames;
 use petgraph::visit::{Dfs, Walker};
-pub type AstTree = DiGraph<AstNode,(),u32>;
+pub type AstTree = StableDiGraph<AstNode,(),u32>;
 
 pub struct AstNode {
     pub rule_id : usize,
@@ -126,8 +126,17 @@ macro_rules! direct_node {
     (at $node:ident in $graph:ident) => {
         {
             $graph.neighbors(NodeIndex::from($node)).next()
-            .expect(format!("no direct node of {:?} in {:?}",
-            $graph.node_weight(NodeIndex::from($node)),$graph).as_str()).index() as u32
+            .expect(format!("no direct node of {:?} in {:?}", $graph.node_weight(NodeIndex::from($node)),$graph).as_str()).index() as u32
+        }
+    };
+}
+/// 这个宏返回指定节点的outgoing 边，你必须保证这个节点的出边只有一条
+#[macro_export] 
+macro_rules! direct_edge {
+    (at $node:ident in $graph:ident) => {
+        {
+            $graph.edges(NodeIndex::from($node)).next()
+            .expect(format!("no direct edge of {:?} in {:?}", $graph.node_weight(NodeIndex::from($node)),$graph).as_str()).index() as u32
         }
     };
 }

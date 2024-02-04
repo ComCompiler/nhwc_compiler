@@ -9,7 +9,7 @@ use clap::Parser;
 use petgraph::{adj::NodeIndex, visit::Dfs};
 
 
-use crate::toolkit::{cfg_node::{parse_ast_to_cfg, GetText}, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree};
+use crate::toolkit::{cfg_node::{parse_ast_to_cfg, CfgGraph, GetText}, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree};
 
 #[derive(Parser)]
 #[command(author, version, about)]
@@ -36,11 +36,11 @@ fn main() {
     let mut dfs = Dfs::new(&cfg, NodeIndex::from(0));
 
 
-    for cfg_edge_index in cfg.edge_indices()  {
-        cfg.edge_weight_mut(cfg_edge_index).unwrap().get_ast_node_text(&ast_tree);
+    for cfg_edge in cfg.edge_weights_mut()  {
+        cfg_edge.get_text();
     }
     while let Some(node) =  dfs.next(&cfg){
-        node_mut!(at node in cfg).get_ast_node_text(&ast_tree);
+        node_mut!(at node in cfg).load_ast_node_text(&ast_tree);
     }
 
     generate_png_by_graph(&cfg,"cfg_graph".to_string());  

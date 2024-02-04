@@ -434,11 +434,11 @@ labeledStatement
     ;
 
 compoundStatement
-    :   '{' blockItemList? '}'
+    :   '{' blockItemList '}'
     ;
 
 blockItemList
-    :   blockItem+
+    :   blockItem*
     ;
 
 blockItem
@@ -478,14 +478,17 @@ doWhileIterationStatement
 //    |   For '(' declaration  expression? ';' expression? ')' statement
 
 forCondition
-	:   (forDeclaration | expression?) ';' forExpression? ';' forExpression?
+	:   (forDeclaration | expression?) ';' forMidExpression? ';' forEndExpression?
 	;
 
 forDeclaration
     :   declarationSpecifiers initDeclaratorList?
     ;
 
-forExpression
+forEndExpression
+    :   assignmentExpression (',' assignmentExpression)*
+    ;
+forMidExpression
     :   assignmentExpression (',' assignmentExpression)*
     ;
 
@@ -496,7 +499,6 @@ jumpStatement
     |   returnStatement
     // |   'goto' unaryExpression // GCC extension
     // )
-    ';'
     ;
 
 continueStatement
@@ -504,7 +506,7 @@ continueStatement
     ;
 
 breakStatement
-    :   'continue' ';'
+    :   'break' ';'
     ;
 
 returnStatement

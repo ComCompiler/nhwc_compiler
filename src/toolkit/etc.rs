@@ -1,10 +1,12 @@
 use std::{fs::File, process::Command, fmt::Debug, env, io::{Write, Read}};
 
-use petgraph::{dot::{Dot, Config}, EdgeType, Graph};
+use petgraph::{dot::{Dot, Config}, stable_graph::{StableDiGraph, StableGraph}, EdgeType, Graph};
+
+use super::ast_node::AstTree;
 
 
 /// 生成树(可以是任何树)对应的png ，将此png 放在命令行*当前*目录下
-pub fn generate_png_by_graph<N:Debug,E:Debug,Ty :EdgeType>(g:&Graph<N,E,Ty>, name :String){
+pub fn generate_png_by_graph<N:Debug,E:Debug,Ty :EdgeType>(g:&StableGraph<N,E,Ty>, name :String){
     println!("current working dir is {:?}", env::current_dir());
     let png_name = name.clone()+ ".png";
     let dot_name = name+ ".dot";
