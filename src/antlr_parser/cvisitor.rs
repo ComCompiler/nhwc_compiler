@@ -525,10 +525,10 @@ pub trait CVisitor<'input>: ParseTreeVisitor<'input,CParserContextType>{
 	fn visit_forDeclaration(&mut self, ctx: &ForDeclarationContext<'input>) { self.visit_children(ctx) }
 
 	/**
-	 * Visit a parse tree produced by {@link CParser#forEndExpression}.
+	 * Visit a parse tree produced by {@link CParser#forAfterExpression}.
 	 * @param ctx the parse tree
 	 */
-	fn visit_forEndExpression(&mut self, ctx: &ForEndExpressionContext<'input>) { self.visit_children(ctx) }
+	fn visit_forAfterExpression(&mut self, ctx: &ForAfterExpressionContext<'input>) { self.visit_children(ctx) }
 
 	/**
 	 * Visit a parse tree produced by {@link CParser#forMidExpression}.
@@ -1282,10 +1282,10 @@ pub trait CVisitorCompat<'input>:ParseTreeVisitorCompat<'input, Node= CParserCon
 		}
 
 	/**
-	 * Visit a parse tree produced by {@link CParser#forEndExpression}.
+	 * Visit a parse tree produced by {@link CParser#forAfterExpression}.
 	 * @param ctx the parse tree
 	 */
-		fn visit_forEndExpression(&mut self, ctx: &ForEndExpressionContext<'input>) -> Self::Return {
+		fn visit_forAfterExpression(&mut self, ctx: &ForAfterExpressionContext<'input>) -> Self::Return {
 			self.visit_children(ctx)
 		}
 
@@ -1805,8 +1805,8 @@ where
         *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
 	}
 
-	fn visit_forEndExpression(&mut self, ctx: &ForEndExpressionContext<'input>){
-		let result = <Self as CVisitorCompat>::visit_forEndExpression(self, ctx);
+	fn visit_forAfterExpression(&mut self, ctx: &ForAfterExpressionContext<'input>){
+		let result = <Self as CVisitorCompat>::visit_forAfterExpression(self, ctx);
         *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
 	}
 

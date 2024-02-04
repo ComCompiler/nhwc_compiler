@@ -478,14 +478,14 @@ doWhileIterationStatement
 //    |   For '(' declaration  expression? ';' expression? ')' statement
 
 forCondition
-	:   (forDeclaration | expression?) ';' forMidExpression? ';' forEndExpression?
+	:   (forDeclaration | expression?) ';' forMidExpression? ';' forAfterExpression?
 	;
 
 forDeclaration
     :   declarationSpecifiers initDeclaratorList?
     ;
 
-forEndExpression
+forAfterExpression
     :   assignmentExpression (',' assignmentExpression)*
     ;
 forMidExpression

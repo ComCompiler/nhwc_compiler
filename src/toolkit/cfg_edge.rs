@@ -10,33 +10,44 @@ pub enum CfgEdge{
         ast_node: u32 ,
         text: String
     },
-    Else{
-
-    },
-    Direct{
-        
+    Else{ }, Direct{ },
+    After{
+        ast_node :u32 ,
+        text: String
     }
+
 }
 impl GetText for CfgEdge{
     fn get_text(&self)-> Option<&str> {
         match self {
-            CfgEdge::Conditioned { ast_node:ptr_ast_node, text } =>{ let  ast_node = * ptr_ast_node ;
+            CfgEdge::Conditioned { ast_node:ptr_ast_node, text } =>{ 
+                let  ast_node = * ptr_ast_node ;
                 Some(text.as_str())
             }
             CfgEdge::Else {  } => None,
             CfgEdge::Direct {  } => None,
+            CfgEdge::After { ast_node:ptr_ast_node, text } => { 
+                let  ast_node = * ptr_ast_node ;
+                Some(text.as_str())
+            }
         }
     }
 }
 impl CfgEdge{
-    fn load_ast_node_text(&mut self,ast_tree :&AstTree)->&str {
+    pub fn load_ast_node_text(&mut self,ast_tree :&AstTree)->&str {
         match self {
-            CfgEdge::Conditioned { ast_node:ptr_ast_node, text } =>{ let  ast_node = * ptr_ast_node ;
+            CfgEdge::Conditioned { ast_node:ptr_ast_node, text } =>{ 
+                let  ast_node = * ptr_ast_node ;
                 *text =node!(at ast_node in ast_tree).text.clone(); 
                 text.as_str()
             }
             CfgEdge::Else {  } => "",
             CfgEdge::Direct {  } => "",
+            CfgEdge::After { ast_node:ptr_ast_node, text } => { 
+                let  ast_node = * ptr_ast_node ;
+                *text =node!(at ast_node in ast_tree).text.clone(); 
+                text.as_str()
+            }
         }
     }
 }
@@ -45,11 +56,12 @@ impl Debug for CfgEdge{
         match self{
             CfgEdge::Conditioned {  ast_node: ast_node_idx, text } =>{
                 let ast_node = *ast_node_idx;
-                write!(f,"{} {} \n{}","Entry",ast_node_idx, text)},
+                write!(f,"{} \n{}",ast_node_idx, text)},
             CfgEdge::Else {} =>
-                write!(f,""),
+                write!(f,"Else"),
             CfgEdge::Direct {} =>
                 write!(f,""),
+            CfgEdge::After { ast_node, text } => write!(f,"{}",text),
         }
     }
 }

@@ -245,7 +245,7 @@ use std::any::{Any,TypeId};
 	pub const RULE_doWhileIterationStatement:usize = 83; 
 	pub const RULE_forCondition:usize = 84; 
 	pub const RULE_forDeclaration:usize = 85; 
-	pub const RULE_forEndExpression:usize = 86; 
+	pub const RULE_forAfterExpression:usize = 86; 
 	pub const RULE_forMidExpression:usize = 87; 
 	pub const RULE_jumpStatement:usize = 88; 
 	pub const RULE_continueStatement:usize = 89; 
@@ -279,7 +279,7 @@ use std::any::{Any,TypeId};
 		"compoundStatement", "blockItemList", "blockItem", "expressionStatement", 
 		"selectionStatement", "ifSelection", "switchSelection", "iterationStatement", 
 		"forIterationStatement", "whileIterationStatement", "doWhileIterationStatement", 
-		"forCondition", "forDeclaration", "forEndExpression", "forMidExpression", 
+		"forCondition", "forDeclaration", "forAfterExpression", "forMidExpression", 
 		"jumpStatement", "continueStatement", "breakStatement", "returnStatement", 
 		"compilationUnit", "translationUnit", "externalDeclaration", "functionDefinition", 
 		"declarationList"
@@ -13643,7 +13643,7 @@ fn forDeclaration(&self) -> Option<Rc<ForDeclarationContextAll<'input>>> where S
 fn forMidExpression(&self) -> Option<Rc<ForMidExpressionContextAll<'input>>> where Self:Sized{
 	self.child_of_type(0)
 }
-fn forEndExpression(&self) -> Option<Rc<ForEndExpressionContextAll<'input>>> where Self:Sized{
+fn forAfterExpression(&self) -> Option<Rc<ForAfterExpressionContextAll<'input>>> where Self:Sized{
 	self.child_of_type(0)
 }
 fn expression(&self) -> Option<Rc<ExpressionContextAll<'input>>> where Self:Sized{
@@ -13726,9 +13726,9 @@ where
 			_la = recog.base.input.la(1);
 			if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Star - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
 				{
-				/*InvokeRule forEndExpression*/
+				/*InvokeRule forAfterExpression*/
 				recog.base.set_state(1074);
-				recog.forEndExpression()?;
+				recog.forAfterExpression()?;
 
 				}
 			}
@@ -13862,55 +13862,55 @@ where
 		Ok(_localctx)
 	}
 }
-//------------------- forEndExpression ----------------
-pub type ForEndExpressionContextAll<'input> = ForEndExpressionContext<'input>;
+//------------------- forAfterExpression ----------------
+pub type ForAfterExpressionContextAll<'input> = ForAfterExpressionContext<'input>;
 
 
-pub type ForEndExpressionContext<'input> = BaseParserRuleContext<'input,ForEndExpressionContextExt<'input>>;
+pub type ForAfterExpressionContext<'input> = BaseParserRuleContext<'input,ForAfterExpressionContextExt<'input>>;
 
 #[derive(Clone)]
-pub struct ForEndExpressionContextExt<'input>{
+pub struct ForAfterExpressionContextExt<'input>{
 ph:PhantomData<&'input str>
 }
 
-impl<'input> CParserContext<'input> for ForEndExpressionContext<'input>{}
+impl<'input> CParserContext<'input> for ForAfterExpressionContext<'input>{}
 
-impl<'input,'a> Listenable<dyn CListener<'input> + 'a> for ForEndExpressionContext<'input>{
+impl<'input,'a> Listenable<dyn CListener<'input> + 'a> for ForAfterExpressionContext<'input>{
 		fn enter(&self,listener: &mut (dyn CListener<'input> + 'a)) {
 			listener.enter_every_rule(self);
-			listener.enter_forEndExpression(self);
+			listener.enter_forAfterExpression(self);
 		}
 		fn exit(&self,listener: &mut (dyn CListener<'input> + 'a)) {
-			listener.exit_forEndExpression(self);
+			listener.exit_forAfterExpression(self);
 			listener.exit_every_rule(self);
 		}
 }
 
-impl<'input,'a> Visitable<dyn CVisitor<'input> + 'a> for ForEndExpressionContext<'input>{
+impl<'input,'a> Visitable<dyn CVisitor<'input> + 'a> for ForAfterExpressionContext<'input>{
 	fn accept(&self,visitor: &mut (dyn CVisitor<'input> + 'a)) {
-		visitor.visit_forEndExpression(self);
+		visitor.visit_forAfterExpression(self);
 	}
 }
 
-impl<'input> CustomRuleContext<'input> for ForEndExpressionContextExt<'input>{
+impl<'input> CustomRuleContext<'input> for ForAfterExpressionContextExt<'input>{
 	type TF = LocalTokenFactory<'input>;
 	type Ctx = CParserContextType;
-	fn get_rule_index(&self) -> usize { RULE_forEndExpression }
-	//fn type_rule_index() -> usize where Self: Sized { RULE_forEndExpression }
+	fn get_rule_index(&self) -> usize { RULE_forAfterExpression }
+	//fn type_rule_index() -> usize where Self: Sized { RULE_forAfterExpression }
 }
-antlr_rust::tid!{ForEndExpressionContextExt<'a>}
+antlr_rust::tid!{ForAfterExpressionContextExt<'a>}
 
-impl<'input> ForEndExpressionContextExt<'input>{
-	fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input > >, invoking_state: isize) -> Rc<ForEndExpressionContextAll<'input>> {
+impl<'input> ForAfterExpressionContextExt<'input>{
+	fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input > >, invoking_state: isize) -> Rc<ForAfterExpressionContextAll<'input>> {
 		Rc::new(
-			BaseParserRuleContext::new_parser_ctx(parent, invoking_state,ForEndExpressionContextExt{
+			BaseParserRuleContext::new_parser_ctx(parent, invoking_state,ForAfterExpressionContextExt{
 				ph:PhantomData
 			}),
 		)
 	}
 }
 
-pub trait ForEndExpressionContextAttrs<'input>: CParserContext<'input> + BorrowMut<ForEndExpressionContextExt<'input>>{
+pub trait ForAfterExpressionContextAttrs<'input>: CParserContext<'input> + BorrowMut<ForAfterExpressionContextExt<'input>>{
 
 fn assignmentExpression_all(&self) ->  Vec<Rc<AssignmentExpressionContextAll<'input>>> where Self:Sized{
 	self.children_of_type()
@@ -13930,20 +13930,20 @@ fn Comma(&self, i: usize) -> Option<Rc<TerminalNode<'input,CParserContextType>>>
 
 }
 
-impl<'input> ForEndExpressionContextAttrs<'input> for ForEndExpressionContext<'input>{}
+impl<'input> ForAfterExpressionContextAttrs<'input> for ForAfterExpressionContext<'input>{}
 
 impl<'input, I, H> CParser<'input, I, H>
 where
     I: TokenStream<'input, TF = LocalTokenFactory<'input> > + TidAble<'input>,
     H: ErrorStrategy<'input,BaseParserType<'input,I>>
 {
-	pub fn forEndExpression(&mut self,)
-	-> Result<Rc<ForEndExpressionContextAll<'input>>,ANTLRError> {
+	pub fn forAfterExpression(&mut self,)
+	-> Result<Rc<ForAfterExpressionContextAll<'input>>,ANTLRError> {
 		let mut recog = self;
 		let _parentctx = recog.ctx.take();
-		let mut _localctx = ForEndExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
-        recog.base.enter_rule(_localctx.clone(), 172, RULE_forEndExpression);
-        let mut _localctx: Rc<ForEndExpressionContextAll> = _localctx;
+		let mut _localctx = ForAfterExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
+        recog.base.enter_rule(_localctx.clone(), 172, RULE_forAfterExpression);
+        let mut _localctx: Rc<ForAfterExpressionContextAll> = _localctx;
 		let mut _la: isize = -1;
 		let result: Result<(), ANTLRError> = (|| {
 

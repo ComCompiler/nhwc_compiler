@@ -2,7 +2,7 @@ use core::panic;
 use std::collections::{BTreeMap, HashMap};
 use crate::{antlr_parser::clexer::Newline, toolkit::{ast_node,cfg_node}};
 
-use super::symbol_field::{self, SymbolField};
+use super::symbol_field::{self, Field};
 
 #[derive(Debug)]
 pub struct SymbolTable {
@@ -62,28 +62,28 @@ impl SymbolTable {
 
 #[derive(Debug)]
 pub struct Symbol{
-    fields :  HashMap<&'static str,Box<dyn SymbolField>>,
+    fields :  HashMap<&'static str,Box<dyn Field>>,
     scope_depth :i32 ,
     symbol_name : String
 }
 pub trait SymbolBehavior{
-    fn add_field(&mut self,key :&'static str,sf:Box<dyn SymbolField>);
+    fn add_field(&mut self,key :&'static str,sf:Box<dyn Field>);
     fn remove_field(&mut self, field_name : &'static str);
-    fn get_field(&self,key: &str) -> Option<&Box<dyn SymbolField>>;
-    fn get_field_mut(&mut self,key: &str) -> Option<&mut Box< dyn SymbolField>>;
+    fn get_field(&self,key: &str) -> Option<&Box<dyn Field>>;
+    fn get_field_mut(&mut self,key: &str) -> Option<&mut Box< dyn Field>>;
         
 }
 impl SymbolBehavior for Symbol{
-    fn add_field(&mut self,key :&'static str,sf:Box<dyn SymbolField>) {
+    fn add_field(&mut self,key :&'static str,sf:Box<dyn Field>) {
         self.fields.insert(key, sf);
     }
-    fn get_field(&self,key: &str) -> Option<&Box<dyn SymbolField>> {
+    fn get_field(&self,key: &str) -> Option<&Box<dyn Field>> {
         self.fields.get(key)
     }
     fn remove_field(&mut self, field_name : &'static str) {
         self.fields.remove(field_name);
     }
-    fn get_field_mut(&mut self,key: &str) -> Option<&mut Box< dyn SymbolField>> {
+    fn get_field_mut(&mut self,key: &str) -> Option<&mut Box< dyn Field>> {
         self.fields.get_mut(key)
     }
 }

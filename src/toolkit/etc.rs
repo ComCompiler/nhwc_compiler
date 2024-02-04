@@ -11,7 +11,7 @@ pub fn generate_png_by_graph<N:Debug,E:Debug,Ty :EdgeType>(g:&StableGraph<N,E,Ty
     let png_name = name.clone()+ ".png";
     let dot_name = name+ ".dot";
     let mut f = File::create(dot_name.clone()).expect("无法写入文件");
-    f.write_all(format!("{:?}", Dot::with_config(&g, &[Config::EdgeNoLabel])).as_bytes())
+    f.write_all(format!("{:?}", Dot::with_config(&g, &[])).as_bytes())
         .expect("写入失败");
     let output = Command::new("dot")
         .args(["-Tpng",dot_name.as_str(), "-o",png_name.as_str()])

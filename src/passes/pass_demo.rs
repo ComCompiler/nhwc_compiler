@@ -1,12 +1,12 @@
 use std::any::Any;
 
-use crate::toolkit::{pass_manager::Pass, symbol_field::SymbolField};
+use crate::toolkit::{pass_manager::Pass, symbol_field::Field};
 #[derive(Debug)]
 struct PrintSymbolStruct{
     type_str : String
 }
 
-impl SymbolField for PrintSymbolStruct{
+impl Field for PrintSymbolStruct{
     fn as_any(&self) -> &dyn Any {
         self
     }
@@ -25,7 +25,7 @@ impl Pass for PassDemo{
     fn before_pass(&self) {
         println!("before pass ");
     }
-    fn before_function(&self) {
+    fn visit_function(&self) {
         
     }
 }

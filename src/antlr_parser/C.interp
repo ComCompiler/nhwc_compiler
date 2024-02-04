@@ -331,7 +331,7 @@ whileIterationStatement
 doWhileIterationStatement
 forCondition
 forDeclaration
-forEndExpression
+forAfterExpression
 forMidExpression
 jumpStatement
 continueStatement

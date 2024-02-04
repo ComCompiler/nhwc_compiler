@@ -64,7 +64,7 @@ public class CParser extends Parser {
 		RULE_blockItem = 75, RULE_expressionStatement = 76, RULE_selectionStatement = 77, 
 		RULE_ifSelection = 78, RULE_switchSelection = 79, RULE_iterationStatement = 80, 
 		RULE_forIterationStatement = 81, RULE_whileIterationStatement = 82, RULE_doWhileIterationStatement = 83, 
-		RULE_forCondition = 84, RULE_forDeclaration = 85, RULE_forEndExpression = 86, 
+		RULE_forCondition = 84, RULE_forDeclaration = 85, RULE_forAfterExpression = 86, 
 		RULE_forMidExpression = 87, RULE_jumpStatement = 88, RULE_continueStatement = 89, 
 		RULE_breakStatement = 90, RULE_returnStatement = 91, RULE_compilationUnit = 92, 
 		RULE_translationUnit = 93, RULE_externalDeclaration = 94, RULE_functionDefinition = 95, 
@@ -93,7 +93,7 @@ public class CParser extends Parser {
 			"compoundStatement", "blockItemList", "blockItem", "expressionStatement", 
 			"selectionStatement", "ifSelection", "switchSelection", "iterationStatement", 
 			"forIterationStatement", "whileIterationStatement", "doWhileIterationStatement", 
-			"forCondition", "forDeclaration", "forEndExpression", "forMidExpression", 
+			"forCondition", "forDeclaration", "forAfterExpression", "forMidExpression", 
 			"jumpStatement", "continueStatement", "breakStatement", "returnStatement", 
 			"compilationUnit", "translationUnit", "externalDeclaration", "functionDefinition", 
 			"declarationList"
@@ -6362,8 +6362,8 @@ public class CParser extends Parser {
 		public ForMidExpressionContext forMidExpression() {
 			return getRuleContext(ForMidExpressionContext.class,0);
 		}
-		public ForEndExpressionContext forEndExpression() {
-			return getRuleContext(ForEndExpressionContext.class,0);
+		public ForAfterExpressionContext forAfterExpression() {
+			return getRuleContext(ForAfterExpressionContext.class,0);
 		}
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
@@ -6425,7 +6425,7 @@ public class CParser extends Parser {
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & 612507141508431886L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 1055531215745025L) != 0)) {
 				{
 				setState(1074);
-				forEndExpression();
+				forAfterExpression();
 				}
 			}
 
@@ -6489,7 +6489,7 @@ public class CParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class ForEndExpressionContext extends ParserRuleContext {
+	public static class ForAfterExpressionContext extends ParserRuleContext {
 		public List<AssignmentExpressionContext> assignmentExpression() {
 			return getRuleContexts(AssignmentExpressionContext.class);
 		}
@@ -6500,15 +6500,15 @@ public class CParser extends Parser {
 		public TerminalNode Comma(int i) {
 			return getToken(CParser.Comma, i);
 		}
-		public ForEndExpressionContext(ParserRuleContext parent, int invokingState) {
+		public ForAfterExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_forEndExpression; }
+		@Override public int getRuleIndex() { return RULE_forAfterExpression; }
 	}
 
-	public final ForEndExpressionContext forEndExpression() throws RecognitionException {
-		ForEndExpressionContext _localctx = new ForEndExpressionContext(_ctx, getState());
-		enterRule(_localctx, 172, RULE_forEndExpression);
+	public final ForAfterExpressionContext forAfterExpression() throws RecognitionException {
+		ForAfterExpressionContext _localctx = new ForAfterExpressionContext(_ctx, getState());
+		enterRule(_localctx, 172, RULE_forAfterExpression);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);

@@ -11,7 +11,8 @@ use petgraph::graph::{DiGraph, Node};
 use crate::toolkit::ast_node::{AstNode,AstTree};
 use crate::toolkit::cfg_edge::CfgEdge;
 use crate::{add_edge, add_node, direct_node, find_nodes_by_dfs, node_mut, rule_id, RULE_compoundStatement, RULE_functionDefinition};
-use crate::antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_breakStatement, RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forCondition, RULE_forIterationStatement, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement};
+use crate::antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_breakStatement, RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
+};
 use crate::{find,find_nodes,node};
 
 use super::symbol_table::SymbolIndex;
@@ -149,42 +150,50 @@ impl Debug for CfgNode{
         }
     }
 }
+pub fn process_while(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_while_node:u32) -> Option<(u32,u32)>{
+    //expression做成branch节点
+    let expression_node = find!(rule RULE_expression at current_while_node in ast_tree).unwrap();
+    let branch_struct = CfgNode::Branch { ast_node:expression_node, text: String::new() };
+    let cfg_branch_node = add_node!(branch_struct to cfg_graph);
+    let statement_node = find!(rule RULE_statement at current_while_node in ast_tree).unwrap();
+    if let Some((st_head_node, st_tail_node)) = process_stmt(cfg_graph, ast_tree, statement_node){
+        add_edge!({CfgEdge::Conditioned { ast_node: expression_node, text: String::new() } } from cfg_branch_node to st_head_node in cfg_graph);
+        add_edge!({CfgEdge::Direct {}} from st_tail_node to cfg_branch_node in cfg_graph);
+    }else{
+        add_edge!({CfgEdge::Direct {}} from cfg_branch_node to cfg_branch_node in cfg_graph);
+    }
+    Some((cfg_branch_node,cfg_branch_node))
+}
 
 ///处理循环过程的cfg节点处理和连接，返回branch和statement的idx
 pub fn process_iteration(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_iteration_node:u32)->Option<(u32,u32)>{
     //处理branch的构造
     let which_iteration_node = direct_node!(at current_iteration_node in ast_tree);
     match(rule_id!(at which_iteration_node in ast_tree),which_iteration_node){
-        (RULE_whileIterationStatement,while_iter) => {
-            //expression做成branch节点
-            let expression_node = find!(rule RULE_expression at which_iteration_node in ast_tree).unwrap();
-            let branch_struct = CfgNode::Branch { ast_node:expression_node, text: String::new() };
-            let cfg_branch_node = add_node!(branch_struct to cfg_graph);
-            let statement_node = find!(rule RULE_statement at which_iteration_node in ast_tree).unwrap();
-            if let Some((st_head_node, st_tail_node)) = process_stmt(cfg_graph, ast_tree, statement_node){
-                add_edge!({CfgEdge::Conditioned { ast_node: expression_node, text: String::new() } } from cfg_branch_node to st_head_node in cfg_graph);
-                add_edge!({CfgEdge::Direct {}} from st_tail_node to cfg_branch_node in cfg_graph);
-            }else{
-                add_edge!({CfgEdge::Direct {}} from cfg_branch_node to cfg_branch_node in cfg_graph);
-            }
-            Some((cfg_branch_node,cfg_branch_node))
+        (RULE_whileIterationStatement,while_node) => {
+            process_while(cfg_graph, ast_tree, while_node)
         }
-        (RULE_forIterationStatement,for_iter) => {
-            //forconditioin做成branch节点
-            let condition_node = find!(rule RULE_forCondition at which_iteration_node in ast_tree).unwrap();
-            let branch_struct = CfgNode::Branch { ast_node:condition_node, text: String::new() };
-            let cfg_branch_node = add_node!(branch_struct to cfg_graph);
-            let statement_node = find!(rule RULE_statement at which_iteration_node in ast_tree).unwrap();
-            if let Some((st_head_node, st_tail_node)) = process_stmt(cfg_graph, ast_tree, statement_node){
-                add_edge!({CfgEdge::Conditioned { ast_node: condition_node , text: String::new() } } from cfg_branch_node to st_head_node in cfg_graph);
-                add_edge!({CfgEdge::Direct {}} from st_tail_node to cfg_branch_node in cfg_graph);
-            }else{
-                add_edge!({CfgEdge::Direct {}} from cfg_branch_node to cfg_branch_node in cfg_graph);
-            }
-            Some((cfg_branch_node,cfg_branch_node))
+        (RULE_forIterationStatement,for_node) => {
+            process_for(cfg_graph, ast_tree, for_node )
         }
         (_,_) => panic!("循环不属于for或while循环"),
     }
+}
+pub fn process_for(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_for_node:u32)->Option<(u32,u32)>{
+    //forconditioin做成branch节点
+    let for_condition_node = find!(rule RULE_forCondition at current_for_node in ast_tree).unwrap();
+    let mid_expression = find!(rule RULE_forMidExpression at for_condition_node in ast_tree).unwrap();
+    let after_expression = find!(rule RULE_forAfterExpression at for_condition_node in ast_tree).unwrap();
+    let branch_struct = CfgNode::Branch { ast_node:for_condition_node, text: String::new() };
+    let cfg_branch_node = add_node!(branch_struct to cfg_graph);
+    let statement_node = find!(rule RULE_statement at current_for_node in ast_tree).unwrap();
+    if let Some((st_head_node, st_tail_node)) = process_stmt(cfg_graph, ast_tree, statement_node){
+        add_edge!({CfgEdge::Conditioned { ast_node: mid_expression , text: String::new() } } from cfg_branch_node to st_head_node in cfg_graph);
+        add_edge!({CfgEdge::After { ast_node: after_expression, text:String::new() } } from st_tail_node to cfg_branch_node in cfg_graph);
+    }else{
+        add_edge!({CfgEdge::Direct {}} from cfg_branch_node to cfg_branch_node in cfg_graph);
+    }
+    Some((cfg_branch_node,cfg_branch_node))
 }
 
 ///处理branch下面statement的多种情况，包括单语句，大括号，分支语句
@@ -260,15 +269,22 @@ pub fn process_if(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,if_node:u32) -> Opti
     //处理statement
     let statement_nodes:Vec<u32> = find_nodes!(rule RULE_statement at if_node in ast_tree);
     if statement_nodes.len() == 1{
-        add_edge!({CfgEdge::Direct {}} from cfg_branch_node to cfg_gather_node in cfg_graph);
-    }else if statement_nodes.len() > 2{
-        panic!("不对, selectionStatement 下面不可能有两个以上的Statement")
-    }
-    for statement_node in statement_nodes{
-        if let Some((st_head_node, st_tail_node)) = process_stmt(cfg_graph, ast_tree, statement_node){
-            add_edge!({CfgEdge::Direct {}} from cfg_branch_node to st_head_node in cfg_graph);
-            add_edge!({CfgEdge::Direct {}} from st_tail_node to cfg_gather_node in cfg_graph);
+        add_edge!({CfgEdge::Else {} } from cfg_branch_node to cfg_gather_node in cfg_graph);
+        if let Some((st_head_node, st_tail_node)) = process_stmt(cfg_graph, ast_tree, statement_nodes[0]){
+            add_edge!({CfgEdge::Conditioned { ast_node: expression_node, text: String::new() } } from cfg_branch_node to st_head_node in cfg_graph);
+            add_edge!({CfgEdge::Direct {  }  } from st_tail_node to cfg_gather_node in cfg_graph);
         }
+    } else if statement_nodes.len() == 2{
+        if let Some((st_head_node, st_tail_node)) = process_stmt(cfg_graph, ast_tree, statement_nodes[0]){
+            add_edge!({CfgEdge::Else {  }  } from cfg_branch_node to st_head_node in cfg_graph);
+            add_edge!({CfgEdge::Direct {  }  } from st_tail_node to cfg_gather_node in cfg_graph);
+        }
+        if let Some((st_head_node, st_tail_node)) = process_stmt(cfg_graph, ast_tree, statement_nodes[1]){
+            add_edge!({CfgEdge::Conditioned { ast_node: expression_node, text: String::new() } } from cfg_branch_node to st_head_node in cfg_graph);
+            add_edge!({CfgEdge::Direct {  }  } from st_tail_node to cfg_gather_node in cfg_graph);
+        }
+    }else if statement_nodes.len() >2 {
+        panic!("不对, selectionStatement 下面不可能有两个以上的Statement")
     }
     Some((cfg_branch_node , cfg_gather_node))
 }
@@ -312,7 +328,7 @@ pub fn try_unite(opt_node1:Option<u32>,opt_node2:Option<u32>, cfg_graph:&mut Cfg
                     let edges:Vec<u32> =cfg_graph.edges(NodeIndex::from(node2)).map(|x| x.id().index() as u32).collect();
                     if edges.len() == 0 {
                         for edge in edges{
-                            let dst =  cfg_graph.edge_endpoints(EdgeIndex::from(edge)).unwrap().1;
+                            let dst =  cfg_graph.edge_endpoints(EdgeIndex::from(edge)).unwrap().1.index() as u32;
                             add_edge!({CfgEdge::Direct {  }} from node1 to dst in cfg_graph);
                         }
                         cfg_graph.remove_node(NodeIndex::from(node2));

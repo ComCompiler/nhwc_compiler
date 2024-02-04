@@ -865,15 +865,15 @@ fn enter_forDeclaration(&mut self, _ctx: &ForDeclarationContext<'input>) { }
  */
 fn exit_forDeclaration(&mut self, _ctx: &ForDeclarationContext<'input>) { }
 /**
- * Enter a parse tree produced by {@link CParser#forEndExpression}.
+ * Enter a parse tree produced by {@link CParser#forAfterExpression}.
  * @param ctx the parse tree
  */
-fn enter_forEndExpression(&mut self, _ctx: &ForEndExpressionContext<'input>) { }
+fn enter_forAfterExpression(&mut self, _ctx: &ForAfterExpressionContext<'input>) { }
 /**
- * Exit a parse tree produced by {@link CParser#forEndExpression}.
+ * Exit a parse tree produced by {@link CParser#forAfterExpression}.
  * @param ctx the parse tree
  */
-fn exit_forEndExpression(&mut self, _ctx: &ForEndExpressionContext<'input>) { }
+fn exit_forAfterExpression(&mut self, _ctx: &ForAfterExpressionContext<'input>) { }
 /**
  * Enter a parse tree produced by {@link CParser#forMidExpression}.
  * @param ctx the parse tree
