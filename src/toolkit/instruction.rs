@@ -1,5 +1,6 @@
 use super::symbol_table::{Symbol, SymbolBehavior, SymbolIndex};
 
+#[derive(Clone)]
 pub enum ArithOp{        
     Add{
         a : SymbolIndex ,
@@ -23,17 +24,21 @@ pub enum ArithOp{
         b : SymbolIndex ,
     },
 }
+#[derive(Clone)]
 pub struct FuncOp{
     func:SymbolIndex,
     args:Vec<SymbolIndex>       //存储所有的实参
 }
+#[derive(Clone)]
 pub struct PhiPair{
     value : SymbolIndex,
     bb : SymbolIndex,
 }
+#[derive(Clone)]
 pub struct PhiOp{
     syms : Vec<PhiPair>,
 }
+#[derive(Clone)]
 pub enum MemOp{
     Load{
         ptr: SymbolIndex,
@@ -46,12 +51,15 @@ pub enum MemOp{
         align:u32,
     }
 }
+#[derive(Clone)]
 pub enum Op{
     ArithOp(ArithOp),
     FuncOp(FuncOp),
     Jump(JumpOp)
 }
-enum Instruction{
+
+#[derive(Clone)]
+pub enum Instruction{
     Assign{
         lhs:SymbolIndex,
         rhs:ArithOp,
@@ -60,16 +68,19 @@ enum Instruction{
         op:Op,
     }
 }
-enum IcmpPlan{
+#[derive(Clone)]
+pub enum IcmpPlan{
     eq,ne,              // 等与不等
     ugt,uge,ult,ule,    //无符号比较
     sgt,sge,slt,sle,    //有符号比较
 }
-struct ComparedPair{
+#[derive(Clone)]
+pub struct ComparedPair{
     compared : SymbolIndex,
     label : SymbolIndex,
 }
-enum JumpOp{
+#[derive(Clone)]
+pub enum JumpOp{
     Ret{
         ret_sym : SymbolIndex , // 这是返回的类型
     },
