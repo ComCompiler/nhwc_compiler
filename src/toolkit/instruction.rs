@@ -44,7 +44,8 @@ pub enum Op{
     }
 }
 
-struct Instruction{
+#[derive(Clone)]
+pub struct Instruction{
     
 
 }

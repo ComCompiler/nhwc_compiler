@@ -865,6 +865,16 @@ fn enter_forDeclaration(&mut self, _ctx: &ForDeclarationContext<'input>) { }
  */
 fn exit_forDeclaration(&mut self, _ctx: &ForDeclarationContext<'input>) { }
 /**
+ * Enter a parse tree produced by {@link CParser#forBeforeExpression}.
+ * @param ctx the parse tree
+ */
+fn enter_forBeforeExpression(&mut self, _ctx: &ForBeforeExpressionContext<'input>) { }
+/**
+ * Exit a parse tree produced by {@link CParser#forBeforeExpression}.
+ * @param ctx the parse tree
+ */
+fn exit_forBeforeExpression(&mut self, _ctx: &ForBeforeExpressionContext<'input>) { }
+/**
  * Enter a parse tree produced by {@link CParser#forAfterExpression}.
  * @param ctx the parse tree
  */

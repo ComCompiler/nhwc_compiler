@@ -3,7 +3,7 @@ use crate::node;
 use std::fmt::Debug;
 use super::ast_node::AstTree;
 use super::{ast_node, cfg_node::GetText};
-
+#[derive(Clone)]
 pub enum CfgEdge{
     Conditioned{
         // 这里对应的是 Expr ast node 的条件

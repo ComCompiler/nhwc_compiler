@@ -7,7 +7,7 @@ mod tests{
     use petgraph::visit::Data;
     
     
-    use crate::{antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_functionDefinition}, find, find_nodes, toolkit::{ast_node::find_dfs_ast, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, symbol_field::{DataType, Field}, symbol_table::{Symbol, SymbolBehavior, SymbolIndex, SymbolTable}}, Cli};
+    use crate::{antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_functionDefinition}, find, find_nodes, toolkit::{ast_node::find_dfs_ast, context::{self, Context, ContextBuilder }, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, symbol_field::{DataType, Field}, symbol_table::{Symbol, SymbolBehavior, SymbolIndex, SymbolTable}}, Cli};
 
     #[test]
     fn add(){
@@ -20,10 +20,12 @@ mod tests{
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo.c").unwrap();
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
-        let g = parse_as_ast_tree(code, true);
+        let mut context = ContextBuilder::default().code(code).build().unwrap();
+        parse_as_ast_tree(&mut context);
+        let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
-        let node_ids:Vec<u32> = find_dfs_ast(&g, 0,RULE_functionDefinition ).collect();
-        assert_eq!(node_ids , vec![3,140] ,"找到的 node id 不对");
+        let node_ids:Vec<u32> = find_dfs_ast(&ast_tree, 0,RULE_functionDefinition ).collect();
+        assert_eq!(node_ids , vec![3,143] ,"找到的 node id 不对");
     }
 
     #[test]
@@ -32,7 +34,10 @@ mod tests{
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo.c").unwrap();
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
-        let ref ast_tree = parse_as_ast_tree(code, true);
+
+        let mut context = ContextBuilder::default().code(code).build().unwrap();
+        parse_as_ast_tree(&mut context);
+        let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
         let node = 3;
         let node_id= find!(rule RULE_compoundStatement at node in ast_tree).unwrap();
@@ -43,12 +48,16 @@ mod tests{
         let mut args = Cli::parse();
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo.c").unwrap();
+
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
-        let ref ast_tree = parse_as_ast_tree(code, true);
+
+        let mut context = ContextBuilder::default().code(code).build().unwrap();
+        parse_as_ast_tree(&mut context);
+        let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
         let node =11;
         let node_ids:Vec<u32>= find_nodes!(rule RULE_blockItem at node in ast_tree);
-        assert_eq!(node_ids , vec![119,24,12] ,"找到的 node id 不对");
+        assert_eq!(node_ids , vec![121,24,12] ,"找到的 node id 不对");
 
     }
     #[test]
@@ -57,10 +66,11 @@ mod tests{
         // 你也可以通过运行 cargo run -- --help 来查看所有可用选项
         let path = "./demos/demo.c".to_string();
         let code = read_file_content(path);
-        // 此时 g 就是我们生成的petgraph 的ast 树
-        let g = parse_as_ast_tree(code, true);
+        let mut context = ContextBuilder::default().code(code).build().unwrap();
+        parse_as_ast_tree(&mut context);
+        let ast_tree = &mut context.ast_tree;
         // 生成 petgraph 图对应的 png 
-        generate_png_by_graph(&g,"graph".to_string());  
+        generate_png_by_graph(&ast_tree,"graph".to_string());  
     }
     #[test]
     fn find_items_of_func_def_using_macro_find_nodes_test2(){
@@ -68,14 +78,18 @@ mod tests{
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo.c").unwrap();
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
-        let ref ast_tree = parse_as_ast_tree(code, true);
+
+        let mut context = ContextBuilder::default().code(code).build().unwrap();
+        parse_as_ast_tree(&mut context);
+        let ast_tree = &mut context.ast_tree;
+
         //dfs遍历ast
         let node =3;  // 三号节点是一个 function def 
         let node_ids:Vec<u32>= find_nodes!(rule RULE_compoundStatement 
                                            then RULE_blockItemList
                                            finally RULE_blockItem
                                               at node in ast_tree);
-        assert_eq!(node_ids , vec![119,24,12] ,"找到的 node id 不对");
+        assert_eq!(node_ids , vec![121,24,12] ,"找到的 node id 不对");
 
 
     }
@@ -85,7 +99,9 @@ mod tests{
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo.c").unwrap();
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
-        let ref ast_tree = parse_as_ast_tree(code, true);
+        let mut context = ContextBuilder::default().code(code).build().unwrap();
+        parse_as_ast_tree(&mut context);
+        let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
         let node =3;  // 三号节点是一个 function def 
         let node_ids= find!(rule RULE_compoundStatement 

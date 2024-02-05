@@ -4,7 +4,7 @@ use crate::{antlr_parser::clexer::Newline, toolkit::{ast_node,cfg_node}};
 
 use super::symbol_field::{self, Field};
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct SymbolTable {
     map: BTreeMap<SymbolIndex,Symbol >,
 }
@@ -58,9 +58,14 @@ impl SymbolTable {
         self.map.remove(&SymbolIndex { scope_depth ,  symbol_name} );
     }
 }
+impl Default for SymbolTable{
+    fn default() -> Self {
+        Self { map: Default::default() }
+    }
+}
 
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct Symbol{
     fields :  HashMap<&'static str,Box<dyn Field>>,
     scope_depth :i32 ,
@@ -73,6 +78,13 @@ pub trait SymbolBehavior{
     fn get_field_mut(&mut self,key: &str) -> Option<&mut Box< dyn Field>>;
         
 }
+
+impl Clone for Box<dyn Field>{
+    fn clone(&self) -> Self {
+        panic!("you should never use the clone for Field");
+    }
+}
+
 impl SymbolBehavior for Symbol{
     fn add_field(&mut self,key :&'static str,sf:Box<dyn Field>) {
         self.fields.insert(key, sf);

@@ -6,6 +6,7 @@ use crate::antlr_parser::cparser::ruleNames;
 use petgraph::visit::{Dfs, Walker};
 pub type AstTree = StableDiGraph<AstNode,(),u32>;
 
+#[derive(Clone)]
 pub struct AstNode {
     pub rule_id : usize,
     pub node_index : u32,

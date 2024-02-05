@@ -1,31 +1,36 @@
 use core::panic;
 use std::any::Any;
 use std::fmt::Debug;
-use std::mem;
+use std::{clone, mem};
 use std::thread::{current, scope};
 use petgraph::stable_graph::{EdgeIndex, NodeIndex, StableDiGraph};
 use petgraph::visit::{EdgeRef, IntoEdges};
 use petgraph::{Directed, Graph};
 use petgraph::graph::{DiGraph, Node};
 
-use crate::toolkit::ast_node::{AstNode,AstTree};
+use crate::toolkit::ast_node::AstTree;
 use crate::toolkit::cfg_edge::CfgEdge;
 use crate::{add_edge, add_node, direct_node, find_nodes_by_dfs, node_mut, rule_id, RULE_compoundStatement, RULE_functionDefinition};
-use crate::antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_breakStatement, RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
+use crate::antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_breakStatement, RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
 };
 use crate::{find,find_nodes,node};
 
+use super::context::Context;
+use super::instruction::Instruction;
 use super::symbol_table::SymbolIndex;
-use super::{ast_node, cfg_edge};
+use super::{ast_node, cfg_edge, context};
 
 //use crate::toolkit::ast_node::AstNode;
 
 pub type CfgGraph = StableDiGraph<CfgNode,CfgEdge,u32>;
 
+#[derive(Clone)]
 pub enum CfgNode {
     Entry {
         ast_node: u32,
         text: String,
+        //f 里面调用 函数 c
+        //就往 calls in func 里面加入c
         calls_in_func : Vec<u32>,
     },
     Exit {
@@ -42,10 +47,10 @@ pub enum CfgNode {
     BasicBlock{
         ast_nodes: Vec<u32>,
         text: String,
+        // instructions of this basic block (第二步才生成这个 instrs)
+        instrs: Vec<Instruction>,
     },
-    FuncParent{
-
-    }
+    FuncParent {  }
 }
 pub trait GetText{
     // fn load_ast_node_text(&mut self,ast_tree : &AstTree){ }
@@ -86,7 +91,7 @@ impl GetText for CfgNode {
                 }
             }
             CfgNode::Gather {} => Some(""),
-            CfgNode::BasicBlock { ast_nodes, text } =>{ 
+            CfgNode::BasicBlock { ast_nodes, text, instrs } =>{ 
                 if !text.is_empty(){
                     Some(text.as_str())
                 }else{
@@ -116,7 +121,7 @@ impl CfgNode{
                 let _  = mem::replace(text, new_str);
             }
             CfgNode::Gather {} => {}
-            CfgNode::BasicBlock { ast_nodes, text } =>{ 
+            CfgNode::BasicBlock { ast_nodes, text, instrs } =>{ 
                 let new_str = {let mut s = "".to_string();
                     for ast_node_idx in ast_nodes{
                         let ast_node = *ast_node_idx;
@@ -129,6 +134,18 @@ impl CfgNode{
             }
             CfgNode::FuncParent {  } => {}
         }
+    }
+    pub fn new_bb( ast_nodes:Vec<u32>) -> Self{
+        Self::BasicBlock { ast_nodes, text: String::new(), instrs: vec![] }
+    }
+    pub fn new_direct(ast_node:u32) -> Self{
+        Self::Branch { text: String::new(), ast_node  }
+    }
+    pub fn new_func_parent() -> Self{
+        Self::FuncParent {  }
+    }
+    pub fn new_branch(ast_node:u32) -> Self{
+        Self::Branch { ast_node:ast_node, text: String::new() }
     }
 }
 
@@ -144,7 +161,7 @@ impl Debug for CfgNode{
                 write!(f,"{} {} \n{}","Branch",ast_node_idx, text),
             CfgNode::Gather {  } =>
                 write!(f,"{} ","Gather"),
-            CfgNode::BasicBlock { ast_nodes: ast_node_idxes, text } => 
+            CfgNode::BasicBlock { ast_nodes: ast_node_idxes, text, instrs } => 
                 write!(f,"{} {}","BasicBlock",text),
             CfgNode::FuncParent {  } => write!(f,"{}","root",),
         }
@@ -182,9 +199,11 @@ pub fn process_iteration(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_itera
 pub fn process_for(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_for_node:u32)->Option<(u32,u32)>{
     //forconditioin做成branch节点
     let for_condition_node = find!(rule RULE_forCondition at current_for_node in ast_tree).unwrap();
+    let for_before_node = find!(rule RULE_forBeforeExpression at for_condition_node in ast_tree).unwrap();
     let mid_expression = find!(rule RULE_forMidExpression at for_condition_node in ast_tree).unwrap();
     let after_expression = find!(rule RULE_forAfterExpression at for_condition_node in ast_tree).unwrap();
-    let branch_struct = CfgNode::Branch { ast_node:for_condition_node, text: String::new() };
+
+    let branch_struct = CfgNode::Branch { ast_node: for_before_node, text: String::new() };
     let cfg_branch_node = add_node!(branch_struct to cfg_graph);
     let statement_node = find!(rule RULE_statement at current_for_node in ast_tree).unwrap();
     if let Some((st_head_node, st_tail_node)) = process_stmt(cfg_graph, ast_tree, statement_node){
@@ -208,18 +227,18 @@ pub fn process_stmt(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_statement_
             process_expression(cfg_graph, ast_tree, expressionstatement_node)
         }
         (RULE_iterationStatement,iter_node) => {
-            process_iteration(cfg_graph, ast_tree,which_statement)
+            process_iteration(cfg_graph, ast_tree,iter_node)
         }
         (RULE_selectionStatement,select_node) => {
-            process_selection(cfg_graph, ast_tree, which_statement)
+            process_selection(cfg_graph, ast_tree, select_node)
         }
         (RULE_jumpStatement,jump_node) => {
-            let bb_struct = CfgNode::BasicBlock{ ast_nodes:vec![jump_node], text: String::new() };
+            let bb_struct = CfgNode::new_bb(vec![jump_node]);
             let cfg_basicblock_node = add_node!(bb_struct to cfg_graph); 
             Some((cfg_basicblock_node,cfg_basicblock_node))
         }
         (RULE_labeledStatement,labeled_node) => {
-            let bb_struct = CfgNode::BasicBlock{ ast_nodes:vec![labeled_node], text: String::new() };
+            let bb_struct = CfgNode::new_bb(vec![labeled_node]);
             let cfg_basicblock_node = add_node!(bb_struct to cfg_graph); 
             Some((cfg_basicblock_node,cfg_basicblock_node))
         }
@@ -230,12 +249,12 @@ pub fn process_stmt(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_statement_
     }
 }
 pub fn process_declartion(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_declare_node:u32) -> Option<(u32,u32)>{
-    let bb_struct = CfgNode::BasicBlock{ ast_nodes:vec![current_declare_node], text: String::new() };
+    let bb_struct = CfgNode::new_bb(vec![current_declare_node]);
     let cfg_basicblock_node = add_node!(bb_struct to cfg_graph); 
     Some((cfg_basicblock_node,cfg_basicblock_node))
 }
 pub fn process_expression(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_expression_node:u32) -> Option<(u32,u32)>{
-    let bb_struct = CfgNode::BasicBlock{ ast_nodes:vec![current_expression_node], text: String::new() };
+    let bb_struct = CfgNode::new_bb(vec![current_expression_node]);
     let cfg_basicblock_node = add_node!(bb_struct to cfg_graph); 
     Some((cfg_basicblock_node,cfg_basicblock_node))
 }
@@ -313,7 +332,7 @@ pub fn try_unite(opt_node1:Option<u32>,opt_node2:Option<u32>, cfg_graph:&mut Cfg
     match  (opt_node1,opt_node2){
         (Some(node1),Some(node2)) => {
             match (cfg_graph.index_twice_mut(NodeIndex::from(node1), NodeIndex::from(node2))) {
-                (CfgNode::BasicBlock{ ast_nodes:ast_nodes1, text:_text1 }, CfgNode::BasicBlock{ ast_nodes:ast_nodes2, text :_text2}) => {
+                (CfgNode::BasicBlock{ ast_nodes:ast_nodes1, text:_text1, instrs:_ }, CfgNode::BasicBlock{ ast_nodes:ast_nodes2, text :_text2, instrs:_ }) => {
                     ast_nodes1.extend_from_slice(&ast_nodes2);
                     let edges:Vec<u32> =cfg_graph.edges(NodeIndex::from(node2)).map(|x| x.id().index() as u32).collect();
                     for edge in edges{
@@ -323,7 +342,7 @@ pub fn try_unite(opt_node1:Option<u32>,opt_node2:Option<u32>, cfg_graph:&mut Cfg
                     cfg_graph.remove_node(NodeIndex::from(node2));
                     Some(node1)
                 }
-                (_, CfgNode::BasicBlock{ ast_nodes:ast_nodes2, text :_text2}) => {
+                (_, CfgNode::BasicBlock{ ast_nodes:ast_nodes2, text :_text2, instrs }) => {
                     // 检测如果 node2 里面 bb 内容为空 就删掉这个bb 并且转移它的边
                     let edges:Vec<u32> =cfg_graph.edges(NodeIndex::from(node2)).map(|x| x.id().index() as u32).collect();
                     if edges.len() == 0 {
@@ -404,15 +423,19 @@ pub fn process_compound(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,current_compou
     opt_current_cfg_head_and_tail
 }
 
-pub fn parse_ast_to_cfg(ast_tree:&AstTree) -> CfgGraph{
-    let mut cfg_graph = CfgGraph::new();
+/// 这个函数依赖 ast 
+pub fn parse_ast_to_cfg(context:&mut Context) {
+    let cfg_graph = &mut context.cfg_graph;
+    let ast_tree = &context.ast_tree;
+
     let ast_root_node = 0 ;
+
     let funcdef_nodes:Vec<u32> = find_nodes_by_dfs!( rule RULE_functionDefinition at ast_root_node in ast_tree);
-    let cfg_func_parent  =  CfgNode::FuncParent {  };
+    let cfg_func_parent  =  CfgNode::new_func_parent();
     // 为每一个function 创建一个共享的根节点
     let cfg_func_parent_node = cfg_graph.add_node(cfg_func_parent);
     for funcdef_node in funcdef_nodes{
-        // 这里是事件  visit_function 发生的地方
+        // 插入函数符号
 
         let entry_struct = CfgNode::Entry { ast_node:funcdef_node, text: String::new(), calls_in_func: Vec::new()};
         let cfg_entry_node = add_node!(entry_struct to cfg_graph);
@@ -421,7 +444,8 @@ pub fn parse_ast_to_cfg(ast_tree:&AstTree) -> CfgGraph{
         let cfg_exit_node = add_node!(exit_struct to cfg_graph);
         let current_compound_node = find!(rule RULE_compoundStatement at funcdef_node in ast_tree ).unwrap();
 
-        match process_compound(&mut cfg_graph, ast_tree, current_compound_node){
+
+        match process_compound(cfg_graph, ast_tree, current_compound_node){
             Some((cfg_head_node, cfg_tail_node)) => {
                 add_edge!( {CfgEdge::Direct {  }} from  cfg_entry_node to cfg_head_node in cfg_graph);
                 add_edge!( {CfgEdge::Direct {  }} from  cfg_tail_node to cfg_exit_node in cfg_graph);
@@ -431,5 +455,4 @@ pub fn parse_ast_to_cfg(ast_tree:&AstTree) -> CfgGraph{
             }
         }
     }
-    cfg_graph
 }

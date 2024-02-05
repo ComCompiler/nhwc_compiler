@@ -8,3 +8,5 @@ pub mod gen_ast;
 pub mod pass_manager;
 pub mod instruction;
 pub mod scope_node;
+pub mod gen_nhwc_code;
+pub mod context;
