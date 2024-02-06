@@ -1,10 +1,11 @@
-use clap::builder;
+use std::cell::RefCell;
+
 use derive_builder::Builder;
 use petgraph::{stable_graph::node_index, visit::Dfs};
 
-use crate::{node_mut, Cli};
+use crate::Cli;
 
-use super::{ast_node::AstTree, cfg_edge, cfg_node::{parse_ast_to_cfg, CfgGraph}, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, symbol_table::SymbolTable};
+use super::{ast_node::AstTree, cfg_node::{parse_ast_to_cfg, CfgGraph}, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, symbol_table::SymbolTable};
 
 #[derive(Default,Builder)]
 #[builder(default)]
@@ -50,5 +51,8 @@ impl Context{
         self.load_text();   
         generate_png_by_graph(&self.ast_tree,"ast_tree".to_string());  
         generate_png_by_graph(&self.cfg_graph,"cfg_graph".to_string());  
+    }
+    pub fn get_all_data_mut(&mut self){
+
     }
 }

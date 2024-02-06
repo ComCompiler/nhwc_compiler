@@ -51,21 +51,25 @@ pub enum MemOp{
         align:u32,
     }
 }
-#[derive(Clone)]
-pub enum Op{
-    ArithOp(ArithOp),
-    FuncOp(FuncOp),
-    Jump(JumpOp)
-}
+// #[derive(Clone)]
+// pub enum Op{
+//     ArithOp(ArithOp),
+//     FuncOp(FuncOp),
+//     Jump(JumpOp)
+// }
 
 #[derive(Clone)]
 pub enum Instruction{
-    Assign{
+    Arith{
         lhs:SymbolIndex,
         rhs:ArithOp,
     },
-    NotAssign{
-        op:Op,
+    Call{
+        assigned : Option<SymbolIndex>,
+        func_op : FuncOp
+    },
+    Jump{
+        op:JumpOp,
     }
 }
 #[derive(Clone)]
@@ -86,7 +90,7 @@ pub enum JumpOp{
     },
     Br{
         cond : SymbolIndex ,
-        t1 : SymbolIndex ,
+        t1 : SymbolIndex , // 这是一个 BasicBlock 的symbol 
         t2 : SymbolIndex,
     },
     Switch{
@@ -95,7 +99,7 @@ pub enum JumpOp{
         compared: Vec<ComparedPair>,
     },
     Jump{
-        cfg_des_label : u32 , // 这是 cfg blcok 的 索引
+        cfg_dst_label : u32 , // 这是 cfg blcok 的 索引
     },
 }
 

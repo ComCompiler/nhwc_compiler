@@ -18,9 +18,8 @@ pub struct Cli {
     c_file_path: PathBuf
 }
 
-///dfs遍历ast树寻找源文件代码块
 
-
+// 这是一个计时宏
 macro_rules! timeit {
     ($a:block , $word:expr) => {
         {
