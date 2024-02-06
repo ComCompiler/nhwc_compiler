@@ -7,7 +7,7 @@ mod tests{
     use petgraph::visit::Data;
     
     
-    use crate::{antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_functionDefinition}, find, find_nodes, toolkit::{ast_node::find_dfs_ast, context::{self, Context, ContextBuilder }, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, symbol_field::{DataType, Field}, symbol_table::{Symbol, SymbolBehavior, SymbolIndex, SymbolTable}}, Cli};
+    use crate::{antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_functionDefinition}, find, find_nodes, toolkit::{ast_node::find_dfs_ast, context::{self, Context, ContextBuilder }, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, instruction::Instruction, symbol_field::{DataType, Field}, symbol_table::{Symbol, SymbolBehavior, SymbolIndex, SymbolTable}}, Cli};
 
     #[test]
     fn add(){
@@ -165,5 +165,18 @@ mod tests{
         
         
         
+    }
+    #[test]
+    fn try_instruction_fmt(){
+        let mut symtab = SymbolTable::new();
+
+        let lhs_symbol_index = symtab.add(Symbol::new(0, "lhs".to_string()) );
+        let a_symbol_index = symtab.add(Symbol::new(0, "No.1".to_string()) );
+        let b_symbol_index = symtab.add(Symbol::new(0, "No.2".to_string()) );
+
+
+
+        let instr=Instruction::new_add(lhs_symbol_index, a_symbol_index, b_symbol_index);
+        println!("{:?}",instr)
     }
 }
