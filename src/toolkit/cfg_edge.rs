@@ -21,13 +21,11 @@ impl GetText for CfgEdge{
     fn get_text(&self)-> Option<&str> {
         match self {
             CfgEdge::Conditioned { ast_node:ptr_ast_node, text } =>{ 
-                let  ast_node = * ptr_ast_node ;
                 Some(text.as_str())
             }
             CfgEdge::Else {  } => None,
             CfgEdge::Direct {  } => None,
             CfgEdge::After { ast_node:ptr_ast_node, text } => { 
-                let  ast_node = * ptr_ast_node ;
                 Some(text.as_str())
             }
         }
