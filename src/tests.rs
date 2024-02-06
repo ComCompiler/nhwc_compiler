@@ -176,7 +176,9 @@ mod tests{
 
 
 
-        let instr=Instruction::new_add(lhs_symbol_index, a_symbol_index, b_symbol_index);
-        println!("{:?}",instr)
+        let instr=Instruction::new_add(lhs_symbol_index.clone(), a_symbol_index.clone(), b_symbol_index.clone());
+        let instr2 = Instruction::new_mul(lhs_symbol_index.clone(), a_symbol_index.clone(), b_symbol_index.clone());
+        println!("{:?}",instr);
+        println!("{:?}",instr2);
     }
 }

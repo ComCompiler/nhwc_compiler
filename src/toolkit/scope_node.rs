@@ -9,6 +9,7 @@ use super::{ast_node::AstTree, cfg_node::{CfgGraph, CfgNode, GetText}};
 
 pub type ScopeTree = StableDiGraph<ScopeNode,(),u32>;
 
+#[derive(Clone)]
 pub struct ScopeNode{
     cfg_nodes:Vec<u32>,
     text:String

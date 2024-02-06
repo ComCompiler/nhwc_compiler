@@ -1,3 +1,5 @@
+use super::symbol_table::{Symbol, SymbolIndex};
+
 
 pub trait Pass{
     fn before_pass(&self){}
@@ -5,5 +7,7 @@ pub trait Pass{
     fn visit_function(&self){ }
 }
 struct PassManager{
-    passes : Vec<Box<dyn Pass>>
+    passes : Vec<Box<dyn Pass>>,
+    loop_entries :  Vec<SymbolIndex>,
+    function_entries : Vec<SymbolIndex>
 }

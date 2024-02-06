@@ -10,7 +10,7 @@ pub struct SymbolTable {
 }
 
 /// 由于我们对 Symbol 的索引必须同时考虑 symbol 所在的scope 的层级以及 symbol的名字，不如直接改成结构体SymbolIndex
-#[derive(Debug,Clone,PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug,Clone,PartialEq, Eq, PartialOrd, Ord,)]
 pub struct SymbolIndex{
     pub scope_depth :i32 ,
     pub symbol_name : String
@@ -100,8 +100,9 @@ impl SymbolBehavior for Symbol{
     }
 }
 
+
 impl Symbol {
-    pub fn new( scope_depth:i32 ,symbol_name: String) -> Symbol{
+    pub fn new(scope_depth:i32 ,symbol_name: String) -> Symbol{
         Symbol{
             fields: HashMap::new(),
             symbol_name, 
