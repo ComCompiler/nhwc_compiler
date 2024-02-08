@@ -1,10 +1,11 @@
 
-use std::{cell::RefCell, rc::Rc, mem};
-use crate::{antlr_parser::{self, cvisitor::CVisitorCompat}, toolkit::ast_node::AstNode};
+use std::{any::Any, cell::RefCell, mem, rc::Rc};
+use crate::{antlr_parser::{self, clexer::ruleNames, cvisitor::CVisitorCompat}, toolkit::ast_node::AstNode};
+
 
 
 use antlr_parser::{clistener::CListener, cparser::CParserContextType};
-use antlr_rust::{tree::{ParseTreeListener,  ParseTreeVisitorCompat}, parser::ParserNodeType};
+use antlr_rust::{parser::ParserNodeType, parser_rule_context::ParserRuleContext, rule_context::CustomRuleContext, token::Token, tree::{LeafNode, ParseTree, ParseTreeListener, ParseTreeVisitorCompat, TerminalNode}};
 use petgraph::Graph;
 /*
 
@@ -17,7 +18,6 @@ pub type ASTGraphRcCell= Rc<RefCell<Graph<AstNode,(), petgraph::Directed>>>;
 pub struct TerminalOnlyListener<S>{
     pub st : S,  // status passing through the tree 
     pub visit_term_f: Box<dyn FnMut(& ParserContext,&mut S)->()>,
-
 }
 
 impl<'input,S> ParseTreeListener<'input,CParserContextType> for TerminalOnlyListener<S>{
@@ -29,27 +29,31 @@ impl<'input,S> ParseTreeListener<'input,CParserContextType> for TerminalOnlyList
 }
 impl<'input,S> CListener<'input> for TerminalOnlyListener<S>{ }
 
-pub struct TermianlRuleListener<S>{
+pub struct TerminalRuleListener<S>{
     pub st : S,  // status passing through the tree 
-    pub visit_term_f: Box<dyn FnMut(& ParserContext,&mut S)->()>,
-    pub enter_rule_f: Box<dyn FnMut(& ParserContext,&mut S)->()>,
-    pub exit_rule_f: Box<dyn FnMut(& ParserContext,&mut S)->()>
+    // pub visit_term_f: Box<dyn FnMut(& ParserContext,&mut S)->()>,
+    pub enter_rule_f: Box<dyn FnMut(& ParserContext,&mut S,bool,usize)->()>,
+    pub exit_rule_f: Box<dyn FnMut(& ParserContext,&mut S,bool,usize)->()>
 }
-
-impl<'input,S> ParseTreeListener<'input,CParserContextType> for TermianlRuleListener<S>{
-    fn visit_terminal(&mut self, _node: &antlr_rust::tree::TerminalNode<'input, CParserContextType>) {
-        (*self.visit_term_f)(_node,&mut self.st);
+impl<'input,S> ParseTreeListener<'input,CParserContextType> for TerminalRuleListener<S>{
+    fn visit_terminal(&mut self, ctx: &antlr_rust::tree::TerminalNode<'input, CParserContextType>) {
+        println!("token type  {}", ctx.symbol.get_token_type(),);
+        // 如果 token type = -1 那么，这是个 EOF 标记
+        if ctx.symbol.get_token_type() != -1 {
+            (*self.enter_rule_f)(ctx,&mut self.st,true,(ctx.symbol.get_token_type()) as usize);
+            (*self.exit_rule_f)(ctx,&mut self.st,true,(ctx.symbol.get_token_type()) as usize);
+        }
     }
     fn visit_error_node(&mut self, _node: &antlr_rust::tree::ErrorNode<'input, CParserContextType>) {
     }
-    fn enter_every_rule(&mut self, _ctx: &<CParserContextType as ParserNodeType>::Type) {
-        (*self.enter_rule_f)(_ctx,&mut self.st);
+    fn enter_every_rule(&mut self, ctx: &<CParserContextType as ParserNodeType>::Type) {
+        (*self.enter_rule_f)(ctx,&mut self.st,false,ctx.get_rule_index());
     }
-    fn exit_every_rule(&mut self, _ctx: &<CParserContextType as ParserNodeType>::Type) {
-        (*self.exit_rule_f)(_ctx,&mut self.st);
+    fn exit_every_rule(&mut self, ctx: &<CParserContextType as ParserNodeType>::Type) {
+        (*self.exit_rule_f)(ctx,&mut self.st,false,ctx.get_rule_index());
     }
 }
-impl<'input,S> CListener<'input> for TermianlRuleListener<S>{ }
+impl<'input,S> CListener<'input> for TerminalRuleListener<S>{ }
 
 
 
@@ -61,7 +65,8 @@ pub struct RuleOnlyListener<S>{
 }
 
 impl<'input,S> ParseTreeListener<'input,CParserContextType> for RuleOnlyListener<S>{
-    fn visit_terminal(&mut self, _node: &antlr_rust::tree::TerminalNode<'input, CParserContextType>) { }
+    fn visit_terminal(&mut self, node: &TerminalNode<'input, CParserContextType>) {
+     }
 
     fn visit_error_node(&mut self, _node: &antlr_rust::tree::ErrorNode<'input, CParserContextType>) {}
 

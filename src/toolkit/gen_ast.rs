@@ -2,7 +2,8 @@ use antlr_rust::{common_token_stream::CommonTokenStream, InputStream};
 use antlr_rust::rule_context::CustomRuleContext;
 use petgraph::{ Graph,  csr::NodeIndex};
 
-use crate::{toolkit::ast_node::AstNode, antlr_parser::{rule_only_walkers::RuleOnlyListener, clexer::CLexer, cparser::{CParser, CTreeWalker}}};
+use crate::{toolkit::ast_node::AstNode, antlr_parser::{rule_walkers::RuleOnlyListener, clexer::CLexer, cparser::{CParser, CTreeWalker}}};
+use crate::antlr_parser::rule_walkers::TerminalRuleListener;
 
 use super::ast_node::AstTree;
 use super::context::{self, Context};
@@ -15,11 +16,11 @@ pub fn parse_as_ast_tree(context : &mut Context){
     // 由于 antlr 已经生成了一个 AST 树 但我们需要的是 petgraph 类型，因此我们需要重新遍历一次这个树，生成 petgraph的
     {
     let mut  count = 0 ;
-    let listener = RuleOnlyListener{
+    let listener = TerminalRuleListener{
         st: (Vec::<usize>::new(),false,ast_tree,&mut count),
-        enter_rule_f:Box::new(|ctx,s|{
+        enter_rule_f:Box::new(|ctx,s,is_terminal,type_idx|{
             let (node_count_under_depth,is_last_wrap_drop,g,count) = s;
-            let mut ast_node = AstNode::new(ctx.get_rule_index(),ctx.get_text());
+            let mut ast_node = AstNode::new(type_idx ,ctx.get_text(), is_terminal);
             ast_node.node_index = **count;
             **count+=1;
             let node_id = g.add_node(ast_node).index() ;
@@ -45,7 +46,7 @@ pub fn parse_as_ast_tree(context : &mut Context){
             (0..node_count_under_depth.len()-1).for_each(|i|node_count_under_depth[i]+=1);
             *is_last_wrap_drop=false;
         }),
-        exit_rule_f: Box::new(|ctx,s|{
+        exit_rule_f: Box::new(|ctx,s,is_terminal, type_idx|{
             let (node_count_under_depth,is_last_wrap_drop,_g, count) = s;
             node_count_under_depth.pop();
             *is_last_wrap_drop=true;

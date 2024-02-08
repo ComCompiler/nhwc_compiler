@@ -61,7 +61,7 @@ mod tests{
 
     }
     #[test]
-    fn gen_png(){
+    fn gen_ast_png(){
         // 读取命令选项，诸如 -c 表示代码文件地址
         // 你也可以通过运行 cargo run -- --help 来查看所有可用选项
         let path = "./demos/demo.c".to_string();

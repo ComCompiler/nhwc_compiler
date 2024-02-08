@@ -11,3 +11,5 @@ pub mod instruction;
 pub mod scope_node;
 pub mod gen_nhwc_cfg;
 pub mod context;
+pub mod gen_et;
+pub mod macros;
