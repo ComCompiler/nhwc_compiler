@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use petgraph::{adj::NodeIndex, graph::DiGraph, stable_graph::{StableDiGraph, StableGraph}, visit::Bfs};
+use petgraph::{ graph::DiGraph, stable_graph::{NodeIndex, StableDiGraph, StableGraph}, visit::Bfs};
 
 use petgraph::visit::{Dfs, Walker};
 pub type AstTree = StableDiGraph<AstNode,(),u32>;
@@ -30,7 +30,7 @@ impl Debug for AstNode{
 
 
 /// 返回 start 所有子节点以dfs序返回的特定rule_id 的迭代器
-pub fn find_dfs_ast<'a>(ast_tree:&'a AstTree,start:NodeIndex,target_rule_id: usize) -> impl Iterator<Item = u32> + 'a{
+pub fn find_dfs_ast<'a>(ast_tree:&'a AstTree,start:u32,target_rule_id: usize) -> impl Iterator<Item = u32> + 'a{
     // let ast_tree = &*ast_tree_rc.borrow();
     let dfs = Dfs::new(ast_tree, NodeIndex::from(start));
     let dfs_iter= dfs.iter(ast_tree);
@@ -58,8 +58,18 @@ pub fn find_bfs_ast<'a>(ast_tree:&'a AstTree,start:NodeIndex,target_rule_id: usi
 
 
 /// 返回 start 下一层特定rule_id 的迭代器
-pub fn find_neighbors_ast<'a>(ast_tree:&'a AstTree,start:NodeIndex,target_rule_id: usize) ->impl Iterator<Item = u32> + 'a {
+pub fn find_neighbors_ast<'a>(ast_tree:&'a AstTree,start:u32,target_rule_id: usize) ->impl Iterator<Item = u32> + 'a {
     let ns = ast_tree.neighbors(NodeIndex::from(start));
     ns.map(|x| x.index() as u32).filter(move |x| ast_tree.node_weight(NodeIndex::from(*x)).unwrap().rule_id == target_rule_id )
+}
+pub fn find_neighbors_term_ast<'a>(ast_tree:&'a AstTree,start:u32,target_term_id: usize) ->impl Iterator<Item = u32> + 'a {
+    let ns = ast_tree.neighbors(NodeIndex::from(start));
+    ns.map(|x| x.index() as u32).filter(move |x| ast_tree.node_weight(NodeIndex::from(*x)).unwrap().rule_id == target_term_id 
+                                                                && ast_tree.node_weight(NodeIndex::from(*x)).unwrap().is_terminal == true )
+}
+pub fn find_neighbors_rule_ast<'a>(ast_tree:&'a AstTree,start:u32,target_rule_id: usize) ->impl Iterator<Item = u32> + 'a {
+    let ns = ast_tree.neighbors(NodeIndex::from(start));
+    ns.map(|x| x.index() as u32).filter(move |x| ast_tree.node_weight(NodeIndex::from(*x)).unwrap().rule_id == target_rule_id 
+                                                                && ast_tree.node_weight(NodeIndex::from(*x)).unwrap().is_terminal == false )
 }
 

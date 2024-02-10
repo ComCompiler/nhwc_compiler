@@ -37,7 +37,7 @@ pub struct TerminalRuleListener<S>{
 }
 impl<'input,S> ParseTreeListener<'input,CParserContextType> for TerminalRuleListener<S>{
     fn visit_terminal(&mut self, ctx: &antlr_rust::tree::TerminalNode<'input, CParserContextType>) {
-        println!("token type  {}", ctx.symbol.get_token_type(),);
+        // println!("token type  {}", ctx.symbol.get_token_type(),);
         // 如果 token type = -1 那么，这是个 EOF 标记
         if ctx.symbol.get_token_type() != -1 {
             (*self.enter_rule_f)(ctx,&mut self.st,true,(ctx.symbol.get_token_type()) as usize);

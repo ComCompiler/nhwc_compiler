@@ -11,7 +11,7 @@
 macro_rules! find {
     (rule $id:ident at $node:ident in $ast_tree:ident) => {
         {
-            let mut iter  = crate::toolkit::ast_node::find_neighbors_ast($ast_tree,$node,$id);
+            let mut iter  = crate::toolkit::ast_node::find_neighbors_rule_ast($ast_tree,$node,$id);
             iter.next()
         }
     } ;
@@ -22,9 +22,15 @@ macro_rules! find {
             find!(rule $fin_id at new_node in $ast_tree)
         }
     };
-    (symbol $symbol_name:ident at $scope_depth:ident  in $symtab:ident) => {
+    (symbol $symbol_name:ident at $scope_node:ident  in $symtab:ident) => {
         {
-            $symtab.get_verbose($symbol_name , $scope_depth)
+            $symtab.get_verbose($symbol_name , $scope_node)
+        }
+    };
+    (term $term_name:ident at $node:ident in $ast_tree:ident) => {
+        {
+            let mut iter  = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,$id);
+            iter.next()
         }
     };
     (field $field_id:ident as $field_type:ident in $symbol:ident) => {
@@ -70,7 +76,7 @@ macro_rules! find {
 macro_rules! find_nodes {
     (rule $id:ident at $node:ident in $ast_tree:ident) => {
         {
-            let iter = crate::toolkit::ast_node::find_neighbors_ast($ast_tree,$node,$id);
+            let iter = crate::toolkit::ast_node::find_neighbors_rule_ast($ast_tree,$node,$id);
             iter.collect()
         }
     };

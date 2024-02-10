@@ -25,7 +25,7 @@ mod tests{
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
         let node_ids:Vec<u32> = find_dfs_ast(&ast_tree, 0,RULE_functionDefinition ).collect();
-        assert_eq!(node_ids , vec![3,143] ,"找到的 node id 不对");
+        assert_eq!(node_ids , vec![3,176] ,"找到的 node id 不对");
     }
 
     #[test]
@@ -39,9 +39,9 @@ mod tests{
         parse_as_ast_tree(&mut context);
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
-        let node = 3;
+        let node =find_dfs_ast(ast_tree, 0, RULE_functionDefinition).next().unwrap();  // 三号节点是一个 function def 
         let node_id= find!(rule RULE_compoundStatement at node in ast_tree).unwrap();
-        assert_eq!(node_id , 10 ,"找到的 node id 不对");
+        assert_eq!(node_id , 14 ,"找到的 node id 不对");
     }
     #[test]
     fn find_items_of_itemlists_using_macro_find_nodes(){
@@ -55,10 +55,9 @@ mod tests{
         parse_as_ast_tree(&mut context);
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
-        let node =11;
+        let node =find_dfs_ast(ast_tree, 0, RULE_blockItemList).next().unwrap();  // 三号节点是一个 function def 
         let node_ids:Vec<u32>= find_nodes!(rule RULE_blockItem at node in ast_tree);
-        assert_eq!(node_ids , vec![121,24,12] ,"找到的 node id 不对");
-
+        assert_eq!(node_ids , vec![150,34,17] ,"找到的 node id 不对");
     }
     #[test]
     fn gen_ast_png(){
@@ -84,14 +83,12 @@ mod tests{
         let ast_tree = &mut context.ast_tree;
 
         //dfs遍历ast
-        let node =3;  // 三号节点是一个 function def 
+        let node =find_dfs_ast(ast_tree, 0, RULE_functionDefinition).next().unwrap();  // 三号节点是一个 function def 
         let node_ids:Vec<u32>= find_nodes!(rule RULE_compoundStatement 
                                            then RULE_blockItemList
                                            finally RULE_blockItem
                                               at node in ast_tree);
-        assert_eq!(node_ids , vec![121,24,12] ,"找到的 node id 不对");
-
-
+        assert_eq!(node_ids , vec![150,34,17] ,"找到的 node id 不对");
     }
     #[test]
     fn find_items_of_func_def_using_macro_find_node_test2(){
@@ -103,14 +100,14 @@ mod tests{
         parse_as_ast_tree(&mut context);
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
-        let node =3;  // 三号节点是一个 function def 
+        let node =find_dfs_ast(ast_tree, 0, RULE_functionDefinition).next().unwrap();  // 三号节点是一个 function def 
         let node_ids= find!(rule RULE_compoundStatement 
                                 finally RULE_blockItemList
                                 at node in ast_tree).unwrap();
-        assert_eq!(node_ids , 11 ,"找到的 node id 不对");
-
-
+        assert_eq!(node_ids , 16 ,"找到的 node id 不对");
     }
+
+    
     #[test]
     fn find_symbol(){
         let mut symtab = SymbolTable::new();
