@@ -9,8 +9,10 @@ use super::{ast_node::AstTree, cfg_node::{CfgGraph, CfgNode, GetText}};
 
 pub type ScopeTree = StableDiGraph<ScopeNode,(),u32>;
 
+#[derive(Clone)]
 pub struct ScopeNode{
-    cfg_nodes:Vec<u32>,
+    pub cfg_nodes:Vec<u32>,
+    pub ast_nodes:Vec<u32>,
     text:String
 }
 impl GetText for ScopeNode {
@@ -35,3 +37,4 @@ impl ScopeNode{
         let _ = mem::replace(&mut self.text, new_str);
     }
 }
+

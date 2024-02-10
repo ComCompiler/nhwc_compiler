@@ -35,7 +35,7 @@ pub struct FuncOp{
 }
 #[derive(Clone)]
 pub struct PhiPair{
-    value : SymbolIndex,
+    variable : SymbolIndex,
     bb : SymbolIndex,
 }
 #[derive(Clone)]
@@ -152,15 +152,15 @@ impl Debug for ArithOp{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Add { a, b } => 
-                    write!(f,"Add type {}, {}",a.symbol_name,b.symbol_name),
+                write!(f,"Add type {}, {}",a.symbol_name,b.symbol_name),
             Self::Mul { a, b } => 
-                    write!(f,"Mul type {}, {}",a.symbol_name,b.symbol_name),
-                Self::Div { a, b } => 
-                    write!(f,"Div type {}, {}",a.symbol_name,b.symbol_name),
-                Self::Sub { a, b } => 
-                    write!(f,"Sub type {}, {}",a.symbol_name,b.symbol_name),
-                Self::Icmp { plan, a, b } => 
-                    write!(f,"icmp {:?} type {}, {}",plan,a.symbol_name,b.symbol_name)
+                write!(f,"Mul type {}, {}",a.symbol_name,b.symbol_name),
+            Self::Div { a, b } => 
+                write!(f,"Div type {}, {}",a.symbol_name,b.symbol_name),
+            Self::Sub { a, b } => 
+                write!(f,"Sub type {}, {}",a.symbol_name,b.symbol_name),
+            Self::Icmp { plan, a, b } => 
+                write!(f,"icmp {:?} type {}, {}",plan,a.symbol_name,b.symbol_name)
         }
     }
 }

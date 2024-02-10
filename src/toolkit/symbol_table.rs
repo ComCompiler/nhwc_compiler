@@ -10,9 +10,9 @@ pub struct SymbolTable {
 }
 
 /// 由于我们对 Symbol 的索引必须同时考虑 symbol 所在的scope 的层级以及 symbol的名字，不如直接改成结构体SymbolIndex
-#[derive(Debug,Clone,PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug,Clone,PartialEq, Eq, PartialOrd, Ord,)]
 pub struct SymbolIndex{
-    pub scope_depth :i32 ,
+    pub scope_node :u32 ,
     pub symbol_name : String
 }
 impl SymbolTable {
@@ -26,7 +26,7 @@ impl SymbolTable {
     // 添加或更新符号，如果是更新，那么返回旧的符号
     pub fn add(&mut self, symbol: Symbol) -> SymbolIndex{
         let symbol_index = SymbolIndex{
-            scope_depth: symbol.scope_depth,
+            scope_node: symbol.scope_node,
             symbol_name: symbol.symbol_name.clone(),
         };
         let retured_symbol_index = symbol_index.clone();
@@ -37,14 +37,14 @@ impl SymbolTable {
     }
 
     // 查找符号
-    pub fn get_verbose(&self, symbol_name:String ,  scope_depth : i32) -> Option<&Symbol> {
-        self.map.get(&SymbolIndex { scope_depth ,  symbol_name} )
+    pub fn get_verbose(&self, symbol_name:String ,  scope_node : u32) -> Option<&Symbol> {
+        self.map.get(&SymbolIndex { scope_node ,  symbol_name} )
     }
     pub fn get(&self, symbol_index : &SymbolIndex) -> Option<&Symbol> {
         self.map.get(symbol_index)
     }
-    pub fn get_mut_verbose(&mut self, symbol_name:String ,  scope_depth : i32) -> Option<&mut Symbol> {
-        self.map.get_mut(&SymbolIndex { scope_depth ,  symbol_name} )
+    pub fn get_mut_verbose(&mut self, symbol_name:String ,  scope_node : u32) -> Option<&mut Symbol> {
+        self.map.get_mut(&SymbolIndex { scope_node ,  symbol_name} )
     }
     pub fn get_mut(&mut self, symbol_index : &SymbolIndex) -> Option<&mut Symbol> {
         self.map.get_mut(symbol_index)
@@ -54,8 +54,8 @@ impl SymbolTable {
     pub fn remove(&mut self, symbol_index : &SymbolIndex) {
         self.map.remove(symbol_index);
     }
-    pub fn remove_verbose(&mut self, symbol_name:String ,  scope_depth : i32) {
-        self.map.remove(&SymbolIndex { scope_depth ,  symbol_name} );
+    pub fn remove_verbose(&mut self, symbol_name:String ,  scope_node : u32) {
+        self.map.remove(&SymbolIndex { scope_node ,  symbol_name} );
     }
 }
 impl Default for SymbolTable{
@@ -68,7 +68,7 @@ impl Default for SymbolTable{
 #[derive(Debug,Clone)]
 pub struct Symbol{
     fields :  HashMap<&'static str,Box<dyn Field>>,
-    scope_depth :i32 ,
+    scope_node :u32 ,
     symbol_name : String
 }
 pub trait SymbolBehavior{
@@ -100,12 +100,13 @@ impl SymbolBehavior for Symbol{
     }
 }
 
+
 impl Symbol {
-    pub fn new( scope_depth:i32 ,symbol_name: String) -> Symbol{
+    pub fn new(scope_node:u32 ,symbol_name: String) -> Symbol{
         Symbol{
             fields: HashMap::new(),
             symbol_name, 
-            scope_depth,
+            scope_node,
         }
     }
 }

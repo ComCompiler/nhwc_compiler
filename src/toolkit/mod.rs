@@ -1,5 +1,6 @@
 pub mod ast_node;
 pub mod cfg_node;
+pub mod gen_cfg;
 pub mod cfg_edge;
 pub mod symbol_field;
 pub mod symbol_table;
@@ -8,5 +9,7 @@ pub mod gen_ast;
 pub mod pass_manager;
 pub mod instruction;
 pub mod scope_node;
-pub mod gen_nhwc_code;
+pub mod gen_nhwc_cfg;
 pub mod context;
+pub mod gen_et;
+pub mod macros;
