@@ -129,6 +129,9 @@ macro_rules! add_edge {
     ($a:ident to $b:ident in $ast_tree:ident) => {
         $ast_tree.add_edge(NodeIndex::from($a), NodeIndex::from($b),() ).index() as u32 
     };
+    (from $a:ident to $b:ident in $scope_tree:ident) => {
+        $scope_tree.add_edge(NodeIndex::from($a), NodeIndex::from($b),() ).index() as u32 
+    };
 }
 #[macro_export] 
 macro_rules! add_node {
