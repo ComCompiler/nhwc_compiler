@@ -7,7 +7,7 @@ mod tests{
     use petgraph::visit::Data;
     
     
-    use crate::{antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_functionDefinition}, find, find_nodes, toolkit::{ast_node::find_dfs_ast, context::{self, Context, ContextBuilder }, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, instruction::Instruction, symbol_field::{DataType, Field}, symbol_table::{Symbol, SymbolBehavior, SymbolIndex, SymbolTable}}, Cli};
+    use crate::{antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_functionDefinition}}, find, find_nodes, toolkit::{ast_node::find_dfs_ast, context::{self, Context, ContextBuilder }, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, instruction::Instruction, symbol_field::{DataType, Field}, symbol_table::{Symbol, SymbolBehavior, SymbolIndex, SymbolTable}}, Cli};
 
     #[test]
     fn add(){
@@ -101,10 +101,10 @@ mod tests{
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
         let node =find_dfs_ast(ast_tree, 0, RULE_functionDefinition).next().unwrap();  // 三号节点是一个 function def 
-        let node_ids= find!(rule RULE_compoundStatement 
+        let node= find!(rule RULE_compoundStatement 
                                 finally RULE_blockItemList
                                 at node in ast_tree).unwrap();
-        assert_eq!(node_ids , 16 ,"找到的 node id 不对");
+        assert_eq!(node , 16 ,"找到的 node id 不对");
     }
 
     
@@ -177,5 +177,19 @@ mod tests{
         let instr2 = Instruction::new_mul(lhs_symbol_index.clone(), a_symbol_index.clone(), b_symbol_index.clone());
         println!("{:?}",instr);
         println!("{:?}",instr2);
+    }
+    #[test]
+    fn find_term(){
+        let mut args = Cli::parse();
+        // 设置 path 为 demo.c
+        args.c_file_path = PathBuf::from_str("./demos/demo.c").unwrap();
+        let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
+        let mut context = ContextBuilder::default().code(code).build().unwrap();
+        parse_as_ast_tree(&mut context);
+        let ast_tree = &mut context.ast_tree;
+        //dfs遍历ast
+        let node = 266;  // 三号节点是一个 function def 
+        let node= find!(term Return at node in ast_tree).unwrap();
+        assert_eq!(node , 267 ,"找到的 node id 不对");
     }
 }

@@ -29,7 +29,7 @@ macro_rules! find {
     };
     (term $term_name:ident at $node:ident in $ast_tree:ident) => {
         {
-            let mut iter  = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,$id);
+            let mut iter  = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,$term_name);
             iter.next()
         }
     };
