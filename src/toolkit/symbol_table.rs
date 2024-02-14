@@ -15,6 +15,10 @@ pub struct SymbolIndex{
     pub scope_node :u32 ,
     pub symbol_name : String
 }
+impl SymbolIndex{
+    pub fn new(scope_node:u32, symbol_name:String)->Self{
+        SymbolIndex{ scope_node,symbol_name } }
+}
 impl SymbolTable {
     // 创建一个新的符号表
     pub fn new() -> SymbolTable {
@@ -25,10 +29,7 @@ impl SymbolTable {
 
     // 添加或更新符号，如果是更新，那么返回旧的符号
     pub fn add(&mut self, symbol: Symbol) -> SymbolIndex{
-        let symbol_index = SymbolIndex{
-            scope_node: symbol.scope_node,
-            symbol_name: symbol.symbol_name.clone(),
-        };
+        let symbol_index = symbol.sym_idx.clone();
         let retured_symbol_index = symbol_index.clone();
         match self.map.insert(symbol_index,symbol){
             None =>{retured_symbol_index},
@@ -68,8 +69,7 @@ impl Default for SymbolTable{
 #[derive(Debug,Clone)]
 pub struct Symbol{
     fields :  HashMap<&'static str,Box<dyn Field>>,
-    scope_node :u32 ,
-    symbol_name : String
+    pub sym_idx : SymbolIndex,
 }
 pub trait SymbolBehavior{
     fn add_field(&mut self,key :&'static str,sf:Box<dyn Field>);
@@ -105,8 +105,7 @@ impl Symbol {
     pub fn new(scope_node:u32 ,symbol_name: String) -> Symbol{
         Symbol{
             fields: HashMap::new(),
-            symbol_name, 
-            scope_node,
+            sym_idx : SymbolIndex::new(scope_node, symbol_name)
         }
     }
 }

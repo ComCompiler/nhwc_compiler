@@ -29,7 +29,7 @@ macro_rules! find {
     };
     (term $term_name:ident at $node:ident in $ast_tree:ident) => {
         {
-            let mut iter  = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,$id);
+            let mut iter  = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,$term_name);
             iter.next()
         }
     };
@@ -128,9 +128,6 @@ macro_rules! add_edge {
     };
     ($a:ident to $b:ident in $ast_tree:ident) => {
         $ast_tree.add_edge(NodeIndex::from($a), NodeIndex::from($b),() ).index() as u32 
-    };
-    (from $a:ident to $b:ident in $scope_tree:ident) => {
-        $scope_tree.add_edge(NodeIndex::from($a), NodeIndex::from($b),() ).index() as u32 
     };
 }
 #[macro_export] 

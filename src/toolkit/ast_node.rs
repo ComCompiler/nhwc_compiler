@@ -62,9 +62,9 @@ pub fn find_neighbors_ast<'a>(ast_tree:&'a AstTree,start:u32,target_rule_id: usi
     let ns = ast_tree.neighbors(NodeIndex::from(start));
     ns.map(|x| x.index() as u32).filter(move |x| ast_tree.node_weight(NodeIndex::from(*x)).unwrap().rule_id == target_rule_id )
 }
-pub fn find_neighbors_term_ast<'a>(ast_tree:&'a AstTree,start:u32,target_term_id: usize) ->impl Iterator<Item = u32> + 'a {
+pub fn find_neighbors_term_ast<'a>(ast_tree:&'a AstTree,start:u32,target_term_id: isize) ->impl Iterator<Item = u32> + 'a {
     let ns = ast_tree.neighbors(NodeIndex::from(start));
-    ns.map(|x| x.index() as u32).filter(move |x| ast_tree.node_weight(NodeIndex::from(*x)).unwrap().rule_id == target_term_id 
+    ns.map(|x| x.index() as u32).filter(move |x| ast_tree.node_weight(NodeIndex::from(*x)).unwrap().rule_id == (target_term_id as u32).try_into().unwrap() 
                                                                 && ast_tree.node_weight(NodeIndex::from(*x)).unwrap().is_terminal == true )
 }
 pub fn find_neighbors_rule_ast<'a>(ast_tree:&'a AstTree,start:u32,target_rule_id: usize) ->impl Iterator<Item = u32> + 'a {
