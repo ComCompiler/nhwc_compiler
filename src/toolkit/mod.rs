@@ -13,3 +13,4 @@ pub mod gen_nhwc_cfg;
 pub mod context;
 pub mod gen_et;
 pub mod macros;
+mod gen_scope;

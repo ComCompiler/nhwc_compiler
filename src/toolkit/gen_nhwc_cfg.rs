@@ -45,7 +45,6 @@ fn parse_unit(cfg_graph:&mut CfgGraph,nhwc_cfg:&mut NhwcCfg,symtab : &mut Symbol
 /// 由于cfg 里面包含了其他的一些块和边，例如 branch 块和 after conditioned边
 /// 因此我们需要再做一次转化，把边转化成相应的跳转或者调整代码，把所有node 都转化成BasicBlock
 fn parse_cfg_into_nhwc_cfg(context :&mut Context){
-    let cfg_graph = &mut context.cfg_graph;
-
+    let (cfg_graph,scope_tree)= (&mut context.cfg_graph , &mut context.scope_tree);
 
 }

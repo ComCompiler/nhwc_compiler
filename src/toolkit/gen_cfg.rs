@@ -1,5 +1,5 @@
 use petgraph::stable_graph::{EdgeIndex, NodeIndex};
-use petgraph::visit::{EdgeRef};
+use petgraph::visit::EdgeRef;
 use crate::toolkit::ast_node::AstTree;
 use crate::toolkit::cfg_edge::CfgEdge;
 use crate::{add_edge, add_node, direct_node, find_nodes_by_dfs, rule_id, RULE_compoundStatement, RULE_functionDefinition};

@@ -5,7 +5,7 @@ use petgraph::{stable_graph::node_index, visit::Dfs};
 
 use crate::Cli;
 
-use super::{ast_node::AstTree, cfg_node::CfgGraph, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, gen_cfg::{parse_ast_to_cfg}, scope_node::ScopeTree, symbol_table::SymbolTable};
+use super::{ast_node::AstTree, cfg_node::CfgGraph, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, gen_cfg::parse_ast_to_cfg, gen_scope::parse_ast_to_scope, scope_node::{self, ScopeTree}, symbol_table::SymbolTable};
 
 #[derive(Default,Builder)]
 #[builder(default)]
@@ -31,6 +31,7 @@ impl Context{
     pub fn load_text(&mut self){
         let cfg_graph = &mut self.cfg_graph;
         let ast_tree = &mut self.ast_tree;
+        let scope_tree = &mut self.scope_tree;
         // let symt = self.op_cfg_graph.unwrap();
         let mut dfs = Dfs::new(&*cfg_graph, node_index(0));
         for cfg_edge in cfg_graph.edge_weights_mut()  {
@@ -38,6 +39,9 @@ impl Context{
         }
         for cfg_node in cfg_graph.node_weights_mut(){
             cfg_node.load_ast_node_text(&ast_tree);
+        }
+        for scope_node in scope_tree.node_weights_mut(){
+            scope_node.load_ast_node_text(&ast_tree);
         }
     }   
     pub fn init(args:Cli) -> Self{
@@ -48,6 +52,8 @@ impl Context{
         parse_as_ast_tree(&mut context);
         //第二步，根据 ast_tree 生成 cfg_graph
         parse_ast_to_cfg(&mut context);
+        //第三步，根据ast_tree生成scope_tree
+        parse_ast_to_scope(&mut context);
 
         context
     }
@@ -55,6 +61,7 @@ impl Context{
         self.load_text();   
         generate_png_by_graph(&self.ast_tree,"ast_tree".to_string());  
         generate_png_by_graph(&self.cfg_graph,"cfg_graph".to_string());  
+        generate_png_by_graph(&self.scope_tree, "scope_tree".to_string());
     }
     pub fn get_all_data_mut(&mut self){
 
