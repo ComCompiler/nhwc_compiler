@@ -12,7 +12,7 @@ pub type ScopeTree = StableDiGraph<ScopeNode,(),u32>;
 
 #[derive(Clone)]
 pub struct ScopeNode{
-    pub ast_nodes:Vec<u32>,
+    pub ast_node:u32,
     pub text:String
 }
 impl GetText for ScopeNode {
@@ -26,17 +26,9 @@ impl GetText for ScopeNode {
 }
 impl ScopeNode {
     pub fn load_ast_node_text(&mut self, ast_tree: &AstTree) {
-        let new_str = {let mut s = String::new();
-            for &ast_node_idx in &self.ast_nodes {
-                let node_index = petgraph::graph::NodeIndex::new(ast_node_idx as usize);
-                if let Some(ast_node) = ast_tree.node_weight(node_index) {
-                    s += ast_node.text.as_str();
-                    s += "\n";
-                }
-            }
-            s
-        };
-        let _ = std::mem::replace(&mut self.text, new_str);
+        let ast_node = self.ast_node;
+        let new_str = node!(at ast_node in ast_tree).text.clone();
+        let _  = mem::replace(&mut self.text, new_str);
     }
 }
 // impl ScopeNode{
@@ -55,7 +47,7 @@ impl ScopeNode {
 
 impl Debug for ScopeNode{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"{:?} {}",self.ast_nodes,self.text)
+        write!(f,"{:?} {}",self.ast_node,self.text)
     }
 }
 

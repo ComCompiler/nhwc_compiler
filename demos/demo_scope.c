@@ -11,7 +11,22 @@ void test(int x,int a ){
 }
 
 int test2(int abc){
-    
+    if(abc>0){
+        abc++;
+    }
+    else abc--;
+    while(abc>0){
+        abc++;
+    }
+    for(int i;i<10;i++){
+        abc++;
+    }
+    switch(abc){
+        case 0:abc++;break;
+        case 1:abc--;break;
+        default:abc = abc+3;break;
+    }
+    return abc;
 }
 
 
@@ -20,4 +35,5 @@ int main(){
     test(f,g);
     {{}} 
     {}
+    return 0;
 }
