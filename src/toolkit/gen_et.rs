@@ -56,7 +56,7 @@ fn process_ident(et_tree:&mut EtTree , ast_tree: &mut AstTree,scope_tree:&ScopeT
 }
 
 
-fn symbol_def_use_order_check(et_tree:&mut EtTree , ast_tree: &mut AstTree,scope_tree:&ScopeTree,ident_node:u32,scope_node:u32,src_ast_node_in_scope_node:u32,l_or_r_val:L_or_R_Val)->u32{
+// fn symbol_def_use_order_check(et_tree:&mut EtTree , ast_tree: &mut AstTree,scope_tree:&ScopeTree,ident_node:u32,scope_node:u32,src_ast_node_in_scope_node:u32,l_or_r_val:L_or_R_Val)->u32{
     // let sym_name = node!(at ident_node in ast_tree).text.clone();
     // // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 
@@ -80,4 +80,4 @@ fn symbol_def_use_order_check(et_tree:&mut EtTree , ast_tree: &mut AstTree,scope
     // let et_node = add_node!(et_node_struct to et_tree);
     // et_node
 
-}
+// }

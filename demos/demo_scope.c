@@ -12,7 +12,8 @@ void test(int x,int a ){
 
 int test2(int abc){
     if(abc>0){
-        abc++;
+        abc = abc+2;
+        {abc++;}
     }
     else abc--;
     while(abc>0){
