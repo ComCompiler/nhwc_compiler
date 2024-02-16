@@ -108,7 +108,7 @@ use std::ops::{Deref, DerefMut};
 	pub const PlusPlus:isize=77; 
 	pub const Minus:isize=78; 
 	pub const MinusMinus:isize=79; 
-	pub const Star:isize=80; 
+	pub const Mul:isize=80; 
 	pub const Div:isize=81; 
 	pub const Mod:isize=82; 
 	pub const And:isize=83; 
@@ -123,7 +123,7 @@ use std::ops::{Deref, DerefMut};
 	pub const Semi:isize=92; 
 	pub const Comma:isize=93; 
 	pub const Assign:isize=94; 
-	pub const StarAssign:isize=95; 
+	pub const MulAssign:isize=95; 
 	pub const DivAssign:isize=96; 
 	pub const ModAssign:isize=97; 
 	pub const PlusAssign:isize=98; 
@@ -169,8 +169,8 @@ use std::ops::{Deref, DerefMut};
 		"ThreadLocal", "LeftParen", "RightParen", "LeftBracket", "RightBracket", 
 		"LeftBrace", "RightBrace", "Less", "LessEqual", "Greater", "GreaterEqual", 
 		"LeftShift", "RightShift", "Plus", "PlusPlus", "Minus", "MinusMinus", 
-		"Star", "Div", "Mod", "And", "Or", "AndAnd", "OrOr", "Caret", "Not", "Tilde", 
-		"Question", "Colon", "Semi", "Comma", "Assign", "StarAssign", "DivAssign", 
+		"Mul", "Div", "Mod", "And", "Or", "AndAnd", "OrOr", "Caret", "Not", "Tilde", 
+		"Question", "Colon", "Semi", "Comma", "Assign", "MulAssign", "DivAssign", 
 		"ModAssign", "PlusAssign", "MinusAssign", "LeftShiftAssign", "RightShiftAssign", 
 		"AndAssign", "XorAssign", "OrAssign", "Equal", "NotEqual", "Arrow", "Dot", 
 		"Ellipsis", "Identifier", "IdentifierNondigit", "Nondigit", "Digit", "UniversalCharacterName", 
@@ -228,16 +228,16 @@ use std::ops::{Deref, DerefMut};
 		Some("LeftBracket"), Some("RightBracket"), Some("LeftBrace"), Some("RightBrace"), 
 		Some("Less"), Some("LessEqual"), Some("Greater"), Some("GreaterEqual"), 
 		Some("LeftShift"), Some("RightShift"), Some("Plus"), Some("PlusPlus"), 
-		Some("Minus"), Some("MinusMinus"), Some("Star"), Some("Div"), Some("Mod"), 
+		Some("Minus"), Some("MinusMinus"), Some("Mul"), Some("Div"), Some("Mod"), 
 		Some("And"), Some("Or"), Some("AndAnd"), Some("OrOr"), Some("Caret"), 
 		Some("Not"), Some("Tilde"), Some("Question"), Some("Colon"), Some("Semi"), 
-		Some("Comma"), Some("Assign"), Some("StarAssign"), Some("DivAssign"), 
-		Some("ModAssign"), Some("PlusAssign"), Some("MinusAssign"), Some("LeftShiftAssign"), 
-		Some("RightShiftAssign"), Some("AndAssign"), Some("XorAssign"), Some("OrAssign"), 
-		Some("Equal"), Some("NotEqual"), Some("Arrow"), Some("Dot"), Some("Ellipsis"), 
-		Some("Identifier"), Some("Constant"), Some("DigitSequence"), Some("StringLiteral"), 
-		Some("MultiLineMacro"), Some("Directive"), Some("AsmBlock"), Some("Whitespace"), 
-		Some("Newline"), Some("BlockComment"), Some("LineComment")
+		Some("Comma"), Some("Assign"), Some("MulAssign"), Some("DivAssign"), Some("ModAssign"), 
+		Some("PlusAssign"), Some("MinusAssign"), Some("LeftShiftAssign"), Some("RightShiftAssign"), 
+		Some("AndAssign"), Some("XorAssign"), Some("OrAssign"), Some("Equal"), 
+		Some("NotEqual"), Some("Arrow"), Some("Dot"), Some("Ellipsis"), Some("Identifier"), 
+		Some("Constant"), Some("DigitSequence"), Some("StringLiteral"), Some("MultiLineMacro"), 
+		Some("Directive"), Some("AsmBlock"), Some("Whitespace"), Some("Newline"), 
+		Some("BlockComment"), Some("LineComment")
 	];
 	lazy_static!{
 	    static ref _shared_context_cache: Arc<PredictionContextCache> = Arc::new(PredictionContextCache::new());

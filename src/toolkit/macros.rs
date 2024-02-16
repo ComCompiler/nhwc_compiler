@@ -11,7 +11,7 @@
 macro_rules! find {
     (rule $id:ident at $node:ident in $ast_tree:ident) => {
         {
-            let mut iter  = crate::toolkit::ast_node::find_neighbors_rule_ast($ast_tree,$node,$id);
+            let mut iter  = crate::toolkit::ast_node::find_neighbors_rule_ast($ast_tree,$node,Some($id));
             iter.next()
         }
     } ;
@@ -29,7 +29,13 @@ macro_rules! find {
     };
     (term $term_name:ident at $node:ident in $ast_tree:ident) => {
         {
-            let mut iter  = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,$term_name);
+            let mut iter  = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,Some($term_name));
+            iter.next()
+        }
+    };
+    (term at $node:ident in $ast_tree:ident) => {
+        {
+            let mut iter  = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,None);
             iter.next()
         }
     };
@@ -76,7 +82,14 @@ macro_rules! find {
 macro_rules! find_nodes {
     (rule $id:ident at $node:ident in $ast_tree:ident) => {
         {
-            let iter = crate::toolkit::ast_node::find_neighbors_rule_ast($ast_tree,$node,$id);
+            let iter = crate::toolkit::ast_node::find_neighbors_rule_ast($ast_tree,$node,Some($id));
+            let nodes:Vec<u32> = iter.collect();
+            nodes
+        }
+    };
+    (rule at $node:ident in $ast_tree:ident) => {
+        {
+            let iter = crate::toolkit::ast_node::find_neighbors_rule_ast($ast_tree,$node,None);
             let nodes:Vec<u32> = iter.collect();
             nodes
         }
@@ -89,6 +102,14 @@ macro_rules! find_nodes {
             nodes
         }
     };
+    (rule $($id:ident)then+ finally at $node:ident in $ast_tree:ident) => {
+        {
+            let new_node = $node;
+            $(let new_node = find!(rule $id at new_node in $ast_tree).unwrap();)+
+            let nodes:Vec<u32> = find_nodes!(rule at new_node in $ast_tree);
+            nodes
+        }
+    };
 
 }
 
@@ -97,7 +118,7 @@ macro_rules! find_nodes {
 macro_rules! find_nodes_by_dfs {
     (rule $id:ident at $node:ident in $ast_tree:ident) => {
         {
-            let iter = crate::toolkit::ast_node::find_dfs_ast($ast_tree,$node,$id);
+            let iter = crate::toolkit::ast_node::find_dfs_rule_ast($ast_tree,$node,$id);
             iter.collect()
         }
     };
@@ -139,6 +160,9 @@ macro_rules! add_edge {
 macro_rules! add_node {
     ($node_struct:ident to $graph:ident) => {
         $graph.add_node($node_struct ).index() as u32
+    };
+    ($node_struct:block to $graph:ident) => {
+        $graph.add_node($node_struct ).index() as u32 
     };
 }
 

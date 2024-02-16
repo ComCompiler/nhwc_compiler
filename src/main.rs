@@ -39,10 +39,7 @@ fn main() {
     // 生成 petgraph 图对应的 png 
 
 
-    let mut context = timeit!({Context::init(args)} , "init");
-
-    timeit!({context.load_text() }, "load_text");
-    timeit!({context.generate_pngs() }, "generate_pngs");
+    let mut context = timeit!({Context::init(args,true)} , "init");
     // test
     println!("Hello, world!");
 }

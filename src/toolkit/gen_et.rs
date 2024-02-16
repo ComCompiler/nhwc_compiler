@@ -1,3 +1,4 @@
+use std::panic;
 use std::thread::scope;
 
 use clap::ValueEnum;
@@ -5,8 +6,9 @@ use petgraph::{Directed, Graph};
 use petgraph::stable_graph::NodeIndex;
 
 use crate::antlr_parser::cparser::{RULE_assignmentExpression, RULE_expression};
-use crate::{add_edge, add_node, find, find_nodes, node};
+use crate::{add_edge, add_node, find, find_nodes, node, rule_id};
 
+use super::ast_node::{self, find_neighbors_term_ast};
 use super::symbol_table::SymbolIndex;
 use super::{ast_node::AstTree, scope_node::{self, ScopeTree}, symbol_table::{self, Symbol, SymbolTable}};
 
@@ -30,6 +32,10 @@ enum ExprOp{
     Sub,
     Div,
     Assign,
+    AddAssign,
+    DivAssign,
+    MulAssign,
+    SubAssign,
 }
 
 impl EtNode{
@@ -71,38 +77,56 @@ fn process_expr_stmt(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&Sc
     }
 
 }
-fn process_expr(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&ScopeTree, expr_node:u32, scope_node:u32,parent_et_node:u32 )-> u32{
+fn process_expr(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&ScopeTree, expr_node:u32, scope_node:u32,parent_et_node:u32 ){
     // expr 节点下面 至少有一个 assignment expression 
     let assign_expr_nodes:Vec<u32> =  find_nodes!(rule RULE_assignmentExpression at expr_node in ast_tree);
-    for &assign_expr_node in assign_expr_nodes.iter(){
-        // process_assign_expr(et_tree,ast_tree,scope_tree,assign_expr_node,scope_node,)
+    let sep_node = add_node!({EtNode::Separator} to et_tree);
+    if assign_expr_nodes.is_empty(){
+        panic!("这个 expression {} 里面没有任何 assign_expr",expr_node);
     }
-    todo!()
+    for &assign_expr_node in assign_expr_nodes.iter(){
+        process_assign_expr(et_tree,ast_tree,scope_tree,assign_expr_node,scope_node,sep_node);
+    }
+    
 }
-fn process_assign_expr(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&ScopeTree, assign_expr_node:u32, scope_node:u32,parent_et_node:u32 )-> u32{
-    todo!()
+/// assignment expr 是 assignmentOperator( =  /= *= += -= <<= >>= &= ^= |= )右边的式子
+fn process_assign_expr(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&ScopeTree, assign_expr_node:u32, scope_node:u32,parent_et_node:u32 ){
+    let op_term =find!(term Assign at assign_expr_node in ast_tree);
+    match op_term{
+        // 有 term 说明这一层,是 a=3 这样的形式
+        Some(term_node) => {
+            match (rule_id!(at term_node in ast_tree),term_node) {
+                _ => {
+                    panic!("未知 operator in assign expression {} ", term_node)
+                }
+            }
+        },
+        // 无 term 说明这一层啥也没有，直接进入下一层  吧
+        None => todo!(),
+    }
+    
 }
-fn process_cond_expr()-> u32{
+fn process_cond_expr(){
     todo!()
 
 }
-fn process_logical_or_expr()-> u32{
+fn process_logical_or_expr(){
     todo!()
 
 }
-fn process_logical_and_expr()-> u32{
+fn process_logical_and_expr(){
     todo!()
 
 }
-fn process_inclusive_or_expr()-> u32{
+fn process_inclusive_or_expr(){
     todo!()
 
 }
-fn process_exclusive_or_expr()-> u32{
+fn process_exclusive_or_expr(){
     todo!()
 
 }
-fn process_and_expr()-> u32{
+fn process_and_expr(){
     todo!()
 
 }

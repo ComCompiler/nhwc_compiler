@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 
 use derive_builder::Builder;
-use petgraph::{stable_graph::node_index, visit::Dfs};
+use petgraph::{dot::Config, stable_graph::node_index, visit::Dfs};
 
 use crate::Cli;
 
@@ -28,42 +28,36 @@ impl Context{
             scope_tree: ScopeTree::new(),
         }
     }
-    pub fn load_text(&mut self){
-        let cfg_graph = &mut self.cfg_graph;
-        let ast_tree = &mut self.ast_tree;
-        let scope_tree = &mut self.scope_tree;
-        // let symt = self.op_cfg_graph.unwrap();
-        let mut dfs = Dfs::new(&*cfg_graph, node_index(0));
-        for cfg_edge in cfg_graph.edge_weights_mut()  {
-            cfg_edge.load_ast_node_text(&ast_tree);
-        }
-        for cfg_node in cfg_graph.node_weights_mut(){
-            cfg_node.load_ast_node_text(&ast_tree);
-        }
-        for scope_node in scope_tree.node_weights_mut(){
-            scope_node.load_ast_node_text(&ast_tree);
-        }
-    }   
-    pub fn init(args:Cli) -> Self{
+    pub fn init(args:Cli, is_generate_pngs:bool) -> Self{
         let mut context = Self::new();
         // 第零步，先读取 code 
         context.code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
-        // 第一步，先生成 ast_tree 
+        // 1.先生成 ast_tree 
         parse_as_ast_tree(&mut context);
-        //第二步，根据 ast_tree 生成 cfg_graph
+        // 1.1 生成对应的png 
+        if is_generate_pngs{
+            let ast_tree = &mut context.ast_tree;
+            generate_png_by_graph(&ast_tree,"ast_tree".to_string(),&[Config::EdgeNoLabel]);  
+        }
+        // 2. 根据 ast_tree 生成 cfg_graph
         parse_ast_to_cfg(&mut context);
-        //第三步，根据ast_tree生成scope_tree
+        // 2.1 生成对应的png 
+        if is_generate_pngs{
+            for cfg_node in context.cfg_graph.node_weights_mut(){
+                cfg_node.load_ast_node_text(&context.ast_tree);
+            }
+            generate_png_by_graph(&context.cfg_graph,"cfg_graph".to_string(),&[]);  
+        }
+        // 3. 根据ast_tree生成scope_tree
         parse_ast_to_scope(&mut context);
-
+        // 3.1 生成对应的pn 
+        if is_generate_pngs{
+            // let symt = self.op_cfg_graph.unwrap();
+            for scope_node in context.scope_tree.node_weights_mut(){
+                scope_node.load_ast_node_text(&context.ast_tree);
+            }
+            generate_png_by_graph(&context.scope_tree, "scope_tree".to_string(),&[Config::EdgeNoLabel]);
+        }
         context
-    }
-    pub fn generate_pngs(&mut self){
-        self.load_text();   
-        generate_png_by_graph(&self.ast_tree,"ast_tree".to_string());  
-        generate_png_by_graph(&self.cfg_graph,"cfg_graph".to_string());  
-        generate_png_by_graph(&self.scope_tree, "scope_tree".to_string());
-    }
-    pub fn get_all_data_mut(&mut self){
-        todo!()
     }
 }

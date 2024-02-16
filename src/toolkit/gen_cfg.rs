@@ -280,7 +280,7 @@ pub fn parse_ast_to_cfg(context:&mut Context) {
 
     let ast_root_node = 0 ;
 
-    let funcdef_nodes:Vec<u32> = find_nodes_by_dfs!( rule RULE_functionDefinition at ast_root_node in ast_tree);
+    let funcdef_nodes:Vec<u32> = find_nodes_by_dfs!(rule RULE_functionDefinition at ast_root_node in ast_tree);
     let cfg_func_parent  =  CfgNode::new_func_parent();
     // 为每一个function 创建一个共享的根节点
     let cfg_func_parent_node = cfg_graph.add_node(cfg_func_parent);
@@ -291,6 +291,7 @@ pub fn parse_ast_to_cfg(context:&mut Context) {
         add_edge!( {CfgEdge::Direct {  } } from  cfg_func_parent_node to cfg_entry_node in cfg_graph);
         let exit_struct = CfgNode::Exit  { ast_node:funcdef_node, text: String::new() };
         let cfg_exit_node = add_node!(exit_struct to cfg_graph);
+        println!("funcdef {}",funcdef_node);
         let current_compound_node = find!(rule RULE_compoundStatement at funcdef_node in ast_tree ).unwrap();
 
 

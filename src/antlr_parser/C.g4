@@ -602,7 +602,7 @@ Plus : '+';
 PlusPlus : '++';
 Minus : '-';
 MinusMinus : '--';
-Star : '*';
+Mul : '*';
 Div : '/';
 Mod : '%';
 
@@ -621,7 +621,7 @@ Comma : ',';
 
 Assign : '=';
 // '*=' | '/=' | '%=' | '+=' | '-=' | '<<=' | '>>=' | '&=' | '^=' | '|='
-StarAssign : '*=';
+MulAssign : '*=';
 DivAssign : '/=';
 ModAssign : '%=';
 PlusAssign : '+=';

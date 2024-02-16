@@ -4,10 +4,10 @@ mod tests{
     use std::{path::PathBuf, str::FromStr, vec};
 
     use clap::Parser;
-    use petgraph::visit::Data;
+    use petgraph::{dot::Config, visit::Data};
     
     
-    use crate::{antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_functionDefinition}}, find, find_nodes, toolkit::{ast_node::find_dfs_ast, context::{self, Context, ContextBuilder }, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, instruction::Instruction, symbol_field::{DataType, Field}, symbol_table::{Symbol, SymbolBehavior, SymbolIndex, SymbolTable}}, Cli};
+    use crate::{antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_functionDefinition}}, find, find_nodes, toolkit::{ast_node::find_dfs_rule_ast, context::{self, Context, ContextBuilder }, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, instruction::Instruction, symbol_field::{DataType, Field}, symbol_table::{Symbol, SymbolBehavior, SymbolIndex, SymbolTable}}, Cli};
 
     #[test]
     fn add(){
@@ -24,7 +24,7 @@ mod tests{
         parse_as_ast_tree(&mut context);
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
-        let node_ids:Vec<u32> = find_dfs_ast(&ast_tree, 0,RULE_functionDefinition ).collect();
+        let node_ids:Vec<u32> = find_dfs_rule_ast(&ast_tree, 0,RULE_functionDefinition ).collect();
         assert_eq!(node_ids , vec![3,176] ,"找到的 node id 不对");
     }
 
@@ -39,7 +39,7 @@ mod tests{
         parse_as_ast_tree(&mut context);
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
-        let node =find_dfs_ast(ast_tree, 0, RULE_functionDefinition).next().unwrap();  // 三号节点是一个 function def 
+        let node =find_dfs_rule_ast(ast_tree, 0, RULE_functionDefinition).next().unwrap();  // 三号节点是一个 function def 
         let node_id= find!(rule RULE_compoundStatement at node in ast_tree).unwrap();
         assert_eq!(node_id , 14 ,"找到的 node id 不对");
     }
@@ -55,7 +55,7 @@ mod tests{
         parse_as_ast_tree(&mut context);
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
-        let node =find_dfs_ast(ast_tree, 0, RULE_blockItemList).next().unwrap();  // 三号节点是一个 function def 
+        let node =find_dfs_rule_ast(ast_tree, 0, RULE_blockItemList).next().unwrap();  // 三号节点是一个 function def 
         let node_ids:Vec<u32>= find_nodes!(rule RULE_blockItem at node in ast_tree);
         assert_eq!(node_ids , vec![150,34,17] ,"找到的 node id 不对");
     }
@@ -69,7 +69,7 @@ mod tests{
         parse_as_ast_tree(&mut context);
         let ast_tree = &mut context.ast_tree;
         // 生成 petgraph 图对应的 png 
-        generate_png_by_graph(&ast_tree,"graph".to_string());  
+        generate_png_by_graph(&ast_tree,"graph".to_string(),&[Config::EdgeNoLabel]);  
     }
     #[test]
     fn find_items_of_func_def_using_macro_find_nodes_test2(){
@@ -83,7 +83,7 @@ mod tests{
         let ast_tree = &mut context.ast_tree;
 
         //dfs遍历ast
-        let node =find_dfs_ast(ast_tree, 0, RULE_functionDefinition).next().unwrap();  // 三号节点是一个 function def 
+        let node =find_dfs_rule_ast(ast_tree, 0, RULE_functionDefinition).next().unwrap();  // 三号节点是一个 function def 
         let node_ids:Vec<u32>= find_nodes!(rule RULE_compoundStatement 
                                            then RULE_blockItemList
                                            finally RULE_blockItem
@@ -100,7 +100,7 @@ mod tests{
         parse_as_ast_tree(&mut context);
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
-        let node =find_dfs_ast(ast_tree, 0, RULE_functionDefinition).next().unwrap();  // 三号节点是一个 function def 
+        let node =find_dfs_rule_ast(ast_tree, 0, RULE_functionDefinition).next().unwrap();  // 三号节点是一个 function def 
         let node= find!(rule RULE_compoundStatement 
                                 finally RULE_blockItemList
                                 at node in ast_tree).unwrap();

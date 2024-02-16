@@ -118,7 +118,7 @@ use std::any::{Any,TypeId};
 		pub const PlusPlus:isize=77; 
 		pub const Minus:isize=78; 
 		pub const MinusMinus:isize=79; 
-		pub const Star:isize=80; 
+		pub const Mul:isize=80; 
 		pub const Div:isize=81; 
 		pub const Mod:isize=82; 
 		pub const And:isize=83; 
@@ -133,7 +133,7 @@ use std::any::{Any,TypeId};
 		pub const Semi:isize=92; 
 		pub const Comma:isize=93; 
 		pub const Assign:isize=94; 
-		pub const StarAssign:isize=95; 
+		pub const MulAssign:isize=95; 
 		pub const DivAssign:isize=96; 
 		pub const ModAssign:isize=97; 
 		pub const PlusAssign:isize=98; 
@@ -328,16 +328,16 @@ use std::any::{Any,TypeId};
 		Some("LeftBracket"), Some("RightBracket"), Some("LeftBrace"), Some("RightBrace"), 
 		Some("Less"), Some("LessEqual"), Some("Greater"), Some("GreaterEqual"), 
 		Some("LeftShift"), Some("RightShift"), Some("Plus"), Some("PlusPlus"), 
-		Some("Minus"), Some("MinusMinus"), Some("Star"), Some("Div"), Some("Mod"), 
+		Some("Minus"), Some("MinusMinus"), Some("Mul"), Some("Div"), Some("Mod"), 
 		Some("And"), Some("Or"), Some("AndAnd"), Some("OrOr"), Some("Caret"), 
 		Some("Not"), Some("Tilde"), Some("Question"), Some("Colon"), Some("Semi"), 
-		Some("Comma"), Some("Assign"), Some("StarAssign"), Some("DivAssign"), 
-		Some("ModAssign"), Some("PlusAssign"), Some("MinusAssign"), Some("LeftShiftAssign"), 
-		Some("RightShiftAssign"), Some("AndAssign"), Some("XorAssign"), Some("OrAssign"), 
-		Some("Equal"), Some("NotEqual"), Some("Arrow"), Some("Dot"), Some("Ellipsis"), 
-		Some("Identifier"), Some("Constant"), Some("DigitSequence"), Some("StringLiteral"), 
-		Some("MultiLineMacro"), Some("Directive"), Some("AsmBlock"), Some("Whitespace"), 
-		Some("Newline"), Some("BlockComment"), Some("LineComment")
+		Some("Comma"), Some("Assign"), Some("MulAssign"), Some("DivAssign"), Some("ModAssign"), 
+		Some("PlusAssign"), Some("MinusAssign"), Some("LeftShiftAssign"), Some("RightShiftAssign"), 
+		Some("AndAssign"), Some("XorAssign"), Some("OrAssign"), Some("Equal"), 
+		Some("NotEqual"), Some("Arrow"), Some("Dot"), Some("Ellipsis"), Some("Identifier"), 
+		Some("Constant"), Some("DigitSequence"), Some("StringLiteral"), Some("MultiLineMacro"), 
+		Some("Directive"), Some("AsmBlock"), Some("Whitespace"), Some("Newline"), 
+		Some("BlockComment"), Some("LineComment")
 	];
 	lazy_static!{
 	    static ref _shared_context_cache: Arc<PredictionContextCache> = Arc::new(PredictionContextCache::new());
@@ -1536,7 +1536,7 @@ where
 						recog.base.set_state(275);
 						recog.err_handler.sync(&mut recog.base)?;
 						_la = recog.base.input.la(1);
-						if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Star - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
+						if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Mul - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
 							{
 							/*InvokeRule argumentExpressionList*/
 							recog.base.set_state(274);
@@ -1917,7 +1917,7 @@ where
 					}
 				}
 
-			 Plus | Minus | Star | And | Not | Tilde 
+			 Plus | Minus | Mul | And | Not | Tilde 
 				=> {
 					{
 					/*InvokeRule unaryOperator*/
@@ -2044,10 +2044,10 @@ pub trait UnaryOperatorContextAttrs<'input>: CParserContext<'input> + BorrowMut<
 fn And(&self) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
 	self.get_token(And, 0)
 }
-/// Retrieves first TerminalNode corresponding to token Star
-/// Returns `None` if there is no child corresponding to token Star
-fn Star(&self) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
-	self.get_token(Star, 0)
+/// Retrieves first TerminalNode corresponding to token Mul
+/// Returns `None` if there is no child corresponding to token Mul
+fn Mul(&self) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
+	self.get_token(Mul, 0)
 }
 /// Retrieves first TerminalNode corresponding to token Plus
 /// Returns `None` if there is no child corresponding to token Plus
@@ -2094,7 +2094,7 @@ where
 			{
 			recog.base.set_state(314);
 			_la = recog.base.input.la(1);
-			if { !(((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (Minus - 76)) | (1usize << (Star - 76)) | (1usize << (And - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0)) } {
+			if { !(((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (Minus - 76)) | (1usize << (Mul - 76)) | (1usize << (And - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0)) } {
 				recog.err_handler.recover_inline(&mut recog.base)?;
 
 			}
@@ -2344,14 +2344,14 @@ fn castExpression_all(&self) ->  Vec<Rc<CastExpressionContextAll<'input>>> where
 fn castExpression(&self, i: usize) -> Option<Rc<CastExpressionContextAll<'input>>> where Self:Sized{
 	self.child_of_type(i)
 }
-/// Retrieves all `TerminalNode`s corresponding to token Star in current rule
-fn Star_all(&self) -> Vec<Rc<TerminalNode<'input,CParserContextType>>>  where Self:Sized{
+/// Retrieves all `TerminalNode`s corresponding to token Mul in current rule
+fn Mul_all(&self) -> Vec<Rc<TerminalNode<'input,CParserContextType>>>  where Self:Sized{
 	self.children_of_type()
 }
-/// Retrieves 'i's TerminalNode corresponding to token Star, starting from 0.
-/// Returns `None` if number of children corresponding to token Star is less or equal than `i`.
-fn Star(&self, i: usize) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
-	self.get_token(Star, i)
+/// Retrieves 'i's TerminalNode corresponding to token Mul, starting from 0.
+/// Returns `None` if number of children corresponding to token Mul is less or equal than `i`.
+fn Mul(&self, i: usize) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
+	self.get_token(Mul, i)
 }
 /// Retrieves all `TerminalNode`s corresponding to token Div in current rule
 fn Div_all(&self) -> Vec<Rc<TerminalNode<'input,CParserContextType>>>  where Self:Sized{
@@ -2401,12 +2401,12 @@ where
 			recog.base.set_state(333);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			while ((((_la - 80)) & !0x3f) == 0 && ((1usize << (_la - 80)) & ((1usize << (Star - 80)) | (1usize << (Div - 80)) | (1usize << (Mod - 80)))) != 0) {
+			while ((((_la - 80)) & !0x3f) == 0 && ((1usize << (_la - 80)) & ((1usize << (Mul - 80)) | (1usize << (Div - 80)) | (1usize << (Mod - 80)))) != 0) {
 				{
 				{
 				recog.base.set_state(329);
 				_la = recog.base.input.la(1);
-				if { !(((((_la - 80)) & !0x3f) == 0 && ((1usize << (_la - 80)) & ((1usize << (Star - 80)) | (1usize << (Div - 80)) | (1usize << (Mod - 80)))) != 0)) } {
+				if { !(((((_la - 80)) & !0x3f) == 0 && ((1usize << (_la - 80)) & ((1usize << (Mul - 80)) | (1usize << (Div - 80)) | (1usize << (Mod - 80)))) != 0)) } {
 					recog.err_handler.recover_inline(&mut recog.base)?;
 
 				}
@@ -4017,10 +4017,10 @@ pub trait AssignmentOperatorContextAttrs<'input>: CParserContext<'input> + Borro
 fn Assign(&self) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
 	self.get_token(Assign, 0)
 }
-/// Retrieves first TerminalNode corresponding to token StarAssign
-/// Returns `None` if there is no child corresponding to token StarAssign
-fn StarAssign(&self) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
-	self.get_token(StarAssign, 0)
+/// Retrieves first TerminalNode corresponding to token MulAssign
+/// Returns `None` if there is no child corresponding to token MulAssign
+fn MulAssign(&self) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
+	self.get_token(MulAssign, 0)
 }
 /// Retrieves first TerminalNode corresponding to token DivAssign
 /// Returns `None` if there is no child corresponding to token DivAssign
@@ -4092,7 +4092,7 @@ where
 			{
 			recog.base.set_state(424);
 			_la = recog.base.input.la(1);
-			if { !(((((_la - 94)) & !0x3f) == 0 && ((1usize << (_la - 94)) & ((1usize << (Assign - 94)) | (1usize << (StarAssign - 94)) | (1usize << (DivAssign - 94)) | (1usize << (ModAssign - 94)) | (1usize << (PlusAssign - 94)) | (1usize << (MinusAssign - 94)) | (1usize << (LeftShiftAssign - 94)) | (1usize << (RightShiftAssign - 94)) | (1usize << (AndAssign - 94)) | (1usize << (XorAssign - 94)) | (1usize << (OrAssign - 94)))) != 0)) } {
+			if { !(((((_la - 94)) & !0x3f) == 0 && ((1usize << (_la - 94)) & ((1usize << (Assign - 94)) | (1usize << (MulAssign - 94)) | (1usize << (DivAssign - 94)) | (1usize << (ModAssign - 94)) | (1usize << (PlusAssign - 94)) | (1usize << (MinusAssign - 94)) | (1usize << (LeftShiftAssign - 94)) | (1usize << (RightShiftAssign - 94)) | (1usize << (AndAssign - 94)) | (1usize << (XorAssign - 94)) | (1usize << (OrAssign - 94)))) != 0)) } {
 				recog.err_handler.recover_inline(&mut recog.base)?;
 
 			}
@@ -4445,7 +4445,7 @@ where
 					recog.base.set_state(438);
 					recog.err_handler.sync(&mut recog.base)?;
 					_la = recog.base.input.la(1);
-					if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__8) | (1usize << T__10) | (1usize << T__11) | (1usize << T__12) | (1usize << T__13) | (1usize << T__14))) != 0) || ((((_la - 64)) & !0x3f) == 0 && ((1usize << (_la - 64)) & ((1usize << (LeftParen - 64)) | (1usize << (Star - 64)) | (1usize << (Caret - 64)))) != 0) || _la==Identifier {
+					if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__8) | (1usize << T__10) | (1usize << T__11) | (1usize << T__12) | (1usize << T__13) | (1usize << T__14))) != 0) || ((((_la - 64)) & !0x3f) == 0 && ((1usize << (_la - 64)) & ((1usize << (LeftParen - 64)) | (1usize << (Mul - 64)) | (1usize << (Caret - 64)))) != 0) || _la==Identifier {
 						{
 						/*InvokeRule initDeclaratorList*/
 						recog.base.set_state(437);
@@ -6576,7 +6576,7 @@ where
 					recog.base.set_state(553);
 					recog.err_handler.sync(&mut recog.base)?;
 					_la = recog.base.input.la(1);
-					if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__8) | (1usize << T__10) | (1usize << T__11) | (1usize << T__12) | (1usize << T__13) | (1usize << T__14))) != 0) || ((((_la - 64)) & !0x3f) == 0 && ((1usize << (_la - 64)) & ((1usize << (LeftParen - 64)) | (1usize << (Star - 64)) | (1usize << (Caret - 64)))) != 0) || _la==Identifier {
+					if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__8) | (1usize << T__10) | (1usize << T__11) | (1usize << T__12) | (1usize << T__13) | (1usize << T__14))) != 0) || ((((_la - 64)) & !0x3f) == 0 && ((1usize << (_la - 64)) & ((1usize << (LeftParen - 64)) | (1usize << (Mul - 64)) | (1usize << (Caret - 64)))) != 0) || _la==Identifier {
 						{
 						/*InvokeRule declarator*/
 						recog.base.set_state(552);
@@ -7800,7 +7800,7 @@ where
 			recog.base.set_state(616);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			if _la==Star || _la==Caret {
+			if _la==Mul || _la==Caret {
 				{
 				/*InvokeRule pointer*/
 				recog.base.set_state(615);
@@ -7953,10 +7953,10 @@ fn assignmentExpression(&self) -> Option<Rc<AssignmentExpressionContextAll<'inpu
 fn Static(&self) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
 	self.get_token(Static, 0)
 }
-/// Retrieves first TerminalNode corresponding to token Star
-/// Returns `None` if there is no child corresponding to token Star
-fn Star(&self) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
-	self.get_token(Star, 0)
+/// Retrieves first TerminalNode corresponding to token Mul
+/// Returns `None` if there is no child corresponding to token Mul
+fn Mul(&self) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
+	self.get_token(Mul, 0)
 }
 fn parameterTypeList(&self) -> Option<Rc<ParameterTypeListContextAll<'input>>> where Self:Sized{
 	self.child_of_type(0)
@@ -8110,7 +8110,7 @@ where
 							recog.base.set_state(650);
 							recog.err_handler.sync(&mut recog.base)?;
 							_la = recog.base.input.la(1);
-							if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Star - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
+							if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Mul - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
 								{
 								/*InvokeRule assignmentExpression*/
 								recog.base.set_state(649);
@@ -8219,7 +8219,7 @@ where
 							}
 
 							recog.base.set_state(674);
-							recog.base.match_token(Star,&mut recog.err_handler)?;
+							recog.base.match_token(Mul,&mut recog.err_handler)?;
 
 							recog.base.set_state(675);
 							recog.base.match_token(RightBracket,&mut recog.err_handler)?;
@@ -8784,7 +8784,7 @@ where
 			recog.base.set_state(713);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2) | (1usize << T__3) | (1usize << T__4) | (1usize << T__5) | (1usize << T__6) | (1usize << T__7) | (1usize << T__8) | (1usize << T__9) | (1usize << T__10) | (1usize << T__11) | (1usize << T__12) | (1usize << T__13) | (1usize << T__14) | (1usize << T__15) | (1usize << T__16) | (1usize << T__17) | (1usize << T__18) | (1usize << Auto) | (1usize << Break) | (1usize << Case) | (1usize << Char) | (1usize << Const) | (1usize << Continue) | (1usize << Default) | (1usize << Do) | (1usize << Double) | (1usize << Else) | (1usize << Enum) | (1usize << Extern))) != 0) || ((((_la - 32)) & !0x3f) == 0 && ((1usize << (_la - 32)) & ((1usize << (Float - 32)) | (1usize << (For - 32)) | (1usize << (Goto - 32)) | (1usize << (If - 32)) | (1usize << (Inline - 32)) | (1usize << (Int - 32)) | (1usize << (Long - 32)) | (1usize << (Register - 32)) | (1usize << (Restrict - 32)) | (1usize << (Return - 32)) | (1usize << (Short - 32)) | (1usize << (Signed - 32)) | (1usize << (Sizeof - 32)) | (1usize << (Static - 32)) | (1usize << (Struct - 32)) | (1usize << (Switch - 32)) | (1usize << (Typedef - 32)) | (1usize << (Union - 32)) | (1usize << (Unsigned - 32)) | (1usize << (Void - 32)) | (1usize << (Volatile - 32)) | (1usize << (While - 32)) | (1usize << (Alignas - 32)) | (1usize << (Alignof - 32)) | (1usize << (Atomic - 32)) | (1usize << (Bool - 32)) | (1usize << (Complex - 32)) | (1usize << (Generic - 32)) | (1usize << (Imaginary - 32)) | (1usize << (Noreturn - 32)) | (1usize << (StaticAssert - 32)) | (1usize << (ThreadLocal - 32)))) != 0) || ((((_la - 66)) & !0x3f) == 0 && ((1usize << (_la - 66)) & ((1usize << (LeftBracket - 66)) | (1usize << (RightBracket - 66)) | (1usize << (LeftBrace - 66)) | (1usize << (RightBrace - 66)) | (1usize << (Less - 66)) | (1usize << (LessEqual - 66)) | (1usize << (Greater - 66)) | (1usize << (GreaterEqual - 66)) | (1usize << (LeftShift - 66)) | (1usize << (RightShift - 66)) | (1usize << (Plus - 66)) | (1usize << (PlusPlus - 66)) | (1usize << (Minus - 66)) | (1usize << (MinusMinus - 66)) | (1usize << (Star - 66)) | (1usize << (Div - 66)) | (1usize << (Mod - 66)) | (1usize << (And - 66)) | (1usize << (Or - 66)) | (1usize << (AndAnd - 66)) | (1usize << (OrOr - 66)) | (1usize << (Caret - 66)) | (1usize << (Not - 66)) | (1usize << (Tilde - 66)) | (1usize << (Question - 66)) | (1usize << (Colon - 66)) | (1usize << (Semi - 66)) | (1usize << (Assign - 66)) | (1usize << (StarAssign - 66)) | (1usize << (DivAssign - 66)) | (1usize << (ModAssign - 66)))) != 0) || ((((_la - 98)) & !0x3f) == 0 && ((1usize << (_la - 98)) & ((1usize << (PlusAssign - 98)) | (1usize << (MinusAssign - 98)) | (1usize << (LeftShiftAssign - 98)) | (1usize << (RightShiftAssign - 98)) | (1usize << (AndAssign - 98)) | (1usize << (XorAssign - 98)) | (1usize << (OrAssign - 98)) | (1usize << (Equal - 98)) | (1usize << (NotEqual - 98)) | (1usize << (Arrow - 98)) | (1usize << (Dot - 98)) | (1usize << (Ellipsis - 98)) | (1usize << (Identifier - 98)) | (1usize << (Constant - 98)) | (1usize << (DigitSequence - 98)) | (1usize << (StringLiteral - 98)) | (1usize << (MultiLineMacro - 98)) | (1usize << (Directive - 98)) | (1usize << (AsmBlock - 98)) | (1usize << (Whitespace - 98)) | (1usize << (Newline - 98)) | (1usize << (BlockComment - 98)) | (1usize << (LineComment - 98)))) != 0) {
+			if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2) | (1usize << T__3) | (1usize << T__4) | (1usize << T__5) | (1usize << T__6) | (1usize << T__7) | (1usize << T__8) | (1usize << T__9) | (1usize << T__10) | (1usize << T__11) | (1usize << T__12) | (1usize << T__13) | (1usize << T__14) | (1usize << T__15) | (1usize << T__16) | (1usize << T__17) | (1usize << T__18) | (1usize << Auto) | (1usize << Break) | (1usize << Case) | (1usize << Char) | (1usize << Const) | (1usize << Continue) | (1usize << Default) | (1usize << Do) | (1usize << Double) | (1usize << Else) | (1usize << Enum) | (1usize << Extern))) != 0) || ((((_la - 32)) & !0x3f) == 0 && ((1usize << (_la - 32)) & ((1usize << (Float - 32)) | (1usize << (For - 32)) | (1usize << (Goto - 32)) | (1usize << (If - 32)) | (1usize << (Inline - 32)) | (1usize << (Int - 32)) | (1usize << (Long - 32)) | (1usize << (Register - 32)) | (1usize << (Restrict - 32)) | (1usize << (Return - 32)) | (1usize << (Short - 32)) | (1usize << (Signed - 32)) | (1usize << (Sizeof - 32)) | (1usize << (Static - 32)) | (1usize << (Struct - 32)) | (1usize << (Switch - 32)) | (1usize << (Typedef - 32)) | (1usize << (Union - 32)) | (1usize << (Unsigned - 32)) | (1usize << (Void - 32)) | (1usize << (Volatile - 32)) | (1usize << (While - 32)) | (1usize << (Alignas - 32)) | (1usize << (Alignof - 32)) | (1usize << (Atomic - 32)) | (1usize << (Bool - 32)) | (1usize << (Complex - 32)) | (1usize << (Generic - 32)) | (1usize << (Imaginary - 32)) | (1usize << (Noreturn - 32)) | (1usize << (StaticAssert - 32)) | (1usize << (ThreadLocal - 32)))) != 0) || ((((_la - 66)) & !0x3f) == 0 && ((1usize << (_la - 66)) & ((1usize << (LeftBracket - 66)) | (1usize << (RightBracket - 66)) | (1usize << (LeftBrace - 66)) | (1usize << (RightBrace - 66)) | (1usize << (Less - 66)) | (1usize << (LessEqual - 66)) | (1usize << (Greater - 66)) | (1usize << (GreaterEqual - 66)) | (1usize << (LeftShift - 66)) | (1usize << (RightShift - 66)) | (1usize << (Plus - 66)) | (1usize << (PlusPlus - 66)) | (1usize << (Minus - 66)) | (1usize << (MinusMinus - 66)) | (1usize << (Mul - 66)) | (1usize << (Div - 66)) | (1usize << (Mod - 66)) | (1usize << (And - 66)) | (1usize << (Or - 66)) | (1usize << (AndAnd - 66)) | (1usize << (OrOr - 66)) | (1usize << (Caret - 66)) | (1usize << (Not - 66)) | (1usize << (Tilde - 66)) | (1usize << (Question - 66)) | (1usize << (Colon - 66)) | (1usize << (Semi - 66)) | (1usize << (Assign - 66)) | (1usize << (MulAssign - 66)) | (1usize << (DivAssign - 66)) | (1usize << (ModAssign - 66)))) != 0) || ((((_la - 98)) & !0x3f) == 0 && ((1usize << (_la - 98)) & ((1usize << (PlusAssign - 98)) | (1usize << (MinusAssign - 98)) | (1usize << (LeftShiftAssign - 98)) | (1usize << (RightShiftAssign - 98)) | (1usize << (AndAssign - 98)) | (1usize << (XorAssign - 98)) | (1usize << (OrAssign - 98)) | (1usize << (Equal - 98)) | (1usize << (NotEqual - 98)) | (1usize << (Arrow - 98)) | (1usize << (Dot - 98)) | (1usize << (Ellipsis - 98)) | (1usize << (Identifier - 98)) | (1usize << (Constant - 98)) | (1usize << (DigitSequence - 98)) | (1usize << (StringLiteral - 98)) | (1usize << (MultiLineMacro - 98)) | (1usize << (Directive - 98)) | (1usize << (AsmBlock - 98)) | (1usize << (Whitespace - 98)) | (1usize << (Newline - 98)) | (1usize << (BlockComment - 98)) | (1usize << (LineComment - 98)))) != 0) {
 				{
 				/*InvokeRule gccAttribute*/
 				recog.base.set_state(712);
@@ -8805,7 +8805,7 @@ where
 				recog.base.set_state(717);
 				recog.err_handler.sync(&mut recog.base)?;
 				_la = recog.base.input.la(1);
-				if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2) | (1usize << T__3) | (1usize << T__4) | (1usize << T__5) | (1usize << T__6) | (1usize << T__7) | (1usize << T__8) | (1usize << T__9) | (1usize << T__10) | (1usize << T__11) | (1usize << T__12) | (1usize << T__13) | (1usize << T__14) | (1usize << T__15) | (1usize << T__16) | (1usize << T__17) | (1usize << T__18) | (1usize << Auto) | (1usize << Break) | (1usize << Case) | (1usize << Char) | (1usize << Const) | (1usize << Continue) | (1usize << Default) | (1usize << Do) | (1usize << Double) | (1usize << Else) | (1usize << Enum) | (1usize << Extern))) != 0) || ((((_la - 32)) & !0x3f) == 0 && ((1usize << (_la - 32)) & ((1usize << (Float - 32)) | (1usize << (For - 32)) | (1usize << (Goto - 32)) | (1usize << (If - 32)) | (1usize << (Inline - 32)) | (1usize << (Int - 32)) | (1usize << (Long - 32)) | (1usize << (Register - 32)) | (1usize << (Restrict - 32)) | (1usize << (Return - 32)) | (1usize << (Short - 32)) | (1usize << (Signed - 32)) | (1usize << (Sizeof - 32)) | (1usize << (Static - 32)) | (1usize << (Struct - 32)) | (1usize << (Switch - 32)) | (1usize << (Typedef - 32)) | (1usize << (Union - 32)) | (1usize << (Unsigned - 32)) | (1usize << (Void - 32)) | (1usize << (Volatile - 32)) | (1usize << (While - 32)) | (1usize << (Alignas - 32)) | (1usize << (Alignof - 32)) | (1usize << (Atomic - 32)) | (1usize << (Bool - 32)) | (1usize << (Complex - 32)) | (1usize << (Generic - 32)) | (1usize << (Imaginary - 32)) | (1usize << (Noreturn - 32)) | (1usize << (StaticAssert - 32)) | (1usize << (ThreadLocal - 32)))) != 0) || ((((_la - 66)) & !0x3f) == 0 && ((1usize << (_la - 66)) & ((1usize << (LeftBracket - 66)) | (1usize << (RightBracket - 66)) | (1usize << (LeftBrace - 66)) | (1usize << (RightBrace - 66)) | (1usize << (Less - 66)) | (1usize << (LessEqual - 66)) | (1usize << (Greater - 66)) | (1usize << (GreaterEqual - 66)) | (1usize << (LeftShift - 66)) | (1usize << (RightShift - 66)) | (1usize << (Plus - 66)) | (1usize << (PlusPlus - 66)) | (1usize << (Minus - 66)) | (1usize << (MinusMinus - 66)) | (1usize << (Star - 66)) | (1usize << (Div - 66)) | (1usize << (Mod - 66)) | (1usize << (And - 66)) | (1usize << (Or - 66)) | (1usize << (AndAnd - 66)) | (1usize << (OrOr - 66)) | (1usize << (Caret - 66)) | (1usize << (Not - 66)) | (1usize << (Tilde - 66)) | (1usize << (Question - 66)) | (1usize << (Colon - 66)) | (1usize << (Semi - 66)) | (1usize << (Assign - 66)) | (1usize << (StarAssign - 66)) | (1usize << (DivAssign - 66)) | (1usize << (ModAssign - 66)))) != 0) || ((((_la - 98)) & !0x3f) == 0 && ((1usize << (_la - 98)) & ((1usize << (PlusAssign - 98)) | (1usize << (MinusAssign - 98)) | (1usize << (LeftShiftAssign - 98)) | (1usize << (RightShiftAssign - 98)) | (1usize << (AndAssign - 98)) | (1usize << (XorAssign - 98)) | (1usize << (OrAssign - 98)) | (1usize << (Equal - 98)) | (1usize << (NotEqual - 98)) | (1usize << (Arrow - 98)) | (1usize << (Dot - 98)) | (1usize << (Ellipsis - 98)) | (1usize << (Identifier - 98)) | (1usize << (Constant - 98)) | (1usize << (DigitSequence - 98)) | (1usize << (StringLiteral - 98)) | (1usize << (MultiLineMacro - 98)) | (1usize << (Directive - 98)) | (1usize << (AsmBlock - 98)) | (1usize << (Whitespace - 98)) | (1usize << (Newline - 98)) | (1usize << (BlockComment - 98)) | (1usize << (LineComment - 98)))) != 0) {
+				if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2) | (1usize << T__3) | (1usize << T__4) | (1usize << T__5) | (1usize << T__6) | (1usize << T__7) | (1usize << T__8) | (1usize << T__9) | (1usize << T__10) | (1usize << T__11) | (1usize << T__12) | (1usize << T__13) | (1usize << T__14) | (1usize << T__15) | (1usize << T__16) | (1usize << T__17) | (1usize << T__18) | (1usize << Auto) | (1usize << Break) | (1usize << Case) | (1usize << Char) | (1usize << Const) | (1usize << Continue) | (1usize << Default) | (1usize << Do) | (1usize << Double) | (1usize << Else) | (1usize << Enum) | (1usize << Extern))) != 0) || ((((_la - 32)) & !0x3f) == 0 && ((1usize << (_la - 32)) & ((1usize << (Float - 32)) | (1usize << (For - 32)) | (1usize << (Goto - 32)) | (1usize << (If - 32)) | (1usize << (Inline - 32)) | (1usize << (Int - 32)) | (1usize << (Long - 32)) | (1usize << (Register - 32)) | (1usize << (Restrict - 32)) | (1usize << (Return - 32)) | (1usize << (Short - 32)) | (1usize << (Signed - 32)) | (1usize << (Sizeof - 32)) | (1usize << (Static - 32)) | (1usize << (Struct - 32)) | (1usize << (Switch - 32)) | (1usize << (Typedef - 32)) | (1usize << (Union - 32)) | (1usize << (Unsigned - 32)) | (1usize << (Void - 32)) | (1usize << (Volatile - 32)) | (1usize << (While - 32)) | (1usize << (Alignas - 32)) | (1usize << (Alignof - 32)) | (1usize << (Atomic - 32)) | (1usize << (Bool - 32)) | (1usize << (Complex - 32)) | (1usize << (Generic - 32)) | (1usize << (Imaginary - 32)) | (1usize << (Noreturn - 32)) | (1usize << (StaticAssert - 32)) | (1usize << (ThreadLocal - 32)))) != 0) || ((((_la - 66)) & !0x3f) == 0 && ((1usize << (_la - 66)) & ((1usize << (LeftBracket - 66)) | (1usize << (RightBracket - 66)) | (1usize << (LeftBrace - 66)) | (1usize << (RightBrace - 66)) | (1usize << (Less - 66)) | (1usize << (LessEqual - 66)) | (1usize << (Greater - 66)) | (1usize << (GreaterEqual - 66)) | (1usize << (LeftShift - 66)) | (1usize << (RightShift - 66)) | (1usize << (Plus - 66)) | (1usize << (PlusPlus - 66)) | (1usize << (Minus - 66)) | (1usize << (MinusMinus - 66)) | (1usize << (Mul - 66)) | (1usize << (Div - 66)) | (1usize << (Mod - 66)) | (1usize << (And - 66)) | (1usize << (Or - 66)) | (1usize << (AndAnd - 66)) | (1usize << (OrOr - 66)) | (1usize << (Caret - 66)) | (1usize << (Not - 66)) | (1usize << (Tilde - 66)) | (1usize << (Question - 66)) | (1usize << (Colon - 66)) | (1usize << (Semi - 66)) | (1usize << (Assign - 66)) | (1usize << (MulAssign - 66)) | (1usize << (DivAssign - 66)) | (1usize << (ModAssign - 66)))) != 0) || ((((_la - 98)) & !0x3f) == 0 && ((1usize << (_la - 98)) & ((1usize << (PlusAssign - 98)) | (1usize << (MinusAssign - 98)) | (1usize << (LeftShiftAssign - 98)) | (1usize << (RightShiftAssign - 98)) | (1usize << (AndAssign - 98)) | (1usize << (XorAssign - 98)) | (1usize << (OrAssign - 98)) | (1usize << (Equal - 98)) | (1usize << (NotEqual - 98)) | (1usize << (Arrow - 98)) | (1usize << (Dot - 98)) | (1usize << (Ellipsis - 98)) | (1usize << (Identifier - 98)) | (1usize << (Constant - 98)) | (1usize << (DigitSequence - 98)) | (1usize << (StringLiteral - 98)) | (1usize << (MultiLineMacro - 98)) | (1usize << (Directive - 98)) | (1usize << (AsmBlock - 98)) | (1usize << (Whitespace - 98)) | (1usize << (Newline - 98)) | (1usize << (BlockComment - 98)) | (1usize << (LineComment - 98)))) != 0) {
 					{
 					/*InvokeRule gccAttribute*/
 					recog.base.set_state(716);
@@ -8958,7 +8958,7 @@ where
 				recog.base.set_state(727);
 				recog.err_handler.sync(&mut recog.base)?;
 				_la = recog.base.input.la(1);
-				if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Star - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
+				if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Mul - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
 					{
 					/*InvokeRule argumentExpressionList*/
 					recog.base.set_state(726);
@@ -9090,7 +9090,7 @@ where
 			recog.base.set_state(739);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			while (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2) | (1usize << T__3) | (1usize << T__4) | (1usize << T__5) | (1usize << T__6) | (1usize << T__7) | (1usize << T__8) | (1usize << T__9) | (1usize << T__10) | (1usize << T__11) | (1usize << T__12) | (1usize << T__13) | (1usize << T__14) | (1usize << T__15) | (1usize << T__16) | (1usize << T__17) | (1usize << T__18) | (1usize << Auto) | (1usize << Break) | (1usize << Case) | (1usize << Char) | (1usize << Const) | (1usize << Continue) | (1usize << Default) | (1usize << Do) | (1usize << Double) | (1usize << Else) | (1usize << Enum) | (1usize << Extern))) != 0) || ((((_la - 32)) & !0x3f) == 0 && ((1usize << (_la - 32)) & ((1usize << (Float - 32)) | (1usize << (For - 32)) | (1usize << (Goto - 32)) | (1usize << (If - 32)) | (1usize << (Inline - 32)) | (1usize << (Int - 32)) | (1usize << (Long - 32)) | (1usize << (Register - 32)) | (1usize << (Restrict - 32)) | (1usize << (Return - 32)) | (1usize << (Short - 32)) | (1usize << (Signed - 32)) | (1usize << (Sizeof - 32)) | (1usize << (Static - 32)) | (1usize << (Struct - 32)) | (1usize << (Switch - 32)) | (1usize << (Typedef - 32)) | (1usize << (Union - 32)) | (1usize << (Unsigned - 32)) | (1usize << (Void - 32)) | (1usize << (Volatile - 32)) | (1usize << (While - 32)) | (1usize << (Alignas - 32)) | (1usize << (Alignof - 32)) | (1usize << (Atomic - 32)) | (1usize << (Bool - 32)) | (1usize << (Complex - 32)) | (1usize << (Generic - 32)) | (1usize << (Imaginary - 32)) | (1usize << (Noreturn - 32)) | (1usize << (StaticAssert - 32)) | (1usize << (ThreadLocal - 32)))) != 0) || ((((_la - 64)) & !0x3f) == 0 && ((1usize << (_la - 64)) & ((1usize << (LeftParen - 64)) | (1usize << (LeftBracket - 64)) | (1usize << (RightBracket - 64)) | (1usize << (LeftBrace - 64)) | (1usize << (RightBrace - 64)) | (1usize << (Less - 64)) | (1usize << (LessEqual - 64)) | (1usize << (Greater - 64)) | (1usize << (GreaterEqual - 64)) | (1usize << (LeftShift - 64)) | (1usize << (RightShift - 64)) | (1usize << (Plus - 64)) | (1usize << (PlusPlus - 64)) | (1usize << (Minus - 64)) | (1usize << (MinusMinus - 64)) | (1usize << (Star - 64)) | (1usize << (Div - 64)) | (1usize << (Mod - 64)) | (1usize << (And - 64)) | (1usize << (Or - 64)) | (1usize << (AndAnd - 64)) | (1usize << (OrOr - 64)) | (1usize << (Caret - 64)) | (1usize << (Not - 64)) | (1usize << (Tilde - 64)) | (1usize << (Question - 64)) | (1usize << (Colon - 64)) | (1usize << (Semi - 64)) | (1usize << (Comma - 64)) | (1usize << (Assign - 64)) | (1usize << (StarAssign - 64)))) != 0) || ((((_la - 96)) & !0x3f) == 0 && ((1usize << (_la - 96)) & ((1usize << (DivAssign - 96)) | (1usize << (ModAssign - 96)) | (1usize << (PlusAssign - 96)) | (1usize << (MinusAssign - 96)) | (1usize << (LeftShiftAssign - 96)) | (1usize << (RightShiftAssign - 96)) | (1usize << (AndAssign - 96)) | (1usize << (XorAssign - 96)) | (1usize << (OrAssign - 96)) | (1usize << (Equal - 96)) | (1usize << (NotEqual - 96)) | (1usize << (Arrow - 96)) | (1usize << (Dot - 96)) | (1usize << (Ellipsis - 96)) | (1usize << (Identifier - 96)) | (1usize << (Constant - 96)) | (1usize << (DigitSequence - 96)) | (1usize << (StringLiteral - 96)) | (1usize << (MultiLineMacro - 96)) | (1usize << (Directive - 96)) | (1usize << (AsmBlock - 96)) | (1usize << (Whitespace - 96)) | (1usize << (Newline - 96)) | (1usize << (BlockComment - 96)) | (1usize << (LineComment - 96)))) != 0) {
+			while (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2) | (1usize << T__3) | (1usize << T__4) | (1usize << T__5) | (1usize << T__6) | (1usize << T__7) | (1usize << T__8) | (1usize << T__9) | (1usize << T__10) | (1usize << T__11) | (1usize << T__12) | (1usize << T__13) | (1usize << T__14) | (1usize << T__15) | (1usize << T__16) | (1usize << T__17) | (1usize << T__18) | (1usize << Auto) | (1usize << Break) | (1usize << Case) | (1usize << Char) | (1usize << Const) | (1usize << Continue) | (1usize << Default) | (1usize << Do) | (1usize << Double) | (1usize << Else) | (1usize << Enum) | (1usize << Extern))) != 0) || ((((_la - 32)) & !0x3f) == 0 && ((1usize << (_la - 32)) & ((1usize << (Float - 32)) | (1usize << (For - 32)) | (1usize << (Goto - 32)) | (1usize << (If - 32)) | (1usize << (Inline - 32)) | (1usize << (Int - 32)) | (1usize << (Long - 32)) | (1usize << (Register - 32)) | (1usize << (Restrict - 32)) | (1usize << (Return - 32)) | (1usize << (Short - 32)) | (1usize << (Signed - 32)) | (1usize << (Sizeof - 32)) | (1usize << (Static - 32)) | (1usize << (Struct - 32)) | (1usize << (Switch - 32)) | (1usize << (Typedef - 32)) | (1usize << (Union - 32)) | (1usize << (Unsigned - 32)) | (1usize << (Void - 32)) | (1usize << (Volatile - 32)) | (1usize << (While - 32)) | (1usize << (Alignas - 32)) | (1usize << (Alignof - 32)) | (1usize << (Atomic - 32)) | (1usize << (Bool - 32)) | (1usize << (Complex - 32)) | (1usize << (Generic - 32)) | (1usize << (Imaginary - 32)) | (1usize << (Noreturn - 32)) | (1usize << (StaticAssert - 32)) | (1usize << (ThreadLocal - 32)))) != 0) || ((((_la - 64)) & !0x3f) == 0 && ((1usize << (_la - 64)) & ((1usize << (LeftParen - 64)) | (1usize << (LeftBracket - 64)) | (1usize << (RightBracket - 64)) | (1usize << (LeftBrace - 64)) | (1usize << (RightBrace - 64)) | (1usize << (Less - 64)) | (1usize << (LessEqual - 64)) | (1usize << (Greater - 64)) | (1usize << (GreaterEqual - 64)) | (1usize << (LeftShift - 64)) | (1usize << (RightShift - 64)) | (1usize << (Plus - 64)) | (1usize << (PlusPlus - 64)) | (1usize << (Minus - 64)) | (1usize << (MinusMinus - 64)) | (1usize << (Mul - 64)) | (1usize << (Div - 64)) | (1usize << (Mod - 64)) | (1usize << (And - 64)) | (1usize << (Or - 64)) | (1usize << (AndAnd - 64)) | (1usize << (OrOr - 64)) | (1usize << (Caret - 64)) | (1usize << (Not - 64)) | (1usize << (Tilde - 64)) | (1usize << (Question - 64)) | (1usize << (Colon - 64)) | (1usize << (Semi - 64)) | (1usize << (Comma - 64)) | (1usize << (Assign - 64)) | (1usize << (MulAssign - 64)))) != 0) || ((((_la - 96)) & !0x3f) == 0 && ((1usize << (_la - 96)) & ((1usize << (DivAssign - 96)) | (1usize << (ModAssign - 96)) | (1usize << (PlusAssign - 96)) | (1usize << (MinusAssign - 96)) | (1usize << (LeftShiftAssign - 96)) | (1usize << (RightShiftAssign - 96)) | (1usize << (AndAssign - 96)) | (1usize << (XorAssign - 96)) | (1usize << (OrAssign - 96)) | (1usize << (Equal - 96)) | (1usize << (NotEqual - 96)) | (1usize << (Arrow - 96)) | (1usize << (Dot - 96)) | (1usize << (Ellipsis - 96)) | (1usize << (Identifier - 96)) | (1usize << (Constant - 96)) | (1usize << (DigitSequence - 96)) | (1usize << (StringLiteral - 96)) | (1usize << (MultiLineMacro - 96)) | (1usize << (Directive - 96)) | (1usize << (AsmBlock - 96)) | (1usize << (Whitespace - 96)) | (1usize << (Newline - 96)) | (1usize << (BlockComment - 96)) | (1usize << (LineComment - 96)))) != 0) {
 				{
 				recog.base.set_state(737);
 				recog.err_handler.sync(&mut recog.base)?;
@@ -9104,9 +9104,9 @@ where
 				 Alignof | Atomic | Bool | Complex | Generic | Imaginary | Noreturn |
 				 StaticAssert | ThreadLocal | LeftBracket | RightBracket | LeftBrace |
 				 RightBrace | Less | LessEqual | Greater | GreaterEqual | LeftShift |
-				 RightShift | Plus | PlusPlus | Minus | MinusMinus | Star | Div | Mod |
+				 RightShift | Plus | PlusPlus | Minus | MinusMinus | Mul | Div | Mod |
 				 And | Or | AndAnd | OrOr | Caret | Not | Tilde | Question | Colon |
-				 Semi | Comma | Assign | StarAssign | DivAssign | ModAssign | PlusAssign |
+				 Semi | Comma | Assign | MulAssign | DivAssign | ModAssign | PlusAssign |
 				 MinusAssign | LeftShiftAssign | RightShiftAssign | AndAssign | XorAssign |
 				 OrAssign | Equal | NotEqual | Arrow | Dot | Ellipsis | Identifier |
 				 Constant | DigitSequence | StringLiteral | MultiLineMacro | Directive |
@@ -9217,14 +9217,14 @@ impl<'input> PointerContextExt<'input>{
 
 pub trait PointerContextAttrs<'input>: CParserContext<'input> + BorrowMut<PointerContextExt<'input>>{
 
-/// Retrieves all `TerminalNode`s corresponding to token Star in current rule
-fn Star_all(&self) -> Vec<Rc<TerminalNode<'input,CParserContextType>>>  where Self:Sized{
+/// Retrieves all `TerminalNode`s corresponding to token Mul in current rule
+fn Mul_all(&self) -> Vec<Rc<TerminalNode<'input,CParserContextType>>>  where Self:Sized{
 	self.children_of_type()
 }
-/// Retrieves 'i's TerminalNode corresponding to token Star, starting from 0.
-/// Returns `None` if number of children corresponding to token Star is less or equal than `i`.
-fn Star(&self, i: usize) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
-	self.get_token(Star, i)
+/// Retrieves 'i's TerminalNode corresponding to token Mul, starting from 0.
+/// Returns `None` if number of children corresponding to token Mul is less or equal than `i`.
+fn Mul(&self, i: usize) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
+	self.get_token(Mul, i)
 }
 /// Retrieves all `TerminalNode`s corresponding to token Caret in current rule
 fn Caret_all(&self) -> Vec<Rc<TerminalNode<'input,CParserContextType>>>  where Self:Sized{
@@ -9272,7 +9272,7 @@ where
 				{
 				recog.base.set_state(742);
 				_la = recog.base.input.la(1);
-				if { !(_la==Star || _la==Caret) } {
+				if { !(_la==Mul || _la==Caret) } {
 					recog.err_handler.recover_inline(&mut recog.base)?;
 
 				}
@@ -9298,7 +9298,7 @@ where
 				recog.base.set_state(748); 
 				recog.err_handler.sync(&mut recog.base)?;
 				_la = recog.base.input.la(1);
-				if !(_la==Star || _la==Caret) {break}
+				if !(_la==Mul || _la==Caret) {break}
 			}
 			}
 			Ok(())
@@ -9792,7 +9792,7 @@ where
 					recog.base.set_state(773);
 					recog.err_handler.sync(&mut recog.base)?;
 					_la = recog.base.input.la(1);
-					if ((((_la - 64)) & !0x3f) == 0 && ((1usize << (_la - 64)) & ((1usize << (LeftParen - 64)) | (1usize << (LeftBracket - 64)) | (1usize << (Star - 64)) | (1usize << (Caret - 64)))) != 0) {
+					if ((((_la - 64)) & !0x3f) == 0 && ((1usize << (_la - 64)) & ((1usize << (LeftParen - 64)) | (1usize << (LeftBracket - 64)) | (1usize << (Mul - 64)) | (1usize << (Caret - 64)))) != 0) {
 						{
 						/*InvokeRule abstractDeclarator*/
 						recog.base.set_state(772);
@@ -10037,7 +10037,7 @@ where
 			recog.base.set_state(787);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			if ((((_la - 64)) & !0x3f) == 0 && ((1usize << (_la - 64)) & ((1usize << (LeftParen - 64)) | (1usize << (LeftBracket - 64)) | (1usize << (Star - 64)) | (1usize << (Caret - 64)))) != 0) {
+			if ((((_la - 64)) & !0x3f) == 0 && ((1usize << (_la - 64)) & ((1usize << (LeftParen - 64)) | (1usize << (LeftBracket - 64)) | (1usize << (Mul - 64)) | (1usize << (Caret - 64)))) != 0) {
 				{
 				/*InvokeRule abstractDeclarator*/
 				recog.base.set_state(786);
@@ -10166,7 +10166,7 @@ where
 					recog.base.set_state(791);
 					recog.err_handler.sync(&mut recog.base)?;
 					_la = recog.base.input.la(1);
-					if _la==Star || _la==Caret {
+					if _la==Mul || _la==Caret {
 						{
 						/*InvokeRule pointer*/
 						recog.base.set_state(790);
@@ -10306,10 +10306,10 @@ fn assignmentExpression(&self) -> Option<Rc<AssignmentExpressionContextAll<'inpu
 fn Static(&self) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
 	self.get_token(Static, 0)
 }
-/// Retrieves first TerminalNode corresponding to token Star
-/// Returns `None` if there is no child corresponding to token Star
-fn Star(&self) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
-	self.get_token(Star, 0)
+/// Retrieves first TerminalNode corresponding to token Mul
+/// Returns `None` if there is no child corresponding to token Mul
+fn Mul(&self) -> Option<Rc<TerminalNode<'input,CParserContextType>>> where Self:Sized{
+	self.get_token(Mul, 0)
 }
 fn parameterTypeList(&self) -> Option<Rc<ParameterTypeListContextAll<'input>>> where Self:Sized{
 	self.child_of_type(0)
@@ -10404,7 +10404,7 @@ where
 					recog.base.set_state(817);
 					recog.err_handler.sync(&mut recog.base)?;
 					_la = recog.base.input.la(1);
-					if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Star - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
+					if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Mul - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
 						{
 						/*InvokeRule assignmentExpression*/
 						recog.base.set_state(816);
@@ -10477,7 +10477,7 @@ where
 					recog.base.match_token(LeftBracket,&mut recog.err_handler)?;
 
 					recog.base.set_state(835);
-					recog.base.match_token(Star,&mut recog.err_handler)?;
+					recog.base.match_token(Mul,&mut recog.err_handler)?;
 
 					recog.base.set_state(836);
 					recog.base.match_token(RightBracket,&mut recog.err_handler)?;
@@ -10570,7 +10570,7 @@ where
 							recog.base.set_state(856);
 							recog.err_handler.sync(&mut recog.base)?;
 							_la = recog.base.input.la(1);
-							if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Star - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
+							if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Mul - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
 								{
 								/*InvokeRule assignmentExpression*/
 								recog.base.set_state(855);
@@ -10667,7 +10667,7 @@ where
 							recog.base.match_token(LeftBracket,&mut recog.err_handler)?;
 
 							recog.base.set_state(877);
-							recog.base.match_token(Star,&mut recog.err_handler)?;
+							recog.base.match_token(Mul,&mut recog.err_handler)?;
 
 							recog.base.set_state(878);
 							recog.base.match_token(RightBracket,&mut recog.err_handler)?;
@@ -10940,7 +10940,7 @@ where
 			recog.err_handler.sync(&mut recog.base)?;
 			match recog.base.input.la(1) {
 			 T__0 | T__1 | T__2 | Sizeof | Alignof | Generic | LeftParen | Plus |
-			 PlusPlus | Minus | MinusMinus | Star | And | AndAnd | Not | Tilde | Identifier |
+			 PlusPlus | Minus | MinusMinus | Mul | And | AndAnd | Not | Tilde | Identifier |
 			 Constant | DigitSequence | StringLiteral 
 				=> {
 					//recog.base.enter_outer_alt(_localctx.clone(), 1);
@@ -11918,7 +11918,7 @@ where
 					recog.base.set_state(967);
 					recog.err_handler.sync(&mut recog.base)?;
 					_la = recog.base.input.la(1);
-					if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Star - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
+					if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Mul - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
 						{
 						/*InvokeRule logicalOrExpression*/
 						recog.base.set_state(959);
@@ -11958,7 +11958,7 @@ where
 						recog.base.set_state(978);
 						recog.err_handler.sync(&mut recog.base)?;
 						_la = recog.base.input.la(1);
-						if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Star - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
+						if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Mul - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
 							{
 							/*InvokeRule logicalOrExpression*/
 							recog.base.set_state(970);
@@ -12387,7 +12387,7 @@ where
 			recog.base.set_state(1009);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			while (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2) | (1usize << T__3) | (1usize << T__4) | (1usize << T__5) | (1usize << T__6) | (1usize << T__7) | (1usize << T__8) | (1usize << T__9) | (1usize << T__15) | (1usize << T__16) | (1usize << T__17) | (1usize << Auto) | (1usize << Break) | (1usize << Case) | (1usize << Char) | (1usize << Const) | (1usize << Continue) | (1usize << Default) | (1usize << Do) | (1usize << Double) | (1usize << Enum) | (1usize << Extern))) != 0) || ((((_la - 32)) & !0x3f) == 0 && ((1usize << (_la - 32)) & ((1usize << (Float - 32)) | (1usize << (For - 32)) | (1usize << (If - 32)) | (1usize << (Inline - 32)) | (1usize << (Int - 32)) | (1usize << (Long - 32)) | (1usize << (Register - 32)) | (1usize << (Restrict - 32)) | (1usize << (Return - 32)) | (1usize << (Short - 32)) | (1usize << (Signed - 32)) | (1usize << (Sizeof - 32)) | (1usize << (Static - 32)) | (1usize << (Struct - 32)) | (1usize << (Switch - 32)) | (1usize << (Typedef - 32)) | (1usize << (Union - 32)) | (1usize << (Unsigned - 32)) | (1usize << (Void - 32)) | (1usize << (Volatile - 32)) | (1usize << (While - 32)) | (1usize << (Alignas - 32)) | (1usize << (Alignof - 32)) | (1usize << (Atomic - 32)) | (1usize << (Bool - 32)) | (1usize << (Complex - 32)) | (1usize << (Generic - 32)) | (1usize << (Noreturn - 32)) | (1usize << (StaticAssert - 32)) | (1usize << (ThreadLocal - 32)))) != 0) || ((((_la - 64)) & !0x3f) == 0 && ((1usize << (_la - 64)) & ((1usize << (LeftParen - 64)) | (1usize << (LeftBrace - 64)) | (1usize << (Plus - 64)) | (1usize << (PlusPlus - 64)) | (1usize << (Minus - 64)) | (1usize << (MinusMinus - 64)) | (1usize << (Star - 64)) | (1usize << (And - 64)) | (1usize << (AndAnd - 64)) | (1usize << (Not - 64)) | (1usize << (Tilde - 64)) | (1usize << (Semi - 64)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
+			while (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2) | (1usize << T__3) | (1usize << T__4) | (1usize << T__5) | (1usize << T__6) | (1usize << T__7) | (1usize << T__8) | (1usize << T__9) | (1usize << T__15) | (1usize << T__16) | (1usize << T__17) | (1usize << Auto) | (1usize << Break) | (1usize << Case) | (1usize << Char) | (1usize << Const) | (1usize << Continue) | (1usize << Default) | (1usize << Do) | (1usize << Double) | (1usize << Enum) | (1usize << Extern))) != 0) || ((((_la - 32)) & !0x3f) == 0 && ((1usize << (_la - 32)) & ((1usize << (Float - 32)) | (1usize << (For - 32)) | (1usize << (If - 32)) | (1usize << (Inline - 32)) | (1usize << (Int - 32)) | (1usize << (Long - 32)) | (1usize << (Register - 32)) | (1usize << (Restrict - 32)) | (1usize << (Return - 32)) | (1usize << (Short - 32)) | (1usize << (Signed - 32)) | (1usize << (Sizeof - 32)) | (1usize << (Static - 32)) | (1usize << (Struct - 32)) | (1usize << (Switch - 32)) | (1usize << (Typedef - 32)) | (1usize << (Union - 32)) | (1usize << (Unsigned - 32)) | (1usize << (Void - 32)) | (1usize << (Volatile - 32)) | (1usize << (While - 32)) | (1usize << (Alignas - 32)) | (1usize << (Alignof - 32)) | (1usize << (Atomic - 32)) | (1usize << (Bool - 32)) | (1usize << (Complex - 32)) | (1usize << (Generic - 32)) | (1usize << (Noreturn - 32)) | (1usize << (StaticAssert - 32)) | (1usize << (ThreadLocal - 32)))) != 0) || ((((_la - 64)) & !0x3f) == 0 && ((1usize << (_la - 64)) & ((1usize << (LeftParen - 64)) | (1usize << (LeftBrace - 64)) | (1usize << (Plus - 64)) | (1usize << (PlusPlus - 64)) | (1usize << (Minus - 64)) | (1usize << (MinusMinus - 64)) | (1usize << (Mul - 64)) | (1usize << (And - 64)) | (1usize << (AndAnd - 64)) | (1usize << (Not - 64)) | (1usize << (Tilde - 64)) | (1usize << (Semi - 64)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
 				{
 				{
 				/*InvokeRule blockItem*/
@@ -12619,7 +12619,7 @@ where
 			recog.base.set_state(1017);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Star - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
+			if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Mul - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
 				{
 				/*InvokeRule expression*/
 				recog.base.set_state(1016);
@@ -13680,7 +13680,7 @@ where
 			recog.base.set_state(1068);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Star - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
+			if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Mul - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
 				{
 				/*InvokeRule forMidExpression*/
 				recog.base.set_state(1067);
@@ -13695,7 +13695,7 @@ where
 			recog.base.set_state(1072);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Star - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
+			if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Mul - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
 				{
 				/*InvokeRule forAfterExpression*/
 				recog.base.set_state(1071);
@@ -13807,7 +13807,7 @@ where
 			recog.base.set_state(1076);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__8) | (1usize << T__10) | (1usize << T__11) | (1usize << T__12) | (1usize << T__13) | (1usize << T__14))) != 0) || ((((_la - 64)) & !0x3f) == 0 && ((1usize << (_la - 64)) & ((1usize << (LeftParen - 64)) | (1usize << (Star - 64)) | (1usize << (Caret - 64)))) != 0) || _la==Identifier {
+			if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__8) | (1usize << T__10) | (1usize << T__11) | (1usize << T__12) | (1usize << T__13) | (1usize << T__14))) != 0) || ((((_la - 64)) & !0x3f) == 0 && ((1usize << (_la - 64)) & ((1usize << (LeftParen - 64)) | (1usize << (Mul - 64)) | (1usize << (Caret - 64)))) != 0) || _la==Identifier {
 				{
 				/*InvokeRule initDeclaratorList*/
 				recog.base.set_state(1075);
@@ -13929,7 +13929,7 @@ where
 					recog.base.set_state(1080);
 					recog.err_handler.sync(&mut recog.base)?;
 					_la = recog.base.input.la(1);
-					if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Star - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
+					if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Mul - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
 						{
 						/*InvokeRule expression*/
 						recog.base.set_state(1079);
@@ -14653,7 +14653,7 @@ where
 			recog.base.set_state(1113);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Star - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
+			if (((_la) & !0x3f) == 0 && ((1usize << _la) & ((1usize << T__0) | (1usize << T__1) | (1usize << T__2))) != 0) || ((((_la - 44)) & !0x3f) == 0 && ((1usize << (_la - 44)) & ((1usize << (Sizeof - 44)) | (1usize << (Alignof - 44)) | (1usize << (Generic - 44)) | (1usize << (LeftParen - 44)))) != 0) || ((((_la - 76)) & !0x3f) == 0 && ((1usize << (_la - 76)) & ((1usize << (Plus - 76)) | (1usize << (PlusPlus - 76)) | (1usize << (Minus - 76)) | (1usize << (MinusMinus - 76)) | (1usize << (Mul - 76)) | (1usize << (And - 76)) | (1usize << (AndAnd - 76)) | (1usize << (Not - 76)) | (1usize << (Tilde - 76)))) != 0) || ((((_la - 110)) & !0x3f) == 0 && ((1usize << (_la - 110)) & ((1usize << (Identifier - 110)) | (1usize << (Constant - 110)) | (1usize << (DigitSequence - 110)) | (1usize << (StringLiteral - 110)))) != 0) {
 				{
 				/*InvokeRule expression*/
 				recog.base.set_state(1112);
@@ -14766,7 +14766,7 @@ where
 			recog.base.set_state(1118);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			if ((((_la - 1)) & !0x3f) == 0 && ((1usize << (_la - 1)) & ((1usize << (T__0 - 1)) | (1usize << (T__3 - 1)) | (1usize << (T__4 - 1)) | (1usize << (T__5 - 1)) | (1usize << (T__6 - 1)) | (1usize << (T__7 - 1)) | (1usize << (T__8 - 1)) | (1usize << (T__9 - 1)) | (1usize << (T__10 - 1)) | (1usize << (T__11 - 1)) | (1usize << (T__12 - 1)) | (1usize << (T__13 - 1)) | (1usize << (T__14 - 1)) | (1usize << (T__16 - 1)) | (1usize << (Auto - 1)) | (1usize << (Char - 1)) | (1usize << (Const - 1)) | (1usize << (Double - 1)) | (1usize << (Enum - 1)) | (1usize << (Extern - 1)) | (1usize << (Float - 1)))) != 0) || ((((_la - 36)) & !0x3f) == 0 && ((1usize << (_la - 36)) & ((1usize << (Inline - 36)) | (1usize << (Int - 36)) | (1usize << (Long - 36)) | (1usize << (Register - 36)) | (1usize << (Restrict - 36)) | (1usize << (Short - 36)) | (1usize << (Signed - 36)) | (1usize << (Static - 36)) | (1usize << (Struct - 36)) | (1usize << (Typedef - 36)) | (1usize << (Union - 36)) | (1usize << (Unsigned - 36)) | (1usize << (Void - 36)) | (1usize << (Volatile - 36)) | (1usize << (Alignas - 36)) | (1usize << (Atomic - 36)) | (1usize << (Bool - 36)) | (1usize << (Complex - 36)) | (1usize << (Noreturn - 36)) | (1usize << (StaticAssert - 36)) | (1usize << (ThreadLocal - 36)) | (1usize << (LeftParen - 36)))) != 0) || ((((_la - 80)) & !0x3f) == 0 && ((1usize << (_la - 80)) & ((1usize << (Star - 80)) | (1usize << (Caret - 80)) | (1usize << (Semi - 80)) | (1usize << (Identifier - 80)))) != 0) {
+			if ((((_la - 1)) & !0x3f) == 0 && ((1usize << (_la - 1)) & ((1usize << (T__0 - 1)) | (1usize << (T__3 - 1)) | (1usize << (T__4 - 1)) | (1usize << (T__5 - 1)) | (1usize << (T__6 - 1)) | (1usize << (T__7 - 1)) | (1usize << (T__8 - 1)) | (1usize << (T__9 - 1)) | (1usize << (T__10 - 1)) | (1usize << (T__11 - 1)) | (1usize << (T__12 - 1)) | (1usize << (T__13 - 1)) | (1usize << (T__14 - 1)) | (1usize << (T__16 - 1)) | (1usize << (Auto - 1)) | (1usize << (Char - 1)) | (1usize << (Const - 1)) | (1usize << (Double - 1)) | (1usize << (Enum - 1)) | (1usize << (Extern - 1)) | (1usize << (Float - 1)))) != 0) || ((((_la - 36)) & !0x3f) == 0 && ((1usize << (_la - 36)) & ((1usize << (Inline - 36)) | (1usize << (Int - 36)) | (1usize << (Long - 36)) | (1usize << (Register - 36)) | (1usize << (Restrict - 36)) | (1usize << (Short - 36)) | (1usize << (Signed - 36)) | (1usize << (Static - 36)) | (1usize << (Struct - 36)) | (1usize << (Typedef - 36)) | (1usize << (Union - 36)) | (1usize << (Unsigned - 36)) | (1usize << (Void - 36)) | (1usize << (Volatile - 36)) | (1usize << (Alignas - 36)) | (1usize << (Atomic - 36)) | (1usize << (Bool - 36)) | (1usize << (Complex - 36)) | (1usize << (Noreturn - 36)) | (1usize << (StaticAssert - 36)) | (1usize << (ThreadLocal - 36)) | (1usize << (LeftParen - 36)))) != 0) || ((((_la - 80)) & !0x3f) == 0 && ((1usize << (_la - 80)) & ((1usize << (Mul - 80)) | (1usize << (Caret - 80)) | (1usize << (Semi - 80)) | (1usize << (Identifier - 80)))) != 0) {
 				{
 				/*InvokeRule translationUnit*/
 				recog.base.set_state(1117);
@@ -14889,7 +14889,7 @@ where
 				recog.base.set_state(1125); 
 				recog.err_handler.sync(&mut recog.base)?;
 				_la = recog.base.input.la(1);
-				if !(((((_la - 1)) & !0x3f) == 0 && ((1usize << (_la - 1)) & ((1usize << (T__0 - 1)) | (1usize << (T__3 - 1)) | (1usize << (T__4 - 1)) | (1usize << (T__5 - 1)) | (1usize << (T__6 - 1)) | (1usize << (T__7 - 1)) | (1usize << (T__8 - 1)) | (1usize << (T__9 - 1)) | (1usize << (T__10 - 1)) | (1usize << (T__11 - 1)) | (1usize << (T__12 - 1)) | (1usize << (T__13 - 1)) | (1usize << (T__14 - 1)) | (1usize << (T__16 - 1)) | (1usize << (Auto - 1)) | (1usize << (Char - 1)) | (1usize << (Const - 1)) | (1usize << (Double - 1)) | (1usize << (Enum - 1)) | (1usize << (Extern - 1)) | (1usize << (Float - 1)))) != 0) || ((((_la - 36)) & !0x3f) == 0 && ((1usize << (_la - 36)) & ((1usize << (Inline - 36)) | (1usize << (Int - 36)) | (1usize << (Long - 36)) | (1usize << (Register - 36)) | (1usize << (Restrict - 36)) | (1usize << (Short - 36)) | (1usize << (Signed - 36)) | (1usize << (Static - 36)) | (1usize << (Struct - 36)) | (1usize << (Typedef - 36)) | (1usize << (Union - 36)) | (1usize << (Unsigned - 36)) | (1usize << (Void - 36)) | (1usize << (Volatile - 36)) | (1usize << (Alignas - 36)) | (1usize << (Atomic - 36)) | (1usize << (Bool - 36)) | (1usize << (Complex - 36)) | (1usize << (Noreturn - 36)) | (1usize << (StaticAssert - 36)) | (1usize << (ThreadLocal - 36)) | (1usize << (LeftParen - 36)))) != 0) || ((((_la - 80)) & !0x3f) == 0 && ((1usize << (_la - 80)) & ((1usize << (Star - 80)) | (1usize << (Caret - 80)) | (1usize << (Semi - 80)) | (1usize << (Identifier - 80)))) != 0)) {break}
+				if !(((((_la - 1)) & !0x3f) == 0 && ((1usize << (_la - 1)) & ((1usize << (T__0 - 1)) | (1usize << (T__3 - 1)) | (1usize << (T__4 - 1)) | (1usize << (T__5 - 1)) | (1usize << (T__6 - 1)) | (1usize << (T__7 - 1)) | (1usize << (T__8 - 1)) | (1usize << (T__9 - 1)) | (1usize << (T__10 - 1)) | (1usize << (T__11 - 1)) | (1usize << (T__12 - 1)) | (1usize << (T__13 - 1)) | (1usize << (T__14 - 1)) | (1usize << (T__16 - 1)) | (1usize << (Auto - 1)) | (1usize << (Char - 1)) | (1usize << (Const - 1)) | (1usize << (Double - 1)) | (1usize << (Enum - 1)) | (1usize << (Extern - 1)) | (1usize << (Float - 1)))) != 0) || ((((_la - 36)) & !0x3f) == 0 && ((1usize << (_la - 36)) & ((1usize << (Inline - 36)) | (1usize << (Int - 36)) | (1usize << (Long - 36)) | (1usize << (Register - 36)) | (1usize << (Restrict - 36)) | (1usize << (Short - 36)) | (1usize << (Signed - 36)) | (1usize << (Static - 36)) | (1usize << (Struct - 36)) | (1usize << (Typedef - 36)) | (1usize << (Union - 36)) | (1usize << (Unsigned - 36)) | (1usize << (Void - 36)) | (1usize << (Volatile - 36)) | (1usize << (Alignas - 36)) | (1usize << (Atomic - 36)) | (1usize << (Bool - 36)) | (1usize << (Complex - 36)) | (1usize << (Noreturn - 36)) | (1usize << (StaticAssert - 36)) | (1usize << (ThreadLocal - 36)) | (1usize << (LeftParen - 36)))) != 0) || ((((_la - 80)) & !0x3f) == 0 && ((1usize << (_la - 80)) & ((1usize << (Mul - 80)) | (1usize << (Caret - 80)) | (1usize << (Semi - 80)) | (1usize << (Identifier - 80)))) != 0)) {break}
 			}
 			}
 			Ok(())

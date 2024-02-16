@@ -202,7 +202,7 @@ Plus
 PlusPlus
 Minus
 MinusMinus
-Star
+Mul
 Div
 Mod
 And
@@ -217,7 +217,7 @@ Colon
 Semi
 Comma
 Assign
-StarAssign
+MulAssign
 DivAssign
 ModAssign
 PlusAssign
@@ -324,7 +324,7 @@ Plus
 PlusPlus
 Minus
 MinusMinus
-Star
+Mul
 Div
 Mod
 And
@@ -339,7 +339,7 @@ Colon
 Semi
 Comma
 Assign
-StarAssign
+MulAssign
 DivAssign
 ModAssign
 PlusAssign

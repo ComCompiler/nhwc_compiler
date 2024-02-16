@@ -4,6 +4,8 @@ int none(){
 int kill()
 {
 	int a = 2;
+	int b = 2;
+    a=3,b=2;
 	if (a<3)  none();
 	return 0;
 }
@@ -16,6 +18,8 @@ int main()
             break;
         case 2:
             none();
+            int b = a= ++kill();
+            c = 1+2;
             break;
         case 3:
             printf("您选择了选项 3\n");

@@ -56,8 +56,6 @@ impl<'input,S> ParseTreeListener<'input,CParserContextType> for TerminalRuleList
 impl<'input,S> CListener<'input> for TerminalRuleListener<S>{ }
 
 
-
-
 pub struct RuleOnlyListener<S>{
     pub st : S,  // status passing through the tree 
     pub enter_rule_f: Box<dyn FnMut(& ParserContext,&mut S)->()>,

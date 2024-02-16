@@ -1,5 +1,5 @@
 void test(int x,int a ){
-    int y = 1;
+    float y = 1.1;
     int z = y+a;
     x++;
     {
