@@ -1,12 +1,14 @@
+use std::ops::{AddAssign, DivAssign, MulAssign};
 use std::panic;
 use std::thread::scope;
 
 use clap::ValueEnum;
-use petgraph::{Directed, Graph};
+use petgraph::{operator, Directed, Graph};
 use petgraph::stable_graph::NodeIndex;
 
-use crate::antlr_parser::cparser::{RULE_assignmentExpression, RULE_expression};
-use crate::{add_edge, add_node, find, find_nodes, node, rule_id};
+use crate::antlr_parser::clexer::{DivAssign, MinusAssign, MulAssign, PlusAssign};
+use crate::antlr_parser::cparser::{Assign, RULE_andExpression, RULE_assignmentExpression, RULE_assignmentOperator, RULE_exclusiveOrExpression, RULE_expression, RULE_inclusiveOrExpression, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_unaryExpression};
+use crate::{add_edge, add_node, add_node_with_edge, direct_node, find, find_nodes, node, rule_id, term_id};
 
 use super::ast_node::{self, find_neighbors_term_ast};
 use super::symbol_table::SymbolIndex;
@@ -32,10 +34,11 @@ enum ExprOp{
     Sub,
     Div,
     Assign,
-    AddAssign,
-    DivAssign,
-    MulAssign,
-    SubAssign,
+    LogicalOr,
+    LogicalAnd,
+    InclusiveOr,
+    And,
+    ExclusiveOr,
 }
 
 impl EtNode{
@@ -48,11 +51,29 @@ impl EtNode{
     pub fn new_op_div()->Self{
         EtNode::Operator { op:ExprOp::Div}
     }
+    pub fn new_op_mul()->Self{
+        EtNode::Operator { op:ExprOp::Mul}
+    }
     pub fn new_op_assign()->Self{
         EtNode::Operator { op:ExprOp::Assign}
     }
     pub fn new_op_sep()->Self{
         EtNode::Separator
+    }
+    pub fn new_op_logical_and()->Self{
+        EtNode::Operator { op: ExprOp::And }
+    }
+    pub fn new_op_logical_or()->Self{
+        EtNode::Operator { op: ExprOp::LogicalOr }
+    }
+    pub fn new_op_inclusive_or()->Self{
+        EtNode::Operator { op: ExprOp::LogicalOr }
+    }
+    pub fn new_op_and()->Self{
+        EtNode::Operator { op: ExprOp::LogicalOr }
+    }
+    pub fn new_op_exclusive_or()->Self{
+        EtNode::Operator { op: ExprOp::LogicalOr }
     }
     //你必须确保这个symbol 是一个 constant
     pub fn new_constant(const_symbol : Symbol)->Self{
@@ -91,13 +112,63 @@ fn process_expr(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&ScopeTr
 }
 /// assignment expr 是 assignmentOperator( =  /= *= += -= <<= >>= &= ^= |= )右边的式子
 fn process_assign_expr(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&ScopeTree, assign_expr_node:u32, scope_node:u32,parent_et_node:u32 ){
-    let op_term =find!(term Assign at assign_expr_node in ast_tree);
-    match op_term{
+    let op_assign_operator =find!(rule RULE_assignmentOperator at assign_expr_node in ast_tree);
+    match op_assign_operator{
         // 有 term 说明这一层,是 a=3 这样的形式
-        Some(term_node) => {
-            match (rule_id!(at term_node in ast_tree),term_node) {
+        Some(assign_operator_node) => {
+            let operator_node = direct_node!(at assign_operator_node in ast_tree);
+            match (term_id!(at operator_node in ast_tree),operator_node) {
+                // ?暂时只支持五个 assign 类算符
+                (Assign,assign_operator)=>{
+                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign()} from parent_et_node in et_tree );
+                    let unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
+                    let right_assign_expr_ndoe = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
+                    process_unary_expr(et_tree,ast_tree,scope_tree,unary_expr_node,scope_node,et_assign_node);
+                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_assign_node);
+                }
+                (MulAssign,mul_assign_operator)=>{
+                    // 这里要添加两个node 一个是 赋值 = 一个是 * 
+                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign()} from parent_et_node in et_tree );
+                    let et_mul_node = add_node_with_edge!({EtNode::new_op_mul()} from et_assign_node in et_tree );
+
+                    let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
+                    let right_assign_expr_ndoe = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_assign_node);
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_mul_node);
+                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_assign_node);
+                }
+                (DivAssign,div_assign_operator)=>{
+                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign()} from parent_et_node in et_tree );
+                    let et_div_node = add_node_with_edge!({EtNode::new_op_div()} from et_assign_node in et_tree );
+
+                    let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
+                    let right_assign_expr_ndoe = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_assign_node);
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_div_node);
+                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_assign_node);
+                }
+                (PlusAssign,plus_assign_operator)=>{
+                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign()} from parent_et_node in et_tree );
+                    let et_add_node = add_node_with_edge!({EtNode::new_op_add()} from et_assign_node in et_tree );
+
+                    let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
+                    let right_assign_expr_ndoe = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_assign_node);
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_add_node);
+                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_assign_node);
+                }
+                (MinusAssign,minus_assign_operator)=>{
+                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign()} from parent_et_node in et_tree );
+                    let et_sub_node = add_node_with_edge!({EtNode::new_op_sub()} from et_assign_node in et_tree );
+
+                    let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
+                    let right_assign_expr_ndoe = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_assign_node);
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_sub_node);
+                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_assign_node);
+                }
                 _ => {
-                    panic!("未知 operator in assign expression {} ", term_node)
+                    panic!("未知 operator in assign expression {} ", assign_operator_node)
                 }
             }
         },
@@ -106,29 +177,130 @@ fn process_assign_expr(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&
     }
     
 }
-fn process_cond_expr(){
-    todo!()
+fn process_cond_expr(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&ScopeTree, cond_expr_node:u32, scope_node:u32,parent_et_node:u32){
+    let logical_or_node = find!(rule RULE_logicalOrExpression at cond_expr_node in ast_tree).unwrap();
+    process_logical_or_expr(et_tree, ast_tree, scope_tree, logical_or_node, scope_node, parent_et_node);
+}
+fn process_logical_or_expr(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&ScopeTree, logical_or_expr_node:u32, scope_node:u32,parent_et_node:u32){
+    let logical_and_nodes = find_nodes!(rule RULE_logicalAndExpression at logical_or_expr_node in ast_tree);
+    let mut op_last_ep_or_node = None;
+    if logical_and_nodes.len()>1{
+        for (index,&logical_and_expr_node) in logical_and_nodes.iter().enumerate(){
+            // 这里要分别处理 第一个节点  中间结点 和 最后一个节点
+            if index != logical_and_nodes.len()-1{
+                if op_last_ep_or_node.is_none(){
+                    op_last_ep_or_node = Some(add_node_with_edge!({EtNode::new_op_logical_or()} from parent_et_node in et_tree ));
+                }else{
+                    let last_ep_or_node = op_last_ep_or_node.unwrap();
+                    op_last_ep_or_node = Some(add_node_with_edge!({EtNode::new_op_logical_or()} from last_ep_or_node in et_tree ));
+                }
+                process_logical_and_expr(et_tree, ast_tree, scope_tree, logical_and_expr_node, scope_node, op_last_ep_or_node.unwrap());
+            }else {
+                process_logical_and_expr(et_tree, ast_tree, scope_tree, logical_and_expr_node, scope_node, op_last_ep_or_node.unwrap());
+            }
+        }
+    }else if logical_and_nodes.len()==1 {
+        process_logical_and_expr(et_tree, ast_tree, scope_tree,logical_and_nodes[0], scope_node,parent_et_node);
+    }else{
+        panic!("夭寿了,logical_and_expression 在这个logical_or_expression下一个也没有")
+    }
+}
+fn process_logical_and_expr(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&ScopeTree, logical_and_expr:u32, scope_node:u32,parent_et_node:u32){
+    let inclusive_or_nodes = find_nodes!(rule RULE_inclusiveOrExpression at logical_and_expr in ast_tree);
+    let mut op_last_ep_logical_and_node = None;
+    if inclusive_or_nodes.len()>1{
+        for (index,&inclusive_or_node) in inclusive_or_nodes.iter().enumerate(){
+            // 这里要分别处理 第一个节点  中间结点 和 最后一个节点
+            if index != inclusive_or_nodes.len()-1{
+                if op_last_ep_logical_and_node.is_none(){
+                    op_last_ep_logical_and_node = Some(add_node_with_edge!({EtNode::new_op_logical_and()} from parent_et_node in et_tree ));
+                }else{
+                    let last_ep_logical_and_node = op_last_ep_logical_and_node.unwrap();
+                    op_last_ep_logical_and_node = Some(add_node_with_edge!({EtNode::new_op_logical_and()} from last_ep_logical_and_node in et_tree ));
+                }
+                process_inclusive_or_expr(et_tree, ast_tree, scope_tree, inclusive_or_node, scope_node, op_last_ep_logical_and_node.unwrap());
+            }else {
+                process_inclusive_or_expr(et_tree, ast_tree, scope_tree, inclusive_or_node, scope_node, op_last_ep_logical_and_node.unwrap());
+            }
+        }
+    }else if inclusive_or_nodes.len()==1 {
+        process_inclusive_or_expr(et_tree, ast_tree, scope_tree, inclusive_or_nodes[0], scope_node, parent_et_node)
+    }else {
+        panic!("夭寿了,inclusive_or_expression 在这个logical_and_expression下一个也没有")
+    }
 
 }
-fn process_logical_or_expr(){
-    todo!()
-
+fn process_inclusive_or_expr(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&ScopeTree, inclusive_or_expr:u32, scope_node:u32,parent_et_node:u32){
+    let exclusive_or_nodes = find_nodes!(rule RULE_exclusiveOrExpression at inclusive_or_expr in ast_tree);
+    let mut op_last_ep_inclusive_or_node = None;
+    if exclusive_or_nodes.len()>1{
+        for (index,&inclusive_or_node) in exclusive_or_nodes.iter().enumerate(){
+            // 这里要分别处理 第一个节点  中间结点 和 最后一个节点
+            if index != exclusive_or_nodes.len()-1{
+                if op_last_ep_inclusive_or_node.is_none(){
+                    op_last_ep_inclusive_or_node = Some(add_node_with_edge!({EtNode::new_op_exclusive_or()} from parent_et_node in et_tree ));
+                }else{
+                    let last_ep_inclusive_or_node = op_last_ep_inclusive_or_node.unwrap();
+                    op_last_ep_inclusive_or_node = Some(add_node_with_edge!({EtNode::new_op_exclusive_or()} from last_ep_inclusive_or_node in et_tree ));
+                }
+                process_inclusive_or_expr(et_tree, ast_tree, scope_tree, inclusive_or_node, scope_node, op_last_ep_inclusive_or_node.unwrap());
+            }else {
+                process_inclusive_or_expr(et_tree, ast_tree, scope_tree, inclusive_or_node, scope_node, op_last_ep_inclusive_or_node.unwrap());
+            }
+        }
+    }else if exclusive_or_nodes.len()==1 {
+        process_inclusive_or_expr(et_tree, ast_tree, scope_tree, exclusive_or_nodes[0], scope_node, parent_et_node)
+    }else {
+        panic!("夭寿了,exclusive_or_expression 在这个logical_and_expression下一个也没有")
+    }
 }
-fn process_logical_and_expr(){
-    todo!()
-
+fn process_exclusive_or_expr(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&ScopeTree, exclusive_or_expr_node:u32, scope_node:u32,parent_et_node:u32){
+    let and_expr_nodes = find_nodes!(rule RULE_andExpression at exclusive_or_expr_node in ast_tree);
+    let mut op_last_ep_and_node = None;
+    if and_expr_nodes.len()>1{
+        for (index,&inclusive_or_node) in and_expr_nodes.iter().enumerate(){
+            // 这里要分别处理 第一个节点  中间结点 和 最后一个节点
+            if index != and_expr_nodes.len()-1{
+                if op_last_ep_and_node.is_none(){
+                    op_last_ep_and_node = Some(add_node_with_edge!({EtNode::new_op_exclusive_or()} from parent_et_node in et_tree ));
+                }else{
+                    let last_ep_inclusive_or_node = op_last_ep_and_node.unwrap();
+                    op_last_ep_and_node = Some(add_node_with_edge!({EtNode::new_op_exclusive_or()} from last_ep_inclusive_or_node in et_tree ));
+                }
+                process_and_expr(et_tree, ast_tree, scope_tree, inclusive_or_node, scope_node, op_last_ep_and_node.unwrap());
+            }else {
+                process_and_expr(et_tree, ast_tree, scope_tree, inclusive_or_node, scope_node, op_last_ep_and_node.unwrap());
+            }
+        }
+    }else if and_expr_nodes.len()==1 {
+        process_and_expr(et_tree, ast_tree, scope_tree, and_expr_nodes[0], scope_node, parent_et_node)
+    }else {
+        panic!("夭寿了,and_expr 在这个exclusive_or_expr下一个也没有")
+    }
 }
-fn process_inclusive_or_expr(){
-    todo!()
-
-}
-fn process_exclusive_or_expr(){
-    todo!()
-
-}
-fn process_and_expr(){
-    todo!()
-
+fn process_and_expr(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&ScopeTree, exclusive_or_expr_node:u32, scope_node:u32,parent_et_node:u32){
+    let and_expr_nodes = find_nodes!(rule RULE_andExpression at exclusive_or_expr_node in ast_tree);
+    let mut op_last_ep_and_node = None;
+    if and_expr_nodes.len()>1{
+        for (index,&inclusive_or_node) in and_expr_nodes.iter().enumerate(){
+            // 这里要分别处理 第一个节点  中间结点 和 最后一个节点
+            if index != and_expr_nodes.len()-1{
+                if op_last_ep_and_node.is_none(){
+                    op_last_ep_and_node = Some(add_node_with_edge!({EtNode::new_op_exclusive_or()} from parent_et_node in et_tree ));
+                }else{
+                    let last_ep_inclusive_or_node = op_last_ep_and_node.unwrap();
+                    op_last_ep_and_node = Some(add_node_with_edge!({EtNode::new_op_exclusive_or()} from last_ep_inclusive_or_node in et_tree ));
+                }
+                process_and_expr(et_tree, ast_tree, scope_tree, inclusive_or_node, scope_node, op_last_ep_and_node.unwrap());
+            }else {
+                process_and_expr(et_tree, ast_tree, scope_tree, inclusive_or_node, scope_node, op_last_ep_and_node.unwrap());
+            }
+        }
+    }else if and_expr_nodes.len()==1 {
+        process_and_expr(et_tree, ast_tree, scope_tree, and_expr_nodes[0], scope_node, parent_et_node)
+    }else {
+        panic!("夭寿了,and_expr 在这个exclusive_or_expr下一个也没有")
+    }
 }
 fn process_equality_expr()-> u32{
     todo!()
@@ -154,7 +326,7 @@ fn process_cast_expr()-> u32{
     todo!()
 
 }
-fn process_unary_expr()-> u32{
+fn process_unary_expr(et_tree:&mut EtTree ,ast_tree: &mut AstTree, scope_tree:&ScopeTree, unary_expr_node:u32, scope_node:u32,parent_et_node:u32 ){
     todo!()
 
 }

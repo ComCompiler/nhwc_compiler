@@ -224,7 +224,7 @@ pub fn process_compound(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,symtab:&mut Sy
     let blockitem_nodes: Vec<u32>= find_nodes!(rule RULE_blockItem at blockitemlist_node in ast_tree);
 
     // 这里 rev 是因为 adj 只能返回  rev 的部分  
-    for &blockitem_node in blockitem_nodes.iter().rev(){
+    for blockitem_node in blockitem_nodes{
         let declare_or_statement_node = direct_node!(at blockitem_node in ast_tree);
         match (rule_id!(at declare_or_statement_node in ast_tree),declare_or_statement_node) {
             ((RULE_statement),stmt_node) => {

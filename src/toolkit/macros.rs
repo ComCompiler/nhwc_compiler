@@ -83,7 +83,9 @@ macro_rules! find_nodes {
     (rule $id:ident at $node:ident in $ast_tree:ident) => {
         {
             let iter = crate::toolkit::ast_node::find_neighbors_rule_ast($ast_tree,$node,Some($id));
-            let nodes:Vec<u32> = iter.collect();
+            let mut nodes:Vec<u32> = iter.collect();
+            // let nodenodes.reverse()
+            nodes.reverse();
             nodes
         }
     };
@@ -166,6 +168,37 @@ macro_rules! add_node {
     };
 }
 
+#[macro_export] 
+macro_rules! add_node_with_edge{
+    ($node_struct:ident from $from_node:ident in $graph:ident) => {
+        {
+            $graph.add_node($node_struct ).index() as u32;
+            $graph.add_edge(NodeIndex::from($from_node), NodeIndex::from(node_id),());
+            node_id
+        }
+    };
+    ($node_struct:block with edge edgestruct:block from $from_node:ident in $graph:ident) => {
+        {
+            let node_id = $graph.add_node($node_struct ).index() as u32;
+            $graph.add_edge(NodeIndex::from($from_node), NodeIndex::from(node_id),edgestruct );
+            node_id
+        }
+    };
+    ($node_struct:block from $from_node:ident in $graph:ident) => {
+        {
+            let node_id = $graph.add_node($node_struct ).index() as u32;
+            $graph.add_edge(NodeIndex::from($from_node), NodeIndex::from(node_id),() );
+            node_id
+        }
+    };
+    ($node_struct:block with edge edgestruct:block from $from_node:ident in $graph:ident) => {
+        {
+            let node_id = $graph.add_node($node_struct ).index() as u32;
+            $graph.add_edge(NodeIndex::from($from_node), NodeIndex::from(node_id),edgestruct );
+            ndoe_id
+        }
+    };
+}
 
 #[macro_export] 
 macro_rules! node {
@@ -190,7 +223,21 @@ macro_rules! node_mut {
 macro_rules! rule_id {
     (at $node:ident in $ast_tree:ident) => {
         {
+            if node!(at $node in $ast_tree).is_terminal{
+                panic!("can't use rule_id macro to a terminal node")
+            }
             node!(at $node in $ast_tree).rule_id
+        }
+    };
+}
+#[macro_export] 
+macro_rules! term_id {
+    (at $node:ident in $ast_tree:ident) => {
+        {
+            if !node!(at $node in $ast_tree).is_terminal{
+                panic!("can't use term_id macro to a rule node")
+            }
+            (node!(at $node in $ast_tree).rule_id as isize).try_into().expect("无法将此 term_id 转化为 isize 类型")
         }
     };
 }

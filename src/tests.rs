@@ -57,7 +57,7 @@ mod tests{
         //dfs遍历ast
         let node =find_dfs_rule_ast(ast_tree, 0, RULE_blockItemList).next().unwrap();  // 三号节点是一个 function def 
         let node_ids:Vec<u32>= find_nodes!(rule RULE_blockItem at node in ast_tree);
-        assert_eq!(node_ids , vec![150,34,17] ,"找到的 node id 不对");
+        assert_eq!(node_ids , vec![17,34,150] ,"找到的 node id 不对");
     }
     #[test]
     fn gen_ast_png(){
@@ -88,7 +88,7 @@ mod tests{
                                            then RULE_blockItemList
                                            finally RULE_blockItem
                                               at node in ast_tree);
-        assert_eq!(node_ids , vec![150,34,17] ,"找到的 node id 不对");
+        assert_eq!(node_ids , vec![17,34,150] ,"找到的 node id 不对");
     }
     #[test]
     fn find_items_of_func_def_using_macro_find_node_test2(){
