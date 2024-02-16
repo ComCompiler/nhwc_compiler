@@ -77,14 +77,16 @@ macro_rules! find_nodes {
     (rule $id:ident at $node:ident in $ast_tree:ident) => {
         {
             let iter = crate::toolkit::ast_node::find_neighbors_rule_ast($ast_tree,$node,$id);
-            iter.collect()
+            let nodes:Vec<u32> = iter.collect();
+            nodes
         }
     };
     (rule $($id:ident)then+ finally $fin_id:ident at $node:ident in $ast_tree:ident) => {
         {
             let new_node = $node;
             $(let new_node = find!(rule $id at new_node in $ast_tree).unwrap();)+
-            find_nodes!(rule $fin_id at new_node in $ast_tree)
+            let nodes:Vec<u32> = find_nodes!(rule $fin_id at new_node in $ast_tree);
+            nodes
         }
     };
 
@@ -128,6 +130,9 @@ macro_rules! add_edge {
     };
     ($a:ident to $b:ident in $ast_tree:ident) => {
         $ast_tree.add_edge(NodeIndex::from($a), NodeIndex::from($b),() ).index() as u32 
+    };
+    (from $a:ident to $b:ident in $scope_tree:ident) => {
+        $scope_tree.add_edge(NodeIndex::from($a), NodeIndex::from($b),() ).index() as u32 
     };
 }
 #[macro_export] 

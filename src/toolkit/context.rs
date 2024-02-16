@@ -64,6 +64,6 @@ impl Context{
         generate_png_by_graph(&self.scope_tree, "scope_tree".to_string());
     }
     pub fn get_all_data_mut(&mut self){
-
+        todo!()
     }
 }
