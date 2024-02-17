@@ -1,12 +1,9 @@
-use std::borrow::Borrow;
-
 use petgraph::stable_graph::NodeIndex;
-use syn::token::Add;
 
 use crate::toolkit::ast_node::AstTree;
 
-use crate::{add_edge, add_node, direct_edge, direct_node, find_nodes_by_dfs, node_mut, rule_id, add_node_with_edge,RULE_compoundStatement, RULE_functionDefinition};
-use crate::antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_constantExpression, RULE_declaration, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_initDeclarator, RULE_initDeclaratorList, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_parameterDeclaration, RULE_parameterTypeList, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_translationUnit, RULE_whileIterationStatement
+use crate::{add_node, direct_node, find_nodes_by_dfs, rule_id, add_node_with_edge,RULE_compoundStatement, RULE_functionDefinition};
+use crate::antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_constantExpression, RULE_declaration, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection,RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_parameterTypeList, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
 };
 use crate::{find,find_nodes,node};
 
@@ -117,7 +114,7 @@ pub fn process_iteration(scope_tree:&mut ScopeTree,ast_tree:&AstTree,scope_paren
     let iteration_nextnode = direct_node!(at current_iteration_node in ast_tree);
     match(rule_id!(at iteration_nextnode in ast_tree),iteration_nextnode){
         (RULE_forIterationStatement,ast_for_node) =>{
-            process_for(scope_tree, ast_tree, scope_parent, iteration_nextnode)
+            process_for(scope_tree, ast_tree, scope_parent, ast_for_node)
         }
         (RULE_whileIterationStatement,ast_while_node) =>{
             process_while(scope_tree, ast_tree, scope_parent, ast_while_node)
@@ -170,9 +167,9 @@ pub fn process_compound(scope_tree:&mut ScopeTree,ast_tree:&AstTree,scope_parent
         let block_nextnode = direct_node!(at ast_block_node in ast_tree);
 
         //处理declaration或statement
-        match(rule_id!(at block_nextnode in ast_tree),block_nextnode){
+        match (rule_id!(at block_nextnode in ast_tree),block_nextnode){
             (RULE_statement,statement_node) => {
-                process_statement(scope_tree, ast_tree, scope_compound_node, block_nextnode);
+                process_statement(scope_tree, ast_tree, scope_compound_node, statement_node);
             }
             (RULE_declaration,declaration_node) => {
                 add_node_with_edge!({ScopeNode{ast_node:block_nextnode,text:String::new()}} from scope_compound_node in scope_tree);
