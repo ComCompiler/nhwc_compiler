@@ -96,6 +96,22 @@ macro_rules! find_nodes {
             nodes
         }
     };
+    (term $id:ident at $node:ident in $ast_tree:ident) => {
+        {
+            let iter = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,Some($id));
+            let mut nodes:Vec<u32> = iter.collect();
+            // let nodenodes.reverse()
+            nodes.reverse();
+            nodes
+        }
+    };
+    (term at $node:ident in $ast_tree:ident) => {
+        {
+            let iter = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,None);
+            let nodes:Vec<u32> = iter.collect();
+            nodes
+        }
+    };
     (rule $($id:ident)then+ finally $fin_id:ident at $node:ident in $ast_tree:ident) => {
         {
             let new_node = $node;

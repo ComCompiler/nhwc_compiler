@@ -35,10 +35,11 @@ primaryExpression
     |   Constant
     |   StringLiteral+
     |   '(' expression ')'
-    |   genericSelection
-    |   '__extension__'? '(' compoundStatement ')' // Blocks (GCC extension)
-    |   '__builtin_va_arg' '(' unaryExpression ',' typeName ')'
-    |   '__builtin_offsetof' '(' typeName ',' unaryExpression ')'
+    // |   genericSelection
+    // |   '__extension__'? '(' compoundStatement ')' // Blocks (GCC extension)
+    // |   '__builtin_va_arg' '(' unaryExpression ',' typeName ')'
+    // |   '__builtin_offsetof' '(' typeName ',' unaryExpression ')'
+    // 这四种看不懂，先删了 
     ;
 
 genericSelection
@@ -56,7 +57,8 @@ genericAssociation
 postfixExpression
     :
     (   primaryExpression
-    |   '__extension__'? '(' typeName ')' '{' initializerList ','? '}'
+    // |   '__extension__'? '(' typeName ')' '{' initializerList ','? '}'
+    // 这个看不懂，先封了
     )
     ('[' expression ']'
     | '(' argumentExpressionList? ')'
@@ -72,11 +74,11 @@ argumentExpressionList
 
 unaryExpression
     :
-    ('++' |  '--' |  'sizeof')*
+    // ('++' |  '--' |  'sizeof')* 这个也禁了了，看不懂这个
     (postfixExpression
     |   unaryOperator castExpression
     |   ('sizeof' | '_Alignof') '(' typeName ')'
-    |   '&&' Identifier // GCC extension address of label
+    // |   '&&' Identifier // GCC extension address of label 我们先把 &&label 禁了
     )
     ;
 
@@ -87,7 +89,7 @@ unaryOperator
 castExpression
     :   '__extension__'? '(' typeName ')' castExpression
     |   unaryExpression
-    |   DigitSequence // for
+    // |   DigitSequence // for       这段不知道是什么，不要了
     ;
 
 multiplicativeExpression
@@ -489,10 +491,10 @@ forBeforeExpression
     ;
 
 forAfterExpression
-    :   assignmentExpression (',' assignmentExpression)*
+    :   expression
     ;
 forMidExpression
-    :   assignmentExpression (',' assignmentExpression)*
+    :   expression
     ;
 
 jumpStatement
@@ -602,7 +604,7 @@ Plus : '+';
 PlusPlus : '++';
 Minus : '-';
 MinusMinus : '--';
-Mul : '*';
+Star : '*';
 Div : '/';
 Mod : '%';
 
