@@ -7,7 +7,7 @@ use std::{path::PathBuf, str::FromStr, time::Instant};
 use antlr_parser::cparser::{RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition} ;
 use clap::Parser;
 use petgraph::{adj::NodeIndex, visit::Dfs};
-use toolkit::{ast_node::find_dfs_rule_ast, etc::generate_png_by_graph, gen_et::{EtNode, EtTree}};
+use toolkit::{ast_node::{find_dfs_rule_ast, AstTree}, etc::generate_png_by_graph, gen_et::{EtNode, EtTree}};
 
 
 use crate::toolkit::context::{Context, ContextBuilder};
@@ -32,6 +32,7 @@ macro_rules! timeit {
         }
     };
 }
+
 fn main() {
     // // 读取命令选项，诸如 -c 表示代码文件地址
     // // 你也可以通过运行 cargo run -- --help 来查看所有可用选项
@@ -54,6 +55,10 @@ fn main() {
         for expr_stmt_node in expr_stmt_nodes{
             toolkit::gen_et::process_expr_stmt(&mut et_tree, &context.ast_tree, &context.scope_tree, expr_stmt_node, 0, 0);
         }
+        //debug输出et_node内容
+        for et_node in et_tree.node_weights_mut(){
+            et_node.load_et_node_text()
+        }
         generate_png_by_graph(&et_tree, "et_tree".to_string(), &[petgraph::dot::Config::EdgeNoLabel]);
-
+        
 }
