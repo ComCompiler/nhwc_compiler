@@ -29,7 +29,6 @@ pub enum EtNode{
     // 考虑到 可能出现  a=3,b=2; 这样的语句，因此需要规定一个Separator
     Separator{ast_node:u32,text:String}, 
 }
-#[derive (Debug)]
 enum ExprOp{
     Mul,
     Add,
@@ -63,9 +62,44 @@ enum ExprOp{
     PlusPlus,
     MinusMinus,
 }
-// impl Debug for ExprOp{
+impl Debug for ExprOp{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Mul => write!(f, "*"),
+            Self::Add => write!(f, "+"),
+            Self::Sub => write!(f, "-"),
+            Self::Div => write!(f, "/"),
+            Self::Assign => write!(f, "="),
+            Self::LogicalOr => write!(f, "//"),
+            Self::LogicalAnd => write!(f, "&&"),
+            Self::LogicalNot => write!(f, "!"),
+            Self::BitwiseOr => write!(f, "|"),
+            Self::BitwiseAnd => write!(f, "&"),
+            Self::BitwiseXor => write!(f, "^"),
+            Self::BitwiseNot => write!(f, "~"),
+            Self::Eq => write!(f, "="),
+            Self::NEq => write!(f, "!="),
+            Self::Less => write!(f, "<"),
+            Self::Greater => write!(f, ">"),
+            Self::LEq => write!(f, "<="),
+            Self::GEq => write!(f, ">="),
+            Self::LShift => write!(f, "<<"),
+            Self::RShift => write!(f, ">>"),
+            Self::Mod => write!(f, "%"),
+            Self::Cast => write!(f, "Cast"),
+            Self::Call => write!(f, "Call"),
+            Self::Negative => write!(f, "-"),
+            Self::Positive => write!(f, "+"),
+            Self::AddrOf => write!(f, "&"),
+            Self::Deref => write!(f, "*"),
+            Self::DotMember => write!(f, "DotMember"),
+            Self::ArrowMember => write!(f, "ArrowMember"),
+            Self::PlusPlus => write!(f, "++"),
+            Self::MinusMinus => write!(f, "--"),
+        }
+    }
+}
 
-// }
 impl EtNode{
     pub fn new_op_add(ast_node:u32)->Self{
         EtNode::Operator { op:ExprOp::Add,ast_node,text:String::new()}
@@ -194,10 +228,14 @@ impl EtNode{
 impl Debug for EtNode{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Operator { op, ast_node, text } => f.debug_struct("Operator").field("op", op).field("ast_node", ast_node).field("text", text).finish(),
-            Self::Constant { const_sym, ast_node, text } => f.debug_struct("Constant").field("const_sym", const_sym).field("ast_node", ast_node).field("text", text).finish(),
-            Self::Symbol { sym, ast_node, text } => f.debug_struct("Symbol").field("sym", sym).field("ast_node", ast_node).field("text", text).finish(),
-            Self::Separator { ast_node, text } => f.debug_struct("Separator").field("ast_node", ast_node).field("text", text).finish(),
+            Self::Operator { op, ast_node, text } =>
+                write!(f,"{:?}",op),
+            Self::Constant { const_sym, ast_node, text } => 
+                write!(f,"{:?}",const_sym),
+            Self::Symbol { sym, ast_node, text } =>
+                write!(f,"{:?}",sym),
+            Self::Separator { ast_node, text } =>
+                write!(f,",")
         }
     }
 }
