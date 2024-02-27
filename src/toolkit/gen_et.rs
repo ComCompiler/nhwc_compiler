@@ -274,7 +274,7 @@ pub fn process_assign_expr(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&
             match (term_id!(at operator_node in ast_tree),operator_node) {
                 // ?暂时只支持五个 assign 类算符
                 (Assign,assign_operator)=>{
-                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign(scope_node)} from parent_et_node in et_tree );
+                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign(assign_expr_node)} from parent_et_node in et_tree );
                     let unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
                     process_unary_expr(et_tree,ast_tree,scope_tree,unary_expr_node,scope_node,et_assign_node);
@@ -675,15 +675,15 @@ pub fn process_multiplicative_expr(et_tree: &mut EtTree, ast_tree: &AstTree, sco
 
 pub fn process_cast_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, cast_expr_node: u32, scope_node: u32, parent_et_node: u32) {
     // 检查 castExpression 节点是否是类型转换的情况
-    if let Some(type_cast_node) = find!(rule RULE_typeName at cast_expr_node in ast_tree) {
+    if let Some(type_name_node) = find!(rule RULE_typeName at cast_expr_node in ast_tree) {
         // 如果存在 typeName，说明是类型转换的情况
-        let type_sym = Symbol::new(scope_node,node!(at type_cast_node in ast_tree).text.clone());
+        let type_sym = Symbol::new(scope_node,node!(at type_name_node in ast_tree).text.clone());
         let cast_node = add_node_with_edge!({EtNode::new_op_cast( cast_expr_node)} from parent_et_node in et_tree);
         // 添加 cast op 节点的左节点，这是个 type symbol 
         add_node_with_edge!({EtNode::new_symbol( scope_node,type_sym)} from cast_node in et_tree);
         
         // 递归处理 castExpression
-        let child_cast_expr_node = find!(rule RULE_castExpression at type_cast_node in ast_tree).unwrap();
+        let child_cast_expr_node = find!(rule RULE_castExpression at cast_expr_node in ast_tree).expect(format!("在 节点 {} 下找不到 castExpr",type_name_node).as_str());
         process_cast_expr(et_tree, ast_tree, scope_tree, child_cast_expr_node, scope_node, cast_node);
     } else if let Some(unary_expr_node) = find!(rule RULE_unaryExpression at cast_expr_node in ast_tree) {
         // 如果是 unaryExpression，直接处理
@@ -775,6 +775,7 @@ pub fn process_primary_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree
         println!("ident {}",ident_node);
         process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, parent_et_node, Def_Or_Use::Use);
     }else if let Some(expr_node) = find!(rule RULE_expression at primary_expr_node in ast_tree){
+        println!("expr found under {}",primary_expr_node );
         process_expr(et_tree, ast_tree, scope_tree, expr_node, scope_node, parent_et_node);
     }else if let Some(string_node) = find!(term StringLiteral at primary_expr_node in ast_tree){
         process_constant(et_tree, ast_tree, scope_tree, string_node, scope_node, parent_et_node, Def_Or_Use::Use);

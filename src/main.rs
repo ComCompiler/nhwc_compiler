@@ -44,14 +44,13 @@ fn main() {
     // let mut context = timeit!({Context::init(args,true)} , "init");
     // // test
     // println!("Hello, world!");
-            let mut args = Cli::parse();
+        let mut args = Cli::parse();
         // 设置 path 为 demo.c
-        args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
         let context = Context::init(args, true);
         let mut et_tree = EtTree::new();
         //dfs遍历ast找到第一个 expr stmt
         let expr_stmt_nodes:Vec<u32>=find_dfs_rule_ast(&context.ast_tree, 0, RULE_expressionStatement).collect();  // 三号节点是一个 function def 
-        et_tree.add_node(EtNode::new_sep(0));
+        // et_tree.add_node(EtNode::new_sep(0));
         for expr_stmt_node in expr_stmt_nodes{
             toolkit::gen_et::process_expr_stmt(&mut et_tree, &context.ast_tree, &context.scope_tree, expr_stmt_node, 0, 0);
         }
