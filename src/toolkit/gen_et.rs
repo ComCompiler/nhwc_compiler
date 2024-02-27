@@ -750,12 +750,12 @@ pub fn process_postfix_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree
     }else if let Some(_string_node) = find!(term PlusPlus at postfix_expr_node in ast_tree){
         //说明这是个++的语法 
         let et_plusplus_node =  add_node_with_edge!({EtNode::new_op_plusplus( postfix_expr_node)} from parent_et_node in et_tree);
-        let primary_expr_node= find!(rule RULE_primaryExpression at parent_et_node in ast_tree).unwrap();
+        let primary_expr_node= find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree).unwrap();
         process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, et_plusplus_node);
     }else if let Some(_string_node) = find!(term MinusMinus at postfix_expr_node in ast_tree){
         //说明这是个--的语法 
         let et_minusminus_node =  add_node_with_edge!({EtNode::new_op_minusminus( postfix_expr_node)} from parent_et_node in et_tree);
-        let primary_expr_node= find!(rule RULE_primaryExpression at parent_et_node in ast_tree).unwrap();
+        let primary_expr_node= find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree).unwrap();
         process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, et_minusminus_node);
     }else if let Some(primary_expr_node) = find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree){
         process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, parent_et_node)
@@ -789,7 +789,7 @@ pub fn process_ident(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeT
 
     let sym_struct = Symbol::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
-    add_node_with_edge!({EtNode::Symbol {sym:sym_struct,ast_node:ident_node, text: todo!() }} from parent_et_node in et_tree);
+    add_node_with_edge!({EtNode::Symbol {sym:sym_struct,ast_node:ident_node, text:String::new() }} from parent_et_node in et_tree);
 }
 pub fn process_constant(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeTree,const_node:u32,scope_node:u32,parent_et_node:u32 ,def_or_use:Def_Or_Use) {
     let sym_name = node!(at const_node in ast_tree).text.clone();
@@ -797,7 +797,7 @@ pub fn process_constant(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&Sco
 
     let sym_struct = Symbol::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
-    add_node_with_edge!({EtNode::Symbol {sym:sym_struct,ast_node:const_node, text: todo!() }} from parent_et_node in et_tree);
+    add_node_with_edge!({EtNode::Symbol {sym:sym_struct,ast_node:const_node, text:String::new() }} from parent_et_node in et_tree);
 }
 
 
