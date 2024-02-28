@@ -46,7 +46,7 @@ fn main() {
     // println!("Hello, world!");
             let mut args = Cli::parse();
         // 设置 path 为 demo.c
-        args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
+        args.c_file_path = PathBuf::from_str("./demos/demo_equality.c").unwrap();
         let context = Context::init(args, true);
         let mut et_tree = EtTree::new();
         //dfs遍历ast找到第一个 expr stmt
@@ -57,8 +57,9 @@ fn main() {
         }
         //debug输出et_node内容
         for et_node in et_tree.node_weights_mut(){
-            et_node.load_et_node_text()
+            et_node.load_ast_node_text(&context.ast_tree)
         }
+
         generate_png_by_graph(&et_tree, "et_tree".to_string(), &[petgraph::dot::Config::EdgeNoLabel]);
         
 }
