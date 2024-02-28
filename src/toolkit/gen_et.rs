@@ -311,44 +311,36 @@ pub fn process_assign_expr(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&
                 }
                 (MulAssign,mul_assign_operator)=>{
                     // 这里要添加两个node 一个是 赋值 = 一个是 * 
-                    let et_assign_node = add_node_with_edge!({EtNode::new_op_mul_assign(scope_node)} from parent_et_node in et_tree );
-                    let et_mul_node = add_node_with_edge!({EtNode::new_op_mul(scope_node)} from et_assign_node in et_tree );
+                    let et_mul_assign_node = add_node_with_edge!({EtNode::new_op_mul_assign(scope_node)} from parent_et_node in et_tree );
 
                     let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_assign_node);
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_mul_node);
-                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_assign_node);
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_mul_assign_node);
+                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_mul_assign_node);
                 }
                 (DivAssign,div_assign_operator)=>{
-                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign(scope_node)} from parent_et_node in et_tree );
-                    let et_div_node = add_node_with_edge!({EtNode::new_op_div(scope_node)} from et_assign_node in et_tree );
+                    let et_div_assign_node = add_node_with_edge!({EtNode::new_op_div_assign(scope_node)} from parent_et_node in et_tree );
 
                     let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_assign_node);
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_div_node);
-                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_assign_node);
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_div_assign_node);
+                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_div_assign_node);
                 }
                 (PlusAssign,plus_assign_operator)=>{
-                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign(scope_node)} from parent_et_node in et_tree );
-                    let et_add_node = add_node_with_edge!({EtNode::new_op_add(scope_node)} from et_assign_node in et_tree );
+                    let et_plus_assign_node = add_node_with_edge!({EtNode::new_op_plus_assign(scope_node)} from parent_et_node in et_tree );
 
                     let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_assign_node);
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_add_node);
-                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_assign_node);
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_plus_assign_node);
+                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_plus_assign_node);
                 }
                 (MinusAssign,minus_assign_operator)=>{
-                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign(scope_node)} from parent_et_node in et_tree );
-                    let et_sub_node = add_node_with_edge!({EtNode::new_op_sub(scope_node)} from et_assign_node in et_tree );
+                    let et_minus_assign_node = add_node_with_edge!({EtNode::new_op_minus_assign(scope_node)} from parent_et_node in et_tree );
 
                     let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_assign_node);
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_sub_node);
-                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_assign_node);
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_minus_assign_node);
+                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_minus_assign_node);
                 }
                 _ => {
                     panic!("未知 operator in assign expression {} ", assign_operator_node)
