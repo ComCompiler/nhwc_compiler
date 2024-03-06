@@ -107,8 +107,8 @@ impl Debug for ExprOp{
             Self::RMinusMinus => write!(f, "--(R)"),
             Self::PlusAssign => write!(f, "+="),
             Self::MulAssign => write!(f, "*="),
-            Self::MinusAssign => write!(f, "-="),
-            Self::DivAssign => write!(f, "/="),
+            Self::MinusAssign=> write!(f, "-="),
+            Self::DivAssign => write!(f, "-="),
         }
     }
 }
@@ -291,7 +291,7 @@ pub fn process_expr_stmt(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&Sc
 pub fn process_expr(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&ScopeTree, expr_node:u32, scope_node:u32,parent_et_node:u32 ){
     // expr 节点下面 至少有一个 assignment expression 
     let assign_expr_nodes:Vec<u32> =  find_nodes!(rule RULE_assignmentExpression at expr_node in ast_tree);
-    let sep_node = add_node!({EtNode::new_sep(expr_node)} to et_tree);
+    let sep_node = add_node_with_edge!({EtNode::new_sep(expr_node)} from parent_et_node in et_tree);
     if assign_expr_nodes.is_empty(){
         panic!("这个 expression {} 里面没有任何 assign_expr",expr_node);
     }
@@ -778,12 +778,12 @@ pub fn process_postfix_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree
     }else if let Some(_string_node) = find!(term PlusPlus at postfix_expr_node in ast_tree){
         //说明这是个++的语法 
         let et_plusplus_node =  add_node_with_edge!({EtNode::new_op_right_plusplus( postfix_expr_node)} from parent_et_node in et_tree);
-        let primary_expr_node= find!(rule RULE_primaryExpression at parent_et_node in ast_tree).unwrap();
+        let primary_expr_node= find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree).expect(format!("process_postfix_expr error at ast_node{}",postfix_expr_node).as_str());
         process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, et_plusplus_node);
     }else if let Some(_string_node) = find!(term MinusMinus at postfix_expr_node in ast_tree){
         //说明这是个--的语法 
         let et_minusminus_node =  add_node_with_edge!({EtNode::new_op_minusminus( postfix_expr_node)} from parent_et_node in et_tree);
-        let primary_expr_node= find!(rule RULE_primaryExpression at parent_et_node in ast_tree).unwrap();
+        let primary_expr_node= find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree).unwrap();
         process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, et_minusminus_node);
     }else if let Some(primary_expr_node) = find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree){
         process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, parent_et_node)
