@@ -44,20 +44,21 @@ fn main() {
     // let mut context = timeit!({Context::init(args,true)} , "init");
     // // test
     // println!("Hello, world!");
-        let mut args = Cli::parse();
+            let mut args = Cli::parse();
         // 设置 path 为 demo.c
         let context = Context::init(args, true);
         let mut et_tree = EtTree::new();
         //dfs遍历ast找到第一个 expr stmt
         let expr_stmt_nodes:Vec<u32>=find_dfs_rule_ast(&context.ast_tree, 0, RULE_expressionStatement).collect();  // 三号节点是一个 function def 
-        // et_tree.add_node(EtNode::new_sep(0));
+        et_tree.add_node(EtNode::new_sep(0));
         for expr_stmt_node in expr_stmt_nodes{
             toolkit::gen_et::process_expr_stmt(&mut et_tree, &context.ast_tree, &context.scope_tree, expr_stmt_node, 0, 0);
         }
         //debug输出et_node内容
         for et_node in et_tree.node_weights_mut(){
-            et_node.load_et_node_text()
+            et_node.load_ast_node_text(&context.ast_tree)
         }
+
         generate_png_by_graph(&et_tree, "et_tree".to_string(), &[petgraph::dot::Config::EdgeNoLabel]);
 
         println!("hello world!")

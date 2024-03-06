@@ -74,7 +74,7 @@ argumentExpressionList
 
 unaryExpression
     :
-    // ('++' |  '--' |  'sizeof')* 这个也禁了了，看不懂这个
+     ('++' |  '--' |  'sizeof')* //暂时解封， 这个也禁了了，看不懂这个
     (postfixExpression
     |   unaryOperator castExpression
     |   ('sizeof' | '_Alignof') '(' typeName ')'

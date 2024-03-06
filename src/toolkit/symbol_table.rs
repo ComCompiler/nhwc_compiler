@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use crate::{antlr_parser::clexer::Newline, toolkit::{ast_node,cfg_node}};
 
 use super::symbol_field::{self, Field};
-
+use core::fmt::Debug;
 #[derive(Debug,Clone)]
 pub struct SymbolTable {
     map: BTreeMap<SymbolIndex,Symbol >,
@@ -66,10 +66,15 @@ impl Default for SymbolTable{
 }
 
 
-#[derive(Debug,Clone)]
+#[derive(Clone)]
 pub struct Symbol{
     fields :  HashMap<&'static str,Box<dyn Field>>,
     pub sym_idx : SymbolIndex,
+}
+impl Debug for Symbol{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f,"{:?}",self.sym_idx.symbol_name)
+    }
 }
 pub trait SymbolBehavior{
     fn add_field(&mut self,key :&'static str,sf:Box<dyn Field>);

@@ -9,6 +9,7 @@ use petgraph::stable_graph::{NodeIndex, StableGraph};
 
 use crate::antlr_parser::clexer::{And, Arrow, Constant, DivAssign, Dot, Equal, Greater, GreaterEqual, Identifier, LeftShift, Less, LessEqual, Minus, MinusAssign, MinusMinus, MulAssign, Not, NotEqual, Plus, PlusAssign, PlusPlus, RightShift, Star, StringLiteral, Tilde};
 use crate::antlr_parser::cparser::{Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_inclusiveOrExpression, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_unaryExpression, RULE_unaryOperator};
+use crate::toolkit::context;
 use crate::{add_edge, add_node, add_node_with_edge, direct_node, find, find_nodes, node, rule_id, term_id};
 
 use super::ast_node::{self, find_neighbors_term_ast};
@@ -59,8 +60,14 @@ enum ExprOp{
     Deref,
     DotMember,
     ArrowMember,
-    PlusPlus,
-    MinusMinus,
+    LPlusPlus,
+    RPlusPlus,
+    LMinusMinus,
+    RMinusMinus,
+    MulAssign,
+    DivAssign,
+    PlusAssign,
+    MinusAssign
 }
 impl Debug for ExprOp{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -94,8 +101,14 @@ impl Debug for ExprOp{
             Self::Deref => write!(f, "*"),
             Self::DotMember => write!(f, "DotMember"),
             Self::ArrowMember => write!(f, "ArrowMember"),
-            Self::PlusPlus => write!(f, "++"),
-            Self::MinusMinus => write!(f, "--"),
+            Self::LPlusPlus => write!(f, "++(L)"),
+            Self::RPlusPlus => write!(f, "++(R)"),
+            Self::LMinusMinus => write!(f, "--(L)"),
+            Self::RMinusMinus => write!(f, "--(R)"),
+            Self::PlusAssign => write!(f, "+="),
+            Self::MulAssign => write!(f, "*="),
+            Self::MinusAssign => write!(f, "-="),
+            Self::DivAssign => write!(f, "/="),
         }
     }
 }
@@ -139,6 +152,18 @@ impl EtNode{
     }
     pub fn new_op_bitwise_not(ast_node:u32)->Self{
         EtNode::Operator { op: ExprOp::BitwiseNot ,ast_node,text:String::new()}
+    }
+    pub fn new_op_mul_assign(ast_node:u32)->Self{
+    EtNode::Operator { op: ExprOp::MulAssign ,ast_node,text:String::new()}        
+    }
+    pub fn new_op_minus_assign(ast_node:u32)->Self{
+    EtNode::Operator { op: ExprOp::MinusAssign,ast_node,text:String::new()}        
+    }
+    pub fn new_op_div_assign(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::DivAssign ,ast_node,text:String::new()}        
+    }
+    pub fn new_op_plus_assign(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::PlusAssign ,ast_node,text:String::new()}
     }
     //你必须确保这个symbol 是一个 constant
     pub fn new_constant(ast_node:u32,const_symbol : Symbol)->Self{
@@ -198,11 +223,14 @@ impl EtNode{
     pub fn new_op_arrow_member(ast_node:u32) ->Self{
         EtNode::Operator { op: ExprOp::ArrowMember ,ast_node,text:String::new()}
     }
-    pub fn new_op_plusplus(ast_node:u32) ->Self{
-        EtNode::Operator { op: ExprOp::PlusPlus ,ast_node,text:String::new()}
+    pub fn new_op_left_plusplus(ast_node:u32) ->Self{
+        EtNode::Operator { op: ExprOp::LPlusPlus ,ast_node,text:String::new()}
+    }
+    pub fn new_op_right_plusplus(ast_node:u32) ->Self{
+        EtNode::Operator { op: ExprOp::RPlusPlus ,ast_node,text:String::new()}
     }
     pub fn new_op_minusminus(ast_node:u32) ->Self{
-        EtNode::Operator { op: ExprOp::MinusMinus ,ast_node,text:String::new()}
+        EtNode::Operator { op: ExprOp::RMinusMinus ,ast_node,text:String::new()}
     }
     pub fn load_et_node_text(&mut self) {
         let et_node = match self {
@@ -222,8 +250,15 @@ impl EtNode{
                 EtNode::Constant { const_sym, ast_node, text } => text,
                 EtNode::Symbol { sym, ast_node, text } => text,
                 EtNode::Separator { ast_node, text } => text,
-            }, new_str);
+            },
+            new_str);
         }
+    pub fn load_ast_node_text(&mut self,ast_tree: &AstTree) {
+        if let EtNode::Separator { ast_node, text } = self {
+            let ast_node=*ast_node;
+            let _=mem::replace(text,node!(at ast_node in ast_tree).text.clone());
+        }
+    }
 }
 impl Debug for EtNode{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -231,11 +266,12 @@ impl Debug for EtNode{
             Self::Operator { op, ast_node, text } =>
                 write!(f,"{:?}",op),
             Self::Constant { const_sym, ast_node, text } => 
-                write!(f,"{:?}",const_sym),
+                write!(f,"{}",const_sym.sym_idx.symbol_name),
             Self::Symbol { sym, ast_node, text } =>
-                write!(f,"{:?}",sym),
-            Self::Separator { ast_node, text } =>
-                write!(f,",")
+                write!(f,"{}",sym.sym_idx.symbol_name),
+            Self::Separator { ast_node, text } =>{
+                write!(f,"{}",text)
+            }
         }
     }
 }
@@ -264,7 +300,7 @@ pub fn process_expr(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&ScopeTr
     }
     
 }
-/// assignment expr 是 assignmentOperator( =  /= *= += -= <<= >>= &= ^= |= )右边的式子
+/// assignment expr 是 assignmentOperator( =  /= *= += -= %= <<= >>= &= ^= |= )右边的式子
 pub fn process_assign_expr(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&ScopeTree, assign_expr_node:u32, scope_node:u32,parent_et_node:u32 ){
     let op_assign_operator =find!(rule RULE_assignmentOperator at assign_expr_node in ast_tree);
     match op_assign_operator{
@@ -282,44 +318,36 @@ pub fn process_assign_expr(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&
                 }
                 (MulAssign,mul_assign_operator)=>{
                     // 这里要添加两个node 一个是 赋值 = 一个是 * 
-                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign(scope_node)} from parent_et_node in et_tree );
-                    let et_mul_node = add_node_with_edge!({EtNode::new_op_mul(scope_node)} from et_assign_node in et_tree );
+                    let et_mul_assign_node = add_node_with_edge!({EtNode::new_op_mul_assign(scope_node)} from parent_et_node in et_tree );
 
                     let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_assign_node);
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_mul_node);
-                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_assign_node);
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_mul_assign_node);
+                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_mul_assign_node);
                 }
                 (DivAssign,div_assign_operator)=>{
-                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign(scope_node)} from parent_et_node in et_tree );
-                    let et_div_node = add_node_with_edge!({EtNode::new_op_div(scope_node)} from et_assign_node in et_tree );
+                    let et_div_assign_node = add_node_with_edge!({EtNode::new_op_div_assign(scope_node)} from parent_et_node in et_tree );
 
                     let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_assign_node);
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_div_node);
-                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_assign_node);
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_div_assign_node);
+                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_div_assign_node);
                 }
                 (PlusAssign,plus_assign_operator)=>{
-                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign(scope_node)} from parent_et_node in et_tree );
-                    let et_add_node = add_node_with_edge!({EtNode::new_op_add(scope_node)} from et_assign_node in et_tree );
+                    let et_plus_assign_node = add_node_with_edge!({EtNode::new_op_plus_assign(scope_node)} from parent_et_node in et_tree );
 
                     let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_assign_node);
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_add_node);
-                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_assign_node);
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_plus_assign_node);
+                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_plus_assign_node);
                 }
                 (MinusAssign,minus_assign_operator)=>{
-                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign(scope_node)} from parent_et_node in et_tree );
-                    let et_sub_node = add_node_with_edge!({EtNode::new_op_sub(scope_node)} from et_assign_node in et_tree );
+                    let et_minus_assign_node = add_node_with_edge!({EtNode::new_op_minus_assign(scope_node)} from parent_et_node in et_tree );
 
                     let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_assign_node);
-                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_sub_node);
-                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_assign_node);
+                    process_unary_expr(et_tree,ast_tree,scope_tree,left_unary_expr_node,scope_node,et_minus_assign_node);
+                    process_assign_expr(et_tree,ast_tree,scope_tree,right_assign_expr_ndoe,scope_node,et_minus_assign_node);
                 }
                 _ => {
                     panic!("未知 operator in assign expression {} ", assign_operator_node)
@@ -749,7 +777,7 @@ pub fn process_postfix_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree
         process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, et_arrow_member_node,Def_Or_Use::Use);
     }else if let Some(_string_node) = find!(term PlusPlus at postfix_expr_node in ast_tree){
         //说明这是个++的语法 
-        let et_plusplus_node =  add_node_with_edge!({EtNode::new_op_plusplus( postfix_expr_node)} from parent_et_node in et_tree);
+        let et_plusplus_node =  add_node_with_edge!({EtNode::new_op_right_plusplus( postfix_expr_node)} from parent_et_node in et_tree);
         let primary_expr_node= find!(rule RULE_primaryExpression at parent_et_node in ast_tree).unwrap();
         process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, et_plusplus_node);
     }else if let Some(_string_node) = find!(term MinusMinus at postfix_expr_node in ast_tree){
@@ -790,7 +818,7 @@ pub fn process_ident(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeT
 
     let sym_struct = Symbol::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
-    add_node_with_edge!({EtNode::Symbol {sym:sym_struct,ast_node:ident_node, text: todo!() }} from parent_et_node in et_tree);
+    add_node_with_edge!({EtNode::Symbol {sym:sym_struct,ast_node:ident_node, text:String::new() }} from parent_et_node in et_tree);
 }
 pub fn process_constant(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeTree,const_node:u32,scope_node:u32,parent_et_node:u32 ,def_or_use:Def_Or_Use) {
     let sym_name = node!(at const_node in ast_tree).text.clone();
@@ -798,7 +826,7 @@ pub fn process_constant(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&Sco
 
     let sym_struct = Symbol::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
-    add_node_with_edge!({EtNode::Symbol {sym:sym_struct,ast_node:const_node, text: todo!() }} from parent_et_node in et_tree);
+    add_node_with_edge!({EtNode::Symbol {sym:sym_struct,ast_node:const_node, text:String::new() }} from parent_et_node in et_tree);
 }
 
 

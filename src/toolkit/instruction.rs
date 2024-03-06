@@ -64,17 +64,21 @@ pub enum MemOp{
 
 #[derive(Clone)]
 pub enum Instruction{
+    // 算数运算符 + - * / etc.
     Arith{
         lhs:SymbolIndex,
         rhs:ArithOp,
     },
+    // 调用函数
     Call{
         assigned : Option<SymbolIndex>,
         func_op : FuncOp
     },
+    // 跳转  break continue  return  etc.
     Jump{
         op:JumpOp,
     },
+    // phi node 
     Phi{
         lhs : SymbolIndex,
         rhs : PhiOp,
