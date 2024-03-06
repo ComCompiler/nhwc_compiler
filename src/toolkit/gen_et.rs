@@ -1,5 +1,6 @@
+use std::fmt::Debug;
 use std::ops::{AddAssign, DivAssign, MulAssign};
-use std::panic;
+use std::{mem, panic};
 use std::thread::scope;
 
 use clap::ValueEnum;
@@ -18,18 +19,16 @@ pub type EtTree = StableGraph<EtNode,(),Directed,u32>;
 pub enum Def_Or_Use{
     Def, Use
 }
-#[derive(Debug)]
 pub enum EtNode{
     // et 树的terminal 要么是一个 Constant ，要么是一个 SymbolIndex 
     // 而 et 树的 non-terminal node 要么是 root 要么是一个 op 
-    Operator{op: ExprOp,ast_node:u32},
+    Operator{op: ExprOp,ast_node:u32,text:String}, 
     // 在这里 constant 也是一个 Symbol ，到时候在 SymbolField 里面加上 Constant 标记 就可以了
-    Constant{const_sym:Symbol,ast_node:u32 },
-    Symbol{sym:Symbol,ast_node:u32},
+    Constant{const_sym:Symbol,ast_node:u32,text:String },
+    Symbol{sym:Symbol,ast_node:u32,text:String},
     // 考虑到 可能出现  a=3,b=2; 这样的语句，因此需要规定一个Separator
-    Separator{ast_node:u32}, 
+    Separator{ast_node:u32,text:String}, 
 }
-#[derive(Debug)]
 enum ExprOp{
     Mul,
     Add,
@@ -63,113 +62,183 @@ enum ExprOp{
     PlusPlus,
     MinusMinus,
 }
-
-impl EtNode{
-    pub fn new_op_add(ast_node:u32)->Self{
-        EtNode::Operator { op:ExprOp::Add,ast_node}
-    }
-    pub fn new_op_sub(ast_node:u32)->Self{
-        EtNode::Operator { op:ExprOp::Sub,ast_node}
-    }
-    pub fn new_op_div(ast_node:u32)->Self{
-        EtNode::Operator { op:ExprOp::Div,ast_node}
-    }
-    pub fn new_op_mul(ast_node:u32)->Self{
-        EtNode::Operator { op:ExprOp::Mul,ast_node}
-    }
-    pub fn new_op_assign(ast_node:u32)->Self{
-        EtNode::Operator { op:ExprOp::Assign,ast_node}
-    }
-    pub fn new_sep(ast_node:u32)->Self{
-        EtNode::Separator{ast_node}
-    }
-    pub fn new_op_logical_or(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::LogicalOr ,ast_node}
-    }
-    pub fn new_op_logical_and(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::LogicalAnd ,ast_node}
-    }
-    pub fn new_op_logical_not(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::LogicalNot ,ast_node}
-    }
-    pub fn new_op_bitwise_or(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::BitwiseOr ,ast_node}
-    }
-    pub fn new_op_bitwise_xor(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::BitwiseXor ,ast_node}
-    }
-    pub fn new_op_bitwise_and(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::BitwiseAnd ,ast_node}
-    }
-    pub fn new_op_bitwise_not(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::BitwiseNot ,ast_node}
-    }
-    //你必须确保这个symbol 是一个 constant
-    pub fn new_constant(ast_node:u32,const_symbol : Symbol)->Self{
-        EtNode::Constant { const_sym: const_symbol ,ast_node}
-    }
-    pub fn new_symbol(ast_node:u32,symbol : Symbol)->Self{
-        EtNode::Constant { const_sym: symbol,ast_node }
-    }
-    pub fn new_op_equal(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::Eq ,ast_node}
-    }
-    pub fn new_op_not_equal(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::NEq ,ast_node}
-    }
-    pub fn new_op_less_than(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::Less ,ast_node}
-    }
-    pub fn new_op_greater_than(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::Greater ,ast_node}
-    }
-    pub fn new_op_less_than_or_equal(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::LEq ,ast_node}
-    }
-    pub fn new_op_greater_than_or_equal(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::GEq ,ast_node}
-    }
-    pub fn new_op_left_shift(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::LShift ,ast_node}
-    }
-    pub fn new_op_right_shift(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::RShift ,ast_node}
-    }
-    pub fn new_op_mod(ast_node:u32)->Self{
-        EtNode::Operator { op: ExprOp::Mod ,ast_node}
-    }
-    pub fn new_op_cast(ast_node:u32) ->Self{
-        EtNode::Operator { op: ExprOp::Cast ,ast_node}
-    }
-    pub fn new_op_call(ast_node:u32) ->Self{
-        EtNode::Operator { op: ExprOp::Call ,ast_node}
-    }
-    pub fn new_op_negative(ast_node:u32) ->Self{
-        EtNode::Operator { op: ExprOp::Negative ,ast_node}
-    }
-    pub fn new_op_positive(ast_node:u32) ->Self{
-        EtNode::Operator { op: ExprOp::Positive ,ast_node}
-    }
-    pub fn new_op_addr_of(ast_node:u32) ->Self{
-        EtNode::Operator { op: ExprOp::AddrOf ,ast_node}
-    }
-    pub fn new_op_deref(ast_node:u32) ->Self{
-        EtNode::Operator { op: ExprOp::Deref ,ast_node}
-    }
-    pub fn new_op_dot_member(ast_node:u32) ->Self{
-        EtNode::Operator { op: ExprOp::DotMember ,ast_node}
-    }
-    pub fn new_op_arrow_member(ast_node:u32) ->Self{
-        EtNode::Operator { op: ExprOp::ArrowMember ,ast_node}
-    }
-    pub fn new_op_plusplus(ast_node:u32) ->Self{
-        EtNode::Operator { op: ExprOp::PlusPlus ,ast_node}
-    }
-    pub fn new_op_minusminus(ast_node:u32) ->Self{
-        EtNode::Operator { op: ExprOp::MinusMinus ,ast_node}
+impl Debug for ExprOp{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Mul => write!(f, "*"),
+            Self::Add => write!(f, "+"),
+            Self::Sub => write!(f, "-"),
+            Self::Div => write!(f, "/"),
+            Self::Assign => write!(f, "="),
+            Self::LogicalOr => write!(f, "//"),
+            Self::LogicalAnd => write!(f, "&&"),
+            Self::LogicalNot => write!(f, "!"),
+            Self::BitwiseOr => write!(f, "|"),
+            Self::BitwiseAnd => write!(f, "&"),
+            Self::BitwiseXor => write!(f, "^"),
+            Self::BitwiseNot => write!(f, "~"),
+            Self::Eq => write!(f, "="),
+            Self::NEq => write!(f, "!="),
+            Self::Less => write!(f, "<"),
+            Self::Greater => write!(f, ">"),
+            Self::LEq => write!(f, "<="),
+            Self::GEq => write!(f, ">="),
+            Self::LShift => write!(f, "<<"),
+            Self::RShift => write!(f, ">>"),
+            Self::Mod => write!(f, "%"),
+            Self::Cast => write!(f, "Cast"),
+            Self::Call => write!(f, "Call"),
+            Self::Negative => write!(f, "-"),
+            Self::Positive => write!(f, "+"),
+            Self::AddrOf => write!(f, "&"),
+            Self::Deref => write!(f, "*"),
+            Self::DotMember => write!(f, "DotMember"),
+            Self::ArrowMember => write!(f, "ArrowMember"),
+            Self::PlusPlus => write!(f, "++"),
+            Self::MinusMinus => write!(f, "--"),
+        }
     }
 }
 
+impl EtNode{
+    pub fn new_op_add(ast_node:u32)->Self{
+        EtNode::Operator { op:ExprOp::Add,ast_node,text:String::new()}
+    }
+    pub fn new_op_sub(ast_node:u32)->Self{
+        EtNode::Operator { op:ExprOp::Sub,ast_node,text:String::new()}
+    }
+    pub fn new_op_div(ast_node:u32)->Self{
+        EtNode::Operator { op:ExprOp::Div,ast_node,text:String::new()}
+    }
+    pub fn new_op_mul(ast_node:u32)->Self{
+        EtNode::Operator { op:ExprOp::Mul,ast_node,text:String::new()}
+    }
+    pub fn new_op_assign(ast_node:u32)->Self{
+        EtNode::Operator { op:ExprOp::Assign,ast_node,text:String::new()}
+    }
+    pub fn new_sep(ast_node:u32)->Self{
+        EtNode::Separator{ast_node,text:String::new()}
+    }
+    pub fn new_op_logical_or(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::LogicalOr ,ast_node,text:String::new()}
+    }
+    pub fn new_op_logical_and(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::LogicalAnd ,ast_node,text:String::new()}
+    }
+    pub fn new_op_logical_not(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::LogicalNot ,ast_node,text:String::new()}
+    }
+    pub fn new_op_bitwise_or(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::BitwiseOr ,ast_node,text:String::new()}
+    }
+    pub fn new_op_bitwise_xor(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::BitwiseXor ,ast_node,text:String::new()}
+    }
+    pub fn new_op_bitwise_and(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::BitwiseAnd ,ast_node,text:String::new()}
+    }
+    pub fn new_op_bitwise_not(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::BitwiseNot ,ast_node,text:String::new()}
+    }
+    //你必须确保这个symbol 是一个 constant
+    pub fn new_constant(ast_node:u32,const_symbol : Symbol)->Self{
+        EtNode::Constant { const_sym: const_symbol ,ast_node,text:String::new()}
+    }
+    pub fn new_symbol(ast_node:u32,symbol : Symbol)->Self{
+        EtNode::Constant { const_sym: symbol,ast_node,text:String::new() }
+    }
+    pub fn new_op_equal(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::Eq ,ast_node,text:String::new()}
+    }
+    pub fn new_op_not_equal(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::NEq ,ast_node,text:String::new()}
+    }
+    pub fn new_op_less_than(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::Less ,ast_node,text:String::new()}
+    }
+    pub fn new_op_greater_than(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::Greater ,ast_node,text:String::new()}
+    }
+    pub fn new_op_less_than_or_equal(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::LEq ,ast_node,text:String::new()}
+    }
+    pub fn new_op_greater_than_or_equal(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::GEq ,ast_node,text:String::new()}
+    }
+    pub fn new_op_left_shift(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::LShift ,ast_node,text:String::new()}
+    }
+    pub fn new_op_right_shift(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::RShift ,ast_node,text:String::new()}
+    }
+    pub fn new_op_mod(ast_node:u32)->Self{
+        EtNode::Operator { op: ExprOp::Mod ,ast_node,text:String::new()}
+    }
+    pub fn new_op_cast(ast_node:u32) ->Self{
+        EtNode::Operator { op: ExprOp::Cast ,ast_node,text:String::new()}
+    }
+    pub fn new_op_call(ast_node:u32) ->Self{
+        EtNode::Operator { op: ExprOp::Call ,ast_node,text:String::new()}
+    }
+    pub fn new_op_negative(ast_node:u32) ->Self{
+        EtNode::Operator { op: ExprOp::Negative ,ast_node,text:String::new()}
+    }
+    pub fn new_op_positive(ast_node:u32) ->Self{
+        EtNode::Operator { op: ExprOp::Positive ,ast_node,text:String::new()}
+    }
+    pub fn new_op_addr_of(ast_node:u32) ->Self{
+        EtNode::Operator { op: ExprOp::AddrOf ,ast_node,text:String::new()}
+    }
+    pub fn new_op_deref(ast_node:u32) ->Self{
+        EtNode::Operator { op: ExprOp::Deref ,ast_node,text:String::new()}
+    }
+    pub fn new_op_dot_member(ast_node:u32) ->Self{
+        EtNode::Operator { op: ExprOp::DotMember ,ast_node,text:String::new()}
+    }
+    pub fn new_op_arrow_member(ast_node:u32) ->Self{
+        EtNode::Operator { op: ExprOp::ArrowMember ,ast_node,text:String::new()}
+    }
+    pub fn new_op_plusplus(ast_node:u32) ->Self{
+        EtNode::Operator { op: ExprOp::PlusPlus ,ast_node,text:String::new()}
+    }
+    pub fn new_op_minusminus(ast_node:u32) ->Self{
+        EtNode::Operator { op: ExprOp::MinusMinus ,ast_node,text:String::new()}
+    }
+    pub fn load_et_node_text(&mut self) {
+        let et_node = match self {
+            EtNode::Operator { op, ast_node, text } => ast_node,
+            EtNode::Constant { const_sym, ast_node, text } => ast_node,
+            EtNode::Symbol { sym, ast_node, text } => ast_node,
+            EtNode::Separator { ast_node, text } => ast_node,
+        };
+        let new_str=match self {
+            EtNode::Operator { op, ast_node, text }=> text.clone(),
+            EtNode::Constant { const_sym, ast_node, text } => text.clone(),
+            EtNode::Symbol { sym, ast_node, text } => text.clone(),
+            EtNode::Separator { ast_node, text } => text.clone(),
+        };
+        let _  = mem::replace(match self {
+                EtNode::Operator { op, ast_node, text } => text,
+                EtNode::Constant { const_sym, ast_node, text } => text,
+                EtNode::Symbol { sym, ast_node, text } => text,
+                EtNode::Separator { ast_node, text } => text,
+            }, new_str);
+        }
+}
+impl Debug for EtNode{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Operator { op, ast_node, text } =>
+                write!(f,"{:?}",op),
+            Self::Constant { const_sym, ast_node, text } => 
+                write!(f,"{:?}",const_sym),
+            Self::Symbol { sym, ast_node, text } =>
+                write!(f,"{:?}",sym),
+            Self::Separator { ast_node, text } =>
+                write!(f,",")
+        }
+    }
+}
 // 这个文件中的函数都返回子树的 根节点
 
 pub fn process_expr_stmt(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&ScopeTree, expr_stmt_node:u32, scope_node:u32,root_et_node:u32 ){
@@ -205,7 +274,7 @@ pub fn process_assign_expr(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&
             match (term_id!(at operator_node in ast_tree),operator_node) {
                 // ?暂时只支持五个 assign 类算符
                 (Assign,assign_operator)=>{
-                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign(scope_node)} from parent_et_node in et_tree );
+                    let et_assign_node = add_node_with_edge!({EtNode::new_op_assign(assign_expr_node)} from parent_et_node in et_tree );
                     let unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
                     process_unary_expr(et_tree,ast_tree,scope_tree,unary_expr_node,scope_node,et_assign_node);
@@ -606,15 +675,15 @@ pub fn process_multiplicative_expr(et_tree: &mut EtTree, ast_tree: &AstTree, sco
 
 pub fn process_cast_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, cast_expr_node: u32, scope_node: u32, parent_et_node: u32) {
     // 检查 castExpression 节点是否是类型转换的情况
-    if let Some(type_cast_node) = find!(rule RULE_typeName at cast_expr_node in ast_tree) {
+    if let Some(type_name_node) = find!(rule RULE_typeName at cast_expr_node in ast_tree) {
         // 如果存在 typeName，说明是类型转换的情况
-        let type_sym = Symbol::new(scope_node,node!(at type_cast_node in ast_tree).text.clone());
+        let type_sym = Symbol::new(scope_node,node!(at type_name_node in ast_tree).text.clone());
         let cast_node = add_node_with_edge!({EtNode::new_op_cast( cast_expr_node)} from parent_et_node in et_tree);
         // 添加 cast op 节点的左节点，这是个 type symbol 
         add_node_with_edge!({EtNode::new_symbol( scope_node,type_sym)} from cast_node in et_tree);
         
         // 递归处理 castExpression
-        let child_cast_expr_node = find!(rule RULE_castExpression at type_cast_node in ast_tree).unwrap();
+        let child_cast_expr_node = find!(rule RULE_castExpression at cast_expr_node in ast_tree).expect(format!("在 节点 {} 下找不到 castExpr",type_name_node).as_str());
         process_cast_expr(et_tree, ast_tree, scope_tree, child_cast_expr_node, scope_node, cast_node);
     } else if let Some(unary_expr_node) = find!(rule RULE_unaryExpression at cast_expr_node in ast_tree) {
         // 如果是 unaryExpression，直接处理
@@ -706,6 +775,7 @@ pub fn process_primary_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree
         println!("ident {}",ident_node);
         process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, parent_et_node, Def_Or_Use::Use);
     }else if let Some(expr_node) = find!(rule RULE_expression at primary_expr_node in ast_tree){
+        println!("expr found under {}",primary_expr_node );
         process_expr(et_tree, ast_tree, scope_tree, expr_node, scope_node, parent_et_node);
     }else if let Some(string_node) = find!(term StringLiteral at primary_expr_node in ast_tree){
         process_constant(et_tree, ast_tree, scope_tree, string_node, scope_node, parent_et_node, Def_Or_Use::Use);
@@ -720,7 +790,7 @@ pub fn process_ident(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeT
 
     let sym_struct = Symbol::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
-    add_node_with_edge!({EtNode::Symbol { sym: sym_struct, ast_node: ident_node }} from parent_et_node in et_tree);
+    add_node_with_edge!({EtNode::Symbol {sym:sym_struct,ast_node:ident_node, text: todo!() }} from parent_et_node in et_tree);
 }
 pub fn process_constant(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeTree,const_node:u32,scope_node:u32,parent_et_node:u32 ,def_or_use:Def_Or_Use) {
     let sym_name = node!(at const_node in ast_tree).text.clone();
@@ -728,7 +798,7 @@ pub fn process_constant(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&Sco
 
     let sym_struct = Symbol::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
-    add_node_with_edge!({EtNode::Symbol { sym: sym_struct, ast_node: const_node }} from parent_et_node in et_tree);
+    add_node_with_edge!({EtNode::Symbol {sym:sym_struct,ast_node:const_node, text: todo!() }} from parent_et_node in et_tree);
 }
 
 
