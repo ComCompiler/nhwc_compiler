@@ -47,10 +47,6 @@ fn main() {
             let mut args = Cli::parse();
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo_assign.c").unwrap();
-<<<<<<< HEAD
-        // args.c_file_path = PathBuf::from_str("./demos/demo2.c").unwrap();
-=======
->>>>>>> refs/remotes/origin/master
         let context = Context::init(args, true);
         let mut et_tree = EtTree::new();
         //dfs遍历ast找到第一个 expr stmt
@@ -65,11 +61,7 @@ fn main() {
         }
 
         generate_png_by_graph(&et_tree, "et_tree".to_string(), &[petgraph::dot::Config::EdgeNoLabel]);
-<<<<<<< HEAD
 
         println!("hello world!")
 
-=======
-        
->>>>>>> refs/remotes/origin/master
 }
