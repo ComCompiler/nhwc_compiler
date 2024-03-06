@@ -13,7 +13,8 @@ pub type ScopeTree = StableDiGraph<ScopeNode,(),u32>;
 #[derive(Clone)]
 pub struct ScopeNode{
     pub ast_node:u32,
-    pub text:String
+    pub text:String,
+    pub parent:u32,
 }
 impl GetText for ScopeNode {
     fn get_text(&self)-> Option<&str> {
