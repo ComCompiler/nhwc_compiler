@@ -69,6 +69,10 @@ pub enum Instruction{
         lhs:SymbolIndex,
         rhs:ArithOp,
     },
+    SimpleAssign{
+        lhs: SymbolIndex,
+        rhs: SymbolIndex,
+    },
     // 调用函数
     Call{
         assigned : Option<SymbolIndex>,
@@ -221,6 +225,9 @@ impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
             
             Self::Phi { lhs, rhs } => 
                 write!(f,""),
+            Self::SimpleAssign { lhs, rhs }=>{
+                write!(f,"{}={}",lhs.symbol_name,rhs.symbol_name)
+            },
         }
     }            
     
