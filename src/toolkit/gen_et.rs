@@ -60,8 +60,10 @@ enum ExprOp{
     Deref,
     DotMember,
     ArrowMember,
-    PlusPlus,
-    MinusMinus,
+    LPlusPlus,
+    RPlusPlus,
+    LMinusMinus,
+    RMinusMinus,
     MulAssign,
     DivAssign,
     PlusAssign,
@@ -99,12 +101,14 @@ impl Debug for ExprOp{
             Self::Deref => write!(f, "*"),
             Self::DotMember => write!(f, "DotMember"),
             Self::ArrowMember => write!(f, "ArrowMember"),
-            Self::PlusPlus => write!(f, "++"),
-            Self::MinusMinus => write!(f, "--"),
-            Self::MulAssign => write!(f,"*="),
-            Self::DivAssign => write!(f,"/="),
-            Self::PlusAssign => write!(f,"+="),
-            Self::MinusAssign => write!(f,"-="),
+            Self::LPlusPlus => write!(f, "++(L)"),
+            Self::RPlusPlus => write!(f, "++(R)"),
+            Self::LMinusMinus => write!(f, "--(L)"),
+            Self::RMinusMinus => write!(f, "--(R)"),
+            Self::PlusAssign => write!(f, "+="),
+            Self::MulAssign => write!(f, "*="),
+            Self::MinusAssign => write!(f, "-="),
+            Self::DivAssign => write!(f, "/="),
         }
     }
 }
@@ -219,11 +223,14 @@ impl EtNode{
     pub fn new_op_arrow_member(ast_node:u32) ->Self{
         EtNode::Operator { op: ExprOp::ArrowMember ,ast_node,text:String::new()}
     }
-    pub fn new_op_plusplus(ast_node:u32) ->Self{
-        EtNode::Operator { op: ExprOp::PlusPlus ,ast_node,text:String::new()}
+    pub fn new_op_left_plusplus(ast_node:u32) ->Self{
+        EtNode::Operator { op: ExprOp::LPlusPlus ,ast_node,text:String::new()}
+    }
+    pub fn new_op_right_plusplus(ast_node:u32) ->Self{
+        EtNode::Operator { op: ExprOp::RPlusPlus ,ast_node,text:String::new()}
     }
     pub fn new_op_minusminus(ast_node:u32) ->Self{
-        EtNode::Operator { op: ExprOp::MinusMinus ,ast_node,text:String::new()}
+        EtNode::Operator { op: ExprOp::RMinusMinus ,ast_node,text:String::new()}
     }
     pub fn load_et_node_text(&mut self) {
         let et_node = match self {
@@ -770,13 +777,13 @@ pub fn process_postfix_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree
         process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, et_arrow_member_node,Def_Or_Use::Use);
     }else if let Some(_string_node) = find!(term PlusPlus at postfix_expr_node in ast_tree){
         //说明这是个++的语法 
-        let et_plusplus_node =  add_node_with_edge!({EtNode::new_op_plusplus( postfix_expr_node)} from parent_et_node in et_tree);
-        let primary_expr_node= find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree).unwrap();
+        let et_plusplus_node =  add_node_with_edge!({EtNode::new_op_right_plusplus( postfix_expr_node)} from parent_et_node in et_tree);
+        let primary_expr_node= find!(rule RULE_primaryExpression at parent_et_node in ast_tree).unwrap();
         process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, et_plusplus_node);
     }else if let Some(_string_node) = find!(term MinusMinus at postfix_expr_node in ast_tree){
         //说明这是个--的语法 
         let et_minusminus_node =  add_node_with_edge!({EtNode::new_op_minusminus( postfix_expr_node)} from parent_et_node in et_tree);
-        let primary_expr_node= find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree).unwrap();
+        let primary_expr_node= find!(rule RULE_primaryExpression at parent_et_node in ast_tree).unwrap();
         process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, et_minusminus_node);
     }else if let Some(primary_expr_node) = find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree){
         process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, parent_et_node)
