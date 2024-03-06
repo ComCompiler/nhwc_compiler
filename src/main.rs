@@ -46,7 +46,7 @@ fn main() {
     // println!("Hello, world!");
             let mut args = Cli::parse();
         // 设置 path 为 demo.c
-        args.c_file_path = PathBuf::from_str("./demos/demo_equality.c").unwrap();
+        args.c_file_path = PathBuf::from_str("./demos/demo_assign.c").unwrap();
         let context = Context::init(args, true);
         let mut et_tree = EtTree::new();
         //dfs遍历ast找到第一个 expr stmt
