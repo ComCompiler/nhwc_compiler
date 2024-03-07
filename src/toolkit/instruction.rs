@@ -64,6 +64,18 @@ pub enum MemOp{
 
 #[derive(Clone)]
 pub enum Instruction{
+    //定义函数
+    Deffun{
+        funname:SymbolIndex,
+        rettype:SymbolIndex,
+        paralst:Vec<SymbolIndex>,
+    },
+    //定义变量
+    Defvar{
+        varname:SymbolIndex,
+        vartype:SymbolIndex,
+        value:SymbolIndex,
+    },
     // 算数运算符 + - * / etc.
     Arith{
         lhs:SymbolIndex,
@@ -122,38 +134,46 @@ pub enum JumpOp{
 
 // 以下是构造函数:
 impl Instruction{
+    pub fn new_deffun(funname:SymbolIndex,rettype:SymbolIndex,paralst:Vec<SymbolIndex>) -> Self{
+        Self::Deffun { funname ,rettype, paralst }
+    }
+
+    pub fn new_defvar(vartype:SymbolIndex,varname:SymbolIndex,value:SymbolIndex) -> Self{
+        Self::Defvar { varname, vartype, value }
+    }
+    
     // Instruction -> Arith -> ArithOp
     pub fn new_add(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex) -> Self{
-        Self::Arith { lhs:lhs, rhs: ArithOp::Add { a: a, b: b } }
+        Self::Arith {lhs, rhs: ArithOp::Add { a, b } }
     }
     pub fn new_mul(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex) -> Self{
-        Self::Arith { lhs:lhs, rhs: ArithOp::Mul { a: a, b: b } }
+        Self::Arith {lhs, rhs: ArithOp::Mul { a,  b } }
     }
     pub fn new_div(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex) -> Self{
-        Self::Arith { lhs:lhs, rhs: ArithOp::Div { a: a, b: b } }
+        Self::Arith { lhs, rhs: ArithOp::Div { a, b } }
     }
     pub fn new_sub(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex) -> Self{
-        Self::Arith { lhs:lhs, rhs: ArithOp::Sub { a: a, b: b } }
+        Self::Arith {lhs, rhs: ArithOp::Sub {a, b } }
     }
     pub fn new_icmp(lhs: SymbolIndex, plan:IcmpPlan,a:SymbolIndex,b:SymbolIndex) -> Self{
-        Self::Arith { lhs:lhs, rhs: ArithOp::Icmp { plan:plan,a: a, b: b } }
+        Self::Arith {lhs, rhs: ArithOp::Icmp { plan,a, b } }
     }
     // Instruction -> Call -> FuncOp
     pub fn new_func_call(assigned:Option<SymbolIndex> , func:SymbolIndex , args:Vec<SymbolIndex>) ->Self{       //也许可以直接传入一个Func结构体
-        Self::Call { assigned: assigned, func_op: FuncOp { func: func, args: args } }
+        Self::Call {  assigned, func_op: FuncOp { func,args } }
     }
     // Instruction -> Jump ->JumpOp
     pub fn new_ret(ret_sym:SymbolIndex) -> Self{
-        Self::Jump { op: JumpOp::Ret { ret_sym: ret_sym } }
+        Self::Jump { op: JumpOp::Ret { ret_sym } }
     }
     pub fn new_br(cond:SymbolIndex,t1:SymbolIndex,t2:SymbolIndex) ->Self{
-        Self::Jump { op: JumpOp::Br { cond: cond, t1: t1, t2: t2 } }
+        Self::Jump { op: JumpOp::Br { cond: cond, t1,t2 } }
     }
     pub fn new_switch(cond : SymbolIndex,default : SymbolIndex,compared: Vec<ComparedPair>) -> Self{
-        Self::Jump { op: JumpOp::Switch { cond: cond, default: default, compared: compared } }
+        Self::Jump { op: JumpOp::Switch {cond,  default, compared } }
     }
     pub fn new_jump(cfg_dst_label : u32) ->Self{
-        Self::Jump { op: JumpOp::DirectJump { cfg_dst_label: cfg_dst_label } }
+        Self::Jump { op: JumpOp::DirectJump {  cfg_dst_label } }
     }
 }
 impl Debug for ArithOp{
@@ -226,9 +246,17 @@ impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
             Self::Phi { lhs, rhs } => 
                 write!(f,""),
             Self::SimpleAssign { lhs, rhs }=>{
-                write!(f,"{}={}",lhs.symbol_name,rhs.symbol_name)
+                write!(f,"{}={}",lhs.symbol_name,rhs.symbol_name);
             },
+            Instruction::Deffun { funname, rettype, paralst } => todo!(),
+            Instruction::Arith { lhs, rhs } => todo!(),
+            Instruction::SimpleAssign { lhs, rhs } => todo!(),
+            Instruction::Call { assigned, func_op } => todo!(),
+            Instruction::Jump { op } => todo!(),
+            Instruction::Defvar { varname, vartype, value } => todo!(),
+            Instruction::Phi { lhs, rhs } => todo!(), }
+            Instruction::Phi { lhs, rhs } => todo!(),
+            Instruction::Defvar { varname, vartype, value: todo!() } => todo!(),
         }
     }            
     
-}

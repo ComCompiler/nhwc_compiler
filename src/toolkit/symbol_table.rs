@@ -13,7 +13,7 @@ pub struct SymbolTable {
 #[derive(Debug,Clone,PartialEq, Eq, PartialOrd, Ord,)]
 pub struct SymbolIndex{
     pub scope_node :u32 ,
-    pub symbol_name : String
+    pub symbol_name : String,
 }
 impl SymbolIndex{
     pub fn new(scope_node:u32, symbol_name:String)->Self{
@@ -30,7 +30,7 @@ impl SymbolTable {
     // 添加或更新符号，如果是更新，那么返回旧的符号
     pub fn add(&mut self, symbol: Symbol) -> SymbolIndex{
         let symbol_index = symbol.sym_idx.clone();
-        let retured_symbol_index = symbol_index.clone();
+        let retured_symbol_index = symbol_index.clone(); 
         match self.map.insert(symbol_index,symbol){
             None =>{retured_symbol_index},
             Some(_) => panic!( "symtab插入失败,你这个表中已经存在同名称同scope的符号了,你必须先remove 掉它"), // do nothing , 插入成功，里面没有同scope的同名符号
@@ -68,7 +68,7 @@ impl Default for SymbolTable{
 
 #[derive(Clone)]
 pub struct Symbol{
-    fields :  HashMap<&'static str,Box<dyn Field>>,
+    pub fields :  HashMap<&'static str,Box<dyn Field>>,
     pub sym_idx : SymbolIndex,
 }
 impl Debug for Symbol{
