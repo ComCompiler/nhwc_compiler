@@ -227,14 +227,13 @@ impl Debug for PhiOp{
 impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            
             Self::Arith { lhs, rhs } => 
                 write!(f,"%{} = {:?}",lhs.symbol_name,rhs),
             
             Self::Call { assigned, func_op } => 
                 match assigned{
                     Some(symidx)=>
-                        write!(f,"{}={:?}",symidx.symbol_name,func_op),
+                        write!(f,"%{}={:?}",symidx.symbol_name,func_op),
                     
                     None => 
                         write!(f,"{:?}",func_op)
@@ -245,18 +244,21 @@ impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
             
             Self::Phi { lhs, rhs } => 
                 write!(f,""),
-            Self::SimpleAssign { lhs, rhs }=>{
-                write!(f,"{}={}",lhs.symbol_name,rhs.symbol_name);
-            },
-            Instruction::Deffun { funname, rettype, paralst } => todo!(),
-            Instruction::Arith { lhs, rhs } => todo!(),
-            Instruction::SimpleAssign { lhs, rhs } => todo!(),
-            Instruction::Call { assigned, func_op } => todo!(),
-            Instruction::Jump { op } => todo!(),
-            Instruction::Defvar { varname, vartype, value } => todo!(),
-            Instruction::Phi { lhs, rhs } => todo!(), }
-            Instruction::Phi { lhs, rhs } => todo!(),
-            Instruction::Defvar { varname, vartype, value: todo!() } => todo!(),
+            Self::SimpleAssign { lhs, rhs }=>
+                write!(f,"{}={}",lhs.symbol_name,rhs.symbol_name),
+            Self::Deffun { funname, rettype, paralst } =>
+                write!(f,"{} {} {:?}",rettype.symbol_name,funname.symbol_name,paralst),
+            Self::Defvar { varname, vartype, value }=>
+                write!(f,"define {} %{} = {}",vartype.symbol_name,varname.symbol_name,value.symbol_name),
+            // Instruction::Deffun { funname, rettype, paralst } => todo!(),
+            // Instruction::Arith { lhs, rhs } => todo!(),
+            // Instruction::SimpleAssign { lhs, rhs } => todo!(),
+            // Instruction::Call { assigned, func_op } => todo!(),
+            // Instruction::Jump { op } => todo!(),
+            // Instruction::Defvar { varname, vartype, value } => todo!(),
+            // Instruction::Phi { lhs, rhs } => todo!(), }
+            // Instruction::Phi { lhs, rhs } => todo!(),
+            // Instruction::Defvar { varname, vartype, value: todo!() } => todo!(),
         }
     }            
-    
+}
