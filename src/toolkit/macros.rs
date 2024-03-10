@@ -22,6 +22,13 @@ macro_rules! find {
             find!(rule $fin_id at new_node in $ast_tree)
         }
     };
+    (rule $($id:ident)then+ finally term $fin_id:ident at $node:ident in $ast_tree:ident) => {
+        {
+            let new_node = $node;
+            $(let new_node = find!(rule $id at new_node in $ast_tree).unwrap();)+
+            find!(term $fin_id at new_node in $ast_tree)
+        }
+    };
     (symbol $symbol_name:ident at $scope_node:ident  in $symtab:ident) => {
         {
             $symtab.get_verbose($symbol_name , $scope_node)
