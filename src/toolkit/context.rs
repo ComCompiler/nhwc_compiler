@@ -5,7 +5,7 @@ use petgraph::{dot::Config, stable_graph::node_index, visit::Dfs};
 
 use crate::Cli;
 
-use super::{ast_node::AstTree, cfg_node::CfgGraph, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, gen_cfg::parse_ast_to_cfg, gen_scope::parse_ast_to_scope, scope_node::{self, ScopeTree}, symbol_table::SymbolTable};
+use super::{ast_node::AstTree, cfg_node::CfgGraph, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, gen_cfg::parse_ast_to_cfg, et_node::{EtNode, EtTree}, gen_scope::parse_ast_to_scope, scope_node::{self, ScopeTree}, symbol_table::SymbolTable};
 
 #[derive(Default,Builder)]
 #[builder(default)]
@@ -16,6 +16,7 @@ pub struct Context{
     pub symtab : SymbolTable,
     pub scope_tree : ScopeTree,
     pub nhwc_cfg : CfgGraph,
+    pub et_tree:EtTree,
 }
 impl Context{
     fn new() -> Self{
@@ -26,6 +27,7 @@ impl Context{
             symtab: SymbolTable::new(),
             code: String::new(),
             scope_tree: ScopeTree::new(),
+            et_tree:EtTree::new(),
         }
     }
     pub fn init(args:Cli, is_generate_pngs:bool) -> Self{

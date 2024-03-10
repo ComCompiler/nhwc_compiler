@@ -7,10 +7,10 @@ use std::{path::PathBuf, str::FromStr, time::Instant};
 use antlr_parser::cparser::{RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition} ;
 use clap::Parser;
 use petgraph::{adj::NodeIndex, visit::Dfs};
-use toolkit::{ast_node::{find_dfs_rule_ast, AstTree}, etc::generate_png_by_graph, gen_et::{EtNode, EtTree}};
+use toolkit::{ast_node::find_dfs_rule_ast, etc::generate_png_by_graph};
 
 
-use crate::toolkit::context::{Context, ContextBuilder};
+use crate::toolkit::{context::{Context, ContextBuilder}, et_node::{EtNode, EtTree}};
 #[derive(Parser)]
 #[command(author, version, about)]
 pub struct Cli {

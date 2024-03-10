@@ -1,32 +1,28 @@
-use std::fmt::Debug;
-use std::ops::{AddAssign, DivAssign, MulAssign};
-use std::{mem, panic};
-use std::thread::scope;
 
-use clap::ValueEnum;
-use petgraph::{operator, Directed, Graph};
-use petgraph::stable_graph::{NodeIndex, StableGraph};
+use std::panic;
+
+use petgraph::stable_graph::NodeIndex;
 
 
 use crate::antlr_parser::clexer::{And, Arrow, Constant, DivAssign, Dot, Equal, Greater, GreaterEqual, Identifier, LeftShift, Less, LessEqual, Minus, MinusAssign, MinusMinus, MulAssign, Not, NotEqual, Plus, PlusAssign, PlusPlus, RightShift, Star, StringLiteral, Tilde};
-use crate::antlr_parser::cparser::{Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_unaryExpression, RULE_unaryOperator};
-use crate::toolkit::context;
-use crate::{add_edge, add_node, add_node_with_edge, direct_node, find, find_nodes, node, rule_id, term_id};
+use crate::antlr_parser::cparser::{Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_declarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_unaryExpression, RULE_unaryOperator};
+use crate::toolkit::symbol_table::SymbolIndex;
+use crate::{add_node, add_node_with_edge, direct_node, find, find_nodes, node, term_id};
 
-use super::ast_node::{self, find_neighbors_term_ast};
-use super::et_node::{Def_Or_Use, EtNode};
-use super::symbol_table::SymbolIndex;
-use super::{ast_node::AstTree, scope_node::{self, ScopeTree}, symbol_table::{self, Symbol, SymbolTable}};
+use super::et_node::{Def_Or_Use, EtNode, EtTree};
+use super::{ast_node::AstTree, scope_node::ScopeTree, symbol_table::Symbol};
 
-pub type EtTree = StableGraph<EtNode,(),Directed,u32>;
+// pub fn process_decl2et(et_tree:&mut EtTree,ast_tree:&AstTree,scope_tree:&ScopeTree,decl_node:u32,scope_node:u32,root_et_node:u32){
+//     let initdecl_list = find!(rule RULE_initDeclaratorList at decl_node in ast_tree).unwrap();
+//     let initdecl_nodes = find_nodes!(rule RULE_initDeclarator at initdecl_list in ast_tree);
+//     for initdecl_node in initdecl_nodes{
+//         let assign_node = find!(term Assign at initdecl_node in ast_tree).unwrap();
+//         let et_assign = add_node!({EtNode::new_op_assign(assign_node)} to et_tree);
+//         let lt_decl = find!(rule RULE_declarator at initdecl_node in ast_tree).unwrap();
+//         add_node_with_edge!({EtNode::new_op_})
+//     }
+// }
 
-pub fn process_declartion(et_tree:&mut EtTree,ast_tree:&AstTree,scope_tree:&ScopeTree,decl_node:u32,scope_node:u32,root_et_node:u32){
-    let initdecl_list = find!(rule RULE_initDeclaratorList at decl_node in ast_tree).unwrap();
-    let initdecl_nodes = find_nodes!(rule RULE_initDeclarator at initdecl_list in ast_tree);
-    for initdecl_node in initdecl_nodes{
-        
-    }
-}
 
 pub fn process_expr_stmt(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&ScopeTree, expr_stmt_node:u32, scope_node:u32,root_et_node:u32 ){
     let op_expr_node = find!(rule RULE_expression at expr_stmt_node in ast_tree);
@@ -456,7 +452,7 @@ pub fn process_cast_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &
     // 检查 castExpression 节点是否是类型转换的情况
     if let Some(type_name_node) = find!(rule RULE_typeName at cast_expr_node in ast_tree) {
         // 如果存在 typeName，说明是类型转换的情况
-        let type_sym = Symbol::new(scope_node,node!(at type_name_node in ast_tree).text.clone());
+        let type_sym = SymbolIndex::new(scope_node,node!(at type_name_node in ast_tree).text.clone());
         let cast_node = add_node_with_edge!({EtNode::new_op_cast( cast_expr_node)} from parent_et_node in et_tree);
         // 添加 cast op 节点的左节点，这是个 type symbol 
         add_node_with_edge!({EtNode::new_symbol( scope_node,type_sym)} from cast_node in et_tree);
@@ -567,7 +563,7 @@ pub fn process_ident(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeT
     let sym_name = node!(at ident_node in ast_tree).text.clone();
     // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 
-    let sym_struct = Symbol::new(scope_node, sym_name);
+    let sym_struct = SymbolIndex::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
     add_node_with_edge!({EtNode::Symbol {sym:sym_struct,ast_node:ident_node, text:String::new() }} from parent_et_node in et_tree);
 }
@@ -575,7 +571,7 @@ pub fn process_constant(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&Sco
     let sym_name = node!(at const_node in ast_tree).text.clone();
     // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 
-    let sym_struct = Symbol::new(scope_node, sym_name);
+    let sym_struct = SymbolIndex::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
     add_node_with_edge!({EtNode::Symbol {sym:sym_struct,ast_node:const_node, text:String::new() }} from parent_et_node in et_tree);
 }

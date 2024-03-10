@@ -2,7 +2,7 @@ use petgraph::{graph, stable_graph::NodeIndex, visit::Dfs};
 
 use crate::{antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_statement}, find, node, rule_id};
 
-use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, scope_node::ScopeTree, symbol_table::{self, Symbol, SymbolTable}};
+use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::EtTree, gen_cfg::process_declartion, scope_node::ScopeTree, symbol_table::{self, Symbol, SymbolTable}};
 
 /*
  这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有 
@@ -21,9 +21,9 @@ fn parse_bb2nhwc(){
     
 }
 ///处理变量定义语句,decalration转换为instruction
-fn parse_declaration2nhwc(ast_tree:&AstTree,decl_node:u32,symbol_table:&SymbolTable,scope_tree:&ScopeTree){
+fn parse_declaration2nhwc(ast_tree:&AstTree,decl_node:u32,symbol_table:&SymbolTable,scope_tree:&ScopeTree,et_tree:&EtTree){
     let vartype = find!(rule RULE_declarationSpecifiers at decl_node in ast_tree).unwrap();
-    
+    // let et_node = process_decl2et(et_tree,ast_tree,scope_tree,d,)
 }
 fn parse_for2nhwc(){
     
@@ -38,7 +38,7 @@ fn parse_func2nhwc(){
 /// 由于cfg 里面包含了其他的一些块和边，例如 branch 块和 after conditioned边
 /// 因此我们需要再做一次转化，把边转化成相应的跳转或者调整代码，把所有node 都转化成BasicBlock
 fn parse_cfg_into_nhwc_cfg(context :&mut Context){
-    let (cfg_graph,scope_tree,ast_tree,symbol_table)= (&mut context.cfg_graph , &mut context.scope_tree,&mut context.ast_tree,&mut context.symtab);
+    let (cfg_graph,scope_tree,ast_tree,symbol_table,et_tree)= (&mut context.cfg_graph , &mut context.scope_tree,&mut context.ast_tree,&mut context.symtab,&mut context.et_tree);
 
     let start_node: NodeIndex<u32> = NodeIndex::new(0);
     //先遍历一遍函数名，将函数名加入到符号表中
@@ -79,8 +79,8 @@ fn parse_cfg_into_nhwc_cfg(context :&mut Context){
                 for astnode in ast_nodes{
                     let astnode = *astnode;
                     match(rule_id!(at astnode in ast_tree),astnode){
-                        (RULE_declaration,expression_node)=>{
-                            
+                        (RULE_declaration,declaration_node)=>{
+                            parse_declaration2nhwc(ast_tree, declaration_node, symbol_table, scope_tree,et_tree)            
                         },
                         (RULE_statement,statement_node)=>{
 
