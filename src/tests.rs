@@ -84,9 +84,9 @@ mod tests{
 
         //dfs遍历ast
         let node =find_dfs_rule_ast(ast_tree, 0, RULE_functionDefinition).next().unwrap();  // 三号节点是一个 function def 
-        let node_ids:Vec<u32>= find_nodes!(rule RULE_compoundStatement 
-                                           then RULE_blockItemList
-                                           finally RULE_blockItem
+        let node_ids:Vec<u32>= find_nodes!(rule RULE_compoundStatement  //起始节点a
+                                           then RULE_blockItemList      //经过节点b
+                                    finally rule RULE_blockItem       //寻找节点b的所有属性为c的子节点
                                               at node in ast_tree);
         assert_eq!(node_ids , vec![17,34,152] ,"找到的 node id 不对");
     }
@@ -101,8 +101,8 @@ mod tests{
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
         let node =find_dfs_rule_ast(ast_tree, 0, RULE_functionDefinition).next().unwrap();  // 三号节点是一个 function def 
-        let node= find!(rule RULE_compoundStatement 
-                                finally RULE_blockItemList
+        let node= find!(rule RULE_compoundStatement                //起始节点a
+                                finally rule RULE_blockItemList              //寻找节点a的属性为b的子节点
                                 at node in ast_tree).unwrap();
         assert_eq!(node , 16 ,"找到的 node id 不对");
     }
