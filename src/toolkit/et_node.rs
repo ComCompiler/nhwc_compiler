@@ -1,38 +1,31 @@
 use std::fmt::Debug;
-use std::ops::{AddAssign, DivAssign, MulAssign};
-use std::{mem, panic};
-use std::thread::scope;
+use std::mem;
+use petgraph:: Directed;
+use petgraph::stable_graph::{NodeIndex, StableDiGraph, StableGraph};
+use crate::node;
+use super::ast_node::AstTree;
+use super::symbol_table::{Symbol, SymbolIndex};
 
-use clap::ValueEnum;
-use petgraph::{operator, Directed, Graph};
-use petgraph::stable_graph::{NodeIndex, StableGraph};
+pub type EtTree = StableDiGraph<EtNode,(),u32>;
 
-use crate::antlr_parser::clexer::{And, Arrow, Constant, DivAssign, Dot, Equal, Greater, GreaterEqual, Identifier, LeftShift, Less, LessEqual, Minus, MinusAssign, MinusMinus, MulAssign, Not, NotEqual, Plus, PlusAssign, PlusPlus, RightShift, Star, StringLiteral, Tilde};
-use crate::antlr_parser::cparser::{Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_inclusiveOrExpression, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_unaryExpression, RULE_unaryOperator};
-use crate::toolkit::context;
-use crate::{add_edge, add_node, add_node_with_edge, direct_node, find, find_nodes, node, rule_id, term_id};
-
-use super::ast_node::{self, find_neighbors_term_ast};
-use super::symbol_table::SymbolIndex;
-use super::{ast_node::AstTree, scope_node::{self, ScopeTree}, symbol_table::{self, Symbol, SymbolTable}};
-
-pub type EtTree = StableGraph<EtNode,(),Directed,u32>;
-
+#[derive(Clone)]
 pub enum Def_Or_Use{
     Def, Use
 }
+#[derive(Clone)]
 pub enum EtNode{
     // et 树的terminal 要么是一个 Constant ，要么是一个 SymbolIndex 
     // 而 et 树的 non-terminal node 要么是 root 要么是一个 op 
     Operator{op: ExprOp,ast_node:u32,text:String}, 
     // 在这里 constant 也是一个 Symbol ，到时候在 SymbolField 里面加上 Constant 标记 就可以了
-    Constant{const_sym:Symbol,ast_node:u32,text:String },
-    Symbol{sym:Symbol,ast_node:u32,text:String},
+    Constant{const_sym:SymbolIndex,ast_node:u32,text:String },
+    Symbol{sym:SymbolIndex,ast_node:u32,text:String},
     // 考虑到 可能出现  a=3,b=2; 这样的语句，因此需要规定一个Separator
     Separator{ast_node:u32,text:String}, 
     //需要declarator来声明变量
     Declare{decl_type:Symbol },
 }
+#[derive(Clone)]
 pub enum ExprOp{
     Mul,
     Add,
@@ -169,10 +162,10 @@ impl EtNode{
         EtNode::Operator { op: ExprOp::PlusAssign ,ast_node,text:String::new()}
     }
     //你必须确保这个symbol 是一个 constant
-    pub fn new_constant(ast_node:u32,const_symbol : Symbol)->Self{
+    pub fn new_constant(ast_node:u32,const_symbol : SymbolIndex)->Self{
         EtNode::Constant { const_sym: const_symbol ,ast_node,text:String::new()}
     }
-    pub fn new_symbol(ast_node:u32,symbol : Symbol)->Self{
+    pub fn new_symbol(ast_node:u32,symbol : SymbolIndex)->Self{
         EtNode::Constant { const_sym: symbol,ast_node,text:String::new() }
     }
     pub fn new_op_equal(ast_node:u32)->Self{
@@ -275,9 +268,9 @@ impl Debug for EtNode{
             Self::Operator { op, ast_node, text } =>
                 write!(f,"{:?}",op),
             Self::Constant { const_sym, ast_node, text } => 
-                write!(f,"{}",const_sym.sym_idx.symbol_name),
+                write!(f,"{}",const_sym.symbol_name),
             Self::Symbol { sym, ast_node, text } =>
-                write!(f,"{}",sym.sym_idx.symbol_name),
+                write!(f,"{}",sym.symbol_name),
             Self::Separator { ast_node, text } =>{
                 write!(f,"{}",text)
             }

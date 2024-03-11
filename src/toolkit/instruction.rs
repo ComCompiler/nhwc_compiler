@@ -250,15 +250,6 @@ impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
                 write!(f,"{} {} {:?}",rettype.symbol_name,funname.symbol_name,paralst),
             Self::Defvar { varname, vartype, value }=>
                 write!(f,"define {} %{} = {}",vartype.symbol_name,varname.symbol_name,value.symbol_name),
-            // Instruction::Deffun { funname, rettype, paralst } => todo!(),
-            // Instruction::Arith { lhs, rhs } => todo!(),
-            // Instruction::SimpleAssign { lhs, rhs } => todo!(),
-            // Instruction::Call { assigned, func_op } => todo!(),
-            // Instruction::Jump { op } => todo!(),
-            // Instruction::Defvar { varname, vartype, value } => todo!(),
-            // Instruction::Phi { lhs, rhs } => todo!(), }
-            // Instruction::Phi { lhs, rhs } => todo!(),
-            // Instruction::Defvar { varname, vartype, value: todo!() } => todo!(),
         }
     }            
 }

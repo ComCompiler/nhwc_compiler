@@ -1,8 +1,10 @@
+use std::collections::HashMap;
+
 use petgraph::{graph, stable_graph::NodeIndex, visit::Dfs};
 
-use crate::{antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_statement}, find, node, rule_id};
+use crate::{antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_statement}, find, find_nodes, node, rule_id};
 
-use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, scope_node::ScopeTree, symbol_table::{self, Symbol, SymbolTable}};
+use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{EtNode, EtTree}, gen_cfg::process_declartion, gen_et::process_decl2et, scope_node::ScopeTree, symbol_table::{self, Symbol, SymbolTable}};
 
 /*
  这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有 
@@ -10,6 +12,28 @@ use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context,
 
 
 pub type NhwcCfg = CfgGraph;
+
+fn check_var(et_tree:&mut EtTree,symbol_table:&SymbolTable,scope_tree:&ScopeTree,ast2scope:&HashMap<u32,u32>,et_node:u32){
+    let var_node = node!(at et_node in et_tree);
+    match var_node{
+        EtNode::Symbol { sym, ast_node, text } =>{
+            let var_scope = ast2scope.get(ast_node);
+            match var_scope{
+                Some(scope_var_node)=>{
+
+                },
+                None =>{
+                    panic!("ast2scope中没有这个变量");
+                }
+            }
+        },
+        _ =>{
+            panic!("该节点不是变量！");
+        }
+    }
+
+}
+
 fn parse_expr2nhwc(){
 
 }
@@ -21,8 +45,23 @@ fn parse_bb2nhwc(){
     
 }
 ///处理变量定义语句,decalration转换为instruction
-fn parse_declaration2nhwc(ast_tree:&AstTree,decl_node:u32,symbol_table:&SymbolTable,scope_tree:&ScopeTree){
+fn parse_declaration2nhwc(ast_tree:&AstTree,decl_node:u32,symbol_table:&SymbolTable,scope_tree:&ScopeTree,mut et_tree:&mut EtTree,ast2scope:&HashMap<u32,u32>){
     let vartype = find!(rule RULE_declarationSpecifiers at decl_node in ast_tree).unwrap();
+    let var_valuelist = find!(rule RULE_initDeclaratorList at decl_node in ast_tree).unwrap();
+    let var_values: Vec<u32> = find_nodes!(rule RULE_initDeclarator at var_valuelist in ast_tree);
+    for var_value in var_values {
+        let scope_decl_node = ast2scope.get(&decl_node);
+        match scope_decl_node{
+            Some(scope_decl) =>{
+                let et_root = process_decl2et(et_tree,ast_tree,scope_tree,decl_node,*scope_decl);
+
+            },
+            None =>{
+                panic!("ast2scope表中没有找到该astnode")
+            }
+        }
+        
+    }
     
 }
 fn parse_for2nhwc(){
@@ -38,7 +77,7 @@ fn parse_func2nhwc(){
 /// 由于cfg 里面包含了其他的一些块和边，例如 branch 块和 after conditioned边
 /// 因此我们需要再做一次转化，把边转化成相应的跳转或者调整代码，把所有node 都转化成BasicBlock
 fn parse_cfg_into_nhwc_cfg(context :&mut Context){
-    let (cfg_graph,scope_tree,ast_tree,symbol_table)= (&mut context.cfg_graph , &mut context.scope_tree,&mut context.ast_tree,&mut context.symtab);
+    let (cfg_graph,scope_tree,ast_tree,symbol_table,et_tree,ast2scope)= (&mut context.cfg_graph , &mut context.scope_tree,&mut context.ast_tree,&mut context.symtab,&mut context.et_tree,&context.ast2scope);
 
     let start_node: NodeIndex<u32> = NodeIndex::new(0);
     //先遍历一遍函数名，将函数名加入到符号表中
@@ -79,8 +118,8 @@ fn parse_cfg_into_nhwc_cfg(context :&mut Context){
                 for astnode in ast_nodes{
                     let astnode = *astnode;
                     match(rule_id!(at astnode in ast_tree),astnode){
-                        (RULE_declaration,expression_node)=>{
-                            
+                        (RULE_declaration,declaration_node)=>{
+                            parse_declaration2nhwc(ast_tree, declaration_node, symbol_table, scope_tree,et_tree,ast2scope)            
                         },
                         (RULE_statement,statement_node)=>{
 

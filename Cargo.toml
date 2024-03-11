@@ -12,3 +12,5 @@ clap = { version = "4.4.6", features = ["derive"] }
 petgraph = "0.6.4"
 syn = "1"
 derive_builder = "0.13.0"
+[lib]
+create-type = ["dylib"]
