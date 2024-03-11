@@ -1,3 +1,8 @@
+use std::fmt::Debug;
+use std::ops::{AddAssign, DivAssign, MulAssign};
+use std::process::id;
+use std::{mem, panic};
+use std::thread::scope;
 
 use std::panic;
 
@@ -5,6 +10,9 @@ use petgraph::stable_graph::NodeIndex;
 
 
 use crate::antlr_parser::clexer::{And, Arrow, Constant, DivAssign, Dot, Equal, Greater, GreaterEqual, Identifier, LeftShift, Less, LessEqual, Minus, MinusAssign, MinusMinus, MulAssign, Not, NotEqual, Plus, PlusAssign, PlusPlus, RightShift, Star, StringLiteral, Tilde};
+use crate::antlr_parser::cparser::{Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_declaration, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_unaryExpression, RULE_unaryOperator};
+use crate::toolkit::context;
+use crate::{add_edge, add_node, add_node_with_edge, direct_node, find, find_nodes, node, rule_id, term_id};
 use crate::antlr_parser::cparser::{Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_declarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_unaryExpression, RULE_unaryOperator};
 use crate::toolkit::symbol_table::SymbolIndex;
 use crate::{add_node, add_node_with_edge, direct_node, find, find_nodes, node, term_id};
@@ -12,14 +20,54 @@ use crate::{add_node, add_node_with_edge, direct_node, find, find_nodes, node, t
 use super::et_node::{Def_Or_Use, EtNode, EtTree};
 use super::{ast_node::AstTree, scope_node::ScopeTree, symbol_table::Symbol};
 
-pub fn process_decl2et(et_tree:&mut EtTree,ast_tree:&AstTree,scope_tree:&ScopeTree,ast_decl_node:u32,scope_node:u32)->u32{
-    let initdecl_list = find!(rule RULE_initDeclaratorList at ast_decl_node in ast_tree).unwrap();
-    let initdecl_nodes = find_nodes!(rule RULE_initDeclarator at initdecl_list in ast_tree);
-    for initdecl_node in initdecl_nodes{
-        let assign_node = find!(term Assign at initdecl_node in ast_tree).unwrap();
-        let et_assign = add_node!({EtNode::new_op_assign(assign_node)} to et_tree);
-        let lt_decl = find!(rule RULE_declarator at initdecl_node in ast_tree).unwrap();
-        // add_node_with_edge!({EtNode::new_op_})
+pub fn process_decl2et(et_tree:&mut EtTree,ast_tree:&AstTree,scope_tree:&ScopeTree,decl_node:u32,scope_node:u32,root_et_node:u32){
+    // "int x = 10;"中 int是declarationSpecfier->typeSpecifier  
+        //x是init~List -> init~ -> declarator
+        //=表示存在初始化器
+        //10是initializer,它也可以是一个表达式
+
+    let initdecl_nodes=find_nodes!(rule RULE_declaration 
+                                    then RULE_initDeclaratorList
+                                    finally RULE_initDeclarator
+                                    at decl_node in ast_tree);
+    // 存储initdeclarator节点
+    for initdecl_node in initdecl_nodes{    //适用于int a , b , c这样一次声明多个变量
+        //1.忽略int等typeSpecifier
+        //2.语句的节点直接连到"="上,(如果没有= -> 连到变量名以及可能的指针或数组等修饰符上 )
+        // 找到initdecl_node下面的identifier节点
+        let identifier_node=find!(rule RULE_declarator
+                                        then RULE_directDeclarator
+                                        finally term Identifier
+                                        at initdecl_node in ast_tree).unwrap();
+        
+        // 获取变量名,不会
+        let identifier_name: String = todo!();
+        
+        //要放入et_tree的declare_node
+        let declare_node=EtNode::new_decl(decl_node, identifier_name);
+        
+        
+        let initializer_node = find!(rule RULE_initializer at initdecl_node in ast_tree);
+
+        // 如果存在初始化器，则构建等号节点,其左子树为decl_node -> identifier
+        if let Some(initializer_node) = initializer_node {
+            // 连接等号节点到ET树中
+            // 等号节点
+            let equal_node=EtNode::new_op_equal(decl_node);
+            add_node_with_edge!(equal_node from root_et_node in et_tree);
+            // 连接decl_node到=节点上
+            add_node_with_edge!(decl_node from equal_node in et_tree);
+            // 连接identifier到decl_node上
+            add_node_with_edge!(identifier_node from decl_node in et_tree);
+            //=节点左边搞定,搞右边initialize
+            add_node_with_edge!(initializer_node from equal_node in et_tree);
+
+        } else {
+            // 如果没有初始化器，则直接将decl_node连到root,下面连identifier
+            add_node_with_edge!(declare_node from root_et_node in et_tree);
+            add_node_with_edge!(identifier_node from decl_node in et_tree);
+        }
+        // 3.有= -> =的左子树为变量名,右子树为值
     }
     0
 }
@@ -372,8 +420,7 @@ fn process_additive_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &
                 EtNode::new_op_add(additive_expr_node)
             },
             Minus => {
-                EtNode::new_op_sub( additive_expr_node)
-            },
+                EtNode::new_op_sub( additive_expr_node) },
             _ => panic!("Unexpected operator in additive expression"),
         }
     };

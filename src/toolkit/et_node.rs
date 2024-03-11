@@ -23,6 +23,8 @@ pub enum EtNode{
     Symbol{sym_idx:SymbolIndex,ast_node:u32,text:String,def_or_use:Def_Or_Use},
     // 考虑到 可能出现  a=3,b=2; 这样的语句，因此需要规定一个Separator
     Separator{ast_node:u32,text:String}, 
+    //需要declarator来声明变量
+    Declare{decl_type:Symbol },
 }
 #[derive(Clone)]
 pub enum ExprOp{
@@ -229,24 +231,30 @@ impl EtNode{
     pub fn new_op_minusminus(ast_node:u32) ->Self{
         EtNode::Operator { op: ExprOp::RMinusMinus ,ast_node,text:String::new()}
     }
+    pub fn new_decl(ast_node:u32 , variable_name:String) -> Self{
+        EtNode::Declare { decl_type: Symbol::new(ast_node, variable_name ) }
+    }
     pub fn load_et_node_text(&mut self) {
         let et_node = match self {
             EtNode::Operator { op, ast_node, text } => ast_node,
             EtNode::Constant { const_sym_idx, ast_node, text } => ast_node,
             EtNode::Symbol { sym_idx, ast_node, text ,def_or_use} => ast_node,
             EtNode::Separator { ast_node, text } => ast_node,
+            EtNode::Declare { decl_type } => todo!(),
         };
         let new_str=match self {
             EtNode::Operator { op, ast_node, text }=> text.clone(),
             EtNode::Constant { const_sym_idx, ast_node, text } => text.clone(),
             EtNode::Symbol { sym_idx, ast_node, text,def_or_use } => text.clone(),
             EtNode::Separator { ast_node, text } => text.clone(),
+            EtNode::Declare { decl_type } => todo!(),
         };
         let _  = mem::replace(match self {
                 EtNode::Operator { op, ast_node, text } => text,
                 EtNode::Constant { const_sym_idx, ast_node, text } => text,
                 EtNode::Symbol { sym_idx, ast_node, text,def_or_use } => text,
                 EtNode::Separator { ast_node, text } => text,
+                EtNode::Declare { decl_type } => todo!(),
             },
             new_str);
         }
@@ -269,6 +277,11 @@ impl Debug for EtNode{
             Self::Separator { ast_node, text } =>{
                 write!(f,"{}",text)
             }
+            EtNode::Operator { op, ast_node, text } => todo!(),
+            EtNode::Constant { const_sym, ast_node, text } => todo!(),
+            EtNode::Symbol { sym, ast_node, text } => todo!(),
+            EtNode::Separator { ast_node, text } => todo!(),
+            EtNode::Declare { decl_type  } => todo!(),
         }
     }
 }
