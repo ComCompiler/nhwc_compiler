@@ -155,7 +155,7 @@ constantExpression
     ;
 
 declaration
-    :   declarationSpecifiers initDeclaratorList? ';'
+    :   declarationSpecifiers initDeclaratorList ';'
     |   staticAssertDeclaration
     ;
 
@@ -533,7 +533,7 @@ externalDeclaration
     ;
 
 functionDefinition
-    :   declarationSpecifiers? declarator declarationList? compoundStatement
+    :   declarationSpecifiers declarator  compoundStatement
     ;
 
 declarationList

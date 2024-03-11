@@ -204,7 +204,7 @@ mod tests{
         let expr_stmt_nodes:Vec<u32>=find_dfs_rule_ast(&context.ast_tree, 0, RULE_expressionStatement).collect();  // 三号节点是一个 function def 
         et_tree.add_node(EtNode::new_sep(0));
         for expr_stmt_node in expr_stmt_nodes{
-            toolkit::gen_et::process_expr_stmt(&mut et_tree, &context.ast_tree, &context.scope_tree, expr_stmt_node, 0, 0);
+            toolkit::gen_et::process_any_stmt(&mut et_tree, &context.ast_tree, &context.scope_tree, expr_stmt_node, 0,);
         }
         generate_png_by_graph(&et_tree, "et_tree".to_string(), &[petgraph::dot::Config::EdgeNoLabel]);
         

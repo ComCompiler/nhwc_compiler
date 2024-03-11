@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
-use petgraph::{graph, stable_graph::NodeIndex, visit::Dfs};
+use petgraph::{stable_graph::NodeIndex, visit::Dfs};
 
 use crate::{antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_statement}, find, find_nodes, node, rule_id};
 
-use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{EtNode, EtTree}, gen_cfg::process_declartion, gen_et::process_decl2et, scope_node::ScopeTree, symbol_table::{self, Symbol, SymbolTable}};
+use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{EtNode, EtTree}, gen_et::process_any_stmt, scope_node::ScopeTree, symbol_table::{Symbol, SymbolTable}};
 
 /*
  这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有 
@@ -16,7 +16,7 @@ pub type NhwcCfg = CfgGraph;
 fn check_var(et_tree:&mut EtTree,symbol_table:&SymbolTable,scope_tree:&ScopeTree,ast2scope:&HashMap<u32,u32>,et_node:u32){
     let var_node = node!(at et_node in et_tree);
     match var_node{
-        EtNode::Symbol { sym, ast_node, text } =>{
+        EtNode::Symbol { sym_idx, ast_node, text, def_or_use } =>{
             let var_scope = ast2scope.get(ast_node);
             match var_scope{
                 Some(scope_var_node)=>{
@@ -53,7 +53,7 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,decl_node:u32,symbol_table:&SymbolTa
         let scope_decl_node = ast2scope.get(&decl_node);
         match scope_decl_node{
             Some(scope_decl) =>{
-                let et_root = process_decl2et(et_tree,ast_tree,scope_tree,decl_node,*scope_decl);
+                let et_root = process_any_stmt(et_tree,ast_tree,scope_tree,decl_node,*scope_decl);
 
             },
             None =>{

@@ -10,12 +10,12 @@ use petgraph::{adj::NodeIndex, visit::Dfs};
 use toolkit::{ast_node::{find_dfs_rule_ast, AstTree}, etc::generate_png_by_graph};
 
 
-use crate::toolkit::{context::{Context, ContextBuilder}, et_node::{EtNode, EtTree}};
+use crate::{antlr_parser::cparser::RULE_declaration, toolkit::{context::{Context, ContextBuilder}, et_node::{EtNode, EtTree}}};
 #[derive(Parser)]
 #[command(author, version, about)]
 pub struct Cli {
     ///设置文件地址
-    #[arg(short, long, value_name = "FILE",default_value = "./demos/demo1.c")]
+    #[arg(short, long, value_name = "FILE",default_value = "./demos/demo_function_with_args.c")]
     c_file_path: PathBuf
 }
 
@@ -43,17 +43,15 @@ fn main() {
 
     let mut context = timeit!({Context::init(args,true)} , "init");
     // test
-    println!("Hello, world!");
-            let mut args = Cli::parse();
-    // 设置 path 为 demo.c
     // args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
-    let context = Context::init(args, true);
     let mut et_tree = EtTree::new();
     //dfs遍历ast找到第一个 expr stmt
-    let expr_stmt_nodes:Vec<u32>=find_dfs_rule_ast(&context.ast_tree, 0, RULE_expressionStatement).collect();  // 三号节点是一个 function def 
+    let mut nodes: Vec<u32> = vec![];
+    nodes.extend(find_dfs_rule_ast(&context.ast_tree, 0, RULE_declaration));  
+    nodes.extend(find_dfs_rule_ast(&context.ast_tree, 0, RULE_expressionStatement));  
     et_tree.add_node(EtNode::new_sep(0));
-    for expr_stmt_node in expr_stmt_nodes{
-        toolkit::gen_et::process_expr_stmt(&mut et_tree, &context.ast_tree, &context.scope_tree, expr_stmt_node, 0, 0);
+    for node in nodes{
+        toolkit::gen_et::process_any_stmt(&mut et_tree, &context.ast_tree, &context.scope_tree, node, 0,);
     }
     //debug输出et_node内容
     for et_node in et_tree.node_weights_mut(){

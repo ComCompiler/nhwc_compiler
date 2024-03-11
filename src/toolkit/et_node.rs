@@ -10,7 +10,9 @@ pub type EtTree = StableDiGraph<EtNode,(),u32>;
 
 #[derive(Clone)]
 pub enum Def_Or_Use{
-    Def, Use
+    Def{
+        type_ast_node: u32,
+    }, Use
 }
 #[derive(Clone)]
 pub enum EtNode{
@@ -24,7 +26,6 @@ pub enum EtNode{
     // 考虑到 可能出现  a=3,b=2; 这样的语句，因此需要规定一个Separator
     Separator{ast_node:u32,text:String}, 
     //需要declarator来声明变量
-    Declare{decl_type:Symbol },
 }
 #[derive(Clone)]
 pub enum ExprOp{
@@ -231,30 +232,24 @@ impl EtNode{
     pub fn new_op_minusminus(ast_node:u32) ->Self{
         EtNode::Operator { op: ExprOp::RMinusMinus ,ast_node,text:String::new()}
     }
-    pub fn new_decl(ast_node:u32 , variable_name:String) -> Self{
-        EtNode::Declare { decl_type: Symbol::new(ast_node, variable_name ) }
-    }
     pub fn load_et_node_text(&mut self) {
         let et_node = match self {
             EtNode::Operator { op, ast_node, text } => ast_node,
             EtNode::Constant { const_sym_idx, ast_node, text } => ast_node,
             EtNode::Symbol { sym_idx, ast_node, text ,def_or_use} => ast_node,
             EtNode::Separator { ast_node, text } => ast_node,
-            EtNode::Declare { decl_type } => todo!(),
         };
         let new_str=match self {
             EtNode::Operator { op, ast_node, text }=> text.clone(),
             EtNode::Constant { const_sym_idx, ast_node, text } => text.clone(),
             EtNode::Symbol { sym_idx, ast_node, text,def_or_use } => text.clone(),
             EtNode::Separator { ast_node, text } => text.clone(),
-            EtNode::Declare { decl_type } => todo!(),
         };
         let _  = mem::replace(match self {
                 EtNode::Operator { op, ast_node, text } => text,
                 EtNode::Constant { const_sym_idx, ast_node, text } => text,
                 EtNode::Symbol { sym_idx, ast_node, text,def_or_use } => text,
                 EtNode::Separator { ast_node, text } => text,
-                EtNode::Declare { decl_type } => todo!(),
             },
             new_str);
         }
@@ -268,21 +263,24 @@ impl EtNode{
 impl Debug for EtNode{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Operator { op, ast_node, text } =>
+            EtNode::Operator { op, ast_node, text } =>
                 write!(f,"{:?}",op),
-            Self::Constant { const_sym_idx, ast_node, text } => 
-                write!(f,"{}",const_sym.sym_idx.symbol_name),
-            Self::Symbol { sym_idx, ast_node, text, def_or_use } =>
-                write!(f,"{}",sym_idx.sym_idx.symbol_name),
-            Self::Separator { ast_node, text } =>{
+            EtNode::Constant { const_sym_idx, ast_node, text } => 
+                write!(f,"{}",const_sym_idx.symbol_name),
+            EtNode::Symbol { sym_idx, ast_node, text, def_or_use } =>
+                write!(f,"{:?} {}",def_or_use,sym_idx.symbol_name),
+            EtNode::Separator { ast_node, text } =>{
                 write!(f,"{}",text)
             }
-            EtNode::Operator { op, ast_node, text } => todo!(),
-            EtNode::Constant { const_sym, ast_node, text } => todo!(),
-            EtNode::Symbol { sym, ast_node, text } => todo!(),
-            EtNode::Separator { ast_node, text } => todo!(),
-            EtNode::Declare { decl_type  } => todo!(),
         }
     }
 }
-// 这个文件中的函数都返回子树的 根节点
+
+impl Debug for Def_Or_Use{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Def_Or_Use::Def { type_ast_node } => write!(f,"def"),
+            Def_Or_Use::Use => write!(f,"use"),
+        }
+    }
+}
