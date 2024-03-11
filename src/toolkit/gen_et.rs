@@ -12,16 +12,17 @@ use crate::{add_node, add_node_with_edge, direct_node, find, find_nodes, node, t
 use super::et_node::{Def_Or_Use, EtNode, EtTree};
 use super::{ast_node::AstTree, scope_node::ScopeTree, symbol_table::Symbol};
 
-// pub fn process_decl2et(et_tree:&mut EtTree,ast_tree:&AstTree,scope_tree:&ScopeTree,decl_node:u32,scope_node:u32,root_et_node:u32){
-//     let initdecl_list = find!(rule RULE_initDeclaratorList at decl_node in ast_tree).unwrap();
-//     let initdecl_nodes = find_nodes!(rule RULE_initDeclarator at initdecl_list in ast_tree);
-//     for initdecl_node in initdecl_nodes{
-//         let assign_node = find!(term Assign at initdecl_node in ast_tree).unwrap();
-//         let et_assign = add_node!({EtNode::new_op_assign(assign_node)} to et_tree);
-//         let lt_decl = find!(rule RULE_declarator at initdecl_node in ast_tree).unwrap();
-//         add_node_with_edge!({EtNode::new_op_})
-//     }
-// }
+pub fn process_decl2et(et_tree:&mut EtTree,ast_tree:&AstTree,scope_tree:&ScopeTree,ast_decl_node:u32,scope_node:u32)->u32{
+    let initdecl_list = find!(rule RULE_initDeclaratorList at ast_decl_node in ast_tree).unwrap();
+    let initdecl_nodes = find_nodes!(rule RULE_initDeclarator at initdecl_list in ast_tree);
+    for initdecl_node in initdecl_nodes{
+        let assign_node = find!(term Assign at initdecl_node in ast_tree).unwrap();
+        let et_assign = add_node!({EtNode::new_op_assign(assign_node)} to et_tree);
+        let lt_decl = find!(rule RULE_declarator at initdecl_node in ast_tree).unwrap();
+        // add_node_with_edge!({EtNode::new_op_})
+    }
+    0
+}
 
 
 pub fn process_expr_stmt(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&ScopeTree, expr_stmt_node:u32, scope_node:u32,root_et_node:u32 ){

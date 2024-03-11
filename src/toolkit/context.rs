@@ -1,4 +1,4 @@
-use std::cell::RefCell;
+use std::{cell::RefCell, collections::HashMap};
 
 use derive_builder::Builder;
 use petgraph::{dot::Config, stable_graph::node_index, visit::Dfs};
@@ -17,6 +17,7 @@ pub struct Context{
     pub scope_tree : ScopeTree,
     pub nhwc_cfg : CfgGraph,
     pub et_tree:EtTree,
+    pub ast2scope:HashMap<u32,u32>,
 }
 impl Context{
     fn new() -> Self{
@@ -28,6 +29,7 @@ impl Context{
             code: String::new(),
             scope_tree: ScopeTree::new(),
             et_tree:EtTree::new(),
+            ast2scope:HashMap::new(),
         }
     }
     pub fn init(args:Cli, is_generate_pngs:bool) -> Self{
@@ -52,6 +54,7 @@ impl Context{
         }
         // 3. 根据ast_tree生成scope_tree
         parse_ast_to_scope(&mut context);
+        
         // 3.1 生成对应的pn 
         if is_generate_pngs{
             // let symt = self.op_cfg_graph.unwrap();

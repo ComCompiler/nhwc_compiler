@@ -6,7 +6,9 @@ int main(){
     int e;
     int f = a+b+c;
     int g = h+3+2;
+    int x = 1,y=2;
     {
+        c = 2,d = 2;
         a = 4;
         int i = 0;
         int j = a+b;
