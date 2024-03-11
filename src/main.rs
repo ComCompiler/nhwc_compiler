@@ -15,7 +15,7 @@ use crate::{antlr_parser::cparser::RULE_declaration, toolkit::{context::{Context
 #[command(author, version, about)]
 pub struct Cli {
     ///设置文件地址
-    #[arg(short, long, value_name = "FILE",default_value = "./demos/demo_function_with_args.c")]
+    #[arg(short, long, value_name = "FILE",default_value = "./demos/demo1.c")]
     c_file_path: PathBuf
 }
 
@@ -49,9 +49,11 @@ fn main() {
     let mut nodes: Vec<u32> = vec![];
     nodes.extend(find_dfs_rule_ast(&context.ast_tree, 0, RULE_declaration));  
     nodes.extend(find_dfs_rule_ast(&context.ast_tree, 0, RULE_expressionStatement));  
-    et_tree.add_node(EtNode::new_sep(0));
+    let root =0 ;
+    et_tree.add_node(EtNode::new_sep(root));
     for node in nodes{
-        toolkit::gen_et::process_any_stmt(&mut et_tree, &context.ast_tree, &context.scope_tree, node, 0,);
+        let any_root = toolkit::gen_et::process_any_stmt(&mut et_tree, &context.ast_tree, &context.scope_tree, node, 0,);
+        add_edge!(from root to any_root in et_tree);
     }
     //debug输出et_node内容
     for et_node in et_tree.node_weights_mut(){
