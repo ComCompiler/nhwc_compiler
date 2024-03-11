@@ -18,8 +18,9 @@ pub enum EtNode{
     // 而 et 树的 non-terminal node 要么是 root 要么是一个 op 
     Operator{op: ExprOp,ast_node:u32,text:String}, 
     // 在这里 constant 也是一个 Symbol ，到时候在 SymbolField 里面加上 Constant 标记 就可以了
-    Constant{const_sym:SymbolIndex,ast_node:u32,text:String },
-    Symbol{sym:SymbolIndex,ast_node:u32,text:String},
+    Constant{const_sym_idx:SymbolIndex,ast_node:u32,text:String },
+    // Def_Or_Use 是一个枚举类型，要么是 Def 要么是 Use
+    Symbol{sym_idx:SymbolIndex,ast_node:u32,text:String,def_or_use:Def_Or_Use},
     // 考虑到 可能出现  a=3,b=2; 这样的语句，因此需要规定一个Separator
     Separator{ast_node:u32,text:String}, 
 }
@@ -61,7 +62,8 @@ pub enum ExprOp{
     MulAssign,
     DivAssign,
     PlusAssign,
-    MinusAssign
+    MinusAssign,
+    ArrayIndex,
 }
 impl Debug for ExprOp{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -103,6 +105,7 @@ impl Debug for ExprOp{
             Self::MulAssign => write!(f, "*="),
             Self::MinusAssign=> write!(f, "-="),
             Self::DivAssign => write!(f, "-="),
+            Self::ArrayIndex => write!(f, "[]"),
         }
     }
 }
@@ -161,10 +164,10 @@ impl EtNode{
     }
     //你必须确保这个symbol 是一个 constant
     pub fn new_constant(ast_node:u32,const_symbol : SymbolIndex)->Self{
-        EtNode::Constant { const_sym: const_symbol ,ast_node,text:String::new()}
+        EtNode::Constant { const_sym_idx: const_symbol ,ast_node,text:String::new()}
     }
     pub fn new_symbol(ast_node:u32,symbol : SymbolIndex)->Self{
-        EtNode::Constant { const_sym: symbol,ast_node,text:String::new() }
+        EtNode::Constant { const_sym_idx: symbol,ast_node,text:String::new() }
     }
     pub fn new_op_equal(ast_node:u32)->Self{
         EtNode::Operator { op: ExprOp::Eq ,ast_node,text:String::new()}
@@ -229,20 +232,20 @@ impl EtNode{
     pub fn load_et_node_text(&mut self) {
         let et_node = match self {
             EtNode::Operator { op, ast_node, text } => ast_node,
-            EtNode::Constant { const_sym, ast_node, text } => ast_node,
-            EtNode::Symbol { sym, ast_node, text } => ast_node,
+            EtNode::Constant { const_sym_idx, ast_node, text } => ast_node,
+            EtNode::Symbol { sym_idx, ast_node, text ,def_or_use} => ast_node,
             EtNode::Separator { ast_node, text } => ast_node,
         };
         let new_str=match self {
             EtNode::Operator { op, ast_node, text }=> text.clone(),
-            EtNode::Constant { const_sym, ast_node, text } => text.clone(),
-            EtNode::Symbol { sym, ast_node, text } => text.clone(),
+            EtNode::Constant { const_sym_idx, ast_node, text } => text.clone(),
+            EtNode::Symbol { sym_idx, ast_node, text,def_or_use } => text.clone(),
             EtNode::Separator { ast_node, text } => text.clone(),
         };
         let _  = mem::replace(match self {
                 EtNode::Operator { op, ast_node, text } => text,
-                EtNode::Constant { const_sym, ast_node, text } => text,
-                EtNode::Symbol { sym, ast_node, text } => text,
+                EtNode::Constant { const_sym_idx, ast_node, text } => text,
+                EtNode::Symbol { sym_idx, ast_node, text,def_or_use } => text,
                 EtNode::Separator { ast_node, text } => text,
             },
             new_str);
@@ -259,10 +262,10 @@ impl Debug for EtNode{
         match self {
             Self::Operator { op, ast_node, text } =>
                 write!(f,"{:?}",op),
-            Self::Constant { const_sym, ast_node, text } => 
-                write!(f,"{}",const_sym.symbol_name),
-            Self::Symbol { sym, ast_node, text } =>
-                write!(f,"{}",sym.symbol_name),
+            Self::Constant { const_sym_idx, ast_node, text } => 
+                write!(f,"{}",const_sym.sym_idx.symbol_name),
+            Self::Symbol { sym_idx, ast_node, text, def_or_use } =>
+                write!(f,"{}",sym_idx.sym_idx.symbol_name),
             Self::Separator { ast_node, text } =>{
                 write!(f,"{}",text)
             }
