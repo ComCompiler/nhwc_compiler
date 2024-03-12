@@ -88,7 +88,7 @@ fn process_expr_stmt(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&ScopeT
     let op_expr_node = find!(rule RULE_expression at expr_stmt_node in ast_tree);
     match op_expr_node{
         Some(expr_node) => {
-            let expr_node = process_expr(et_tree,ast_tree,scope_tree,expr_node,scope_node,parent_et_node);
+            process_expr(et_tree,ast_tree,scope_tree,expr_node,scope_node,parent_et_node)
         },
         None => {
             // 这里什么也不用做，因为这个 epxr_stmt 里面没有 expression
