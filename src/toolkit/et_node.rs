@@ -257,6 +257,11 @@ impl EtNode{
         if let EtNode::Separator { ast_node, text } = self {
             let ast_node=*ast_node;
             let _=mem::replace(text,node!(at ast_node in ast_tree).text.clone());
+        }else if let EtNode::Symbol { sym_idx, ast_node, text, def_or_use } = self {
+            if let Def_Or_Use::Def { type_ast_node } = def_or_use{
+                let type_ast_node=*type_ast_node;
+                let _=mem::replace(text,node!(at type_ast_node in ast_tree).text.clone());
+            }
         }
     }
 }
@@ -268,7 +273,7 @@ impl Debug for EtNode{
             EtNode::Constant { const_sym_idx, ast_node, text } => 
                 write!(f,"{}",const_sym_idx.symbol_name),
             EtNode::Symbol { sym_idx, ast_node, text, def_or_use } =>
-                write!(f,"{:?} {}",def_or_use,sym_idx.symbol_name),
+                write!(f,"{:?} {} {}",def_or_use,text,sym_idx.symbol_name),
             EtNode::Separator { ast_node, text } =>{
                 write!(f,"{}",text)
             }
