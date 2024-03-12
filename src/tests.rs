@@ -4,10 +4,10 @@ mod tests{
     use std::{path::PathBuf, str::FromStr, vec};
 
     use clap::Parser;
-    use petgraph::{dot::Config, visit::Data};
+    use petgraph::{dot::Config, graph::NodeIndex, visit::Data};
     
     
-    use crate::{antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition}}, find, find_nodes, toolkit::{self, ast_node::find_dfs_rule_ast, context::{self, Context, ContextBuilder }, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, et_node::{EtNode, EtTree}, gen_scope::parse_ast_to_scope, instruction::Instruction, scope_node::ScopeTree, symbol_field::{DataType, Field}, symbol_table::{Symbol, SymbolBehavior, SymbolIndex, SymbolTable}}, Cli};
+    use crate::{antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compilationUnit, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, gen_scope::parse_ast_to_scope, instruction::Instruction, scope_node::ScopeTree, symbol_field::{DataType, Field}, symbol_table::{Symbol, SymbolBehavior, SymbolIndex, SymbolTable}}, Cli};
 
     #[test]
     fn add(){
@@ -202,11 +202,26 @@ mod tests{
         let mut et_tree = EtTree::new();
         //dfs遍历ast找到第一个 expr stmt
         let expr_stmt_nodes:Vec<u32>=find_dfs_rule_ast(&context.ast_tree, 0, RULE_expressionStatement).collect();  // 三号节点是一个 function def 
-        et_tree.add_node(EtNode::new_sep(0));
+        et_tree.add_node(EtNode::<()>::new(EtNakedNode::new_sep(0),()));
         for expr_stmt_node in expr_stmt_nodes{
             toolkit::gen_et::process_any_stmt(&mut et_tree, &context.ast_tree, &context.scope_tree, expr_stmt_node, 0,);
         }
         generate_png_by_graph(&et_tree, "et_tree".to_string(), &[petgraph::dot::Config::EdgeNoLabel]);
         
+    }
+    #[test]
+    fn test_direct_nodes(){
+        let mut args = Cli::parse();
+        // 设置 path 为 demo.c
+        args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
+        let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
+
+        let mut context = ContextBuilder::default().code(code).build().unwrap();
+        parse_as_ast_tree(&mut context);
+        let ast_tree = &mut context.ast_tree;
+        //dfs遍历ast
+        let node =find_dfs_rule_ast(ast_tree, 0, RULE_translationUnit).next().unwrap();  
+        let nodes = direct_nodes!(at node in ast_tree);
+        assert_eq!(nodes.len() , 2 ,"找到的 nodes 数量 不对 {:?}",nodes);
     }
 }

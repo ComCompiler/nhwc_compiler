@@ -91,7 +91,6 @@ macro_rules! find_nodes {
         {
             let iter = crate::toolkit::ast_node::find_neighbors_rule_ast($ast_tree,$node,Some($id));
             let mut nodes:Vec<u32> = iter.collect();
-            // let nodenodes.reverse()
             nodes.reverse();
             nodes
         }
@@ -107,7 +106,6 @@ macro_rules! find_nodes {
         {
             let iter = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,Some($id));
             let mut nodes:Vec<u32> = iter.collect();
-            // let nodenodes.reverse()
             nodes.reverse();
             nodes
         }
@@ -156,6 +154,17 @@ macro_rules! direct_node {
         {
             $graph.neighbors(NodeIndex::from($node)).next()
             .expect(format!("no direct node of {:?} in {:?}", $graph.node_weight(NodeIndex::from($node)),$graph).as_str()).index() as u32
+        }
+    };
+}
+#[macro_export] 
+macro_rules! direct_nodes{
+    (at $node:ident in $graph:ident) => {
+        {
+            let iter = $graph.neighbors(NodeIndex::from($node)).map(|x| x.index() as u32);
+            let mut nodes:Vec<u32> = iter.collect();
+            nodes.reverse();
+            nodes
         }
     };
 }

@@ -4,7 +4,8 @@ use petgraph::{stable_graph::NodeIndex, visit::Dfs};
 
 use crate::{antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_statement}, find, find_nodes, node, rule_id};
 
-use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{EtNode, EtTree}, gen_et::process_any_stmt, scope_node::ScopeTree, symbol_table::{Symbol, SymbolTable}};
+use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{EtNakedNode, EtTree}, gen_et::process_any_stmt, scope_node::ScopeTree, symbol_table::{Symbol, SymbolTable}};
+use std::fmt::Debug;
 
 /*
  这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有 
@@ -13,11 +14,11 @@ use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context,
 
 pub type NhwcCfg = CfgGraph;
 
-fn check_var(et_tree:&mut EtTree,symbol_table:&SymbolTable,scope_tree:&ScopeTree,ast2scope:&HashMap<u32,u32>,et_node:u32){
+fn check_var<Info:Default+Clone+Debug>(et_tree:&mut EtTree<()>,symbol_table:&SymbolTable,scope_tree:&ScopeTree,ast2scope:&HashMap<u32,u32>,et_node:u32){
     let var_node = node!(at et_node in et_tree);
-    match var_node{
-        EtNode::Symbol { sym_idx, ast_node, text, def_or_use } =>{
-            let var_scope = ast2scope.get(ast_node);
+    match &var_node.et_naked_node{
+        EtNakedNode::Symbol { sym_idx, ast_node, text, def_or_use } =>{
+            let var_scope = ast2scope.get(&ast_node);
             match var_scope{
                 Some(scope_var_node)=>{
 
@@ -44,8 +45,9 @@ fn parse_stmt2nhwc(){
 fn parse_bb2nhwc(){
     
 }
+
 ///处理变量定义语句,decalration转换为instruction
-fn parse_declaration2nhwc(ast_tree:&AstTree,decl_node:u32,symbol_table:&SymbolTable,scope_tree:&ScopeTree,mut et_tree:&mut EtTree,ast2scope:&HashMap<u32,u32>){
+fn parse_declaration2nhwc(ast_tree:&AstTree,decl_node:u32,symbol_table:&SymbolTable,scope_tree:&ScopeTree,mut et_tree:&mut EtTree<()>,ast2scope:&HashMap<u32,u32>){
     let vartype = find!(rule RULE_declarationSpecifiers at decl_node in ast_tree).unwrap();
     let var_valuelist = find!(rule RULE_initDeclaratorList at decl_node in ast_tree).unwrap();
     let var_values: Vec<u32> = find_nodes!(rule RULE_initDeclarator at var_valuelist in ast_tree);
