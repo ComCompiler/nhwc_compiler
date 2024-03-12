@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use petgraph::{stable_graph::NodeIndex, visit::Dfs};
 
-use crate::{antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_statement}, find, find_nodes, node, rule_id};
+use crate::{antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_statement}, add_node, direct_node, find_nodes_by_dfs, rule_id, add_node_with_edge,find,node,find_nodes};
 
 use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{EtNode, EtTree}, gen_et::process_any_stmt, scope_node::ScopeTree, symbol_table::{Symbol, SymbolTable}};
 
@@ -17,7 +17,7 @@ fn check_var(et_tree:&mut EtTree,symbol_table:&SymbolTable,scope_tree:&ScopeTree
     let var_node = node!(at et_node in et_tree);
     match var_node{
         EtNode::Symbol { sym_idx, ast_node, text, def_or_use } =>{
-            let var_scope = ast2scope.get(ast_node);
+            let var_scope = ast2scope.get(&ast_node);
             match var_scope{
                 Some(scope_var_node)=>{
 
@@ -54,8 +54,9 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,decl_node:u32,symbol_table:&SymbolTa
         match scope_decl_node{
             Some(scope_decl) =>{
                 let et_root = process_any_stmt(et_tree,ast_tree,scope_tree,decl_node,*scope_decl);
-
-            },
+                let et_op = direct_node!(at et_root in et_tree);
+                
+            }
             None =>{
                 panic!("ast2scope表中没有找到该astnode")
             }
@@ -109,7 +110,7 @@ fn parse_cfg_into_nhwc_cfg(context :&mut Context){
 
             },
             Some(CfgNode::ForLoop { ast_before_node, ast_mid_node, ast_after_node, text })=>{
-
+                
             },
             Some(CfgNode::WhileLoop { ast_expr_node, text })=>{
 
