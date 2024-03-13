@@ -28,6 +28,7 @@ pub enum CfgNode {
         //f 里面调用 函数 c
         //就往 calls in func 里面加入c
         calls_in_func : Vec<u32>,
+        instr:Instruction,
     },
     Exit {
         ast_node: u32,
@@ -70,7 +71,7 @@ impl GetText for CfgNode {
 
     fn get_text(&self)-> Option<&str> {
         match self {
-            CfgNode::Entry {  ast_node, text, calls_in_func:_  } => {
+            CfgNode::Entry {  ast_node, text, calls_in_func:_, instr:_  } => {
                 if !text.is_empty(){
                     Some(text.as_str())
                 }else{
@@ -130,7 +131,7 @@ impl GetText for CfgNode {
 impl CfgNode{
     pub fn load_ast_node_text(&mut self,ast_tree : &AstTree){ 
         match self {
-            CfgNode::Entry {  ast_node, text, calls_in_func:_  } => {
+            CfgNode::Entry {  ast_node, text, calls_in_func:_, instr:_  } => {
                 let ast_node = *ast_node;
                 let new_str = node!(at ast_node in ast_tree).text.clone();
                 let _ = mem::replace(text, new_str);
@@ -202,7 +203,7 @@ impl CfgNode{
 impl Debug for CfgNode{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self{
-            CfgNode::Entry {  ast_node: ast_node_idx, text, calls_in_func:_ } =>
+            CfgNode::Entry {  ast_node: ast_node_idx, text, calls_in_func:_, instr :_} =>
                 write!(f,"{} {} \n{}","Entry",ast_node_idx,text),
             CfgNode::Exit {  ast_node: ast_node_idx, text: _ } =>
                 write!(f,"{} {} ","Exit",ast_node_idx ),

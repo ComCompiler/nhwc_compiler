@@ -15,3 +15,6 @@ int main(){
     }
     j = 1;
 }
+void fun(int a,int b){
+    a = b+a;
+}

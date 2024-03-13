@@ -2,6 +2,7 @@ use petgraph::stable_graph::{EdgeIndex, NodeIndex};
 use petgraph::visit::EdgeRef;
 use crate::toolkit::ast_node::AstTree;
 use crate::toolkit::cfg_edge::CfgEdge;
+use crate::toolkit::instruction::Instruction;
 use crate::{add_edge, add_node, direct_node, find_nodes_by_dfs, rule_id, RULE_compoundStatement, RULE_functionDefinition};
 use crate::antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
 };
@@ -286,7 +287,7 @@ pub fn parse_ast_to_cfg(context:&mut Context) {
     let cfg_func_parent_node = cfg_graph.add_node(cfg_func_parent);
     for funcdef_node in funcdef_nodes{
 
-        let entry_struct = CfgNode::Entry { ast_node:funcdef_node, text: String::new(), calls_in_func: Vec::new()};
+        let entry_struct = CfgNode::Entry { ast_node:funcdef_node, text: String::new(), calls_in_func: Vec::new(), instr:Instruction::Deffun{ funname: SymbolIndex::new(funcdef_node, String::new()), rettype: SymbolIndex::new(funcdef_node, String::new()), paralst: Vec::new() }};
         let cfg_entry_node = add_node!(entry_struct to cfg_graph);
         add_edge!( {CfgEdge::Direct {  } } from  cfg_func_parent_node to cfg_entry_node in cfg_graph);
         let exit_struct = CfgNode::Exit  { ast_node:funcdef_node, text: String::new() };
