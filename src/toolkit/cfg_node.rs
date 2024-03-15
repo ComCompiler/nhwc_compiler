@@ -1,20 +1,14 @@
-use core::panic;
-use std::any::Any;
+
 use std::fmt::Debug;
-use std::{clone, mem};
-use std::thread::{current, scope};
-use petgraph::stable_graph::{EdgeIndex, NodeIndex, StableDiGraph};
-use petgraph::visit::{EdgeRef, IntoEdges};
+use std:: mem;
+
+use petgraph::stable_graph::{ NodeIndex, StableDiGraph};
+
 use crate::toolkit::ast_node::AstTree;
 use crate::toolkit::cfg_edge::CfgEdge;
-use crate::{add_edge, add_node, direct_node, find_nodes_by_dfs, node_mut, rule_id, RULE_compoundStatement, RULE_functionDefinition};
-use crate::antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_breakStatement, RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
-};
-use crate::{find,find_nodes,node};
+use crate::node;
 
-use super::context::Context;
 use super::instruction::Instruction;
-use super::symbol_table::{SymbolIndex, SymbolTable};
 
 //use crate::toolkit::ast_node::AstNode;
 
@@ -129,7 +123,7 @@ impl GetText for CfgNode {
     }
 }
 impl CfgNode{
-    pub fn load_ast_node_text(&mut self,ast_tree : &AstTree){ 
+    pub fn load_ast_node_text(&mut self,ast_tree :&AstTree){ 
         match self {
             CfgNode::Entry {  ast_node, text, calls_in_func:_, instr:_  } => {
                 let ast_node = *ast_node;
@@ -203,8 +197,8 @@ impl CfgNode{
 impl Debug for CfgNode{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self{
-            CfgNode::Entry {  ast_node: ast_node_idx, text, calls_in_func:_, instr :_} =>
-                write!(f,"{} {} \n{}","Entry",ast_node_idx,text),
+            CfgNode::Entry {  ast_node: ast_node_idx, text, calls_in_func:_, instr} =>
+                write!(f,"{} {} \n{} \n{:?}","Entry",ast_node_idx,text,instr),
             CfgNode::Exit {  ast_node: ast_node_idx, text: _ } =>
                 write!(f,"{} {} ","Exit",ast_node_idx ),
             CfgNode::Branch {   ast_expr_node: ast_node_idx, text } =>
@@ -221,3 +215,27 @@ impl Debug for CfgNode{
         }
     }
 }
+// pub trait DetailedDebug {
+//     fn detailed_fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
+// }
+// impl DetailedDebug for CfgNode {
+//     fn detailed_fmt(&self,ast_tree :&mut Formatter<'_>) -> std::fmt::Result {
+//         match self{
+//             CfgNode::Entry {  ast_node: ast_node_idx, text:_, calls_in_func:_, instr } =>
+//                 write!(f,"{} {} \n{:?}","Entry",ast_node_idx,instr),
+//             CfgNode::Exit {  ast_node: ast_node_idx, text: _ } =>
+//                 write!(f,"{} {} ","Exit",ast_node_idx ),
+//             CfgNode::Branch {   ast_expr_node: ast_node_idx, text } =>
+//                 write!(f,"{} {} \n{}","Branch",ast_node_idx, text),
+//             CfgNode::Gather {  } =>
+//                 write!(f,"{} ","Gather"),
+//             CfgNode::BasicBlock { ast_nodes: _ast_node_idxes, text:_, instrs } => 
+//                 write!(f,"{} {:?}","BasicBlock",instrs),
+//             CfgNode::Func {  } => write!(f,"{}","root",),
+//             CfgNode::ForLoop {  text, ast_before_node, ast_mid_node: _, ast_after_node: _ } => 
+//                 write!(f,"{} {} \n{}","For",ast_before_node, text),
+//             CfgNode::WhileLoop { ast_expr_node, text } => write!(f,"{} {} \n{}","While",ast_expr_node, text),
+//             CfgNode::Switch { ast_expr_node, text } => write!(f,"{} {} \n{}","Switch",ast_expr_node, text),
+//         }
+//     }
+// }

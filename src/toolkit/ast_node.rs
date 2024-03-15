@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use petgraph::{ graph::DiGraph, stable_graph::{NodeIndex, StableDiGraph, StableGraph}, visit::Bfs};
+use petgraph::{ stable_graph::{NodeIndex, StableDiGraph}, visit::Bfs};
 
 use petgraph::visit::{Dfs, Walker};
 pub type AstTree = StableDiGraph<AstNode,(),u32>;

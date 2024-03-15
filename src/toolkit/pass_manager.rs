@@ -1,4 +1,4 @@
-use super::symbol_table::{Symbol, SymbolIndex};
+use super::symbol_table:: SymbolIndex;
 
 
 pub trait Pass{

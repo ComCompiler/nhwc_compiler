@@ -1,11 +1,11 @@
-use std::{cell::RefCell, collections::HashMap};
+use std::collections::HashMap;
 
 use derive_builder::Builder;
-use petgraph::{dot::Config, stable_graph::node_index, visit::Dfs};
+use petgraph::dot::Config;
 
 use crate::Cli;
 
-use super::{ast_node::AstTree, cfg_node::CfgGraph, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, gen_cfg::parse_ast_to_cfg, et_node::{EtNode, EtTree}, gen_scope::parse_ast_to_scope, scope_node::{self, ScopeTree}, symbol_table::SymbolTable};
+use super::{ast_node::AstTree, cfg_node::CfgGraph, et_node::EtTree, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, gen_cfg::parse_ast_to_cfg, gen_nhwc_cfg::parse_cfg_into_nhwc_cfg, gen_scope::parse_ast_to_scope, scope_node::ScopeTree, symbol_table::SymbolTable};
 
 #[derive(Default,Builder)]
 #[builder(default)]
@@ -63,6 +63,16 @@ impl Context{
             }
             generate_png_by_graph(&context.scope_tree, "scope_tree".to_string(),&[Config::EdgeNoLabel]);
         }
+        // //4.对cfg生成对应的nhwc ir，以及生成et
+        // parse_cfg_into_nhwc_cfg(&mut context);
+        // //4.1可视化
+        // if is_generate_pngs{
+        //     for cfg_node in context.cfg_graph.node_weights_mut(){
+        //         cfg_node.load_ast_node_text(&context.ast_tree)
+        //     }
+        //     generate_png_by_graph(&context.cfg_graph,"nhwc_cfg_graph".to_string(),&[]);
+        // }
+
         context
     }
 }

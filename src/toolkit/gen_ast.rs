@@ -1,12 +1,12 @@
 use antlr_rust::{common_token_stream::CommonTokenStream, InputStream};
-use antlr_rust::rule_context::CustomRuleContext;
-use petgraph::{ Graph,  csr::NodeIndex};
 
-use crate::{toolkit::ast_node::AstNode, antlr_parser::{rule_walkers::RuleOnlyListener, clexer::CLexer, cparser::{CParser, CTreeWalker}}};
+use petgraph:: csr::NodeIndex;
+
+use crate::{toolkit::ast_node::AstNode, antlr_parser::{clexer::CLexer, cparser::{CParser, CTreeWalker}}};
 use crate::antlr_parser::rule_walkers::TerminalRuleListener;
 
-use super::ast_node::AstTree;
-use super::context::{self, Context};
+
+use super::context::Context;
 
 /// 把代码生成为AST树 code 为代码文本的字符串
 pub fn parse_as_ast_tree(context : &mut Context){

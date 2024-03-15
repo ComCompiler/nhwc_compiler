@@ -2,15 +2,15 @@ mod toolkit;
 mod antlr_parser;
 mod tests;
 mod passes;
-use std::{path::PathBuf, str::FromStr, time::Instant};
+use std::{path::PathBuf,time::Instant};
 
 use antlr_parser::cparser::{RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition} ;
 use clap::Parser;
-use petgraph::{adj::NodeIndex, visit::Dfs};
-use toolkit::{ast_node::{find_dfs_rule_ast, AstTree}, etc::generate_png_by_graph};
+use petgraph::adj::NodeIndex;
+use toolkit::{ast_node::find_dfs_rule_ast, etc::generate_png_by_graph};
 
 
-use crate::{antlr_parser::cparser::RULE_declaration, toolkit::{context::{Context, ContextBuilder}, et_node::{EtNakedNode, EtTree}}};
+use crate::{antlr_parser::cparser::RULE_declaration, toolkit::{context::Context, et_node::{EtNakedNode, EtTree}}};
 #[derive(Parser)]
 #[command(author, version, about)]
 pub struct Cli {

@@ -5,7 +5,7 @@ use petgraph::stable_graph::NodeIndex;
 use crate::toolkit::ast_node::AstTree;
 
 use crate::{add_node, direct_node, find_nodes_by_dfs, rule_id, add_node_with_edge,RULE_compoundStatement, RULE_functionDefinition};
-use crate::antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_constantExpression, RULE_declaration, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection,RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_parameterTypeList, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
+use crate::antlr_parser::cparser::{RULE_assignmentExpression, RULE_blockItem, RULE_blockItemList, RULE_constantExpression, RULE_declaration, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_initDeclarator, RULE_initDeclaratorList, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_parameterTypeList, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
 };
 use crate::{find,find_nodes,node};
 
@@ -16,7 +16,7 @@ use super::scope_node::{ScopeNode, ScopeTree};
 pub fn process_function(scope_tree:&mut ScopeTree,ast_tree:&AstTree,scope_parent:u32,current_function_node:u32,ast2scope:&mut HashMap<u32,u32>) -> u32{
     //将函数名存进scopetree
     let scope_function_node = add_node_with_edge!({ScopeNode{ast_node:current_function_node,text:String::new(),parent:scope_parent}} from scope_parent in scope_tree);
-    ast2scope.insert(scope_parent, scope_function_node);
+    ast2scope.insert(current_function_node, scope_function_node);
 
     //处理函数中的参数列表
     let ast_directdeclarator = find!(rule RULE_declarator finally RULE_directDeclarator  at current_function_node in ast_tree).unwrap();
@@ -45,8 +45,11 @@ pub fn process_statement(scope_tree:&mut ScopeTree,ast_tree:&AstTree,scope_paren
             process_selection(scope_tree, ast_tree, scope_parent, selection_node,ast2scope)
         }
         (RULE_expressionStatement,expressionstatment_node) => {
-            let scope_expr = add_node_with_edge!({ScopeNode{ast_node:expressionstatment_node,text:String::new(),parent:scope_parent}} from scope_parent in scope_tree);
+            let assign_exprs = find_nodes!(rule RULE_expression finally RULE_assignmentExpression at expressionstatment_node in ast_tree);
+            for assign_expr in assign_exprs{
+                let scope_expr = add_node_with_edge!({ScopeNode{ast_node:assign_expr,text:String::new(),parent:scope_parent}} from scope_parent in scope_tree);
             ast2scope.insert(expressionstatment_node, scope_expr);
+            }
         }
         (RULE_labeledStatement,label_node) => {
             let scope_label_node = add_node_with_edge!({ScopeNode{ast_node:label_node,text:String::new(),parent:scope_parent}} from scope_parent in scope_tree);
@@ -192,8 +195,11 @@ pub fn process_compound(scope_tree:&mut ScopeTree,ast_tree:&AstTree,scope_parent
                 process_statement(scope_tree, ast_tree, scope_compound_node, statement_node,ast2scope);
             }
             (RULE_declaration,declaration_node) => {
-                let scope_decl = add_node_with_edge!({ScopeNode{ast_node:declaration_node,text:String::new(),parent:scope_compound_node}} from scope_compound_node in scope_tree);
-                ast2scope.insert(declaration_node, scope_decl);
+                let initdecl_nodes = find_nodes!(rule RULE_initDeclaratorList finally RULE_initDeclarator at declaration_node in ast_tree);
+                for initdecl_node in initdecl_nodes{
+                    let scope_decl = add_node_with_edge!({ScopeNode{ast_node:initdecl_node,text:String::new(),parent:scope_compound_node}} from scope_compound_node in scope_tree);
+                    ast2scope.insert(declaration_node, scope_decl);
+                }
             }
             (_,_) => {
                 panic!("不属于declaration或statement,ast出错");

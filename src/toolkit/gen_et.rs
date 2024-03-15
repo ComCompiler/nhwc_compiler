@@ -1,19 +1,15 @@
 use std::fmt::Debug;
-use std::ops::{AddAssign, DivAssign, MulAssign};
-use std::process::id;
-use std::{mem, panic};
-use std::thread::scope;
+use std:: panic;
 use petgraph::stable_graph::NodeIndex;
-use syn::Ident;
 
 use crate::antlr_parser::clexer::{And, Arrow, Constant, DivAssign, Dot, Equal, Greater, GreaterEqual, Identifier, LeftShift, Less, LessEqual, Minus, MinusAssign, MinusMinus, MulAssign, Not, NotEqual, Plus, PlusAssign, PlusPlus, RightShift, Star, StringLiteral, Tilde};
 use crate::antlr_parser::cparser::{Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_declaration, RULE_declarationSpecifier, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_expressionStatement, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_parameterTypeList, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_typeSpecifier, RULE_unaryExpression, RULE_unaryOperator};
-use crate::toolkit::context;
-use crate::{add_edge, add_node, add_node_with_edge, direct_node, find, find_nodes, node, rule_id, term_id};
+
+use crate::{ add_node, add_node_with_edge, direct_node, find, find_nodes, node, term_id};
 use crate::toolkit::symbol_table::SymbolIndex;
 
 use super::et_node::{Def_Or_Use, EtNakedNode, EtTree};
-use super::{ast_node::AstTree, scope_node::ScopeTree, symbol_table::Symbol};
+use super::{ast_node::AstTree, scope_node::ScopeTree};
 
 // 这个函数 返回 separator node 
 // 只能处理三类  expr_stmt & declaration & expr 

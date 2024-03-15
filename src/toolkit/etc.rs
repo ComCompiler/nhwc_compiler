@@ -1,8 +1,7 @@
 use std::{fs::File, process::Command, fmt::Debug, env, io::{Write, Read}};
 
-use petgraph::{dot::{Dot, Config}, stable_graph::{StableDiGraph, StableGraph}, EdgeType, Graph};
+use petgraph::{dot::{Dot, Config}, stable_graph::StableGraph, EdgeType};
 
-use super::ast_node::AstTree;
 
 
 /// 生成树(可以是任何树)对应的png ，将此png 放在命令行*当前*目录下

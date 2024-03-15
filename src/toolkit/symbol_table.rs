@@ -1,6 +1,6 @@
 use core::panic;
 use std::collections::{BTreeMap, HashMap};
-use crate::{antlr_parser::clexer::Newline, toolkit::{ast_node,cfg_node}};
+
 
 use super::symbol_field::{self, Field};
 use core::fmt::Debug;
@@ -76,7 +76,7 @@ impl Debug for Symbol{
         write!(f,"{:?}",self.sym_idx.symbol_name)
     }
 }
-pub trait SymbolBehavior{
+pub trait Fields{
     fn add_field(&mut self,key :&'static str,sf:Box<dyn Field>);
     fn remove_field(&mut self, field_name : &'static str);
     fn get_field(&self,key: &str) -> Option<&Box<dyn Field>>;
@@ -89,8 +89,8 @@ impl Clone for Box<dyn Field>{
         panic!("you should never use the clone for Field");
     }
 }
-
-impl SymbolBehavior for Symbol{
+///动态添加字段，如
+impl Fields for Symbol{
     fn add_field(&mut self,key :&'static str,sf:Box<dyn Field>) {
         self.fields.insert(key, sf);
     }

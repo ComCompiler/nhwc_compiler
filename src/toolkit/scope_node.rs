@@ -5,7 +5,7 @@ use petgraph::stable_graph::{NodeIndex, StableDiGraph};
 
 use crate::node;
 
-use super::{ast_node::AstTree, cfg_node::{CfgGraph, CfgNode, GetText}};
+use super::{ast_node::AstTree, cfg_node::GetText};
 
 
 pub type ScopeTree = StableDiGraph<ScopeNode,(),u32>;

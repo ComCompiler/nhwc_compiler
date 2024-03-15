@@ -1,10 +1,10 @@
 use std::fmt::Debug;
 use std::mem;
-use petgraph:: Directed;
-use petgraph::stable_graph::{NodeIndex, StableDiGraph, StableGraph};
+
+use petgraph::stable_graph::{NodeIndex, StableDiGraph};
 use crate::node;
 use super::ast_node::AstTree;
-use super::symbol_table::{Symbol, SymbolIndex};
+use super::symbol_table:: SymbolIndex;
 
 pub type EtTree<Info> = StableDiGraph<EtNode<Info>,(),u32>;
 

@@ -156,6 +156,12 @@ macro_rules! direct_node {
             .expect(format!("no direct node of {:?} in {:?}", $graph.node_weight(NodeIndex::from($node)),$graph).as_str()).index() as u32
         }
     };
+    (at $node:ident in $graph:ident ret option)=>{
+        {
+            let node_index_option = $graph.neighbors(NodeIndex::from($node)).next();
+            node_index_option.map(|node_index| node_index.index() as u32)
+        }
+    }
 }
 #[macro_export] 
 macro_rules! direct_nodes{

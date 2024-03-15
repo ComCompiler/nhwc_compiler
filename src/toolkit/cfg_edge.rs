@@ -2,7 +2,7 @@ use crate::NodeIndex;
 use crate::node;
 use std::fmt::Debug;
 use super::ast_node::AstTree;
-use super::{ast_node, cfg_node::GetText};
+use super::cfg_node::GetText;
 #[derive(Clone)]
 pub enum CfgEdge{
     Conditioned{

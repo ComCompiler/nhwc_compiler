@@ -10,7 +10,7 @@ use crate::{find,find_nodes,node};
 
 use super::cfg_node::{CfgGraph, CfgNode};
 use super::context::Context;
-use super::scope_node::{ScopeNode, ScopeTree};
+
 use super::symbol_table::{SymbolIndex, SymbolTable};
 
 pub fn process_while(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,symtab:&mut SymbolTable,current_while_node:u32) -> Option<(u32,u32)>{

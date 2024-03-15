@@ -1,8 +1,5 @@
 use std::fmt::Debug;
-
-use syn::ExprCall;
-
-use super::symbol_table::{Symbol, SymbolBehavior, SymbolIndex};
+use super::symbol_table::SymbolIndex;
 
 #[derive(Clone)]
 pub enum ArithOp{        
@@ -247,7 +244,7 @@ impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
             Self::SimpleAssign { lhs, rhs }=>
                 write!(f,"{}={}",lhs.symbol_name,rhs.symbol_name),
             Self::Deffun { funname, rettype, paralst } =>
-                write!(f,"{} {} {:?}",rettype.symbol_name,funname.symbol_name,paralst),
+                write!(f,"{} {} {} {:?}","define",rettype.symbol_name,funname.symbol_name,paralst),
             Self::Defvar { varname, vartype, value }=>
                 write!(f,"define {} %{} = {}",vartype.symbol_name,varname.symbol_name,value.symbol_name),
         }
