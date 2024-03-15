@@ -279,3 +279,34 @@ macro_rules! term_id {
         }
     };
 }
+#[macro_export] 
+macro_rules! dfs_graph {
+    (at $node:ident in $graph:ident for dfs) =>{
+        {
+            let mut visited:Vec<bool> = vec![false;$graph.node_count()];
+            let mut dfs_vec: Vec<u32> = vec![];
+
+            crate::toolkit::gen_nhwc_cfg::dfs($graph, $node,&mut visited,&mut dfs_vec);
+            dfs_vec
+        }
+    };
+}
+#[macro_export] 
+macro_rules! push_instr {
+    (add $instr:ident to $node:ident for entry in $graph:ident) =>{
+        {
+            let cfg_entry_node = node_mut!(at $node in $graph);
+            if let crate::toolkit::cfg_node::CfgNode::Entry { ast_node:_, text:_, calls_in_func:_, instr } = cfg_entry_node{
+                *instr = $instr;
+            }
+        }
+    };
+    (add $instr:ident to $node:ident for bb in $graph:ident) =>{
+        {
+            let cfg_bb_node = node_mut!(at $node in $graph);
+            if let crate::toolkit::cfg_node::CfgNode::BasicBlock { ast_nodes:_, text:_, instrs } = cfg_bb_node{
+                instrs.push($instr);
+            }
+        }
+    };
+}

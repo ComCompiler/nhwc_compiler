@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use petgraph::{adj::Neighbors, stable_graph::NodeIndex, visit::{Dfs, IntoNeighbors}};
+use petgraph::{adj::Neighbors, stable_graph::NodeIndex, visit::{self, Dfs, IntoNeighbors}};
 
-use crate::{ antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_initDeclarator, RULE_initDeclaratorList, RULE_parameterDeclaration, RULE_parameterTypeList}, direct_node, direct_nodes, find, find_nodes, node, node_mut, rule_id};
+use crate::{ antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_initDeclarator, RULE_initDeclaratorList, RULE_parameterDeclaration, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id};
 
 use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{EtNakedNode, EtTree}, gen_et::process_any_stmt, instruction::Instruction, scope_node::ScopeTree, symbol_table::{Symbol, SymbolIndex, SymbolTable}};
 
@@ -41,11 +41,11 @@ fn parse_expr2nhwc(){
 fn parse_stmt2nhwc(){
     
 }
-fn parse_bb2nhwc(ast_tree:&AstTree,scope_tree:&ScopeTree,et_tree:&mut EtTree<()>,symbol_table:&SymbolTable,ast2scope:&HashMap<u32,u32>,ast_nodes:Vec<u32>,instrs:&mut Vec<Instruction>){
+fn parse_bb2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&ScopeTree,et_tree:&mut EtTree<()>,symbol_table:&SymbolTable,ast2scope:&HashMap<u32,u32>,ast_nodes:Vec<u32>,cfg_bb:u32){
     for astnode in ast_nodes{
         match(rule_id!(at astnode in ast_tree),astnode){
             (RULE_declaration,declaration_node)=>{
-                parse_declaration2nhwc(ast_tree, declaration_node, symbol_table, scope_tree,et_tree,ast2scope,declaration_node,instrs)  
+                parse_declaration2nhwc(ast_tree,cfg_graph, declaration_node, symbol_table, scope_tree,et_tree,ast2scope,declaration_node,cfg_bb)  
             },
             (RULE_expressionStatementr,statement_node)=>{
 
@@ -74,7 +74,7 @@ fn process_ettree(et_tree:&EtTree<()>,scope_tree:&ScopeTree,symbol_table:&Symbol
 }
 
 ///定义变量的decl转为ir，并通过et查找元素是否合法
-fn parse_declaration2nhwc(ast_tree:&AstTree,decl_node:u32,symbol_table:&SymbolTable,scope_tree:&ScopeTree,mut et_tree:&mut EtTree<()>,ast2scope:&HashMap<u32,u32>,ast_decl_node:u32, instrs:&mut Vec<Instruction>){
+fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,decl_node:u32,symbol_table:&SymbolTable,scope_tree:&ScopeTree,mut et_tree:&mut EtTree<()>,ast2scope:&HashMap<u32,u32>,ast_decl_node:u32,cfg_bb:u32){
     //获取scope
     if let Some(decl_scope) = ast2scope.get(&ast_decl_node){
         //获得变量类型，做成symidx
@@ -102,7 +102,7 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,decl_node:u32,symbol_table:&SymbolTa
                     let initdecl_value = SymbolIndex::new(*initdecl_scope,String::new());
                     let et_instr = Instruction::new_defvar(type_symidx.clone(), initdecl_name, initdecl_value);
 
-                    instrs.push(et_instr);
+                    push_instr!(add et_instr to cfg_bb for bb in cfg_graph);
                 }
             }else{
                 panic!("{}没有在ast2scope里面找到",ast_initdecl);
@@ -156,10 +156,9 @@ fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,scope_tree:&ScopeTr
         else{}
         //做成instr放在cfg的entry里面
         let fun_instruction = Instruction::new_deffun(name_symidx, type_symidx, para_symlst);
-        let cfg_entry = node_mut!(at cfg_entry in cfg_graph);
-        if let CfgNode::Entry { ast_node:_, text:_, calls_in_func:_, instr } = cfg_entry{
-            *instr = fun_instruction;
-        }
+        
+        push_instr!(add fun_instruction to cfg_entry for entry in cfg_graph);
+
     }else{
         panic!("找不到{}该函数的scopenode!",ast_fun);
     }
@@ -187,10 +186,11 @@ pub fn parse_cfg_into_nhwc_cfg(context :&mut Context){
     }
     //再遍历一遍entry，对于每个函数做dfs,处理函数体
     for cfg_entry in cfg_funs.clone(){
-        let mut dfs = Dfs::new(&*cfg_graph,NodeIndex::new(cfg_entry as usize));
-        while let Some(node) = dfs.next(&*cfg_graph) {
-            let cfg_node = cfg_graph.node_mut_weight(node).unwrap();
-            match cfg_node {
+        let dfs_vec = dfs_graph!(at cfg_entry in cfg_graph for dfs);
+
+        for node in dfs_vec{
+            let cfgnode = node!(at node in cfg_graph);
+            match cfgnode {
                 CfgNode::Branch { ast_expr_node, text } =>{
 
                 },
@@ -203,11 +203,27 @@ pub fn parse_cfg_into_nhwc_cfg(context :&mut Context){
                 CfgNode::WhileLoop { ast_expr_node, text }=>{
 
                 },
-                CfgNode::BasicBlock { ast_nodes, text, mut instrs }=>{
-                    parse_bb2nhwc(ast_tree, scope_tree, et_tree, symbol_table, ast2scope,ast_nodes.clone(),&mut instrs)
+                CfgNode::BasicBlock { ast_nodes, text:_, instrs:_ }=>{
+                    // parse_bb2nhwc(ast_tree,cfg_graph, scope_tree, et_tree, symbol_table, ast2scope,ast_nodes.clone(),node)
                 },
                 _=>{},
             }
+        }
+    }
+}
+
+pub fn dfs(cfg_graph: &mut CfgGraph, cfg_node: u32, visited: &mut Vec<bool>, dfs_vec: &mut Vec<u32>) {
+    if visited[cfg_node as usize] {
+        return;
+    }
+    visited[cfg_node as usize] = true;
+    dfs_vec.push(cfg_node);
+
+    // 假设`direct_nodes!`能安全地返回一个空集合或当前节点的直接相连节点列表
+    let nodes = direct_nodes!(at cfg_node in cfg_graph);
+    for node in nodes {
+        if !visited[node as usize] {
+            dfs(cfg_graph, node, visited, dfs_vec);
         }
     }
 }

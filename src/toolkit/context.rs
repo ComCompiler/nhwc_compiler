@@ -63,15 +63,15 @@ impl Context{
             }
             generate_png_by_graph(&context.scope_tree, "scope_tree".to_string(),&[Config::EdgeNoLabel]);
         }
-        // //4.对cfg生成对应的nhwc ir，以及生成et
-        // parse_cfg_into_nhwc_cfg(&mut context);
-        // //4.1可视化
-        // if is_generate_pngs{
-        //     for cfg_node in context.cfg_graph.node_weights_mut(){
-        //         cfg_node.load_ast_node_text(&context.ast_tree)
-        //     }
-        //     generate_png_by_graph(&context.cfg_graph,"nhwc_cfg_graph".to_string(),&[]);
-        // }
+        //4.对cfg生成对应的nhwc ir，以及生成et
+        parse_cfg_into_nhwc_cfg(&mut context);
+        //4.1可视化
+        if is_generate_pngs{
+            for cfg_node in context.cfg_graph.node_weights_mut(){
+                cfg_node.load_ast_node_text(&context.ast_tree)
+            }
+            generate_png_by_graph(&context.cfg_graph,"nhwc_cfg_graph".to_string(),&[]);
+        }
 
         context
     }
