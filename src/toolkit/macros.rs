@@ -46,11 +46,11 @@ macro_rules! find {
             iter.next()
         }
     };
-    (field $field_id:ident as $field_type:ident in $symbol:ident) => {
+    (field $field_id:ident:$field_type:ident in $symbol:ident) => {
         {
             {
                 let field = $symbol.get_field(stringify!($field_id)).unwrap();
-                match field.as_any().downcast_mut::<$field_type>(){
+                match field.as_any().downcast_ref::<$field_type>(){
                     Some(data_type) => {
                         data_type
                     },
@@ -59,20 +59,54 @@ macro_rules! find {
             }
         }
     };
-    (mut field $field_id:ident as $field_type:ident in $symbol:ident) => {
+    (field mut $field_name:ident:$field_type:ident in $symbol:ident) => {
         {
             {
-                let field = $symbol.get_field_mut(stringify!($field_id)).unwrap();
+                let field = $symbol.get_field_mut(stringify!($field_name)).unwrap();
                 match field.as_any().downcast_mut::<$field_type>(){
                     Some(data_type) => {
                         data_type
                     },
-                    None => panic!(concat!("这个field ",stringify!(field_id), "不是",stringify!($field_type), "类型")),
+                    None => panic!(concat!("这个field ",stringify!(field_name), "不是",stringify!($field_type), "类型")),
                 }
             }
         }
-    }
-    
+    };
+
+    (field $field_name:ident:$field_type:ident at $symbol_index:ident in $symtab:ident ) => {
+        {
+            let field:Option<&Box<dyn Field>> = $symtab
+                .get_mut(&$symbol_index)
+                .expect(format!("在符号表中找不到{:?}这个符号",$symbol_index) .as_str())
+                .get_field($field_name);
+            let op_field_data =match field{
+                Some(value)=>{
+                    Some(value.as_any().downcast_ref::<$field_type>().expect(format!("symbol {:?} 的 field {}不是这个类型",$symbol_index,$field_name).as_str()))
+                }
+                None=>{
+                    None   
+                }
+            };
+            op_field_data
+        }
+    };
+    (field mut $field_name:ident:$field_type:ident at $symbol_index:ident in $symtab:ident ) => {
+        {
+            let field:Option<&Box<dyn Field>> = $symtab
+                .get_mut(&$symbol_index)
+                .expect(format!("在符号表中找不到{:?}这个符号",$symbol_index) .as_str())
+                .get_field($field_name);
+            let op_field_data =match field{
+                Some(value)=>{
+                    Some(value.as_any().downcast_mut::<$field_type>().expect(format!("symbol {:?} 的 field {}不是这个类型的",$symbol_index,$field_name).as_str()))
+                }
+                None=>{
+                    None   
+                }
+            };
+            op_field_data
+        }
+    };
 }
 
 /// ? 返回下一层找到的第一个rule_id符合的节点，使用这个宏的时候必须确保语境中有ast_tree和node
@@ -133,7 +167,6 @@ macro_rules! find_nodes {
             nodes
         }
     };
-
 }
 
 /// 这个宏返回指定节点下dfs的遍历筛选结果迭代器
@@ -244,7 +277,7 @@ macro_rules! add_node_with_edge{
 /// add_symbol(x with fields {a_name:a,b_name:b,c_name:c} to some_symtab)
 #[macro_export] 
 macro_rules! add_symbol {
-    ($symbol:ident with field {$field_name:ident:$field_value:expr} to $symtab:ident ) => {
+    ($symbol:ident with field $field_name:ident:{$field_value:expr} to $symtab:ident ) => {
         let symbol_index = symtab.add(symbol);
         symtab.get_mut(symbol_index).unwrap().add_field($field_name,Box::new(field_value));
         symbol_index
@@ -256,33 +289,15 @@ macro_rules! add_symbol {
         }
     };
 }
-/// 这个宏会返回一个Option 表示是否在这个符号内找到了指定的field
-#[macro_export]
-macro_rules! find_field {
-    ({$field_name:ident:$field_type:ty} at $symbol_index:ident in $symtab:ident ) => {
-        {
-            let field:Option<&Box<dyn Field>> = $symtab
-                .get_mut(&$symbol_index)
-                .expect(format!("在符号表中找不到{:?}这个符号",$symbol_index) .as_str())
-                .get_field($field_name);
-            let op_field_data =match field{
-                Some(value)=>{
-                    Some(value.as_any().downcast_ref::<$field_type>().expect(format!("symbol {:?} 的 field {}不是这个类型的",$symbol_index,$field_name).as_str()))
-                }
-                None=>{
-                    None   
-                }
-            };
-            op_field_data
-        }
-    };
-}
-/// add_fields({a_name,})
-/// add_field(a_name)
+/// add_field({a_name,})
+/// 如果发现你想添加的field 已经存在则会直接 panic 
 #[macro_export]
 macro_rules! add_field {
-    ({$field_name:ident:$field:expr} to $symidx:ident in $symtab:ident) => {
+    ($field_name:ident:{$field:expr} to $symidx:ident in $symtab:ident) => {
         $symtab.get_mut(&$symidx).unwrap().add_field($field_name,Box::new($field));
+    };
+    ($field_name:ident:{$field:expr} to $symbol:ident) => {
+        $symbol:add_field($field_name,Box::new($field));
     };
 }
 

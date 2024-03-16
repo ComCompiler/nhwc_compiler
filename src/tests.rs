@@ -8,7 +8,7 @@ mod tests{
     use petgraph::{dot::Config, graph::NodeIndex, visit::Data};
     
     
-    use crate::{add_field, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compilationUnit, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_field, find_nodes, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, gen_scope::parse_ast_to_scope, instruction::Instruction, scope_node::ScopeTree, symbol_field::{DataType, Field}, symbol_table::{Fields, Symbol, SymbolIndex, SymbolTable}}, Cli};
+    use crate::{add_field, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compilationUnit, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, gen_scope::parse_ast_to_scope, instruction::Instruction, scope_node::ScopeTree, symbol_field::{DataType, Field}, symbol_table::{Fields, Symbol, SymbolIndex, SymbolTable}}, Cli};
 
     #[test]
     fn add(){
@@ -158,9 +158,10 @@ mod tests{
             Some(x) => {println!("找到了符号 x"); x},
             None => {panic!( "没有找到符号 x ");},
         };
-        add_field!({TYPE:DataType::I32} to x in symtab);
-        let data_type= find_field!({TYPE:DataType} at x in symtab);
-        println!("{:?}" ,find_field!({TYPE:DataType} at x in symtab));
+
+        add_field!(TYPE:{DataType::I32} to x in symtab);
+        let data_type= find!(field TYPE:DataType at x in symtab);
+        println!("{:?}" ,data_type);
     }
     #[test]
     fn try_instruction_fmt(){
