@@ -1,13 +1,14 @@
 
 #[cfg(test)]
 mod tests{
+    use core::panic;
     use std::{path::PathBuf, str::FromStr, vec};
 
     use clap::Parser;
     use petgraph::{dot::Config, graph::NodeIndex, visit::Data};
     
     
-    use crate::{antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compilationUnit, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, gen_scope::parse_ast_to_scope, instruction::Instruction, scope_node::ScopeTree, symbol_field::{DataType, Field}, symbol_table::{Symbol, Fields, SymbolIndex, SymbolTable}}, Cli};
+    use crate::{add_field, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compilationUnit, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_field, find_nodes, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, gen_scope::parse_ast_to_scope, instruction::Instruction, scope_node::ScopeTree, symbol_field::{DataType, Field}, symbol_table::{Fields, Symbol, SymbolIndex, SymbolTable}}, Cli};
 
     #[test]
     fn add(){
@@ -147,21 +148,19 @@ mod tests{
 
     #[test]
     fn find_symbol_macro_test(){
-        let field_name = "type";
+        const TYPE:&str = "type";
         let mut symtab = SymbolTable::new();
-
-        let x_symbol_index = symtab.add(Symbol::new(0, "x".to_string()) );
-        let y_symbol_index = symtab.add(Symbol::new(0, "y".to_string()) );
-
-        let x =match symtab.get_mut_verbose("x".to_string(), 0){
+        let x_struct=Symbol::new(0, "x".to_string());
+        let x = add_symbol!(x_struct to symtab);
+        let y_struct = Symbol::new(0, "y".to_string());
+        let y = add_symbol!(y_struct to symtab);
+        let sym_x =match symtab.get_mut_verbose("x".to_string(), 0){
             Some(x) => {println!("找到了符号 x"); x},
             None => {panic!( "没有找到符号 x ");},
         };
-        x.add_field("text", Box::new(DataType::I32));
-        println!("{:?}" ,symtab);
-        
-        
-        
+        add_field!({TYPE:DataType::I32} to x in symtab);
+        let data_type= find_field!({TYPE:DataType} at x in symtab);
+        println!("{:?}" ,find_field!({TYPE:DataType} at x in symtab));
     }
     #[test]
     fn try_instruction_fmt(){

@@ -237,6 +237,55 @@ macro_rules! add_node_with_edge{
         }
     };
 }
+/// add symbol with Some Fields to symtab 
+/// 比如说 将一个 I32 类型的 变量符号 添加到 符号表中，并且返回这个symbol在符号表中的 index 
+/// 要求 field_value 必须实现 Field trait
+/// add_symbol(x with field field_name_A:field_value_A to some_symtab)
+/// add_symbol(x with fields {a_name:a,b_name:b,c_name:c} to some_symtab)
+#[macro_export] 
+macro_rules! add_symbol {
+    ($symbol:ident with field {$field_name:ident:$field_value:expr} to $symtab:ident ) => {
+        let symbol_index = symtab.add(symbol);
+        symtab.get_mut(symbol_index).unwrap().add_field($field_name,Box::new(field_value));
+        symbol_index
+    };
+    ($symbol:ident to $symtab:ident ) => {
+        {
+            let symbol_index = $symtab.add($symbol);
+            symbol_index
+        }
+    };
+}
+/// 这个宏会返回一个Option 表示是否在这个符号内找到了指定的field
+#[macro_export]
+macro_rules! find_field {
+    ({$field_name:ident:$field_type:ty} at $symbol_index:ident in $symtab:ident ) => {
+        {
+            let field:Option<&Box<dyn Field>> = $symtab
+                .get_mut(&$symbol_index)
+                .expect(format!("在符号表中找不到{:?}这个符号",$symbol_index) .as_str())
+                .get_field($field_name);
+            let op_field_data =match field{
+                Some(value)=>{
+                    Some(value.as_any().downcast_ref::<$field_type>().expect(format!("symbol {:?} 的 field {}不是这个类型的",$symbol_index,$field_name).as_str()))
+                }
+                None=>{
+                    None   
+                }
+            };
+            op_field_data
+        }
+    };
+}
+/// add_fields({a_name,})
+/// add_field(a_name)
+#[macro_export]
+macro_rules! add_field {
+    ({$field_name:ident:$field:expr} to $symidx:ident in $symtab:ident) => {
+        $symtab.get_mut(&$symidx).unwrap().add_field($field_name,Box::new($field));
+    };
+}
+
 
 #[macro_export] 
 macro_rules! node {

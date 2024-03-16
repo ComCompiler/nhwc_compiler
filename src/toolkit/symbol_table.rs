@@ -107,6 +107,12 @@ impl Fields for Symbol{
 
 
 impl Symbol {
+    pub fn new_verbose(scope_node:u32 ,symbol_name: String) -> Symbol{
+        Symbol{
+            fields: HashMap::new(),
+            sym_idx : SymbolIndex::new(scope_node, symbol_name)
+        }
+    }
     pub fn new(scope_node:u32 ,symbol_name: String) -> Symbol{
         Symbol{
             fields: HashMap::new(),
