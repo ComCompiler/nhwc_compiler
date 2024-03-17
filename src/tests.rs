@@ -8,7 +8,7 @@ mod tests{
     use petgraph::{dot::Config, graph::NodeIndex, visit::Data};
     
     
-    use crate::{add_field, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compilationUnit, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, gen_scope::parse_ast_to_scope, instruction::Instruction, scope_node::ScopeTree, symbol_field::{DataType, Field}, symbol_table::{FieldsOwner, Symbol, SymbolIndex, SymbolTable}}, Cli};
+    use crate::{add_field, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, gen_ast::parse_as_ast_tree, instruction::Instruction, symbol_field::DataType, symbol_table::{FieldsOwner, Symbol, SymbolTable}}, Cli};
 
     #[test]
     fn add(){
@@ -223,5 +223,17 @@ mod tests{
         let node =find_dfs_rule_ast(ast_tree, 0, RULE_translationUnit).next().unwrap();  
         let nodes = direct_nodes!(at node in ast_tree);
         assert_eq!(nodes.len() , 2 ,"找到的 nodes 数量 不对 {:?}",nodes);
+    }
+    #[test]
+    fn test_eval_et(){
+         let mut args = Cli::parse();
+        // 设置 path 为 demo_calculate.c
+        args.c_file_path = PathBuf::from_str("./demos/demo_calculate.c").unwrap();
+        // let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
+        // let mut context = ContextBuilder::default().code(code).build().unwrap();
+        // let mut et_tree: petgraph::prelude::StableGraph<EtNode<()>, ()> = EtTree::new();
+        // et_tree.add_node(EtNode::<()>::new(EtNakedNode::new_sep(0),()));
+        // println!("{}",eval_et(&mut et_tree,0));
+
     }
 }

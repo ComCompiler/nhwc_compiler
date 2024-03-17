@@ -15,3 +15,4 @@ pub mod gen_et;
 pub mod macros;
 pub mod gen_scope;
 pub mod et_node;
+pub mod eval;
