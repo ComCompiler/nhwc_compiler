@@ -8,7 +8,9 @@ mod tests{
     use petgraph::{dot::Config, graph::NodeIndex, visit::Data};
     
     
-    use crate::{add_field, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, gen_ast::parse_as_ast_tree, instruction::Instruction, symbol_field::DataType, symbol_table::{FieldsOwner, Symbol, SymbolTable}}, Cli};
+    use crate::{add_field, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, gen_ast::parse_as_ast_tree, instruction::Instruction, symbol::Symbol, symbol_field::DataType, symbol_table::SymbolTable}, Cli};
+    use crate::toolkit::symbol::FieldsOwner;
+
 
     #[test]
     fn add(){
