@@ -1,9 +1,10 @@
+use core::panic;
 use std::any::Any;
 
 use clap::value_parser;
 use petgraph::{adj::NodeIndex, visit::{self, Dfs, Walker}};
 
-use crate::{direct_nodes, node};
+use crate::{direct_nodes, node, toolkit::symbol_table::SymbolIndex};
 
 use super::{ast_node::{find_dfs_rule_ast, AstTree}, cfg_node::GetText, et_node::{self, EtNakedNode, EtNode, EtTree}};
 
@@ -33,53 +34,63 @@ pub fn dfs_et_tree(et_tree:&mut EtTree, et_node: u32, visited:&mut Vec<u32>, dfs
         dfs_et_tree(et_tree, *sub_node, visited, dfs_vec);
     }
 }
-pub fn eval_et(et_tree:&mut EtTree , Operator_node:u32 ) ->u32 {
-    // 读取运算符   direct_nodes!宏
-    // 运算         match et_node的ExprOp                     ✓    
-    // 更改ettree,使节点直接指向运算结果        递归实现
+pub fn eval_et(et_tree:&mut EtTree , operator_et_node:u32 ) ->u32 {
     let mut value = 0;
 
-    let mut sub_nodes=direct_nodes!(at Operator_node in et_tree);
-    
     // 每个节点分两种情况,constant 或者 operator
-    for sub_node in sub_nodes {
-        value = match node!(at sub_node in et_tree){
-            EtNode { et_naked_node: EtNakedNode::Constant { const_sym_idx, ast_node, text: cons }, info } => {
-                //获取constant节点的值
-
-                // let value=node!(at sub_node in et_tree).get_text().unwrap().parse::<u32>().unwrap();
-                println!("constant value:{}",cons);
-                cons.parse::<u32>().unwrap()
+    for sub_node in direct_nodes!(at operator_et_node in et_tree) {
+        let var_name = match node!(at sub_node in et_tree).clone().et_naked_node{
+        // let value = match node!(at Operator_node in et_tree){
+            EtNakedNode::Constant { const_sym_idx, ast_node, text } => {
+                
+                let constant_value: u32 = const_sym_idx.symbol_name.parse::<u32>().unwrap();
+                println!(" 111 constant value:{:?}",constant_value);
+                constant_value
             },
             
-            EtNode { et_naked_node: EtNakedNode::Operator { ast_node, text, op }, info } =>{
+            EtNakedNode::Operator { ast_node, text, op } =>{
                 
                 // 1递归调用
-                let sub_node_value= eval_et(et_tree, sub_node);
+                // let sub_node_value=eval_et(et_tree, sub_node) ;
+                // println!("op value {:?}",sub_node_value);
+                println!(" 222 匹配到了Operator {:?}" , op);
+                // 2获取operator节点的子节点
+                let sub_sub_nodes=direct_nodes!(at sub_node in et_tree);//里面的u32是节点编号
 
-                // 2获取operator节点的值     etnode里面的text就是里面的值
-                println!("op valur{:?}",sub_node_value);
+                // 3 计算子节点的值
+                let mut sub_sub_nodes_symbol_idx: Vec<SymbolIndex> = Vec::new();
+                for sub_sub_node in sub_sub_nodes{
+                    match node!(at sub_sub_node in et_tree).clone().et_naked_node {
+                        EtNakedNode::Constant { const_sym_idx, ast_node, text } => {
+                            println!("计算孙子节点的Constant");
+                            println!(" 333 sub_sub_node中 {:?}",const_sym_idx);
+                            sub_sub_nodes_symbol_idx.push(const_sym_idx)
+                            
+                        },
+                        EtNakedNode::Operator { op, ast_node, text } => {
+                            println!("计算孙子节点的Operator");
+                            sub_sub_nodes_symbol_idx.push(
+                                SymbolIndex::new(0,
+                                    eval_et(et_tree, sub_sub_node).to_string()))
 
-                // 3获取operator节点的子节点
-                let sub_nodes=direct_nodes!(at sub_node in et_tree);
+
+                        }
+                        // EtNakedNode::Symbol { sym_idx, ast_node, text, def_or_use } => todo!(),
+                        // EtNakedNode::Separator { ast_node, text } => todo!(),
+                        _ => panic!("有问题")
+                    }
+                    
+                }
                 
-
-                // 4计算子节点结果并返回
-                // return op.clone().eval_sub_et_nodes(&sub_nodes)
-                sub_node_value
-                
-                // 问题      当一条路走到头,到了constant,怎么把这个值返回到上一层迭代中的Vec中去
-                //           在哪里使用eval_sub_et_nodes?怎么更新这个Vec?怎么把下一层传来的已经计算的值加入进去?
-
+                // 3计算子节点结果并返回
+                println!(" 444 sub_sub_nodes_symbol_idx 为{:?}", sub_sub_nodes_symbol_idx);
+                op.clone().eval_sub_et_nodes(et_tree,&sub_sub_nodes_symbol_idx)
 
             }
             _ => 
-                panic!("错误的 EtNode 类型 !"),
+                    panic!("错误的 EtNode 类型 !")
         };
-        // break;
-        
     }
+    println!(" 555 本次递归调用后,返回value的值为    {:?}",value);
     value
-    // for sub_node in sub_nodes {
-    //     eval_et(et_tree, sub_node);
 }

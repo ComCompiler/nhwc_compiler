@@ -1,5 +1,5 @@
 use std::fmt::Debug;
-use std::mem;
+use std::{mem, u32};
 
 use petgraph::stable_graph::{NodeIndex, StableDiGraph};
 use crate::node;
@@ -72,6 +72,52 @@ pub enum ExprOp{
     PlusAssign,
     MinusAssign,
     ArrayIndex,
+}
+impl ExprOp{
+    /// 传入的vec的内部是节点在et_tree里的节点序号
+    /// 作用是
+    pub fn eval_sub_et_nodes(&self ,et_tree:&mut EtTree, vec:&Vec<SymbolIndex>) -> u32{
+        match &self {
+            ExprOp::Mul => vec[0].symbol_name.parse::<u32>().unwrap() * vec[1].symbol_name.parse::<u32>().unwrap(),
+            ExprOp::Add => vec[0].symbol_name.parse::<u32>().unwrap() + vec[1].symbol_name.parse::<u32>().unwrap(),
+            ExprOp::Sub => vec[0].symbol_name.parse::<u32>().unwrap() - vec[1].symbol_name.parse::<u32>().unwrap(),
+            ExprOp::Div => vec[0].symbol_name.parse::<u32>().unwrap() / vec[1].symbol_name.parse::<u32>().unwrap(),
+            ExprOp::Assign => todo!(),
+            ExprOp::LogicalOr => todo!(),
+            ExprOp::LogicalAnd => todo!(),
+            ExprOp::LogicalNot => todo!(),
+            ExprOp::BitwiseOr => todo!(),
+            ExprOp::BitwiseAnd => todo!(),
+            ExprOp::BitwiseXor => todo!(),
+            ExprOp::BitwiseNot => todo!(),
+            ExprOp::Eq => todo!(),
+            ExprOp::NEq => todo!(),
+            ExprOp::Less => todo!(),
+            ExprOp::Greater => todo!(),
+            ExprOp::LEq => todo!(),
+            ExprOp::GEq => todo!(),
+            ExprOp::LShift => todo!(),
+            ExprOp::RShift => todo!(),
+            ExprOp::Mod => todo!(),
+            ExprOp::Cast => todo!(),
+            ExprOp::Call => todo!(),
+            ExprOp::Negative => todo!(),
+            ExprOp::Positive => todo!(),
+            ExprOp::AddrOf => todo!(),
+            ExprOp::Deref => todo!(),
+            ExprOp::DotMember => todo!(),
+            ExprOp::ArrowMember => todo!(),
+            ExprOp::LPlusPlus => todo!(),
+            ExprOp::RPlusPlus => todo!(),
+            ExprOp::LMinusMinus => todo!(),
+            ExprOp::RMinusMinus => todo!(),
+            ExprOp::MulAssign => todo!(),
+            ExprOp::DivAssign => todo!(),
+            ExprOp::PlusAssign => todo!(),
+            ExprOp::MinusAssign => todo!(),
+            ExprOp::ArrayIndex => todo!(),
+        }
+    }
 }
 impl Debug for ExprOp{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
