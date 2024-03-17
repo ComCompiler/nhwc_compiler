@@ -44,7 +44,7 @@ fn main() {
     let mut context = timeit!({Context::init(args,true)} , "init");
     // test
     // args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
-    let mut et_tree = EtTree::<()>::new();
+    let mut et_tree = EtTree::new();
     //dfs遍历ast找到第一个 expr stmt
     let mut nodes: Vec<u32> = vec![];
     nodes.extend(find_dfs_rule_ast(&context.ast_tree, 0, RULE_declaration));  
