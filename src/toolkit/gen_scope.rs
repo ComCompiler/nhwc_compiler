@@ -45,11 +45,8 @@ pub fn process_statement(scope_tree:&mut ScopeTree,ast_tree:&AstTree,scope_paren
             process_selection(scope_tree, ast_tree, scope_parent, selection_node,ast2scope)
         }
         (RULE_expressionStatement,expressionstatment_node) => {
-            let assign_exprs = find_nodes!(rule RULE_expression finally RULE_assignmentExpression at expressionstatment_node in ast_tree);
-            for assign_expr in assign_exprs{
-                let scope_expr = add_node_with_edge!({ScopeNode{ast_node:assign_expr,text:String::new(),parent:scope_parent}} from scope_parent in scope_tree);
-            ast2scope.insert(expressionstatment_node, scope_expr);
-            }
+            let scope_expr = add_node_with_edge!({ScopeNode{ast_node:expressionstatment_node,text:String::new(),parent:scope_parent}} from scope_parent in scope_tree);
+                ast2scope.insert(expressionstatment_node, scope_expr);
         }
         (RULE_labeledStatement,label_node) => {
             let scope_label_node = add_node_with_edge!({ScopeNode{ast_node:label_node,text:String::new(),parent:scope_parent}} from scope_parent in scope_tree);
@@ -195,11 +192,8 @@ pub fn process_compound(scope_tree:&mut ScopeTree,ast_tree:&AstTree,scope_parent
                 process_statement(scope_tree, ast_tree, scope_compound_node, statement_node,ast2scope);
             }
             (RULE_declaration,declaration_node) => {
-                let initdecl_nodes = find_nodes!(rule RULE_initDeclaratorList finally RULE_initDeclarator at declaration_node in ast_tree);
-                for initdecl_node in initdecl_nodes{
-                    let scope_decl = add_node_with_edge!({ScopeNode{ast_node:initdecl_node,text:String::new(),parent:scope_compound_node}} from scope_compound_node in scope_tree);
+                let scope_decl = add_node_with_edge!({ScopeNode{ast_node:declaration_node,text:String::new(),parent:scope_compound_node}} from scope_compound_node in scope_tree);
                     ast2scope.insert(declaration_node, scope_decl);
-                }
             }
             (_,_) => {
                 panic!("不属于declaration或statement,ast出错");

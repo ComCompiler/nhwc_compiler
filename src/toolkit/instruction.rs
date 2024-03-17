@@ -242,11 +242,11 @@ impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
             Self::Phi { lhs, rhs } => 
                 write!(f,""),
             Self::SimpleAssign { lhs, rhs }=>
-                write!(f,"{}={}",lhs.symbol_name,rhs.symbol_name),
+                write!(f,"Assign {},{}",lhs.symbol_name,rhs.symbol_name),
             Self::Deffun { funname, rettype, paralst } =>
-                write!(f,"{} {} {} {:?}","define",rettype.symbol_name,funname.symbol_name,paralst),
+                write!(f,"FunDef {} {} {:?}",rettype.symbol_name,funname.symbol_name,paralst),
             Self::Defvar { varname, vartype, value }=>
-                write!(f,"define {} %{} = {}",vartype.symbol_name,varname.symbol_name,value.symbol_name),
+                write!(f,"VarDef {} %{} = {}",vartype.symbol_name,varname.symbol_name,value.symbol_name),
         }
     }            
 }
