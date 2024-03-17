@@ -360,6 +360,11 @@ macro_rules! node {
             $graph.node_weight(NodeIndex::from($node)).expect("找不到 index 对应的 node ")
         }
     };
+    (at $node:block in $graph:ident) => {
+        {
+            $graph.node_weight(NodeIndex::from($node)).expect("找不到 index 对应的 node ")
+        }
+    };
 }
 
 #[macro_export] 
