@@ -4,6 +4,9 @@ use std::collections::{BTreeMap, HashMap};
 
 use super::symbol_field::{self, Field};
 use core::fmt::Debug;
+
+pub type Fields =  HashMap<&'static str,Box<dyn Field>>;
+
 #[derive(Debug,Clone)]
 pub struct SymbolTable {
     map: BTreeMap<SymbolIndex,Symbol >,
@@ -28,12 +31,12 @@ impl SymbolTable {
     }
 
     // 添加或更新符号，如果是更新，那么返回旧的符号
-    pub fn add(&mut self, symbol: Symbol) -> SymbolIndex{
-        let symbol_index = symbol.sym_idx.clone();
-        let retured_symbol_index = symbol_index.clone(); 
-        match self.map.insert(symbol_index,symbol){
-            None =>{retured_symbol_index},
-            Some(_) => panic!( "symtab插入失败,你这个表中已经存在同名称同scope的符号了,你必须先remove 掉它"), // do nothing , 插入成功，里面没有同scope的同名符号
+    pub fn add(&mut self, sym: Symbol) -> SymbolIndex{
+        let symidx = sym.sym_idx.clone();
+        let symidx_cloned = sym.sym_idx.clone();
+        match self.map.insert(symidx,sym){
+            None =>{symidx_cloned},
+            Some(_) => panic!( "symtab插入失败,你这个表中已经存在同名称同scope的符号{:?}了,你必须先remove 掉它",symidx_cloned), // do nothing , 插入成功，里面没有同scope的同名符号
         }
     }
 
@@ -44,7 +47,7 @@ impl SymbolTable {
     pub fn get(&self, symbol_index : &SymbolIndex) -> Option<&Symbol> {
         self.map.get(symbol_index)
     }
-    pub fn get_mut_verbose(&mut self, symbol_name:String ,  scope_node : u32) -> Option<&mut Symbol> {
+    pub fn get_verbose_mut(&mut self, symbol_name:String ,  scope_node : u32) -> Option<&mut Symbol> {
         self.map.get_mut(&SymbolIndex { scope_node ,  symbol_name} )
     }
     pub fn get_mut(&mut self, symbol_index : &SymbolIndex) -> Option<&mut Symbol> {
@@ -68,15 +71,15 @@ impl Default for SymbolTable{
 
 #[derive(Clone)]
 pub struct Symbol{
-    pub fields :  HashMap<&'static str,Box<dyn Field>>,
+    pub fields :  Fields,
     pub sym_idx : SymbolIndex,
 }
 impl Debug for Symbol{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"{:?}",self.sym_idx.symbol_name)
+        write!(f,"{{{:?} fields:{:?}}}",self.sym_idx.symbol_name,self.fields)
     }
 }
-pub trait Fields{
+pub trait FieldsOwner{
     fn add_field(&mut self,key :&'static str,sf:Box<dyn Field>);
     fn remove_field(&mut self, field_name : &'static str);
     fn get_field(&self,key: &str) -> Option<&Box<dyn Field>>;
@@ -90,7 +93,7 @@ impl Clone for Box<dyn Field>{
     }
 }
 ///动态添加字段，如
-impl Fields for Symbol{
+impl FieldsOwner for Symbol{
     fn add_field(&mut self,key :&'static str,sf:Box<dyn Field>) {
         self.fields.insert(key, sf);
     }

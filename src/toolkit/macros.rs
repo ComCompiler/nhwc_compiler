@@ -29,11 +29,8 @@ macro_rules! find {
             find!(term $fin_id at new_node in $ast_tree)
         }
     };
-    (symbol $symbol_name:ident at $scope_node:ident  in $symtab:ident) => {
-        {
-            $symtab.get_verbose($symbol_name , $scope_node)
-        }
-    };
+
+
     (term $term_name:ident at $node:ident in $ast_tree:ident) => {
         {
             let mut iter  = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,Some($term_name));
@@ -46,42 +43,52 @@ macro_rules! find {
             iter.next()
         }
     };
-    (field $field_id:ident:$field_type:ident in $symbol:ident) => {
+    (field $field_id:ident:$field_type:ident in $sym:ident) => {
         {
-            {
-                let field = $symbol.get_field(stringify!($field_id)).unwrap();
-                match field.as_any().downcast_ref::<$field_type>(){
-                    Some(data_type) => {
-                        data_type
-                    },
-                    None => panic!(concat!("这个field ",stringify!(field_id), "不是",stringify!($field_type), "类型")),
+            let op_field = $sym.get_field(stringify!($field_id));
+            match op_field {
+                None=>{
+                    None
+                }
+                Some(field)=>{
+                    match field.as_any().downcast_ref::<$field_type>(){
+                        Some(data) => {
+                            Some(data)
+                        },
+                        None => panic!(concat!("这个field ",stringify!(field_id), "不是",stringify!($field_type), "类型")),
+                    }
                 }
             }
         }
     };
-    (field mut $field_name:ident:$field_type:ident in $symbol:ident) => {
+    (field mut $field_name:ident:$field_type:ident in $sym:ident) => {
         {
-            {
-                let field = $symbol.get_field_mut(stringify!($field_name)).unwrap();
-                match field.as_any().downcast_mut::<$field_type>(){
-                    Some(data_type) => {
-                        data_type
-                    },
-                    None => panic!(concat!("这个field ",stringify!(field_name), "不是",stringify!($field_type), "类型")),
+            let op_field = $sym.get_field_mut(stringify!($field_id));
+            match op_field {
+                None=>{
+                    None
+                }
+                Some(field)=>{
+                    match field.as_any().downcast_mut::<$field_type>(){
+                        Some(data) => {
+                            Some(data)
+                        },
+                        None => panic!(concat!("这个field ",stringify!(field_id), "不是",stringify!($field_type), "类型")),
+                    }
                 }
             }
         }
     };
 
-    (field $field_name:ident:$field_type:ident at $symbol_index:ident in $symtab:ident ) => {
+    (field $field_name:ident:$field_type:ident at $symidx:ident in $symtab:ident ) => {
         {
             let field:Option<&Box<dyn Field>> = $symtab
-                .get_mut(&$symbol_index)
-                .expect(format!("在符号表中找不到{:?}这个符号",$symbol_index) .as_str())
+                .get_mut(&$symidx)
+                .expect(format!("在符号表中找不到{:?}这个符号",$symidx) .as_str())
                 .get_field($field_name);
             let op_field_data =match field{
                 Some(value)=>{
-                    Some(value.as_any().downcast_ref::<$field_type>().expect(format!("symbol {:?} 的 field {}不是这个类型",$symbol_index,$field_name).as_str()))
+                    Some(value.as_any().downcast_ref::<$field_type>().expect(format!("symbol {:?} 的 field {}不是这个类型",$symidx,$field_name).as_str()))
                 }
                 None=>{
                     None   
@@ -90,21 +97,51 @@ macro_rules! find {
             op_field_data
         }
     };
-    (field mut $field_name:ident:$field_type:ident at $symbol_index:ident in $symtab:ident ) => {
+    (field mut $field_name:ident:$field_type:ident at $symidx:ident in $symtab:ident ) => {
         {
             let field:Option<&Box<dyn Field>> = $symtab
-                .get_mut(&$symbol_index)
-                .expect(format!("在符号表中找不到{:?}这个符号",$symbol_index) .as_str())
+                .get_mut(&$symidx)
+                .expect(format!("在符号表中找不到{:?}这个符号",$symidx) .as_str())
                 .get_field($field_name);
             let op_field_data =match field{
                 Some(value)=>{
-                    Some(value.as_any().downcast_mut::<$field_type>().expect(format!("symbol {:?} 的 field {}不是这个类型的",$symbol_index,$field_name).as_str()))
+                    Some(value.as_any().downcast_mut::<$field_type>().expect(format!("symbol {:?} 的 field {}不是这个类型的",$symidx,$field_name).as_str()))
                 }
                 None=>{
                     None   
                 }
             };
             op_field_data
+        }
+    };
+    (symbol $sym_name:ident of scope $scope_node:ident  in $symtab:ident) => {
+        {
+            $symtab.get_verbose($sym_name , $scope_node)
+        }
+    };
+    (symbol mut $sym_name:ident of scope $scope_node:ident  in $symtab:ident) => {
+        {
+            $symtab.get_verbose_mut($sym_name , $scope_node)
+        }
+    };
+    (symbol $sym_name:block of scope $scope_node:block  in $symtab:ident) => {
+        {
+            $symtab.get_verbose($sym_name , $scope_node)
+        }
+    };
+    (symbol mut $sym_name:block of scope $scope_node:block  in $symtab:ident) => {
+        {
+            $symtab.get_verbose_mut($sym_name , $scope_node)
+        }
+    };
+    (symbol at $symidx:ident  in $symtab:ident) => {
+        {
+            $symtab.get_verbose($sym_name , $scope_node)
+        }
+    };
+    (symbol mut at $symidx:ident  in $symtab:ident) => {
+        {
+            $symtab.get_mut(&$symidx)
         }
     };
 }
@@ -277,15 +314,29 @@ macro_rules! add_node_with_edge{
 /// add_symbol(x with fields {a_name:a,b_name:b,c_name:c} to some_symtab)
 #[macro_export] 
 macro_rules! add_symbol {
-    ($symbol:ident with field $field_name:ident:{$field_value:expr} to $symtab:ident ) => {
-        let symbol_index = symtab.add(symbol);
-        symtab.get_mut(symbol_index).unwrap().add_field($field_name,Box::new(field_value));
-        symbol_index
-    };
-    ($symbol:ident to $symtab:ident ) => {
+    ($sym:ident $(with field $field_name:ident:$field_value:block)? to $symtab:ident ) => {
         {
-            let symbol_index = $symtab.add($symbol);
-            symbol_index
+            let symidx = $symtab.add($symbol);
+            $(
+                let sym =  $symtab.get_mut(&symidx).unwrap();
+                sym.add_field($field_name,Box::new(field_value));
+            )?
+            symidx
+        }
+    };
+    ($sym:block $(with field $field_name:ident:$field_value:block)? to $symtab:ident ) => {
+        {
+            let symidx = $symtab.add($sym);
+            $($symtab.get_mut($symidx).unwrap().add_field($field_name,Box::new($field_value));)?
+            symidx
+        }
+    };
+    ($sym_name:block of scope $scope:block $(with field $field_name:ident:{$field_value:expr})? to $symtab:ident ) => {
+        {
+            let sym = Symbol::new_verbose($scope,$sym_name);
+            $(sym.add_field($field_name,Box::new($field_value));)?
+            let symidx = $symtab.add(sym);
+            symidx
         }
     };
 }
@@ -296,8 +347,8 @@ macro_rules! add_field {
     ($field_name:ident:{$field:expr} to $symidx:ident in $symtab:ident) => {
         $symtab.get_mut(&$symidx).unwrap().add_field($field_name,Box::new($field));
     };
-    ($field_name:ident:{$field:expr} to $symbol:ident) => {
-        $symbol:add_field($field_name,Box::new($field));
+    ($field_name:ident:{$field:expr} to $sym:ident) => {
+        $sym:add_field($field_name,Box::new($field));
     };
 }
 

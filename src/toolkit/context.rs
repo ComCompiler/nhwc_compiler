@@ -16,7 +16,7 @@ pub struct Context{
     pub symtab : SymbolTable,
     pub scope_tree : ScopeTree,
     pub nhwc_cfg : CfgGraph,
-    pub et_tree:EtTree<()>,
+    pub et_tree:EtTree,
     pub ast2scope:HashMap<u32,u32>,
 }
 impl Context{

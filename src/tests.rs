@@ -8,7 +8,7 @@ mod tests{
     use petgraph::{dot::Config, graph::NodeIndex, visit::Data};
     
     
-    use crate::{add_field, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compilationUnit, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, gen_scope::parse_ast_to_scope, instruction::Instruction, scope_node::ScopeTree, symbol_field::{DataType, Field}, symbol_table::{Fields, Symbol, SymbolIndex, SymbolTable}}, Cli};
+    use crate::{add_field, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compilationUnit, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, gen_scope::parse_ast_to_scope, instruction::Instruction, scope_node::ScopeTree, symbol_field::{DataType, Field}, symbol_table::{FieldsOwner, Symbol, SymbolIndex, SymbolTable}}, Cli};
 
     #[test]
     fn add(){
@@ -85,10 +85,12 @@ mod tests{
 
         //dfs遍历ast
         let node =find_dfs_rule_ast(ast_tree, 0, RULE_functionDefinition).next().unwrap();  // 三号节点是一个 function def 
-        let node_ids:Vec<u32>= find_nodes!(rule RULE_compoundStatement  //起始节点a
-                                           then RULE_blockItemList      //经过节点b
-                                    finally RULE_blockItem       //寻找节点b的所有属性为c的子节点
-                                              at node in ast_tree);
+        let node_ids= find_nodes!(
+            rule RULE_compoundStatement  //起始节点a
+            then RULE_blockItemList      //经过节点b
+            finally RULE_blockItem       //寻找节点b的所有属性为c的子节点
+            at node in ast_tree
+        );
         assert_eq!(node_ids , vec![17,34,152] ,"找到的 node id 不对");
     }
     #[test]
@@ -113,8 +115,8 @@ mod tests{
     fn find_symbol(){
         let mut symtab = SymbolTable::new();
 
-        let x_symbol_index = symtab.add(Symbol::new(0, "x".to_string()) );
-        let y_symbol_index = symtab.add(Symbol::new(0, "y".to_string()) );
+        let x = symtab.add(Symbol::new(0, "x".to_string()) );
+        let y = symtab.add(Symbol::new(0, "y".to_string()) );
 
         match symtab.get_verbose("x".to_string(), 0){
             Some(_) => {println!("找到了符号 x")},
@@ -135,10 +137,10 @@ mod tests{
         let field_name = "type";
         let mut symtab = SymbolTable::new();
 
-        let x_symbol_index = symtab.add(Symbol::new(0, "x".to_string()) );
-        let y_symbol_index = symtab.add(Symbol::new(0, "y".to_string()) );
+        let x = symtab.add(Symbol::new(0, "x".to_string()) );
+        let y = symtab.add(Symbol::new(0, "y".to_string()) );
 
-        match symtab.get(&x_symbol_index){
+        match symtab.get(&x){
             Some(_) => {println!("找到了符号 x")},
             None => {panic!( "没有找到符号 x ");},
         }
@@ -150,31 +152,29 @@ mod tests{
     fn find_symbol_macro_test(){
         const TYPE:&str = "type";
         let mut symtab = SymbolTable::new();
-        let x_struct=Symbol::new(0, "x".to_string());
-        let x = add_symbol!(x_struct to symtab);
-        let y_struct = Symbol::new(0, "y".to_string());
-        let y = add_symbol!(y_struct to symtab);
-        let sym_x =match symtab.get_mut_verbose("x".to_string(), 0){
+
+        let x = add_symbol!({Symbol::new_verbose(0, "x".to_string())} to symtab );
+        let y = add_symbol!({Symbol::new_verbose(0, "y".to_string())} to symtab);
+
+        add_field!(TYPE:{DataType::I32} to x in symtab);
+        let x_sym =match find!(symbol mut at x in symtab){
             Some(x) => {println!("找到了符号 x"); x},
             None => {panic!( "没有找到符号 x ");},
         };
 
-        add_field!(TYPE:{DataType::I32} to x in symtab);
-        let data_type= find!(field TYPE:DataType at x in symtab);
-        println!("{:?}" ,data_type);
+        let data_type= find!(field TYPE:DataType in x_sym);
+        println!("x_sym {:?}" ,x_sym);
     }
     #[test]
     fn try_instruction_fmt(){
         let mut symtab = SymbolTable::new();
 
-        let lhs_symbol_index = symtab.add(Symbol::new(0, "lhs".to_string()) );
-        let a_symbol_index = symtab.add(Symbol::new(0, "No.1".to_string()) );
-        let b_symbol_index = symtab.add(Symbol::new(0, "No.2".to_string()) );
+        let lhs = add_symbol!({"lhs".to_string()} of scope {0} to symtab);
+        let a = add_symbol!({"No.1".to_string()} of scope {0} to symtab);
+        let b = add_symbol!({"No.2".to_string()} of scope {0} to symtab);
 
-
-
-        let instr=Instruction::new_add(lhs_symbol_index.clone(), a_symbol_index.clone(), b_symbol_index.clone());
-        let instr2 = Instruction::new_mul(lhs_symbol_index.clone(), a_symbol_index.clone(), b_symbol_index.clone());
+        let instr=Instruction::new_add(lhs.clone(), a.clone(), b.clone());
+        let instr2 = Instruction::new_mul(lhs.clone(), a.clone(), b.clone());
         println!("{:?}",instr);
         println!("{:?}",instr2);
     }
@@ -202,7 +202,7 @@ mod tests{
         let mut et_tree = EtTree::new();
         //dfs遍历ast找到第一个 expr stmt
         let expr_stmt_nodes:Vec<u32>=find_dfs_rule_ast(&context.ast_tree, 0, RULE_expressionStatement).collect();  // 三号节点是一个 function def 
-        et_tree.add_node(EtNode::<()>::new(EtNakedNode::new_sep(0),()));
+        et_tree.add_node(EtNode::new(EtNakedNode::new_sep(0)));
         for expr_stmt_node in expr_stmt_nodes{
             toolkit::gen_et::process_any_stmt(&mut et_tree, &context.ast_tree, &context.scope_tree, expr_stmt_node, 0,);
         }

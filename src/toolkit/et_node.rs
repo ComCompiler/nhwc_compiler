@@ -4,9 +4,9 @@ use std::mem;
 use petgraph::stable_graph::{NodeIndex, StableDiGraph};
 use crate::node;
 use super::ast_node::AstTree;
-use super::symbol_table:: SymbolIndex;
+use super::symbol_table::{Fields,  SymbolIndex};
 
-pub type EtTree<Info> = StableDiGraph<EtNode<Info>,(),u32>;
+pub type EtTree = StableDiGraph<EtNode,(),u32>;
 
 #[derive(Clone)]
 pub enum Def_Or_Use{
@@ -28,9 +28,9 @@ pub enum EtNakedNode{
     //需要declarator来声明变量
 }
 #[derive(Clone)]
-pub struct EtNode<Info:Debug+Default+Clone> {
+pub struct EtNode {
     pub et_naked_node:EtNakedNode,
-    pub info : Info
+    pub info : Fields,
 }
 #[derive(Clone)]
 pub enum ExprOp{
@@ -119,8 +119,8 @@ impl Debug for ExprOp{
 }
 
 impl EtNakedNode{
-    pub fn  to_et_node<Info:Debug+Default+Clone>(self)-> EtNode<Info>{
-        EtNode::new(self, Info::default())
+    pub fn  to_et_node(self)-> EtNode{
+        EtNode::new(self)
     }
     pub fn new_op_add(ast_node:u32)->Self{
         EtNakedNode::Operator { op:ExprOp::Add,ast_node,text:String::new()}
@@ -162,10 +162,10 @@ impl EtNakedNode{
         EtNakedNode::Operator { op: ExprOp::BitwiseNot ,ast_node,text:String::new()}
     }
     pub fn new_op_mul_assign(ast_node:u32)->Self{
-    EtNakedNode::Operator { op: ExprOp::MulAssign ,ast_node,text:String::new()}        
+        EtNakedNode::Operator { op: ExprOp::MulAssign ,ast_node,text:String::new()}        
     }
     pub fn new_op_minus_assign(ast_node:u32)->Self{
-    EtNakedNode::Operator { op: ExprOp::MinusAssign,ast_node,text:String::new()}        
+        EtNakedNode::Operator { op: ExprOp::MinusAssign,ast_node,text:String::new()}        
     }
     pub fn new_op_div_assign(ast_node:u32)->Self{
         EtNakedNode::Operator { op: ExprOp::DivAssign ,ast_node,text:String::new()}        
@@ -298,17 +298,17 @@ impl Debug for Def_Or_Use{
     }
 }
 
-impl <Info: Debug+Default + std::clone::Clone> Debug for EtNode<Info>{
+impl  Debug for EtNode{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f,"{:?} {:?}",self.et_naked_node,self.info)
     }
 }
 
-impl <Info:Debug+Default+Clone> EtNode<Info>{
-    pub fn new(et_naked_node:EtNakedNode,info:Info)-> EtNode<Info>{
+impl  EtNode{
+    pub fn new(et_naked_node:EtNakedNode)-> EtNode{
         EtNode{
             et_naked_node,
-            info,
+            info: Fields::new()
         }
     }
     pub fn load_ast_node_text(&mut self,ast_tree: &AstTree) {

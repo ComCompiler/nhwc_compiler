@@ -41,7 +41,7 @@ fn parse_expr2nhwc(){
 fn parse_stmt2nhwc(){
     
 }
-fn parse_bb2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&ScopeTree,et_tree:&mut EtTree<()>,symbol_table:&SymbolTable,ast2scope:&HashMap<u32,u32>,ast_nodes:Vec<u32>,cfg_bb:u32){
+fn parse_bb2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&ScopeTree,et_tree:&mut EtTree,symbol_table:&SymbolTable,ast2scope:&HashMap<u32,u32>,ast_nodes:Vec<u32>,cfg_bb:u32){
     for astnode in ast_nodes{
         match(rule_id!(at astnode in ast_tree),astnode){
             (RULE_declaration,declaration_node)=>{
@@ -57,7 +57,7 @@ fn parse_bb2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&ScopeTre
     }
 }
 
-fn process_ettree(et_tree:&EtTree<()>,scope_tree:&ScopeTree,symbol_table:&SymbolTable,ast2scope:&HashMap<u32,u32>,et_node:u32){
+fn process_ettree(et_tree:&EtTree,scope_tree:&ScopeTree,symbol_table:&SymbolTable,ast2scope:&HashMap<u32,u32>,et_node:u32){
     let nake_et = &node!(at et_node in et_tree).et_naked_node;
     match nake_et{
         EtNakedNode::Separator { ast_node, text }=>{},
@@ -74,7 +74,7 @@ fn process_ettree(et_tree:&EtTree<()>,scope_tree:&ScopeTree,symbol_table:&Symbol
 }
 
 ///定义变量的decl转为ir，并通过et查找元素是否合法
-fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,decl_node:u32,symbol_table:&SymbolTable,scope_tree:&ScopeTree,mut et_tree:&mut EtTree<()>,ast2scope:&HashMap<u32,u32>,ast_decl_node:u32,cfg_bb:u32){
+fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,decl_node:u32,symbol_table:&SymbolTable,scope_tree:&ScopeTree,mut et_tree:&mut EtTree,ast2scope:&HashMap<u32,u32>,ast_decl_node:u32,cfg_bb:u32){
     //获取scope
     if let Some(decl_scope) = ast2scope.get(&ast_decl_node){
         //获得变量类型，做成symidx
@@ -124,7 +124,7 @@ fn parse_while2nhwc(){
 }
 
 ///将函数名存入符号表，将函数签名处理为ir，并处理函数体内的语句
-fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,scope_tree:&ScopeTree,et_tree:&mut EtTree<()>,symbol_table:&mut SymbolTable,ast2scope:&HashMap<u32,u32>,ast_fun:u32,ast_funsign:u32,cfg_entry:u32){
+fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,scope_tree:&ScopeTree,et_tree:&mut EtTree,symbol_table:&mut SymbolTable,ast2scope:&HashMap<u32,u32>,ast_fun:u32,ast_funsign:u32,cfg_entry:u32){
     //获取函数所对应的scopenode
     if let Some(fun_scope) = ast2scope.get(&ast_fun){
         //获取函数名称
