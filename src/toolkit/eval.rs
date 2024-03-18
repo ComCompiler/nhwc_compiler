@@ -36,10 +36,10 @@ pub fn dfs_et_tree(et_tree:&mut EtTree, et_node: u32, visited:&mut Vec<u32>, dfs
 }
 pub fn eval_et(et_tree:&mut EtTree , operator_et_node:u32 ) ->u32 {
     let mut value = 0;
-
+    println!("输入的operator_et_node: {:?}", node!(at operator_et_node in et_tree).clone().et_naked_node);
     // 每个节点分两种情况,constant 或者 operator
     for sub_node in direct_nodes!(at operator_et_node in et_tree) {
-        let var_name = match node!(at sub_node in et_tree).clone().et_naked_node{
+        value = match node!(at sub_node in et_tree).clone().et_naked_node{
         // let value = match node!(at Operator_node in et_tree){
             EtNakedNode::Constant { const_sym_idx, ast_node, text } => {
                 
@@ -57,13 +57,18 @@ pub fn eval_et(et_tree:&mut EtTree , operator_et_node:u32 ) ->u32 {
                 // 2获取operator节点的子节点
                 let sub_sub_nodes=direct_nodes!(at sub_node in et_tree);//里面的u32是节点编号
 
+                // 3.19凌晨尝试修改
+                // op.eval_sub_et_nodes(et_tree, sub_sub_nodes);
+                eval_et(et_tree, sub_node)
+
+                /*
                 // 3 计算子节点的值
                 let mut sub_sub_nodes_symbol_idx: Vec<SymbolIndex> = Vec::new();
                 for sub_sub_node in sub_sub_nodes{
                     match node!(at sub_sub_node in et_tree).clone().et_naked_node {
                         EtNakedNode::Constant { const_sym_idx, ast_node, text } => {
                             println!("计算孙子节点的Constant");
-                            println!(" 333 sub_sub_node中 {:?}",const_sym_idx);
+                            println!(" 333 sub_sub_node中 {:?}",const_sym_idx); //没有到达过
                             sub_sub_nodes_symbol_idx.push(const_sym_idx)
                             
                         },
@@ -77,15 +82,16 @@ pub fn eval_et(et_tree:&mut EtTree , operator_et_node:u32 ) ->u32 {
                         }
                         // EtNakedNode::Symbol { sym_idx, ast_node, text, def_or_use } => todo!(),
                         // EtNakedNode::Separator { ast_node, text } => todo!(),
-                        _ => panic!("有问题")
+                        _ => panic!("有问题 , 不是Constant也不是Operator")
                     }
                     
                 }
-                
+                // sub_sub_nodes_symbol_idx.reverse();
                 // 3计算子节点结果并返回
                 println!(" 444 sub_sub_nodes_symbol_idx 为{:?}", sub_sub_nodes_symbol_idx);
+                println!(" 计算子节点后返回value值为 {:?}",op.clone().eval_sub_et_nodes(et_tree,&sub_sub_nodes_symbol_idx));
                 op.clone().eval_sub_et_nodes(et_tree,&sub_sub_nodes_symbol_idx)
-
+                */
             }
             _ => 
                     panic!("错误的 EtNode 类型 !")

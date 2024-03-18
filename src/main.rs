@@ -60,6 +60,7 @@ fn main() {
     for et_node in et_tree.node_weights_mut(){
         et_node.load_ast_node_text(&context.ast_tree)
     }
+    // 下面两行是eval.rs的debug段,不需要可以注释掉
     println!("进入eval_et函数!!!");
     eval_et(&mut et_tree, 4);
 
