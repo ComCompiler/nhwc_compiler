@@ -10,7 +10,7 @@ use petgraph::adj::NodeIndex;
 use toolkit::{ast_node::find_dfs_rule_ast, etc::generate_png_by_graph};
 
 
-use crate::{antlr_parser::cparser::RULE_declaration, toolkit::{context::Context, et_node::{EtNakedNode, EtTree}}};
+use crate::{antlr_parser::cparser::RULE_declaration, toolkit::{context::Context, et_node::{EtNakedNode, EtTree}, eval::eval_et}};
 #[derive(Parser)]
 #[command(author, version, about)]
 pub struct Cli {
@@ -34,6 +34,7 @@ macro_rules! timeit {
 }
 
 fn main() {
+    
     // 读取命令选项，诸如 -c 表示代码文件地址
     // 你也可以通过运行 cargo run -- --help 来查看所有可用选项
     let args = Cli::parse();
@@ -59,6 +60,9 @@ fn main() {
     for et_node in et_tree.node_weights_mut(){
         et_node.load_ast_node_text(&context.ast_tree)
     }
+    // 下面两行是eval.rs的debug段,不需要可以注释掉
+    println!("进入eval_et函数!!!");
+    eval_et(&mut et_tree, 4);
 
     generate_png_by_graph(&et_tree, "et_tree".to_string(), &[petgraph::dot::Config::EdgeNoLabel]);
 
