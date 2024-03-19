@@ -238,7 +238,7 @@ mod tests{
         let mut context = ContextBuilder::default().code(code).build().unwrap();
         let mut et_tree: petgraph::prelude::StableGraph<EtNode, ()> = EtTree::new();
         et_tree.add_node(EtNode::new(EtNakedNode::new_sep(0)));
-        println!("{}",eval_et(&mut et_tree,0));
+        println!("{:?}",eval_et(&mut et_tree,0));
 
         // let id = 1;
         // let a = node!(at id in et_tree);

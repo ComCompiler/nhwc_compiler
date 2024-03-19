@@ -170,6 +170,7 @@ macro_rules! find_nodes {
         {
             let iter = crate::toolkit::ast_node::find_neighbors_rule_ast($ast_tree,$node,None);
             let nodes:Vec<u32> = iter.collect();
+            nodes.reverse();
             nodes
         }
     };
@@ -184,7 +185,8 @@ macro_rules! find_nodes {
     (term at $node:ident in $ast_tree:ident) => {
         {
             let iter = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,None);
-            let nodes:Vec<u32> = iter.collect();
+            let mut nodes:Vec<u32> = iter.collect();
+            nodes.reverse();
             nodes
         }
     };

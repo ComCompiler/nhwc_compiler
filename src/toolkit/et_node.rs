@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 use std::{mem, u32};
 
+use eval::{to_value, eval};
 use petgraph::stable_graph::{NodeIndex, StableDiGraph};
 use crate::node;
 use super::ast_node::AstTree;
@@ -78,12 +79,12 @@ pub enum ExprOp{
 impl ExprOp{
     /// 传入的vec的内部是节点在et_tree里的节点序号
     /// 作用是
-    pub fn eval_sub_et_nodes(&self ,et_tree:&mut EtTree, vec:&Vec<SymbolIndex>) -> u32{
-        match &self {
-            ExprOp::Mul => vec[0].symbol_name.parse::<u32>().unwrap() * vec[1].symbol_name.parse::<u32>().unwrap(),
-            ExprOp::Add => vec[0].symbol_name.parse::<u32>().unwrap() + vec[1].symbol_name.parse::<u32>().unwrap(),
-            ExprOp::Sub => vec[0].symbol_name.parse::<u32>().unwrap() - vec[1].symbol_name.parse::<u32>().unwrap(),
-            ExprOp::Div => vec[0].symbol_name.parse::<u32>().unwrap() / vec[1].symbol_name.parse::<u32>().unwrap(),
+    pub fn eval_sub_et_nodes(&self ,et_tree:&mut EtTree, vec:&Vec<SymbolIndex>) -> SymbolIndex{
+        let sym_idx = match &self {
+            ExprOp::Mul => eval(&format!("{}{}{}",&vec[0].symbol_name,"*", &vec[1].symbol_name)).unwrap(),
+            ExprOp::Add => eval(&format!("{}{}{}",&vec[0].symbol_name,"+", &vec[1].symbol_name)).unwrap(),
+            ExprOp::Sub => eval(&format!("{}{}{}",&vec[0].symbol_name,"-", &vec[1].symbol_name)).unwrap(),
+            ExprOp::Div => eval(&format!("{}{}{}",&vec[0].symbol_name,"/", &vec[1].symbol_name)).unwrap(),
             ExprOp::Assign => todo!(),
             ExprOp::LogicalOr => todo!(),
             ExprOp::LogicalAnd => todo!(),
@@ -118,7 +119,9 @@ impl ExprOp{
             ExprOp::PlusAssign => todo!(),
             ExprOp::MinusAssign => todo!(),
             ExprOp::ArrayIndex => todo!(),
-        }
+            _ => panic!("错误的 Oprator !")
+        };
+        SymbolIndex::new(0, sym_idx.to_string())
     }
 }
 impl Debug for ExprOp{
