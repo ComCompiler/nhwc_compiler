@@ -6,17 +6,20 @@ use std::{path::PathBuf,time::Instant};
 
 use antlr_parser::cparser::{RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition} ;
 use clap::Parser;
+use passes::{ast2cfg_pass::{self, Ast2CfgPass}, ast2et_debug_pass::{self, Ast2EtDebugPass}, ast2st_pass::{self, Ast2StPass}, cfg2ncfg_pass::{self, Cfg2NcfgPass}, code2ast_pass::{self, Code2AstPass}};
 use petgraph::adj::NodeIndex;
 use toolkit::{ast_node::find_dfs_rule_ast, etc::generate_png_by_graph};
 
 
-use crate::{antlr_parser::cparser::RULE_declaration, toolkit::{context::Context, et_node::{EtNakedNode, EtTree}, eval::eval_et}};
-#[derive(Parser)]
+use crate::{antlr_parser::cparser::RULE_declaration, passes::pass_demo::PassDemo, toolkit::{context::Context, et_node::{EtNakedNode, EtTree}, eval::eval_et, pass_manager::{Pass, PassManager}}};
+#[derive(Parser,Clone,Default)]
 #[command(author, version, about)]
-pub struct Cli {
+pub struct Args {
     ///设置文件地址
     #[arg(short, long, value_name = "FILE",default_value = "./demos/demo1.c")]
-    c_file_path: PathBuf
+    c_file_path: PathBuf,
+    // #[arg(short, long, default_value = "true")]
+    // gen_png : bool
 }
 
 
@@ -37,34 +40,21 @@ fn main() {
     
     // 读取命令选项，诸如 -c 表示代码文件地址
     // 你也可以通过运行 cargo run -- --help 来查看所有可用选项
-    let args = Cli::parse();
-    // 此时 g 就是我们生成的petgraph 的ast 树
-    // 生成 petgraph 图对应的 png 
-
-
-    let mut context = timeit!({Context::init(args,true)} , "init");
-    // test
+    let args = Args::parse();
     // args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
-    let mut et_tree = EtTree::new();
-    //dfs遍历ast找到第一个 expr stmt
-    let mut nodes: Vec<u32> = vec![];
-    nodes.extend(find_dfs_rule_ast(&context.ast_tree, 0, RULE_declaration));  
-    nodes.extend(find_dfs_rule_ast(&context.ast_tree, 0, RULE_expressionStatement));  
-    let root =0 ;
-    et_tree.add_node(EtNakedNode::new_sep(root).to_et_node());
-    for node in nodes{
-        let any_root = toolkit::gen_et::process_any_stmt(&mut et_tree, &context.ast_tree, &context.scope_tree, node, 0,);
-        add_edge!(from root to any_root in et_tree);
-    }
-    //debug输出et_node内容
-    for et_node in et_tree.node_weights_mut(){
-        et_node.load_ast_node_text(&context.ast_tree)
-    }
-    println!("进入eval_et函数!!!");
-    eval_et(&mut et_tree, 4);
-
-    generate_png_by_graph(&et_tree, "et_tree".to_string(), &[petgraph::dot::Config::EdgeNoLabel]);
-
-    println!("hello world!")
-
+    let mut pass_manager = PassManager::new(args);
+    let code2ast_pass = Code2AstPass::new(false);
+    let ast2cfg_pass = Ast2CfgPass::new(false);
+    let ast2et_debug_pass = Ast2EtDebugPass::new(false);
+    let cfg2ncfg_pass = Cfg2NcfgPass::new(false);
+    let ast2st_pass = Ast2StPass::new(false);
+    add_passes!(
+        code2ast_pass
+        then ast2et_debug_pass
+        then ast2cfg_pass
+        then ast2st_pass
+        then cfg2ncfg_pass
+        to pass_manager
+    );
+    timeit!({pass_manager.execute_passes()}, "all passed finish");
 }

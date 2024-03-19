@@ -4,7 +4,9 @@ use std::{mem, u32};
 use petgraph::stable_graph::{NodeIndex, StableDiGraph};
 use crate::node;
 use super::ast_node::AstTree;
-use super::symbol_table::{Fields,  SymbolIndex};
+use super::symbol_table::{  SymbolIndex};
+use super::field::{Fields, FieldsOwner};
+use super::field::Field;
 
 pub type EtTree = StableDiGraph<EtNode,(),u32>;
 

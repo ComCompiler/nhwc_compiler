@@ -2,10 +2,9 @@ use core::panic;
 use std::collections::{BTreeMap, HashMap};
 
 
-use super::{symbol::Symbol, symbol_field::{self, Field}};
+use super::{symbol::Symbol, field::{self, Field}};
 use core::fmt::Debug;
 
-pub type Fields =  HashMap<&'static str,Box<dyn Field>>;
 
 #[derive(Debug,Clone)]
 pub struct SymbolTable {
