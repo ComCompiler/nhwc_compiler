@@ -64,7 +64,7 @@ impl Context{
             generate_png_by_graph(&context.scope_tree, "scope_tree".to_string(),&[Config::EdgeNoLabel]);
         }
         //4.对cfg生成对应的nhwc ir，以及生成et
-        parse_cfg_into_nhwc_cfg(&mut context);
+        parse_cfg_into_nhwc_cfg(&mut context,0);
         //4.1可视化
         if is_generate_pngs{
             for cfg_node in context.cfg_graph.node_weights_mut(){
