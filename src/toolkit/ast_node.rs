@@ -63,7 +63,7 @@ pub fn find_neighbors_term_ast<'a>(ast_tree:&'a AstTree,start:u32,op_target_term
     let ns = ast_tree.neighbors(NodeIndex::from(start));
     ns.map(|x| x.index() as u32).filter(move |x| 
         ( op_target_term_id.is_none()   
-        || (ast_tree.node_weight(NodeIndex::from(*x)).unwrap().rule_id == (op_target_term_id.unwrap() as u32).try_into().expect("isize to usize 失败") )
+        || (ast_tree.node_weight(NodeIndex::from(*x)).unwrap().rule_id == {let a:usize=(op_target_term_id.unwrap() as u32).try_into().expect("isize to usize 失败");a} )
         ) 
         && ast_tree.node_weight(NodeIndex::from(*x)).unwrap().is_terminal == true )
 }
