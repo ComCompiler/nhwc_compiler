@@ -18,13 +18,15 @@ impl Pass for Cfg2NcfgPass{
     // 运行这个pass 
     fn run(&mut self,ctx:&mut Context) {
         println!("pass Cfg2NhwcCfgPass run");
-        parse_cfg_into_nhwc_cfg(ctx);
+        parse_cfg_into_nhwc_cfg(ctx,0);
+        println!("已生成");
         //4.1可视化
         if self.is_gen_png{
             for cfg_node in ctx.cfg_graph.node_weights_mut(){
                 cfg_node.load_ast_node_text(&ctx.ast_tree)
             }
             generate_png_by_graph(&ctx.nhwc_cfg,"nhwc_cfg_graph".to_string(),&[]);
+            println!("可视化结束");
         }
     }
     // 返回pass的描述，具体作用

@@ -205,8 +205,8 @@ impl Debug for CfgNode{
                 write!(f,"{} {} \n{}","Branch",ast_node_idx, text),
             CfgNode::Gather {  } =>
                 write!(f,"{} ","Gather"),
-            CfgNode::BasicBlock { ast_nodes: _ast_node_idxes, text, instrs: _ } => 
-                write!(f,"{} {}","BasicBlock",text),
+            CfgNode::BasicBlock { ast_nodes: _ast_node_idxes, text, instrs } => 
+                write!(f,"{} {}\n{:?}","BasicBlock",text,instrs),
             CfgNode::Func {  } => write!(f,"{}","root",),
             CfgNode::ForLoop {  text, ast_before_node, ast_mid_node: _, ast_after_node: _ } => 
                 write!(f,"{} {} \n{}","For",ast_before_node, text),

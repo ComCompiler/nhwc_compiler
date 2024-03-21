@@ -5,7 +5,7 @@ int main(){
     int d = 9+(1+2)*(2+4/5)+1;
     int e;
     int f = a+b+c;
-    int g = h+3+2;
+    // int g = h+3+2;
     int x = 1,y=2;
     {
         c = 2,d = 2;
