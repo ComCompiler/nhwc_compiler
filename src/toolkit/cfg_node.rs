@@ -8,7 +8,7 @@ use crate::toolkit::ast_node::AstTree;
 use crate::toolkit::cfg_edge::CfgEdge;
 use crate::node;
 
-use super::instruction::Instruction;
+use super::nhwc_instr::Instruction;
 
 //use crate::toolkit::ast_node::AstNode;
 

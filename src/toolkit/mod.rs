@@ -7,7 +7,7 @@ pub mod symbol_table;
 pub mod etc;
 pub mod gen_ast;
 pub mod pass_manager;
-pub mod instruction;
+pub mod nhwc_instr;
 pub mod scope_node;
 pub mod gen_nhwc_cfg;
 pub mod context;

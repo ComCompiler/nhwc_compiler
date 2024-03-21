@@ -1,5 +1,7 @@
 use std::fmt::Debug;
-use super::symbol_table::SymbolIndex;
+use petgraph::{data, visit::Data};
+
+use super::{field::DataType, symbol::Symbol, symbol_table::SymbolIndex};
 
 #[derive(Clone)]
 pub enum ArithOp{        
@@ -249,4 +251,306 @@ impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
                 write!(f,"VarDef {} %{} = {}",vartype.symbol_name,varname.symbol_name,value.symbol_name),
         }
     }            
+}
+
+//只写了riscv手册里rv32 的 base的部分
+pub enum RiscInstr{
+    BaseIntInstr(BaseIntInstr)
+}
+pub enum BaseIntInstr{
+    Shifts(Shifts),
+    Arithmetic(Arithmetic),
+    Logical(Logical),
+    Compare(Compare),
+    Branch(Branch),
+    JumpAndLink(JumpAndLink),
+    Environment(Environment),
+    CSR(CSR),
+    Loads(Loads),
+    Stores(Stores)
+}
+
+pub struct Register{
+    reg_name : SymbolIndex
+}
+pub enum Shifts{
+    /// Shift Left Logical
+    SLL{
+        rd : Register,
+        rs1 : Register,
+        rs2 : Register
+    },
+    /// Shift Left Log Imm
+    SLLI{
+        rd : Register,
+        rs1 : Register,
+        shamt : DataType
+    },
+    /// Shift Right Logical
+    SRL{
+        rd : Register,
+        rs1 : Register,
+        rs2 : Register
+    },
+    /// Shift Right Log Imm
+    SRLI {
+        rd: Register,
+        rs1: Register,
+        shamt: DataType
+    },
+    /// Shift Right Arithmetic
+    SRA {
+        rd : Register,
+        rs1 : Register,
+        rs2 : Register
+    },
+    ///Shift Right ArithImm
+    SRAI {
+        rd: Register,
+        rs1: Register,
+        shamt: DataType
+    }
+}
+pub enum Arithmetic {
+    /// ADD
+    ADD{
+        rd : Register,
+        rs1 : Register,
+        rs2 : Register
+    },
+    /// ADD Imediate
+    ADDI{
+        rd: Register,
+        rs1: Register,
+        imm: DataType
+    },
+    /// SUBtract
+    SUB{
+        rd : Register,
+        rs1 : Register,
+        rs2 : Register
+    },
+    /// Load Upper Imm
+    LUI{
+        rd: Register,
+        imm: DataType
+    },
+    /// Add Upper Imm To PC
+    AUIPC{
+        rd: Register,
+        imm: DataType
+    },
+}
+pub enum Logical {
+
+    /// XOR
+    XOR{
+        rd : Register,
+        rs1 : Register,
+        rs2 : Register
+    },
+    /// XOR Immediate
+    XORI{
+        rd: Register,
+        rs1: Register,
+        imm: DataType
+    },
+    /// OR
+    Or{
+        rd : Register,
+        rs1 : Register,
+        rs2 : Register
+    },
+    /// OR Immdiate
+    ORImmediate{
+        rd: Register,
+        rs1: Register,
+        imm: DataType,
+    },
+    /// AND
+    And{
+        rd : Register,
+        rs1 : Register,
+        rs2 : Register
+    },
+    /// AND Immediate
+    AndI{
+        rd: Register,
+        rs1: Register,
+        imm: DataType
+    }
+}
+pub enum Compare{
+    /// Set <
+    SLT{
+        rd : Register,
+        rs1 : Register,
+        rs2 : Register
+    },
+    ///Set < Immediate
+    SLTI{
+        rd: Register,
+        rs1: Register,
+        imm: DataType,
+    },
+    /// Set < Unsigned
+    SLTU{
+        rd : Register,
+        rs1 : Register,
+        rs2 : Register
+    },
+    /// Set < Imm Unsigned
+    SLTUI{
+        rd: Register,
+        rs1: Register,
+        imm: DataType,
+    }
+}
+pub enum Branch{
+    /// Branch =
+    BEQ{
+        rs1 : Register,
+        rs2 : Register,
+        imm : DataType
+    },
+    /// Branch Not Equal
+    BNE{
+        rs1 : Register,
+        rs2 : Register,
+        imm : DataType
+    },
+    /// Branch Less Than
+    BLT{
+        rs1 : Register,
+        rs2 : Register,
+        imm : DataType
+    },
+    /// Branch Less Than Unsigned
+    BGE{
+        rs1 : Register,
+        rs2 : Register,
+        imm : DataType
+    },
+    /// Branch < Unsigned
+    BLTU{
+        rs1 : Register,
+        rs2 : Register,
+        imm : DataType
+    },
+    /// Branch >= Unsigned
+    BGEU{
+        rs1 : Register,
+        rs2 : Register,
+        imm : DataType
+    }
+}
+pub enum JumpAndLink{
+    /// Jump & Link 
+    JAL{
+        rd : Register,
+        imm : DataType
+    },
+    /// Jump & Link Register
+    JALR{
+        rd : Register,
+        rs1 : Register,
+        imm : DataType
+    }
+}
+pub enum Environment {
+    /// CALL
+    ECALL{},
+    ///BREAK
+    EBREAK{}
+}
+/// Control Status Register 控制和状态寄存器
+pub enum CSR {
+    ///Read / Write
+    CSRRW{
+        rd : Register,
+        csr : Register,
+        rs1 : Register,
+    },
+    /// Read & Set Bit
+    CSRRS{
+        rd : Register,
+        csr : Register,
+        rs1 : Register,
+    },
+    /// Read & Clear Bit
+    CSRRC{
+        rd : Register,
+        csr : Register,
+        rs1 : Register,
+    },
+    /// Read / Write Imm
+    CSRRWI{
+        rd : Register,
+        csr : Register,
+        imm : DataType
+    },
+    /// Read & Set Bit Imm
+    CSRRSI{
+        rd : Register,
+        csr : Register,
+        imm : DataType
+    },
+    /// Read & Clear Bit Imm
+    CSRRCI{
+        rd : Register,
+        csr : Register,
+        imm : DataType
+    }
+}
+pub enum Loads{
+    /// Load Byte
+    LB{
+        rd : Register,
+        rs1 : Register,
+        imm : DataType
+    },
+    /// Load Halfword
+    LH{
+        rd : Register,
+        rs1 : Register,
+        imm : DataType
+    },
+    /// Load Byte Unsigned
+    LBU{
+        rd : Register,
+        rs1 : Register,
+        imm : DataType
+    },
+    /// Load Half Unsigned
+    LHU{
+        rd : Register,
+        rs1 : Register,
+        imm : DataType
+    },
+    /// Load Word
+    LW{
+        rd : Register,
+        rs1 : Register,
+        imm : DataType
+    }
+}
+pub enum Stores {
+    /// Store Byte
+    SB{
+        rs1 : Register,
+        rs2 : Register,
+        imm : DataType
+    },
+    /// Store Halfword
+    SH{
+        rs1 : Register,
+        rs2 : Register,
+        imm : DataType
+    },
+    ///Store Word
+    SW{
+        rs1 : Register,
+        rs2 : Register,
+        imm : DataType
+    }
 }
