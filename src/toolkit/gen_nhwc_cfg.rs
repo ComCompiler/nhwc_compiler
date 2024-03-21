@@ -180,10 +180,18 @@ fn process_opnode(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
         EtNakedNode::Symbol { sym_idx, ast_node, text, def_or_use } => {
             match def_or_use {
                 Def_Or_Use::Def { type_ast_node } => {
-                    
+                    panic!("{}赋值号右边不应出现定义的变量",et_node);
                 },
                 Def_Or_Use::Use => {
-
+                    let var_sym_idx = sym_idx.clone();
+                    let use_var = match find!(symbol mut at var_sym_idx in symbol_table){
+                        Some(use_var) =>{
+                            return (sym_idx.clone(),counter)
+                        },
+                        None=>{
+                            panic!("符号表中未找到{}",*text);
+                        },
+                    };
                 },
             }
         },
