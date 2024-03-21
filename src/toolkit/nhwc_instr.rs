@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use std::fmt::{Debug, Formatter};
 use petgraph::{data, visit::Data};
 
 use super::{field::DataType, symbol::Symbol, symbol_table::SymbolIndex};
@@ -273,6 +273,11 @@ pub enum BaseIntInstr{
 pub struct Register{
     reg_name : SymbolIndex
 }
+impl Debug for Register{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f,"%{}",self.reg_name.symbol_name)
+    }
+}
 pub enum Shifts{
     /// Shift Left Logical
     SLL{
@@ -311,6 +316,18 @@ pub enum Shifts{
         shamt: DataType
     }
 }
+impl Debug for Shifts{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self{
+            Shifts::SLL{rd,rs1,rs2} => write!(f,"SLL %{},%{},%{}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,rs2.reg_name.symbol_name),
+            Shifts::SLLI{rd,rs1,shamt} => write!(f,"SLLI %{},%{},{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,shamt),
+            Shifts::SRL{rd,rs1,rs2} => write!(f,"SRL %{},%{},%{}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,rs2.reg_name.symbol_name),
+            Shifts::SRLI{rd,rs1,shamt} => write!(f,"SRLI %{},%{},{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,shamt),
+            Shifts::SRA{rd,rs1,rs2} => write!(f,"SRA %{},%{},%{}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,rs2.reg_name.symbol_name),
+            Shifts::SRAI{rd,rs1,shamt} => write!(f,"SRAI %{},%{},{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,shamt)
+        }
+    }
+}
 pub enum Arithmetic {
     /// ADD
     ADD{
@@ -340,6 +357,18 @@ pub enum Arithmetic {
         rd: Register,
         imm: DataType
     },
+}
+impl Debug for Arithmetic {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Arithmetic::ADD{rd,rs1,rs2} => write!(f,"ADD %{},%{},%{}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,rs2.reg_name.symbol_name),
+            Arithmetic::ADDI{rd,rs1,imm} => write!(f,"ADDI %{},%{},{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,imm),
+            Arithmetic::SUB{rd,rs1,rs2} => write!(f,"SUB %{},%{},%{}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,rs2.reg_name.symbol_name),
+            Arithmetic::LUI{rd,imm} => write!(f,"LUI %{},{:?}",rd.reg_name.symbol_name,imm),
+            Arithmetic::AUIPC{rd,imm} => write!(f,"AUIPC %{},{:?}",rd.reg_name.symbol_name,imm),
+
+        }
+    }
 }
 pub enum Logical {
 
@@ -380,6 +409,18 @@ pub enum Logical {
         imm: DataType
     }
 }
+impl Debug for Logical{
+    fn fmt(&self,f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self{
+            Logical::XOR{rd,rs1,rs2} => write!(f,"XOR %{},%{},%{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,rs2.reg_name.symbol_name),
+            Logical::XORI{rd,rs1,imm} => write!(f,"XORI %{},%{},{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,imm),
+            Logical::Or{rd,rs1,rs2} => write!(f,"OR %{},%{},%{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,rs2.reg_name.symbol_name),
+            Logical::ORImmediate{rd,rs1,imm} => write!(f,"ORI %{},%{},{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,imm),
+            Logical::And{rd,rs1,rs2} => write!(f,"AND %{},%{},%{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,rs2.reg_name.symbol_name),
+            Logical::AndI{rd,rs1,imm} => write!(f,"ANDI %{},%{},{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,imm),
+        }
+    }
+}
 pub enum Compare{
     /// Set <
     SLT{
@@ -404,6 +445,16 @@ pub enum Compare{
         rd: Register,
         rs1: Register,
         imm: DataType,
+    }
+}
+impl Debug for Compare{
+    fn fmt(&self,f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self{
+            Compare::SLT{rd,rs1,rs2} => write!(f,"SLT %{},%{},%{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,rs2.reg_name.symbol_name),
+            Compare::SLTI{rd,rs1,imm} => write!(f,"SLTI %{},%{},{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,imm),
+            Compare::SLTU{rd,rs1,rs2} => write!(f,"SLTU %{},%{},%{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,rs2.reg_name.symbol_name),
+            Compare::SLTUI{rd,rs1,imm} => write!(f,"SLTUI %{},%{},{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,imm),
+        }
     }
 }
 pub enum Branch{
@@ -444,6 +495,18 @@ pub enum Branch{
         imm : DataType
     }
 }
+impl Debug for Branch{
+    fn fmt(&self,f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self{
+            Branch::BEQ{rs1,rs2,imm} => write!(f,"BEQ %{},%{},{:?}",rs1.reg_name.symbol_name,rs2.reg_name.symbol_name,imm),
+            Branch::BNE{rs1,rs2,imm} => write!(f,"BNE %{},%{},{:?}",rs1.reg_name.symbol_name,rs2.reg_name.symbol_name,imm),
+            Branch::BLT{rs1,rs2,imm} => write!(f,"BLT %{},%{},{:?}",rs1.reg_name.symbol_name,rs2.reg_name.symbol_name,imm),
+            Branch::BGE{rs1,rs2,imm} => write!(f,"BGE %{},%{},{:?}",rs1.reg_name.symbol_name,rs2.reg_name.symbol_name,imm),
+            Branch::BLTU{rs1,rs2,imm} => write!(f,"BLTU %{},%{},{:?}",rs1.reg_name.symbol_name,rs2.reg_name.symbol_name,imm),
+            Branch::BGEU{rs1,rs2,imm} => write!(f,"BGEU %{},%{},{:?}",rs1.reg_name.symbol_name,rs2.reg_name.symbol_name,imm)
+        }
+    }
+}
 pub enum JumpAndLink{
     /// Jump & Link 
     JAL{
@@ -457,11 +520,27 @@ pub enum JumpAndLink{
         imm : DataType
     }
 }
+impl Debug for JumpAndLink{
+    fn fmt(&self,f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self{
+            JumpAndLink::JAL{rd,imm} => write!(f,"JAL %{},{:?}",rd.reg_name.symbol_name,imm),
+            JumpAndLink::JALR{rd,rs1,imm} => write!(f,"JALR %{},%{},{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,imm)
+        }
+    }
+}
 pub enum Environment {
     /// CALL
     ECALL{},
     ///BREAK
     EBREAK{}
+}
+impl Debug for Environment{
+    fn fmt(&self,f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self{
+            Environment::ECALL{} => write!(f,"ECALL"),
+            Environment::EBREAK{} => write!(f,"EBREAK")
+        }
+    }
 }
 /// Control Status Register 控制和状态寄存器
 pub enum CSR {
@@ -502,6 +581,18 @@ pub enum CSR {
         imm : DataType
     }
 }
+impl Debug for CSR{
+    fn fmt(&self,f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self{
+            CSR::CSRRW{rd,csr,rs1} => write!(f,"CSRRW %{},%{},%{:?}",rd.reg_name.symbol_name,csr.reg_name.symbol_name,rs1.reg_name.symbol_name),
+            CSR::CSRRS{rd,csr,rs1} => write!(f,"CSRRS %{},%{},%{:?}",rd.reg_name.symbol_name,csr.reg_name.symbol_name,rs1.reg_name.symbol_name),
+            CSR::CSRRC{rd,csr,rs1} => write!(f,"CSRRC %{},%{},%{:?}",rd.reg_name.symbol_name,csr.reg_name.symbol_name,rs1.reg_name.symbol_name),
+            CSR::CSRRSI{rd,csr,imm} => write!(f,"CSRRSI %{},%{},{:?}",rd.reg_name.symbol_name,csr.reg_name.symbol_name,imm),
+            CSR::CSRRCI{rd,csr,imm} => write!(f,"CSRRCI %{},%{},{:?}",rd.reg_name.symbol_name,csr.reg_name.symbol_name,imm),
+            CSR::CSRRWI{rd,csr,imm} => write!(f,"CSRRWI %{},%{},{:?}",rd.reg_name.symbol_name,csr.reg_name.symbol_name,imm),
+        }
+    }
+}
 pub enum Loads{
     /// Load Byte
     LB{
@@ -534,6 +625,18 @@ pub enum Loads{
         imm : DataType
     }
 }
+impl Debug for Loads{
+
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self{
+            Loads::LB{rd,rs1,imm} => write!(f,"LB %{},%{:?}(%{})",rd.reg_name.symbol_name,imm,rs1.reg_name.symbol_name),
+            Loads::LH{rd,rs1,imm} => write!(f,"LH %{},%{:?}(%{})",rd.reg_name.symbol_name,imm,rs1.reg_name.symbol_name),
+            Loads::LBU{rd,rs1,imm} => write!(f,"LBU %{},%{:?}(%{})",rd.reg_name.symbol_name,imm,rs1.reg_name.symbol_name),
+            Loads::LHU{rd,rs1,imm} => write!(f,"LHU %{},%{:?}(%{})",rd.reg_name.symbol_name,imm,rs1.reg_name.symbol_name),
+            Loads::LW{rd,rs1,imm} => write!(f,"LW %{},%{:?}(%{})",rd.reg_name.symbol_name,imm,rs1.reg_name.symbol_name),
+        }
+    }
+}
 pub enum Stores {
     /// Store Byte
     SB{
@@ -553,4 +656,15 @@ pub enum Stores {
         rs2 : Register,
         imm : DataType
     }
+}
+impl Debug for Stores{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self{
+            Stores::SB{rs1,rs2,imm} => write!(f,"SB %{},%{}(%{:?})",rs1.reg_name.symbol_name,rs2.reg_name.symbol_name,imm),
+            Stores::SH{rs1,rs2,imm} => write!(f,"SH %{},%{}(%{:?})",rs1.reg_name.symbol_name,rs2.reg_name.symbol_name,imm),
+            Stores::SW{rs1,rs2,imm} => write!(f,"SW %{},%{}(%{:?})",rs1.reg_name.symbol_name,rs2.reg_name.symbol_name,imm)
+
+        }
+    }
+
 }
