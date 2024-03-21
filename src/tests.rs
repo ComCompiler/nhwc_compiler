@@ -8,8 +8,8 @@ mod tests{
     use petgraph::{dot::Config, graph::NodeIndex, visit::Data};
     
     
-    use crate::{add_field, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, instruction::Instruction, symbol::Symbol, symbol_field::DataType, symbol_table::SymbolTable}, Cli};
-    use crate::toolkit::symbol::FieldsOwner;
+    use crate::{add_field, add_pass, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, node, node_mut, passes::pass_demo::PassDemo, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::DataType, gen_ast::parse_as_ast_tree, instruction::Instruction, pass_manager::{self, Pass, PassManager}, symbol::Symbol, symbol_table::SymbolTable}, Args};
+    use crate::toolkit::field::FieldsOwner;
 
 
     #[test]
@@ -19,7 +19,7 @@ mod tests{
 
     #[test]
     fn find_dfs_ast_test(){
-        let mut args = Cli::parse();
+        let mut args = Args::parse();
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo.c").unwrap();
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
@@ -33,7 +33,7 @@ mod tests{
 
     #[test]
     fn find_compound_of_func_def(){
-        let mut args = Cli::parse();
+        let mut args = Args::parse();
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo.c").unwrap();
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
@@ -48,7 +48,7 @@ mod tests{
     }
     #[test]
     fn find_items_of_itemlists_using_macro_find_nodes(){
-        let mut args = Cli::parse();
+        let mut args = Args::parse();
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo.c").unwrap();
 
@@ -76,7 +76,7 @@ mod tests{
     }
     #[test]
     fn find_items_of_func_def_using_macro_find_nodes_test2(){
-        let mut args = Cli::parse();
+        let mut args = Args::parse();
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo.c").unwrap();
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
@@ -97,7 +97,7 @@ mod tests{
     }
     #[test]
     fn find_items_of_func_def_using_macro_find_node_test2(){
-        let mut args = Cli::parse();
+        let mut args = Args::parse();
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo.c").unwrap();
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
@@ -156,7 +156,7 @@ mod tests{
         let mut symtab = SymbolTable::new();
 
         let x = add_symbol!({Symbol::new_verbose(0, "x".to_string())} to symtab );
-        let y = add_symbol!({Symbol::new_verbose(0, "y".to_string())} to symtab);
+        let y = add_symbol!({Symbol::new_verbose(0, "y".to_string())} with field TYPE:{DataType::U32} to symtab);
 
         add_field!(TYPE:{DataType::I32} to x in symtab);
         let x_sym =match find!(symbol mut at x in symtab){
@@ -169,9 +169,10 @@ mod tests{
     }
     #[test]
     fn try_instruction_fmt(){
+        const TYPE:&str = "type";
         let mut symtab = SymbolTable::new();
 
-        let lhs = add_symbol!({"lhs".to_string()} of scope {0} to symtab);
+        let lhs = add_symbol!({"lhs".to_string()} of scope {0} with field TYPE:{DataType::U32} to symtab);
         let a = add_symbol!({"No.1".to_string()} of scope {0} to symtab);
         let b = add_symbol!({"No.2".to_string()} of scope {0} to symtab);
 
@@ -182,7 +183,7 @@ mod tests{
     }
     #[test]
     fn find_term(){
-        let mut args = Cli::parse();
+        let mut args = Args::parse();
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo.c").unwrap();
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
@@ -197,23 +198,25 @@ mod tests{
     
     #[test]
     fn gen_expr_demo(){
-        let mut args = Cli::parse();
+        let mut args = Args::parse();
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo2.c").unwrap();
-        let context = Context::init(args, true);
+        let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
+        let mut ctx = ContextBuilder::default().code(code).build().unwrap();
+        parse_as_ast_tree(&mut ctx);
         let mut et_tree = EtTree::new();
         //dfs遍历ast找到第一个 expr stmt
-        let expr_stmt_nodes:Vec<u32>=find_dfs_rule_ast(&context.ast_tree, 0, RULE_expressionStatement).collect();  // 三号节点是一个 function def 
+        let expr_stmt_nodes:Vec<u32>=find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expressionStatement).collect();  // 三号节点是一个 function def 
         et_tree.add_node(EtNode::new(EtNakedNode::new_sep(0)));
         for expr_stmt_node in expr_stmt_nodes{
-            toolkit::gen_et::process_any_stmt(&mut et_tree, &context.ast_tree, &context.scope_tree, expr_stmt_node, 0,);
+            toolkit::gen_et::process_any_stmt(&mut et_tree, &ctx.ast_tree, &ctx.scope_tree, expr_stmt_node, 0,);
         }
         generate_png_by_graph(&et_tree, "et_tree".to_string(), &[petgraph::dot::Config::EdgeNoLabel]);
         
     }
     #[test]
     fn test_direct_nodes(){
-        let mut args = Cli::parse();
+        let mut args = Args::parse();
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
@@ -228,14 +231,30 @@ mod tests{
     }
     #[test]
     fn test_eval_et(){
-         let mut args = Cli::parse();
+         let mut args = Args::parse();
         // 设置 path 为 demo_calculate.c
         args.c_file_path = PathBuf::from_str("./demos/demo_calculate.c").unwrap();
-        // let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
-        // let mut context = ContextBuilder::default().code(code).build().unwrap();
-        // let mut et_tree: petgraph::prelude::StableGraph<EtNode<()>, ()> = EtTree::new();
-        // et_tree.add_node(EtNode::<()>::new(EtNakedNode::new_sep(0),()));
-        // println!("{}",eval_et(&mut et_tree,0));
+        let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
+        let mut context = ContextBuilder::default().code(code).build().unwrap();
+        let mut et_tree: petgraph::prelude::StableGraph<EtNode, ()> = EtTree::new();
+        et_tree.add_node(EtNode::new(EtNakedNode::new_sep(0)));
+        println!("{:?}",eval_et(&mut et_tree,0));
 
+        // let id = 1;
+        // let a = node!(at id in et_tree);
+        // let b = node_mut!(at id in et_tree);
+        // let m = a.clone();
     }
+    
+
+    #[test]
+    fn test_pass_demo(){
+        let args = Args::parse();
+        let mut pass_manager = PassManager::new(args);
+        let pass1 = PassDemo::new();
+        println!("{}",pass1.get_desc());
+        add_pass!(pass1 to pass_manager);
+        pass_manager.execute_passes();
+    }
+
 }

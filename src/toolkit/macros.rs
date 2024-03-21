@@ -313,10 +313,9 @@ macro_rules! add_node_with_edge{
 /// 比如说 将一个 I32 类型的 变量符号 添加到 符号表中，并且返回这个symbol在符号表中的 index 
 /// 要求 field_value 必须实现 Field trait
 /// add_symbol(x with field field_name_A:field_value_A to some_symtab)
-/// add_symbol(x with fields {a_name:a,b_name:b,c_name:c} to some_symtab)
 #[macro_export] 
 macro_rules! add_symbol {
-    ($sym:ident $(with field $field_name:ident:$field_value:block)? to $symtab:ident ) => {
+    ($sym:ident $(with field $field_name:ident:$field_value:block)* to $symtab:ident ) => {
         {
             let symidx = $symtab.add($symbol);
             $(
@@ -326,17 +325,20 @@ macro_rules! add_symbol {
             symidx
         }
     };
-    ($sym:block $(with field $field_name:ident:$field_value:block)? to $symtab:ident ) => {
+    ($sym:block $(with field $field_name:ident:$field_value:block)* to $symtab:ident ) => {
         {
             let symidx = $symtab.add($sym);
-            $($symtab.get_mut($symidx).unwrap().add_field($field_name,Box::new($field_value));)?
+            $(
+                let sym =  $symtab.get_mut(&symidx).unwrap();
+                sym.add_field($field_name,Box::new($field_value));
+            )?
             symidx
         }
     };
-    ($sym_name:block of scope $scope:block $(with field $field_name:ident:{$field_value:expr})? to $symtab:ident ) => {
+    ($sym_name:block of scope $scope:block $(with field $field_name:ident:{$field_value:expr})* to $symtab:ident ) => {
         {
-            let sym = Symbol::new_verbose($scope,$sym_name);
-            $(sym.add_field($field_name,Box::new($field_value));)?
+            let mut sym = Symbol::new_verbose($scope,$sym_name);
+            $(sym.add_field($field_name,Box::new($field_value));)*
             let symidx = $symtab.add(sym);
             symidx
         }
@@ -430,5 +432,19 @@ macro_rules! push_instr {
                 instrs.push($instr);
             }
         }
+    };
+}
+
+#[macro_export]
+macro_rules! add_pass {
+    ($pass:ident to $pass_manager:ident) => {
+        $pass_manager.add_pass(Box::new($pass));
+    };
+}
+#[macro_export]
+macro_rules! add_passes {
+    ($first_pass:ident $(then $next_pass:ident)* to $pass_manager:ident) => {
+        $pass_manager.add_pass(Box::new($first_pass));
+        $($pass_manager.add_pass(Box::new($next_pass));)*
     };
 }

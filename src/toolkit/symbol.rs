@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use core::fmt::Debug;
 
 
-use super::{symbol_field::Field, symbol_table::{Fields, SymbolIndex}};
+use super::{field::Field, symbol_table:: SymbolIndex};
+use super::field::{Fields, FieldsOwner};
 
 #[derive(Clone)]
 pub struct Symbol{
@@ -15,13 +16,6 @@ impl Debug for Symbol{
     }
 }
 
-pub trait FieldsOwner{
-    fn add_field(&mut self,key :&'static str,sf:Box<dyn Field>);
-    fn remove_field(&mut self, field_name : &'static str);
-    fn get_field(&self,key: &str) -> Option<&Box<dyn Field>>;
-    fn get_field_mut(&mut self,key: &str) -> Option<&mut Box< dyn Field>>;
-        
-}
 impl FieldsOwner for Symbol{
     fn add_field(&mut self,key :&'static str,sf:Box<dyn Field>) {
         self.fields.insert(key, sf);
@@ -32,7 +26,7 @@ impl FieldsOwner for Symbol{
     fn remove_field(&mut self, field_name : &'static str) {
         self.fields.remove(field_name);
     }
-    fn get_field_mut(&mut self,key: &str) -> Option<&mut Box< dyn Field>> {
+    fn get_field_mut(&mut self,key: &str) -> Option<&mut Box<dyn Field>> {
         self.fields.get_mut(key)
     }
 }
