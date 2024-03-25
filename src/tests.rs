@@ -8,7 +8,7 @@ mod tests{
     use petgraph::{dot::Config, graph::NodeIndex, visit::Data};
     
     
-    use crate::{add_field, add_pass, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, node, node_mut, passes::pass_demo::PassDemo, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::DataType, gen_ast::parse_as_ast_tree, nhwc_instr::Instruction, pass_manager::{self, Pass, PassManager}, symbol::Symbol, symbol_table::SymbolTable}, Args};
+    use crate::{add_field, add_pass, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, node, node_mut, passes::pass_demo::PassDemo, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::Value, gen_ast::parse_as_ast_tree, nhwc_instr::Instruction, pass_manager::{self, Pass, PassManager}, symbol::Symbol, symbol_table::SymbolTable}, Args};
     use crate::toolkit::field::FieldsOwner;
 
 
@@ -152,27 +152,27 @@ mod tests{
 
     #[test]
     fn find_symbol_macro_test(){
-        const TYPE:&str = "type";
+        const VALUE:&str = "VALUE";
         let mut symtab = SymbolTable::new();
 
         let x = add_symbol!({Symbol::new_verbose(0, "x".to_string())} to symtab );
-        let y = add_symbol!({Symbol::new_verbose(0, "y".to_string())} with field TYPE:{DataType::U32} to symtab);
+        let y = add_symbol!({Symbol::new_verbose(0, "y".to_string())} with field VALUE:{Value::U32(None)} to symtab);
 
-        add_field!(TYPE:{DataType::I32} to x in symtab);
+        add_field!(VALUE:{Value::I32(None)} to x in symtab);
         let x_sym =match find!(symbol mut at x in symtab){
             Some(x) => {println!("找到了符号 x"); x},
             None => {panic!( "没有找到符号 x ");},
         };
 
-        let data_type= find!(field TYPE:DataType in x_sym);
+        let data_type= find!(field VALUE:Value in x_sym);
         println!("x_sym {:?}" ,x_sym);
     }
     #[test]
     fn try_instruction_fmt(){
-        const TYPE:&str = "type";
+        const VALUE:&str = "value";
         let mut symtab = SymbolTable::new();
 
-        let lhs = add_symbol!({"lhs".to_string()} of scope {0} with field TYPE:{DataType::U32} to symtab);
+        let lhs = add_symbol!({"lhs".to_string()} of scope {0} with field VALUE:{Value::U32(None)} to symtab);
         let a = add_symbol!({"No.1".to_string()} of scope {0} to symtab);
         let b = add_symbol!({"No.2".to_string()} of scope {0} to symtab);
 
