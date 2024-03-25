@@ -43,11 +43,11 @@ fn main() {
     let args = Args::parse();
     // args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
     let mut pass_manager = PassManager::new(args);
-    let code2ast_pass = Code2AstPass::new(false);
-    let ast2cfg_pass = Ast2CfgPass::new(false);
-    let ast2et_debug_pass = Ast2EtDebugPass::new(false);
-    let cfg2ncfg_pass = Cfg2NcfgPass::new(false);
-    let ast2st_pass = Ast2StPass::new(false);
+    let code2ast_pass = Code2AstPass::new(true);
+    let ast2cfg_pass = Ast2CfgPass::new(true);
+    let ast2et_debug_pass = Ast2EtDebugPass::new(true);
+    let cfg2ncfg_pass = Cfg2NcfgPass::new(true);
+    let ast2st_pass = Ast2StPass::new(true);
     add_passes!(
         code2ast_pass
         then ast2et_debug_pass
