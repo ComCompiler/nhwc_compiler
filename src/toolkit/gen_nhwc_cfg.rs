@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use petgraph::{adj::Neighbors, stable_graph::NodeIndex, visit::{self, Dfs, IntoNeighbors}};
 use syn::token::In;
 
-use crate::{ add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_initDeclarator, RULE_initDeclaratorList, RULE_parameterDeclaration, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::symbol::Symbol};
+use crate::{ add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_initDeclarator, RULE_initDeclaratorList, RULE_parameterDeclaration, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{cfg_node::GetText, symbol::Symbol}};
 
 use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, gen_et::process_any_stmt, nhwc_instr::Instruction, scope_node::{self, ScopeTree}, symbol_table::{ SymbolIndex, SymbolTable}};
 
@@ -48,8 +48,14 @@ fn process_symbol(scope_tree:&ScopeTree,symbol_table:&mut SymbolTable,def_or_use
             symbol_symidx
         },
         Def_Or_Use::Use => {
+            println!("symbol是{}",symbol);
             let mut symbol_str = symbol.clone();
             while let None = find!(symbol symbol_str of scope symbol_scope in symbol_table){
+                let ast = node!(at symbol_scope in scope_tree).ast_node;
+                println!("scope为{}",ast);
+                if symbol_scope == 0{
+                    panic!("scope为{}符号表中未找到{:?}",symbol_scope,symbol.clone());
+                }
                 symbol_scope = node!(at symbol_scope in scope_tree).parent;
                 symbol_str = symbol.clone();
             }
@@ -180,7 +186,10 @@ fn process_opnode(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
             (const_sym_idx.clone(),counter)
         },
         EtNakedNode::Symbol { sym_idx, ast_node, text, def_or_use } => {
-            let symbol_symidx = process_symbol(scope_tree,symbol_table,def_or_use,text,scope_node);
+            println!("处理{}",ast_node);
+            let ast_node = *ast_node;
+            let ast_text = &node!(at ast_node in ast_tree).text;
+            let symbol_symidx = process_symbol(scope_tree,symbol_table,def_or_use,ast_text,scope_node);
             (symbol_symidx,counter)
         },
         _=>{
@@ -190,6 +199,9 @@ fn process_opnode(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
 }
 
 fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symbol_table:&mut SymbolTable,ast2scope:&HashMap<u32,u32>,et_node:u32,scope_node:u32,var_type:SymbolIndex,cfg_bb:u32,counter:u32)->u32{
+    let ast = node!(at scope_node in scope_tree).ast_node;
+    println!("ettree处理的是{}",ast);
+    let scope_parent = node!(at scope_node in scope_tree).parent;
     let nake_et = &node!(at et_node in et_tree).et_naked_node;
     match nake_et{
         EtNakedNode::Operator { op, ast_node, text }=>{
@@ -199,12 +211,10 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                         let sym_nodes = direct_nodes!(at et_node in et_tree);
 
                         //递归获取变量值的symidx
-                        let (vl_symidx,counter) = process_opnode(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, sym_nodes[1],scope_node,cfg_bb,counter);
+                        let (vl_symidx,counter) = process_opnode(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, sym_nodes[1],scope_parent,cfg_bb,counter);
 
                         //将定义的变量添加到symtb里面
-                        let ast_node = *ast_node;
-                        let var_str = node!(at ast_node in ast_tree).text.clone();
-                        let var_symidx = add_symbol!({Symbol::new_verbose(scope_node, var_str)} to symbol_table);
+                        let (var_symidx,counter) = process_opnode(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, sym_nodes[0], scope_parent, cfg_bb, counter);
 
                         let defvar_instr = Instruction::new_defvar(var_type, var_symidx, vl_symidx);
 
@@ -229,6 +239,7 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
 
 ///定义变量的decl转为ir，并通过et查找元素是否合法
 fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,decl_node:u32,symbol_table:&mut SymbolTable,scope_tree:&ScopeTree,mut et_tree:&mut EtTree,ast2scope:&HashMap<u32,u32>,ast_decl_node:u32,cfg_bb:u32,mut counter:u32)->u32{
+    println!("decl处理的ast为{}",ast_decl_node);
     //获取scope
     if let Some(decl_scope) = ast2scope.get(&ast_decl_node){
         //获得变量类型，做成symidx
@@ -246,8 +257,6 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,decl_node:u
         }
         //无子树,直接做成instruction
         else{
-            
-
             let decl_str = node!(at ast_decl_node in ast_tree).text.clone();
             let decl_name = SymbolIndex::new(*decl_scope, decl_str);
             let decl_value = SymbolIndex::new(*decl_scope,String::new());
