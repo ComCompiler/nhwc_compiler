@@ -1,7 +1,7 @@
 use std::fmt::{Debug, Formatter};
 use petgraph::{data, visit::Data};
 
-use super::{field::DataType, symbol::Symbol, symbol_table::SymbolIndex};
+use super::{field::Value, symbol::Symbol, symbol_table::SymbolIndex};
 
 #[derive(Clone)]
 pub enum ArithOp{        
@@ -289,7 +289,7 @@ pub enum Shifts{
     SLLI{
         rd : Register,
         rs1 : Register,
-        shamt : DataType
+        shamt : Value
     },
     /// Shift Right Logical
     SRL{
@@ -301,7 +301,7 @@ pub enum Shifts{
     SRLI {
         rd: Register,
         rs1: Register,
-        shamt: DataType
+        shamt: Value
     },
     /// Shift Right Arithmetic
     SRA {
@@ -313,7 +313,7 @@ pub enum Shifts{
     SRAI {
         rd: Register,
         rs1: Register,
-        shamt: DataType
+        shamt: Value
     }
 }
 impl Debug for Shifts{
@@ -339,7 +339,7 @@ pub enum Arithmetic {
     ADDI{
         rd: Register,
         rs1: Register,
-        imm: DataType
+        imm: Value
     },
     /// SUBtract
     SUB{
@@ -350,12 +350,12 @@ pub enum Arithmetic {
     /// Load Upper Imm
     LUI{
         rd: Register,
-        imm: DataType
+        imm: Value
     },
     /// Add Upper Imm To PC
     AUIPC{
         rd: Register,
-        imm: DataType
+        imm: Value
     },
 }
 impl Debug for Arithmetic {
@@ -382,7 +382,7 @@ pub enum Logical {
     XORI{
         rd: Register,
         rs1: Register,
-        imm: DataType
+        imm: Value
     },
     /// OR
     Or{
@@ -394,7 +394,7 @@ pub enum Logical {
     ORImmediate{
         rd: Register,
         rs1: Register,
-        imm: DataType,
+        imm: Value,
     },
     /// AND
     And{
@@ -406,7 +406,7 @@ pub enum Logical {
     AndI{
         rd: Register,
         rs1: Register,
-        imm: DataType
+        imm: Value
     }
 }
 impl Debug for Logical{
@@ -432,7 +432,7 @@ pub enum Compare{
     SLTI{
         rd: Register,
         rs1: Register,
-        imm: DataType,
+        imm: Value,
     },
     /// Set < Unsigned
     SLTU{
@@ -444,7 +444,7 @@ pub enum Compare{
     SLTUI{
         rd: Register,
         rs1: Register,
-        imm: DataType,
+        imm: Value,
     }
 }
 impl Debug for Compare{
@@ -462,37 +462,37 @@ pub enum Branch{
     BEQ{
         rs1 : Register,
         rs2 : Register,
-        imm : DataType
+        imm : Value
     },
     /// Branch Not Equal
     BNE{
         rs1 : Register,
         rs2 : Register,
-        imm : DataType
+        imm : Value
     },
     /// Branch Less Than
     BLT{
         rs1 : Register,
         rs2 : Register,
-        imm : DataType
+        imm : Value
     },
     /// Branch Less Than Unsigned
     BGE{
         rs1 : Register,
         rs2 : Register,
-        imm : DataType
+        imm : Value
     },
     /// Branch < Unsigned
     BLTU{
         rs1 : Register,
         rs2 : Register,
-        imm : DataType
+        imm : Value
     },
     /// Branch >= Unsigned
     BGEU{
         rs1 : Register,
         rs2 : Register,
-        imm : DataType
+        imm : Value
     }
 }
 impl Debug for Branch{
@@ -511,13 +511,13 @@ pub enum JumpAndLink{
     /// Jump & Link 
     JAL{
         rd : Register,
-        imm : DataType
+        imm : Value
     },
     /// Jump & Link Register
     JALR{
         rd : Register,
         rs1 : Register,
-        imm : DataType
+        imm : Value
     }
 }
 impl Debug for JumpAndLink{
@@ -566,19 +566,19 @@ pub enum CSR {
     CSRRWI{
         rd : Register,
         csr : Register,
-        imm : DataType
+        imm : Value
     },
     /// Read & Set Bit Imm
     CSRRSI{
         rd : Register,
         csr : Register,
-        imm : DataType
+        imm : Value
     },
     /// Read & Clear Bit Imm
     CSRRCI{
         rd : Register,
         csr : Register,
-        imm : DataType
+        imm : Value
     }
 }
 impl Debug for CSR{
@@ -598,31 +598,31 @@ pub enum Loads{
     LB{
         rd : Register,
         rs1 : Register,
-        imm : DataType
+        imm : Value
     },
     /// Load Halfword
     LH{
         rd : Register,
         rs1 : Register,
-        imm : DataType
+        imm : Value
     },
     /// Load Byte Unsigned
     LBU{
         rd : Register,
         rs1 : Register,
-        imm : DataType
+        imm : Value
     },
     /// Load Half Unsigned
     LHU{
         rd : Register,
         rs1 : Register,
-        imm : DataType
+        imm : Value
     },
     /// Load Word
     LW{
         rd : Register,
         rs1 : Register,
-        imm : DataType
+        imm : Value
     }
 }
 impl Debug for Loads{
@@ -642,19 +642,19 @@ pub enum Stores {
     SB{
         rs1 : Register,
         rs2 : Register,
-        imm : DataType
+        imm : Value
     },
     /// Store Halfword
     SH{
         rs1 : Register,
         rs2 : Register,
-        imm : DataType
+        imm : Value
     },
     ///Store Word
     SW{
         rs1 : Register,
         rs2 : Register,
-        imm : DataType
+        imm : Value
     }
 }
 impl Debug for Stores{

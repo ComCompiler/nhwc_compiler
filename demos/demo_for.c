@@ -7,6 +7,7 @@ int m(){
 }
 int k(){
     int x = 4;
+    int y = x+1;
     for (int i = 0;i < 17;i ++){
         m();
         x = x+1;

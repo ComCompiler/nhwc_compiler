@@ -18,10 +18,10 @@ pub trait Field : Any + Debug {
 }
 
 #[derive(Debug,Clone)]
-pub enum DataType{
+pub enum Value{
     I32(Option<i32>),U32(Option<u32>),U8(Option<u8>)
 }
-impl Field for DataType {
+impl Field for Value {
     fn as_any(&self) -> &dyn Any {
         self
     }
@@ -29,14 +29,14 @@ impl Field for DataType {
     //     &self
     // }
 }
-impl DataType{
+impl Value{
     pub fn new_i32(value:i32) -> Self{
-        DataType::I32(Some(value))
+        Value::I32(Some(value))
     }
     pub fn new_u32(value:u32) -> Self{
-        DataType::U32(Some(value))
+        Value::U32(Some(value))
     }
     pub fn new_u8(value:u8) -> Self{
-        DataType::U8(Some(value))
+        Value::U8(Some(value))
     }
 }
