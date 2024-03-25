@@ -26,11 +26,7 @@ impl Pass for Cfg2NcfgPass{
             for cfg_node in ctx.cfg_graph.node_weights_mut(){
                 cfg_node.load_ast_node_text(&ctx.ast_tree)
             }
-<<<<<<< HEAD
-            generate_png_by_graph(&ctx.nhwc_cfg,"nhwc_cfg_graph".to_string(),&[Config::EdgeNoLabel]);
-=======
             generate_png_by_graph(&ctx.cfg_graph,"nhwc_cfg_graph".to_string(),&[]);
->>>>>>> refs/remotes/origin/master
             println!("可视化结束");
         }
     }

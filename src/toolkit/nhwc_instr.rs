@@ -227,12 +227,12 @@ impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Arith { lhs, rhs } => 
-                write!(f,"%{} = {:?}",lhs.symbol_name,rhs),
+                write!(f,"{} = {:?}\n",lhs.symbol_name,rhs),
             
             Self::Call { assigned, func_op } => 
                 match assigned{
                     Some(symidx)=>
-                        write!(f,"%{}={:?}",symidx.symbol_name,func_op),
+                        write!(f,"{} = {:?}\n",symidx.symbol_name,func_op),
                     
                     None => 
                         write!(f,"{:?}",func_op)
@@ -244,11 +244,16 @@ impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
             Self::Phi { lhs, rhs } => 
                 write!(f,""),
             Self::SimpleAssign { lhs, rhs }=>
-                write!(f,"Assign {},{}",lhs.symbol_name,rhs.symbol_name),
+                write!(f,"Assign {},{}\n",lhs.symbol_name,rhs.symbol_name),
             Self::Deffun { funname, rettype, paralst } =>
-                write!(f,"FunDef {} {} {:?}",rettype.symbol_name,funname.symbol_name,paralst),
-            Self::Defvar { varname, vartype, value }=>
-                write!(f,"VarDef {} %{} = {}",vartype.symbol_name,varname.symbol_name,value.symbol_name),
+                write!(f,"Define {} {} {:?}\n",rettype.symbol_name,funname.symbol_name,paralst.                                                                   ),
+            Self::Defvar { varname, vartype, value } => {
+                if value.symbol_name.is_empty() {
+                    Ok(write!(f, "Alloc {} %{}\n", vartype.symbol_name, varname.symbol_name)?)
+                } else {
+                    Ok(write!(f, "Alloc {} %{} = {}\n", vartype.symbol_name, varname.symbol_name, value.symbol_name)?)
+                }
+            }
         }
     }            
 }

@@ -1,19 +1,18 @@
 int main(){
-    int a = 3;
-    int b = 3+4;
-    int c = 3+b;
-    int d = 9+(1+2)*(2+4/5)+1;
-    int e;
-    int f = a+b+c;
-    // int g = h+3+2;
-    int x = 1,y=2;
-    {
-        c = 2,d = 2;
-        a = 4;
-        int i = 0;
-        int j = a+b;
-    }
-    j = 1;
+    int a,b,c,d,e;
+    a = 2+3;
+    b = 2-3*4/2+2*7;
+    c = a+b;
+    d = a*3;
+    d += 1;
+    d -= 2;
+    d *= a;
+    d /= b+3;
+    b++;
+    b--;
+    ++c;
+    --c;
+    e = ++a+b++;
 }
 void fun(int a,int b){
     a = b+a;
