@@ -246,7 +246,7 @@ impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
             Self::SimpleAssign { lhs, rhs }=>
                 write!(f,"Assign {},{}\n",lhs.symbol_name,rhs.symbol_name),
             Self::Deffun { funname, rettype, paralst } =>
-                write!(f,"Define {} {} {:?}\n",rettype.symbol_name,funname.symbol_name,paralst.                                                                   ),
+                write!(f,"Define {} {} {:?}\n",rettype.symbol_name,funname.symbol_name,paralst),
             Self::Defvar { varname, vartype, value } => {
                 if value.symbol_name.is_empty() {
                     Ok(write!(f, "Alloc {} %{}\n", vartype.symbol_name, varname.symbol_name)?)

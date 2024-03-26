@@ -74,7 +74,7 @@ argumentExpressionList
 
 unaryExpression
     :
-     ('++' |  '--' |  'sizeof')* //暂时解封， 这个也禁了了，看不懂这个
+//     ('++' |  '--' |  'sizeof')* // 这段不要了，因为用 unaryOperator 包含++ -- 更加合适一些， 这个也禁了了，看不懂这个
     (postfixExpression
     |   unaryOperator castExpression
     |   ('sizeof' | '_Alignof') '(' typeName ')'
@@ -83,7 +83,7 @@ unaryExpression
     ;
 
 unaryOperator
-    :   '&' | '*' | '+' | '-' | '~' | '!'
+    :   '&' | '*' | '+' | '-' | '~' | '!' |'++' |'--'
     ;
 
 castExpression
