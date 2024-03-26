@@ -140,6 +140,9 @@ impl Instruction{
     pub fn new_defvar(vartype:SymbolIndex,varname:SymbolIndex,value:SymbolIndex) -> Self{
         Self::Defvar { varname, vartype, value }
     }
+    pub fn new_assign(lhs:SymbolIndex,rhs:SymbolIndex) ->Self{
+        Self::SimpleAssign { lhs, rhs }
+    }
     
     // Instruction -> Arith -> ArithOp
     pub fn new_add(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex) -> Self{
@@ -246,7 +249,7 @@ impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
             Self::SimpleAssign { lhs, rhs }=>
                 write!(f,"Assign {},{}\n",lhs.symbol_name,rhs.symbol_name),
             Self::Deffun { funname, rettype, paralst } =>
-                write!(f,"Define {} {} {:?}\n",rettype.symbol_name,funname.symbol_name,paralst.                                                                   ),
+                write!(f,"Define {} {} {:?}\n",rettype.symbol_name,funname.symbol_name,paralst),
             Self::Defvar { varname, vartype, value } => {
                 if value.symbol_name.is_empty() {
                     Ok(write!(f, "Alloc {} %{}\n", vartype.symbol_name, varname.symbol_name)?)

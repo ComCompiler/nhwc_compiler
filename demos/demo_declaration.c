@@ -1,4 +1,6 @@
 int main(){
+    int x,y;
+    int q = 2,k;
     int a,b,c,d,e;
     a = 2+3;
     b = 2-3*4/2+2*7;

@@ -256,6 +256,46 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                         panic!("{}下面缺少赋值变量和值",et_node);
                     }
                 },
+                // super::et_node::ExprOp::Mul => todo!(),
+                // super::et_node::ExprOp::Add => todo!(),
+                // super::et_node::ExprOp::Sub => todo!(),
+                // super::et_node::ExprOp::Div => todo!(),
+                // super::et_node::ExprOp::LogicalOr => todo!(),
+                // super::et_node::ExprOp::LogicalAnd => todo!(),
+                // super::et_node::ExprOp::LogicalNot => todo!(),
+                // super::et_node::ExprOp::BitwiseOr => todo!(),
+                // super::et_node::ExprOp::BitwiseAnd => todo!(),
+                // super::et_node::ExprOp::BitwiseXor => todo!(),
+                // super::et_node::ExprOp::BitwiseNot => todo!(),
+                // super::et_node::ExprOp::Eq => todo!(),
+                // super::et_node::ExprOp::NEq => todo!(),
+                // super::et_node::ExprOp::Less => todo!(),
+                // super::et_node::ExprOp::Greater => todo!(),
+                // super::et_node::ExprOp::LEq => todo!(),
+                // super::et_node::ExprOp::GEq => todo!(),
+                // super::et_node::ExprOp::LShift => todo!(),
+                // super::et_node::ExprOp::RShift => todo!(),
+                // super::et_node::ExprOp::Mod => todo!(),
+                // super::et_node::ExprOp::Cast => todo!(),
+                // super::et_node::ExprOp::Call => todo!(),
+                // super::et_node::ExprOp::Negative => todo!(),
+                // super::et_node::ExprOp::Positive => todo!(),
+                // super::et_node::ExprOp::AddrOf => todo!(),
+                // super::et_node::ExprOp::Deref => todo!(),
+                // super::et_node::ExprOp::DotMember => todo!(),
+                // super::et_node::ExprOp::ArrowMember => todo!(),
+
+                super::et_node::ExprOp::LPlusPlus => {
+                    todo!()
+                },
+                super::et_node::ExprOp::RPlusPlus => todo!(),
+                super::et_node::ExprOp::LMinusMinus => todo!(),
+                super::et_node::ExprOp::RMinusMinus => todo!(),
+                super::et_node::ExprOp::MulAssign => todo!(),
+                super::et_node::ExprOp::DivAssign => todo!(),
+                super::et_node::ExprOp::PlusAssign => todo!(),
+                super::et_node::ExprOp::MinusAssign => todo!(),
+                super::et_node::ExprOp::ArrayIndex => todo!(),
                 _ => todo!(),
             }
         },
@@ -282,6 +322,21 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_tabl
 
         //如果该节点有子树
         if let Some(et_op) = direct_node!(at et_root in et_tree ret option){
+            // let et_ops = direct_nodes!(at et_root in et_tree);
+            // for et_op in et_ops{
+            //     let etnode = node!(at et_op in et_tree);
+            //     match etnode.et_naked_node{
+            //         EtNakedNode::Separator { ast_node, text } => {
+
+            //         },
+            //         _ =>{
+            //             panic!("");
+            //         }
+            //     }
+            // }
+            
+
+            
             counter = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, et_op,*decl_scope,type_symidx,cfg_bb,counter);
             counter
         }
