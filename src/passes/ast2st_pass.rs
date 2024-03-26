@@ -1,7 +1,7 @@
 use std::any::Any;
 use petgraph::dot::Config;
 
-use crate::toolkit::{context::Context, etc::{generate_png_by_graph, read_file_content}, field::Field, gen_ast::parse_as_ast_tree, gen_cfg::parse_ast_to_cfg, gen_scope::parse_ast_to_scope, pass_manager::Pass};
+use crate::toolkit::{context::Context, etc::generate_png_by_graph, gen_scope::parse_ast_to_scope, pass_manager::Pass};
 #[derive(Debug)]
 pub struct Ast2StPass{
     is_gen_png:bool

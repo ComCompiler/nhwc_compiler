@@ -542,8 +542,9 @@ pub fn process_unary_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: 
     };
     // 检查是否存在一元操作符
     if let Some(unary_operator_node) = find!(rule RULE_unaryOperator at unary_expr_node in ast_tree) {
-        let unary_operator_node = find!(rule RULE_unaryOperator at unary_operator_node in ast_tree).unwrap();
-        let op_node = add_node_with_edge!({get_expr_node_of_unary_op_node(unary_operator_node)} from parent_et_node in et_tree);
+        let unary_operator_term_node = direct_node!(at unary_operator_node in ast_tree);
+        // .expect(format!("在 unaryOperator {} 下找不到 unaryOpertor term",unary_operator_node).as_str());
+        let op_node = add_node_with_edge!({get_expr_node_of_unary_op_node(unary_operator_term_node)} from parent_et_node in et_tree);
         
         // 一元操作符后跟的是 unaryExpression
         let child_cast_expr_node = find!(rule RULE_castExpression at unary_expr_node in ast_tree).unwrap();
