@@ -163,7 +163,7 @@ impl Debug for ExprOp{
             Self::PlusAssign => write!(f, "+="),
             Self::MulAssign => write!(f, "*="),
             Self::MinusAssign=> write!(f, "-="),
-            Self::DivAssign => write!(f, "-="),
+            Self::DivAssign => write!(f, "/="),
             Self::ArrayIndex => write!(f, "[]"),
         }
     }
@@ -288,7 +288,10 @@ impl EtNakedNode{
     pub fn new_op_right_plusplus(ast_node:u32) ->Self{
         EtNakedNode::Operator { op: ExprOp::RPlusPlus ,ast_node,text:String::new()}
     }
-    pub fn new_op_minusminus(ast_node:u32) ->Self{
+    pub fn new_op_left_minusminus(ast_node:u32) ->Self{
+        EtNakedNode::Operator { op: ExprOp::LMinusMinus ,ast_node,text:String::new()}
+    }
+    pub fn new_op_right_minusminus(ast_node:u32) ->Self{
         EtNakedNode::Operator { op: ExprOp::RMinusMinus ,ast_node,text:String::new()}
     }
     fn load_et_node_text(&mut self) {

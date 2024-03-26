@@ -16,10 +16,11 @@ pub struct SymbolTable {
 pub struct SymbolIndex{
     pub scope_node :u32 ,
     pub symbol_name : String,
+    pub index_ssa : Option<u32>,
 }
 impl SymbolIndex{
     pub fn new(scope_node:u32, symbol_name:String)->Self{
-        SymbolIndex{ scope_node,symbol_name } }
+        SymbolIndex{ scope_node,symbol_name, index_ssa: None} }
 }
 impl SymbolTable {
     // 创建一个新的符号表
@@ -41,13 +42,13 @@ impl SymbolTable {
 
     // 查找符号
     pub fn get_verbose(&self, symbol_name:String ,  scope_node : u32) -> Option<&Symbol> {
-        self.map.get(&SymbolIndex { scope_node ,  symbol_name} )
+        self.map.get(&SymbolIndex { scope_node ,  symbol_name, index_ssa: None} )
     }
     pub fn get(&self, symbol_index : &SymbolIndex) -> Option<&Symbol> {
         self.map.get(symbol_index)
     }
     pub fn get_verbose_mut(&mut self, symbol_name:String ,  scope_node : u32) -> Option<&mut Symbol> {
-        self.map.get_mut(&SymbolIndex { scope_node ,  symbol_name} )
+        self.map.get_mut(&SymbolIndex { scope_node ,  symbol_name, index_ssa: None} )
     }
     pub fn get_mut(&mut self, symbol_index : &SymbolIndex) -> Option<&mut Symbol> {
         self.map.get_mut(symbol_index)
@@ -58,7 +59,7 @@ impl SymbolTable {
         self.map.remove(symbol_index);
     }
     pub fn remove_verbose(&mut self, symbol_name:String ,  scope_node : u32) {
-        self.map.remove(&SymbolIndex { scope_node ,  symbol_name} );
+        self.map.remove(&SymbolIndex { scope_node ,  symbol_name, index_ssa: None} );
     }
 }
 impl Default for SymbolTable{

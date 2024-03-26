@@ -53,10 +53,11 @@ fn process_init_declarator(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&
     let declarator_node =find!(rule RULE_declarator at init_decl_node in ast_tree).unwrap();
 
     let direct_decl_node =find!(rule RULE_directDeclarator at declarator_node in ast_tree).expect(format!("error when try unwrap its son as direct_declaration_node {}",declarator_node).as_str());
-    process_direct_decl(et_tree, ast_tree, scope_tree, direct_decl_node, type_ast_node, scope_node, parent_et_node);
 
     let ident_node =  find!(term Identifier at direct_decl_node in ast_tree).unwrap();
     let op_assign_node = find!(term Assign at init_decl_node in ast_tree);
+
+    // 处理可能存在的 initializer , 通过判断 Assign term是否存在来判断是否存在 initializer
     match op_assign_node {
         Some(assign_node) => {
             // 这里手动生成 et_assign_node 然后在它的左边放上新定义的变量 
@@ -66,7 +67,8 @@ fn process_init_declarator(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&
             process_assign_expr(et_tree, ast_tree, scope_tree, assign_expr_node, scope_node, et_assign_node);
         },
         None => {
-            // 说明这是一个 类似于 int a; 的形式，没有初始值
+            // 说明这是一个 类似于 int a; 的形式，没有初始值，因此只需要把变量放在 parent et node 下面就行了 
+            process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, parent_et_node, Def_Or_Use::Def{type_ast_node});
         },
     }
 }
@@ -77,6 +79,7 @@ fn process_direct_decl(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&Scop
 
     }else if let Some(ident_node) = find!(term Identifier at direct_decl_node in ast_tree){
         // 这说明这只是一个简单的 ident
+
     }
 }
 
@@ -529,6 +532,8 @@ pub fn process_unary_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: 
             And => EtNakedNode::new_op_addr_of( unary_expr_node).to_et_node(),
             Star => EtNakedNode::new_op_deref( unary_expr_node).to_et_node(),
             Plus => EtNakedNode::new_op_positive( unary_expr_node).to_et_node(),
+            PlusPlus => EtNakedNode::new_op_left_plusplus(unary_expr_node).to_et_node(),
+            MinusMinus => EtNakedNode::new_op_left_minusminus(unary_expr_node).to_et_node(),
             Minus => EtNakedNode::new_op_negative( unary_expr_node).to_et_node(),
             Tilde => EtNakedNode::new_op_bitwise_not( unary_expr_node).to_et_node(),
             Not => EtNakedNode::new_op_logical_and( unary_expr_node).to_et_node(),
@@ -537,8 +542,9 @@ pub fn process_unary_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: 
     };
     // 检查是否存在一元操作符
     if let Some(unary_operator_node) = find!(rule RULE_unaryOperator at unary_expr_node in ast_tree) {
-        let unary_operator_node = find!(rule RULE_unaryOperator at unary_operator_node in ast_tree).unwrap();
-        let op_node = add_node_with_edge!({get_expr_node_of_unary_op_node(unary_operator_node)} from parent_et_node in et_tree);
+        let unary_operator_term_node = direct_node!(at unary_operator_node in ast_tree);
+        // .expect(format!("在 unaryOperator {} 下找不到 unaryOpertor term",unary_operator_node).as_str());
+        let op_node = add_node_with_edge!({get_expr_node_of_unary_op_node(unary_operator_term_node)} from parent_et_node in et_tree);
         
         // 一元操作符后跟的是 unaryExpression
         let child_cast_expr_node = find!(rule RULE_castExpression at unary_expr_node in ast_tree).unwrap();
@@ -584,7 +590,7 @@ fn process_postfix_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &S
         process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, et_plusplus_node);
     }else if let Some(_string_node) = find!(term MinusMinus at postfix_expr_node in ast_tree){
         //说明这是个--的语法 
-        let et_minusminus_node =  add_node_with_edge!({EtNakedNode::new_op_minusminus( postfix_expr_node).to_et_node()} from parent_et_node in et_tree);
+        let et_minusminus_node =  add_node_with_edge!({EtNakedNode::new_op_right_minusminus( postfix_expr_node).to_et_node()} from parent_et_node in et_tree);
         let primary_expr_node= find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree).unwrap();
         process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, et_minusminus_node);
     }else if let Some(primary_expr_node) = find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree){
