@@ -1,5 +1,5 @@
 use core::panic;
-use std::collections::{BTreeMap, HashMap};
+use std::{collections::{BTreeMap, HashMap}, fmt::Formatter};
 
 
 use super::{symbol::Symbol, field::{self, Field}};
@@ -12,7 +12,7 @@ pub struct SymbolTable {
 }
 
 /// 由于我们对 Symbol 的索引必须同时考虑 symbol 所在的scope 的层级以及 symbol的名字，不如直接改成结构体SymbolIndex
-#[derive(Debug,Clone,PartialEq, Eq, PartialOrd, Ord,)]
+#[derive(Clone,PartialEq, Eq, PartialOrd, Ord,)]
 pub struct SymbolIndex{
     pub scope_node :u32 ,
     pub symbol_name : String,
