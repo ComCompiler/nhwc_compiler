@@ -1,5 +1,5 @@
 int main(){
-    int x,y;
+    int x;
     int q = 2,k;
     int a,b,c,d,e;
     a = 2+3;
