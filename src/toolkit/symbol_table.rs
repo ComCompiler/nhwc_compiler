@@ -72,3 +72,11 @@ impl Clone for Box<dyn Field>{
         panic!("you should never use the clone for Field");
     }
 }
+impl Debug for SymbolIndex{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self.index_ssa {
+            Some(index_ssa) => write!(f, "{}_s{}_i{}", self.symbol_name, self.scope_node, index_ssa),
+            None => write!(f, "{}_s{}", self.symbol_name, self.scope_node),
+        }
+    }
+}

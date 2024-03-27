@@ -182,15 +182,15 @@ impl Debug for ArithOp{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Add { a, b } => 
-                write!(f,"Add type {}, {}",a.symbol_name,b.symbol_name),
+                write!(f,"Add type {:?}, {:?}",a,b),
             Self::Mul { a, b } => 
-                write!(f,"Mul type {}, {}",a.symbol_name,b.symbol_name),
+                write!(f,"Mul type {:?}, {:?}",a,b),
             Self::Div { a, b } => 
-                write!(f,"Div type {}, {}",a.symbol_name,b.symbol_name),
+                write!(f,"Div type {:?}, {:?}", a,b),
             Self::Sub { a, b } => 
-                write!(f,"Sub type {}, {}",a.symbol_name,b.symbol_name),
+                write!(f,"Sub type  {:?}, {:?}", a,b),
             Self::Icmp { plan, a, b } => 
-                write!(f,"icmp {:?} type {}, {}",plan,a.symbol_name,b.symbol_name)
+                write!(f,"icmp {:?} type {:?}, {:?}",plan,a,b)
         }
     }
 }
@@ -199,17 +199,17 @@ impl Debug for FuncOp{
         let new_str : Vec<&str>=self.args.iter().map(|x|x.symbol_name.as_str()).collect();
         let arg = new_str.join(", ");
         
-        write!(f,"call type {}(type {})",self.func.symbol_name,arg)
+        write!(f,"call type {:?}(type {})",self.func,arg)
     }
 }
 impl Debug for JumpOp{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Ret { ret_sym } =>
-                write!(f,"ret type {}",ret_sym.symbol_name),
+                write!(f,"ret type {:?}",ret_sym),
             
             Self::Br { cond, t1, t2 } => 
-                write!(f,"br i1 {}, label {}, label {}" , cond.symbol_name,t1.symbol_name,t2.symbol_name),
+                write!(f,"br i1 {:?}, label {:?}, label {:?}" , cond,t1,t2),
             
             Self::Switch { cond, default, compared } =>     
                 write!(f,"还没见过"),
@@ -230,12 +230,12 @@ impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Arith { lhs, rhs } => 
-                write!(f,"{} = {:?}\n",lhs.symbol_name,rhs),
+                write!(f,"{:?} = {:?}\n",lhs,rhs),
             
             Self::Call { assigned, func_op } => 
                 match assigned{
                     Some(symidx)=>
-                        write!(f,"{} = {:?}\n",symidx.symbol_name,func_op),
+                        write!(f,"{:?} = {:?}\n",symidx,func_op),
                     
                     None => 
                         write!(f,"{:?}",func_op)
@@ -245,16 +245,16 @@ impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
                 write!(f,"{:?}",op),
             
             Self::Phi { lhs, rhs } => 
-                write!(f,""),
+                write!(f,"phi函数,但是还没写呢"),
             Self::SimpleAssign { lhs, rhs }=>
-                write!(f,"Assign {},{}\n",lhs.symbol_name,rhs.symbol_name),
+                write!(f,"Assign {:?},{:?}\n",lhs,rhs),
             Self::Deffun { funname, rettype, paralst } =>
-                write!(f,"Define {} {} {:?}\n",rettype.symbol_name,funname.symbol_name,paralst),
+                write!(f,"Define {:?} {:?} {:?}\n",rettype,funname,paralst),
             Self::Defvar { varname, vartype, value } => {
                 if value.symbol_name.is_empty() {
-                    Ok(write!(f, "Alloc {} %{}\n", vartype.symbol_name, varname.symbol_name)?)
+                    Ok(write!(f, "Alloc {:?} %{:?}\n", vartype, varname)?)
                 } else {
-                    Ok(write!(f, "Alloc {} %{} = {}\n", vartype.symbol_name, varname.symbol_name, value.symbol_name)?)
+                    Ok(write!(f, "Alloc {:?} %{:?} = {:?}\n", vartype, varname, value)?)
                 }
             }
         }
@@ -283,7 +283,7 @@ pub struct Register{
 }
 impl Debug for Register{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f,"%{}",self.reg_name.symbol_name)
+        write!(f,"{:?}",self.reg_name)
     }
 }
 pub enum Shifts{
@@ -332,7 +332,7 @@ impl Debug for Shifts{
             Shifts::SRL{rd,rs1,rs2} => write!(f,"SRL %{},%{},%{}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,rs2.reg_name.symbol_name),
             Shifts::SRLI{rd,rs1,shamt} => write!(f,"SRLI %{},%{},{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,shamt),
             Shifts::SRA{rd,rs1,rs2} => write!(f,"SRA %{},%{},%{}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,rs2.reg_name.symbol_name),
-            Shifts::SRAI{rd,rs1,shamt} => write!(f,"SRAI %{},%{},{:?}",rd.reg_name.symbol_name,rs1.reg_name.symbol_name,shamt)
+            Shifts::SRAI{rd,rs1,shamt} => write!(f,"SRAI %{},%{},{:?}",rd,rs1.reg_name.symbol_name,shamt)
         }
     }
 }
