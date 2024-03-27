@@ -1,11 +1,10 @@
 use std::collections::HashMap;
 
-use petgraph::{adj::Neighbors, stable_graph::NodeIndex, visit::{self, Dfs, IntoNeighbors}};
-use syn::token::In;
+use petgraph::stable_graph::NodeIndex;
 
-use crate::{ add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_initDeclarator, RULE_initDeclaratorList, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{cfg_node::GetText, symbol::Symbol}};
+use crate::{ add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::symbol::Symbol};
 
-use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, gen_et::process_any_stmt, nhwc_instr::Instruction, scope_node::{self, ScopeTree}, symbol, symbol_table::{ SymbolIndex, SymbolTable}};
+use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, gen_et::process_any_stmt, nhwc_instr::Instruction, scope_node::ScopeTree,symbol_table::{ SymbolIndex, SymbolTable}};
 
 /*
  这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有 
@@ -39,9 +38,11 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_table:&mut 
                                 crate::toolkit::et_node::ExprOp::Assign => {
                                     let op_values = direct_nodes!(at detail_et in et_tree);
 
-                                    let (value_symidx,counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[1], decl_prt_scope, cfg_bb, counter);
+                                    let (value_symidx,new_counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[1], decl_prt_scope, cfg_bb, counter);
+                                    counter = new_counter;
                                     
-                                    let (var_symidx,counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
+                                    let (var_symidx,new_counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
+                                    counter = new_counter;
 
                                     let assign_instr = Instruction::new_assign(var_symidx, value_symidx);
 
@@ -49,7 +50,8 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_table:&mut 
                                 },
                                 crate::toolkit::et_node::ExprOp::LPlusPlus => {
                                     if let Some(symbol_node) = direct_node!(at detail_et in et_tree ret option){
-                                        let (var_symidx,mut counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, decl_prt_scope,  cfg_bb, counter);
+                                        let (var_symidx,new_counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, decl_prt_scope,  cfg_bb, counter);
+                                        counter = new_counter;
                 
                                         let one_symidx = SymbolIndex::new(decl_prt_scope, "1".to_string()); 
                 
@@ -71,7 +73,8 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_table:&mut 
                                 },
                                 crate::toolkit::et_node::ExprOp::RPlusPlus => {
                                     if let Some(symbol_node) = direct_node!(at detail_et in et_tree ret option){
-                                        let (var_symidx,mut counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, decl_prt_scope,  cfg_bb, counter);
+                                        let (var_symidx,new_counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, decl_prt_scope,  cfg_bb, counter);
+                                        counter = new_counter;
                 
                                         let one_symidx = SymbolIndex::new(decl_prt_scope, "1".to_string()); 
                 
@@ -93,7 +96,8 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_table:&mut 
                                 },
                                 crate::toolkit::et_node::ExprOp::LMinusMinus => {
                                     if let Some(symbol_node) = direct_node!(at detail_et in et_tree ret option){
-                                        let (var_symidx,mut counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, decl_prt_scope,  cfg_bb, counter);
+                                        let (var_symidx,new_counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, decl_prt_scope,  cfg_bb, counter);
+                                        counter = new_counter;
                 
                                         let one_symidx = SymbolIndex::new(decl_prt_scope, "1".to_string());
                 
@@ -115,7 +119,8 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_table:&mut 
                                 },
                                 crate::toolkit::et_node::ExprOp::RMinusMinus => {
                                     if let Some(symbol_node) = direct_node!(at detail_et in et_tree ret option){
-                                        let (var_symidx,mut counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, decl_prt_scope,  cfg_bb, counter);
+                                        let (var_symidx,new_counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, decl_prt_scope,  cfg_bb, counter);
+                                        counter = new_counter;
                 
                                         let one_symidx = SymbolIndex::new(decl_prt_scope, "1".to_string());
                 
@@ -138,16 +143,16 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_table:&mut 
                                 crate::toolkit::et_node::ExprOp::MulAssign => {
                                     let op_values = direct_nodes!(at detail_et in et_tree);
 
-                                    let (value_symidx,counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[1], decl_prt_scope, cfg_bb, counter);
+                                    let (value_symidx,new_counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[1], decl_prt_scope, cfg_bb, counter);
+                                    counter = new_counter;
                                     
-                                    let (var_symidx,mut counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
+                                    let (var_symidx,new_counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
+                                    counter = new_counter;
 
                                     let tmp_var_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
-
                                     counter += 1;
 
                                     let mul_instr = Instruction::new_mul(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx);
-
                                     let assign_instr = Instruction::new_assign(var_symidx, tmp_var_symidx);
                                     
                                     push_instr!(add mul_instr to cfg_bb for bb in cfg_graph);
@@ -156,16 +161,16 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_table:&mut 
                                 crate::toolkit::et_node::ExprOp::DivAssign => {
                                     let op_values = direct_nodes!(at detail_et in et_tree);
 
-                                    let (value_symidx,counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[1], decl_prt_scope, cfg_bb, counter);
+                                    let (value_symidx,new_counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[1], decl_prt_scope, cfg_bb, counter);
+                                    counter = new_counter;
                                     
-                                    let (var_symidx,mut counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
+                                    let (var_symidx,new_counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
+                                    counter = new_counter;
 
                                     let tmp_var_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
-
                                     counter += 1;
 
                                     let div_instr = Instruction::new_div(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx);
-
                                     let assign_instr = Instruction::new_assign(var_symidx, tmp_var_symidx);
 
                                     push_instr!(add div_instr to cfg_bb for bb in cfg_graph);
@@ -174,16 +179,16 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_table:&mut 
                                 crate::toolkit::et_node::ExprOp::PlusAssign => {
                                     let op_values = direct_nodes!(at detail_et in et_tree);
 
-                                    let (value_symidx,counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[1], decl_prt_scope, cfg_bb, counter);
+                                    let (value_symidx,new_counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[1], decl_prt_scope, cfg_bb, counter);
+                                    counter = new_counter;
                                     
-                                    let (var_symidx,mut counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
+                                    let (var_symidx,new_counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
+                                    counter = new_counter;
 
                                     let tmp_var_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
-
                                     counter += 1;
 
                                     let add_instr = Instruction::new_add(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx);
-
                                     let assign_instr = Instruction::new_assign(var_symidx, tmp_var_symidx);
 
                                     push_instr!(add add_instr to cfg_bb for bb in cfg_graph);
@@ -192,16 +197,16 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_table:&mut 
                                 crate::toolkit::et_node::ExprOp::MinusAssign => {
                                     let op_values = direct_nodes!(at detail_et in et_tree);
 
-                                    let (value_symidx,counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[1], decl_prt_scope, cfg_bb, counter);
+                                    let (value_symidx,new_counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[1], decl_prt_scope, cfg_bb, counter);
+                                    counter = new_counter;
                                     
-                                    let (var_symidx,mut counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
+                                    let (var_symidx,new_counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
+                                    counter = new_counter;
 
                                     let tmp_var_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
-
                                     counter += 1;
 
                                     let sub_instr = Instruction::new_sub(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx);
-
                                     let assign_instr = Instruction::new_assign(var_symidx, tmp_var_symidx);
 
                                     push_instr!(add sub_instr to cfg_bb for bb in cfg_graph);
@@ -215,8 +220,8 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_table:&mut 
                             panic!("操作符下缺少具体变量或常量");
                         }
                     },
-                    EtNakedNode::Constant { const_sym_idx, ast_node, text } => todo!(),
-                    EtNakedNode::Symbol { sym_idx, ast_node, text, def_or_use } => {
+                    EtNakedNode::Constant { const_sym_idx:_, ast_node:_, text:_ } => todo!(),
+                    EtNakedNode::Symbol { sym_idx:_, ast_node:_, text, def_or_use } => {
 
                         //获得变量类型，做成symidx
                         let vartype = find!(rule RULE_declarationSpecifiers at ast_decl_node in ast_tree).unwrap();
@@ -227,7 +232,6 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_table:&mut 
 
                         //创建空值
                         let value_symidx = SymbolIndex::new(decl_prt_scope, "".to_string());   
-
                         let def_instr = Instruction::new_defvar(type_symidx, symbol_symidx, value_symidx);
 
                         push_instr!(add def_instr to cfg_bb for bb in cfg_graph);
@@ -252,7 +256,7 @@ fn parse_bb2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&ScopeTre
             (RULE_declaration,declaration_node)=>{
                 counter = parse_declaration2nhwc(ast_tree,cfg_graph,symbol_table, scope_tree,et_tree,ast2scope,declaration_node,cfg_bb,counter);
             },
-            (RULE_expressionStatementr,statement_node)=>{
+            (RULE_expressionStatement,statement_node)=>{
                 counter = parse_stmt2nhwc(ast_tree, cfg_graph, symbol_table, scope_tree, et_tree, ast2scope,statement_node, cfg_bb, counter)
             },
             (_,_)=>{
@@ -277,6 +281,7 @@ fn process_symbol(scope_tree:&ScopeTree,symbol_table:&mut SymbolTable,def_or_use
             while let None = find!(symbol symbol_str of scope symbol_scope in symbol_table){
                 let ast = node!(at symbol_scope in scope_tree).ast_node;
                 if symbol_scope == 0{
+                    println!("ast{}",ast);
                     panic!("scope为{}符号表中未找到{:?}",symbol_scope,symbol.clone());
                 }
                 symbol_scope = node!(at symbol_scope in scope_tree).parent;
@@ -291,22 +296,21 @@ fn process_symbol(scope_tree:&ScopeTree,symbol_table:&mut SymbolTable,def_or_use
 fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symbol_table:&mut SymbolTable,ast2scope:&HashMap<u32,u32>,et_node:u32,scope_node:u32,cfg_bb:u32,mut counter:u32)->(SymbolIndex,u32){
     let nake_et = &node!(at et_node in et_tree).et_naked_node;
     match nake_et{
-        EtNakedNode::Operator { op, ast_node, text:_ } => {
+        EtNakedNode::Operator { op, ast_node:_, text:_ } => {
             match op{
                 super::et_node::ExprOp::Mul => {
                     if let Some(_) = direct_node!(at et_node in et_tree ret option){
                         let next_nodes = direct_nodes!(at et_node in et_tree);
 
-                        let (r_symidx,mut counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter);
+                        let (r_symidx,new_counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter);
+                        counter = new_counter;
 
-                        let (l_symidx,mut counter) = process_ettree(ast_tree,cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, next_nodes[0], scope_node,  cfg_bb, counter);
+                        let (l_symidx,new_counter) = process_ettree(ast_tree,cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, next_nodes[0], scope_node,  cfg_bb, counter);
+                        counter = new_counter;
 
                         let tmp_var_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
-
                         counter += 1;
-
                         let mul_instr = Instruction::new_mul(tmp_var_symidx.clone(), l_symidx, r_symidx);
-
                         push_instr!(add mul_instr to cfg_bb for bb in cfg_graph);
 
                         (tmp_var_symidx,counter)
@@ -318,16 +322,16 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                     if let Some(_) = direct_node!(at et_node in et_tree ret option){
                         let next_nodes = direct_nodes!(at et_node in et_tree);
 
-                        let (r_symidx,mut counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter);
+                        let (r_symidx,new_counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter);
+                        counter = new_counter;
 
-                        let (l_symidx,mut counter) = process_ettree(ast_tree,cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, next_nodes[0], scope_node, cfg_bb, counter);
+                        let (l_symidx,new_counter) = process_ettree(ast_tree,cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, next_nodes[0], scope_node, cfg_bb, counter);
+                        counter = new_counter;
 
                         let tmp_var_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
-
                         counter += 1;
 
                         let add_instr = Instruction::new_add(tmp_var_symidx.clone(), l_symidx, r_symidx);
-
                         push_instr!(add add_instr to cfg_bb for bb in cfg_graph);
 
                         (tmp_var_symidx,counter)
@@ -339,16 +343,15 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                     if let Some(_) = direct_node!(at et_node in et_tree ret option){
                         let next_nodes = direct_nodes!(at et_node in et_tree);
 
-                        let (r_symidx,mut counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter);
+                        let (r_symidx,new_counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter);
+                        counter = new_counter;
 
-                        let (l_symidx,mut counter) = process_ettree(ast_tree,cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, next_nodes[0], scope_node, cfg_bb, counter);
+                        let (l_symidx,new_counter) = process_ettree(ast_tree,cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, next_nodes[0], scope_node, cfg_bb, counter);
+                        counter = new_counter;
 
                         let tmp_var_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
-
                         counter += 1;
-
                         let sub_instr = Instruction::new_sub(tmp_var_symidx.clone(), l_symidx, r_symidx);
-
                         push_instr!(add sub_instr to cfg_bb for bb in cfg_graph);
 
                         (tmp_var_symidx,counter)
@@ -360,16 +363,16 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                     if let Some(_) = direct_node!(at et_node in et_tree ret option){
                         let next_nodes = direct_nodes!(at et_node in et_tree);
 
-                        let (r_symidx,mut counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter);
+                        let (r_symidx,new_counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter);
+                        counter = new_counter;
 
-                        let (l_symidx,mut counter) = process_ettree(ast_tree,cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, next_nodes[0], scope_node, cfg_bb, counter);
+                        let (l_symidx,new_counter) = process_ettree(ast_tree,cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, next_nodes[0], scope_node, cfg_bb, counter);
+                        counter = new_counter;
                         
                         let tmp_var_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
-
                         counter += 1;
 
                         let div_instr = Instruction::new_div(tmp_var_symidx.clone(), l_symidx, r_symidx);
-
                         push_instr!(add div_instr to cfg_bb for bb in cfg_graph);
 
                         (tmp_var_symidx,counter)
@@ -404,11 +407,10 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                 // super::et_node::ExprOp::ArrowMember => todo!(),
                 super::et_node::ExprOp::LPlusPlus => {
                     if let Some(symbol_node) = direct_node!(at et_node in et_tree ret option){
-                        let (var_symidx,mut counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, scope_node,  cfg_bb, counter);
+                        let (var_symidx,new_counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, scope_node,  cfg_bb, counter);
+                        counter = new_counter;
 
                         let one_symidx = SymbolIndex::new(scope_node, "1".to_string());
-                        
-
                         let tmp_loadvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
                         counter += 1;
                         let tmp_addvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
@@ -421,6 +423,7 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                         push_instr!(add load_instr to cfg_bb for bb in cfg_graph);
                         push_instr!(add add_instr to cfg_bb for bb in cfg_graph);
                         push_instr!(add assign_instr to cfg_bb for bb in cfg_graph);
+
                         (tmp_addvar_symidx,counter)
                     }else{
                         panic!("操作符{}下缺少符号",et_node);
@@ -428,11 +431,10 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                 },
                 super::et_node::ExprOp::RPlusPlus => {
                     if let Some(symbol_node) = direct_node!(at et_node in et_tree ret option){
-                        let (var_symidx,mut counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, scope_node,  cfg_bb, counter);
+                        let (var_symidx,new_counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, scope_node,  cfg_bb, counter);
+                        counter = new_counter;
 
                         let one_symidx = SymbolIndex::new(scope_node, "1".to_string());
-                        
-
                         let tmp_loadvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
                         counter += 1;
                         let tmp_addvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
@@ -445,6 +447,7 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                         push_instr!(add load_instr to cfg_bb for bb in cfg_graph);
                         push_instr!(add add_instr to cfg_bb for bb in cfg_graph);
                         push_instr!(add assign_instr to cfg_bb for bb in cfg_graph);
+
                         (tmp_loadvar_symidx,counter)
                     }else{
                         panic!("操作符{}下缺少符号",et_node);
@@ -452,11 +455,10 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                 },
                 super::et_node::ExprOp::LMinusMinus => {
                     if let Some(symbol_node) = direct_node!(at et_node in et_tree ret option){
-                        let (var_symidx,mut counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, scope_node,  cfg_bb, counter);
+                        let (var_symidx,new_counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, scope_node,  cfg_bb, counter);
+                        counter = new_counter;
 
                         let one_symidx = SymbolIndex::new(scope_node, "1".to_string());
-                        
-
                         let tmp_loadvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
                         counter += 1;
                         let tmp_subvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
@@ -469,6 +471,7 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                         push_instr!(add load_instr to cfg_bb for bb in cfg_graph);
                         push_instr!(add sub_instr to cfg_bb for bb in cfg_graph);
                         push_instr!(add assign_instr to cfg_bb for bb in cfg_graph);
+
                         (tmp_subvar_symidx,counter)
                     }else{
                         panic!("操作符{}下缺少符号",et_node);
@@ -476,11 +479,10 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                 },
                 super::et_node::ExprOp::RMinusMinus => {
                     if let Some(symbol_node) = direct_node!(at et_node in et_tree ret option){
-                        let (var_symidx,mut counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, scope_node,  cfg_bb, counter);
+                        let (var_symidx,new_counter) = process_ettree(ast_tree,cfg_graph,et_tree, scope_tree, symbol_table, ast2scope, symbol_node, scope_node,  cfg_bb, counter);
+                        counter = new_counter;
 
                         let one_symidx = SymbolIndex::new(scope_node, "1".to_string());
-                        
-
                         let tmp_loadvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
                         counter += 1;
                         let tmp_subvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
@@ -493,18 +495,14 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                         push_instr!(add load_instr to cfg_bb for bb in cfg_graph);
                         push_instr!(add sub_instr to cfg_bb for bb in cfg_graph);
                         push_instr!(add assign_instr to cfg_bb for bb in cfg_graph);
+
                         (tmp_loadvar_symidx,counter)
                     }else{
                         panic!("操作符{}下缺少符号",et_node);
                     }
                 },
-                super::et_node::ExprOp::MulAssign => todo!(),
-                super::et_node::ExprOp::DivAssign => todo!(),
-                super::et_node::ExprOp::PlusAssign => todo!(),
-                super::et_node::ExprOp::MinusAssign => todo!(),
-                super::et_node::ExprOp::ArrayIndex => todo!(),
                 _ => {
-                    panic!("");
+                    panic!("表达式内不应存在带有显性赋值性质的操作符");
                 },
             }
         },
@@ -540,7 +538,7 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_tabl
             for detail_et in detail_ets{
                 let etnode = &node!(at detail_et in et_tree).et_naked_node;
                 match etnode{
-                    EtNakedNode::Operator { op, ast_node, text } => {
+                    EtNakedNode::Operator { op:_, ast_node:_, text:_ } => {
                         if let Some(_) = direct_node!(at detail_et in et_tree ret option){
                             let op_values = direct_nodes!(at detail_et in et_tree);
 
@@ -549,9 +547,11 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_tabl
                             let type_str = node!(at vartype in ast_tree).text.clone();
                             let type_symidx = SymbolIndex::new(decl_scope, type_str);
                             
-                            let (var_symidx,counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
+                            let (var_symidx,new_counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
+                            counter = new_counter;
 
-                            let (value_symidx,counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[1], decl_prt_scope, cfg_bb, counter);
+                            let (value_symidx,new_counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[1], decl_prt_scope, cfg_bb, counter);
+                            counter = new_counter;
 
                             let defvar_instr = Instruction::new_defvar(type_symidx, var_symidx, value_symidx);
 
@@ -560,9 +560,8 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_tabl
                             panic!("操作符下缺少具体变量或常量");
                         }
                     },
-                    EtNakedNode::Constant { const_sym_idx, ast_node, text } => todo!(),
-                    EtNakedNode::Symbol { sym_idx, ast_node, text, def_or_use } => {
-
+                    EtNakedNode::Constant { const_sym_idx:_, ast_node:_, text:_ } => todo!(),
+                    EtNakedNode::Symbol { sym_idx:_, ast_node, text, def_or_use } => {
                         //获得变量类型，做成symidx
                         let vartype = find!(rule RULE_declarationSpecifiers at ast_decl_node in ast_tree).unwrap();
                         let type_str = node!(at vartype in ast_tree).text.clone();
@@ -607,7 +606,7 @@ fn parse_while2nhwc(){
 }
 
 ///将函数名存入符号表，将函数签名处理为ir，并处理函数体内的语句
-fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,scope_tree:&ScopeTree,et_tree:&mut EtTree,symbol_table:&mut SymbolTable,ast2scope:&HashMap<u32,u32>,ast_fun:u32,ast_funsign:u32,cfg_entry:u32){
+fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symbol_table:&mut SymbolTable,ast2scope:&HashMap<u32,u32>,ast_fun:u32,ast_funsign:u32,cfg_entry:u32){
     //获取函数所对应的scopenode
     if let Some(fun_scope) = ast2scope.get(&ast_fun){
         //获取函数名称
@@ -630,9 +629,12 @@ fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,scope_tree:&ScopeTr
             let ast_paralst = find_nodes!(rule RULE_parameterList finally RULE_parameterDeclaration at para in ast_tree);
             //将函数签名转为ir
             for ast_para in ast_paralst{
-                let fun_para = &node!(at ast_para in ast_tree).text;
+                let ast_para_sym = find!(rule RULE_declarator at ast_para in ast_tree).unwrap();
+                let fun_para = &node!(at ast_para_sym in ast_tree).text;
                 let para_symidx = SymbolIndex::new(*fun_scope, fun_para.to_string());
                 para_symlst.push(para_symidx);
+
+                add_symbol!({Symbol::new_verbose(*fun_scope,fun_para.to_string())} to symbol_table);
             }
         }
         //函数无参数，则不需要处理参数部分
@@ -662,7 +664,7 @@ pub fn parse_cfg_into_nhwc_cfg(context :&mut Context,mut counter:u32){
             let ast_fun = *ast_node;
             let ast_funsign = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_directDeclarator at ast_fun in ast_tree).unwrap();
 
-            parse_func2nhwc(ast_tree, cfg_graph, scope_tree, et_tree, symbol_table, ast2scope,ast_fun,ast_funsign,cfg_entry);
+            parse_func2nhwc(ast_tree, cfg_graph,symbol_table, ast2scope,ast_fun,ast_funsign,cfg_entry);
         }else{
             panic!("entry不是函数签名，cfg出错");
         }   
