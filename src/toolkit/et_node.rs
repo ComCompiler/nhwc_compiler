@@ -75,6 +75,7 @@ pub enum ExprOp{
     PlusAssign,
     MinusAssign,
     ArrayIndex,
+    ArrayWrapper,
 }
 impl ExprOp{
     /// 传入的vec的内部是节点在et_tree里的节点序号
@@ -165,6 +166,7 @@ impl Debug for ExprOp{
             Self::MinusAssign=> write!(f, "-="),
             Self::DivAssign => write!(f, "/="),
             Self::ArrayIndex => write!(f, "[]"),
+            Self::ArrayWrapper => write!(f, "{{}}"),
         }
     }
 }
@@ -172,6 +174,12 @@ impl Debug for ExprOp{
 impl EtNakedNode{
     pub fn  to_et_node(self)-> EtNode{
         EtNode::new(self)
+    }
+    pub fn new_op_array_idx(ast_node:u32)->Self{
+        EtNakedNode::Operator { op:ExprOp::ArrayIndex,ast_node,text:String::new()}
+    }
+    pub fn new_op_array_wrapper(ast_node:u32)->Self{
+        EtNakedNode::Operator { op:ExprOp::ArrayWrapper,ast_node,text:String::new()}
     }
     pub fn new_op_add(ast_node:u32)->Self{
         EtNakedNode::Operator { op:ExprOp::Add,ast_node,text:String::new()}

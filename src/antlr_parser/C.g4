@@ -55,17 +55,8 @@ genericAssociation
     ;
 
 postfixExpression
-    :
-    (   primaryExpression
-    // |   '__extension__'? '(' typeName ')' '{' initializerList ','? '}'
-    // 这个看不懂，先封了
-    )
-    ('[' expression ']'
-    | '(' argumentExpressionList? ')'
-    | ('.' | '->') Identifier
-    | '++'
-    | '--'
-    )*
+    : postfixExpression ('[' expression ']' | '(' argumentExpressionList? ')' | ('.' | '->') Identifier | '++' | '--')
+    | primaryExpression
     ;
 
 argumentExpressionList
@@ -297,8 +288,8 @@ directDeclarator
     :   Identifier
     |   '(' declarator ')'
     |   directDeclarator '[' typeQualifierList? assignmentExpression? ']'
-    |   directDeclarator '[' 'static' typeQualifierList? assignmentExpression ']'
-    |   directDeclarator '[' typeQualifierList 'static' assignmentExpression ']'
+    // |   directDeclarator '[' 'static' typeQualifierList? assignmentExpression ']' 看不懂 ，删了
+    // |   directDeclarator '[' typeQualifierList 'static' assignmentExpression ']' 看不懂，删了
     |   directDeclarator '[' typeQualifierList? '*' ']'
     |   directDeclarator '(' parameterTypeList ')'
     |   directDeclarator '(' identifierList? ')'
