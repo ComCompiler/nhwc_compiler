@@ -15,10 +15,9 @@ impl Code2AstPass{
 impl Pass for Code2AstPass{
     // 运行这个pass 
     fn run(&mut self,ctx:&mut Context) {
-        println!("pass Code2AstPass run");
         ctx.code = read_file_content(ctx.args.c_file_path.to_string_lossy().into_owned());
         parse_as_ast_tree(ctx);
-        // 1.1 生成对应的png 
+        // 生成对应的png 
         if self.is_gen_png{
             let ast_tree = &mut ctx.ast_tree;
             generate_png_by_graph(&ast_tree,"ast_tree".to_string(),&[Config::EdgeNoLabel]);  
@@ -31,7 +30,7 @@ impl Pass for Code2AstPass{
     }
     // 返回pass的名称
     fn get_pass_name(&self)->String {
-       return "Code2AstPass Pass".to_string();
+       return "Code2AstPass".to_string();
     }
 }
 

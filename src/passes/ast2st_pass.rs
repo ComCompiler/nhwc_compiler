@@ -17,7 +17,6 @@ impl Ast2StPass{
 impl Pass for Ast2StPass{
     // 运行这个pass 
     fn run(&mut self,ctx:&mut Context) {
-        println!("Ast2St run ");
         parse_ast_to_scope(ctx);
         // 3.1 生成对应的pn 
         if self.is_gen_png{
@@ -35,7 +34,7 @@ impl Pass for Ast2StPass{
     }
     // 返回pass的名称
     fn get_pass_name(&self)->String {
-       return "Ast2ScopeTree Pass".to_string();
+       return "Ast2ScopeTree".to_string();
     }
 }
 

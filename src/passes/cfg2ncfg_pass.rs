@@ -17,7 +17,6 @@ impl Cfg2NcfgPass{
 impl Pass for Cfg2NcfgPass{
     // 运行这个pass 
     fn run(&mut self,ctx:&mut Context) {
-        println!("pass Cfg2NhwcCfgPass run");
         ctx.nhwc_cfg = ctx.cfg_graph.clone();
         parse_cfg_into_nhwc_cfg(ctx,0);
         println!("nhwc已生成");
@@ -36,7 +35,7 @@ impl Pass for Cfg2NcfgPass{
     }
     // 返回pass的名称
     fn get_pass_name(&self)->String {
-       return "Cfg2NhwcCfgPass Pass".to_string();
+       return "Cfg2NhwcCfgPass".to_string();
     }
 }
 

@@ -25,7 +25,6 @@ impl PassDemo{
 impl Pass for PassDemo{
     // 运行这个pass 
     fn run(&mut self,ctx:&mut Context) {
-        println!("pass demo run");
     }
     // 返回pass的描述，具体作用
     fn get_desc(&self)->String{
@@ -34,7 +33,7 @@ impl Pass for PassDemo{
     
     // 返回pass的名称
     fn get_pass_name(&self)->String {
-       return "Demo Pass".to_string();
+       return "DemoPass".to_string();
     }
 }
 

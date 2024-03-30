@@ -13,7 +13,6 @@ impl Nhwc2RiscvDebugPass{
 impl Pass for Nhwc2RiscvDebugPass{
     // 运行这个pass 
     fn run(&mut self,ctx:&mut Context) {
-        println!("pass Nhwc2RiscvDebugPass run");
         // 拿到一个nhwc的vec,转化成汇编语言
     }
     // 返回pass的描述，具体作用
@@ -23,7 +22,7 @@ impl Pass for Nhwc2RiscvDebugPass{
     
     // 返回pass的名称
     fn get_pass_name(&self)->String {
-       return "Nhwc2RiscvDebugPass Pass".to_string();
+       return "Nhwc2RiscvDebugPass".to_string();
     }
 
 

@@ -17,7 +17,6 @@ impl Ast2CfgPass{
 impl Pass for Ast2CfgPass{
     // 运行这个pass 
     fn run(&mut self,ctx:&mut Context) {
-        println!("pass Ast2CfgPass run");
         parse_ast_to_cfg(ctx);
         // 1.1 生成对应的png 
         for cfg_node in ctx.cfg_graph.node_weights_mut(){
@@ -34,7 +33,7 @@ impl Pass for Ast2CfgPass{
     }
     // 返回pass的名称
     fn get_pass_name(&self)->String {
-       return "Ast2Cfg Pass".to_string();
+       return "Ast2CfgPass".to_string();
     }
 }
 

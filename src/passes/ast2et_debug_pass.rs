@@ -18,7 +18,6 @@ impl Ast2EtDebugPass{
 impl Pass for Ast2EtDebugPass{
     // 运行这个pass 
     fn run(&mut self,ctx:&mut Context) {
-        println!("pass Ast2EtDebugPass run");
         let et_tree = &mut ctx.et_tree;
 
         //dfs遍历ast找到第一个 expr stmt
@@ -47,7 +46,7 @@ impl Pass for Ast2EtDebugPass{
     }
     // 返回pass的名称
     fn get_pass_name(&self)->String {
-       return "Ast2EtDebugPass Pass".to_string();
+       return "Ast2EtDebugPass".to_string();
     }
 }
 
