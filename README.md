@@ -10,17 +10,17 @@ nhwc是一个类llvm的编译器框架，它包含一个代码生成框架,可�
 
 ## 2.通过调用一些宏来方便代码书写,如寻找某节点下的子节点(单个或所有子节点),给图增加节点和边等等
 
-![find_node](find_node.png)
+![find_node](./report/find_node.png)
 
-![find_nodes](find_nodes.png)
+![find_nodes](./report/find_nodes.png)
 
-![add_node](add_nodes_edges.png)
+![add_node](./report/add_nodes_edges.png)
 
 ---
 
 ## 3.定义cfg node和cfg edge,把ast转化成cfg(control flow graph)控制流程图
 
-![cfg_tree](cfg.png)
+![cfg_tree](./report/cfg.png)
 
 ---
 
@@ -30,7 +30,7 @@ nhwc是一个类llvm的编译器框架，它包含一个代码生成框架,可�
 
 ## 5.定义scop_tree作用域树,可以用来观察语句所在作用域
 
-### ![scope_tree](scope_tree.png)
+### ![scope_tree](./report/scope_tree.png)
 
 ---
 
@@ -64,7 +64,7 @@ nhwc是一个类llvm的编译器框架，它包含一个代码生成框架,可�
 
 ## 8.定义并生成et_tree(expression tree表达式树),以及组成部分--etnode,并自定义添加debug输出,方便观察expression语句,且考虑到一元运算符+=,+=,-=,/=,*=
 
-### ![et_tree](et_tree.png)
+### ![et_tree](./report/et_tree.png)
 
 ---
 
@@ -82,15 +82,15 @@ nhwc是一个类llvm的编译器框架，它包含一个代码生成框架,可�
 
 ## 添加了多个pass,并可选地生成对应png
 
-![passes](passes.png)
+![passes](./report/passes.png)
 
 >1.code转化为ast
-![code2ast](code2ast.png)
+![code2ast](./report/code2ast.png)
 >2.ast转化为cfg
-![ast2cfg](ast2cfg.png)
+![ast2cfg](./report/ast2cfg.png)
 >3.ast转化为et_debug
-![ast2et_debug](ast2et_debug.png)
+![ast2et_debug](./report/ast2et_debug.png)
 >4.cfg转化为nhwc_cfg
-![cfg转化为nhwc_cfg](cfg2nhwc_cfg.png)
+![cfg转化为nhwc_cfg](./report/cfg2nhwc_cfg.png)
 >5.ast转化为scope tree
-![ast转化为scope tree](ast2scope_tree.png)
+![ast转化为scope tree](./report/ast2scope_tree.png)
