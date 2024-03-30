@@ -2,6 +2,10 @@ use std::{any::Any, collections::HashMap, fmt::Debug};
 
 use petgraph::visit::Data;
 
+use crate::find;
+
+use super::ast_node::AstTree;
+
 pub type Fields =  HashMap<&'static str,Box<dyn Field>>;
 
 
@@ -19,7 +23,11 @@ pub trait Field : Any + Debug {
 
 #[derive(Debug,Clone)]
 pub enum Value{
-    I32(Option<i32>),U32(Option<u32>),U8(Option<u8>)
+    I32(Option<i32>),F32(Option<f32>)
+}
+#[derive(Debug,Clone)]
+pub enum Type{
+    I32,F32
 }
 impl Field for Value {
     fn as_any(&self) -> &dyn Any {
@@ -33,10 +41,12 @@ impl Value{
     pub fn new_i32(value:i32) -> Self{
         Value::I32(Some(value))
     }
-    pub fn new_u32(value:u32) -> Self{
-        Value::U32(Some(value))
+    pub fn new_f32(value:f32) -> Self{
+        Value::F32(Some(value))
     }
-    pub fn new_u8(value:u8) -> Self{
-        Value::U8(Some(value))
+}
+impl Type{
+    fn new(node:u32,ast_tree:&AstTree) -> Self{
+        // 在asttree中找到node的u32所在节点的类型,返回I32或F32
     }
 }

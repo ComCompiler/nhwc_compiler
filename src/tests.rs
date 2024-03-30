@@ -156,7 +156,7 @@ mod tests{
         let mut symtab = SymbolTable::new();
 
         let x = add_symbol!({Symbol::new_verbose(0, "x".to_string())} to symtab );
-        let y = add_symbol!({Symbol::new_verbose(0, "y".to_string())} with field VALUE:{Value::U32(None)} to symtab);
+        let y = add_symbol!({Symbol::new_verbose(0, "y".to_string())} with field VALUE:{Value::I32(None)} to symtab);
 
         add_field!(VALUE:{Value::I32(None)} to x in symtab);
         let x_sym =match find!(symbol mut at x in symtab){

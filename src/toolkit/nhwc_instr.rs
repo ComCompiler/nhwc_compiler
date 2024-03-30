@@ -1,7 +1,7 @@
 use std::fmt::{Debug, Formatter};
 use petgraph::{data, visit::Data};
 
-use super::{field::Value, symbol::Symbol, symbol_table::SymbolIndex};
+use super::{field::{Type, Value}, symbol::Symbol, symbol_table::SymbolIndex};
 
 #[derive(Clone)]
 pub enum ArithOp{        
@@ -72,7 +72,7 @@ pub enum Instruction{
     //定义变量
     Defvar{
         varname:SymbolIndex,
-        vartype:SymbolIndex,
+        vartype:Type,
         value:SymbolIndex,
     },
     // 算数运算符 + - * / etc.
@@ -137,7 +137,7 @@ impl Instruction{
         Self::Deffun { funname ,rettype, paralst }
     }
 
-    pub fn new_defvar(vartype:SymbolIndex,varname:SymbolIndex,value:SymbolIndex) -> Self{
+    pub fn new_defvar(vartype:Type,varname:SymbolIndex,value:SymbolIndex) -> Self{
         Self::Defvar { varname, vartype, value }
     }
     pub fn new_assign(lhs:SymbolIndex,rhs:SymbolIndex) ->Self{
