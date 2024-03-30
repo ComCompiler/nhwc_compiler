@@ -14,38 +14,37 @@ nhwc_compiler 的目标是成为一个简化版的类llvm的编译器框架，�
     - [x] nhwc ir
         - [x] 支持 phi-node 
         - [x] 支持简单的的 llvm ir 功能
-        - [] 支持 对数组访问和修改命令
+        - [ ] 支持 对数组访问和修改命令
     - [x] riscv instr
         - [x] 支持常见的32位操作
     - [x] Pass形式组织的框架
-- [] 编译总流程
+- [ ] 编译总流程
     - [x] code2ast_pass  由c语言代码构造ast树
         - [x] antlr 自带的图结构转 petgraph 图结构
     - [x] ast2st_pass 由 ast 树构造 scope tree 解析作用域
         - [x] 支持 ast node 与 st node 互相映射 
-    - [] ast2et_debug_pass 这个 Pass 仅用于绘制 expression tree 图片，测试toolkit::gen_et
+    - [ ] ast2et_debug_pass 这个 Pass 仅用于绘制 expression tree 图片，测试toolkit::gen_et
         - [x] 支持数组相关 Operator
         - [x] 支持对节点添加 def 或 use 信息
         - [x] 支持简单的常量子树计算优化
         - [x] 支持解析单个 statement 
         - [] 支持直接解析整一个basic block 
     - [x] ast2cfg_pass 用于将 ast 树转化为 cfg (不带nhwc ir)
-    - [] cfg2ncfg_pass 用于从 cfg(不带nhwc ir) 构造 ncfg(带nhwc ir 的cfg)
+    - [ ] cfg2ncfg_pass 用于从 cfg(不带nhwc ir) 构造 ncfg(带nhwc ir 的cfg)
         - [x] 符号作用域检查
         - [x] 支持遍历作为 树的 et 
-        - [] 支持遍历作为 DAG的 et 
-    - [] ncfg2ssa_ncfg 将 ncfg(non-ssa) 转化为 ssa形式的ncfg
-        - [] 插入 phi-node 
-        - [] 变量重命名
-    - [] nhwc2riscv_pass 由nhwc ir 转化为 riscv
-        - [] 完成nhwc ir 到riscv assembly 的简单对应
-    - [] riscv2binary_pass 将riscv 汇编文件编译为二进制文件
-
-- [] 高级优化
-    - [] 支持循环展开
-    - [] 支持对表达式进行公共子表达式消除
-    - [] 支持向量化
-    - [] 支持常量传播
+        - [ ] 支持遍历作为 DAG的 et 
+    - [ ] ncfg2ssa_ncfg 将 ncfg(non-ssa) 转化为 ssa形式的ncfg
+        - [ ] 插入 phi-node 
+        - [ ] 变量重命名
+    - [ ] nhwc2riscv_pass 由nhwc ir 转化为 riscv
+        - [ ] 完成nhwc ir 到riscv assembly 的简单对应
+    - [ ] riscv2binary_pass 将riscv 汇编文件编译为二进制文件
+- [ ] 高级优化
+    - [ ] 支持循环展开
+    - [ ] 支持对表达式进行公共子表达式消除
+    - [ ] 支持向量化
+    - [ ] 支持常量传播
 
 更多内容，敬请期待
 
