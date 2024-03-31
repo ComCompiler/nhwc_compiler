@@ -2,8 +2,8 @@ use std::{any::Any, collections::HashMap, fmt::Debug};
 
 use petgraph::visit::Data;
 
-use crate::find;
-
+use crate::{find, node};
+use crate::NodeIndex;
 use super::ast_node::AstTree;
 
 pub type Fields =  HashMap<&'static str,Box<dyn Field>>;
@@ -49,5 +49,11 @@ impl Value{
 impl Type{
     fn new(node:u32,ast_tree:&AstTree) -> Self{
         // 在asttree中找到node的u32所在节点的类型,返回I32或F32
+        let text = node!(at node in ast_tree).text.as_str();
+        match text {
+            "i32" => Type::I32,
+            "f32" => Type::F32,
+            _ => panic!("text中类型错误"),
+        }
     }
 }
