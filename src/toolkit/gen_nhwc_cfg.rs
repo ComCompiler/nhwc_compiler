@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use petgraph::stable_graph::NodeIndex;
 
-use crate::{ add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::symbol::Symbol};
+use crate::{ add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{field::Type, symbol::Symbol}};
 
 use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, gen_et::process_any_stmt, nhwc_instr::Instruction, scope_node::ScopeTree,symbol_table::{ SymbolIndex, SymbolTable}};
 
@@ -232,7 +232,7 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_table:&mut 
 
                         //创建空值
                         let value_symidx = SymbolIndex::new(decl_prt_scope, "".to_string());   
-                        let def_instr = Instruction::new_defvar(type_symidx, symbol_symidx, value_symidx);
+                        let def_instr = Instruction::new_defvar(Type::I32, symbol_symidx, value_symidx);
 
                         push_instr!(add def_instr to cfg_bb for bb in cfg_graph);
                     },
@@ -553,7 +553,7 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_tabl
                             let (value_symidx,new_counter) = process_ettree(ast_tree, cfg_graph, et_tree, scope_tree, symbol_table, ast2scope, op_values[1], decl_prt_scope, cfg_bb, counter);
                             counter = new_counter;
 
-                            let defvar_instr = Instruction::new_defvar(type_symidx, var_symidx, value_symidx);
+                            let defvar_instr = Instruction::new_defvar(Type::I32, var_symidx, value_symidx);
 
                             push_instr!(add defvar_instr to cfg_bb for bb in cfg_graph);
                         }else{
@@ -575,7 +575,7 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_tabl
                         //创建空值
                         let value_symidx = SymbolIndex::new(decl_prt_scope, "".to_string());   
 
-                        let def_instr = Instruction::new_defvar(type_symidx, symbol_symidx, value_symidx);
+                        let def_instr = Instruction::new_defvar(Type::I32, symbol_symidx, value_symidx);
 
                         push_instr!(add def_instr to cfg_bb for bb in cfg_graph);
                     },

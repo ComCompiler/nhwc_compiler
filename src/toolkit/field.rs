@@ -46,8 +46,8 @@ impl Value{
         Value::F32(Some(value))
     }
 }
-impl Type{
-    fn new(node:u32,ast_tree:&AstTree) -> Self{
-        // 在asttree中找到node的u32所在节点的类型,返回I32或F32
-    }
-}
+// impl Type{
+//     fn new(node:u32,ast_tree:&AstTree) -> Self{
+//         // 在asttree中找到node的u32所在节点的类型,返回I32或F32
+//     }
+// }

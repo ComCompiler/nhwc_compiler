@@ -1,9 +1,13 @@
-# 项目目标 
+# nhwc compiler
 
-nhwc_compiler 的目标是成为一个简化版的类llvm的编译器框架，用于生成 nhwc ir、riscv assembly。
+nhwc compiler 的目标是成为一个简化版的类llvm的编译器框架，用于生成 nhwc ir、riscv assembly。
 这个项目专注于代码可读性，因此使用了大量贴合英语语法的宏和 graphviz 的可视化功能生成图样来更好的debug
 
-# 项目进度
+# nhwc 是什么意思？
+
+nhwc 的意思是 Never Happy When Coding ，出自动画「BanG Dream! It's Mygo!!!」中台词:"我从来没有觉得玩乐队开心过。"
+
+## 进度
 
 - [x] 基础设施
     - [x] 符号表
@@ -28,7 +32,7 @@ nhwc_compiler 的目标是成为一个简化版的类llvm的编译器框架，�
         - [x] 支持对节点添加 def 或 use 信息
         - [x] 支持简单的常量子树计算优化
         - [x] 支持解析单个 statement 
-        - [] 支持直接解析整一个basic block 
+        - [ ] 支持直接解析整一个basic block 
     - [x] ast2cfg_pass 用于将 ast 树转化为 cfg (不带nhwc ir)
     - [ ] cfg2ncfg_pass 用于从 cfg(不带nhwc ir) 构造 ncfg(带nhwc ir 的cfg)
         - [x] 符号作用域检查
@@ -48,9 +52,6 @@ nhwc_compiler 的目标是成为一个简化版的类llvm的编译器框架，�
 
 更多内容，敬请期待
 
-# nhwc 是什么意思？
-
-nhwc 的意思是 Never Happy When Coding ，出自动画「BanG Dream! It's Mygo!!!」中台词:"我从来没有觉得玩乐队开心过。"
 
 ## Pass 形式组织的框架
 
@@ -125,7 +126,11 @@ impl Pass for Code2AstPass{
 
 # cfg 
 
-<p align="center"><img src="./report/cfg.png"></p>
+<p align="center"><img src="./report/cfg_graph.png"></p>
+
+# ncfg 
+
+<p align="center"><img src="./report/nhwc_cfg_graph.png"></p>
 
 <!-- #  -->
 
