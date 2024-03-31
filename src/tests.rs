@@ -172,7 +172,7 @@ mod tests{
         const VALUE:&str = "value";
         let mut symtab = SymbolTable::new();
 
-        let lhs = add_symbol!({"lhs".to_string()} of scope {0} with field VALUE:{Value::U32(None)} to symtab);
+        let lhs = add_symbol!({"lhs".to_string()} of scope {0} with field VALUE:{Value::I32(None)} to symtab);
         let a = add_symbol!({"No.1".to_string()} of scope {0} to symtab);
         let b = add_symbol!({"No.2".to_string()} of scope {0} to symtab);
 
