@@ -30,6 +30,7 @@ impl PassManager {
     /// 调用这个函数运行 PassManager 中的所有函数
     pub fn execute_passes(&mut self){
         for pass in &mut self.passes{
+            println!("Pass {} run",pass.get_pass_name());
             pass.run(&mut self.ctx)
         }
     }

@@ -26,7 +26,7 @@ pub trait Field : Any + Debug {
 pub enum Value{
     I32(Option<i32>),F32(Option<f32>)
 }
-#[derive(Debug,Clone)]
+#[derive(Clone)]
 pub enum Type{
     I32,F32
 }
@@ -47,13 +47,22 @@ impl Value{
     }
 }
 impl Type{
-    fn new(node:u32,ast_tree:&AstTree) -> Self{
+    pub fn new(node:u32,ast_tree:&AstTree) -> Self{
         // 在asttree中找到node的u32所在节点的类型,返回I32或F32
         let text = node!(at node in ast_tree).text.as_str();
         match text {
-            "i32" => Type::I32,
-            "f32" => Type::F32,
+            "int" => Type::I32,
+            "float" => Type::F32,
             _ => panic!("text中类型错误"),
+        }
+    }
+}
+
+impl Debug for Type{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Type::I32 => write!(f,"i32"),
+            Type::F32 => write!(f,"f32"),
         }
     }
 }

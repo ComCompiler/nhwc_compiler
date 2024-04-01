@@ -596,12 +596,12 @@ fn process_postfix_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &S
     }else if let Some(_string_node) = find!(term PlusPlus at postfix_expr_node in ast_tree){
         //说明这是个++的语法 
         let et_plusplus_node =  add_node_with_edge!({EtNakedNode::new_op_right_plusplus( postfix_expr_node).to_et_node()} from parent_et_node in et_tree);
-        let postfix_expr_node= find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree).expect(format!("process_postfix_expr error at ast_node{}",postfix_expr_node).as_str());
+        let postfix_expr_node= find!(rule RULE_postfixExpression at postfix_expr_node in ast_tree).expect(format!("process_postfix_expr error at ast_node{}",postfix_expr_node).as_str());
         process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_plusplus_node);
     }else if let Some(_string_node) = find!(term MinusMinus at postfix_expr_node in ast_tree){
         //说明这是个--的语法 
         let et_minusminus_node =  add_node_with_edge!({EtNakedNode::new_op_right_minusminus( postfix_expr_node).to_et_node()} from parent_et_node in et_tree);
-        let postfix_expr_node= find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree).unwrap();
+        let postfix_expr_node= find!(rule RULE_postfixExpression at postfix_expr_node in ast_tree).unwrap();
         process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_minusminus_node);
     }else if let Some(primary_expr_node) = find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree){
         process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, parent_et_node)

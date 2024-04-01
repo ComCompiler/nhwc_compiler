@@ -1,6 +1,8 @@
 /target
 /P
 *.png
+!report/*.png
 *.dot
 *.java
 */.*/*
+*.pdf

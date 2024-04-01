@@ -8,23 +8,29 @@ pub enum ArithOp{
     Add{
         a : SymbolIndex ,
         b : SymbolIndex ,
+        vartype : Type ,
     },
     Mul{
         a : SymbolIndex ,
         b : SymbolIndex ,
+        vartype : Type ,
+
     },
     Div{
         a : SymbolIndex ,
         b : SymbolIndex ,
-    },
+        vartype : Type ,
+   },
     Sub{
         a : SymbolIndex ,
         b : SymbolIndex ,
+        vartype : Type ,
     },
     Icmp{
         plan : IcmpPlan,
         a : SymbolIndex ,       //寄存器或者数
         b : SymbolIndex ,
+        vartype : Type ,
     },
 }
 #[derive(Clone)]
@@ -145,20 +151,20 @@ impl Instruction{
     }
     
     // Instruction -> Arith -> ArithOp
-    pub fn new_add(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex) -> Self{
-        Self::Arith {lhs, rhs: ArithOp::Add { a, b } }
+    pub fn new_add(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex,vartype:Type) -> Self{
+        Self::Arith {lhs, rhs: ArithOp::Add { a, b, vartype } }
     }
-    pub fn new_mul(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex) -> Self{
-        Self::Arith {lhs, rhs: ArithOp::Mul { a,  b } }
+    pub fn new_mul(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex,vartype:Type) -> Self{
+        Self::Arith {lhs, rhs: ArithOp::Mul { a,  b, vartype} }
     }
-    pub fn new_div(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex) -> Self{
-        Self::Arith { lhs, rhs: ArithOp::Div { a, b } }
+    pub fn new_div(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex,vartype:Type) -> Self{
+        Self::Arith { lhs, rhs: ArithOp::Div { a, b, vartype } }
     }
-    pub fn new_sub(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex) -> Self{
-        Self::Arith {lhs, rhs: ArithOp::Sub {a, b } }
+    pub fn new_sub(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex,vartype:Type) -> Self{
+        Self::Arith {lhs, rhs: ArithOp::Sub {a, b, vartype } }
     }
-    pub fn new_icmp(lhs: SymbolIndex, plan:IcmpPlan,a:SymbolIndex,b:SymbolIndex) -> Self{
-        Self::Arith {lhs, rhs: ArithOp::Icmp { plan,a, b } }
+    pub fn new_icmp(lhs: SymbolIndex, plan:IcmpPlan,a:SymbolIndex,b:SymbolIndex,vartype:Type) -> Self{
+        Self::Arith {lhs, rhs: ArithOp::Icmp { plan,a, b, vartype } }
     }
     // Instruction -> Call -> FuncOp
     pub fn new_func_call(assigned:Option<SymbolIndex> , func:SymbolIndex , args:Vec<SymbolIndex>) ->Self{       //也许可以直接传入一个Func结构体
@@ -181,16 +187,16 @@ impl Instruction{
 impl Debug for ArithOp{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Add { a, b } => 
-                write!(f,"Add type {:?}, {:?}",a,b),
-            Self::Mul { a, b } => 
-                write!(f,"Mul type {:?}, {:?}",a,b),
-            Self::Div { a, b } => 
-                write!(f,"Div type {:?}, {:?}", a,b),
-            Self::Sub { a, b } => 
-                write!(f,"Sub type  {:?}, {:?}", a,b),
-            Self::Icmp { plan, a, b } => 
-                write!(f,"icmp {:?} type {:?}, {:?}",plan,a,b)
+            Self::Add { a, b, vartype } => 
+                write!(f,"Add {:?} {:?}, {:?}",vartype,a,b),
+            Self::Mul { a, b, vartype } => 
+                write!(f,"Mul {:?} {:?}, {:?}",vartype,a,b),
+            Self::Div { a, b, vartype } => 
+                write!(f,"Div {:?} {:?}, {:?}",vartype, a,b),
+            Self::Sub { a, b, vartype } => 
+                write!(f,"Sub {:?} {:?}, {:?}",vartype, a,b),
+            Self::Icmp { plan, a, b, vartype } => 
+                write!(f,"icmp {:?} {:?} {:?}, {:?}",vartype,plan,a,b)
         }
     }
 }
