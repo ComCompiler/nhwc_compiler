@@ -43,9 +43,9 @@ macro_rules! find {
             iter.next()
         }
     };
-    (field $field_id:ident:$field_type:ident in $sym:ident) => {
+    (field $field_name:ident:$field_type:ident in $sym:ident) => {
         {
-            let op_field = $sym.get_field(stringify!($field_id));
+            let op_field = $sym.get_field($field_name);
             match op_field {
                 None=>{
                     None
@@ -55,7 +55,7 @@ macro_rules! find {
                         Some(data) => {
                             Some(data)
                         },
-                        None => panic!(concat!("这个field ",stringify!(field_id), "不是",stringify!($field_type), "类型")),
+                        None => panic!(concat!("这个field ",stringify!($field_name), "不是",stringify!($field_type), "类型")),
                     }
                 }
             }
@@ -63,17 +63,17 @@ macro_rules! find {
     };
     (field mut $field_name:ident:$field_type:ident in $sym:ident) => {
         {
-            let op_field = $sym.get_field_mut(stringify!($field_id));
+            let op_field = $sym.get_field_mut($field_name);
             match op_field {
                 None=>{
                     None
                 }
                 Some(field)=>{
-                    match field.as_any().downcast_mut::<$field_type>(){
+                    match field.as_any_mut().downcast_mut::<$field_type>(){
                         Some(data) => {
                             Some(data)
                         },
-                        None => panic!(concat!("这个field ",stringify!(field_id), "不是",stringify!($field_type), "类型")),
+                        None => panic!(concat!("这个field ",stringify!($field_name), "不是",stringify!($field_type), "类型")),
                     }
                 }
             }
@@ -105,7 +105,7 @@ macro_rules! find {
                 .get_field($field_name);
             let op_field_data =match field{
                 Some(value)=>{
-                    Some(value.as_any().downcast_mut::<$field_type>().expect(format!("symbol {:?} 的 field {}不是这个类型的",$symidx,$field_name).as_str()))
+                    Some(value.as_any_mut().downcast_mut::<$field_type>().expect(format!("symbol {:?} 的 field {}不是这个类型的",$symidx,$field_name).as_str()))
                 }
                 None=>{
                     None   
@@ -129,6 +129,11 @@ macro_rules! find {
             $symtab.get_verbose($sym_name , $scope_node)
         }
     };
+    (symbol $sym_name:block of scope $scope_node:ident  in $symtab:ident) => {
+        {
+            $symtab.get_verbose($sym_name , $scope_node)
+        }
+    };
     (symbol mut $sym_name:block of scope $scope_node:block  in $symtab:ident) => {
         {
             $symtab.get_verbose_mut($sym_name , $scope_node)
@@ -136,7 +141,7 @@ macro_rules! find {
     };
     (symbol at $symidx:ident  in $symtab:ident) => {
         {
-            $symtab.get_verbose($sym_name , $scope_node)
+            $symtab.get($symidx)
         }
     };
     (symbol mut at $symidx:ident  in $symtab:ident) => {
@@ -317,10 +322,10 @@ macro_rules! add_node_with_edge{
 macro_rules! add_symbol {
     ($sym:ident $(with field $field_name:ident:$field_value:block)* to $symtab:ident ) => {
         {
-            let symidx = $symtab.add($symbol);
+            let symidx = $symtab.add($sym);
             $(
                 let sym =  $symtab.get_mut(&symidx).unwrap();
-                sym.add_field($field_name,Box::new(field_value));
+                sym.add_field($field_name,Box::new($field_value));
             )?
             symidx
         }
@@ -446,5 +451,25 @@ macro_rules! add_passes {
     ($first_pass:ident $(then $next_pass:ident)* to $pass_manager:ident) => {
         $pass_manager.add_pass(Box::new($first_pass));
         $($pass_manager.add_pass(Box::new($next_pass));)*
+    };
+}
+
+
+#[macro_export]
+macro_rules! gen_field_trait_for_structs {
+    ($($struct_name:ident),+) => {
+        $( 
+        impl Field for $struct_name {
+            fn as_any(&self) -> &dyn Any {
+                self
+            }
+            fn as_any_mut(&mut self) -> &mut dyn Any {
+                self
+            }
+            fn clone_box(&self)->Box<dyn Field> {
+                Box::new(self.clone())
+            }
+        }
+        )*
     };
 }

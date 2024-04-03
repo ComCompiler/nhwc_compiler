@@ -292,7 +292,7 @@ pub fn parse_ast_to_cfg(context:&mut Context) {
         add_edge!( {CfgEdge::Direct {  } } from  cfg_func_parent_node to cfg_entry_node in cfg_graph);
         let exit_struct = CfgNode::Exit  { ast_node:funcdef_node, text: String::new() };
         let cfg_exit_node = add_node!(exit_struct to cfg_graph);
-        println!("funcdef {}",funcdef_node);
+        // println!("funcdef {}",funcdef_node);
         let current_compound_node = find!(rule RULE_compoundStatement at funcdef_node in ast_tree ).unwrap();
 
 

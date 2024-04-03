@@ -31,8 +31,6 @@ impl Pass for SymtabDebugPass{
             let root = 0;
             add_node_with_edge!({ctx.symtab.clone()} from root in symtab_g);
             generate_png_by_graph(&symtab_g,"symtab".to_string(),&[Config::EdgeNoLabel,Config::Record,Config::Rounded,Config::Symtab]);
-            println!("可视化结束");
-            println!("{:?}",ctx.symtab);
         }
     }
     // 返回pass的描述，具体作用

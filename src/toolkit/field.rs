@@ -2,9 +2,10 @@ use std::{any::Any, collections::HashMap, fmt::Debug};
 
 use petgraph::visit::Data;
 
-use crate::{find, node};
+use crate::{find, gen_field_trait_for_structs, node};
 use crate::NodeIndex;
 use super::ast_node::AstTree;
+use super::symbol_table::SymbolIndex;
 
 pub type Fields =  HashMap<&'static str,Box<dyn Field>>;
 
@@ -19,24 +20,21 @@ pub trait FieldsOwner{
 /// 你实现的类型必须继承这个 trait 
 pub trait Field : Any + Debug {
     fn as_any(&self) -> &dyn Any;
+    fn as_any_mut(&mut self) -> &mut dyn Any;
     fn clone_box(&self)->Box<dyn Field>;
 }
 
 
 #[derive(Debug,Clone)]
 pub enum Value{
-    I32(Option<i32>),F32(Option<f32>),I1(Option<bool>),Fn(Vec<Type>)
+    I32(Option<i32>),F32(Option<f32>),I1(Option<bool>)
 }
 #[derive(Clone)]
 pub enum Type{
-    I32,F32,I1
-}
-impl Field for Value {
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-    fn clone_box(&self)->Box<dyn Field> {
-        Box::new(self.clone())
+    I32,F32,I1,
+    Fn{
+        args_types:Vec<SymbolIndex>,
+        ret_type:Option<SymbolIndex>,
     }
 }
 impl Clone for Box<dyn Field>{
@@ -68,14 +66,6 @@ impl Type{
         }
     }
 }
-impl Field for Type {
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-    fn clone_box(&self)->Box<dyn Field> {
-        Box::new(self.clone())
-    }
-}
 
 impl Debug for Type{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -83,6 +73,7 @@ impl Debug for Type{
             Type::I32 => write!(f,"i32"),
             Type::F32 => write!(f,"f32"),
             Type::I1 => write!(f,"i1"),
+            Type::Fn { args_types, ret_type } => write!(f,"Fn{:?}->{:?}",args_types,ret_type),
         }
     }
 }
@@ -98,6 +89,18 @@ impl Type{
             (Type::I1, Type::I32) => todo!(),
             (Type::I1, Type::F32) => todo!(),
             (Type::I1, Type::I1) => Type::I1,
+            _ => todo!(),
         }
+    }
+}
+gen_field_trait_for_structs!(Type,Value,UseCounter);
+#[derive(Clone)]
+pub struct UseCounter{
+   pub use_count:u32 
+}
+
+impl Debug for UseCounter{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f,"{}",self.use_count)
     }
 }

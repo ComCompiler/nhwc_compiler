@@ -173,7 +173,7 @@ where
                 write!(f, "shape = record,")?;
             }
             if self.config.Rounded {
-                write!(f, "shape = record,style=\"rounded\", margin=0.2, width=0, height=0,")?;
+                write!(f, "style=\"rounded\", margin=0.2, width=0, height=0,")?;
             }
             if !self.config.NodeNoLabel {
                 write!(f, "label = \"")?;
@@ -274,7 +274,6 @@ where
     W: fmt::Write,
 {
     fn write_str(&mut self, s: &str) -> fmt::Result {
-        println!("{}",s);
         for c in s.chars() {
             self.write_char(c)?;
         }
@@ -282,20 +281,17 @@ where
     }
 
     fn write_char(&mut self, c: char) -> fmt::Result {
-        // println!("write char record");
         match c {
             '"' | '\\' => self.0.write_char('\\')?,
             // \l is for left justified linebreak
             '\n' => return self.0.write_str("\\l"),
             '{' => return self.0.write_str("\\{"),
-            // 'h' => {println!("matched {}",'h');return self.0.write_str("hello world !!!")},
             '}' => return self.0.write_str("\\}"),
             '|' => return self.0.write_str("\\|"),
             '<' => return self.0.write_str("\\<"),
             '>' => return self.0.write_str("\\>"),
             _ => {}
         }
-        // println!("nothing matched ");
         self.0.write_char(c)
     }
 }
@@ -307,7 +303,6 @@ where
     W: fmt::Write,
 {
     fn write_str(&mut self, s: &str) -> fmt::Result {
-        println!("{}",s);
         for c in s.chars() {
             self.write_char(c)?;
         }
@@ -315,7 +310,6 @@ where
     }
 
     fn write_char(&mut self, c: char) -> fmt::Result {
-        // println!("write char record");
         match c {
             '"' | '\\' => self.0.write_char('\\')?,
             // \l is for left justified linebreak
@@ -329,7 +323,6 @@ where
             '$' => return self.0.write_str("}"),
             _ => {}
         }
-        // println!("nothing matched ");
         self.0.write_char(c)
     }
 }
@@ -360,7 +353,6 @@ where
         if f.alternate() {
             writeln!(&mut RecordEscaper(f), "{:#}", &self.0)
         } else {
-            println!("fmt for record escaped {}",&self.0);
             write!(&mut RecordEscaper(f), "{}", &self.0)
         }
     }
@@ -373,10 +365,8 @@ where
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if f.alternate() {
-            println!("fmt for record escaped {}",&self.0);
             writeln!(&mut SymtabEscaper(f), "{:#}", &self.0)
         } else {
-            println!("fmt for record escaped {}",&self.0);
             write!(&mut SymtabEscaper(f), "{}", &self.0)
         }
     }

@@ -615,13 +615,13 @@ fn process_arg_expr_list(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &
 }
 fn process_primary_expr(et_tree:&mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, primary_expr_node: u32, scope_node: u32, parent_et_node: u32){
     if let Some(const_node) = find!(term Constant at primary_expr_node in ast_tree){
-        println!("constant {}",const_node);
+        // println!("constant {}",const_node);
         process_constant(et_tree, ast_tree, scope_tree, const_node, scope_node, parent_et_node);
     }else if let Some(ident_node) = find!(term Identifier at primary_expr_node in ast_tree){
-        println!("ident {}",ident_node);
+        // println!("ident {}",ident_node);
         process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, parent_et_node, Def_Or_Use::Use);
     }else if let Some(expr_node) = find!(rule RULE_expression at primary_expr_node in ast_tree){
-        println!("expr found under {}",primary_expr_node );
+        // println!("expr found under {}",primary_expr_node );
         process_expr(et_tree, ast_tree, scope_tree, expr_node, scope_node, parent_et_node);
     }else if let Some(string_node) = find!(term StringLiteral at primary_expr_node in ast_tree){
         process_constant(et_tree, ast_tree, scope_tree, string_node, scope_node, parent_et_node);
