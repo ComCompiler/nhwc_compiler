@@ -1,7 +1,5 @@
 use std::any::Any;
-use petgraph::dot::Config;
-
-use crate::toolkit::{context::Context, etc::{generate_png_by_graph, read_file_content}, field::Field, gen_ast::parse_as_ast_tree, gen_cfg::parse_ast_to_cfg, pass_manager::Pass};
+use crate::toolkit::{context::Context, dot::Config, etc::{generate_png_by_graph, read_file_content}, field::Field, gen_ast::parse_as_ast_tree, gen_cfg::parse_ast_to_cfg, pass_manager::Pass};
 #[derive(Debug)]
 pub struct Ast2CfgPass{
     is_gen_png:bool
@@ -23,7 +21,7 @@ impl Pass for Ast2CfgPass{
             cfg_node.load_ast_node_text(&ctx.ast_tree)
         }
         if self.is_gen_png{
-            generate_png_by_graph(&ctx.cfg_graph,"cfg_graph".to_string(),&[Config::EdgeNoLabel]);  
+            generate_png_by_graph(&ctx.cfg_graph,"cfg_graph".to_string(),&[Config::EdgeNoLabel,Config::Record,Config::Rounded]);  
         }
 
     }

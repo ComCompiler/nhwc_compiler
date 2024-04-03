@@ -522,7 +522,7 @@ fn process_cast_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &Scop
         let type_sym = SymbolIndex::new(scope_node,node!(at type_name_node in ast_tree).text.clone());
         let cast_node = add_node_with_edge!({EtNakedNode::new_op_cast( cast_expr_node).to_et_node()} from parent_et_node in et_tree);
         // 添加 cast op 节点的左节点，这是个 type symbol 
-        add_node_with_edge!({EtNakedNode::new_symbol( scope_node,type_sym).to_et_node()} from cast_node in et_tree);
+        add_node_with_edge!({EtNakedNode::new_symbol(scope_node,type_sym,Def_Or_Use::Use).to_et_node()} from cast_node in et_tree);
         
         // 递归处理 castExpression
         let child_cast_expr_node = find!(rule RULE_castExpression at cast_expr_node in ast_tree).expect(format!("在 节点 {} 下找不到 castExpr",type_name_node).as_str());
@@ -653,7 +653,7 @@ fn process_ident(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeTree,
 
     let sym_idx = SymbolIndex::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
-    add_node_with_edge!({EtNakedNode::Symbol {sym_idx,ast_node:ident_node,text:String::new(), def_or_use }.to_et_node()} from parent_et_node in et_tree);
+    add_node_with_edge!({EtNakedNode::new_symbol(ident_node, sym_idx, def_or_use).to_et_node()} from parent_et_node in et_tree);
 }
 fn process_constant(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeTree,const_node:u32,scope_node:u32,parent_et_node:u32 ) {
     let sym_name = node!(at const_node in ast_tree).text.clone();
@@ -664,34 +664,29 @@ fn process_constant(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeTr
     add_node_with_edge!({EtNakedNode::Constant {const_sym_idx,ast_node:const_node,text:String::new()}.to_et_node()} from parent_et_node in et_tree);
 }
 
-fn process_declartion(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeTree,ident_node:u32,scope_node:u32,parent_et_node:u32 ,def_or_use:Def_Or_Use){
 
-}
+// fn symbol_def_use_order_check(et_tree:&mut EtTree)->u32{
+//     // let sym_name = node!(at ident_node in ast_tree).text.clone();
+//     // // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 
+//     // let sym_struct = Symbol::new(scope_node, sym_name);
+//     // // let symbol = symtab.add(symbol_struct);
 
-fn symbol_def_use_order_check(et_tree:&mut EtTree)->u32{
-    todo!()
-    // let sym_name = node!(at ident_node in ast_tree).text.clone();
-    // // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
+//     // match (symtab.get(&sym_struct.sym_idx),l_or_r_val){
+//     //     (None, L_or_R_Val::LValue) => {
+//     //         // 这种情况是找到了该符号，也就是说之前定义过此符号，如果定义过此符号
 
-    // let sym_struct = Symbol::new(scope_node, sym_name);
-    // // let symbol = symtab.add(symbol_struct);
+//     //     },
+//     //     (None, L_or_R_Val::RValue) => {
+//     //         // 如果没有找到这个符号，并且还是个右值，那么就应该直接报错了
+//     //         panic!("{} 在 {} 没有被定义", sym_struct.sym_idx.symbol_name,);
+//     //     },
+//     //     (Some(_), L_or_R_Val::LValue) => ,
+//     //     (Some(_), L_or_R_Val::RValue) => todo!(),
+//     // }
 
-    // match (symtab.get(&sym_struct.sym_idx),l_or_r_val){
-    //     (None, L_or_R_Val::LValue) => {
-    //         // 这种情况是找到了该符号，也就是说之前定义过此符号，如果定义过此符号
+//     // let et_node_struct :EtNode = EtNode::new(ident_node);
+//     // let et_node = add_node!(et_node_struct to et_tree);
+//     // et_node
 
-    //     },
-    //     (None, L_or_R_Val::RValue) => {
-    //         // 如果没有找到这个符号，并且还是个右值，那么就应该直接报错了
-    //         panic!("{} 在 {} 没有被定义", sym_struct.sym_idx.symbol_name,);
-    //     },
-    //     (Some(_), L_or_R_Val::LValue) => ,
-    //     (Some(_), L_or_R_Val::RValue) => todo!(),
-    // }
-
-    // let et_node_struct :EtNode = EtNode::new(ident_node);
-    // let et_node = add_node!(et_node_struct to et_tree);
-    // et_node
-
-}
+// }

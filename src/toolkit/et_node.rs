@@ -26,7 +26,9 @@ pub enum EtNakedNode{
     Constant{const_sym_idx:SymbolIndex,ast_node:u32,text:String },
     // Def_Or_Use 是一个枚举类型，要么是 Def 要么是 Use
     Symbol{sym_idx:SymbolIndex,ast_node:u32,text:String,def_or_use:Def_Or_Use},
-    // 考虑到 可能出现  a=3,b=2; 这样的语句，因此需要规定一个Separator
+    // array symbol 一个 array 是 array symbol 
+    // ArraySym{sym_idx:SymbolIndex,ast_node:u32,text:String,def_or_use:Def_Or_Use},
+    // // 考虑到 可能出现  a=3,b=2; 这样的语句，因此需要规定一个Separator
     Separator{ast_node:u32,text:String}, 
     //需要declarator来声明变量
 }
@@ -236,9 +238,12 @@ impl EtNakedNode{
     pub fn new_constant(ast_node:u32,const_symbol : SymbolIndex)->Self{
         EtNakedNode::Constant { const_sym_idx: const_symbol ,ast_node,text:String::new()}
     }
-    pub fn new_symbol(ast_node:u32,symbol : SymbolIndex)->Self{
-        EtNakedNode::Constant { const_sym_idx: symbol,ast_node,text:String::new() }
+    pub fn new_symbol(ast_node:u32, sym_idx:SymbolIndex, def_or_use:Def_Or_Use)->Self{
+        EtNakedNode::Symbol {  sym_idx,ast_node,text:String::new(), def_or_use:def_or_use }
     }
+    // pub fn new_array_symbol(ast_node:u32,sym_idx:SymbolIndex ,def_or_use:Def_Or_Use)->Self{
+    //     EtNakedNode::ArraySym  {sym_idx,ast_node,text:String::new(), def_or_use:def_or_use  }
+    // }
     pub fn new_op_equal(ast_node:u32)->Self{
         EtNakedNode::Operator { op: ExprOp::Eq ,ast_node,text:String::new()}
     }
@@ -307,18 +312,21 @@ impl EtNakedNode{
             EtNakedNode::Operator { op, ast_node, text } => ast_node,
             EtNakedNode::Constant { const_sym_idx, ast_node, text } => ast_node,
             EtNakedNode::Symbol { sym_idx, ast_node, text ,def_or_use} => ast_node,
+            // EtNakedNode::ArraySym { sym_idx, ast_node, text ,def_or_use} => ast_node,
             EtNakedNode::Separator { ast_node, text } => ast_node,
         };
         let new_str=match self {
             EtNakedNode::Operator { op, ast_node, text }=> text.clone(),
             EtNakedNode::Constant { const_sym_idx, ast_node, text } => text.clone(),
             EtNakedNode::Symbol { sym_idx, ast_node, text,def_or_use } => text.clone(),
+            // EtNakedNode::ArraySym { sym_idx, ast_node, text,def_or_use } => text.clone(),
             EtNakedNode::Separator { ast_node, text } => text.clone(),
         };
         let _  = mem::replace(match self {
                 EtNakedNode::Operator { op, ast_node, text } => text,
                 EtNakedNode::Constant { const_sym_idx, ast_node, text } => text,
                 EtNakedNode::Symbol { sym_idx, ast_node, text,def_or_use } => text,
+                // EtNakedNode::ArraySym { sym_idx, ast_node, text,def_or_use } => text,
                 EtNakedNode::Separator { ast_node, text } => text,
             },
             new_str);
@@ -344,6 +352,8 @@ impl Debug for EtNakedNode{
                 write!(f,"{}",const_sym_idx.symbol_name),
             EtNakedNode::Symbol { sym_idx, ast_node, text, def_or_use } =>
                 write!(f,"{:?} {} {}",def_or_use,text,sym_idx.symbol_name),
+            // EtNakedNode::ArraySym { sym_idx, ast_node, text, def_or_use } =>
+                // write!(f,"{:?} {} {}",def_or_use,text,sym_idx.symbol_name),
             EtNakedNode::Separator { ast_node, text } =>{
                 write!(f,"{}",text)
             }

@@ -6,3 +6,4 @@ pub mod ast2et_debug_pass;
 pub mod cfg2ncfg_pass;
 pub mod nhwc2riscv_pass;
 pub mod riscv2binary_pass;
+pub mod symtab_debug_pass;

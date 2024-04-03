@@ -1,8 +1,7 @@
 use std::any::Any;
-use petgraph::dot::Config;
 use petgraph::prelude::NodeIndex;
 
-use crate::{add_edge, antlr_parser::cparser::{RULE_declaration, RULE_expressionStatement}, toolkit::{self, ast_node::find_dfs_rule_ast, context::Context, et_node::{EtNakedNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, field::Field, gen_ast::parse_as_ast_tree, gen_cfg::parse_ast_to_cfg, pass_manager::Pass}};
+use crate::{add_edge, antlr_parser::cparser::{RULE_declaration, RULE_expressionStatement}, toolkit::{self, ast_node::find_dfs_rule_ast, context::Context, dot::Config, et_node::{EtNakedNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, field::Field, gen_ast::parse_as_ast_tree, gen_cfg::parse_ast_to_cfg, pass_manager::Pass}};
 #[derive(Debug)]
 pub struct Ast2EtDebugPass{
     is_gen_png:bool
@@ -36,7 +35,7 @@ impl Pass for Ast2EtDebugPass{
         }
         // 1.1 生成对应的png 
         if self.is_gen_png{
-            generate_png_by_graph(&ctx.et_tree,"et_tree".to_string(),&[Config::EdgeNoLabel]);  
+            generate_png_by_graph(&ctx.et_tree,"et_tree".to_string(),&[Config::EdgeNoLabel,Config::Record]);  
         }
 
     }

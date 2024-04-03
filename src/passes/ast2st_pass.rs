@@ -1,7 +1,5 @@
 use std::any::Any;
-use petgraph::dot::Config;
-
-use crate::toolkit::{context::Context, etc::generate_png_by_graph, gen_scope::parse_ast_to_scope, pass_manager::Pass};
+use crate::toolkit::{context::Context, dot::Config, etc::generate_png_by_graph, gen_scope::parse_ast_to_scope, pass_manager::Pass};
 #[derive(Debug)]
 pub struct Ast2StPass{
     is_gen_png:bool
@@ -24,7 +22,7 @@ impl Pass for Ast2StPass{
             for scope_node in ctx.scope_tree.node_weights_mut(){
                 scope_node.load_ast_node_text(&ctx.ast_tree);
             }
-            generate_png_by_graph(&ctx.scope_tree, "scope_tree".to_string(),&[Config::EdgeNoLabel]);
+            generate_png_by_graph(&ctx.scope_tree, "scope_tree".to_string(),&[Config::EdgeNoLabel,Config::Record]);
         }
 
     }

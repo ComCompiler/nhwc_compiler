@@ -17,3 +17,4 @@ pub mod gen_scope;
 pub mod et_node;
 pub mod eval;
 pub mod symbol;
+pub mod dot;

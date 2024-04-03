@@ -1,8 +1,7 @@
 use std::{fs::File, process::Command, fmt::Debug, env, io::{Write, Read}};
 
-use petgraph::{dot::{Dot, Config}, stable_graph::StableGraph, EdgeType};
-
-
+use petgraph::{stable_graph::StableGraph, EdgeType};
+use crate::toolkit::dot::{Dot,Config};
 
 /// 生成树(可以是任何树)对应的png ，将此png 放在命令行*当前*目录下
 pub fn generate_png_by_graph<N:Debug,E:Debug,Ty :EdgeType>(g:&StableGraph<N,E,Ty>, name :String, graph_config:&[Config]){

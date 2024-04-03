@@ -1,12 +1,15 @@
 use core::panic;
-use std::{collections::{BTreeMap, HashMap}, fmt::Formatter};
+use std::{collections::{BTreeMap, HashMap}, fmt::{Display, Formatter}};
 
+
+use petgraph::stable_graph::StableDiGraph;
 
 use super::{symbol::Symbol, field::{self, Field}};
 use core::fmt::Debug;
 
+pub type SymtabGraph = StableDiGraph<SymbolTable,(),u32>;
 
-#[derive(Debug,Clone)]
+#[derive(Clone)]
 pub struct SymbolTable {
     map: BTreeMap<SymbolIndex,Symbol>,
 }
@@ -67,16 +70,20 @@ impl Default for SymbolTable{
         Self { map: Default::default() }
     }
 }
-impl Clone for Box<dyn Field>{
-    fn clone(&self) -> Self {
-        panic!("you should never use the clone for Field");
-    }
-}
 impl Debug for SymbolIndex{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self.index_ssa {
             Some(index_ssa) => write!(f, "{}_s{}_i{}", self.symbol_name, self.scope_node, index_ssa),
             None => write!(f, "{}_s{}", self.symbol_name, self.scope_node),
         }
+    }
+}
+impl Debug for SymbolTable{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::from("#sym_name@fields$");
+        for (symidx,sym) in self.map.iter(){
+            s.push_str(format!("@ # {} @ {:#?} $",symidx.symbol_name,sym.fields).as_str());
+        }
+        write!(f,"{}",s)
     }
 }

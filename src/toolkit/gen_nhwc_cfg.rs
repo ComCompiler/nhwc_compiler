@@ -4,7 +4,7 @@ use petgraph::stable_graph::NodeIndex;
 
 use crate::{ add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{field::Type, symbol::Symbol}};
 
-use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, gen_et::process_any_stmt, nhwc_instr::Instruction, scope_node::ScopeTree,symbol_table::{ SymbolIndex, SymbolTable}};
+use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, field::FieldsOwner, gen_et::process_any_stmt, nhwc_instr::Instruction, scope_node::ScopeTree, symbol_table::{ SymbolIndex, SymbolTable}};
 
 /*
  这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有 
@@ -232,12 +232,11 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_table:&mut 
                     EtNakedNode::Symbol { sym_idx:_, ast_node:_, text, def_or_use } => {
 
                         //获得变量类型，做成symidx
-                        let var = find!(rule RULE_declarationSpecifiers at ast_decl_node in ast_tree).unwrap();
-                        let type_str = node!(at var in ast_tree).text.clone();
-                        let var_type = Type::new(var,ast_tree);
-                        SymbolIndex::new(decl_scope, type_str);
+                        let type_node = find!(rule RULE_declarationSpecifiers at ast_decl_node in ast_tree).unwrap();
+                        // let type_str = node!(at type_node in ast_tree).text.clone();
+                        let var_type = Type::new(type_node,ast_tree);
                         println!("stat enter {}",text);
-                        let symbol_symidx = process_symbol(scope_tree, symbol_table, &def_or_use, &text, decl_prt_scope);
+                        let symbol_symidx = process_symbol(ast_tree,scope_tree, symbol_table, &def_or_use, &text, decl_prt_scope);
 
                         //创建空值
                         let value_symidx = SymbolIndex::new(decl_prt_scope, "".to_string());   
@@ -276,13 +275,15 @@ fn parse_bb2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&ScopeTre
     counter
 }
 
-fn process_symbol(scope_tree:&ScopeTree,symbol_table:&mut SymbolTable,def_or_use:&Def_Or_Use,symbol:&String,scope_node:u32)->SymbolIndex{   
+static TYPE:&str = "type";
+fn process_symbol(ast_tree:&AstTree,scope_tree:&ScopeTree,symbol_table:&mut SymbolTable,def_or_use:&Def_Or_Use,symbol:&String,scope_node:u32)->SymbolIndex{   
     let mut symbol_scope = scope_node;
     match def_or_use{
-        Def_Or_Use::Def { type_ast_node:_ } => { 
+        Def_Or_Use::Def { type_ast_node } => { 
             let symbol_str = symbol.clone();
             println!("处理的符号为{}",*symbol);
-            let symbol_symidx = add_symbol!({Symbol::new_verbose(scope_node,symbol_str)} to symbol_table);
+            let var_type = Type::new(*type_ast_node, ast_tree);
+            let symbol_symidx = add_symbol!({Symbol::new_verbose(scope_node,symbol_str)} with field TYPE:{var_type} to symbol_table);
             symbol_symidx
         },
         Def_Or_Use::Use => {
@@ -319,7 +320,7 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
 
                         let tmp_var_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
                         counter += 1;
-                        let vartype=Type::new(scope_node, ast_tree);
+                        let vartype=Type::I32;
                         let mul_instr = Instruction::new_mul(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype);
                         push_instr!(add mul_instr to cfg_bb for bb in cfg_graph);
 
@@ -340,7 +341,7 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
 
                         let tmp_var_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
                         counter += 1;
-                        let vartype=Type::new(scope_node, ast_tree);
+                        let vartype=Type::I32;
 
                         let add_instr = Instruction::new_add(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype);
                         push_instr!(add add_instr to cfg_bb for bb in cfg_graph);
@@ -362,7 +363,7 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
 
                         let tmp_var_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
                         counter += 1;
-                        let vartype=Type::new(scope_node, ast_tree);
+                        let vartype=Type::I32;
                         let sub_instr = Instruction::new_sub(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype);
                         push_instr!(add sub_instr to cfg_bb for bb in cfg_graph);
 
@@ -383,7 +384,7 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                         
                         let tmp_var_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
                         counter += 1;
-                        let vartype=Type::new(scope_node, ast_tree);
+                        let vartype=Type::I32;
 
                         let div_instr = Instruction::new_div(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype);
                         push_instr!(add div_instr to cfg_bb for bb in cfg_graph);
@@ -428,7 +429,7 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                         counter += 1;
                         let tmp_addvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
                         counter += 1;
-                        let vartype=Type::new(scope_node, ast_tree);
+                        let vartype=Type::I32;
 
                         let load_instr = Instruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone());
                         let add_instr = Instruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype);
@@ -453,7 +454,7 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                         counter += 1;
                         let tmp_addvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
                         counter += 1;
-                        let vartype=Type::new(scope_node, ast_tree);
+                        let vartype=Type::I32;
 
                         let load_instr = Instruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone());
                         let add_instr = Instruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype);
@@ -478,7 +479,7 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                         counter += 1;
                         let tmp_subvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
                         counter += 1;
-                        let vartype=Type::new(scope_node, ast_tree);
+                        let vartype=Type::I32;
 
                         let load_instr = Instruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone());
                         let sub_instr = Instruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype);
@@ -503,7 +504,7 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
                         counter += 1;
                         let tmp_subvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
                         counter += 1;
-                        let vartype=Type::new(scope_node, ast_tree);
+                        let vartype=Type::I32;
 
                         let load_instr = Instruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone());
                         let sub_instr = Instruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype);
@@ -530,7 +531,7 @@ fn process_ettree(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,sco
             let ast_node = *ast_node;
             let ast_text = &node!(at ast_node in ast_tree).text;
             println!("处理的节点为{}符号为{}",ast_node,ast_text);
-            let symbol_symidx = process_symbol(scope_tree,symbol_table,def_or_use,ast_text,scope_node);
+            let symbol_symidx = process_symbol(ast_tree,scope_tree,symbol_table,def_or_use,ast_text,scope_node);
             (symbol_symidx,counter)
         },
         _=>{
@@ -587,7 +588,7 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symbol_tabl
 
                         let ast_node = *ast_node;
                         let var_str = &node!(at ast_node in ast_tree).text;
-                        let symbol_symidx = process_symbol(scope_tree, symbol_table, &def_or_use, var_str, decl_prt_scope);
+                        let symbol_symidx = process_symbol(ast_tree,scope_tree, symbol_table, &def_or_use, var_str, decl_prt_scope);
 
                         //创建空值
                         let value_symidx = SymbolIndex::new(decl_prt_scope, "".to_string());   
@@ -683,7 +684,7 @@ pub fn parse_cfg_into_nhwc_cfg(context :&mut Context,mut counter:u32){
 
             parse_func2nhwc(ast_tree, cfg_graph,symbol_table, ast2scope,ast_fun,ast_funsign,cfg_entry);
         }else{
-            panic!("entry不是函数签名，cfg出错");
+            panic!("entry不是函数签名,cfg出错");
         }   
     }
     //再遍历一遍entry，对于每个函数做dfs,处理函数体
