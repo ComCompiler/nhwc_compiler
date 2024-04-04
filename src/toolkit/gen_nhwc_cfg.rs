@@ -331,9 +331,11 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                     if let Some(_) = direct_node!(at et_node in et_tree ret option){
                         let next_nodes = direct_nodes!(at et_node in et_tree);
 
+                        println!("---------------进入 * 右子树{:?}",next_nodes[1]);
                         let (r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter);
                         counter = new_counter;
 
+                        println!("---------------进入 * 左子树{:?}",next_nodes[0]);
                         let (l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node,  cfg_bb, counter);
                         counter = new_counter;
 
@@ -352,9 +354,11 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                     if let Some(_) = direct_node!(at et_node in et_tree ret option){
                         let next_nodes = direct_nodes!(at et_node in et_tree);
 
+                        println!("---------------进入 + 右子树{:?}",next_nodes[1]);
                         let (r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter);
                         counter = new_counter;
 
+                        println!("---------------进入 + 左子树{:?}",next_nodes[0]);
                         let (l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter);
                         counter = new_counter;
 
@@ -374,9 +378,11 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                     if let Some(_) = direct_node!(at et_node in et_tree ret option){
                         let next_nodes = direct_nodes!(at et_node in et_tree);
 
+                        println!("---------------进入 - 右子树{:?}",next_nodes[1]);
                         let (r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter);
                         counter = new_counter;
 
+                        println!("---------------进入 - 左子树{:?}",next_nodes[0]);
                         let (l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter);
                         counter = new_counter;
 
@@ -395,9 +401,11 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                     if let Some(_) = direct_node!(at et_node in et_tree ret option){
                         let next_nodes = direct_nodes!(at et_node in et_tree);
 
+                        println!("---------------进入 / 右子树{:?}",next_nodes[1]);
                         let (r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter);
                         counter = new_counter;
 
+                        println!("---------------进入 - 左子树{:?}",next_nodes[0]);
                         let (l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter);
                         counter = new_counter;
                         
