@@ -1,47 +1,48 @@
 use std::fmt::{Debug, Formatter};
 use petgraph::{data, visit::Data};
+use syn::Field;
 
-use super::{field::{Type, Value}, symbol::Symbol, symbol_table::SymbolIndex};
+use super::{field::{Fields, Type, Value}, symbol::Symbol, symbol_table::Symidx};
 
 #[derive(Clone)]
 pub enum ArithOp{        
     Add{
-        a : SymbolIndex ,
-        b : SymbolIndex ,
+        a : Symidx ,
+        b : Symidx ,
         vartype : Type ,
     },
     Mul{
-        a : SymbolIndex ,
-        b : SymbolIndex ,
+        a : Symidx ,
+        b : Symidx ,
         vartype : Type ,
 
     },
     Div{
-        a : SymbolIndex ,
-        b : SymbolIndex ,
+        a : Symidx ,
+        b : Symidx ,
         vartype : Type ,
    },
     Sub{
-        a : SymbolIndex ,
-        b : SymbolIndex ,
+        a : Symidx ,
+        b : Symidx ,
         vartype : Type ,
     },
     Icmp{
         plan : IcmpPlan,
-        a : SymbolIndex ,       //寄存器或者数
-        b : SymbolIndex ,
+        a : Symidx ,       //寄存器或者数
+        b : Symidx ,
         vartype : Type ,
     },
 }
 #[derive(Clone)]
 pub struct FuncOp{
-    func:SymbolIndex,
-    args:Vec<SymbolIndex>       //存储所有的实参
+    func:Symidx,
+    args:Vec<Symidx>       //存储所有的实参
 }
 #[derive(Clone)]
 pub struct PhiPair{
-    variable : SymbolIndex,
-    bb : SymbolIndex,
+    variable : Symidx,
+    bb : Symidx,
 }
 #[derive(Clone)]
 pub struct PhiOp{
@@ -50,11 +51,11 @@ pub struct PhiOp{
 #[derive(Clone)]
 pub enum MemOp{
     Load{
-        ptr: SymbolIndex,
+        ptr: Symidx,
     },
     Store{
-        value : SymbolIndex,
-        ptr: SymbolIndex,
+        value : Symidx,
+        ptr: Symidx,
     },
     Alloca{
         align:u32,
@@ -68,31 +69,31 @@ pub enum MemOp{
 // }
 
 #[derive(Clone)]
-pub enum Instruction{
+pub enum NakedInstruction{
     //定义函数
-    Deffun{
-        funname:SymbolIndex,
-        rettype:SymbolIndex,
-        paralst:Vec<SymbolIndex>,
+    Def_Func{
+        func_symidx:Symidx,
+        ret_type:Symidx,
+        args:Vec<Symidx>,
     },
     //定义变量
-    Defvar{
-        varname:SymbolIndex,
+    Def_Var{
+        var_symidx:Symidx,
         vartype:Type,
-        value:SymbolIndex,
+        value:Symidx,
     },
     // 算数运算符 + - * / etc.
     Arith{
-        lhs:SymbolIndex,
+        lhs:Symidx,
         rhs:ArithOp,
     },
     SimpleAssign{
-        lhs: SymbolIndex,
-        rhs: SymbolIndex,
+        lhs: Symidx,
+        rhs: Symidx,
     },
     // 调用函数
     Call{
-        assigned : Option<SymbolIndex>,
+        assigned : Option<Symidx>,
         func_op : FuncOp
     },
     // 跳转  break continue  return  etc.
@@ -101,9 +102,14 @@ pub enum Instruction{
     },
     // phi node 
     Phi{
-        lhs : SymbolIndex,
+        lhs : Symidx,
         rhs : PhiOp,
     },
+}
+#[derive(Clone)]
+pub struct Instruction{
+    naked_instr:NakedInstruction,
+    info:Fields
 }
 #[derive(Clone,Debug)]
 pub enum IcmpPlan{
@@ -113,22 +119,22 @@ pub enum IcmpPlan{
 }
 #[derive(Clone,Debug)]
 pub struct ComparedPair{
-    compared : SymbolIndex,
-    label : SymbolIndex,
+    compared : Symidx,
+    label : Symidx,
 }
 #[derive(Clone)]
 pub enum JumpOp{
     Ret{
-        ret_sym : SymbolIndex , // 这是返回的类型
+        ret_sym : Symidx , // 这是返回的类型
     },
     Br{
-        cond : SymbolIndex ,
-        t1 : SymbolIndex , // 这是一个 BasicBlock 的symbol 
-        t2 : SymbolIndex,
+        cond : Symidx ,
+        t1 : Symidx , // 这是一个 BasicBlock 的symbol 
+        t2 : Symidx,
     },
     Switch{
-        cond : SymbolIndex,
-        default : SymbolIndex,
+        cond : Symidx,
+        default : Symidx,
         compared: Vec<ComparedPair>,
     },
     DirectJump{
@@ -138,46 +144,52 @@ pub enum JumpOp{
 
 
 // 以下是构造函数:
-impl Instruction{
-    pub fn new_deffun(funname:SymbolIndex,rettype:SymbolIndex,paralst:Vec<SymbolIndex>) -> Self{
-        Self::Deffun { funname ,rettype, paralst }
+impl NakedInstruction{
+    pub fn to_instr(self)->Instruction{
+        Instruction{
+            naked_instr: self,
+            info: Fields::new(),
+        }
+    }
+    pub fn new_def_func(func_symidx:Symidx,ret_type:Symidx,args:Vec<Symidx>) -> Self{
+        Self::Def_Func { func_symidx ,ret_type, args }
     }
 
-    pub fn new_defvar(vartype:Type,varname:SymbolIndex,value:SymbolIndex) -> Self{
-        Self::Defvar { varname, vartype, value }
+    pub fn new_def_var(vartype:Type,varname:Symidx,value:Symidx) -> Self{
+        Self::Def_Var { var_symidx: varname, vartype, value }
     }
-    pub fn new_assign(lhs:SymbolIndex,rhs:SymbolIndex) ->Self{
+    pub fn new_assign(lhs:Symidx,rhs:Symidx) ->Self{
         Self::SimpleAssign { lhs, rhs }
     }
     
     // Instruction -> Arith -> ArithOp
-    pub fn new_add(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex,vartype:Type) -> Self{
+    pub fn new_add(lhs: Symidx, a:Symidx,b:Symidx,vartype:Type) -> Self{
         Self::Arith {lhs, rhs: ArithOp::Add { a, b, vartype } }
     }
-    pub fn new_mul(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex,vartype:Type) -> Self{
+    pub fn new_mul(lhs: Symidx, a:Symidx,b:Symidx,vartype:Type) -> Self{
         Self::Arith {lhs, rhs: ArithOp::Mul { a,  b, vartype} }
     }
-    pub fn new_div(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex,vartype:Type) -> Self{
+    pub fn new_div(lhs: Symidx, a:Symidx,b:Symidx,vartype:Type) -> Self{
         Self::Arith { lhs, rhs: ArithOp::Div { a, b, vartype } }
     }
-    pub fn new_sub(lhs: SymbolIndex, a:SymbolIndex,b:SymbolIndex,vartype:Type) -> Self{
+    pub fn new_sub(lhs: Symidx, a:Symidx,b:Symidx,vartype:Type) -> Self{
         Self::Arith {lhs, rhs: ArithOp::Sub {a, b, vartype } }
     }
-    pub fn new_icmp(lhs: SymbolIndex, plan:IcmpPlan,a:SymbolIndex,b:SymbolIndex,vartype:Type) -> Self{
+    pub fn new_icmp(lhs: Symidx, plan:IcmpPlan,a:Symidx,b:Symidx,vartype:Type) -> Self{
         Self::Arith {lhs, rhs: ArithOp::Icmp { plan,a, b, vartype } }
     }
     // Instruction -> Call -> FuncOp
-    pub fn new_func_call(assigned:Option<SymbolIndex> , func:SymbolIndex , args:Vec<SymbolIndex>) ->Self{       //也许可以直接传入一个Func结构体
+    pub fn new_func_call(assigned:Option<Symidx> , func:Symidx , args:Vec<Symidx>) ->Self{       //也许可以直接传入一个Func结构体
         Self::Call {  assigned, func_op: FuncOp { func,args } }
     }
     // Instruction -> Jump ->JumpOp
-    pub fn new_ret(ret_sym:SymbolIndex) -> Self{
+    pub fn new_ret(ret_sym:Symidx) -> Self{
         Self::Jump { op: JumpOp::Ret { ret_sym } }
     }
-    pub fn new_br(cond:SymbolIndex,t1:SymbolIndex,t2:SymbolIndex) ->Self{
+    pub fn new_br(cond:Symidx,t1:Symidx,t2:Symidx) ->Self{
         Self::Jump { op: JumpOp::Br { cond: cond, t1,t2 } }
     }
-    pub fn new_switch(cond : SymbolIndex,default : SymbolIndex,compared: Vec<ComparedPair>) -> Self{
+    pub fn new_switch(cond : Symidx,default : Symidx,compared: Vec<ComparedPair>) -> Self{
         Self::Jump { op: JumpOp::Switch {cond,  default, compared } }
     }
     pub fn new_jump(cfg_dst_label : u32) ->Self{
@@ -232,7 +244,7 @@ impl Debug for PhiOp{
         todo!()
     }
 }
-impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
+impl Debug for NakedInstruction{ // 以类似llvm ir的格式打印输出
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Arith { lhs, rhs } => 
@@ -254,9 +266,9 @@ impl Debug for Instruction{ // 以类似llvm ir的格式打印输出
                 write!(f,"phi函数,但是还没写呢"),
             Self::SimpleAssign { lhs, rhs }=>
                 write!(f,"Assign {:?},{:?}\n",lhs,rhs),
-            Self::Deffun { funname, rettype, paralst } =>
+            Self::Def_Func { func_symidx: funname, ret_type: rettype, args: paralst } =>
                 write!(f,"Define {:?} {:?} {:?}\n",rettype,funname,paralst),
-            Self::Defvar { varname, vartype, value } => {
+            Self::Def_Var { var_symidx: varname, vartype, value } => {
                 if value.symbol_name.is_empty() {
                     Ok(write!(f, "Alloc {:?} %{:?}\n", vartype, varname)?)
                 } else {
@@ -285,7 +297,7 @@ pub enum BaseIntInstr{
 }
 
 pub struct Register{
-    reg_name : SymbolIndex
+    reg_name : Symidx
 }
 impl Debug for Register{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -687,4 +699,10 @@ impl Debug for Stores{
         }
     }
 
+}
+impl Debug for Instruction{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        // write!(f,"{:?} ------{:?}",self.naked_instr,self.info)
+        write!(f,"{:?} ",self.naked_instr)
+    }
 }

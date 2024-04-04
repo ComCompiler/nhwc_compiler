@@ -5,7 +5,7 @@ use syn::token::Use;
 
 use crate::{ add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{field::{Type, UseCounter}, symbol::Symbol}};
 
-use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, field::FieldsOwner, gen_et::process_any_stmt, nhwc_instr::Instruction, scope_node::ScopeTree, symbol, symbol_table::{ SymbolIndex, SymbolTable}};
+use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, field::FieldsOwner, gen_et::process_any_stmt, nhwc_instr::NakedInstruction, scope_node::ScopeTree, symbol, symbol_table::{ Symidx, Symtab}};
 
 /*
  这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有 
@@ -18,7 +18,7 @@ fn parse_expr2nhwc(){
 
 }
 /// 处理所有跳转语句，翻译成对应的instruction并确定跳转到的BB
-fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymbolTable,scope_tree:&ScopeTree,et_tree:&mut EtTree,ast2scope:&HashMap<u32,u32>,ast_decl_node:u32,cfg_bb:u32,mut counter:u32)->u32{
+fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut Symtab,scope_tree:&ScopeTree,et_tree:&mut EtTree,ast2scope:&HashMap<u32,u32>,ast_decl_node:u32,cfg_bb:u32,mut counter:u32)->u32{
     //获取scope
     if let Some(decl_scope) = ast2scope.get(&ast_decl_node){
         let decl_scope = *decl_scope;
@@ -47,7 +47,7 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut Symbol
                                     let (var_symidx,new_counter) = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
                                     counter = new_counter;
 
-                                    let assign_instr = Instruction::new_assign(var_symidx, value_symidx);
+                                    let assign_instr = NakedInstruction::new_assign(var_symidx, value_symidx).to_instr();
 
                                     push_instr!(add assign_instr to cfg_bb for bb in cfg_graph);
                                 },
@@ -56,17 +56,17 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut Symbol
                                         let (var_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, decl_prt_scope,  cfg_bb, counter);
                                         counter = new_counter;
                 
-                                        let one_symidx = SymbolIndex::new(decl_prt_scope, "1".to_string()); 
+                                        let one_symidx = Symidx::new(decl_prt_scope, "1".to_string()); 
                 
-                                        let tmp_loadvar_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
+                                        let tmp_loadvar_symidx = Symidx::new(decl_prt_scope, format!("%{}",counter));
                                         counter += 1;
-                                        let tmp_addvar_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
+                                        let tmp_addvar_symidx = Symidx::new(decl_prt_scope, format!("%{}",counter));
                                         counter += 1;
                                         let vartype=Type::new(decl_prt_scope, ast_tree);
                 
-                                        let load_instr = Instruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone());
-                                        let add_instr = Instruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype);
-                                        let assign_instr = Instruction::new_assign(var_symidx, tmp_addvar_symidx.clone());
+                                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
+                                        let add_instr = NakedInstruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype).to_instr();
+                                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_addvar_symidx.clone()).to_instr();
                 
                                         push_instr!(add load_instr to cfg_bb for bb in cfg_graph);
                                         push_instr!(add add_instr to cfg_bb for bb in cfg_graph);
@@ -80,17 +80,17 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut Symbol
                                         let (var_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, decl_prt_scope,  cfg_bb, counter);
                                         counter = new_counter;
                 
-                                        let one_symidx = SymbolIndex::new(decl_prt_scope, "1".to_string()); 
+                                        let one_symidx = Symidx::new(decl_prt_scope, "1".to_string()); 
                 
-                                        let tmp_loadvar_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
+                                        let tmp_loadvar_symidx = Symidx::new(decl_prt_scope, format!("%{}",counter));
                                         counter += 1;
-                                        let tmp_addvar_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
+                                        let tmp_addvar_symidx = Symidx::new(decl_prt_scope, format!("%{}",counter));
                                         counter += 1;
                                         let vartype=Type::new(decl_prt_scope, ast_tree);
                 
-                                        let load_instr = Instruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone());
-                                        let add_instr = Instruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype);
-                                        let assign_instr = Instruction::new_assign(var_symidx, tmp_addvar_symidx.clone());
+                                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
+                                        let add_instr = NakedInstruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype).to_instr();
+                                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_addvar_symidx.clone()).to_instr();
                 
                                         push_instr!(add load_instr to cfg_bb for bb in cfg_graph);
                                         push_instr!(add add_instr to cfg_bb for bb in cfg_graph);
@@ -104,17 +104,17 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut Symbol
                                         let (var_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, decl_prt_scope,  cfg_bb, counter);
                                         counter = new_counter;
                 
-                                        let one_symidx = SymbolIndex::new(decl_prt_scope, "1".to_string());
+                                        let one_symidx = Symidx::new(decl_prt_scope, "1".to_string());
                 
-                                        let tmp_loadvar_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
+                                        let tmp_loadvar_symidx = Symidx::new(decl_prt_scope, format!("%{}",counter));
                                         counter += 1;
-                                        let tmp_subvar_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
+                                        let tmp_subvar_symidx = Symidx::new(decl_prt_scope, format!("%{}",counter));
                                         counter += 1;
                                         let vartype=Type::new(decl_prt_scope, ast_tree);
                                         
-                                        let load_instr = Instruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone());
-                                        let sub_instr = Instruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype);
-                                        let assign_instr = Instruction::new_assign(var_symidx, tmp_subvar_symidx.clone());
+                                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
+                                        let sub_instr = NakedInstruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype).to_instr();
+                                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_subvar_symidx.clone()).to_instr();
                 
                                         push_instr!(add load_instr to cfg_bb for bb in cfg_graph);
                                         push_instr!(add sub_instr to cfg_bb for bb in cfg_graph);
@@ -128,17 +128,17 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut Symbol
                                         let (var_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, decl_prt_scope,  cfg_bb, counter);
                                         counter = new_counter;
                 
-                                        let one_symidx = SymbolIndex::new(decl_prt_scope, "1".to_string());
+                                        let one_symidx = Symidx::new(decl_prt_scope, "1".to_string());
                 
-                                        let tmp_loadvar_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
+                                        let tmp_loadvar_symidx = Symidx::new(decl_prt_scope, format!("%{}",counter));
                                         counter += 1;
-                                        let tmp_subvar_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
+                                        let tmp_subvar_symidx = Symidx::new(decl_prt_scope, format!("%{}",counter));
                                         counter += 1;
                                         let vartype=Type::new(decl_prt_scope, ast_tree);
                 
-                                        let load_instr = Instruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone());
-                                        let sub_instr = Instruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype);
-                                        let assign_instr = Instruction::new_assign(var_symidx, tmp_subvar_symidx.clone());
+                                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
+                                        let sub_instr = NakedInstruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype).to_instr();
+                                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_subvar_symidx.clone()).to_instr();
                 
                                         push_instr!(add load_instr to cfg_bb for bb in cfg_graph);
                                         push_instr!(add sub_instr to cfg_bb for bb in cfg_graph);
@@ -156,12 +156,12 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut Symbol
                                     let (var_symidx,new_counter) = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
                                     counter = new_counter;
 
-                                    let tmp_var_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
+                                    let tmp_var_symidx = Symidx::new(decl_prt_scope, format!("%{}",counter));
                                     counter += 1;
                                     let vartype=Type::new(decl_prt_scope, ast_tree);
 
-                                    let mul_instr = Instruction::new_mul(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx,vartype);
-                                    let assign_instr = Instruction::new_assign(var_symidx, tmp_var_symidx);
+                                    let mul_instr = NakedInstruction::new_mul(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx,vartype).to_instr();
+                                    let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_var_symidx).to_instr();
                                     
                                     push_instr!(add mul_instr to cfg_bb for bb in cfg_graph);
                                     push_instr!(add assign_instr to cfg_bb for bb in cfg_graph);
@@ -175,12 +175,12 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut Symbol
                                     let (var_symidx,new_counter) = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
                                     counter = new_counter;
 
-                                    let tmp_var_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
+                                    let tmp_var_symidx = Symidx::new(decl_prt_scope, format!("%{}",counter));
                                     counter += 1;
                                     let vartype=Type::new(decl_prt_scope, ast_tree);
 
-                                    let div_instr = Instruction::new_div(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx,vartype);
-                                    let assign_instr = Instruction::new_assign(var_symidx, tmp_var_symidx);
+                                    let div_instr = NakedInstruction::new_div(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx,vartype).to_instr();
+                                    let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_var_symidx).to_instr();
 
                                     push_instr!(add div_instr to cfg_bb for bb in cfg_graph);
                                     push_instr!(add assign_instr to cfg_bb for bb in cfg_graph);
@@ -194,12 +194,12 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut Symbol
                                     let (var_symidx,new_counter) = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
                                     counter = new_counter;
 
-                                    let tmp_var_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
+                                    let tmp_var_symidx = Symidx::new(decl_prt_scope, format!("%{}",counter));
                                     counter += 1;
                                     let vartype=Type::new(decl_prt_scope, ast_tree);
 
-                                    let add_instr = Instruction::new_add(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx,vartype);
-                                    let assign_instr = Instruction::new_assign(var_symidx, tmp_var_symidx);
+                                    let add_instr = NakedInstruction::new_add(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx,vartype).to_instr();
+                                    let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_var_symidx).to_instr();
 
                                     push_instr!(add add_instr to cfg_bb for bb in cfg_graph);
                                     push_instr!(add assign_instr to cfg_bb for bb in cfg_graph);
@@ -213,12 +213,12 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut Symbol
                                     let (var_symidx,new_counter) = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[0], decl_prt_scope, cfg_bb, counter);
                                     counter = new_counter;
 
-                                    let tmp_var_symidx = SymbolIndex::new(decl_prt_scope, format!("%{}",counter));
+                                    let tmp_var_symidx = Symidx::new(decl_prt_scope, format!("%{}",counter));
                                     counter += 1;
                                     let vartype=Type::new(decl_prt_scope, ast_tree);
 
-                                    let sub_instr = Instruction::new_sub(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx,vartype);
-                                    let assign_instr = Instruction::new_assign(var_symidx, tmp_var_symidx);
+                                    let sub_instr = NakedInstruction::new_sub(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx,vartype).to_instr();
+                                    let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_var_symidx).to_instr();
 
                                     push_instr!(add sub_instr to cfg_bb for bb in cfg_graph);
                                     push_instr!(add assign_instr to cfg_bb for bb in cfg_graph);
@@ -242,8 +242,8 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut Symbol
                         let symbol_symidx = process_symbol(ast_tree,scope_tree, symtab, &def_or_use, &text, decl_prt_scope);
 
                         //创建空值
-                        let value_symidx = SymbolIndex::new(decl_prt_scope, "".to_string());   
-                        let def_instr = Instruction::new_defvar(var_type, symbol_symidx, value_symidx);
+                        let value_symidx = Symidx::new(decl_prt_scope, "".to_string());   
+                        let def_instr = NakedInstruction::new_def_var(var_type, symbol_symidx, value_symidx).to_instr();
 
                         push_instr!(add def_instr to cfg_bb for bb in cfg_graph);
                     },
@@ -261,7 +261,7 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut Symbol
     }
 }
 
-fn parse_bb2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&ScopeTree,et_tree:&mut EtTree,symtab:&mut SymbolTable,ast2scope:&HashMap<u32,u32>,ast_nodes:Vec<u32>,cfg_bb:u32,mut counter:u32)->u32{
+fn parse_bb2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&ScopeTree,et_tree:&mut EtTree,symtab:&mut Symtab,ast2scope:&HashMap<u32,u32>,ast_nodes:Vec<u32>,cfg_bb:u32,mut counter:u32)->u32{
     for astnode in ast_nodes{
         match(rule_id!(at astnode in ast_tree),astnode){
             (RULE_declaration,declaration_node)=>{
@@ -278,7 +278,7 @@ fn parse_bb2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&ScopeTre
     counter
 }
 static USE_COUNTER:&str = "use_counter";
-fn process_constant(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymbolTable,const_literal:&String,scope_node:u32)->SymbolIndex{
+fn process_constant(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut Symtab,const_literal:&String,scope_node:u32)->Symidx{
     // 我们认为 constant 的scope node 都是全局的
     match find!(symbol mut {const_literal.clone()} of scope {0} in symtab){
         Some(const_sym) => {
@@ -292,12 +292,12 @@ fn process_constant(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymbolTa
             add_symbol!({Symbol::new(0, const_literal.clone())} with field USE_COUNTER:{UseCounter{ use_count: 1}} to symtab);
         },
     }
-    let const_symidx = SymbolIndex::new(0, const_literal.to_string());
+    let const_symidx = Symidx::new(0, const_literal.to_string());
     const_symidx
 }
 
 static TYPE:&str = "type";
-fn process_symbol(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymbolTable,def_or_use:&Def_Or_Use,symbol_name:&String,scope_node:u32)->SymbolIndex{   
+fn process_symbol(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut Symtab,def_or_use:&Def_Or_Use,symbol_name:&String,scope_node:u32)->Symidx{   
     let mut symbol_scope = scope_node;
     match def_or_use{
         Def_Or_Use::Def { type_ast_node } => { 
@@ -316,13 +316,13 @@ fn process_symbol(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymbolTabl
                 }
                 symbol_scope = node!(at symbol_scope in scope_tree).parent;
             }
-            let symbol_symidx = SymbolIndex::new(scope_node, "%".to_owned()+&symbol_name.clone());
+            let symbol_symidx = Symidx::new(scope_node, "%".to_owned()+&symbol_name.clone());
             symbol_symidx
         },
     }
 }
 
-fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymbolTable,ast2scope:&HashMap<u32,u32>,et_node:u32,scope_node:u32,cfg_bb:u32,mut counter:u32)->(SymbolIndex,u32){
+fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut Symtab,ast2scope:&HashMap<u32,u32>,et_node:u32,scope_node:u32,cfg_bb:u32,mut counter:u32)->(Symidx,u32){
     let nake_et = &node!(at et_node in et_tree).et_naked_node;
     match nake_et{
         EtNakedNode::Operator { op, ast_node:_, text:_ } => {
@@ -337,10 +337,10 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                         let (l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node,  cfg_bb, counter);
                         counter = new_counter;
 
-                        let tmp_var_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
+                        let tmp_var_symidx = Symidx::new(scope_node, format!("%{}",counter));
                         counter += 1;
                         let vartype=Type::I32;
-                        let mul_instr = Instruction::new_mul(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype);
+                        let mul_instr = NakedInstruction::new_mul(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype).to_instr();
                         push_instr!(add mul_instr to cfg_bb for bb in cfg_graph);
 
                         (tmp_var_symidx,counter)
@@ -358,11 +358,11 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                         let (l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter);
                         counter = new_counter;
 
-                        let tmp_var_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
+                        let tmp_var_symidx = Symidx::new(scope_node, format!("%{}",counter));
                         counter += 1;
                         let vartype=Type::I32;
 
-                        let add_instr = Instruction::new_add(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype);
+                        let add_instr = NakedInstruction::new_add(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype).to_instr();
                         push_instr!(add add_instr to cfg_bb for bb in cfg_graph);
 
                         (tmp_var_symidx,counter)
@@ -380,10 +380,10 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                         let (l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter);
                         counter = new_counter;
 
-                        let tmp_var_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
+                        let tmp_var_symidx = Symidx::new(scope_node, format!("%{}",counter));
                         counter += 1;
                         let vartype=Type::I32;
-                        let sub_instr = Instruction::new_sub(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype);
+                        let sub_instr = NakedInstruction::new_sub(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype).to_instr();
                         push_instr!(add sub_instr to cfg_bb for bb in cfg_graph);
 
                         (tmp_var_symidx,counter)
@@ -401,11 +401,11 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                         let (l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter);
                         counter = new_counter;
                         
-                        let tmp_var_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
+                        let tmp_var_symidx = Symidx::new(scope_node, format!("%{}",counter));
                         counter += 1;
                         let vartype=Type::I32;
 
-                        let div_instr = Instruction::new_div(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype);
+                        let div_instr = NakedInstruction::new_div(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype).to_instr();
                         push_instr!(add div_instr to cfg_bb for bb in cfg_graph);
 
                         (tmp_var_symidx,counter)
@@ -443,16 +443,16 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                         let (var_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, scope_node,  cfg_bb, counter);
                         counter = new_counter;
 
-                        let one_symidx = SymbolIndex::new(scope_node, "1".to_string());
-                        let tmp_loadvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
+                        let one_symidx = Symidx::new(scope_node, "1".to_string());
+                        let tmp_loadvar_symidx = Symidx::new(scope_node, format!("%{}",counter));
                         counter += 1;
-                        let tmp_addvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
+                        let tmp_addvar_symidx = Symidx::new(scope_node, format!("%{}",counter));
                         counter += 1;
                         let vartype=Type::I32;
 
-                        let load_instr = Instruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone());
-                        let add_instr = Instruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype);
-                        let assign_instr = Instruction::new_assign(var_symidx, tmp_addvar_symidx.clone());
+                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
+                        let add_instr = NakedInstruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype).to_instr();
+                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_addvar_symidx.clone()).to_instr();
 
                         push_instr!(add load_instr to cfg_bb for bb in cfg_graph);
                         push_instr!(add add_instr to cfg_bb for bb in cfg_graph);
@@ -468,16 +468,16 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                         let (var_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, scope_node,  cfg_bb, counter);
                         counter = new_counter;
 
-                        let one_symidx = SymbolIndex::new(scope_node, "1".to_string());
-                        let tmp_loadvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
+                        let one_symidx = Symidx::new(scope_node, "1".to_string());
+                        let tmp_loadvar_symidx = Symidx::new(scope_node, format!("%{}",counter));
                         counter += 1;
-                        let tmp_addvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
+                        let tmp_addvar_symidx = Symidx::new(scope_node, format!("%{}",counter));
                         counter += 1;
                         let vartype=Type::I32;
 
-                        let load_instr = Instruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone());
-                        let add_instr = Instruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype);
-                        let assign_instr = Instruction::new_assign(var_symidx, tmp_addvar_symidx.clone());
+                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
+                        let add_instr = NakedInstruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype).to_instr();
+                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_addvar_symidx.clone()).to_instr();
 
                         push_instr!(add load_instr to cfg_bb for bb in cfg_graph);
                         push_instr!(add add_instr to cfg_bb for bb in cfg_graph);
@@ -493,16 +493,16 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                         let (var_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, scope_node,  cfg_bb, counter);
                         counter = new_counter;
 
-                        let one_symidx = SymbolIndex::new(scope_node, "1".to_string());
-                        let tmp_loadvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
+                        let one_symidx = Symidx::new(scope_node, "1".to_string());
+                        let tmp_loadvar_symidx = Symidx::new(scope_node, format!("%{}",counter));
                         counter += 1;
-                        let tmp_subvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
+                        let tmp_subvar_symidx = Symidx::new(scope_node, format!("%{}",counter));
                         counter += 1;
                         let vartype=Type::I32;
 
-                        let load_instr = Instruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone());
-                        let sub_instr = Instruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype);
-                        let assign_instr = Instruction::new_assign(var_symidx, tmp_subvar_symidx.clone());
+                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
+                        let sub_instr = NakedInstruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype).to_instr();
+                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_subvar_symidx.clone()).to_instr();
 
                         push_instr!(add load_instr to cfg_bb for bb in cfg_graph);
                         push_instr!(add sub_instr to cfg_bb for bb in cfg_graph);
@@ -518,16 +518,16 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                         let (var_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, scope_node,  cfg_bb, counter);
                         counter = new_counter;
 
-                        let one_symidx = SymbolIndex::new(scope_node, "1".to_string());
-                        let tmp_loadvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
+                        let one_symidx = Symidx::new(scope_node, "1".to_string());
+                        let tmp_loadvar_symidx = Symidx::new(scope_node, format!("%{}",counter));
                         counter += 1;
-                        let tmp_subvar_symidx = SymbolIndex::new(scope_node, format!("%{}",counter));
+                        let tmp_subvar_symidx = Symidx::new(scope_node, format!("%{}",counter));
                         counter += 1;
                         let vartype=Type::I32;
 
-                        let load_instr = Instruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone());
-                        let sub_instr = Instruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype);
-                        let assign_instr = Instruction::new_assign(var_symidx, tmp_subvar_symidx.clone());
+                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
+                        let sub_instr = NakedInstruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype).to_instr();
+                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_subvar_symidx.clone()).to_instr();
 
                         push_instr!(add load_instr to cfg_bb for bb in cfg_graph);
                         push_instr!(add sub_instr to cfg_bb for bb in cfg_graph);
@@ -563,7 +563,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
 }
 
 ///定义变量的decl转为ir，并通过et查找元素是否合法
-fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymbolTable,scope_tree:&ScopeTree,et_tree:&mut EtTree,ast2scope:&HashMap<u32,u32>,ast_decl_node:u32,cfg_bb:u32,mut counter:u32)->u32{
+fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut Symtab,scope_tree:&ScopeTree,et_tree:&mut EtTree,ast2scope:&HashMap<u32,u32>,ast_decl_node:u32,cfg_bb:u32,mut counter:u32)->u32{
     //获取scope
     if let Some(decl_scope) = ast2scope.get(&ast_decl_node){
         let decl_scope = *decl_scope;
@@ -593,7 +593,7 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut
                             let (value_symidx,new_counter) = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[1], decl_prt_scope, cfg_bb, counter);
                             counter = new_counter;
 
-                            let defvar_instr = Instruction::new_defvar(var_type, var_symidx, value_symidx);
+                            let defvar_instr = NakedInstruction::new_def_var(var_type, var_symidx, value_symidx).to_instr();
 
                             push_instr!(add defvar_instr to cfg_bb for bb in cfg_graph);
                         }else{
@@ -613,9 +613,9 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut
                         let symbol_symidx = process_symbol(ast_tree,scope_tree, symtab, &def_or_use, var_str, decl_prt_scope);
 
                         //创建空值
-                        let value_symidx = SymbolIndex::new(decl_prt_scope, "".to_string());   
+                        let value_symidx = Symidx::new(decl_prt_scope, "".to_string());   
 
-                        let def_instr = Instruction::new_defvar(var_type, symbol_symidx, value_symidx);
+                        let def_instr = NakedInstruction::new_def_var(var_type, symbol_symidx, value_symidx).to_instr();
 
                         push_instr!(add def_instr to cfg_bb for bb in cfg_graph);
                     },
@@ -646,12 +646,12 @@ fn parse_while2nhwc(){
 }
 
 ///将函数名存入符号表，将函数签名处理为ir，并处理函数体内的语句
-fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut SymbolTable,ast2scope:&HashMap<u32,u32>,ast_fun:u32,ast_funsign:u32,cfg_entry:u32){
+fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut Symtab,ast2scope:&HashMap<u32,u32>,ast_fun:u32,ast_funsign:u32,cfg_entry:u32){
     //获取函数所对应的scopenode
     if let Some(func_scope) = ast2scope.get(&ast_fun){
         //获取函数名称
         let fun_name = &node!(at ast_funsign in ast_tree).text;
-        let name_symidx = SymbolIndex::new(*func_scope, fun_name.to_string());
+        let name_symidx = Symidx::new(*func_scope, fun_name.to_string());
 
         //添加到符号表中
         let func_symbol = Symbol::new(cfg_entry, fun_name.to_string());
@@ -660,10 +660,10 @@ fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut SymbolT
         //获取返回类型
         let ast_retype = find!(rule RULE_declarationSpecifiers at ast_fun in ast_tree).unwrap();
         let fun_rettype = &node!(at ast_retype in ast_tree).text;
-        let type_symidx = SymbolIndex::new(*func_scope, fun_rettype.to_string());
+        let type_symidx = Symidx::new(*func_scope, fun_rettype.to_string());
 
         //获取参数列表
-        let mut para_symlst: Vec<SymbolIndex> = vec![];
+        let mut para_symlst: Vec<Symidx> = vec![];
         //函数有参数
         if let Some(para) = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_parameterTypeList at ast_fun in ast_tree){
             let ast_func_args = find_nodes!(rule RULE_parameterList finally RULE_parameterDeclaration at para in ast_tree);
@@ -671,7 +671,7 @@ fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut SymbolT
             for ast_func_arg in ast_func_args{
                 let ast_para_sym = find!(rule RULE_declarator at ast_func_arg in ast_tree).unwrap();
                 let func_arg = &node!(at ast_para_sym in ast_tree).text;
-                let arg_symidx = SymbolIndex::new(*func_scope, func_arg.to_string());
+                let arg_symidx = Symidx::new(*func_scope, func_arg.to_string());
                 para_symlst.push(arg_symidx);
 
                 println!("func {} !!!",func_arg);
@@ -681,9 +681,9 @@ fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut SymbolT
         //函数无参数，则不需要处理参数部分
         else{}
         //做成instr放在cfg的entry里面
-        let fun_instruction = Instruction::new_deffun(name_symidx, type_symidx, para_symlst);
+        let func_instr = NakedInstruction::new_def_func(name_symidx, type_symidx, para_symlst).to_instr();
         
-        push_instr!(add fun_instruction to cfg_entry for entry in cfg_graph);
+        push_instr!(add func_instr to cfg_entry for entry in cfg_graph);
 
     }else{
         panic!("找不到{}该函数的scopenode!",ast_fun);

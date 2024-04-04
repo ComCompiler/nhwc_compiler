@@ -313,7 +313,7 @@ where
         match c {
             '"' | '\\' => self.0.write_char('\\')?,
             // \l is for left justified linebreak
-            '\n' => return self.0.write_str(""),
+            '\n' => return self.0.write_str("\\l"),
             '{' => return self.0.write_str("\\{"),
             '}' => return self.0.write_str("\\}"),
             '|' => return self.0.write_str("\\|"),

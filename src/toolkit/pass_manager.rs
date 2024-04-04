@@ -1,6 +1,6 @@
 use crate::{find, Args};
 
-use super::{context::Context, field::Field, symbol_table::SymbolIndex};
+use super::{context::Context, field::Field, symbol_table::Symidx};
 use super::field::{Fields, FieldsOwner};
 
 pub trait Pass{
@@ -11,8 +11,8 @@ pub trait Pass{
 pub struct PassManager{
     /// 其中放置 所有pass 的运行顺序的string 
     passes:Vec<Box<dyn Pass>>,
-    loop_entries :  Vec<SymbolIndex>,
-    function_entries : Vec<SymbolIndex>,
+    loop_entries :  Vec<Symidx>,
+    function_entries : Vec<Symidx>,
     ctx :Context
 }
 impl PassManager {

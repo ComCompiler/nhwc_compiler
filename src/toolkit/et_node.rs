@@ -5,7 +5,7 @@ use eval::{to_value, eval};
 use petgraph::stable_graph::{NodeIndex, StableDiGraph};
 use crate::node;
 use super::ast_node::AstTree;
-use super::symbol_table::{  SymbolIndex};
+use super::symbol_table::{  Symidx};
 use super::field::{Fields, FieldsOwner};
 use super::field::Field;
 
@@ -23,9 +23,9 @@ pub enum EtNakedNode{
     // 而 et 树的 non-terminal node 要么是 root 要么是一个 op 
     Operator{op: ExprOp,ast_node:u32,text:String}, 
     // 在这里 constant 也是一个 Symbol ，到时候在 SymbolField 里面加上 Constant 标记 就可以了
-    Constant{const_sym_idx:SymbolIndex,ast_node:u32,text:String },
+    Constant{const_sym_idx:Symidx,ast_node:u32,text:String },
     // Def_Or_Use 是一个枚举类型，要么是 Def 要么是 Use
-    Symbol{sym_idx:SymbolIndex,ast_node:u32,text:String,def_or_use:Def_Or_Use},
+    Symbol{sym_idx:Symidx,ast_node:u32,text:String,def_or_use:Def_Or_Use},
     // array symbol 一个 array 是 array symbol 
     // ArraySym{sym_idx:SymbolIndex,ast_node:u32,text:String,def_or_use:Def_Or_Use},
     // // 考虑到 可能出现  a=3,b=2; 这样的语句，因此需要规定一个Separator
@@ -82,7 +82,7 @@ pub enum ExprOp{
 impl ExprOp{
     /// 传入的vec的内部是节点在et_tree里的节点序号
     /// 作用是
-    pub fn eval_sub_et_nodes(&self ,et_tree:&mut EtTree, vec:&Vec<SymbolIndex>) -> SymbolIndex{
+    pub fn eval_sub_et_nodes(&self ,et_tree:&mut EtTree, vec:&Vec<Symidx>) -> Symidx{
         let sym_idx = match &self {
             ExprOp::Mul => eval(&format!("{}{}{}",&vec[0].symbol_name,"*", &vec[1].symbol_name)).unwrap(),
             ExprOp::Add => eval(&format!("{}{}{}",&vec[0].symbol_name,"+", &vec[1].symbol_name)).unwrap(),
@@ -124,7 +124,7 @@ impl ExprOp{
             ExprOp::ArrayIndex => eval(&format!("{}[{}]",&vec[0].symbol_name , &vec[1].symbol_name)).unwrap(),
             _ => panic!("错误的 Oprator !")
         };
-        SymbolIndex::new(0, sym_idx.to_string())
+        Symidx::new(0, sym_idx.to_string())
     }
 }
 impl Debug for ExprOp{
@@ -235,10 +235,10 @@ impl EtNakedNode{
         EtNakedNode::Operator { op: ExprOp::PlusAssign ,ast_node,text:String::new()}
     }
     //你必须确保这个symbol 是一个 constant
-    pub fn new_constant(ast_node:u32,const_symbol : SymbolIndex)->Self{
+    pub fn new_constant(ast_node:u32,const_symbol : Symidx)->Self{
         EtNakedNode::Constant { const_sym_idx: const_symbol ,ast_node,text:String::new()}
     }
-    pub fn new_symbol(ast_node:u32, sym_idx:SymbolIndex, def_or_use:Def_Or_Use)->Self{
+    pub fn new_symbol(ast_node:u32, sym_idx:Symidx, def_or_use:Def_Or_Use)->Self{
         EtNakedNode::Symbol {  sym_idx,ast_node,text:String::new(), def_or_use:def_or_use }
     }
     // pub fn new_array_symbol(ast_node:u32,sym_idx:SymbolIndex ,def_or_use:Def_Or_Use)->Self{

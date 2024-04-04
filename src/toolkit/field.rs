@@ -5,7 +5,7 @@ use petgraph::visit::Data;
 use crate::{find, gen_field_trait_for_structs, node};
 use crate::NodeIndex;
 use super::ast_node::AstTree;
-use super::symbol_table::SymbolIndex;
+use super::symbol_table::Symidx;
 
 pub type Fields =  HashMap<&'static str,Box<dyn Field>>;
 
@@ -33,8 +33,8 @@ pub enum Value{
 pub enum Type{
     I32,F32,I1,
     Fn{
-        args_types:Vec<SymbolIndex>,
-        ret_type:Option<SymbolIndex>,
+        args_types:Vec<Symidx>,
+        ret_type:Option<Symidx>,
     }
 }
 impl Clone for Box<dyn Field>{

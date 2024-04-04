@@ -7,7 +7,7 @@ use crate::antlr_parser::clexer::{And, Arrow, Constant, DivAssign, Dot, Equal, G
 use crate::antlr_parser::cparser::{Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_declaration, RULE_declarationSpecifier, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_expressionStatement, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_initializerList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_parameterTypeList, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_typeSpecifier, RULE_unaryExpression, RULE_unaryOperator};
 
 use crate::{ add_node, add_node_with_edge, direct_node, direct_nodes, find, find_nodes, node, rule_id, term_id};
-use crate::toolkit::symbol_table::SymbolIndex;
+use crate::toolkit::symbol_table::Symidx;
 
 use super::et_node::{self, Def_Or_Use, EtNakedNode, EtNode, EtTree};
 use super::{ast_node::AstTree, scope_node::ScopeTree};
@@ -519,7 +519,7 @@ fn process_cast_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &Scop
     // 检查 castExpression 节点是否是类型转换的情况
     if let Some(type_name_node) = find!(rule RULE_typeName at cast_expr_node in ast_tree) {
         // 如果存在 typeName，说明是类型转换的情况
-        let type_sym = SymbolIndex::new(scope_node,node!(at type_name_node in ast_tree).text.clone());
+        let type_sym = Symidx::new(scope_node,node!(at type_name_node in ast_tree).text.clone());
         let cast_node = add_node_with_edge!({EtNakedNode::new_op_cast( cast_expr_node).to_et_node()} from parent_et_node in et_tree);
         // 添加 cast op 节点的左节点，这是个 type symbol 
         add_node_with_edge!({EtNakedNode::new_symbol(scope_node,type_sym,Def_Or_Use::Use).to_et_node()} from cast_node in et_tree);
@@ -651,7 +651,7 @@ fn process_ident(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeTree,
     let sym_name = node!(at ident_node in ast_tree).text.clone();
     // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 
-    let sym_idx = SymbolIndex::new(scope_node, sym_name);
+    let sym_idx = Symidx::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
     add_node_with_edge!({EtNakedNode::new_symbol(ident_node, sym_idx, def_or_use).to_et_node()} from parent_et_node in et_tree);
 }
@@ -659,7 +659,7 @@ fn process_constant(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeTr
     let sym_name = node!(at const_node in ast_tree).text.clone();
     // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 
-    let const_sym_idx = SymbolIndex::new(scope_node, sym_name);
+    let const_sym_idx = Symidx::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
     add_node_with_edge!({EtNakedNode::Constant {const_sym_idx,ast_node:const_node,text:String::new()}.to_et_node()} from parent_et_node in et_tree);
 }

@@ -8,7 +8,7 @@ use crate::toolkit::ast_node::AstTree;
 use crate::toolkit::cfg_edge::CfgEdge;
 use crate::node;
 
-use super::nhwc_instr::Instruction;
+use super::nhwc_instr::{Instruction};
 
 //use crate::toolkit::ast_node::AstNode;
 
@@ -55,7 +55,7 @@ pub enum CfgNode {
         // instructions of this basic block (第二步才生成这个 instrs)
         instrs: Vec<Instruction>,
     },
-    Func {  }
+    Root {  }
 }
 pub trait GetText{
     // fn load_ast_node_text(&mut self,ast_tree : &AstTree){ }
@@ -103,7 +103,7 @@ impl GetText for CfgNode {
                     None
                 }
             }
-            CfgNode::Func {  } => Some(""),
+            CfgNode::Root {  } => Some(""),
             CfgNode::ForLoop {  text, ast_before_node, ast_mid_node, ast_after_node } => {
                 if !text.is_empty(){
                     Some(text.as_str())
@@ -152,7 +152,7 @@ impl CfgNode{
                 };
                 let _ = mem::replace(text, new_str);
             }
-            CfgNode::Func {  } => {}
+            CfgNode::Root {  } => {}
             CfgNode::ForLoop { text, ast_before_node, ast_mid_node, ast_after_node } => {
                 let ast_node = *ast_before_node;
                 let new_str = node!(at ast_node in ast_tree).text.clone();
@@ -176,8 +176,8 @@ impl CfgNode{
     pub fn new_direct(ast_node:u32) -> Self{
         Self::Branch { text: String::new(), ast_expr_node: ast_node  }
     }
-    pub fn new_func_parent() -> Self{
-        Self::Func {  }
+    pub fn new_root() -> Self{
+        Self::Root {  }
     }
     pub fn new_branch(ast_node:u32) -> Self{
         Self::Branch { ast_expr_node:ast_node, text: String::new() }
@@ -190,6 +190,12 @@ impl CfgNode{
     }
     pub fn new_switch(ast_expr_node:u32) -> Self{
         Self::Switch { ast_expr_node, text: String::new() }
+    }
+    pub fn new_entry(ast_node:u32,instr:Instruction) -> Self{
+        Self::Entry { ast_node ,text: String::new(), calls_in_func: vec![], instr } 
+    }
+    pub fn new_exit(ast_node:u32) -> Self{
+        Self::Exit { ast_node, text: String::new() }
     }
 }
 
@@ -205,9 +211,14 @@ impl Debug for CfgNode{
                 write!(f,"{} {} \n{}","Branch",ast_node_idx, text),
             CfgNode::Gather {  } =>
                 write!(f,"{} ","Gather"),
-            CfgNode::BasicBlock { ast_nodes: _ast_node_idxes, text, instrs } => 
-                write!(f,"{} {}\n{:?}","BasicBlock",text,instrs),
-            CfgNode::Func {  } => write!(f,"{}","root",),
+            CfgNode::BasicBlock { ast_nodes: _ast_node_idxes, text, instrs } =>{
+                let mut instrs_str = String::new();
+                for instr in instrs{
+                    instrs_str.push_str(format!("{:?} \n ",instr).as_str())
+                }
+                write!(f,"{}: \n{}\n{}","BasicBlock",text,instrs_str)
+            },
+            CfgNode::Root {  } => write!(f,"{}","root",),
             CfgNode::ForLoop {  text, ast_before_node, ast_mid_node: _, ast_after_node: _ } => 
                 write!(f,"{} {} \n{}","For",ast_before_node, text),
             CfgNode::WhileLoop { ast_expr_node, text } => write!(f,"{} {} \n{}","While",ast_expr_node, text),
