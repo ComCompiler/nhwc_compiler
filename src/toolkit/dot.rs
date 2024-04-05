@@ -114,7 +114,7 @@ pub enum Config {
     // rounded style 
     Rounded,
     // symtab visualization
-    Symtab,
+    SymTab,
     #[doc(hidden)]
     _Incomplete(()),
 }
@@ -148,7 +148,7 @@ make_config_struct!(
     GraphContentOnly,
     Record,
     Rounded,
-    Symtab,
+    SymTab,
 );
 
 impl<'a, G> Dot<'a, G>
@@ -180,7 +180,7 @@ where
                 if self.config.NodeIndexLabel {
                     write!(f, "{}", g.to_index(node.id()))?;
                 } else {
-                    if self.config.Symtab{
+                    if self.config.SymTab{
                         SymtabEscaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
                     }else if self.config.Record{
                         RecordEscaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
