@@ -279,7 +279,7 @@ macro_rules! add_node {
         $graph.add_node($node_struct ).index() as u32
     };
     ($node_struct:block to $graph:ident) => {
-        $graph.add_node($node_struct ).index() as u32 
+        $graph.add_node($node_struct).index() as u32 
     };
 }
 
@@ -415,7 +415,7 @@ macro_rules! dfs_graph {
             let mut visited:Vec<bool> = vec![false;$graph.node_count()];
             let mut dfs_vec: Vec<u32> = vec![];
 
-            crate::toolkit::gen_nhwc_cfg::dfs($graph, $node,&mut visited,&mut dfs_vec);
+            crate::toolkit::etc::dfs($graph, $node,&mut visited,&mut dfs_vec);
             dfs_vec
         }
     };

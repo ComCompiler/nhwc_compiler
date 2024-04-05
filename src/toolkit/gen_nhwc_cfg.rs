@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fs::OpenOptions};
 
-use petgraph::stable_graph::NodeIndex;
+use petgraph::{stable_graph::{NodeIndex, StableGraph}, EdgeType};
 use syn::token::Use;
 
 use crate::{ add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{field::{Type, UseCounter}, symbol::Symbol}};
@@ -14,9 +14,6 @@ use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context,
 
 pub type NhwcCfg = CfgGraph;
 
-fn parse_expr2nhwc(){
-
-}
 /// 处理所有跳转语句，翻译成对应的instruction并确定跳转到的BB
 fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab,scope_tree:&ScopeTree,et_tree:&mut EtTree,ast2scope:&HashMap<u32,u32>,ast_decl_node:u32,cfg_bb:u32,mut counter:u32, symtab_g:&mut Option<&mut SymTabGraph>)->u32{
     //获取scope
@@ -734,38 +731,23 @@ pub fn parse_cfg_into_nhwc_cfg(cfg_graph:&mut CfgGraph, scope_tree:&mut ScopeTre
         for node in dfs_vec{
             let cfgnode = node!(at node in cfg_graph);
             match cfgnode {
-                CfgNode::Branch { ast_expr_node, text } =>{
+                CfgNode::Branch { ast_expr_node, text, true_head_tail_nodes, false_head_tail_nodes, instrs } =>{
 
                 },
-                CfgNode::Switch { ast_expr_node, text } =>{
+                CfgNode::Switch { ast_expr_node, text, instrs } =>{
 
                 },
-                CfgNode::ForLoop { ast_before_node, ast_mid_node, ast_after_node, text }=>{
+                CfgNode::ForLoop { ast_before_node, ast_mid_node, ast_after_node, text, exit_node, body_head_tail_nodes, instrs }=>{
                     
                 },
-                CfgNode::WhileLoop { ast_expr_node, text }=>{
-
+                CfgNode::WhileLoop { ast_expr_node, text, exit_node, body_node, instrs }=>{
+                    
                 },
                 CfgNode::BasicBlock { ast_nodes, text:_, instrs:_ }=>{
                     counter = parse_bb2nhwc(ast_tree,cfg_graph, scope_tree, et_tree, symtab, ast2scope,ast_nodes.clone(),node,counter,symtab_g);
                 },
                 _=>{},
             }
-        }
-    }
-}
-
-pub fn dfs(cfg_graph: &mut CfgGraph, cfg_node: u32, visited: &mut Vec<bool>, dfs_vec: &mut Vec<u32>) {
-    if visited[cfg_node as usize] {
-        return;
-    }
-    visited[cfg_node as usize] = true;
-    dfs_vec.push(cfg_node);
-
-    let nodes = direct_nodes!(at cfg_node in cfg_graph);
-    for node in nodes {
-        if !visited[node as usize] {
-            dfs(cfg_graph, node, visited, dfs_vec);
         }
     }
 }

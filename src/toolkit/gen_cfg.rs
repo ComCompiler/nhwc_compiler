@@ -3,7 +3,7 @@ use petgraph::visit::EdgeRef;
 use crate::toolkit::ast_node::AstTree;
 use crate::toolkit::cfg_edge::CfgEdge;
 use crate::toolkit::nhwc_instr::NakedInstruction;
-use crate::{add_edge, add_node, direct_node, find_nodes_by_dfs, rule_id, RULE_compoundStatement, RULE_functionDefinition};
+use crate::{add_edge, add_node, add_node_with_edge, direct_node, direct_nodes, find_nodes_by_dfs, rule_id, RULE_compoundStatement, RULE_functionDefinition};
 use crate::antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
 };
 use crate::{find,find_nodes,node};
@@ -11,6 +11,7 @@ use crate::{find,find_nodes,node};
 use super::cfg_node::{CfgGraph, CfgNode};
 use super::context::Context;
 
+use super::etc::dfs;
 use super::scope_node::ScopeTree;
 use super::symbol_table::{SymIdx, SymTab};
 /// 这个文件中没有在命名中提到是哪一中图中的节点，那么统一是 scope_node 
@@ -18,10 +19,11 @@ use super::symbol_table::{SymIdx, SymTab};
 pub fn process_while(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,symtab:&mut SymTab,current_while_node:u32) -> Option<(u32,u32)>{
     //expression做成branch节点
     let expr_node = find!(rule RULE_expression at current_while_node in ast_tree).unwrap();
-    let loop_struct = CfgNode::new_while(expr_node);
-    let cfg_loop_node = add_node!(loop_struct to cfg_graph);
     let statement_node = find!(rule RULE_statement at current_while_node in ast_tree).unwrap();
-    if let Some((st_head_node, st_tail_node)) = process_stmt(cfg_graph, ast_tree,symtab, statement_node){
+    let op_head_tail_nodes = process_stmt(cfg_graph, ast_tree,symtab, statement_node);
+    let loop_struct = CfgNode::new_while(expr_node,None,op_head_tail_nodes);
+    let cfg_loop_node = add_node!(loop_struct to cfg_graph);
+    if let Some((st_head_node, st_tail_node)) = op_head_tail_nodes {
         add_edge!({CfgEdge::Conditioned { ast_node: expr_node, text: String::new() } } from cfg_loop_node to st_head_node in cfg_graph);
         add_edge!({CfgEdge::Direct {}} from st_tail_node to cfg_loop_node in cfg_graph);
 
@@ -55,10 +57,11 @@ pub fn process_for(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,symtab:&mut SymTab,
     let for_mid_node = find!(rule RULE_forMidExpression at for_condition_node in ast_tree).unwrap();
     let for_after_node = find!(rule RULE_forAfterExpression at for_condition_node in ast_tree).unwrap();
 
-    let branch_struct = CfgNode::new_for(for_before_node,for_mid_node,for_after_node);
-    let cfg_branch_node = add_node!(branch_struct to cfg_graph);
     let statement_node = find!(rule RULE_statement at current_for_node in ast_tree).unwrap();
-    if let Some((st_head_node, st_tail_node)) = process_stmt(cfg_graph, ast_tree,symtab, statement_node){
+    let op_head_tail = process_stmt(cfg_graph, ast_tree,symtab, statement_node);
+    let branch_struct = CfgNode::new_for(for_before_node,for_mid_node,for_after_node,None,op_head_tail);
+    let cfg_branch_node = add_node!(branch_struct to cfg_graph);
+    if let Some((st_head_node, st_tail_node)) = op_head_tail{
         add_edge!({CfgEdge::Conditioned { ast_node: for_mid_node , text: String::new() } } from cfg_branch_node to st_head_node in cfg_graph);
         add_edge!({CfgEdge::After { ast_node: for_after_node, text:String::new() } } from st_tail_node to cfg_branch_node in cfg_graph);
     }else{
@@ -131,33 +134,47 @@ pub fn process_if(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,symtab:&mut SymTab,i
     //将expression做成branch
     let expression_node = find!(rule RULE_expression at if_node in ast_tree).unwrap();
 
-    let branch_struct = CfgNode::new_branch(expression_node);
-    let cfg_branch_node = add_node!(branch_struct to cfg_graph);
-
-    let cfg_gather_struct = CfgNode::Gather {  };
-    let cfg_gather_node = add_node!(cfg_gather_struct to cfg_graph);
 
     //处理statement
     let statement_nodes:Vec<u32> = find_nodes!(rule RULE_statement at if_node in ast_tree);
     if statement_nodes.len() == 1{
-        add_edge!({CfgEdge::Else {} } from cfg_branch_node to cfg_gather_node in cfg_graph);
-        if let Some((st_head_node, st_tail_node)) = process_stmt(cfg_graph, ast_tree,symtab, statement_nodes[0]){
+        let p0 = process_stmt(cfg_graph, ast_tree,symtab, statement_nodes[0]);
+
+        let branch_struct = CfgNode::new_branch(expression_node, p0,None);
+        let cfg_branch_node = add_node!(branch_struct to cfg_graph);
+
+        let cfg_gather_struct = CfgNode::Gather {  };
+        let cfg_gather_node = add_node!(cfg_gather_struct to cfg_graph);
+
+        if let Some((st_head_node, st_tail_node)) = p0{
             add_edge!({CfgEdge::Conditioned { ast_node: expression_node, text: String::new() } } from cfg_branch_node to st_head_node in cfg_graph);
             add_edge!({CfgEdge::Direct {  }  } from st_tail_node to cfg_gather_node in cfg_graph);
         }
+        add_edge!({CfgEdge::Else {} } from cfg_branch_node to cfg_gather_node in cfg_graph);
+        Some((cfg_branch_node , cfg_gather_node))
     } else if statement_nodes.len() == 2{
-        if let Some((st_head_node, st_tail_node)) = process_stmt(cfg_graph, ast_tree,symtab, statement_nodes[0]){
+        let p0=process_stmt(cfg_graph, ast_tree,symtab, statement_nodes[0]);
+        let p1 = process_stmt(cfg_graph, ast_tree,symtab, statement_nodes[1]);
+
+        let branch_struct = CfgNode::new_branch(expression_node, p0,p1);
+        let cfg_branch_node = add_node!(branch_struct to cfg_graph);
+
+        let cfg_gather_struct = CfgNode::Gather {  };
+        let cfg_gather_node = add_node!(cfg_gather_struct to cfg_graph);
+
+        if let Some((st_head_node, st_tail_node)) = p0{
+            add_edge!({CfgEdge::Conditioned { ast_node: expression_node, text: String::new() } } from cfg_branch_node to st_head_node in cfg_graph);
+            add_edge!({CfgEdge::Direct {  }  } from st_tail_node to cfg_gather_node in cfg_graph);
+        }
+        if let Some((st_head_node, st_tail_node)) = p1{
             add_edge!({CfgEdge::Else {  }  } from cfg_branch_node to st_head_node in cfg_graph);
             add_edge!({CfgEdge::Direct {  }  } from st_tail_node to cfg_gather_node in cfg_graph);
         }
-        if let Some((st_head_node, st_tail_node)) = process_stmt(cfg_graph, ast_tree,symtab, statement_nodes[1]){
-            add_edge!({CfgEdge::Conditioned { ast_node: expression_node, text: String::new() } } from cfg_branch_node to st_head_node in cfg_graph);
-            add_edge!({CfgEdge::Direct {  }  } from st_tail_node to cfg_gather_node in cfg_graph);
-        }
-    }else if statement_nodes.len() >2 {
-        panic!("不对, selectionStatement 下面不可能有两个以上的Statement")
+        Some((cfg_branch_node , cfg_gather_node))
+    }else {
+        panic!("不对, selectionStatement 下面不可能有两个以上的Statement");
     }
-    Some((cfg_branch_node , cfg_gather_node))
+    
 }
 pub fn process_switch(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,symtab:&mut SymTab,switch_node:u32) -> Option<(u32,u32)>{
     //将expression做成branch
@@ -309,12 +326,17 @@ pub fn parse_ast_to_cfg(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut Sy
 
 
 
-
-
-
-
-/// 这个函数用于将cfg生成为 
+/// 这个函数用于将cfg生成为 bbcfg 意思是这个cfg 里面只有bb 
 pub fn parse_cfg2cfgbb(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut SymTab,scope_tree:&ScopeTree){
+    // 建立一个新的cfg 
+    let mut bb_cfg = CfgGraph::new();
+    let root_node = add_node!({CfgNode::Root {  } } to bb_cfg);
+    process_bbcfg_root(ast_tree, cfg_graph, &mut bb_cfg, root_node, root_node, symtab, scope_tree)
+}
 
+pub fn process_bbcfg_root(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,bb_cfg:&mut CfgGraph,current_root_node_in_cfg:u32,current_root_node_in_bbcfg:u32,symtab:&mut SymTab,scope_tree:&ScopeTree){
+    for node in direct_nodes!(at current_root_node_in_cfg in cfg_graph).iter(){
+
+    }
 
 }
