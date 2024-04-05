@@ -7,7 +7,7 @@ use crate::antlr_parser::clexer::{And, Arrow, Constant, DivAssign, Dot, Equal, G
 use crate::antlr_parser::cparser::{Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_declaration, RULE_declarationSpecifier, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_expressionStatement, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_initializerList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_parameterTypeList, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_typeSpecifier, RULE_unaryExpression, RULE_unaryOperator};
 
 use crate::{ add_node, add_node_with_edge, direct_node, direct_nodes, find, find_nodes, node, rule_id, term_id};
-use crate::toolkit::symbol_table::Symidx;
+use crate::toolkit::symbol_table::SymIdx;
 
 use super::et_node::{self, Def_Or_Use, EtNakedNode, EtNode, EtTree};
 use super::{ast_node::AstTree, scope_node::ScopeTree};
@@ -519,7 +519,7 @@ fn process_cast_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &Scop
     // 检查 castExpression 节点是否是类型转换的情况
     if let Some(type_name_node) = find!(rule RULE_typeName at cast_expr_node in ast_tree) {
         // 如果存在 typeName，说明是类型转换的情况
-        let type_sym = Symidx::new(scope_node,node!(at type_name_node in ast_tree).text.clone());
+        let type_sym = SymIdx::new(scope_node,node!(at type_name_node in ast_tree).text.clone());
         let cast_node = add_node_with_edge!({EtNakedNode::new_op_cast( cast_expr_node).to_et_node()} from parent_et_node in et_tree);
         // 添加 cast op 节点的左节点，这是个 type symbol 
         add_node_with_edge!({EtNakedNode::new_symbol(scope_node,type_sym,Def_Or_Use::Use).to_et_node()} from cast_node in et_tree);
@@ -576,20 +576,20 @@ fn process_postfix_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &S
     }else if let Some(arg_expr_list_node) = find!(rule RULE_argumentExpressionList at postfix_expr_node in ast_tree){
         //说明这是个函数调用的语法 call
         let et_call_node =  add_node_with_edge!({EtNakedNode::new_op_call( postfix_expr_node).to_et_node()} from parent_et_node in et_tree);
-        let postfix_expr_node= find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree).unwrap();
+        let postfix_expr_node= find!(rule RULE_postfixExpression at postfix_expr_node in ast_tree).unwrap();
         process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_call_node);
         process_arg_expr_list(et_tree, ast_tree, scope_tree, arg_expr_list_node, scope_node, et_call_node);
     }else if let Some(_dot_node) = find!(term Dot at postfix_expr_node in ast_tree){
         //说明这是个结构体成员访问的语法 dot member access 
         let et_dot_member_node =  add_node_with_edge!({EtNakedNode::new_op_dot_member( postfix_expr_node).to_et_node()} from parent_et_node in et_tree);
-        let postfix_expr_node= find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree).unwrap();
+        let postfix_expr_node= find!(rule RULE_postfixExpression at postfix_expr_node in ast_tree).unwrap();
         let ident_node= find!(term Identifier at postfix_expr_node in ast_tree).unwrap();
         process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_dot_member_node);
         process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, et_dot_member_node,Def_Or_Use::Use);
     }else if let Some(_arrow_node) = find!(term Arrow at postfix_expr_node in ast_tree) {
         //说明这是个结构体成员访问的语法 arrow member access 
         let et_arrow_member_node =  add_node_with_edge!({EtNakedNode::new_op_arrow_member( postfix_expr_node).to_et_node()} from parent_et_node in et_tree);
-        let postfix_expr_node= find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree).unwrap();
+        let postfix_expr_node= find!(rule RULE_postfixExpression at postfix_expr_node in ast_tree).unwrap();
         let ident_node= find!(term Identifier at postfix_expr_node in ast_tree).unwrap();
         process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_arrow_member_node);
         process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, et_arrow_member_node,Def_Or_Use::Use);
@@ -651,7 +651,7 @@ fn process_ident(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeTree,
     let sym_name = node!(at ident_node in ast_tree).text.clone();
     // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 
-    let sym_idx = Symidx::new(scope_node, sym_name);
+    let sym_idx = SymIdx::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
     add_node_with_edge!({EtNakedNode::new_symbol(ident_node, sym_idx, def_or_use).to_et_node()} from parent_et_node in et_tree);
 }
@@ -659,7 +659,7 @@ fn process_constant(et_tree:&mut EtTree , ast_tree: &AstTree,scope_tree:&ScopeTr
     let sym_name = node!(at const_node in ast_tree).text.clone();
     // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 
-    let const_sym_idx = Symidx::new(scope_node, sym_name);
+    let const_sym_idx = SymIdx::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
     add_node_with_edge!({EtNakedNode::Constant {const_sym_idx,ast_node:const_node,text:String::new()}.to_et_node()} from parent_et_node in et_tree);
 }

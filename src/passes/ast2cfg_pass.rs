@@ -15,7 +15,7 @@ impl Ast2CfgPass{
 impl Pass for Ast2CfgPass{
     // 运行这个pass 
     fn run(&mut self,ctx:&mut Context) {
-        parse_ast_to_cfg(ctx);
+        parse_ast_to_cfg(&ctx.ast_tree,&mut ctx.cfg_graph,&mut ctx.symtab,&ctx.scope_tree);
         // 1.1 生成对应的png 
         for cfg_node in ctx.cfg_graph.node_weights_mut(){
             cfg_node.load_ast_node_text(&ctx.ast_tree)

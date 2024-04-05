@@ -15,6 +15,7 @@ pub struct ScopeNode{
     pub ast_node:u32,
     pub text:String,
     pub parent:u32,
+    pub scope_type:ScopeType,
 }
 impl GetText for ScopeNode {
     fn get_text(&self)-> Option<&str> {
@@ -48,7 +49,28 @@ impl ScopeNode {
 
 impl Debug for ScopeNode{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"{:?} {}",self.ast_node,self.text)
+        write!(f,"{} \n {:?} {}",match  self.scope_type{
+            ScopeType::For => "For",
+            ScopeType::While => "While",
+            ScopeType::Func => "Func",
+            ScopeType::Normal => "Normal",
+            ScopeType::Terminal => "Terminal",
+            ScopeType::If => "If",
+            ScopeType::Switch => "Switch",
+            ScopeType::Case => "Case",
+        },self.ast_node,self.text)
     }
 }
 
+
+#[derive(Clone)]
+pub enum ScopeType{
+    For,
+    While,
+    Func,
+    Normal,
+    Terminal,
+    If,
+    Switch,
+    Case,
+}

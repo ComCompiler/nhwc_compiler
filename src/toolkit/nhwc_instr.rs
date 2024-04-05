@@ -2,47 +2,47 @@ use std::fmt::{Debug, Formatter};
 use petgraph::{data, visit::Data};
 use syn::Field;
 
-use super::{field::{Fields, Type, Value}, symbol::Symbol, symbol_table::Symidx};
+use super::{field::{Fields, Type, Value}, symbol::Symbol, symbol_table::SymIdx};
 
 #[derive(Clone)]
 pub enum ArithOp{        
     Add{
-        a : Symidx ,
-        b : Symidx ,
+        a : SymIdx ,
+        b : SymIdx ,
         vartype : Type ,
     },
     Mul{
-        a : Symidx ,
-        b : Symidx ,
+        a : SymIdx ,
+        b : SymIdx ,
         vartype : Type ,
 
     },
     Div{
-        a : Symidx ,
-        b : Symidx ,
+        a : SymIdx ,
+        b : SymIdx ,
         vartype : Type ,
    },
     Sub{
-        a : Symidx ,
-        b : Symidx ,
+        a : SymIdx ,
+        b : SymIdx ,
         vartype : Type ,
     },
     Icmp{
         plan : IcmpPlan,
-        a : Symidx ,       //寄存器或者数
-        b : Symidx ,
+        a : SymIdx ,       //寄存器或者数
+        b : SymIdx ,
         vartype : Type ,
     },
 }
 #[derive(Clone)]
 pub struct FuncOp{
-    func:Symidx,
-    args:Vec<Symidx>       //存储所有的实参
+    func:SymIdx,
+    args:Vec<SymIdx>       //存储所有的实参
 }
 #[derive(Clone)]
 pub struct PhiPair{
-    variable : Symidx,
-    bb : Symidx,
+    variable : SymIdx,
+    bb : SymIdx,
 }
 #[derive(Clone)]
 pub struct PhiOp{
@@ -51,11 +51,11 @@ pub struct PhiOp{
 #[derive(Clone)]
 pub enum MemOp{
     Load{
-        ptr: Symidx,
+        ptr: SymIdx,
     },
     Store{
-        value : Symidx,
-        ptr: Symidx,
+        value : SymIdx,
+        ptr: SymIdx,
     },
     Alloca{
         align:u32,
@@ -72,28 +72,28 @@ pub enum MemOp{
 pub enum NakedInstruction{
     //定义函数
     Def_Func{
-        func_symidx:Symidx,
-        ret_type:Symidx,
-        args:Vec<Symidx>,
+        func_symidx:SymIdx,
+        ret_type:SymIdx,
+        args:Vec<SymIdx>,
     },
     //定义变量
     Def_Var{
-        var_symidx:Symidx,
+        var_symidx:SymIdx,
         vartype:Type,
-        value:Symidx,
+        value:SymIdx,
     },
     // 算数运算符 + - * / etc.
     Arith{
-        lhs:Symidx,
+        lhs:SymIdx,
         rhs:ArithOp,
     },
     SimpleAssign{
-        lhs: Symidx,
-        rhs: Symidx,
+        lhs: SymIdx,
+        rhs: SymIdx,
     },
     // 调用函数
     Call{
-        assigned : Option<Symidx>,
+        assigned : Option<SymIdx>,
         func_op : FuncOp
     },
     // 跳转  break continue  return  etc.
@@ -102,7 +102,7 @@ pub enum NakedInstruction{
     },
     // phi node 
     Phi{
-        lhs : Symidx,
+        lhs : SymIdx,
         rhs : PhiOp,
     },
 }
@@ -119,22 +119,22 @@ pub enum IcmpPlan{
 }
 #[derive(Clone,Debug)]
 pub struct ComparedPair{
-    compared : Symidx,
-    label : Symidx,
+    compared : SymIdx,
+    label : SymIdx,
 }
 #[derive(Clone)]
 pub enum JumpOp{
     Ret{
-        ret_sym : Symidx , // 这是返回的类型
+        ret_sym : SymIdx , // 这是返回的类型
     },
     Br{
-        cond : Symidx ,
-        t1 : Symidx , // 这是一个 BasicBlock 的symbol 
-        t2 : Symidx,
+        cond : SymIdx ,
+        t1 : SymIdx , // 这是一个 BasicBlock 的symbol 
+        t2 : SymIdx,
     },
     Switch{
-        cond : Symidx,
-        default : Symidx,
+        cond : SymIdx,
+        default : SymIdx,
         compared: Vec<ComparedPair>,
     },
     DirectJump{
@@ -151,45 +151,45 @@ impl NakedInstruction{
             info: Fields::new(),
         }
     }
-    pub fn new_def_func(func_symidx:Symidx,ret_type:Symidx,args:Vec<Symidx>) -> Self{
+    pub fn new_def_func(func_symidx:SymIdx,ret_type:SymIdx,args:Vec<SymIdx>) -> Self{
         Self::Def_Func { func_symidx ,ret_type, args }
     }
 
-    pub fn new_def_var(vartype:Type,varname:Symidx,value:Symidx) -> Self{
+    pub fn new_def_var(vartype:Type,varname:SymIdx,value:SymIdx) -> Self{
         Self::Def_Var { var_symidx: varname, vartype, value }
     }
-    pub fn new_assign(lhs:Symidx,rhs:Symidx) ->Self{
+    pub fn new_assign(lhs:SymIdx,rhs:SymIdx) ->Self{
         Self::SimpleAssign { lhs, rhs }
     }
     
     // Instruction -> Arith -> ArithOp
-    pub fn new_add(lhs: Symidx, a:Symidx,b:Symidx,vartype:Type) -> Self{
+    pub fn new_add(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
         Self::Arith {lhs, rhs: ArithOp::Add { a, b, vartype } }
     }
-    pub fn new_mul(lhs: Symidx, a:Symidx,b:Symidx,vartype:Type) -> Self{
+    pub fn new_mul(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
         Self::Arith {lhs, rhs: ArithOp::Mul { a,  b, vartype} }
     }
-    pub fn new_div(lhs: Symidx, a:Symidx,b:Symidx,vartype:Type) -> Self{
+    pub fn new_div(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
         Self::Arith { lhs, rhs: ArithOp::Div { a, b, vartype } }
     }
-    pub fn new_sub(lhs: Symidx, a:Symidx,b:Symidx,vartype:Type) -> Self{
+    pub fn new_sub(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
         Self::Arith {lhs, rhs: ArithOp::Sub {a, b, vartype } }
     }
-    pub fn new_icmp(lhs: Symidx, plan:IcmpPlan,a:Symidx,b:Symidx,vartype:Type) -> Self{
+    pub fn new_icmp(lhs: SymIdx, plan:IcmpPlan,a:SymIdx,b:SymIdx,vartype:Type) -> Self{
         Self::Arith {lhs, rhs: ArithOp::Icmp { plan,a, b, vartype } }
     }
     // Instruction -> Call -> FuncOp
-    pub fn new_func_call(assigned:Option<Symidx> , func:Symidx , args:Vec<Symidx>) ->Self{       //也许可以直接传入一个Func结构体
+    pub fn new_func_call(assigned:Option<SymIdx> , func:SymIdx , args:Vec<SymIdx>) ->Self{       //也许可以直接传入一个Func结构体
         Self::Call {  assigned, func_op: FuncOp { func,args } }
     }
     // Instruction -> Jump ->JumpOp
-    pub fn new_ret(ret_sym:Symidx) -> Self{
+    pub fn new_ret(ret_sym:SymIdx) -> Self{
         Self::Jump { op: JumpOp::Ret { ret_sym } }
     }
-    pub fn new_br(cond:Symidx,t1:Symidx,t2:Symidx) ->Self{
+    pub fn new_br(cond:SymIdx,t1:SymIdx,t2:SymIdx) ->Self{
         Self::Jump { op: JumpOp::Br { cond: cond, t1,t2 } }
     }
-    pub fn new_switch(cond : Symidx,default : Symidx,compared: Vec<ComparedPair>) -> Self{
+    pub fn new_switch(cond : SymIdx,default : SymIdx,compared: Vec<ComparedPair>) -> Self{
         Self::Jump { op: JumpOp::Switch {cond,  default, compared } }
     }
     pub fn new_jump(cfg_dst_label : u32) ->Self{
@@ -297,7 +297,7 @@ pub enum BaseIntInstr{
 }
 
 pub struct Register{
-    reg_name : Symidx
+    reg_name : SymIdx
 }
 impl Debug for Register{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {

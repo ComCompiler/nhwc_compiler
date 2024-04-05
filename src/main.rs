@@ -52,8 +52,8 @@ fn main() {
     add_passes!(
         code2ast_pass
         then ast2et_debug_pass
-        then ast2cfg_pass
         then ast2st_pass
+        then ast2cfg_pass
         then cfg2ncfg_pass
         then symtab_debug_pass
         to pass_manager

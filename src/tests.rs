@@ -8,7 +8,7 @@ mod tests{
     use petgraph::{graph::NodeIndex, visit::Data};
     
     
-    use crate::{add_field, add_pass, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, node, node_mut, passes::pass_demo::PassDemo, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, dot::Config, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::{Type, Value}, gen_ast::parse_as_ast_tree, nhwc_instr::Instruction, pass_manager::{self, Pass, PassManager}, symbol::Symbol, symbol_table::SymbolTable}, Args};
+    use crate::{add_field, add_pass, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, node, node_mut, passes::pass_demo::PassDemo, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, dot::Config, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::{Type, Value}, gen_ast::parse_as_ast_tree, nhwc_instr::NakedInstruction, pass_manager::{self, Pass, PassManager}, symbol::Symbol, symbol_table::SymTab}, Args};
     use crate::toolkit::field::FieldsOwner;
 
 
@@ -115,7 +115,7 @@ mod tests{
     
     #[test]
     fn find_symbol(){
-        let mut symtab = SymbolTable::new();
+        let mut symtab = SymTab::new();
 
         let x = symtab.add(Symbol::new(0, "x".to_string()) );
         let y = symtab.add(Symbol::new(0, "y".to_string()) );
@@ -137,7 +137,7 @@ mod tests{
     #[test]
     fn find_symbol_field(){
         let field_name = "type";
-        let mut symtab = SymbolTable::new();
+        let mut symtab = SymTab::new();
 
         let x = symtab.add(Symbol::new(0, "x".to_string()) );
         let y = symtab.add(Symbol::new(0, "y".to_string()) );
@@ -153,7 +153,7 @@ mod tests{
     #[test]
     fn find_symbol_macro_test(){
         const VALUE:&str = "VALUE";
-        let mut symtab = SymbolTable::new();
+        let mut symtab = SymTab::new();
 
         let x = add_symbol!({Symbol::new_verbose(0, "x".to_string())} to symtab );
         let y = add_symbol!({Symbol::new_verbose(0, "y".to_string())} with field VALUE:{Value::I32(None)} to symtab);
@@ -170,14 +170,14 @@ mod tests{
     #[test]
     fn try_instruction_fmt(){
         const VALUE:&str = "value";
-        let mut symtab = SymbolTable::new();
+        let mut symtab = SymTab::new();
 
         let lhs = add_symbol!({"lhs".to_string()} of scope {0} with field VALUE:{Value::I32(None)} to symtab);
         let a = add_symbol!({"No.1".to_string()} of scope {0} to symtab);
         let b = add_symbol!({"No.2".to_string()} of scope {0} to symtab);
 
-        let instr=Instruction::new_add(lhs.clone(), a.clone(), b.clone(),Type::I32);
-        let instr2 = Instruction::new_mul(lhs.clone(), a.clone(), b.clone(),Type::I32);
+        let instr=NakedInstruction::new_add(lhs.clone(), a.clone(), b.clone(),Type::I32);
+        let instr2 = NakedInstruction::new_mul(lhs.clone(), a.clone(), b.clone(),Type::I32);
         println!("{:?}",instr);
         println!("{:?}",instr2);
     }

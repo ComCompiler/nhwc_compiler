@@ -1,7 +1,7 @@
 use std::any::Any;
 use crate::toolkit::dot::Config;
 
-use crate::toolkit::{context::Context, etc::{generate_png_by_graph, read_file_content}, field::Field, gen_ast::parse_as_ast_tree, gen_cfg::parse_ast_to_cfg, gen_nhwc_cfg::parse_cfg_into_nhwc_cfg, pass_manager::Pass};
+use crate::toolkit::{context::Context, etc::{generate_png_by_graph, read_file_content}, field::Field, gen_ast::parse_as_ast_tree, gen_nhwc_cfg::parse_cfg_into_nhwc_cfg, pass_manager::Pass};
 #[derive(Debug)]
 pub struct Cfg2NcfgPass{ 
     is_gen_png:bool
