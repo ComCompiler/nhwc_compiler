@@ -3,7 +3,7 @@ use std::{collections::HashMap, fs::OpenOptions};
 use petgraph::stable_graph::NodeIndex;
 use syn::token::Use;
 
-use crate::{ add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{field::{Type, UseCounter}, symbol::Symbol}};
+use crate::{ add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{field::{Type, UseCounter}, symbol::Symbol, symbol_table::SymTabEdge}};
 
 use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, field::FieldsOwner, gen_et::process_any_stmt, nhwc_instr::NakedInstruction, scope_node::ScopeTree, symbol, symbol_table::{ SymIdx, SymTab, SymTabGraph}};
 
@@ -295,7 +295,8 @@ fn process_constant(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,c
                 Some(symg) => {
                     let mut idx:u32=(symg.node_count()).try_into().unwrap();
                     if idx!=0{idx -=1}
-                    add_node_with_edge!({symtab.clone()} from idx in symg);
+                    let edge_info = SymTabEdge::new(const_literal.to_string());
+                    add_node_with_edge!({symtab.clone()} with edge {edge_info} from idx in symg);
                 }
                 None => {},
             }
@@ -318,7 +319,8 @@ fn process_symbol(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,def
                 Some(symg) => {
                     let mut idx:u32 = (symg.node_count()).try_into().unwrap() ;
                     if idx!=0{idx -=1}
-                    add_node_with_edge!({symtab.clone()} from idx in symg);
+                    let edge_info = SymTabEdge::new(symbol_name.to_string());
+                    add_node_with_edge!({symtab.clone()} with edge {edge_info} from idx in symg);
                 }
                 None => {},
             };
@@ -710,7 +712,7 @@ fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut SymTab,
 
 /// 由于cfg 里面包含了其他的一些块和边，例如 branch 块和 after conditioned边
 /// 因此我们需要再做一次转化，把边转化成相应的跳转或者调整代码，把所有node 都转化成BasicBlock
-pub fn parse_cfg_into_nhwc_cfg(cfg_graph:&mut CfgGraph, scope_tree:&mut ScopeTree, ast_tree:&mut AstTree,symtab:&mut SymTab, et_tree:&mut EtTree, ast2scope:&mut HashMap<u32,u32> , mut counter:u32, symtab_g:&mut Option<&mut SymTabGraph>){
+pub fn parse_cfg_into_nhwc_cfg(cfg_graph:&mut CfgGraph , scope_tree:&mut ScopeTree , ast_tree:&mut AstTree,symtab:&mut SymTab , et_tree:&mut EtTree , ast2scope:&mut HashMap<u32,u32> , mut counter:u32, symtab_g:&mut Option<&mut SymTabGraph>){
     // let (cfg_graph,scope_tree,ast_tree,symtab,et_tree,ast2scope)= (&mut context.cfg_graph , &mut context.scope_tree,&mut context.ast_tree,&mut context.symtab,&mut context.et_tree,&context.ast2scope);
 
     let start_node: NodeIndex<u32> = NodeIndex::new(0);
