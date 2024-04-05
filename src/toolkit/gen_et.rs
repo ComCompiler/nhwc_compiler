@@ -371,7 +371,7 @@ fn process_relational_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree:
         for (index, &shift_node) in shift_expr_nodes.iter().enumerate() {
             if index != shift_expr_nodes.len() - 1 {
                 if op_last_et_shift_op_node.is_none() {
-                    op_last_et_shift_op_node = Some(add_node_with_edge!({EtNakedNode::new_op_less_than( relational_expr_node).to_et_node()} from parent_et_node in et_tree)); // 默认操作符，实际应根据上下文确定
+                    op_last_et_shift_op_node = Some(add_node_with_edge!({get_expr_node_of_op_node(index)} from parent_et_node in et_tree)); // 默认操作符，实际应根据上下文确定
                 } else {
                     let last_ep_shift_node = op_last_et_shift_op_node.unwrap();
                     op_last_et_shift_op_node = Some(add_node_with_edge!({get_expr_node_of_op_node(index)} from last_ep_shift_node in et_tree));
