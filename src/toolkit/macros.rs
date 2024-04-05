@@ -422,7 +422,7 @@ macro_rules! dfs_graph {
 }
 #[macro_export] 
 macro_rules! push_instr {
-    (add $instr:ident to $node:ident for entry in $graph:ident) =>{
+    ($instr:ident to $node:ident for entry in $graph:ident) =>{
         {
             let cfg_entry_node = node_mut!(at $node in $graph);
             if let crate::toolkit::cfg_node::CfgNode::Entry { ast_node:_, text:_, calls_in_func:_, instr } = cfg_entry_node{
@@ -430,11 +430,30 @@ macro_rules! push_instr {
             }
         }
     };
-    (add $instr:ident to $node:ident for bb in $graph:ident) =>{
+    ($instr:ident to $node:ident in $graph:ident) =>{
         {
-            let cfg_bb_node = node_mut!(at $node in $graph);
-            if let crate::toolkit::cfg_node::CfgNode::BasicBlock { ast_nodes:_, text:_, instrs } = cfg_bb_node{
-                instrs.push($instr);
+            let cfg_node = node_mut!(at $node in $graph);
+            match cfg_node {
+                CfgNode::Exit {  ast_node, text, instrs } =>{
+                    instrs.push($instr);
+                }
+                CfgNode::Branch {  ast_expr_node: ast_node, text, true_head_tail_nodes:  true_head_tail_nodes, false_head_tail_nodes, instrs } => {
+                    instrs.push($instr);
+                }
+                CfgNode::Gather {} => {
+                },
+                CfgNode::BasicBlock { ast_nodes, text, instrs } =>{instrs.push($instr);
+                }
+                CfgNode::ForLoop {  text, ast_before_node, ast_mid_node, ast_after_node, exit_node, body_head_tail_nodes: body_node, instrs } => {
+                    instrs.push($instr);
+                }
+                CfgNode::WhileLoop { ast_expr_node: ast_node, text, exit_node, body_node, instrs } => {
+                    instrs.push($instr);
+                },
+                CfgNode::Switch { ast_expr_node, text, instrs } => {
+                    instrs.push($instr);
+                },
+                _ => panic!("can't push instr to entry or root"),
             }
         }
     };

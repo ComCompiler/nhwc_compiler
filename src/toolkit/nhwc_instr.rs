@@ -70,6 +70,9 @@ pub enum MemOp{
 
 #[derive(Clone)]
 pub enum NakedInstruction{
+    Label{
+        label_symidx:SymIdx,
+    },
     //定义函数
     Def_Func{
         func_symidx:SymIdx,
@@ -153,6 +156,9 @@ impl NakedInstruction{
     }
     pub fn new_def_func(func_symidx:SymIdx,ret_type:SymIdx,args:Vec<SymIdx>) -> Self{
         Self::Def_Func { func_symidx ,ret_type, args }
+    }
+    pub fn new_label(label_symidx:SymIdx) -> Self{
+        Self::Label { label_symidx }
     }
 
     pub fn new_def_var(vartype:Type,varname:SymIdx,value:SymIdx) -> Self{
@@ -275,6 +281,9 @@ impl Debug for NakedInstruction{ // 以类似llvm ir的格式打印输出
                     Ok(write!(f, "Alloc {:?} %{:?} = {:?}\n", vartype, varname, value)?)
                 }
             }
+            Self::Label { label_symidx } => {
+                write!(f,"label {:?}:\n",label_symidx)
+            },
         }
     }            
 }

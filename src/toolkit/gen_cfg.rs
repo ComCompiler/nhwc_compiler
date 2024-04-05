@@ -326,17 +326,17 @@ pub fn parse_ast_to_cfg(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut Sy
 
 
 
-/// 这个函数用于将cfg生成为 bbcfg 意思是这个cfg 里面只有bb 
-pub fn parse_cfg2cfgbb(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut SymTab,scope_tree:&ScopeTree){
-    // 建立一个新的cfg 
-    let mut bb_cfg = CfgGraph::new();
-    let root_node = add_node!({CfgNode::Root {  } } to bb_cfg);
-    process_bbcfg_root(ast_tree, cfg_graph, &mut bb_cfg, root_node, root_node, symtab, scope_tree)
-}
+// /// 这个函数用于将cfg生成为 bbcfg 意思是这个cfg 里面只有bb 
+// pub fn parse_cfg2cfgbb(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut SymTab,scope_tree:&ScopeTree){
+//     // 建立一个新的cfg 
+//     let mut bb_cfg = CfgGraph::new();
+//     let root_node = add_node!({CfgNode::Root {  } } to bb_cfg);
+//     process_bbcfg_root(ast_tree, cfg_graph, &mut bb_cfg, root_node, root_node, symtab, scope_tree)
+// }
 
-pub fn process_bbcfg_root(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,bb_cfg:&mut CfgGraph,current_root_node_in_cfg:u32,current_root_node_in_bbcfg:u32,symtab:&mut SymTab,scope_tree:&ScopeTree){
-    for node in direct_nodes!(at current_root_node_in_cfg in cfg_graph).iter(){
+// pub fn process_bbcfg_root(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,bb_cfg:&mut CfgGraph,current_root_node_in_cfg:u32,current_root_node_in_bbcfg:u32,symtab:&mut SymTab,scope_tree:&ScopeTree){
+//     for node in direct_nodes!(at current_root_node_in_cfg in cfg_graph).iter(){
 
-    }
+//     }
 
-}
+// }
