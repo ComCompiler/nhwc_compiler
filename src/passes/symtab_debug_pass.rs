@@ -1,6 +1,8 @@
 use std::any::Any;
 use petgraph::adj::NodeIndex;
 
+use crate::toolkit::cfg_node::GetText;
+use crate::toolkit::symbol::Symbol;
 use crate::{add_node, add_node_with_edge};
 use crate::toolkit::dot::Config;
 
@@ -27,23 +29,22 @@ impl Pass for SymtabDebugPass{
                 cfg_node.load_ast_node_text(&ctx.ast_tree)
             }
             let mut symtab_g = SymtabGraph::new();
-            println!("ctx的symtab内容为{:#?}",ctx.symtab);
+            // println!("ctx的symtab内容为{:#?}",ctx.symtab);
             add_node!({ctx.symtab.clone()} to symtab_g);
             let root = 0;
             add_node_with_edge!({ctx.symtab.clone()} from root in symtab_g);
             generate_png_by_graph(&symtab_g,"symtab".to_string(),&[Config::EdgeNoLabel,Config::Record,Config::Rounded,Config::Symtab]);
 
-            let mut step_symtab_g = SymtabGraph::new();
 
-            // 遍历读取每个含有symbol的节点? | 读取ctx.symtab并按照#......$ @......$的顺序插入新的symtab? | 遍历symtab?
-            // let step_symtab = Symtab::new();
-            // for cfg_node in ctx.cfg_graph.node_weights_mut(){
+            let (cfg_graph,scope_tree,ast_tree,symtab,et_tree,ast2scope,symtab_graph) = (&mut ctx.cfg_graph,&mut ctx.scope_tree,&mut ctx.ast_tree,&mut ctx.symtab,&mut ctx.et_tree,&mut ctx.ast2scope,&mut ctx.symtab_graph);
+            println!("symtab 内容{:?}",symtab);
+            let mut step_symtab=Symtab::new();
+            let mut step_symtab_g=SymtabGraph::new();
+            add_node!({step_symtab.clone()} to step_symtab_g);
+            parse_cfg_into_nhwc_cfg(cfg_graph,scope_tree,ast_tree,&mut step_symtab,et_tree,ast2scope,0,&mut Some(&mut step_symtab_g));
+            
+            generate_png_by_graph(&step_symtab_g, "step_symtab".to_string(), &[Config::EdgeNoLabel,Config::Record,Config::Rounded,Config::Symtab]);
 
-            //     add_node_with_edge!({step_symtab.clone()} from /*上次的节点 */ in step_symtab_g);
-
-
-            // }
-            // generate_png_by_graph(&symtab_g,"step_symtab".to_string(),&[Config::EdgeNoLabel,Config::Record,Config::Rounded,Config::Symtab]);
         }
     }
     // 返回pass的描述，具体作用

@@ -46,7 +46,7 @@ fn main() {
     let code2ast_pass = Code2AstPass::new(true);
     let ast2cfg_pass = Ast2CfgPass::new(true);
     let ast2et_debug_pass = Ast2EtDebugPass::new(true);
-    let cfg2ncfg_pass = Cfg2NcfgPass::new(true);
+    let cfg2ncfg_pass = Cfg2NcfgPass::new(true,true);
     let ast2st_pass = Ast2StPass::new(true);
     let symtab_debug_pass = SymtabDebugPass::new(true);
     add_passes!(
