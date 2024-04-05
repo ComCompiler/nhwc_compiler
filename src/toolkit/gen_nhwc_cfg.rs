@@ -294,9 +294,14 @@ fn process_constant(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,c
             match symtab_g{
                 Some(symg) => {
                     let mut idx:u32=(symg.node_count()).try_into().unwrap();
-                    if idx!=0{idx -=1}
-                    let edge_info = SymTabEdge::new(const_literal.to_string());
-                    add_node_with_edge!({symtab.clone()} with edge {edge_info} from idx in symg);
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        let edge_info = SymTabEdge::new(const_literal.to_string());
+                        idx-=1;
+                        add_node_with_edge!({symtab.clone()} with edge {edge_info} from idx in symg);
+                    }
                 }
                 None => {},
             }
@@ -318,9 +323,14 @@ fn process_symbol(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,def
             match symtab_g{
                 Some(symg) => {
                     let mut idx:u32 = (symg.node_count()).try_into().unwrap() ;
-                    if idx!=0{idx -=1}
-                    let edge_info = SymTabEdge::new(symbol_name.to_string());
-                    add_node_with_edge!({symtab.clone()} with edge {edge_info} from idx in symg);
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        let edge_info = SymTabEdge::new(symbol_name.to_string());
+                        idx-=1;
+                        add_node_with_edge!({symtab.clone()} with edge {edge_info} from idx in symg);
+                    }
                 }
                 None => {},
             };
