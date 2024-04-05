@@ -7,7 +7,7 @@ use petgraph::stable_graph::StableDiGraph;
 use super::{symbol::Symbol, field::{self, Field}};
 use core::fmt::Debug;
 
-pub type SymtabGraph = StableDiGraph<SymTab,(),u32>;
+pub type SymTabGraph = StableDiGraph<SymTab,(),u32>;
 
 #[derive(Clone)]
 pub struct SymTab {
