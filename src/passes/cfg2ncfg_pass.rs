@@ -33,7 +33,7 @@ impl Pass for Cfg2NcfgPass{
             generate_png_by_graph(&ctx.cfg_graph,"nhwc_cfg_graph".to_string(),&[Config::EdgeNoLabel,Config::Record,Config::Rounded]);
         }
         if self.is_gen_symtab_graph_png{
-            generate_png_by_graph(&ctx.symtab_graph,"symtab_graph".to_string(),&[Config::EdgeNoLabel,Config::Record,Config::Rounded,Config::SymTab]);
+            generate_png_by_graph(&ctx.symtab_graph,"symtab_graph".to_string(),&[Config::Record,Config::Rounded,Config::SymTab]);
         }
     }
     // 返回pass的描述，具体作用

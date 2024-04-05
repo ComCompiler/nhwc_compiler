@@ -3,7 +3,7 @@ use std::{collections::HashMap, fs::OpenOptions};
 use petgraph::{stable_graph::{NodeIndex, StableGraph}, EdgeType};
 use syn::token::Use;
 
-use crate::{ add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{field::{Type, UseCounter}, symbol::Symbol}};
+use crate::{ add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{field::{Type, UseCounter}, symbol::Symbol, symbol_table::SymTabEdge}};
 
 use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, field::FieldsOwner, gen_et::process_any_stmt, nhwc_instr::NakedInstruction, scope_node::ScopeTree, symbol, symbol_table::{ SymIdx, SymTab, SymTabGraph}};
 
@@ -291,8 +291,14 @@ fn process_constant(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,c
             match symtab_g{
                 Some(symg) => {
                     let mut idx:u32=(symg.node_count()).try_into().unwrap();
-                    if idx!=0{idx -=1}
-                    add_node_with_edge!({symtab.clone()} from idx in symg);
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        let edge_info = SymTabEdge::new(const_literal.to_string());
+                        idx-=1;
+                        add_node_with_edge!({symtab.clone()} with edge {edge_info} from idx in symg);
+                    }
                 }
                 None => {},
             }
@@ -314,8 +320,14 @@ fn process_symbol(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,def
             match symtab_g{
                 Some(symg) => {
                     let mut idx:u32 = (symg.node_count()).try_into().unwrap() ;
-                    if idx!=0{idx -=1}
-                    add_node_with_edge!({symtab.clone()} from idx in symg);
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        let edge_info = SymTabEdge::new(symbol_name.to_string());
+                        idx-=1;
+                        add_node_with_edge!({symtab.clone()} with edge {edge_info} from idx in symg);
+                    }
                 }
                 None => {},
             };
