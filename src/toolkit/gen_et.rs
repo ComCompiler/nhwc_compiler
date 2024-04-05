@@ -3,7 +3,7 @@ use std:: panic;
 use lazy_static::initialize;
 use petgraph::stable_graph::NodeIndex;
 
-use crate::antlr_parser::clexer::{And, Arrow, Constant, DivAssign, Dot, Equal, Greater, GreaterEqual, Identifier, LeftShift, Less, LessEqual, Minus, MinusAssign, MinusMinus, MulAssign, Not, NotEqual, Plus, PlusAssign, PlusPlus, RightShift, Star, StringLiteral, Tilde};
+use crate::antlr_parser::clexer::{And, Arrow, Constant, Div, DivAssign, Dot, Equal, Greater, GreaterEqual, Identifier, LeftShift, Less, LessEqual, Minus, MinusAssign, MinusMinus, Mod, MulAssign, Not, NotEqual, Plus, PlusAssign, PlusPlus, RightShift, Star, StringLiteral, Tilde};
 use crate::antlr_parser::cparser::{Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_declaration, RULE_declarationSpecifier, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_expressionStatement, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_initializerList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_parameterTypeList, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_typeSpecifier, RULE_unaryExpression, RULE_unaryOperator};
 
 use crate::{ add_node, add_node_with_edge, direct_node, direct_nodes, find, find_nodes, node, rule_id, term_id};
@@ -235,10 +235,10 @@ fn process_inclusive_or_expr(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree
             // 这里要分别处理 第一个节点  中间结点 和 最后一个节点
             if index != exclusive_or_nodes.len()-1{
                 if op_last_ep_inclusive_or_node.is_none(){
-                    op_last_ep_inclusive_or_node = Some(add_node_with_edge!({EtNakedNode::new_op_bitwise_xor( inclusive_or_expr).to_et_node()} from parent_et_node in et_tree ));
+                    op_last_ep_inclusive_or_node = Some(add_node_with_edge!({EtNakedNode::new_op_bitwise_or( inclusive_or_expr).to_et_node()} from parent_et_node in et_tree ));
                 }else{
                     let last_ep_inclusive_or_node = op_last_ep_inclusive_or_node.unwrap();
-                    op_last_ep_inclusive_or_node = Some(add_node_with_edge!({EtNakedNode::new_op_bitwise_xor( inclusive_or_expr).to_et_node()} from last_ep_inclusive_or_node in et_tree ));
+                    op_last_ep_inclusive_or_node = Some(add_node_with_edge!({EtNakedNode::new_op_bitwise_or( inclusive_or_expr).to_et_node()} from last_ep_inclusive_or_node in et_tree ));
                 }
                 process_exclusive_or_expr(et_tree, ast_tree, scope_tree, exclusive_or_node, scope_node, op_last_ep_inclusive_or_node.unwrap());
             }else {
@@ -282,10 +282,10 @@ fn process_and_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &Scope
         for (index, &equality_node) in equality_expr_nodes.iter().enumerate() {
             if index != equality_expr_nodes.len() - 1 {
                 if op_last_ep_equality_node.is_none() {
-                    op_last_ep_equality_node = Some(add_node_with_edge!({EtNakedNode::new_op_logical_and( and_expr_node).to_et_node()} from parent_et_node in et_tree));
+                    op_last_ep_equality_node = Some(add_node_with_edge!({EtNakedNode::new_op_bitwise_and( and_expr_node).to_et_node()} from parent_et_node in et_tree));
                 } else {
                     let last_ep_equality_node = op_last_ep_equality_node.unwrap();
-                    op_last_ep_equality_node = Some(add_node_with_edge!({EtNakedNode::new_op_logical_and( and_expr_node).to_et_node()} from last_ep_equality_node in et_tree));
+                    op_last_ep_equality_node = Some(add_node_with_edge!({EtNakedNode::new_op_bitwise_and( and_expr_node).to_et_node()} from last_ep_equality_node in et_tree));
                 }
                 process_equality_expr(et_tree, ast_tree, scope_tree, equality_node, scope_node, op_last_ep_equality_node.unwrap());
             } else {
@@ -479,10 +479,10 @@ fn process_multiplicative_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_t
             Star => {
                 EtNakedNode::new_op_mul(multiplicative_expr_node).to_et_node()
             },
-            Divide => {
+            Div => {
                 EtNakedNode::new_op_div( multiplicative_expr_node).to_et_node()
             },
-            Modulo => {
+            Mod => {
                 EtNakedNode::new_op_mod(multiplicative_expr_node).to_et_node()
             },
             _ => panic!("Unexpected operator in multiplicative expression"),
@@ -544,8 +544,8 @@ pub fn process_unary_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: 
             PlusPlus => EtNakedNode::new_op_left_plusplus(unary_expr_node).to_et_node(),
             MinusMinus => EtNakedNode::new_op_left_minusminus(unary_expr_node).to_et_node(),
             Minus => EtNakedNode::new_op_negative( unary_expr_node).to_et_node(),
-            Tilde => EtNakedNode::new_op_bitwise_not( unary_expr_node).to_et_node(),
-            Not => EtNakedNode::new_op_logical_and( unary_expr_node).to_et_node(),
+            Tilde => EtNakedNode::new_op_logical_not( unary_expr_node).to_et_node(),
+            Not => EtNakedNode::new_op_logical_not( unary_expr_node).to_et_node(),
             _ => panic!("Unexpected unary operator"),
         }
     };
