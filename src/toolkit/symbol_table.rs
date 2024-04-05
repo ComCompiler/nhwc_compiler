@@ -7,13 +7,21 @@ use petgraph::stable_graph::StableDiGraph;
 use super::{symbol::Symbol, field::{self, Field}};
 use core::fmt::Debug;
 
-pub type SymTabGraph = StableDiGraph<SymTab,(),u32>;
+pub type SymtabGraph = StableDiGraph<Symtab,SymtabEdge,u32>;
 
 #[derive(Clone)]
 pub struct SymTab {
     map: BTreeMap<SymIdx,Symbol>,
 }
-
+#[derive(Clone)]
+pub struct SymtabEdge{
+    text:String,
+}
+impl Debug for SymtabEdge{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text)
+    }
+}
 /// 由于我们对 Symbol 的索引必须同时考虑 symbol 所在的scope 的层级以及 symbol的名字，不如直接改成结构体SymbolIndex
 #[derive(Clone,PartialEq, Eq, PartialOrd, Ord,)]
 pub struct SymIdx{
