@@ -231,7 +231,7 @@ fn process_inclusive_or_expr(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree
     let exclusive_or_nodes = find_nodes!(rule RULE_exclusiveOrExpression at inclusive_or_expr in ast_tree);
     let mut op_last_ep_inclusive_or_node = None;
     if exclusive_or_nodes.len()>1{
-        for (index,&inclusive_or_node) in exclusive_or_nodes.iter().enumerate(){
+        for (index,&exclusive_or_node) in exclusive_or_nodes.iter().enumerate(){
             // 这里要分别处理 第一个节点  中间结点 和 最后一个节点
             if index != exclusive_or_nodes.len()-1{
                 if op_last_ep_inclusive_or_node.is_none(){
@@ -240,9 +240,9 @@ fn process_inclusive_or_expr(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree
                     let last_ep_inclusive_or_node = op_last_ep_inclusive_or_node.unwrap();
                     op_last_ep_inclusive_or_node = Some(add_node_with_edge!({EtNakedNode::new_op_bitwise_xor( inclusive_or_expr).to_et_node()} from last_ep_inclusive_or_node in et_tree ));
                 }
-                process_inclusive_or_expr(et_tree, ast_tree, scope_tree, inclusive_or_node, scope_node, op_last_ep_inclusive_or_node.unwrap());
+                process_exclusive_or_expr(et_tree, ast_tree, scope_tree, exclusive_or_node, scope_node, op_last_ep_inclusive_or_node.unwrap());
             }else {
-                process_inclusive_or_expr(et_tree, ast_tree, scope_tree, inclusive_or_node, scope_node, op_last_ep_inclusive_or_node.unwrap());
+                process_exclusive_or_expr(et_tree, ast_tree, scope_tree, exclusive_or_node, scope_node, op_last_ep_inclusive_or_node.unwrap());
             }
         }
     }else if exclusive_or_nodes.len()==1 {
