@@ -292,10 +292,10 @@ macro_rules! add_node_with_edge{
             node_id
         }
     };
-    ($node_struct:ident with edge $edgestruct:ident from $from_node:ident in $graph:ident) => {
+    ($node_struct:ident with edge edgestruct:ident from $from_node:ident in $graph:ident) => {
         {
             let node_id = $graph.add_node($node_struct ).index() as u32;
-            $graph.add_edge(NodeIndex::from($from_node), NodeIndex::from(node_id),$edgestruct );
+            $graph.add_edge(NodeIndex::from($from_node), NodeIndex::from(node_id),edgestruct );
             node_id
         }
     };
@@ -306,11 +306,11 @@ macro_rules! add_node_with_edge{
             node_id
         }
     };
-    ($node_struct:block with edge $edgestruct:block from $from_node:ident in $graph:ident) => {
+    ($node_struct:block with edge edgestruct:block from $from_node:ident in $graph:ident) => {
         {
             let node_id = $graph.add_node($node_struct ).index() as u32;
-            $graph.add_edge(NodeIndex::from($from_node), NodeIndex::from(node_id),$edgestruct );
-            node_id
+            $graph.add_edge(NodeIndex::from($from_node), NodeIndex::from(node_id),edgestruct );
+            ndoe_id
         }
     };
 }
