@@ -4,14 +4,14 @@ use crate::toolkit::dot::Config;
 use crate::toolkit::{context::Context, etc::{generate_png_by_graph, read_file_content}, field::Field, gen_ast::parse_as_ast_tree, gen_nhwc_cfg::parse_cfg_into_nhwc_cfg, pass_manager::Pass};
 #[derive(Debug)]
 pub struct Cfg2NcfgPass{ 
-    is_gen_png:bool,
-    is_gen_symtab_png:bool,
+    is_gen_ncfg_png:bool,
+    is_gen_symtab_graph_png:bool,
 }
 impl Cfg2NcfgPass{
     pub fn new(is_gen_png:bool,is_gen_symtab_png:bool)->Self{
         Cfg2NcfgPass{
-            is_gen_png,
-            is_gen_symtab_png,
+            is_gen_ncfg_png: is_gen_png,
+            is_gen_symtab_graph_png: is_gen_symtab_png,
         }
     }
 }
@@ -26,12 +26,14 @@ impl Pass for Cfg2NcfgPass{
         parse_cfg_into_nhwc_cfg(cfg_graph,scope_tree,ast_tree,symtab,et_tree,ast2scope,0,&mut Some(symtab_graph));
         println!("nhwc已生成");
         //4.1可视化
-        if self.is_gen_png{
+        if self.is_gen_ncfg_png{
             for cfg_node in ctx.cfg_graph.node_weights_mut(){
                 cfg_node.load_ast_node_text(&ctx.ast_tree)
             }
             generate_png_by_graph(&ctx.cfg_graph,"nhwc_cfg_graph".to_string(),&[Config::EdgeNoLabel,Config::Record,Config::Rounded]);
-            println!("可视化结束");
+        }
+        if self.is_gen_symtab_graph_png{
+            generate_png_by_graph(&ctx.symtab_graph,"symtab_graph".to_string(),&[Config::EdgeNoLabel,Config::Record,Config::Rounded,Config::SymTab]);
         }
     }
     // 返回pass的描述，具体作用

@@ -710,7 +710,7 @@ fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut SymTab,
 
 /// 由于cfg 里面包含了其他的一些块和边，例如 branch 块和 after conditioned边
 /// 因此我们需要再做一次转化，把边转化成相应的跳转或者调整代码，把所有node 都转化成BasicBlock
-pub fn parse_cfg_into_nhwc_cfg(cfg_graph:&mut CfgGraph , scope_tree:&mut ScopeTree , ast_tree:&mut AstTree,symtab:&mut SymTab , et_tree:&mut EtTree , ast2scope:&mut HashMap<u32,u32> , mut counter:u32, symtab_g:&mut Option<&mut SymTabGraph>){
+pub fn parse_cfg_into_nhwc_cfg(cfg_graph:&mut CfgGraph, scope_tree:&mut ScopeTree, ast_tree:&mut AstTree,symtab:&mut SymTab, et_tree:&mut EtTree, ast2scope:&mut HashMap<u32,u32> , mut counter:u32, symtab_g:&mut Option<&mut SymTabGraph>){
     // let (cfg_graph,scope_tree,ast_tree,symtab,et_tree,ast2scope)= (&mut context.cfg_graph , &mut context.scope_tree,&mut context.ast_tree,&mut context.symtab,&mut context.et_tree,&context.ast2scope);
 
     let start_node: NodeIndex<u32> = NodeIndex::new(0);

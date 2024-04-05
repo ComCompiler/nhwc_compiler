@@ -305,3 +305,16 @@ pub fn parse_ast_to_cfg(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut Sy
         }
     }
 }
+
+
+
+
+
+
+
+
+/// 这个函数用于将cfg生成为 
+pub fn parse_cfg2cfgbb(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut SymTab,scope_tree:&ScopeTree){
+
+
+}

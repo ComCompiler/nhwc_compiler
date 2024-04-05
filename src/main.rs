@@ -48,14 +48,14 @@ fn main() {
     let ast2et_debug_pass = Ast2EtDebugPass::new(true);
     let cfg2ncfg_pass = Cfg2NcfgPass::new(true,true);
     let ast2st_pass = Ast2StPass::new(true);
-    let symtab_debug_pass = SymtabDebugPass::new(true);
+    // let symtab_debug_pass = SymtabDebugPass::new(true);
     add_passes!(
         code2ast_pass
         then ast2et_debug_pass
         then ast2st_pass
         then ast2cfg_pass
         then cfg2ncfg_pass
-        then symtab_debug_pass
+        // then symtab_debug_pass
         to pass_manager
     );
     timeit!({pass_manager.execute_passes()}, "all passed finish");
