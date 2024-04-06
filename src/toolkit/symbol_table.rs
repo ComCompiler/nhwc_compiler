@@ -118,7 +118,7 @@ impl Debug for SymTab{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut s = String::from("#sym_name@fields$");
         for (symidx,sym) in self.map.iter(){
-            s.push_str(format!("@ # {} @ {:?} $",symidx.symbol_name,sym.fields).as_str());
+            s.push_str(format!("@ # {:?} @ {:?} $",symidx,sym.fields).as_str());
         }
         write!(f,"{}",s)
     }
