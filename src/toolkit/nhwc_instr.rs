@@ -207,13 +207,13 @@ impl NakedInstruction{
     pub fn new_icmp(lhs: SymIdx, plan:IcmpPlan,a:SymIdx,b:SymIdx,vartype:Type) -> Self{
         Self::Arith {lhs, rhs: ArithOp::Icmp { plan,a, b, vartype } }
     }
-    pub fn new_logicand(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
+    pub fn new_logic_and(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
         Self::Arith { lhs , rhs: ArithOp::LogicAnd { a, b, vartype} }
     }
-    pub fn new_logicor(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
+    pub fn new_logic_or(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
         Self::Arith { lhs , rhs: ArithOp::LogicOr { a, b, vartype} }
     }
-    pub fn new_logicnot(lhs: SymIdx, a:SymIdx,vartype:Type) -> Self{
+    pub fn new_logic_not(lhs: SymIdx, a:SymIdx,vartype:Type) -> Self{
         Self::Arith { lhs , rhs: ArithOp::LogicNot { a, vartype} }
     }
     // Instruction -> Call -> FuncOp

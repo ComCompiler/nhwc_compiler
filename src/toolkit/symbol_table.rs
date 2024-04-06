@@ -40,10 +40,10 @@ impl SymIdx{
     pub fn new(scope_node:u32, symbol_name:String)->Self{
         SymIdx{ scope_node,symbol_name, index_ssa: None} 
     }
-    pub fn get_type(&mut self,symtab:&mut SymTab) -> Option<&Type>{
+    pub fn get_type<'a>(&'a mut self,symtab:&'a SymTab) -> Option<&'a Type>{
         find!(field TYPE:Type at self in symtab)
     }
-    pub fn get_type_mut(&mut self,symtab:&mut SymTab) -> Option<&mut Type>{
+    pub fn get_type_mut<'a>(&'a mut self,symtab:&'a mut SymTab) -> Option<&mut Type>{
         find!(field mut TYPE:Type at self in symtab)
     }
     // pub fn get_use_counter(&mut self,symtab:&mut SymTab) -> Option<&mut UseCounter>{

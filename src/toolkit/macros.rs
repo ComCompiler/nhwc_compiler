@@ -83,7 +83,7 @@ macro_rules! find {
     (field $field_name:ident:$field_type:ident at $symidx:ident in $symtab:ident ) => {
         {
             let field:Option<&Box<dyn Field>> = $symtab
-                .get_mut(&$symidx)
+                .get(&$symidx)
                 .expect(format!("在符号表中找不到{:?}这个符号",$symidx) .as_str())
                 .get_field($field_name);
             let op_field_data =match field{
@@ -99,10 +99,10 @@ macro_rules! find {
     };
     (field mut $field_name:ident:$field_type:ident at $symidx:ident in $symtab:ident ) => {
         {
-            let field:Option<&Box<dyn Field>> = $symtab
+            let field:Option<&mut Box<dyn Field>> = $symtab
                 .get_mut(&$symidx)
                 .expect(format!("在符号表中找不到{:?}这个符号",$symidx) .as_str())
-                .get_field($field_name);
+                .get_field_mut($field_name);
             let op_field_data =match field{
                 Some(value)=>{
                     Some(value.as_any_mut().downcast_mut::<$field_type>().expect(format!("symbol {:?} 的 field {}不是这个类型的",$symidx,$field_name).as_str()))
