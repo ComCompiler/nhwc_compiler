@@ -4,7 +4,7 @@ use std::any::Any;
 use clap::value_parser;
 use petgraph::{adj::NodeIndex, visit::{self, Dfs, Walker}};
 
-use crate::{direct_nodes, node, toolkit::symbol_table::SymIdx};
+use crate::{direct_nodes, node, toolkit::symtab::SymIdx};
 
 use super::{ast_node::{find_dfs_rule_ast, AstTree}, cfg_node::GetText, et_node::{self, EtNakedNode, EtNode, EtTree}};
 

@@ -13,7 +13,7 @@ use super::context::Context;
 
 use super::etc::dfs;
 use super::scope_node::ScopeTree;
-use super::symbol_table::{SymIdx, SymTab};
+use super::symtab::{SymIdx, SymTab};
 /// 这个文件中没有在命名中提到是哪一中图中的节点，那么统一是 scope_node 
 
 pub fn process_while(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,symtab:&mut SymTab,current_while_node:u32) -> Option<(u32,u32)>{

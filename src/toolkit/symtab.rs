@@ -21,7 +21,7 @@ pub struct SymTabEdge{
 }
 impl Debug for SymTabEdge{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "add {:?}", self.text)
+        write!(f, "{}", self.text)
     }
 }
 impl SymTabEdge{
@@ -71,8 +71,8 @@ impl SymTab {
 
     // 添加或更新符号，如果是更新，那么返回旧的符号
     pub fn add(&mut self, sym: Symbol) -> SymIdx{
-        let symidx = sym.sym_idx.clone();
-        let symidx_cloned = sym.sym_idx.clone();
+        let symidx = sym.symidx.clone();
+        let symidx_cloned = sym.symidx.clone();
         match self.map.insert(symidx,sym){
             None =>{symidx_cloned},
             Some(_) => panic!( "symtab插入失败,你这个表中已经存在同名称同scope的符号{:?}了,你必须先remove 掉它",symidx_cloned), // do nothing , 插入成功，里面没有同scope的同名符号

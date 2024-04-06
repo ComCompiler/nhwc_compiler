@@ -3,7 +3,7 @@ pub mod cfg_node;
 pub mod gen_cfg;
 pub mod cfg_edge;
 pub mod field;
-pub mod symbol_table;
+pub mod symtab;
 pub mod etc;
 pub mod gen_ast;
 pub mod pass_manager;

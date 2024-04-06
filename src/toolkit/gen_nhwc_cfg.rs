@@ -3,9 +3,9 @@ use std::{collections::HashMap, fs::OpenOptions};
 use petgraph::{stable_graph::{NodeIndex, StableGraph}, EdgeType};
 use syn::token::Use;
 
-use crate::{ add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{ast_node, field::{Type, UseCounter}, nhwc_instr::Instruction, symbol::Symbol, symbol_table::{SymTabEdge, TYPE, USE_COUNTER}}};
+use crate::{ add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{ast_node, field::{Type, UseCounter}, nhwc_instr::Instruction, symbol::Symbol, symtab::{SymTabEdge, TYPE, USE_COUNTER}}};
 
-use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, field::FieldsOwner, gen_et::process_any_stmt, nhwc_instr::NakedInstruction, scope_node::ScopeTree, symbol, symbol_table::{ SymIdx, SymTab, SymTabGraph}};
+use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, field::FieldsOwner, gen_et::process_any_stmt, nhwc_instr::NakedInstruction, scope_node::ScopeTree, symbol, symtab::{ SymIdx, SymTab, SymTabGraph}};
 
 /*
  这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有 
@@ -332,22 +332,10 @@ fn process_constant(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,c
         },
         None => {
             println!("add const {} to symtab !!!!",const_literal);
-            add_symbol!({Symbol::new(0, const_literal.clone())} with field USE_COUNTER:{UseCounter{ use_count: 1}} to symtab);
+            add_symbol!({Symbol::new(0, const_literal.clone())} 
+                with field USE_COUNTER:{UseCounter{ use_count: 1}} 
+                to symtab);
             
-            match symtab_g{
-                Some(symg) => {
-                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
-                    // 如果图里没有节点,即idx=0,add_node
-                    if idx==0{
-                        add_node!({symtab.clone()} to symg);
-                    }else {//如果已经有节点了,在最后一个节点上加点加边
-                        let edge_info = SymTabEdge::new(const_literal.to_string());
-                        idx-=1;
-                        add_node_with_edge!({symtab.clone()} with edge {edge_info} from idx in symg);
-                    }
-                }
-                None => {},
-            }
         },
     }
     let const_symidx = SymIdx::new(0, const_literal.to_string());

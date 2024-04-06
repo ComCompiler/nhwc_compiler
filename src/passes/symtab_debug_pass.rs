@@ -6,7 +6,7 @@ use crate::toolkit::symbol::Symbol;
 use crate::{add_node, add_node_with_edge};
 use crate::toolkit::dot::Config;
 
-use crate::toolkit::symbol_table::{SymTab, SymTabEdge, SymTabGraph};
+use crate::toolkit::symtab::{SymTab, SymTabEdge, SymTabGraph};
 use crate::toolkit::{context::Context, etc::{generate_png_by_graph, read_file_content}, field::Field, gen_ast::parse_as_ast_tree, gen_nhwc_cfg::parse_cfg_into_nhwc_cfg, pass_manager::Pass};
 #[derive(Debug)]
 pub struct SymtabDebugPass{ 

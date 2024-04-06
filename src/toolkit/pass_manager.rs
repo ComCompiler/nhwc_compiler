@@ -1,6 +1,6 @@
 use crate::{find, Args};
 
-use super::{context::Context, field::Field, symbol_table::SymIdx};
+use super::{context::Context, field::Field, symtab::SymIdx};
 use super::field::{Fields, FieldsOwner};
 
 pub trait Pass{

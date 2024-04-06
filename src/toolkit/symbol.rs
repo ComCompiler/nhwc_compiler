@@ -2,17 +2,17 @@ use std::collections::HashMap;
 use core::fmt::Debug;
 
 
-use super::{field::Field, symbol_table:: SymIdx};
+use super::{field::Field, symtab:: SymIdx};
 use super::field::{Fields, FieldsOwner};
 
 #[derive(Clone)]
 pub struct Symbol{
     pub fields :  Fields,
-    pub sym_idx : SymIdx,
+    pub symidx : SymIdx,
 }
 impl Debug for Symbol{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"{{{:?} fields:{:?}}}",self.sym_idx.symbol_name,self.fields)
+        write!(f,"{{{:?} fields:{:?}}}",self.symidx.symbol_name,self.fields)
     }
 }
 
@@ -35,13 +35,13 @@ impl Symbol {
     pub fn new_verbose(scope_node:u32 ,symbol_name: String) -> Symbol{
         Symbol{
             fields: HashMap::new(),
-            sym_idx : SymIdx::new(scope_node, symbol_name)
+            symidx : SymIdx::new(scope_node, symbol_name)
         }
     }
     pub fn new(scope_node:u32 ,symbol_name: String) -> Symbol{
         Symbol{
             fields: HashMap::new(),
-            sym_idx : SymIdx::new(scope_node, symbol_name)
+            symidx : SymIdx::new(scope_node, symbol_name)
         }
     }
 }

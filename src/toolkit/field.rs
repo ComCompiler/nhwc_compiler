@@ -5,7 +5,7 @@ use petgraph::visit::Data;
 use crate::{find, gen_field_trait_for_structs, node};
 use crate::NodeIndex;
 use super::ast_node::AstTree;
-use super::symbol_table::SymIdx;
+use super::symtab::SymIdx;
 
 pub type Fields =  HashMap<&'static str,Box<dyn Field>>;
 

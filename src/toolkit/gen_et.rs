@@ -7,7 +7,7 @@ use crate::antlr_parser::clexer::{And, Arrow, Constant, Div, DivAssign, Dot, Equ
 use crate::antlr_parser::cparser::{Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_declaration, RULE_declarationSpecifier, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_expressionStatement, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_initializerList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_parameterTypeList, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_typeSpecifier, RULE_unaryExpression, RULE_unaryOperator};
 
 use crate::{ add_node, add_node_with_edge, direct_node, direct_nodes, find, find_nodes, node, rule_id, term_id};
-use crate::toolkit::symbol_table::SymIdx;
+use crate::toolkit::symtab::SymIdx;
 
 use super::et_node::{self, Def_Or_Use, EtNakedNode, EtNode, EtTree};
 use super::{ast_node::AstTree, scope_node::ScopeTree};

@@ -2,7 +2,7 @@ use std::fmt::{Debug, Formatter};
 use petgraph::{data, visit::Data};
 use syn::Field;
 
-use super::{field::{Fields, Type, Value}, symbol::Symbol, symbol_table::SymIdx};
+use super::{field::{Fields, Type, Value}, symbol::Symbol, symtab::SymIdx};
 
 #[derive(Clone)]
 pub enum ArithOp{        

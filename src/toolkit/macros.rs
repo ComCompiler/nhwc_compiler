@@ -114,38 +114,136 @@ macro_rules! find {
             op_field_data
         }
     };
-    (symbol $sym_name:ident of scope $scope_node:ident  in $symtab:ident) => {
+    (symbol $sym_name:ident of scope $scope_node:ident  in $symtab:ident $(debug symtab_graph $symtab_graph:ident)?) => {
         {
+            $(match $symtab_graph{
+                Some(symg) => {
+                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({$symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        idx-=1;
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("find_sym {}",$sym_name))} from idx in symg);
+                    }
+                }
+                None => {},
+            })?
+
             $symtab.get_verbose($sym_name , $scope_node)
         }
     };
-    (symbol mut $sym_name:ident of scope $scope_node:ident  in $symtab:ident) => {
+    (symbol mut $sym_name:ident of scope $scope_node:ident  in $symtab:ident $(debug symtab_graph $symtab_graph:ident)?) => {
         {
+            $(match $symtab_graph{
+                Some(symg) => {
+                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({$symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        idx-=1;
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("find_sym {}",$sym_name))} from idx in symg);
+                    }
+                }
+                None => {},
+            })?
+
             $symtab.get_verbose_mut($sym_name , $scope_node)
         }
     };
-    (symbol $sym_name:block of scope $scope_node:block  in $symtab:ident) => {
+    (symbol $sym_name:block of scope $scope_node:block  in $symtab:ident $(debug symtab_graph $symtab_graph:ident)?) => {
         {
+            $(match $symtab_graph{
+                Some(symg) => {
+                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({$symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        idx-=1;
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("find_sym {}",$sym_name))} from idx in symg);
+                    }
+                }
+                None => {},
+            })?
+
             $symtab.get_verbose($sym_name , $scope_node)
         }
     };
-    (symbol $sym_name:block of scope $scope_node:ident  in $symtab:ident) => {
+    (symbol $sym_name:block of scope $scope_node:ident  in $symtab:ident $(debug symtab_graph $symtab_graph:ident)?) => {
         {
+            $(match $symtab_graph{
+                Some(symg) => {
+                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({$symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        idx-=1;
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("find_sym {}",$sym_name))} from idx in symg);
+                    }
+                }
+                None => {},
+            })?
+
             $symtab.get_verbose($sym_name , $scope_node)
         }
     };
-    (symbol mut $sym_name:block of scope $scope_node:block  in $symtab:ident) => {
+    (symbol mut $sym_name:block of scope $scope_node:block  in $symtab:ident $(debug symtab_graph $symtab_graph:ident)?) => {
         {
+            $(match $symtab_graph{
+                Some(symg) => {
+                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({$symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        idx-=1;
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("find_sym {}",$sym_name))} from idx in symg);
+                    }
+                }
+                None => {},
+            })?
+
             $symtab.get_verbose_mut($sym_name , $scope_node)
         }
     };
-    (symbol at $symidx:ident  in $symtab:ident) => {
+    (symbol at $symidx:ident  in $symtab:ident $(debug symtab_graph $symtab_graph:ident)?) => {
         {
+            $(match $symtab_graph{
+                Some(symg) => {
+                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({$symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        idx-=1;
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("find_sym {}",$symidx.symbol_name))} from idx in symg);
+                    }
+                }
+                None => {},
+            })?
+
             $symtab.get($symidx)
         }
     };
-    (symbol mut at $symidx:ident  in $symtab:ident) => {
+    (symbol mut at $symidx:ident  in $symtab:ident $(debug symtab_graph $symtab_graph:ident)?) => {
         {
+            $(match $symtab_graph{
+                Some(symg) => {
+                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({$symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        idx-=1;
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!($symidx.symbol_name))} from idx in symg);
+                    }
+                }
+                None => {},
+            })?
+
             $symtab.get_mut(&$symidx)
         }
     };
@@ -320,9 +418,22 @@ macro_rules! add_node_with_edge{
 /// add_symbol(x with field field_name_A:field_value_A to some_symtab)
 #[macro_export] 
 macro_rules! add_symbol {
-    ($sym:ident $(with field $field_name:ident:$field_value:block)* to $symtab:ident ) => {
+    ($sym:ident $(with field $field_name:ident:$field_value:block)* to $symtab:ident $(debug $symtab_graph:ident)?) => {
         {
             let symidx = $symtab.add($sym);
+            $(match $symtab_graph{
+                Some(symg) => {
+                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({$symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        idx-=1;
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("add_sym {}",symidx.symbol_name))} from idx in symg);
+                    }
+                }
+                None => {},
+            })?
             $(
                 let sym =  $symtab.get_mut(&symidx).unwrap();
                 sym.add_field($field_name,Box::new($field_value));
@@ -330,9 +441,22 @@ macro_rules! add_symbol {
             symidx
         }
     };
-    ($sym:block $(with field $field_name:ident:$field_value:block)* to $symtab:ident ) => {
+    ($sym:block $(with field $field_name:ident:$field_value:block)* to $symtab:ident $(debug $symtab_graph:ident)?) => {
         {
             let symidx = $symtab.add($sym);
+            $(match $symtab_graph{
+                Some(symg) => {
+                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({$symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        idx-=1;
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("add_sym {}",symidx.sym_name))} from idx in symg);
+                    }
+                }
+                None => {},
+            })?
             $(
                 let sym =  $symtab.get_mut(&symidx).unwrap();
                 sym.add_field($field_name,Box::new($field_value));
@@ -340,11 +464,25 @@ macro_rules! add_symbol {
             symidx
         }
     };
-    ($sym_name:block of scope $scope:block $(with field $field_name:ident:{$field_value:expr})* to $symtab:ident ) => {
+    // hello 
+    ($sym_name:block of scope $scope:block $(with field $field_name:ident:{$field_value:expr})* to $symtab:ident $(debug $symtab_graph:ident)?) => {
         {
             let mut sym = Symbol::new_verbose($scope,$sym_name);
             $(sym.add_field($field_name,Box::new($field_value));)*
             let symidx = $symtab.add(sym);
+            $(match $symtab_graph{
+                Some(symg) => {
+                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({$symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        idx-=1;
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("add_sym {}",symidx.symbol_name))} from idx in symg);
+                    }
+                }
+                None => {},
+            })?
             symidx
         }
     };
@@ -353,10 +491,36 @@ macro_rules! add_symbol {
 /// 如果发现你想添加的field 已经存在则会直接 panic 
 #[macro_export]
 macro_rules! add_field {
-    ($field_name:ident:{$field:expr} to $symidx:ident in $symtab:ident) => {
+    ($field_name:ident:{$field:expr} to $symidx:ident in $symtab:ident $(debug $symtab_graph:ident)?) => {
+        $(match $symtab_graph{
+            Some(symg) => {
+                let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                // 如果图里没有节点,即idx=0,add_node
+                if idx==0{
+                    add_node!({$symtab.clone()} to symg);
+                }else {//如果已经有节点了,在最后一个节点上加点加边
+                    idx-=1;
+                    add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("add_field {:?} to symbol {}",$field_name,$symidx.symbol_name))} from idx in symg);
+                }
+            }
+            None => {},
+        })?
         $symtab.get_mut(&$symidx).unwrap().add_field($field_name,Box::new($field));
     };
-    ($field_name:ident:{$field:expr} to $sym:ident) => {
+    ($field_name:ident:{$field:expr} to $sym:ident $(debug $symtab_graph:ident)?) => {
+        $(match $symtab_graph{
+            Some(symg) => {
+                let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                // 如果图里没有节点,即idx=0,add_node
+                if idx==0{
+                    add_node!({$symtab.clone()} to symg);
+                }else {//如果已经有节点了,在最后一个节点上加点加边
+                    idx-=1;
+                    add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("add_field {:?} to symbol {}",$field_name,$sym.symidx.symbol_name))} from idx in symg);
+                }
+            }
+            None => {},
+        })?
         $sym:add_field($field_name,Box::new($field));
     };
 }

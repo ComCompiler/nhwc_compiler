@@ -5,7 +5,7 @@ use eval::{to_value, eval};
 use petgraph::stable_graph::{NodeIndex, StableDiGraph};
 use crate::node;
 use super::ast_node::AstTree;
-use super::symbol_table::{  SymIdx};
+use super::symtab::{  SymIdx};
 use super::field::{Fields, FieldsOwner};
 use super::field::Field;
 
