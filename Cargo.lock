@@ -78,10 +78,12 @@ name = "beginner_compiler"
 version = "0.1.0"
 dependencies = [
  "antlr-rust",
+ "casey",
  "clap",
  "derive_builder",
  "eval",
  "lazy_static",
+ "paste",
  "petgraph",
  "syn 1.0.109",
 ]
@@ -118,6 +120,15 @@ name = "byteorder"
 version = "1.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
+
+[[package]]
+name = "casey"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "614586263949597dcc18675da12ef9b429135e13628d92eb8b8c6fa50ca5656b"
+dependencies = [
+ "syn 1.0.109",
+]
 
 [[package]]
 name = "cfg-if"
@@ -370,6 +381,12 @@ dependencies = [
  "smallvec",
  "winapi",
 ]
+
+[[package]]
+name = "paste"
+version = "1.0.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "de3145af08024dea9fa9914f381a17b8fc6034dfb00f3a84013f7ff43f29ed4c"
 
 [[package]]
 name = "petgraph"

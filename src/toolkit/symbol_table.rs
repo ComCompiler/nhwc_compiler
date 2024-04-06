@@ -4,9 +4,9 @@ use std::{collections::{BTreeMap, HashMap}, fmt::{Display, Formatter}};
 
 use petgraph::stable_graph::StableDiGraph;
 
-use crate::{find, toolkit::gen_nhwc_cfg::TYPE};
+use crate::{find};
 
-use super::{field::{self, Field, Type}, symbol::Symbol};
+use super::{field::{self, Field, FieldsOwner,Type}, symbol::Symbol};
 use core::fmt::Debug;
 
 pub type SymTabGraph = StableDiGraph<SymTab,SymTabEdge,u32>;
@@ -40,10 +40,27 @@ impl SymIdx{
     pub fn new(scope_node:u32, symbol_name:String)->Self{
         SymIdx{ scope_node,symbol_name, index_ssa: None} 
     }
-    pub fn get_type(&mut self,symtab:&mut SymTab) -> Option<Type>{
+    pub fn get_type(&mut self,symtab:&mut SymTab) -> Option<&Type>{
         find!(field TYPE:Type at self in symtab)
     }
+    pub fn get_type_mut(&mut self,symtab:&mut SymTab) -> Option<&mut Type>{
+        find!(field mut TYPE:Type at self in symtab)
+    }
+    // pub fn get_use_counter(&mut self,symtab:&mut SymTab) -> Option<&mut UseCounter>{
+    //     find!(field mut USE_COUNTER:UseCounter at self in symtab)
+    //     paste::item
+    // }
 }
+pub static USE_COUNTER:&str = "use_counter";
+pub static TYPE:&str = "type";
+// macro_rules! make_get_field_func {
+//     ($($functionname:ident $field_name:ident:$field_type:ident),*) => {
+        
+        
+//     };
+// }
+
+
 impl SymTab {
     // 创建一个新的符号表
     pub fn new() -> SymTab {

@@ -3,7 +3,7 @@ use std::{collections::HashMap, fs::OpenOptions};
 use petgraph::{stable_graph::{NodeIndex, StableGraph}, EdgeType};
 use syn::token::Use;
 
-use crate::{ add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{ast_node, field::{Type, UseCounter}, nhwc_instr::Instruction, symbol::Symbol, symbol_table::SymTabEdge}};
+use crate::{ add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{ast_node, field::{Type, UseCounter}, nhwc_instr::Instruction, symbol::Symbol, symbol_table::{SymTabEdge, TYPE, USE_COUNTER}}};
 
 use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, field::FieldsOwner, gen_et::process_any_stmt, nhwc_instr::NakedInstruction, scope_node::ScopeTree, symbol, symbol_table::{ SymIdx, SymTab, SymTabGraph}};
 
@@ -321,7 +321,6 @@ fn parse_branch2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&Scop
     //     }
     // }
 }
-static USE_COUNTER:&str = "use_counter";
 fn process_constant(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,const_literal:&String,scope_node:u32, symtab_g:&mut Option<&mut SymTabGraph>)->SymIdx{
     // 我们认为 constant 的scope node 都是全局的
     match find!(symbol mut {const_literal.clone()} of scope {0} in symtab){
@@ -355,7 +354,6 @@ fn process_constant(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,c
     const_symidx
 }
 
-pub static TYPE:&str = "type";
 fn process_symbol(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,def_or_use:&Def_Or_Use,symbol_name:&String,scope_node:u32, symtab_g:&mut Option<&mut SymTabGraph>)->SymIdx{   
     let mut symbol_scope = scope_node;
     match def_or_use{
