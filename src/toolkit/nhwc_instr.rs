@@ -27,11 +27,30 @@ pub enum ArithOp{
         b : SymIdx ,
         vartype : Type ,
     },
+    Mod{
+        a:SymIdx,
+        b:SymIdx,
+        vartype:Type,
+    },
     Icmp{
         plan : IcmpPlan,
         a : SymIdx ,       //寄存器或者数
         b : SymIdx ,
         vartype : Type ,
+    },
+    LogicAnd{
+        a:SymIdx,
+        b:SymIdx,
+        vartype:Type,
+    },
+    LogicOr{
+        a:SymIdx,
+        b:SymIdx,
+        vartype:Type,
+    },
+    LogicNot{
+        a:SymIdx,
+        vartype:Type,
     },
 }
 #[derive(Clone)]
@@ -120,6 +139,7 @@ pub enum IcmpPlan{
     ugt,uge,ult,ule,    //无符号比较
     sgt,sge,slt,sle,    //有符号比较
 }
+
 #[derive(Clone,Debug)]
 pub struct ComparedPair{
     compared : SymIdx,
@@ -181,8 +201,20 @@ impl NakedInstruction{
     pub fn new_sub(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
         Self::Arith {lhs, rhs: ArithOp::Sub {a, b, vartype } }
     }
+    pub fn new_mod(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
+        Self::Arith {lhs, rhs: ArithOp::Mod {a, b, vartype } }
+    }
     pub fn new_icmp(lhs: SymIdx, plan:IcmpPlan,a:SymIdx,b:SymIdx,vartype:Type) -> Self{
         Self::Arith {lhs, rhs: ArithOp::Icmp { plan,a, b, vartype } }
+    }
+    pub fn new_logicand(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
+        Self::Arith { lhs , rhs: ArithOp::LogicAnd { a, b, vartype} }
+    }
+    pub fn new_logicor(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
+        Self::Arith { lhs , rhs: ArithOp::LogicOr { a, b, vartype} }
+    }
+    pub fn new_logicnot(lhs: SymIdx, a:SymIdx,vartype:Type) -> Self{
+        Self::Arith { lhs , rhs: ArithOp::LogicNot { a, vartype} }
     }
     // Instruction -> Call -> FuncOp
     pub fn new_func_call(assigned:Option<SymIdx> , func:SymIdx , args:Vec<SymIdx>) ->Self{       //也许可以直接传入一个Func结构体
@@ -213,8 +245,16 @@ impl Debug for ArithOp{
                 write!(f,"Div {:?} {:?}, {:?}",vartype, a,b),
             Self::Sub { a, b, vartype } => 
                 write!(f,"Sub {:?} {:?}, {:?}",vartype, a,b),
+            Self::Mod { a, b, vartype } =>
+                write!{f,"Mod {:?} {:?}, {:?}",vartype,a,b},
             Self::Icmp { plan, a, b, vartype } => 
-                write!(f,"icmp {:?} {:?} {:?}, {:?}",vartype,plan,a,b)
+                write!(f,"icmp {:?} {:?} {:?}, {:?}",vartype,plan,a,b),
+            Self::LogicAnd { a, b, vartype } =>
+                write!(f,"And {:?} {:?}, {:?}",vartype,a,b),
+            Self::LogicOr { a, b, vartype } =>
+                write!(f,"Or {:?} {:?}, {:?}",vartype,a,b),
+            Self::LogicNot { a, vartype } =>
+                write!(f,"icmp eq {:?} {:?}, 0",vartype,a),
         }
     }
 }

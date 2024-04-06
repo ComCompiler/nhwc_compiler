@@ -79,7 +79,7 @@ macro_rules! find {
             }
         }
     };
-
+    
     (field $field_name:ident:$field_type:ident at $symidx:ident in $symtab:ident ) => {
         {
             let field:Option<&Box<dyn Field>> = $symtab

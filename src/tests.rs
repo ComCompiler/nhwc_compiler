@@ -177,7 +177,7 @@ mod tests{
         let b = add_symbol!({"No.2".to_string()} of scope {0} to symtab);
 
         let instr=NakedInstruction::new_add(lhs.clone(), a.clone(), b.clone(),Type::I32);
-        let instr2 = NakedInstruction::new_mul(lhs.clone(), a.clone(), b.clone(),Type::I32);
+        let instr2 = NakedInstruction::new_add(lhs.clone(), a.clone(), b.clone(),Type::I32);
         println!("{:?}",instr);
         println!("{:?}",instr2);
     }

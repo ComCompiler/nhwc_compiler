@@ -157,7 +157,7 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab
                                     counter += 1;
                                     let vartype=Type::new(decl_parent_scope, ast_tree);
 
-                                    let mul_instr = NakedInstruction::new_mul(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx,vartype).to_instr();
+                                    let mul_instr = NakedInstruction::new_add(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx,vartype).to_instr();
                                     let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_var_symidx).to_instr();
                                     
                                     push_instr!(mul_instr to cfg_bb in cfg_graph);
@@ -402,16 +402,19 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                     if let Some(_) = direct_node!(at et_node in et_tree ret option){
                         let next_nodes = direct_nodes!(at et_node in et_tree);
 
-                        let (r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter,symtab_g);
+                        let (mut r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter,symtab_g);
                         counter = new_counter;
+                        let r_type = r_symidx.get_type(symtab).unwrap();
 
-                        let (l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node,  cfg_bb, counter,symtab_g);
+                        let (mut l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node,  cfg_bb, counter,symtab_g);
                         counter = new_counter;
+                        let l_type = l_symidx.get_type(symtab).unwrap();
 
-                        let tmp_var_symidx = SymIdx::new(scope_node, format!("%{}",counter));
+                        let var_type=Type::adapt(l_type, r_type);
+                        let tmp_var_symidx = add_symbol!({Symbol::new_verbose(scope_node,format!("%{}",counter))} with field TYPE:{var_type.clone()} to symtab);
                         counter += 1;
-                        let vartype=Type::I32;
-                        let mul_instr = NakedInstruction::new_mul(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype).to_instr();
+
+                        let mul_instr = NakedInstruction::new_add(tmp_var_symidx.clone(), l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(mul_instr to cfg_bb in cfg_graph);
 
                         (tmp_var_symidx,counter)
@@ -423,17 +426,19 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                     if let Some(_) = direct_node!(at et_node in et_tree ret option){
                         let next_nodes = direct_nodes!(at et_node in et_tree);
 
-                        let (r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter,symtab_g);
+                        let (mut r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter,symtab_g);
                         counter = new_counter;
+                        let r_type = r_symidx.get_type(symtab).unwrap();
 
-                        let (l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter,symtab_g);
+                        let (mut l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter,symtab_g);
                         counter = new_counter;
+                        let l_type = l_symidx.get_type(symtab).unwrap();
 
-                        let tmp_var_symidx = SymIdx::new(scope_node, format!("%{}",counter));
+                        let var_type=Type::adapt(l_type, r_type);
+                        let tmp_var_symidx = add_symbol!({Symbol::new_verbose(scope_node,format!("%{}",counter))} with field TYPE:{var_type.clone()} to symtab);
                         counter += 1;
-                        let vartype=Type::I32;
 
-                        let add_instr = NakedInstruction::new_add(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype).to_instr();
+                        let add_instr = NakedInstruction::new_add(tmp_var_symidx.clone(), l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(add_instr to cfg_bb in cfg_graph);
 
                         (tmp_var_symidx,counter)
@@ -445,16 +450,19 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                     if let Some(_) = direct_node!(at et_node in et_tree ret option){
                         let next_nodes = direct_nodes!(at et_node in et_tree);
 
-                        let (r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter,symtab_g);
+                        let (mut r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter,symtab_g);
                         counter = new_counter;
+                        let r_type = r_symidx.get_type(symtab).unwrap();
 
-                        let (l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter,symtab_g);
+                        let (mut l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter,symtab_g);
                         counter = new_counter;
+                        let l_type = l_symidx.get_type(symtab).unwrap();
 
-                        let tmp_var_symidx = SymIdx::new(scope_node, format!("%{}",counter));
+                        let var_type=Type::adapt(l_type, r_type);
+                        let tmp_var_symidx = add_symbol!({Symbol::new_verbose(scope_node,format!("%{}",counter))} with field TYPE:{var_type.clone()} to symtab);
                         counter += 1;
-                        let vartype=Type::I32;
-                        let sub_instr = NakedInstruction::new_sub(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype).to_instr();
+
+                        let sub_instr = NakedInstruction::new_sub(tmp_var_symidx.clone(), l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(sub_instr to cfg_bb in cfg_graph);
 
                         (tmp_var_symidx,counter)
@@ -466,17 +474,19 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                     if let Some(_) = direct_node!(at et_node in et_tree ret option){
                         let next_nodes = direct_nodes!(at et_node in et_tree);
 
-                        let (r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter,symtab_g);
+                        let (mut r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter,symtab_g);
                         counter = new_counter;
+                        let r_type = r_symidx.get_type(symtab).unwrap();
 
-                        let (l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter,symtab_g);
+                        let (mut l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter,symtab_g);
                         counter = new_counter;
-                        
-                        let tmp_var_symidx = SymIdx::new(scope_node, format!("%{}",counter));
+                        let l_type = l_symidx.get_type(symtab).unwrap();
+
+                        let var_type=Type::adapt(l_type, r_type);
+                        let tmp_var_symidx = add_symbol!({Symbol::new_verbose(scope_node,format!("%{}",counter))} with field TYPE:{var_type.clone()} to symtab);
                         counter += 1;
-                        let vartype=Type::I32;
 
-                        let div_instr = NakedInstruction::new_div(tmp_var_symidx.clone(), l_symidx, r_symidx,vartype).to_instr();
+                        let div_instr = NakedInstruction::new_div(tmp_var_symidx.clone(), l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(div_instr to cfg_bb in cfg_graph);
 
                         (tmp_var_symidx,counter)
@@ -484,19 +494,108 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                         panic!("操作符{}下缺少符号",et_node);
                     }
                 },
-                super::et_node::ExprOp::Mod => todo!(),
+                super::et_node::ExprOp::Mod => {
+                    if let Some(_) = direct_node!(at et_node in et_tree ret option){
+                        let next_nodes = direct_nodes!(at et_node in et_tree);
+
+                        let (mut r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter,symtab_g);
+                        counter = new_counter;
+                        let r_type = r_symidx.get_type(symtab).unwrap();
+
+                        let (mut l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter,symtab_g);
+                        counter = new_counter;
+                        let l_type = l_symidx.get_type(symtab).unwrap();
+
+                        let var_type=Type::adapt(l_type, r_type);
+                        let tmp_var_symidx = add_symbol!({Symbol::new_verbose(scope_node,format!("%{}",counter))} with field TYPE:{var_type.clone()} to symtab);
+                        counter += 1;
+
+                        let mod_instr = NakedInstruction::new_mod(tmp_var_symidx.clone(), l_symidx, r_symidx,var_type).to_instr();
+                        push_instr!(mod_instr to cfg_bb in cfg_graph);
+
+                        (tmp_var_symidx,counter)
+                    }else{
+                        panic!("操作符{}下缺少符号",et_node);
+                    }
+                },
                 // super::et_node::ExprOp::Assign => todo!(),
                 //逻辑运算符
-                super::et_node::ExprOp::LogicalOr => todo!(),
-                super::et_node::ExprOp::LogicalAnd => todo!(),
-                super::et_node::ExprOp::LogicalNot => todo!(),
+                super::et_node::ExprOp::LogicalOr => {
+                    if let Some(_) = direct_node!(at et_node in et_tree ret option){
+                        let next_nodes = direct_nodes!(at et_node in et_tree);
+
+                        let (mut r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter,symtab_g);
+                        counter = new_counter;
+                        let r_type = r_symidx.get_type(symtab).unwrap();
+
+                        let (mut l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter,symtab_g);
+                        counter = new_counter;
+                        let l_type = l_symidx.get_type(symtab).unwrap();
+
+                        let var_type=Type::adapt(l_type, r_type);
+                        let tmp_var_symidx = add_symbol!({Symbol::new_verbose(scope_node,format!("%{}",counter))} with field TYPE:{var_type.clone()} to symtab);
+                        counter += 1;
+
+                        let logicor_instr = NakedInstruction::new_logicor(tmp_var_symidx.clone(), l_symidx, r_symidx,var_type).to_instr();
+                        push_instr!(logicor_instr to cfg_bb in cfg_graph);
+
+                        (tmp_var_symidx,counter)
+                    }else{
+                        panic!("操作符{}下缺少符号",et_node);
+                    }
+                },
+                super::et_node::ExprOp::LogicalAnd => {
+                    if let Some(_) = direct_node!(at et_node in et_tree ret option){
+                        let next_nodes = direct_nodes!(at et_node in et_tree);
+
+                        let (mut r_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter,symtab_g);
+                        counter = new_counter;
+                        let r_type = r_symidx.get_type(symtab).unwrap();
+
+                        let (mut l_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node, cfg_bb, counter,symtab_g);
+                        counter = new_counter;
+                        let l_type = l_symidx.get_type(symtab).unwrap();
+
+                        let var_type=Type::adapt(l_type, r_type);
+                        let tmp_var_symidx = add_symbol!({Symbol::new_verbose(scope_node,format!("%{}",counter))} with field TYPE:{var_type.clone()} to symtab);
+                        counter += 1;
+
+                        let logicand_instr = NakedInstruction::new_logicand(tmp_var_symidx.clone(), l_symidx, r_symidx,var_type).to_instr();
+                        push_instr!(logicand_instr to cfg_bb in cfg_graph);
+
+                        (tmp_var_symidx,counter)
+                    }else{
+                        panic!("操作符{}下缺少符号",et_node);
+                    }
+                },
+                super::et_node::ExprOp::LogicalNot => {
+                    if let Some(next_node) = direct_node!(at et_node in et_tree ret option){
+                        let (mut symbol_symidx,new_counter) = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_node, scope_node, cfg_bb, counter,symtab_g);
+                        counter = new_counter;
+                        let symbol_type = symbol_symidx.get_type(symtab).unwrap();
+
+                        if !matches!(*symbol_type,Type::I1){
+                            panic!("运算类型错误，逻辑运算符应传入bool类型");
+                        }
+                        let tmp_var_type = symbol_type.clone();
+                        let tmp_var_symidx = add_symbol!({Symbol::new_verbose(scope_node,format!("%{}",counter))} with field TYPE:{tmp_var_type.clone()} to symtab);
+                        counter += 1;
+
+                        let logicnot_instr = NakedInstruction::new_logicnot(tmp_var_symidx.clone(), symbol_symidx, tmp_var_type).to_instr();
+                        push_instr!(logicnot_instr to cfg_bb in cfg_graph);
+
+                        (tmp_var_symidx,counter)
+                    }else{
+                        panic!("操作符{}下缺少符号",et_node);
+                    }
+                },
                 //位运算符
-                super::et_node::ExprOp::BitwiseOr => todo!(),
-                super::et_node::ExprOp::BitwiseAnd => todo!(),
-                super::et_node::ExprOp::BitwiseXor => todo!(),
-                super::et_node::ExprOp::BitwiseNot => todo!(),
-                super::et_node::ExprOp::LShift => todo!(),
-                super::et_node::ExprOp::RShift => todo!(),
+                // super::et_node::ExprOp::BitwiseOr => todo!(),
+                // super::et_node::ExprOp::BitwiseAnd => todo!(),
+                // super::et_node::ExprOp::BitwiseXor => todo!(),
+                // super::et_node::ExprOp::BitwiseNot => todo!(),
+                // super::et_node::ExprOp::LShift => todo!(),
+                // super::et_node::ExprOp::RShift => todo!(),
                 //比较运算符
                 super::et_node::ExprOp::Eq => todo!(),
                 super::et_node::ExprOp::NEq => todo!(),
@@ -506,28 +605,30 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 super::et_node::ExprOp::GEq => todo!(),
 
                 //类型转换
-                super::et_node::ExprOp::Cast => todo!(),
+                // super::et_node::ExprOp::Cast => todo!(),
                 //调用函数
                 super::et_node::ExprOp::Call => {
                     todo!();
-                    //取函数名和实参
-                    let called_fun = direct_nodes!(at et_node in et_tree);
-                    //函数名是数组第一个值，其余为参数
+                    // //取函数名和实参
+                    // let called_fun = direct_nodes!(at et_node in et_tree);
+                    // //函数名是数组第一个值，其余为参数
 
-                    //待处理：检验函数形参
+                    // //待处理：检验函数形参
 
-                    let func_name = called_fun[0];
-                    let func_name_struct = node!(at func_name in et_tree).et_naked_node;
-                    let mut func_name_str = String::new();
-                    match func_name_struct {
-                        EtNakedNode::Symbol { sym_idx, ast_node, text, def_or_use }=>{
-                        func_name_str = node!(at ast_node in ast_tree).text;
-                        },
-                        _ => {},
-                    }
-                    let func_name_symidx = SymIdx::new(scope_node, func_name_str);
-                    //
-                    let call_instr = NakedInstruction::new_func_call(assigned, func_name_symidx, args);
+                    // let func_name = called_fun[0];
+                    // let func_name_struct = node!(at func_name in et_tree).et_naked_node;
+                    // let mut func_name_str = String::new();
+                    // match func_name_struct {
+                    //     EtNakedNode::Symbol { sym_idx, ast_node, text, def_or_use }=>{
+                    //     func_name_str = node!(at ast_node in ast_tree).text;
+                    //     },
+                    //     _ => {
+                    //         panic!("et生成错误，call节点下第一个不是函数名")
+                    //     },
+                    // }
+                    // let func_name_symidx = SymIdx::new(scope_node, func_name_str);
+                    // //
+                    // let call_instr = NakedInstruction::new_func_call(assigned, func_name_symidx, args);
                 },
                 //正负号
                 super::et_node::ExprOp::Negative => todo!(),
@@ -762,12 +863,12 @@ fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut SymTab,
                 let arg_symidx = SymIdx::new(*func_scope, func_arg_str.clone());
                 arg_syms.push(arg_symidx);
 
-                println!("func {} !!!",func_arg_str);
-                add_symbol!({Symbol::new_verbose(*func_scope,func_arg_str.to_string())} with field TYPE:{Type::I32} to symtab);
+                // println!("func {} !!!",func_arg_str);
+                // add_symbol!({Symbol::new_verbose(*func_scope,func_arg_str.to_string())} with field TYPE:{Type::I32} to symtab);
             }
             //添加到符号表中
             let func_symbol = Symbol::new(cfg_entry, fun_name.to_string());
-            add_symbol!(func_symbol with field TYPE:{Type::Fn { arg_syms: arg_syms, ret_sym:type_symidx}} to symtab);
+            add_symbol!(func_symbol with field TYPE:{Type::Fn { arg_syms: arg_syms.clone(), ret_sym:type_symidx.clone()}} to symtab);
         }
         //函数无参数，则不需要处理参数部分
         else{}
