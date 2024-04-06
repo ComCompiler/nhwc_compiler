@@ -4,7 +4,9 @@ use std::{collections::{BTreeMap, HashMap}, fmt::{Display, Formatter}};
 
 use petgraph::stable_graph::StableDiGraph;
 
-use super::{symbol::Symbol, field::{self, Field}};
+use crate::{find, toolkit::gen_nhwc_cfg::TYPE};
+
+use super::{field::{self, Field, Type}, symbol::Symbol};
 use core::fmt::Debug;
 
 pub type SymTabGraph = StableDiGraph<SymTab,SymTabEdge,u32>;
@@ -36,7 +38,11 @@ pub struct SymIdx{
 }
 impl SymIdx{
     pub fn new(scope_node:u32, symbol_name:String)->Self{
-        SymIdx{ scope_node,symbol_name, index_ssa: None} }
+        SymIdx{ scope_node,symbol_name, index_ssa: None} 
+    }
+    pub fn get_type(&mut self,symtab:&mut SymTab) -> Option<Type>{
+        find!(field TYPE:Type at self in symtab)
+    }
 }
 impl SymTab {
     // 创建一个新的符号表

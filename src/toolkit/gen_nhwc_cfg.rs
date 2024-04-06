@@ -3,7 +3,7 @@ use std::{collections::HashMap, fs::OpenOptions};
 use petgraph::{stable_graph::{NodeIndex, StableGraph}, EdgeType};
 use syn::token::Use;
 
-use crate::{ add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{field::{Type, UseCounter}, nhwc_instr::Instruction, symbol::Symbol, symbol_table::SymTabEdge}};
+use crate::{ add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_node, direct_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{ast_node, field::{Type, UseCounter}, nhwc_instr::Instruction, symbol::Symbol, symbol_table::SymTabEdge}};
 
 use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, field::FieldsOwner, gen_et::process_any_stmt, nhwc_instr::NakedInstruction, scope_node::ScopeTree, symbol, symbol_table::{ SymIdx, SymTab, SymTabGraph}};
 
@@ -355,7 +355,7 @@ fn process_constant(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,c
     const_symidx
 }
 
-static TYPE:&str = "type";
+pub static TYPE:&str = "type";
 fn process_symbol(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,def_or_use:&Def_Or_Use,symbol_name:&String,scope_node:u32, symtab_g:&mut Option<&mut SymTabGraph>)->SymIdx{   
     let mut symbol_scope = scope_node;
     match def_or_use{
@@ -398,7 +398,7 @@ fn process_symbol(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,def
 fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,et_node:u32,scope_node:u32,cfg_bb:u32,mut counter:u32, symtab_g:&mut Option<&mut SymTabGraph>)->(SymIdx,u32){
     let nake_et = &node!(at et_node in et_tree).et_naked_node;
     match nake_et{
-        EtNakedNode::Operator { op, ast_node, text:_ } => {
+        EtNakedNode::Operator { op, ast_node:_, text:_ } => {
             match op{
                 super::et_node::ExprOp::Mul => {
                     if let Some(_) = direct_node!(at et_node in et_tree ret option){
@@ -486,31 +486,60 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                         panic!("操作符{}下缺少符号",et_node);
                     }
                 },
+                super::et_node::ExprOp::Mod => todo!(),
                 // super::et_node::ExprOp::Assign => todo!(),
-                // super::et_node::ExprOp::LogicalOr => todo!(),
-                // super::et_node::ExprOp::LogicalAnd => todo!(),
-                // super::et_node::ExprOp::LogicalNot => todo!(),
-                // super::et_node::ExprOp::BitwiseOr => todo!(),
-                // super::et_node::ExprOp::BitwiseAnd => todo!(),
-                // super::et_node::ExprOp::BitwiseXor => todo!(),
-                // super::et_node::ExprOp::BitwiseNot => todo!(),
-                // super::et_node::ExprOp::Eq => todo!(),
-                // super::et_node::ExprOp::NEq => todo!(),
-                // super::et_node::ExprOp::Less => todo!(),
-                // super::et_node::ExprOp::Greater => todo!(),
-                // super::et_node::ExprOp::LEq => todo!(),
-                // super::et_node::ExprOp::GEq => todo!(),
-                // super::et_node::ExprOp::LShift => todo!(),
-                // super::et_node::ExprOp::RShift => todo!(),
-                // super::et_node::ExprOp::Mod => todo!(),
-                // super::et_node::ExprOp::Cast => todo!(),
-                // super::et_node::ExprOp::Call => todo!(),
-                // super::et_node::ExprOp::Negative => todo!(),
-                // super::et_node::ExprOp::Positive => todo!(),
-                // super::et_node::ExprOp::AddrOf => todo!(),
-                // super::et_node::ExprOp::Deref => todo!(),
-                // super::et_node::ExprOp::DotMember => todo!(),
-                // super::et_node::ExprOp::ArrowMember => todo!(),
+                //逻辑运算符
+                super::et_node::ExprOp::LogicalOr => todo!(),
+                super::et_node::ExprOp::LogicalAnd => todo!(),
+                super::et_node::ExprOp::LogicalNot => todo!(),
+                //位运算符
+                super::et_node::ExprOp::BitwiseOr => todo!(),
+                super::et_node::ExprOp::BitwiseAnd => todo!(),
+                super::et_node::ExprOp::BitwiseXor => todo!(),
+                super::et_node::ExprOp::BitwiseNot => todo!(),
+                super::et_node::ExprOp::LShift => todo!(),
+                super::et_node::ExprOp::RShift => todo!(),
+                //比较运算符
+                super::et_node::ExprOp::Eq => todo!(),
+                super::et_node::ExprOp::NEq => todo!(),
+                super::et_node::ExprOp::Less => todo!(),
+                super::et_node::ExprOp::Greater => todo!(),
+                super::et_node::ExprOp::LEq => todo!(),
+                super::et_node::ExprOp::GEq => todo!(),
+
+                //类型转换
+                super::et_node::ExprOp::Cast => todo!(),
+                //调用函数
+                super::et_node::ExprOp::Call => {
+                    todo!();
+                    //取函数名和实参
+                    let called_fun = direct_nodes!(at et_node in et_tree);
+                    //函数名是数组第一个值，其余为参数
+
+                    //待处理：检验函数形参
+
+                    let func_name = called_fun[0];
+                    let func_name_struct = node!(at func_name in et_tree).et_naked_node;
+                    let mut func_name_str = String::new();
+                    match func_name_struct {
+                        EtNakedNode::Symbol { sym_idx, ast_node, text, def_or_use }=>{
+                        func_name_str = node!(at ast_node in ast_tree).text;
+                        },
+                        _ => {},
+                    }
+                    let func_name_symidx = SymIdx::new(scope_node, func_name_str);
+                    //
+                    let call_instr = NakedInstruction::new_func_call(assigned, func_name_symidx, args);
+                },
+                //正负号
+                super::et_node::ExprOp::Negative => todo!(),
+                super::et_node::ExprOp::Positive => todo!(),
+                //引用与解引用
+                super::et_node::ExprOp::AddrOf => todo!(),
+                super::et_node::ExprOp::Deref => todo!(),
+                super::et_node::ExprOp::DotMember => todo!(),
+                super::et_node::ExprOp::ArrowMember => todo!(),
+                //单目运算符
                 super::et_node::ExprOp::LPlusPlus => {
                     if let Some(symbol_node) = direct_node!(at et_node in et_tree ret option){
                         let (var_symidx,new_counter) = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, scope_node,  cfg_bb, counter,symtab_g);
@@ -612,7 +641,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                     }
                 },
                 _ => {
-                    panic!("表达式内不应存在带有显性赋值性质的操作符");
+                    panic!("表达式{:?}内不应存在带有显性赋值性质的操作符",op);
                 },
             }
         },
@@ -718,17 +747,13 @@ fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut SymTab,
         let fun_name = &node!(at ast_funsign in ast_tree).text;
         let name_symidx = SymIdx::new(*func_scope, fun_name.to_string());
 
-        //添加到符号表中
-        let func_symbol = Symbol::new(cfg_entry, fun_name.to_string());
-        add_symbol!(func_symbol with field TYPE:{Type::Fn { args_types: Vec::new(), ret_type:None  }} to symtab);
-
         //获取返回类型
         let ast_retype = find!(rule RULE_declarationSpecifiers at ast_fun in ast_tree).unwrap();
         let fun_rettype = &node!(at ast_retype in ast_tree).text;
         let type_symidx = SymIdx::new(*func_scope, fun_rettype.to_string());
 
         //获取参数列表
-        let mut para_symlst: Vec<SymIdx> = vec![];
+        let mut arg_syms: Vec<SymIdx> = vec![];
         //函数有参数
         if let Some(para) = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_parameterTypeList at ast_fun in ast_tree){
             let ast_func_args = find_nodes!(rule RULE_parameterList finally RULE_parameterDeclaration at para in ast_tree);
@@ -737,16 +762,19 @@ fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut SymTab,
                 let ast_para_sym = find!(rule RULE_declarator at ast_func_arg in ast_tree).unwrap();
                 let func_arg_str = &node!(at ast_para_sym in ast_tree).text;
                 let arg_symidx = SymIdx::new(*func_scope, func_arg_str.clone());
-                para_symlst.push(arg_symidx);
+                arg_syms.push(arg_symidx);
 
                 println!("func {} !!!",func_arg_str);
                 add_symbol!({Symbol::new_verbose(*func_scope,func_arg_str.to_string())} with field TYPE:{Type::I32} to symtab);
             }
+            //添加到符号表中
+            let func_symbol = Symbol::new(cfg_entry, fun_name.to_string());
+            add_symbol!(func_symbol with field TYPE:{Type::Fn { arg_syms: arg_syms, ret_sym:type_symidx}} to symtab);
         }
         //函数无参数，则不需要处理参数部分
         else{}
         //做成instr放在cfg的entry里面
-        let func_instr = NakedInstruction::new_def_func(name_symidx, type_symidx, para_symlst).to_instr();
+        let func_instr = NakedInstruction::new_def_func(name_symidx, type_symidx, arg_syms).to_instr();
         
         push_instr!(func_instr to cfg_entry for entry in cfg_graph);
 
