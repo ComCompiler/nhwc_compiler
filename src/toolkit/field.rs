@@ -65,6 +65,7 @@ impl Type{
             "int" => Type::I32,
             "float" => Type::F32,
             "bool" => Type::I1,
+            "double" => Type::F32,
             _ => panic!("text中类型错误 找到不支持的类型 {}",text),
         }
     }
