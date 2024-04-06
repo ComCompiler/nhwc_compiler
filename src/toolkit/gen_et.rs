@@ -324,7 +324,7 @@ fn process_equality_expr(et_tree: &mut EtTree, ast_tree:&AstTree, scope_tree: &S
             if index != relational_expr_nodes.len() - 1 {
                 if op_last_ep_relational_node.is_none() {
                     // 第一个 relationalExpression，创建一个新的 equality 操作符节点
-                    op_last_ep_relational_node = Some(add_node_with_edge!({EtNakedNode::new_op_equal( equality_expr_node).to_et_node()} from parent_et_node in et_tree));
+                    op_last_ep_relational_node = Some(add_node_with_edge!({get_expr_node_of_op_node(index)} from parent_et_node in et_tree));
                 } else {
                     // 中间的 relationalExpression，创建一个新的 equality 操作符节点并连接到上一个操作符节点
                     let last_ep_relational_node = op_last_ep_relational_node.unwrap();

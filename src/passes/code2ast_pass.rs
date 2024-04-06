@@ -24,11 +24,12 @@ impl Pass for Code2AstPass{
     }
     // 返回pass的描述，具体作用
     fn get_desc(&self)->String{
-       return "pass Code2AstPass description".to_string();
+        return "pass Code2AstPass description".to_string();
     }
     // 返回pass的名称
     fn get_pass_name(&self)->String {
-       return "Code2AstPass".to_string();
+        
+        return "Code2AstPass".to_string();
     }
 }
 
