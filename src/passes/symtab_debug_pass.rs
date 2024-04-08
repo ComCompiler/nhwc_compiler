@@ -1,7 +1,6 @@
 use std::any::Any;
 use petgraph::adj::NodeIndex;
 
-use crate::toolkit::cfg_node::GetText;
 use crate::toolkit::symbol::Symbol;
 use crate::{add_node, add_node_with_edge};
 use crate::toolkit::dot::Config;
@@ -25,9 +24,6 @@ impl Pass for SymtabDebugPass{
     fn run(&mut self,ctx:&mut Context) {
         //4.1可视化
         if self.is_gen_png{
-            for cfg_node in ctx.cfg_graph.node_weights_mut(){
-                cfg_node.load_ast_node_text(&ctx.ast_tree)
-            }
             let mut symtab_g = SymTabGraph::new();
             // println!("ctx的symtab内容为{:#?}",ctx.symtab);
             add_node!({ctx.symtab.clone()} to symtab_g);

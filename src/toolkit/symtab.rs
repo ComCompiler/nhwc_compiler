@@ -40,6 +40,9 @@ impl SymIdx{
     pub fn new(scope_node:u32, symbol_name:String)->Self{
         SymIdx{ scope_node,symbol_name, index_ssa: None} 
     }
+    pub fn new_verbose(scope_node:u32, symbol_name:String, index_ssa:Option<u32>)->Self{
+        SymIdx{ scope_node,symbol_name, index_ssa} 
+    }
     pub fn get_type<'a>(&'a mut self,symtab:&'a SymTab) -> Option<&'a Type>{
         find!(field TYPE:Type at self in symtab)
     }

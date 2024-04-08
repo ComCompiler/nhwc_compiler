@@ -1,8 +1,10 @@
 use std::fmt::{Debug, Formatter};
 use petgraph::{data, visit::Data};
+use slab::Slab;
 use syn::Field;
 
 use super::{field::{Fields, Type, Value}, symbol::Symbol, symtab::SymIdx};
+pub type InstrSlab= Slab<Instruction>;
 
 #[derive(Clone)]
 pub enum ArithOp{        
@@ -135,9 +137,9 @@ pub struct Instruction{
 }
 #[derive(Clone,Debug)]
 pub enum IcmpPlan{
-    eq,ne,              // 等与不等
-    ugt,uge,ult,ule,    //无符号比较
-    sgt,sge,slt,sle,    //有符号比较
+    Eq,Ne,              // 等与不等
+    Ugt,Uge,Ult,Ule,    //无符号比较
+    Sgt,Sge,Slt,Sle,    //有符号比较
 }
 
 #[derive(Clone,Debug)]

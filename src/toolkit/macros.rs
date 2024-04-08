@@ -324,11 +324,11 @@ macro_rules! find_nodes_by_dfs {
 
 /// 这个宏返回指定节点直接附属的节点，你必须保证这个节点下只有一个节点
 #[macro_export] 
-macro_rules! direct_node {
+macro_rules! direct_child_node {
     (at $node:ident in $graph:ident) => {
         {
             $graph.neighbors(NodeIndex::from($node)).next()
-            .expect(format!("no direct node of {:?} in {:?}", $graph.node_weight(NodeIndex::from($node)),$graph).as_str()).index() as u32
+            .expect(format!("no direct child node of {:?} in {:?}", $graph.node_weight(NodeIndex::from($node)),$graph).as_str()).index() as u32
         }
     };
     (at $node:ident in $graph:ident ret option)=>{
@@ -339,7 +339,29 @@ macro_rules! direct_node {
     }
 }
 #[macro_export] 
-macro_rules! direct_nodes{
+macro_rules! direct_parent_node {
+    (at $node:ident in $graph:ident) => {
+        {
+            use petgraph::visit::EdgeRef;
+            let mut edges = $graph.edges_directed(NodeIndex::from($node), petgraph::Direction::Incoming);
+            let op_first_parent_node = edges.next();
+            let op_second_parent_node = edges.next();
+            if let Some(_) = op_second_parent_node{
+                panic!("这个 node 有多个parent 不符合调用 direct_parent_node 的条件");
+            }else{
+                op_first_parent_node.expect(format!("no direct parent node of {:?} in {:?}", $graph.node_weight(NodeIndex::from($node)),$graph).as_str()).source().index() as u32
+            }
+        }
+    };
+    // (at $node:ident in $graph:ident ret option)=>{
+    //     {
+    //         $grpah.edges_directed(node_index(cfg_branch_node as usize), petgraph::Direction::Incoming)
+    //             .next().map(|node_index| node_index.index() as u32)
+    //     }
+    // }
+}
+#[macro_export] 
+macro_rules! direct_children_nodes{
     (at $node:ident in $graph:ident) => {
         {
             let iter = $graph.neighbors(NodeIndex::from($node)).map(|x| x.index() as u32);
@@ -437,7 +459,7 @@ macro_rules! add_symbol {
             $(
                 let sym =  $symtab.get_mut(&symidx).unwrap();
                 sym.add_field($field_name,Box::new($field_value));
-            )?
+            )*
             symidx
         }
     };
@@ -452,7 +474,7 @@ macro_rules! add_symbol {
                         add_node!({$symtab.clone()} to symg);
                     }else {//如果已经有节点了,在最后一个节点上加点加边
                         idx-=1;
-                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("add_sym {}",symidx.sym_name))} from idx in symg);
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("add_sym {}",symidx.symbol_name))} from idx in symg);
                     }
                 }
                 None => {},
@@ -460,14 +482,14 @@ macro_rules! add_symbol {
             $(
                 let sym =  $symtab.get_mut(&symidx).unwrap();
                 sym.add_field($field_name,Box::new($field_value));
-            )?
+            )*
             symidx
         }
     };
     // hello 
     ($sym_name:block of scope $scope:block $(with field $field_name:ident:{$field_value:expr})* to $symtab:ident $(debug $symtab_graph:ident)?) => {
         {
-            let mut sym = Symbol::new_verbose($scope,$sym_name);
+            let mut sym = Symbol::new($scope,$sym_name);
             $(sym.add_field($field_name,Box::new($field_value));)*
             let symidx = $symtab.add(sym);
             $(match $symtab_graph{
@@ -584,40 +606,43 @@ macro_rules! dfs_graph {
         }
     };
 }
+
 #[macro_export] 
 macro_rules! push_instr {
-    ($instr:ident to $node:ident for entry in $graph:ident) =>{
-        {
-            let cfg_entry_node = node_mut!(at $node in $graph);
-            if let crate::toolkit::cfg_node::CfgNode::Entry { ast_node:_, text:_, calls_in_func:_, instr } = cfg_entry_node{
-                *instr = $instr;
-            }
-        }
-    };
-    ($instr:ident to $node:ident in $graph:ident) =>{
+    ($instr:ident to $node:ident in $graph:ident slab $instrsslab:ident) =>{
         {
             let cfg_node = node_mut!(at $node in $graph);
-            match cfg_node {
-                CfgNode::Exit {  ast_node, text, instrs } =>{
-                    instrs.push($instr);
+            match &cfg_node.cfg_type {
+                CfgNodeType::Exit {  ast_node,  } =>{
+                    let instr = $instrsslab.insert($instr);
+                    cfg_node.instrs.push(instr);
                 }
-                CfgNode::Branch {  ast_expr_node: ast_node, text, true_head_tail_nodes:  true_head_tail_nodes, false_head_tail_nodes, instrs } => {
-                    instrs.push($instr);
+                CfgNodeType::Branch {  ast_expr_node: ast_node,  op_true_head_tail_nodes:  true_head_tail_nodes, op_false_head_tail_nodes, } => {
+                    let instr = $instrsslab.insert($instr);
+                    cfg_node.instrs.push(instr);
                 }
-                CfgNode::Gather {} => {
+                CfgNodeType::Gather {} => { },
+                CfgNodeType::BasicBlock { ast_nodes,  } =>{
+                    let instr = $instrsslab.insert($instr);
+                    cfg_node.instrs.push(instr);
+                }
+                CfgNodeType::ForLoop {   ast_before_node, ast_mid_node, ast_after_node, exit_node, op_body_head_tail_nodes: body_node, } => {
+                    let instr = $instrsslab.insert($instr);
+                    cfg_node.instrs.push(instr);
+                }
+                CfgNodeType::WhileLoop { ast_expr_node: ast_node,  exit_node, body_node, } => {
+                    let instr = $instrsslab.insert($instr);
+                    cfg_node.instrs.push(instr);
                 },
-                CfgNode::BasicBlock { ast_nodes, text, instrs } =>{instrs.push($instr);
-                }
-                CfgNode::ForLoop {  text, ast_before_node, ast_mid_node, ast_after_node, exit_node, body_head_tail_nodes: body_node, instrs } => {
-                    instrs.push($instr);
-                }
-                CfgNode::WhileLoop { ast_expr_node: ast_node, text, exit_node, body_node, instrs } => {
-                    instrs.push($instr);
+                CfgNodeType::Switch { ast_expr_node,  } => {
+                    let instr = $instrsslab.insert($instr);
+                    cfg_node.instrs.push(instr);
                 },
-                CfgNode::Switch { ast_expr_node, text, instrs } => {
-                    instrs.push($instr);
+                CfgNodeType::Entry{ ast_node:_,  calls_in_func:_, } => {
+                    let instr = $instrsslab.insert($instr);
+                    cfg_node.instrs.push(instr);
                 },
-                _ => panic!("can't push instr to entry or root"),
+                _ => panic!("can't push instr to root"),
             }
         }
     };
@@ -654,5 +679,12 @@ macro_rules! gen_field_trait_for_structs {
             }
         }
         )*
+    };
+}
+
+#[macro_export]
+macro_rules! element {
+    (at $idx:ident in $slab:ident) => {
+        $slab.get($idx)
     };
 }

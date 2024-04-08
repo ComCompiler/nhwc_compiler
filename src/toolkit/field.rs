@@ -31,7 +31,7 @@ pub enum Value{
 }
 #[derive(Clone)]
 pub enum Type{
-    I32,F32,I1,Void,
+    I32,F32,I1,Void,Label,
     Fn{
         arg_syms:Vec<SymIdx>,
         ret_sym:SymIdx,
@@ -58,9 +58,9 @@ impl Value{
     }
 }
 impl Type{
-    pub fn new(node:u32,ast_tree:&AstTree) -> Self{
+    pub fn new(ast_node:u32,ast_tree:&AstTree) -> Self{
         // 在asttree中找到node的u32所在节点的类型,返回I32或F32
-        let text = node!(at node in ast_tree).text.as_str();
+        let text = node!(at ast_node in ast_tree).text.as_str();
         match text {
             "int" => Type::I32,
             "float" => Type::F32,
@@ -87,6 +87,7 @@ impl Debug for Type{
             Type::I1 => write!(f,"i1"),
             Type::Fn { arg_syms: args_types, ret_sym: ret_type } => write!(f,"Fn{:?}->{:?}",args_types,ret_type),
             Type::Void => write!(f,"void"),
+            Type::Label => write!(f,"label"),
         }
     }
 }

@@ -2,7 +2,6 @@ use crate::NodeIndex;
 use crate::node;
 use std::fmt::Debug;
 use super::ast_node::AstTree;
-use super::cfg_node::GetText;
 #[derive(Clone)]
 pub enum CfgEdge{
     Conditioned{
@@ -16,20 +15,6 @@ pub enum CfgEdge{
         text: String
     }
 
-}
-impl GetText for CfgEdge{
-    fn get_text(&self)-> Option<&str> {
-        match self {
-            CfgEdge::Conditioned { ast_node:ptr_ast_node, text } =>{ 
-                Some(text.as_str())
-            }
-            CfgEdge::Else {  } => None,
-            CfgEdge::Direct {  } => None,
-            CfgEdge::After { ast_node:ptr_ast_node, text } => { 
-                Some(text.as_str())
-            }
-        }
-    }
 }
 impl CfgEdge{
     pub fn load_ast_node_text(&mut self,ast_tree :&AstTree)->&str {

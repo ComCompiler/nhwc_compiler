@@ -5,7 +5,7 @@ use petgraph::stable_graph::{NodeIndex, StableDiGraph};
 
 use crate::node;
 
-use super::{ast_node::AstTree, cfg_node::GetText};
+use super::{ast_node::AstTree};
 
 
 pub type ScopeTree = StableDiGraph<ScopeNode,(),u32>;
@@ -16,15 +16,6 @@ pub struct ScopeNode{
     pub text:String,
     pub parent:u32,
     pub scope_type:ScopeType,
-}
-impl GetText for ScopeNode {
-    fn get_text(&self)-> Option<&str> {
-        if !self.text.is_empty(){
-            Some(self.text.as_str())
-        }else {
-            None
-        }
-    }
 }
 impl ScopeNode {
     pub fn load_ast_node_text(&mut self, ast_tree: &AstTree) {

@@ -32,10 +32,10 @@ impl FieldsOwner for Symbol{
 }
 
 impl Symbol {
-    pub fn new_verbose(scope_node:u32 ,symbol_name: String) -> Symbol{
+    pub fn new_verbose(scope_node:u32 ,symbol_name: String, index_ssa:Option<u32>) -> Symbol{
         Symbol{
             fields: HashMap::new(),
-            symidx : SymIdx::new(scope_node, symbol_name)
+            symidx : SymIdx::new_verbose(scope_node, symbol_name, index_ssa)
         }
     }
     pub fn new(scope_node:u32 ,symbol_name: String) -> Symbol{
