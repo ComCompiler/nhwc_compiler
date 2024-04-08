@@ -7,7 +7,7 @@ int main() {
 
 int performOperations(int a, int b) {
     // 逻辑运算
-    // bool logicResult = (a >= b) || (b <= a) && !(a == 0);
+    bool logicResult = (a >= b) || (b <= a) && !(a == 0);
 
     // 比较运算
     bool comparisonResult = (a % 2 == 0) == (b % 2 != 0);
