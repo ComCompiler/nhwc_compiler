@@ -6,7 +6,7 @@ use syn::token::Use;
 use super::{cfg_node::CfgNodeType, dot::Config, nhwc_instr::InstrSlab};
 use crate::{ add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_child_node, direct_children_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{ast_node, etc::generate_png_by_graph, field::{Type, UseCounter}, nhwc_instr::{IcmpPlan, Instruction}, symbol::Symbol, symtab::{SymTabEdge, TYPE, USE_COUNTER}}};
 
-use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNakedNode, EtTree}, field::FieldsOwner, gen_et::process_any_stmt, nhwc_instr::NakedInstruction, scope_node::ScopeTree, symbol, symtab::{ SymIdx, SymTab, SymTabGraph}};
+use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNodeType, EtTree}, field::FieldsOwner, gen_et::process_any_stmt, nhwc_instr::NakedInstruction, scope_node::ScopeTree, symbol, symtab::{ SymIdx, SymTab, SymTabGraph}};
 
 /*
  这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有 
@@ -29,9 +29,9 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab
         if let Some(_) = direct_child_node!(at et_root in et_tree ret option){
             let et_nodes = direct_children_nodes!(at et_root in et_tree);
             for et_node in et_nodes{
-                let et_struct = &node!(at et_node in et_tree).et_naked_node;
+                let et_struct = &node!(at et_node in et_tree).et_node_type;
                 match et_struct{
-                    EtNakedNode::Operator { op, ast_node, text } => {
+                    EtNodeType::Operator { op, ast_node, text } => {
                         if let Some(_) = direct_child_node!(at et_node in et_tree ret option){
                             match op{
                                 crate::toolkit::et_node::ExprOp::Assign => {
@@ -216,8 +216,8 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab
                             panic!("操作符下缺少具体变量或常量");
                         }
                     },
-                    EtNakedNode::Constant { const_sym_idx:_, ast_node:_, text:_ } => todo!(),
-                    EtNakedNode::Symbol { sym_idx:_, ast_node:_, text, def_or_use } => {
+                    EtNodeType::Constant { const_sym_idx:_, ast_node:_, text:_ } => todo!(),
+                    EtNodeType::Symbol { sym_idx:_, ast_node:_, text, def_or_use } => {
 
                         //获得变量类型，做成symidx
                         let type_node = find!(rule RULE_declarationSpecifiers at ast_decl_node in ast_tree).unwrap();
@@ -266,7 +266,7 @@ fn parse_bb2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&ScopeTre
 fn parse_whileloop2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&ScopeTree,et_tree:&mut EtTree,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,ast_expr_node:u32,cfg_whileloop:u32,counter:&mut u32, instr_slab:&mut InstrSlab, symtab_graph:&mut Option<&mut SymTabGraph>){
     match(rule_id!(at ast_expr_node in ast_tree),ast_expr_node){
         (RULE_expression,statement_node)=>{
-            let label_instr = NakedInstruction::new_label(SymIdx::new(0, "while_head".to_string())).to_instr();
+            let label_instr = NakedInstruction::new_label(SymIdx::new(0, "while.head".to_string())).to_instr();
             push_instr!(label_instr to cfg_whileloop in cfg_graph slab instr_slab);
             parse_stmt2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, ast2scope,statement_node, cfg_whileloop, counter, instr_slab, symtab_graph);
         },
@@ -279,7 +279,7 @@ fn parse_forloop2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&Sco
     match rule_id!(at ast_before_node in ast_tree){
         RULE_forBeforeExpression=>{
             // push before instr label 
-            let label_before_symidx = add_symbol!({Symbol::new(*ast2scope.get(&ast_before_node).unwrap(), "before:".to_string())} with field TYPE:{Type::Label} to symtab);
+            let label_before_symidx = add_symbol!({Symbol::new(*ast2scope.get(&ast_before_node).unwrap(), "for.before:".to_string())} with field TYPE:{Type::Label} to symtab);
             let label_before_instr = NakedInstruction::new_label(label_before_symidx).to_instr();
             push_instr!(label_before_instr to cfg_forloop in cfg_graph slab instr_slab);
             parse_stmt2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, ast2scope, ast_before_node, cfg_forloop, counter, instr_slab, symtab_graph);
@@ -291,7 +291,7 @@ fn parse_forloop2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&Sco
     match rule_id!(at ast_mid_node in ast_tree){
         RULE_forMidExpression=>{
             // push before instr label 
-            let label_mid_symidx = add_symbol!({Symbol::new(*ast2scope.get(&ast_mid_node).unwrap(), "mid:".to_string())} with field TYPE:{Type::Label} to symtab);
+            let label_mid_symidx = add_symbol!({Symbol::new(*ast2scope.get(&ast_mid_node).unwrap(), "for.mid:".to_string())} with field TYPE:{Type::Label} to symtab);
             let label_mid_instr = NakedInstruction::new_label(label_mid_symidx).to_instr();
             push_instr!(label_mid_instr to cfg_forloop in cfg_graph slab instr_slab);
             parse_stmt2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, ast2scope, ast_mid_node, cfg_forloop, counter, instr_slab, symtab_graph);
@@ -303,7 +303,7 @@ fn parse_forloop2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&Sco
     match rule_id!(at ast_after_node in ast_tree){
         RULE_forAfterExpression=>{
             // push before instr label 
-            let label_after_symidx = add_symbol!({Symbol::new(*ast2scope.get(&ast_after_node).unwrap(), "after:".to_string())} with field TYPE:{Type::Label} to symtab);
+            let label_after_symidx = add_symbol!({Symbol::new(*ast2scope.get(&ast_after_node).unwrap(), "for.after:".to_string())} with field TYPE:{Type::Label} to symtab);
             let label_after_instr = NakedInstruction::new_label(label_after_symidx).to_instr();
             let (cfg_body_head_node,cfg_body_tail_node) = op_body_head_and_tail.unwrap();
             push_instr!(label_after_instr to cfg_body_head_node in cfg_graph slab instr_slab);
@@ -388,9 +388,9 @@ fn process_symbol(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,def
 }
 
 fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,et_node:u32,scope_node:u32,cfg_bb:u32,counter:&mut u32, instr_slab:&mut InstrSlab, symtab_graph:&mut Option<&mut SymTabGraph>)->SymIdx{
-    let nake_et = &node!(at et_node in et_tree).et_naked_node;
+    let nake_et = &node!(at et_node in et_tree).et_node_type;
     match nake_et{
-        EtNakedNode::Operator { op, ast_node:_, text:_ } => {
+        EtNodeType::Operator { op, ast_node:_, text:_ } => {
             match op{
                 super::et_node::ExprOp::Mul => {
                     if let Some(_) = direct_child_node!(at et_node in et_tree ret option){
@@ -845,13 +845,13 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
             }
         },
-        EtNakedNode::Constant { const_sym_idx:_, ast_node, text:_ } => {
+        EtNodeType::Constant { const_sym_idx:_, ast_node, text:_ } => {
             println!("调用 process constant");
             let ast_node = *ast_node;
             let constant_literal = &node!(at ast_node in ast_tree).text;
             process_constant(ast_tree, scope_tree, symtab,  constant_literal, scope_node, instr_slab, symtab_graph )
         },
-        EtNakedNode::Symbol { sym_idx:_, ast_node, text:_, def_or_use } => {
+        EtNodeType::Symbol { sym_idx:_, ast_node, text:_, def_or_use } => {
             let ast_node = *ast_node;
             let symbol_literal = &node!(at ast_node in ast_tree).text;
             println!("处理的节点为{}符号为{}",ast_node,symbol_literal);
@@ -878,9 +878,9 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut
         if let Some(_) = direct_child_node!(at et_root in et_tree ret option){
             let detail_ets = direct_children_nodes!(at et_root in et_tree);
             for detail_et in detail_ets{
-                let etnode = &node!(at detail_et in et_tree).et_naked_node;
+                let etnode = &node!(at detail_et in et_tree).et_node_type;
                 match etnode{
-                    EtNakedNode::Operator { op:_, ast_node:_, text:_ } => {
+                    EtNodeType::Operator { op:_, ast_node:_, text:_ } => {
                         if let Some(_) = direct_child_node!(at detail_et in et_tree ret option){
                             let op_values = direct_children_nodes!(at detail_et in et_tree);
 
@@ -900,8 +900,8 @@ fn parse_declaration2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut
                             panic!("操作符下缺少具体变量或常量");
                         }
                     },
-                    EtNakedNode::Constant { const_sym_idx:_, ast_node:_, text:_ } => todo!(),
-                    EtNakedNode::Symbol { sym_idx:_, ast_node, text, def_or_use } => {
+                    EtNodeType::Constant { const_sym_idx:_, ast_node:_, text:_ } => todo!(),
+                    EtNodeType::Symbol { sym_idx:_, ast_node, text, def_or_use } => {
                         //获得变量类型，做成symidx
                         let var = find!(rule RULE_declarationSpecifiers at ast_decl_node in ast_tree).unwrap();
                         let type_str = node!(at var in ast_tree).text.clone();

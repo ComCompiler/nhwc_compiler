@@ -1,7 +1,7 @@
 use std::any::Any;
 use petgraph::prelude::NodeIndex;
 
-use crate::{add_edge, antlr_parser::cparser::{RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forDeclaration}, toolkit::{self, ast_node::find_dfs_rule_ast, context::Context, dot::Config, et_node::{EtNakedNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, field::Field, gen_ast::parse_as_ast_tree, pass_manager::Pass}};
+use crate::{add_edge, antlr_parser::cparser::{RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forDeclaration}, toolkit::{self, ast_node::find_dfs_rule_ast, context::Context, dot::Config, et_node::{EtNodeType, EtTree}, etc::{generate_png_by_graph, read_file_content}, field::Field, gen_ast::parse_as_ast_tree, pass_manager::Pass}};
 #[derive(Debug)]
 pub struct Ast2EtDebugPass{
     is_gen_png:bool
@@ -26,7 +26,7 @@ impl Pass for Ast2EtDebugPass{
         nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expression));  
         nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_forDeclaration));  
         let root =0 ;
-        et_tree.add_node(EtNakedNode::new_sep(root).to_et_node());
+        et_tree.add_node(EtNodeType::new_sep(root).to_et_node());
         for node in nodes{
             let any_root = toolkit::gen_et::process_any_stmt(et_tree, &ctx.ast_tree, &ctx.scope_tree, node, 0,);
             add_edge!(from root to any_root in et_tree);

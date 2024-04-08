@@ -11,7 +11,7 @@ use petgraph::adj::NodeIndex;
 use toolkit::{ast_node::find_dfs_rule_ast, etc::generate_png_by_graph};
 
 
-use crate::{antlr_parser::cparser::RULE_declaration, passes::{pass_demo::PassDemo, symtab_debug_pass::{self, SymtabDebugPass}}, toolkit::{context::Context, et_node::{EtNakedNode, EtTree}, eval::eval_et, pass_manager::{Pass, PassManager}}};
+use crate::{antlr_parser::cparser::RULE_declaration, passes::{pass_demo::PassDemo, symtab_debug_pass::{self, SymtabDebugPass}}, toolkit::{context::Context, et_node::{EtNodeType, EtTree}, eval::eval_et, pass_manager::{Pass, PassManager}}};
 #[derive(Parser,Clone,Default)]
 #[command(author, version, about)]
 pub struct Args {

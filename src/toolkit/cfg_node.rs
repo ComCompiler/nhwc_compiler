@@ -6,8 +6,9 @@ use petgraph::stable_graph::{ NodeIndex, StableDiGraph};
 
 use crate::{element, toolkit::ast_node::AstTree};
 use crate::toolkit::cfg_edge::CfgEdge;
-use crate::node;
+use crate::{node, node_mut};
 
+use super::field::Fields;
 use super::nhwc_instr::{InstrSlab, Instruction};
 
 //use crate::toolkit::ast_node::AstNode;
@@ -59,6 +60,7 @@ pub struct CfgNode{
     pub cfg_type:CfgNodeType,
     pub instrs: Vec<usize>,
     pub text: String,
+    pub info: Fields,
     // instructions of this basic block (第二步才生成这个 instrs)
 }
 impl CfgNode{
@@ -117,6 +119,7 @@ impl CfgNode{
             cfg_type: CfgNodeType::BasicBlock { ast_nodes},
             instrs: vec![],
             text: String::new(),
+            info: Fields::new(),
         }
     }
     pub fn new_gather( ) -> Self{
@@ -124,30 +127,32 @@ impl CfgNode{
             cfg_type: CfgNodeType::Gather {  } ,
             instrs: vec![],
             text: String::new(),
+            info: Fields::new(),
         }
     }
     pub fn new_root() -> Self{
-        Self{cfg_type:CfgNodeType::Root {  },instrs:vec![], text: String::new()}
+        Self{cfg_type:CfgNodeType::Root {  },instrs:vec![], text: String::new(),info: Fields::new(),
+        }
     }
     pub fn new_branch(ast_node:u32, true_head_tail_nodes:Option<(u32,u32)>, false_head_tail_nodes :Option<(u32,u32)>) -> Self{
-        Self{ cfg_type:CfgNodeType::Branch { ast_expr_node:ast_node, op_true_head_tail_nodes: true_head_tail_nodes, op_false_head_tail_nodes: false_head_tail_nodes }, instrs: vec![], text: String::new()}
+        Self{ cfg_type:CfgNodeType::Branch { ast_expr_node:ast_node, op_true_head_tail_nodes: true_head_tail_nodes, op_false_head_tail_nodes: false_head_tail_nodes }, instrs: vec![], text: String::new(),info:Fields::new()}
     }
     pub fn new_for(ast_before_node:u32, ast_mid_node:u32, ast_after_node:u32, exit_node:Option<u32>, body_head_tail_nodes:Option<(u32, u32)>) -> Self{
-        Self{cfg_type:CfgNodeType::ForLoop { ast_before_node, ast_mid_node,ast_after_node, exit_node, op_body_head_tail_nodes: body_head_tail_nodes, },text: String::new(),instrs: vec![]}
+        Self{cfg_type:CfgNodeType::ForLoop { ast_before_node, ast_mid_node,ast_after_node, exit_node, op_body_head_tail_nodes: body_head_tail_nodes, },text: String::new(),instrs: vec![],info:Fields::new()}
     }
     pub fn new_while(ast_expr_node:u32, exit_node:Option<u32>, body_node:Option<(u32,u32)>) -> Self{
-        Self{cfg_type:CfgNodeType::WhileLoop { ast_expr_node,  exit_node, body_node, }, instrs: vec![], text: String::new()}
+        Self{cfg_type:CfgNodeType::WhileLoop { ast_expr_node,  exit_node, body_node, }, instrs: vec![], text: String::new(),info:Fields::new()}
     }
     pub fn new_switch(ast_expr_node:u32) -> Self{
-        Self{cfg_type:CfgNodeType::Switch { ast_expr_node }, instrs: vec![], text: String::new()}
+        Self{cfg_type:CfgNodeType::Switch { ast_expr_node }, instrs: vec![], text: String::new(),info:Fields::new()}
     }
     pub fn new_entry(ast_node:u32,instr:usize) -> Self{
-        Self{cfg_type:CfgNodeType::Entry { ast_node , calls_in_func: vec![]}, instrs: vec![], text: String::new()}
+        Self{cfg_type:CfgNodeType::Entry { ast_node , calls_in_func: vec![]}, instrs: vec![], text: String::new(),info:Fields::new()}
     }
     pub fn new_exit(ast_node:u32) -> Self{
         Self{
             cfg_type:CfgNodeType::Exit { ast_node},
-            text:String::new(),instrs:vec![]
+            text:String::new(),instrs:vec![],info:Fields::new()
         }
     }
 }
@@ -159,10 +164,10 @@ impl Debug for CfgNode{
             CfgNodeType::Entry {  ast_node,  calls_in_func:_} =>
                 write!(f,"{} {} \n{} ","Entry",ast_node,self.text),
             CfgNodeType::Exit {  ast_node, } =>{
-                    write!(f,"{}  \n{}","Exit", self.text)
+                write!(f,"{}  \n{}","Exit", self.text)
             },
             CfgNodeType::Branch {   ast_expr_node,  op_true_head_tail_nodes: true_head_tail_nodes,  op_false_head_tail_nodes: false_head_tail_nodes, } =>{
-                    write!(f,"{} {} \n{}","Branch",ast_expr_node, self.text)
+                write!(f,"{} {} \n{}","Branch",ast_expr_node, self.text)
             },
             CfgNodeType::Gather {  } =>
                 write!(f,"{} ","Gather"),
@@ -171,13 +176,13 @@ impl Debug for CfgNode{
             },
             CfgNodeType::Root {  } => write!(f,"{}","root",),
             CfgNodeType::ForLoop {   ast_before_node, ast_mid_node: _, ast_after_node: _, exit_node, op_body_head_tail_nodes: body_node, } => {
-                    write!(f,"{} {} \n{}","For",ast_before_node, self.text)
+                write!(f,"{} {} \n{}","For",ast_before_node, self.text)
             },
             CfgNodeType::WhileLoop { ast_expr_node,  exit_node, body_node, } => {
-                    write!(f,"{} {} \n{}","While",ast_expr_node, self.text)
+                write!(f,"{} {} \n{}","While",ast_expr_node, self.text)
             },
             CfgNodeType::Switch { ast_expr_node,  } => {
-                    write!(f,"{} {} \n{}","Switch",ast_expr_node, self.text)
+                write!(f,"{} {} \n{}","Switch",ast_expr_node, self.text)
             },
         }
     }
@@ -205,4 +210,9 @@ impl Debug for CfgNode{
 //             CfgNode::Switch { ast_expr_node, text } => write!(f,"{} {} \n{}","Switch",ast_expr_node, text),
 //         }
 //     }
+// }
+
+// pub fn add_cfg_node_on_edge(cfg_graph:CfgGraph, cfg_edge:u32){
+//     let mut cfg_node_struct = node_mut!(at cfg_node in cfg_graph);
+//     cfg_node_struct
 // }

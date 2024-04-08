@@ -6,7 +6,7 @@ use petgraph::{adj::NodeIndex, visit::{self, Dfs, Walker}};
 
 use crate::{direct_children_nodes, node, toolkit::symtab::SymIdx};
 
-use super::{ast_node::{find_dfs_rule_ast, AstTree}, et_node::{self, EtNakedNode, EtNode, EtTree}};
+use super::{ast_node::{find_dfs_rule_ast, AstTree}, et_node::{self, EtNodeType, EtNode, EtTree}};
 
 pub fn dfs_et_tree(et_tree:&mut EtTree, et_node: u32, visited:&mut Vec<u32>, dfs_vec: &mut Vec<u32>) -> () {
 
@@ -23,13 +23,13 @@ pub fn eval_et(et_tree:&mut EtTree , any_et_node:u32 ) ->SymIdx {
     let mut value = SymIdx::new(0,0.to_string());
     // println!("输入的operator_et_node: {:?}", node!(at any_et_node in et_tree).clone().et_naked_node);
     // 每个节点分两种情况,constant 或者 operator
-    value = match node!(at any_et_node in et_tree).clone().et_naked_node{
+    value = match node!(at any_et_node in et_tree).clone().et_node_type{
     // let value = match node!(at Operator_node in et_tree){
-        EtNakedNode::Constant { const_sym_idx, ast_node, text } => {
+        EtNodeType::Constant { const_sym_idx, ast_node, text } => {
             const_sym_idx
         },
         
-        EtNakedNode::Operator { ast_node, text, op } =>{
+        EtNodeType::Operator { ast_node, text, op } =>{
             let sub_nodes=direct_children_nodes!(at any_et_node in et_tree);//里面的u32是节点编号
             let mut sub_nodes_sym_idx: Vec<SymIdx> = Vec::new();
             for sub_node in sub_nodes {

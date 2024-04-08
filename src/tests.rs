@@ -8,7 +8,7 @@ mod tests{
     use petgraph::{graph::NodeIndex, visit::Data};
     
     
-    use crate::{add_field, add_pass, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_children_nodes, direct_parent_node, find, find_nodes, node, node_mut, passes::pass_demo::PassDemo, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, dot::Config, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::{Type, Value}, gen_ast::parse_as_ast_tree, nhwc_instr::{InstrSlab, Instruction, NakedInstruction}, pass_manager::{self, Pass, PassManager}, symbol::Symbol, symtab::SymTab}, Args};
+    use crate::{add_field, add_pass, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_children_nodes, direct_parent_node, find, find_nodes, node, node_mut, passes::pass_demo::PassDemo, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, dot::Config, et_node::{EtNodeType, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::{Type, Value}, gen_ast::parse_as_ast_tree, nhwc_instr::{InstrSlab, Instruction, NakedInstruction}, pass_manager::{self, Pass, PassManager}, symbol::Symbol, symtab::SymTab}, Args};
     use crate::toolkit::field::FieldsOwner;
 
 
@@ -207,7 +207,7 @@ mod tests{
         let mut et_tree = EtTree::new();
         //dfs遍历ast找到第一个 expr stmt
         let expr_stmt_nodes:Vec<u32>=find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expressionStatement).collect();  // 三号节点是一个 function def 
-        et_tree.add_node(EtNode::new(EtNakedNode::new_sep(0)));
+        et_tree.add_node(EtNode::new(EtNodeType::new_sep(0)));
         for expr_stmt_node in expr_stmt_nodes{
             toolkit::gen_et::process_any_stmt(&mut et_tree, &ctx.ast_tree, &ctx.scope_tree, expr_stmt_node, 0,);
         }
@@ -252,7 +252,7 @@ mod tests{
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
         let mut context = ContextBuilder::default().code(code).build().unwrap();
         let mut et_tree: petgraph::prelude::StableGraph<EtNode, ()> = EtTree::new();
-        et_tree.add_node(EtNode::new(EtNakedNode::new_sep(0)));
+        et_tree.add_node(EtNode::new(EtNodeType::new_sep(0)));
         println!("{:?}",eval_et(&mut et_tree,0));
 
         // let id = 1;
