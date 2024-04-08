@@ -1,9 +1,11 @@
-use std::fmt::{self, Display, Write};
+use std::{fmt::{self, Display, Write}, string};
 
 use petgraph::visit::{
     EdgeRef, GraphProp, IntoEdgeReferences, IntoNodeReferences, NodeIndexable, NodeRef,
 };
 
+use crate::toolkit;
+use core::fmt::Debug;
 /// `Dot` implements output to graphviz .dot format for a graph.
 ///
 /// Formatting and options are rather simple, this is mostly intended
@@ -99,6 +101,8 @@ where
 // and/or for a breaking change make this something like an EnumSet: https://docs.rs/enumset
 #[derive(Debug, PartialEq, Eq)]
 pub enum Config {
+    /// graph's title
+    Title(String),
     /// Use indices for node labels.
     NodeIndexLabel,
     /// Use indices for edge labels.
@@ -109,30 +113,33 @@ pub enum Config {
     NodeNoLabel,
     /// Do not print the graph/digraph string.
     GraphContentOnly,
-    // Rect with special label 
+    /// Rect with special label 
     Record,
-    // rounded style 
+    //// rounded style 
     Rounded,
-    // symtab visualization
+    /// symtab visualization
     SymTab,
+    
     #[doc(hidden)]
     _Incomplete(()),
 }
 macro_rules! make_config_struct {
-    ($($variant:ident,)*) => {
+    ($str_variant:ident:$str_variant_type:ty,$($variant:ident,)* ) => {
         #[allow(non_snake_case)]
         #[derive(Default)]
         struct Configs {
-            $($variant: bool,)*
+            $str_variant:$str_variant_type,
+            $($variant:bool,)*
         }
         impl Configs {
             #[inline]
             fn extract(configs: &[Config]) -> Self {
                 let mut conf = Self::default();
                 for c in configs {
-                    match *c {
-                        $(Config::$variant => conf.$variant = true,)*
-                        Config::_Incomplete(()) => {}
+                    match c{
+                        $(Config::$variant=> conf.$variant = true,)*
+                        Config::$str_variant(s) => conf.$str_variant= s.clone(),
+                        Config::_Incomplete(()) => {},
                     }
                 }
                 conf
@@ -141,6 +148,7 @@ macro_rules! make_config_struct {
     }
 }
 make_config_struct!(
+    Title:String,
     NodeIndexLabel,
     EdgeIndexLabel,
     EdgeNoLabel,
@@ -150,12 +158,28 @@ make_config_struct!(
     Rounded,
     SymTab,
 );
-
+#[derive(Clone)]
+pub enum Title{
+    Title(Option<String>),
+}
+impl Debug for Title{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Title::Title(Some(t)) => write!(f, "{:?}", t),
+            Title::Title(None) => write!(f, "None"),
+        }
+    }
+}
+impl Title{
+    pub fn new(s:String)->Self{
+        Title::Title(Some(s))
+    }
+}
 impl<'a, G> Dot<'a, G>
 where
     G: IntoNodeReferences + IntoEdgeReferences + NodeIndexable + GraphProp,
 {
-    fn graph_fmt<NF, EF>(&self, f: &mut fmt::Formatter, node_fmt: NF, edge_fmt: EF) -> fmt::Result
+    fn graph_fmt<NF, EF>(&self, f: &mut fmt::Formatter, node_fmt: NF, edge_fmt: EF ) -> fmt::Result
     where
         NF: Fn(&G::NodeWeight, &mut fmt::Formatter) -> fmt::Result,
         EF: Fn(&G::EdgeWeight, &mut fmt::Formatter) -> fmt::Result,
@@ -165,7 +189,11 @@ where
         if !self.config.GraphContentOnly {
             writeln!(f, "{} {{", TYPE[g.is_directed() as usize])?;
         }
-
+        // 给图添加标题
+        if  !self.config.Title.is_empty(){
+            writeln!(f,"{}label=\"{}\";\n{}fontsize=\"40\";", INDENT, self.config.Title.clone(), INDENT)?;
+            
+        }
         // output all labels
         for node in g.node_references() {
             write!(f, "{}{} [ ", INDENT, g.to_index(node.id()),)?;
