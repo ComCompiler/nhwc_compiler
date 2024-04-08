@@ -1,7 +1,7 @@
 use std::any::Any;
 use petgraph::prelude::NodeIndex;
 
-use crate::{add_edge, antlr_parser::cparser::{RULE_declaration, RULE_expressionStatement}, toolkit::{self, ast_node::find_dfs_rule_ast, context::Context, dot::Config, et_node::{EtNakedNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, field::Field, gen_ast::parse_as_ast_tree, pass_manager::Pass}};
+use crate::{add_edge, antlr_parser::cparser::{RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forDeclaration}, toolkit::{self, ast_node::find_dfs_rule_ast, context::Context, dot::Config, et_node::{EtNakedNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, field::Field, gen_ast::parse_as_ast_tree, pass_manager::Pass}};
 #[derive(Debug)]
 pub struct Ast2EtDebugPass{
     is_gen_png:bool
@@ -22,7 +22,9 @@ impl Pass for Ast2EtDebugPass{
         //dfs遍历ast找到第一个 expr stmt
         let mut nodes: Vec<u32> = vec![];
         nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_declaration));  
-        nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expressionStatement));  
+        // nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expressionStatement));  
+        nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expression));  
+        nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_forDeclaration));  
         let root =0 ;
         et_tree.add_node(EtNakedNode::new_sep(root).to_et_node());
         for node in nodes{

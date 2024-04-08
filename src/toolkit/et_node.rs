@@ -5,7 +5,7 @@ use eval::{to_value, eval};
 use petgraph::stable_graph::{NodeIndex, StableDiGraph};
 use crate::node;
 use super::ast_node::AstTree;
-use super::symbol_table::{  SymIdx};
+use super::symtab::{  SymIdx};
 use super::field::{Fields, FieldsOwner};
 use super::field::Field;
 
@@ -135,14 +135,14 @@ impl Debug for ExprOp{
             Self::Sub => write!(f, "-"),
             Self::Div => write!(f, "/"),
             Self::Assign => write!(f, "="),
-            Self::LogicalOr => write!(f, "//"),
+            Self::LogicalOr => write!(f, "||"),
             Self::LogicalAnd => write!(f, "&&"),
             Self::LogicalNot => write!(f, "!"),
             Self::BitwiseOr => write!(f, "|"),
             Self::BitwiseAnd => write!(f, "&"),
             Self::BitwiseXor => write!(f, "^"),
             Self::BitwiseNot => write!(f, "~"),
-            Self::Eq => write!(f, "="),
+            Self::Eq => write!(f, "=="),
             Self::NEq => write!(f, "!="),
             Self::Less => write!(f, "<"),
             Self::Greater => write!(f, ">"),

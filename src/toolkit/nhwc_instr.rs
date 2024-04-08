@@ -1,8 +1,10 @@
 use std::fmt::{Debug, Formatter};
 use petgraph::{data, visit::Data};
+use slab::Slab;
 use syn::Field;
 
-use super::{field::{Fields, Type, Value}, symbol::Symbol, symbol_table::SymIdx};
+use super::{field::{Fields, Type, Value}, symbol::Symbol, symtab::SymIdx};
+pub type InstrSlab= Slab<Instruction>;
 
 #[derive(Clone)]
 pub enum ArithOp{        
@@ -27,11 +29,30 @@ pub enum ArithOp{
         b : SymIdx ,
         vartype : Type ,
     },
+    Mod{
+        a:SymIdx,
+        b:SymIdx,
+        vartype:Type,
+    },
     Icmp{
         plan : IcmpPlan,
         a : SymIdx ,       //寄存器或者数
         b : SymIdx ,
         vartype : Type ,
+    },
+    LogicAnd{
+        a:SymIdx,
+        b:SymIdx,
+        vartype:Type,
+    },
+    LogicOr{
+        a:SymIdx,
+        b:SymIdx,
+        vartype:Type,
+    },
+    LogicNot{
+        a:SymIdx,
+        vartype:Type,
     },
 }
 #[derive(Clone)]
@@ -70,6 +91,9 @@ pub enum MemOp{
 
 #[derive(Clone)]
 pub enum NakedInstruction{
+    Label{
+        label_symidx:SymIdx,
+    },
     //定义函数
     Def_Func{
         func_symidx:SymIdx,
@@ -113,10 +137,11 @@ pub struct Instruction{
 }
 #[derive(Clone,Debug)]
 pub enum IcmpPlan{
-    eq,ne,              // 等与不等
-    ugt,uge,ult,ule,    //无符号比较
-    sgt,sge,slt,sle,    //有符号比较
+    Eq,Ne,              // 等与不等
+    Ugt,Uge,Ult,Ule,    //无符号比较
+    Sgt,Sge,Slt,Sle,    //有符号比较
 }
+
 #[derive(Clone,Debug)]
 pub struct ComparedPair{
     compared : SymIdx,
@@ -154,6 +179,9 @@ impl NakedInstruction{
     pub fn new_def_func(func_symidx:SymIdx,ret_type:SymIdx,args:Vec<SymIdx>) -> Self{
         Self::Def_Func { func_symidx ,ret_type, args }
     }
+    pub fn new_label(label_symidx:SymIdx) -> Self{
+        Self::Label { label_symidx }
+    }
 
     pub fn new_def_var(vartype:Type,varname:SymIdx,value:SymIdx) -> Self{
         Self::Def_Var { var_symidx: varname, vartype, value }
@@ -175,8 +203,20 @@ impl NakedInstruction{
     pub fn new_sub(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
         Self::Arith {lhs, rhs: ArithOp::Sub {a, b, vartype } }
     }
+    pub fn new_mod(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
+        Self::Arith {lhs, rhs: ArithOp::Mod {a, b, vartype } }
+    }
     pub fn new_icmp(lhs: SymIdx, plan:IcmpPlan,a:SymIdx,b:SymIdx,vartype:Type) -> Self{
         Self::Arith {lhs, rhs: ArithOp::Icmp { plan,a, b, vartype } }
+    }
+    pub fn new_logic_and(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
+        Self::Arith { lhs , rhs: ArithOp::LogicAnd { a, b, vartype} }
+    }
+    pub fn new_logic_or(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
+        Self::Arith { lhs , rhs: ArithOp::LogicOr { a, b, vartype} }
+    }
+    pub fn new_logic_not(lhs: SymIdx, a:SymIdx,vartype:Type) -> Self{
+        Self::Arith { lhs , rhs: ArithOp::LogicNot { a, vartype} }
     }
     // Instruction -> Call -> FuncOp
     pub fn new_func_call(assigned:Option<SymIdx> , func:SymIdx , args:Vec<SymIdx>) ->Self{       //也许可以直接传入一个Func结构体
@@ -207,8 +247,16 @@ impl Debug for ArithOp{
                 write!(f,"Div {:?} {:?}, {:?}",vartype, a,b),
             Self::Sub { a, b, vartype } => 
                 write!(f,"Sub {:?} {:?}, {:?}",vartype, a,b),
+            Self::Mod { a, b, vartype } =>
+                write!{f,"Mod {:?} {:?}, {:?}",vartype,a,b},
             Self::Icmp { plan, a, b, vartype } => 
-                write!(f,"icmp {:?} {:?} {:?}, {:?}",vartype,plan,a,b)
+                write!(f,"icmp {:?} {:?} {:?}, {:?}",vartype,plan,a,b),
+            Self::LogicAnd { a, b, vartype } =>
+                write!(f,"And {:?} {:?}, {:?}",vartype,a,b),
+            Self::LogicOr { a, b, vartype } =>
+                write!(f,"Or {:?} {:?}, {:?}",vartype,a,b),
+            Self::LogicNot { a, vartype } =>
+                write!(f,"icmp eq {:?} {:?}, 0",vartype,a),
         }
     }
 }
@@ -275,6 +323,9 @@ impl Debug for NakedInstruction{ // 以类似llvm ir的格式打印输出
                     Ok(write!(f, "Alloc {:?} %{:?} = {:?}\n", vartype, varname, value)?)
                 }
             }
+            Self::Label { label_symidx } => {
+                write!(f,"label {:?}:\n",label_symidx)
+            },
         }
     }            
 }

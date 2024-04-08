@@ -5,7 +5,7 @@ use petgraph::visit::Data;
 use crate::{find, gen_field_trait_for_structs, node};
 use crate::NodeIndex;
 use super::ast_node::AstTree;
-use super::symbol_table::SymIdx;
+use super::symtab::SymIdx;
 
 pub type Fields =  HashMap<&'static str,Box<dyn Field>>;
 
@@ -27,14 +27,14 @@ pub trait Field : Any + Debug {
 
 #[derive(Debug,Clone)]
 pub enum Value{
-    I32(Option<i32>),F32(Option<f32>),I1(Option<bool>)
+    I32(Option<i32>),F32(Option<f32>),I1(Option<bool>),Void,
 }
 #[derive(Clone)]
 pub enum Type{
-    I32,F32,I1,
+    I32,F32,I1,Void,Label,
     Fn{
-        args_types:Vec<SymIdx>,
-        ret_type:Option<SymIdx>,
+        arg_syms:Vec<SymIdx>,
+        ret_sym:SymIdx,
     }
 }
 impl Clone for Box<dyn Field>{
@@ -53,16 +53,28 @@ impl Value{
     pub fn new_i1(value:bool) -> Self{
         Value::I1(Some(value))
     }
+    pub fn new_void() -> Self{
+        Value::Void
+    }
 }
 impl Type{
-    pub fn new(node:u32,ast_tree:&AstTree) -> Self{
+    pub fn new(ast_node:u32,ast_tree:&AstTree) -> Self{
         // 在asttree中找到node的u32所在节点的类型,返回I32或F32
-        let text = node!(at node in ast_tree).text.as_str();
+        let text = node!(at ast_node in ast_tree).text.as_str();
         match text {
             "int" => Type::I32,
             "float" => Type::F32,
             "bool" => Type::I1,
+            "double" => Type::F32,
             _ => panic!("text中类型错误 找到不支持的类型 {}",text),
+        }
+    }
+
+    pub fn new_from_const(const_str:&String) -> Self{
+        if const_str.contains("."){
+            Type::F32
+        }else{
+            Type::I32
         }
     }
 }
@@ -73,7 +85,9 @@ impl Debug for Type{
             Type::I32 => write!(f,"i32"),
             Type::F32 => write!(f,"f32"),
             Type::I1 => write!(f,"i1"),
-            Type::Fn { args_types, ret_type } => write!(f,"Fn{:?}->{:?}",args_types,ret_type),
+            Type::Fn { arg_syms: args_types, ret_sym: ret_type } => write!(f,"Fn{:?}->{:?}",args_types,ret_type),
+            Type::Void => write!(f,"void"),
+            Type::Label => write!(f,"label"),
         }
     }
 }

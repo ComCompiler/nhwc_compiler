@@ -8,7 +8,7 @@ mod tests{
     use petgraph::{graph::NodeIndex, visit::Data};
     
     
-    use crate::{add_field, add_pass, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_nodes, find, find_nodes, node, node_mut, passes::pass_demo::PassDemo, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, dot::Config, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::{Type, Value}, gen_ast::parse_as_ast_tree, nhwc_instr::NakedInstruction, pass_manager::{self, Pass, PassManager}, symbol::Symbol, symbol_table::SymTab}, Args};
+    use crate::{add_field, add_pass, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_children_nodes, direct_parent_node, find, find_nodes, node, node_mut, passes::pass_demo::PassDemo, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, dot::Config, et_node::{EtNakedNode, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::{Type, Value}, gen_ast::parse_as_ast_tree, nhwc_instr::{InstrSlab, Instruction, NakedInstruction}, pass_manager::{self, Pass, PassManager}, symbol::Symbol, symtab::SymTab}, Args};
     use crate::toolkit::field::FieldsOwner;
 
 
@@ -28,7 +28,7 @@ mod tests{
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
         let node_ids:Vec<u32> = find_dfs_rule_ast(&ast_tree, 0,RULE_functionDefinition ).collect();
-        assert_eq!(node_ids , vec![3,178] ,"找到的 node id 不对");
+        assert_eq!(node_ids , vec![3,179] ,"找到的 node id 不对");
     }
 
     #[test]
@@ -60,7 +60,7 @@ mod tests{
         //dfs遍历ast
         let node =find_dfs_rule_ast(ast_tree, 0, RULE_blockItemList).next().unwrap();  // 三号节点是一个 function def 
         let node_ids:Vec<u32>= find_nodes!(rule RULE_blockItem at node in ast_tree);
-        assert_eq!(node_ids , vec![17,34,152] ,"找到的 node id 不对");
+        assert_eq!(node_ids , vec![17,34,153] ,"找到的 node id 不对");
     }
     #[test]
     fn gen_ast_png(){
@@ -155,8 +155,8 @@ mod tests{
         const VALUE:&str = "VALUE";
         let mut symtab = SymTab::new();
 
-        let x = add_symbol!({Symbol::new_verbose(0, "x".to_string())} to symtab );
-        let y = add_symbol!({Symbol::new_verbose(0, "y".to_string())} with field VALUE:{Value::I32(None)} to symtab);
+        let x = add_symbol!({Symbol::new(0, "x".to_string())} to symtab );
+        let y = add_symbol!({Symbol::new(0, "y".to_string())} with field VALUE:{Value::I32(None)} to symtab);
 
         add_field!(VALUE:{Value::I32(None)} to x in symtab);
         let x_sym =match find!(symbol mut at x in symtab){
@@ -177,7 +177,7 @@ mod tests{
         let b = add_symbol!({"No.2".to_string()} of scope {0} to symtab);
 
         let instr=NakedInstruction::new_add(lhs.clone(), a.clone(), b.clone(),Type::I32);
-        let instr2 = NakedInstruction::new_mul(lhs.clone(), a.clone(), b.clone(),Type::I32);
+        let instr2 = NakedInstruction::new_add(lhs.clone(), a.clone(), b.clone(),Type::I32);
         println!("{:?}",instr);
         println!("{:?}",instr2);
     }
@@ -215,7 +215,7 @@ mod tests{
         
     }
     #[test]
-    fn test_direct_nodes(){
+    fn test_direct_children_nodes(){
         let mut args = Args::parse();
         // 设置 path 为 demo.c
         args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
@@ -226,8 +226,23 @@ mod tests{
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
         let node =find_dfs_rule_ast(ast_tree, 0, RULE_translationUnit).next().unwrap();  
-        let nodes = direct_nodes!(at node in ast_tree);
+        let nodes = direct_children_nodes!(at node in ast_tree);
         assert_eq!(nodes.len() , 2 ,"找到的 nodes 数量 不对 {:?}",nodes);
+    }
+    #[test]
+    fn test_direct_parent_node_macro(){
+        let mut args = Args::parse();
+        // 设置 path 为 demo.c
+        args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
+        let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
+
+        let mut context = ContextBuilder::default().code(code).build().unwrap();
+        parse_as_ast_tree(&mut context);
+        let ast_tree = &mut context.ast_tree;
+        //dfs遍历ast
+        let node =find_dfs_rule_ast(ast_tree, 0, RULE_compoundStatement).next().unwrap();  
+        let parent_node = direct_parent_node!(at node in ast_tree);
+        assert_eq!(3,parent_node,"找到的 parent 不对 {:?}",parent_node);
     }
     #[test]
     fn test_eval_et(){
@@ -257,4 +272,8 @@ mod tests{
         pass_manager.execute_passes();
     }
 
+    #[test]
+    fn test_slab(){
+        let slab =InstrSlab::new();
+    }
 }

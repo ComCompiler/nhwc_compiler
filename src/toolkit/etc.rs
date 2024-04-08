@@ -1,7 +1,8 @@
 use std::{fs::File, process::Command, fmt::Debug, env, io::{Write, Read}};
 
 use petgraph::{stable_graph::StableGraph, EdgeType};
-use crate::toolkit::dot::{Dot,Config};
+use petgraph::stable_graph::NodeIndex;
+use crate::{direct_children_nodes, toolkit::dot::{Config, Dot}};
 
 /// 生成树(可以是任何树)对应的png ，将此png 放在命令行*当前*目录下
 pub fn generate_png_by_graph<N:Debug,E:Debug,Ty :EdgeType>(g:&StableGraph<N,E,Ty>, name :String, graph_config:&[Config]){
@@ -27,4 +28,19 @@ pub fn read_file_content(path:String)->String{
     let mut buf = String::new();
     File::open(path).expect("文件读取异常").read_to_string(&mut buf).expect("读取失败");
     buf
+}
+
+pub fn dfs<N,E,Ty>(graph: &mut StableGraph<N,E,Ty,u32>, start_node: u32, visited: &mut Vec<bool>, dfs_vec: &mut Vec<u32>) where Ty:EdgeType{
+    if visited[start_node as usize] {
+        return;
+    }
+    visited[start_node as usize] = true;
+    dfs_vec.push(start_node);
+
+    let nodes = direct_children_nodes!(at start_node in graph);
+    for node in nodes {
+        if !visited[node as usize] {
+            dfs(graph, node, visited, dfs_vec);
+        }
+    }
 }

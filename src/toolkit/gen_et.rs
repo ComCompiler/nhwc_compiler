@@ -3,11 +3,11 @@ use std:: panic;
 use lazy_static::initialize;
 use petgraph::stable_graph::NodeIndex;
 
-use crate::antlr_parser::clexer::{And, Arrow, Constant, DivAssign, Dot, Equal, Greater, GreaterEqual, Identifier, LeftShift, Less, LessEqual, Minus, MinusAssign, MinusMinus, MulAssign, Not, NotEqual, Plus, PlusAssign, PlusPlus, RightShift, Star, StringLiteral, Tilde};
-use crate::antlr_parser::cparser::{Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_declaration, RULE_declarationSpecifier, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_expressionStatement, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_initializerList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_parameterTypeList, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_typeSpecifier, RULE_unaryExpression, RULE_unaryOperator};
+use crate::antlr_parser::clexer::{And, Arrow, Constant, Div, DivAssign, Dot, Equal, Greater, GreaterEqual, Identifier, LeftShift, Less, LessEqual, Minus, MinusAssign, MinusMinus, Mod, MulAssign, Not, NotEqual, Plus, PlusAssign, PlusPlus, RightShift, Star, StringLiteral, Tilde};
+use crate::antlr_parser::cparser::{Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_declaration, RULE_declarationSpecifier, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_expressionStatement, RULE_forBeforeExpression, RULE_forDeclaration, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_initializerList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_parameterTypeList, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_typeSpecifier, RULE_unaryExpression, RULE_unaryOperator};
 
-use crate::{ add_node, add_node_with_edge, direct_node, direct_nodes, find, find_nodes, node, rule_id, term_id};
-use crate::toolkit::symbol_table::SymIdx;
+use crate::{ add_node, add_node_with_edge, direct_child_node, direct_children_nodes, find, find_nodes, node, rule_id, term_id};
+use crate::toolkit::symtab::SymIdx;
 
 use super::et_node::{self, Def_Or_Use, EtNakedNode, EtNode, EtTree};
 use super::{ast_node::AstTree, scope_node::ScopeTree};
@@ -31,6 +31,27 @@ pub fn process_any_stmt(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&Sco
             process_declaration(et_tree, ast_tree, scope_tree, any_stmt_node, scope_node, sep_node);
             sep_node
         },
+        RULE_forDeclaration=>{
+            let sep_node = add_node!({EtNakedNode::new_sep(any_stmt_node).to_et_node()} to et_tree);
+            process_declaration(et_tree, ast_tree, scope_tree, any_stmt_node, scope_node, sep_node);
+            sep_node
+        },
+        RULE_forBeforeExpression=>{
+            let sep_node = add_node!({EtNakedNode::new_sep(any_stmt_node).to_et_node()} to et_tree);
+            // for before 底下有两种node  forDeclaration or  Expression
+            process_for_before_expr(et_tree, ast_tree, scope_tree, any_stmt_node, scope_node, sep_node);
+            sep_node
+        },
+        RULE_forMidExpression=>{
+            let sep_node = add_node!({EtNakedNode::new_sep(any_stmt_node).to_et_node()} to et_tree);
+            process_expr(et_tree, ast_tree, scope_tree, direct_child_node!(at any_stmt_node in ast_tree), scope_node, sep_node);
+            sep_node
+        },
+        RULE_forAfterExpression=>{
+            let sep_node = add_node!({EtNakedNode::new_sep(any_stmt_node).to_et_node()} to et_tree);
+            process_expr(et_tree, ast_tree, scope_tree, direct_child_node!(at any_stmt_node in ast_tree), scope_node, sep_node);
+            sep_node
+        },
         _=> panic!("试图解析不合法的 ast_node {} with rule_id {:?} 为表达式树(et_tree)",any_stmt_node ,node!(at any_stmt_node in ast_tree).rule_id)
     }   
 }
@@ -48,6 +69,18 @@ fn process_declaration(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&Scop
     );
     for init_decl_node in init_declarator_nodes{
         process_init_declarator(et_tree, ast_tree, scope_tree, init_decl_node, type_ast_node ,scope_node, parent_et_node);
+    }
+}
+fn process_for_before_expr (et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&ScopeTree, for_before_expr:u32, scope_node:u32, parent_et_node: u32){
+    let for_declaration_or_expr_node =direct_child_node!(at for_before_expr in ast_tree);
+    match (rule_id!(at for_declaration_or_expr_node in ast_tree),for_declaration_or_expr_node){
+        (RULE_forDeclaration,for_declaration_node)=>{
+            process_declaration(et_tree, ast_tree, scope_tree, for_declaration_node, scope_node, parent_et_node)   
+        },
+        (RULE_expression,expr_node)=>{
+            process_expr(et_tree, ast_tree, scope_tree, expr_node, scope_node, parent_et_node)   
+        },
+        _ => panic!("在这个 for before expression 底下既没有 forDeclaration 也没有 expression"),
     }
 }
 fn process_init_declarator(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&ScopeTree, init_decl_node:u32, type_ast_node:u32, scope_node:u32, parent_et_node: u32){
@@ -121,7 +154,7 @@ fn process_assign_expr(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&Scop
     match op_assign_operator{
         // 有 term 说明这一层,是 a=3 这样的形式
         Some(assign_operator_node) => {
-            let operator_node = direct_node!(at assign_operator_node in ast_tree);
+            let operator_node = direct_child_node!(at assign_operator_node in ast_tree);
             match (term_id!(at operator_node in ast_tree),operator_node) {
                 // ?暂时只支持五个 assign 类算符
                 (Assign,assign_operator)=>{
@@ -170,7 +203,7 @@ fn process_assign_expr(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree:&Scop
             }
         },
         // 无 term 说明这一层啥也没有，直接进入下一层  吧
-        None => process_cond_expr(et_tree,ast_tree,scope_tree,direct_node!(at assign_expr_node in ast_tree),scope_node,parent_et_node)
+        None => process_cond_expr(et_tree,ast_tree,scope_tree,direct_child_node!(at assign_expr_node in ast_tree),scope_node,parent_et_node)
     }
     
 }
@@ -231,18 +264,18 @@ fn process_inclusive_or_expr(et_tree:&mut EtTree ,ast_tree: &AstTree, scope_tree
     let exclusive_or_nodes = find_nodes!(rule RULE_exclusiveOrExpression at inclusive_or_expr in ast_tree);
     let mut op_last_ep_inclusive_or_node = None;
     if exclusive_or_nodes.len()>1{
-        for (index,&inclusive_or_node) in exclusive_or_nodes.iter().enumerate(){
+        for (index,&exclusive_or_node) in exclusive_or_nodes.iter().enumerate(){
             // 这里要分别处理 第一个节点  中间结点 和 最后一个节点
             if index != exclusive_or_nodes.len()-1{
                 if op_last_ep_inclusive_or_node.is_none(){
-                    op_last_ep_inclusive_or_node = Some(add_node_with_edge!({EtNakedNode::new_op_bitwise_xor( inclusive_or_expr).to_et_node()} from parent_et_node in et_tree ));
+                    op_last_ep_inclusive_or_node = Some(add_node_with_edge!({EtNakedNode::new_op_bitwise_or( inclusive_or_expr).to_et_node()} from parent_et_node in et_tree ));
                 }else{
                     let last_ep_inclusive_or_node = op_last_ep_inclusive_or_node.unwrap();
-                    op_last_ep_inclusive_or_node = Some(add_node_with_edge!({EtNakedNode::new_op_bitwise_xor( inclusive_or_expr).to_et_node()} from last_ep_inclusive_or_node in et_tree ));
+                    op_last_ep_inclusive_or_node = Some(add_node_with_edge!({EtNakedNode::new_op_bitwise_or( inclusive_or_expr).to_et_node()} from last_ep_inclusive_or_node in et_tree ));
                 }
-                process_inclusive_or_expr(et_tree, ast_tree, scope_tree, inclusive_or_node, scope_node, op_last_ep_inclusive_or_node.unwrap());
+                process_exclusive_or_expr(et_tree, ast_tree, scope_tree, exclusive_or_node, scope_node, op_last_ep_inclusive_or_node.unwrap());
             }else {
-                process_inclusive_or_expr(et_tree, ast_tree, scope_tree, inclusive_or_node, scope_node, op_last_ep_inclusive_or_node.unwrap());
+                process_exclusive_or_expr(et_tree, ast_tree, scope_tree, exclusive_or_node, scope_node, op_last_ep_inclusive_or_node.unwrap());
             }
         }
     }else if exclusive_or_nodes.len()==1 {
@@ -282,10 +315,10 @@ fn process_and_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &Scope
         for (index, &equality_node) in equality_expr_nodes.iter().enumerate() {
             if index != equality_expr_nodes.len() - 1 {
                 if op_last_ep_equality_node.is_none() {
-                    op_last_ep_equality_node = Some(add_node_with_edge!({EtNakedNode::new_op_logical_and( and_expr_node).to_et_node()} from parent_et_node in et_tree));
+                    op_last_ep_equality_node = Some(add_node_with_edge!({EtNakedNode::new_op_bitwise_and( and_expr_node).to_et_node()} from parent_et_node in et_tree));
                 } else {
                     let last_ep_equality_node = op_last_ep_equality_node.unwrap();
-                    op_last_ep_equality_node = Some(add_node_with_edge!({EtNakedNode::new_op_logical_and( and_expr_node).to_et_node()} from last_ep_equality_node in et_tree));
+                    op_last_ep_equality_node = Some(add_node_with_edge!({EtNakedNode::new_op_bitwise_and( and_expr_node).to_et_node()} from last_ep_equality_node in et_tree));
                 }
                 process_equality_expr(et_tree, ast_tree, scope_tree, equality_node, scope_node, op_last_ep_equality_node.unwrap());
             } else {
@@ -324,7 +357,7 @@ fn process_equality_expr(et_tree: &mut EtTree, ast_tree:&AstTree, scope_tree: &S
             if index != relational_expr_nodes.len() - 1 {
                 if op_last_ep_relational_node.is_none() {
                     // 第一个 relationalExpression，创建一个新的 equality 操作符节点
-                    op_last_ep_relational_node = Some(add_node_with_edge!({EtNakedNode::new_op_equal( equality_expr_node).to_et_node()} from parent_et_node in et_tree));
+                    op_last_ep_relational_node = Some(add_node_with_edge!({get_expr_node_of_op_node(index)} from parent_et_node in et_tree));
                 } else {
                     // 中间的 relationalExpression，创建一个新的 equality 操作符节点并连接到上一个操作符节点
                     let last_ep_relational_node = op_last_ep_relational_node.unwrap();
@@ -371,7 +404,7 @@ fn process_relational_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree:
         for (index, &shift_node) in shift_expr_nodes.iter().enumerate() {
             if index != shift_expr_nodes.len() - 1 {
                 if op_last_et_shift_op_node.is_none() {
-                    op_last_et_shift_op_node = Some(add_node_with_edge!({EtNakedNode::new_op_less_than( relational_expr_node).to_et_node()} from parent_et_node in et_tree)); // 默认操作符，实际应根据上下文确定
+                    op_last_et_shift_op_node = Some(add_node_with_edge!({get_expr_node_of_op_node(index)} from parent_et_node in et_tree)); // 默认操作符，实际应根据上下文确定
                 } else {
                     let last_ep_shift_node = op_last_et_shift_op_node.unwrap();
                     op_last_et_shift_op_node = Some(add_node_with_edge!({get_expr_node_of_op_node(index)} from last_ep_shift_node in et_tree));
@@ -479,10 +512,10 @@ fn process_multiplicative_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_t
             Star => {
                 EtNakedNode::new_op_mul(multiplicative_expr_node).to_et_node()
             },
-            Divide => {
+            Div => {
                 EtNakedNode::new_op_div( multiplicative_expr_node).to_et_node()
             },
-            Modulo => {
+            Mod => {
                 EtNakedNode::new_op_mod(multiplicative_expr_node).to_et_node()
             },
             _ => panic!("Unexpected operator in multiplicative expression"),
@@ -544,14 +577,14 @@ pub fn process_unary_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: 
             PlusPlus => EtNakedNode::new_op_left_plusplus(unary_expr_node).to_et_node(),
             MinusMinus => EtNakedNode::new_op_left_minusminus(unary_expr_node).to_et_node(),
             Minus => EtNakedNode::new_op_negative( unary_expr_node).to_et_node(),
-            Tilde => EtNakedNode::new_op_bitwise_not( unary_expr_node).to_et_node(),
-            Not => EtNakedNode::new_op_logical_and( unary_expr_node).to_et_node(),
+            Tilde => EtNakedNode::new_op_logical_not( unary_expr_node).to_et_node(),
+            Not => EtNakedNode::new_op_logical_not( unary_expr_node).to_et_node(),
             _ => panic!("Unexpected unary operator"),
         }
     };
     // 检查是否存在一元操作符
     if let Some(unary_operator_node) = find!(rule RULE_unaryOperator at unary_expr_node in ast_tree) {
-        let unary_operator_term_node = direct_node!(at unary_operator_node in ast_tree);
+        let unary_operator_term_node = direct_child_node!(at unary_operator_node in ast_tree);
         // .expect(format!("在 unaryOperator {} 下找不到 unaryOpertor term",unary_operator_node).as_str());
         let op_node = add_node_with_edge!({get_expr_node_of_unary_op_node(unary_operator_term_node)} from parent_et_node in et_tree);
         
