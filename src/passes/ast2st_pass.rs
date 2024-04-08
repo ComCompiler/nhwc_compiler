@@ -22,7 +22,7 @@ impl Pass for Ast2StPass{
             for scope_node in ctx.scope_tree.node_weights_mut(){
                 scope_node.load_ast_node_text(&ctx.ast_tree);
             }
-            generate_png_by_graph(&ctx.scope_tree, "scope_tree".to_string(),&[Config::EdgeNoLabel,Config::Record]);
+            generate_png_by_graph(&ctx.scope_tree, "scope_tree".to_string(),&[Config::EdgeNoLabel,Config::Record,Config::Title("scope_tree".to_string())]);
         }
 
     }

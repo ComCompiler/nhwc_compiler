@@ -18,7 +18,7 @@ impl Pass for Cfg2BbCfgPass{
         // 3.1 生成对应的png
         if self.is_gen_png{
             // let symt = self.op_cfg_graph.unwrap();
-            generate_png_by_graph(&ctx.cfg_graph, "cfg_all_bb".to_string(),&[Config::EdgeNoLabel,Config::Record]);
+            generate_png_by_graph(&ctx.cfg_graph, "cfg_all_bb".to_string(),&[Config::EdgeNoLabel,Config::Record,Config::Title("cfg_all_bb".to_string())]);
         }
     }
     // 返回pass的描述，具体作用
