@@ -43,8 +43,21 @@ macro_rules! find {
             iter.next()
         }
     };
-    (field $field_name:ident:$field_type:ident in $sym:ident) => {
+    (field $field_name:ident:$field_type:ident in $sym:ident $(debug symtab_graph $symtab_graph:ident)?) => {
         {
+            $(match $symtab_graph{
+                Some(symg) => {
+                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({$symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        idx-=1;
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("find_field {}",$field_name))} from idx in symg);
+                    }
+                }
+                None => {},
+            })?
             let op_field = $sym.get_field($field_name);
             match op_field {
                 None=>{
@@ -61,8 +74,21 @@ macro_rules! find {
             }
         }
     };
-    (field mut $field_name:ident:$field_type:ident in $sym:ident) => {
+    (field mut $field_name:ident:$field_type:ident in $sym:ident $(debug symtab_graph $symtab_graph:ident)?) => {
         {
+            $(match $symtab_graph{
+                Some(symg) => {
+                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({$symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        idx-=1;
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("find_field {}",$field_name))} from idx in symg);
+                    }
+                }
+                None => {},
+            })?
             let op_field = $sym.get_field_mut($field_name);
             match op_field {
                 None=>{
@@ -80,8 +106,21 @@ macro_rules! find {
         }
     };
     
-    (field $field_name:ident:$field_type:ident at $symidx:ident in $symtab:ident ) => {
+    (field $field_name:ident:$field_type:ident at $symidx:ident in $symtab:ident $(debug symtab_graph $symtab_graph:ident)?) => {
         {
+            $(match $symtab_graph{
+                Some(symg) => {
+                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({$symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        idx-=1;
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("find_field {}",$field_name))} from idx in symg);
+                    }
+                }
+                None => {},
+            })?
             let field:Option<&Box<dyn Field>> = $symtab
                 .get(&$symidx)
                 .expect(format!("在符号表中找不到{:?}这个符号",$symidx) .as_str())
@@ -97,8 +136,21 @@ macro_rules! find {
             op_field_data
         }
     };
-    (field mut $field_name:ident:$field_type:ident at $symidx:ident in $symtab:ident ) => {
+    (field mut $field_name:ident:$field_type:ident at $symidx:ident in $symtab:ident $(debug symtab_graph $symtab_graph:ident)?) => {
         {
+            $(match $symtab_graph{
+                Some(symg) => {
+                    let mut idx:u32=(symg.node_count()).try_into().unwrap();
+                    // 如果图里没有节点,即idx=0,add_node
+                    if idx==0{
+                        add_node!({$symtab.clone()} to symg);
+                    }else {//如果已经有节点了,在最后一个节点上加点加边
+                        idx-=1;
+                        add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("find_field {}",$field_name))} from idx in symg);
+                    }
+                }
+                None => {},
+            })?
             let field:Option<&mut Box<dyn Field>> = $symtab
                 .get_mut(&$symidx)
                 .expect(format!("在符号表中找不到{:?}这个符号",$symidx) .as_str())

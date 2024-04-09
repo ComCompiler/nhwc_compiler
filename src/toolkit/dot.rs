@@ -101,6 +101,11 @@ where
 // and/or for a breaking change make this something like an EnumSet: https://docs.rs/enumset
 #[derive(Debug, PartialEq, Eq)]
 pub enum Config {
+    /// edge's color  
+    /// 官方帮助文档https://graphviz.org/docs/edges/  
+    /// 暂时只指定颜色(red,blue,yellow...)  
+    /// &[String]中有四种,分别指定find_sym, add_sym, find_field, add_field  
+    EdgeColorConfig(Vec<String>),
     /// graph's title
     Title(String),
     /// Use indices for node labels.
@@ -124,11 +129,14 @@ pub enum Config {
     _Incomplete(()),
 }
 macro_rules! make_config_struct {
-    ($str_variant:ident:$str_variant_type:ty,$($variant:ident,)* ) => {
+    ($edge_color_config:ident:Vec<String>,
+        $title:ident:String,
+        $($variant:ident,)* ) => {
         #[allow(non_snake_case)]
         #[derive(Default)]
         struct Configs {
-            $str_variant:$str_variant_type,
+            $edge_color_config:Vec<String>,
+            $title:String,
             $($variant:bool,)*
         }
         impl Configs {
@@ -138,7 +146,8 @@ macro_rules! make_config_struct {
                 for c in configs {
                     match c{
                         $(Config::$variant=> conf.$variant = true,)*
-                        Config::$str_variant(s) => conf.$str_variant= s.clone(),
+                        Config::$title(s) => conf.$title= s.clone(),
+                        Config::$edge_color_config(s) => conf.$edge_color_config=s.to_vec(),
                         Config::_Incomplete(()) => {},
                     }
                 }
@@ -148,6 +157,7 @@ macro_rules! make_config_struct {
     }
 }
 make_config_struct!(
+    EdgeColorConfig:Vec<String>,
     Title:String,
     NodeIndexLabel,
     EdgeIndexLabel,
@@ -192,8 +202,8 @@ where
         // 给图添加标题
         if  !self.config.Title.is_empty(){
             writeln!(f,"{}label=\"{}\";\n{}fontsize=\"40\";", INDENT, self.config.Title.clone(), INDENT)?;
-            
         }
+
         // output all labels
         for node in g.node_references() {
             write!(f, "{}{} [ ", INDENT, g.to_index(node.id()),)?;
@@ -239,6 +249,10 @@ where
                 }
                 write!(f, "\" ")?;
             }
+            // if !self.config.EdgeColorConfig.is_empty(){
+            //     // 匹配当前边属性:find_sym, add_sym, find_field, add_field 
+            //     write!(f,"color=\"{}\",",self.config.EdgeColorConfig);
+            // }
             writeln!(f, "{}]", (self.get_edge_attributes)(g, edge))?;
         }
 

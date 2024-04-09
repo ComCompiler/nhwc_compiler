@@ -162,27 +162,27 @@ impl Debug for CfgNode{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.cfg_type{
             CfgNodeType::Entry {  ast_node,  calls_in_func:_} =>
-                write!(f,"{} {} \n{} ","Entry",ast_node,self.text),
+                write!(f,"{} {} \n{} \n{}\n{:?}","Entry",ast_node,self.text,"Fields",self.info),
             CfgNodeType::Exit {  ast_node, } =>{
-                write!(f,"{}  \n{}","Exit", self.text)
+                write!(f,"{}  \n{}\n{}\n{:?}","Exit", self.text,"Fields",self.info)
             },
             CfgNodeType::Branch {   ast_expr_node,  op_true_head_tail_nodes: true_head_tail_nodes,  op_false_head_tail_nodes: false_head_tail_nodes, } =>{
-                write!(f,"{} {} \n{}","Branch",ast_expr_node, self.text)
+                write!(f,"{} {} \n{}\n{}\n{:?}","Branch",ast_expr_node, self.text,"Fields",self.info)
             },
             CfgNodeType::Gather {  } =>
-                write!(f,"{} ","Gather"),
+                write!(f,"{} \n{}\n{:?}","Gather","Fields",self.info),
             CfgNodeType::BasicBlock { ast_nodes: _ast_node_idxes,  } =>{
-                write!(f,"{}: \n{}","BasicBlock", self.text)
+                write!(f,"{}: \n{}\n{}\n{:?}","BasicBlock", self.text,"Fields",self.info)
             },
-            CfgNodeType::Root {  } => write!(f,"{}","root",),
+            CfgNodeType::Root {  } => write!(f,"{}\n{}\n{:?}","root","Fields",self.info),
             CfgNodeType::ForLoop {   ast_before_node, ast_mid_node: _, ast_after_node: _, exit_node, op_body_head_tail_nodes: body_node, } => {
-                write!(f,"{} {} \n{}","For",ast_before_node, self.text)
+                write!(f,"{} {} \n{}\n{}\n{:?}","For",ast_before_node, self.text,"Fields",self.info)
             },
             CfgNodeType::WhileLoop { ast_expr_node,  exit_node, body_node, } => {
-                write!(f,"{} {} \n{}","While",ast_expr_node, self.text)
+                write!(f,"{} {} \n{}\n{}\n{:?}","While",ast_expr_node, self.text,"Fields",self.info)
             },
             CfgNodeType::Switch { ast_expr_node,  } => {
-                write!(f,"{} {} \n{}","Switch",ast_expr_node, self.text)
+                write!(f,"{} {} \n{}\n{}\n{:?}","Switch",ast_expr_node, self.text,"Fields",self.info)
             },
         }
     }

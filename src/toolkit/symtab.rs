@@ -43,12 +43,7 @@ impl SymIdx{
     pub fn new_verbose(scope_node:u32, symbol_name:String, index_ssa:Option<u32>)->Self{
         SymIdx{ scope_node,symbol_name, index_ssa} 
     }
-    pub fn get_type<'a>(&'a mut self,symtab:&'a SymTab) -> Option<&'a Type>{
-        find!(field TYPE:Type at self in symtab)
-    }
-    pub fn get_type_mut<'a>(&'a mut self,symtab:&'a mut SymTab) -> Option<&mut Type>{
-        find!(field mut TYPE:Type at self in symtab)
-    }
+
     // pub fn get_use_counter(&mut self,symtab:&mut SymTab) -> Option<&mut UseCounter>{
     //     find!(field mut USE_COUNTER:UseCounter at self in symtab)
     //     paste::item
