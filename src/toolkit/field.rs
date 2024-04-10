@@ -98,12 +98,14 @@ impl Type{
             (Type::I32, Type::F32) => Type::F32,
             (Type::F32, Type::I32) => Type::F32,
             (Type::F32, Type::F32) => Type::F32,
-            (Type::I32, Type::I1) => todo!(),
-            (Type::F32, Type::I1) => todo!(),
-            (Type::I1, Type::I32) => todo!(),
-            (Type::I1, Type::F32) => todo!(),
+            (Type::I32, Type::I1) => Type::I32,
+            (Type::F32, Type::I1) => Type::F32,
+            (Type::I1, Type::I32) => Type::I32,
+            (Type::I1, Type::F32) => Type::F32,
             (Type::I1, Type::I1) => Type::I1,
-            _ => todo!(),
+            _ => {
+                panic!("{:?}和{:?}不能进行兼容",ty1,ty2);
+            }
         }
     }
 }

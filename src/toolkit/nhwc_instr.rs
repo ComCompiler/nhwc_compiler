@@ -34,8 +34,15 @@ pub enum ArithOp{
         b:SymIdx,
         vartype:Type,
     },
+    //整数比较
     Icmp{
         plan : IcmpPlan,
+        a : SymIdx ,       //寄存器或者数
+        b : SymIdx ,
+        vartype : Type ,
+    },
+    Ucmp{
+        plan:UcmpPlan,
         a : SymIdx ,       //寄存器或者数
         b : SymIdx ,
         vartype : Type ,
@@ -129,6 +136,10 @@ pub enum NakedInstruction{
         lhs : SymIdx,
         rhs : PhiOp,
     },
+    TranType{
+        lhs:SymIdx,
+        op:Trans,
+    }
 }
 #[derive(Clone)]
 pub struct Instruction{
@@ -140,6 +151,11 @@ pub enum IcmpPlan{
     Eq,Ne,              // 等与不等
     Ugt,Uge,Ult,Ule,    //无符号比较
     Sgt,Sge,Slt,Sle,    //有符号比较
+}
+#[derive(Clone,Debug)]
+pub enum UcmpPlan{
+    Oeq,One,              // 等与不等
+    Ogt,Oge,Olt,Ole,    //有序比较
 }
 
 #[derive(Clone,Debug)]
@@ -166,8 +182,39 @@ pub enum JumpOp{
         cfg_dst_label : u32 , // 这是 cfg blcok 的 索引
     },
 }
-
-
+#[derive(Clone)]
+pub enum Trans{
+    Fptosi{
+        float_symidx:SymIdx,
+    },//浮点转整数
+    Sitofp{
+        int_symidx:SymIdx,
+    },//整数转浮点数
+    Zext{
+        bool_symidx:SymIdx,
+    },//I1转整数
+    Bitcast{
+        rptr_symidx:SymIdx,
+        rptr_type:Type,
+        lptr_type:Type,
+    },//指针类型转指针类型，比如I32指针转F32指针
+    //其他类型转I1通过变量和0进行比较得到
+    //I1转f32分两步，先转I32，后转F32
+}
+impl Debug for Trans{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Sitofp { int_symidx } =>
+                write!(f,"sitofp i32 {:?} to f32",int_symidx),
+            Self::Fptosi { float_symidx } =>
+                write!(f,"fptosi f32 {:?} to i32",float_symidx),
+            Self::Zext { bool_symidx } =>
+                write!(f,"zext i1 {:?} to i32",bool_symidx),
+            Self::Bitcast {lptr_type, rptr_symidx, rptr_type } =>
+                write!(f,"bitcast {:?} {:?} to {:?}",rptr_type,rptr_symidx,lptr_type),
+        }
+    }
+}
 // 以下是构造函数:
 impl NakedInstruction{
     pub fn to_instr(self)->Instruction{
@@ -209,6 +256,9 @@ impl NakedInstruction{
     pub fn new_icmp(lhs: SymIdx, plan:IcmpPlan,a:SymIdx,b:SymIdx,vartype:Type) -> Self{
         Self::Arith {lhs, rhs: ArithOp::Icmp { plan,a, b, vartype } }
     }
+    pub fn new_ucmp(lhs: SymIdx, plan:UcmpPlan,a:SymIdx,b:SymIdx,vartype:Type) -> Self{
+        Self::Arith {lhs, rhs: ArithOp::Ucmp { plan,a, b, vartype } }
+    }
     pub fn new_logic_and(lhs: SymIdx, a:SymIdx,b:SymIdx,vartype:Type) -> Self{
         Self::Arith { lhs , rhs: ArithOp::LogicAnd { a, b, vartype} }
     }
@@ -235,6 +285,19 @@ impl NakedInstruction{
     pub fn new_jump(cfg_dst_label : u32) ->Self{
         Self::Jump { op: JumpOp::DirectJump {  cfg_dst_label } }
     }
+    //自动类型转换
+    pub fn new_int2float(int_symidx:SymIdx,float_symidx:SymIdx) ->Self{
+        Self::TranType { lhs: float_symidx, op: Trans::Sitofp { int_symidx } }
+    }
+    pub fn new_float2int(float_symidx:SymIdx,int_symidx:SymIdx)->Self{
+        Self::TranType { lhs: int_symidx, op: Trans::Fptosi { float_symidx} }   
+    }
+    pub fn new_bool2int(bool_symidx:SymIdx,int_symidx:SymIdx)->Self{
+        Self::TranType { lhs: int_symidx, op: Trans::Zext { bool_symidx}}
+    }
+    pub fn new_ptr2ptr(lptr:SymIdx,lptr_type:Type,rptr:SymIdx,rptr_type:Type)->Self{
+        Self::TranType { lhs: lptr, op: Trans::Bitcast { rptr_symidx:rptr,rptr_type,lptr_type }}
+    }
 }
 impl Debug for ArithOp{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -251,6 +314,8 @@ impl Debug for ArithOp{
                 write!{f,"Mod {:?} {:?}, {:?}",vartype,a,b},
             Self::Icmp { plan, a, b, vartype } => 
                 write!(f,"icmp {:?} {:?} {:?}, {:?}",vartype,plan,a,b),
+            Self::Ucmp { plan, a, b, vartype } =>
+                write!(f,"ucmp {:?} {:?} {:?}, {:?}",vartype,plan,a,b),
             Self::LogicAnd { a, b, vartype } =>
                 write!(f,"And {:?} {:?}, {:?}",vartype,a,b),
             Self::LogicOr { a, b, vartype } =>
@@ -326,6 +391,8 @@ impl Debug for NakedInstruction{ // 以类似llvm ir的格式打印输出
             Self::Label { label_symidx } => {
                 write!(f,"label {:?}:\n",label_symidx)
             },
+            Self::TranType {lhs, op   } =>
+                write!(f,"{:?} = {:?}\n",lhs,op)
         }
     }            
 }
