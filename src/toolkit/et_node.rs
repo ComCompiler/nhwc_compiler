@@ -1,13 +1,12 @@
 use std::fmt::Debug;
 use std::{mem, u32};
 
-use eval::{to_value, eval};
+use eval::eval;
 use petgraph::stable_graph::{NodeIndex, StableDiGraph};
 use crate::node;
 use super::ast_node::AstTree;
-use super::symtab::{  SymIdx};
-use super::field::{Fields, FieldsOwner};
-use super::field::Field;
+use super::symtab::SymIdx;
+use super::field::Fields;
 
 pub type EtTree = StableDiGraph<EtNode,(),u32>;
 
@@ -308,26 +307,26 @@ impl EtNodeType{
         EtNodeType::Operator { op: ExprOp::RMinusMinus ,ast_node,text:String::new()}
     }
     fn load_et_node_text(&mut self) {
-        let et_node = match self {
-            EtNodeType::Operator { op, ast_node, text } => ast_node,
-            EtNodeType::Constant { const_sym_idx, ast_node, text } => ast_node,
-            EtNodeType::Symbol { sym_idx, ast_node, text ,def_or_use} => ast_node,
+        let _et_node = match self {
+            EtNodeType::Operator { op:_, ast_node, text:_ } => ast_node,
+            EtNodeType::Constant { const_sym_idx:_, ast_node, text:_ } => ast_node,
+            EtNodeType::Symbol { sym_idx:_, ast_node, text:_ ,def_or_use:_} => ast_node,
             // EtNakedNode::ArraySym { sym_idx, ast_node, text ,def_or_use} => ast_node,
-            EtNodeType::Separator { ast_node, text } => ast_node,
+            EtNodeType::Separator { ast_node, text:_ } => ast_node,
         };
         let new_str=match self {
-            EtNodeType::Operator { op, ast_node, text }=> text.clone(),
-            EtNodeType::Constant { const_sym_idx, ast_node, text } => text.clone(),
-            EtNodeType::Symbol { sym_idx, ast_node, text,def_or_use } => text.clone(),
+            EtNodeType::Operator { op:_, ast_node:_, text }=> text.clone(),
+            EtNodeType::Constant { const_sym_idx:_, ast_node:_, text } => text.clone(),
+            EtNodeType::Symbol { sym_idx:_, ast_node:_, text,def_or_use:_ } => text.clone(),
             // EtNakedNode::ArraySym { sym_idx, ast_node, text,def_or_use } => text.clone(),
-            EtNodeType::Separator { ast_node, text } => text.clone(),
+            EtNodeType::Separator { ast_node:_, text } => text.clone(),
         };
         let _  = mem::replace(match self {
-                EtNodeType::Operator { op, ast_node, text } => text,
-                EtNodeType::Constant { const_sym_idx, ast_node, text } => text,
-                EtNodeType::Symbol { sym_idx, ast_node, text,def_or_use } => text,
+                EtNodeType::Operator { op:_, ast_node:_, text } => text,
+                EtNodeType::Constant { const_sym_idx:_, ast_node:_, text } => text,
+                EtNodeType::Symbol { sym_idx:_, ast_node:_, text,def_or_use:_ } => text,
                 // EtNakedNode::ArraySym { sym_idx, ast_node, text,def_or_use } => text,
-                EtNodeType::Separator { ast_node, text } => text,
+                EtNodeType::Separator { ast_node:_, text } => text,
             },
             new_str);
         }
@@ -335,7 +334,7 @@ impl EtNodeType{
         if let EtNodeType::Separator { ast_node, text } = self {
             let ast_node=*ast_node;
             let _=mem::replace(text,node!(at ast_node in ast_tree).text.clone());
-        }else if let EtNodeType::Symbol { sym_idx, ast_node, text, def_or_use } = self {
+        }else if let EtNodeType::Symbol { sym_idx:_, ast_node:_, text, def_or_use } = self {
             if let Def_Or_Use::Def { type_ast_node } = def_or_use{
                 let type_ast_node=*type_ast_node;
                 let _=mem::replace(text,node!(at type_ast_node in ast_tree).text.clone());
@@ -346,15 +345,15 @@ impl EtNodeType{
 impl Debug for EtNodeType{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            EtNodeType::Operator { op, ast_node, text } =>
+            EtNodeType::Operator { op, ast_node:_, text:_ } =>
                 write!(f,"{:?}",op),
-            EtNodeType::Constant { const_sym_idx, ast_node, text } => 
+            EtNodeType::Constant { const_sym_idx, ast_node:_, text:_ } => 
                 write!(f,"{}",const_sym_idx.symbol_name),
-            EtNodeType::Symbol { sym_idx, ast_node, text, def_or_use } =>
+            EtNodeType::Symbol { sym_idx, ast_node:_, text, def_or_use } =>
                 write!(f,"{:?} {} {}",def_or_use,text,sym_idx.symbol_name),
             // EtNakedNode::ArraySym { sym_idx, ast_node, text, def_or_use } =>
                 // write!(f,"{:?} {} {}",def_or_use,text,sym_idx.symbol_name),
-            EtNodeType::Separator { ast_node, text } =>{
+            EtNodeType::Separator { ast_node:_, text } =>{
                 write!(f,"{}",text)
             }
         }
@@ -364,7 +363,7 @@ impl Debug for EtNodeType{
 impl Debug for Def_Or_Use{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Def_Or_Use::Def { type_ast_node } => write!(f,"def"),
+            Def_Or_Use::Def { type_ast_node:_ } => write!(f,"def"),
             Def_Or_Use::Use => write!(f,"use"),
         }
     }

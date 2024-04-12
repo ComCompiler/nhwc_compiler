@@ -1,5 +1,4 @@
-use std::any::Any;
-use crate::toolkit::{context::Context, pass_manager::Pass, field::Field};
+use crate::toolkit::{context::Context, pass_manager::Pass};
 /// 定义额外的信息，这样我们就可以把 add_field 宏加入到符号表或者任何实现了 Fields trait 的地方 
 /// 任何一个Pass 都有一个pass_run函数 来进行这个pass 相关的工作，比如说对于 SSAPass 我们要对 一个BasicBlock 中的ExprTree做出转换。
 /// 因为实际上 一个 ExprTree 最终会对应一个BasicBlock。

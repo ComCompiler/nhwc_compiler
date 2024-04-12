@@ -38,13 +38,13 @@ impl Debug for CfgEdge{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self{
             CfgEdge::Conditioned {  ast_node: ast_node_idx, text } =>{
-                let ast_node = *ast_node_idx;
+                let _ast_node = *ast_node_idx;
                 write!(f,"{} \n{}",ast_node_idx, text)},
             CfgEdge::Else {} =>
                 write!(f,"Else"),
             CfgEdge::Direct {} =>
                 write!(f,""),
-            CfgEdge::After { ast_node, text } => write!(f,"{}",text),
+            CfgEdge::After { ast_node:_, text } => write!(f,"{}",text),
         }
     }
 }

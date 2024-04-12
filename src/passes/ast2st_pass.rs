@@ -1,11 +1,10 @@
-use std::any::Any;
 use crate::toolkit::{context::Context, dot::Config, etc::generate_png_by_graph, gen_scope::parse_ast_to_scope, pass_manager::Pass};
 #[derive(Debug)]
 pub struct Ast2StPass{
     is_gen_png:bool
 }
 impl Ast2StPass{
-    pub fn new(is_gen_png:bool)->Self{
+    pub fn new(_is_gen_png:bool)->Self{
         Ast2StPass{
             is_gen_png:true ,
         }

@@ -1,20 +1,16 @@
-use petgraph::graph::node_index;
 use petgraph::stable_graph::{EdgeIndex, NodeIndex};
 use petgraph::visit::EdgeRef;
 use crate::toolkit::ast_node::AstTree;
 use crate::toolkit::cfg_edge::CfgEdge;
-use crate::toolkit::nhwc_instr::NakedInstruction;
-use crate::{add_edge, add_node, add_node_with_edge, direct_child_node, direct_children_nodes, find_nodes_by_dfs, rule_id, RULE_compoundStatement, RULE_functionDefinition};
+use crate::{add_edge, add_node, direct_child_node, find_nodes_by_dfs, rule_id, RULE_compoundStatement, RULE_functionDefinition};
 use crate::antlr_parser::cparser::{RULE_blockItem, RULE_blockItemList, RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
 };
 use crate::{find,find_nodes,node};
 
 use super::cfg_node::{CfgGraph, CfgNode, CfgNodeType};
-use super::context::Context;
 
-use super::etc::dfs;
 use super::scope_node::ScopeTree;
-use super::symtab::{SymIdx, SymTab};
+use super::symtab::SymTab;
 /// 这个文件中没有在命名中提到是哪一中图中的节点，那么统一是 scope_node 
 
 pub fn process_while(cfg_graph:&mut CfgGraph,ast_tree:&AstTree,symtab:&mut SymTab,current_while_node:u32) -> Option<(u32,u32)>{

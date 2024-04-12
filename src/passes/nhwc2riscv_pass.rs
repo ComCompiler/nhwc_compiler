@@ -1,5 +1,4 @@
-use std::any::Any;
-use crate::toolkit::{context::Context, field::Field, nhwc_instr::NakedInstruction, pass_manager::Pass};
+use crate::toolkit::{context::Context, pass_manager::Pass};
 #[derive(Debug)]
 pub struct Nhwc2RiscvDebugPass{
     is_gen_png : bool

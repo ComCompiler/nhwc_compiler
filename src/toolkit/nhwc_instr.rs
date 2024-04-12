@@ -321,7 +321,7 @@ impl Debug for ArithOp{
             Self::LogicOr { a, b, vartype } =>
                 write!(f,"Or {:?} {:?}, {:?}",vartype,a,b),
             Self::LogicNot { a, vartype } =>
-                write!(f,"icmp eq {:?} {:?}, 0",vartype,a),
+                write!(f,"xor {:?} {:?}, true",vartype,a),
         }
     }
 }

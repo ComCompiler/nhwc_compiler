@@ -4,7 +4,6 @@ use petgraph::visit::{
     EdgeRef, GraphProp, IntoEdgeReferences, IntoNodeReferences, NodeIndexable, NodeRef,
 };
 
-use crate::toolkit;
 use core::fmt::Debug;
 /// `Dot` implements output to graphviz .dot format for a graph.
 ///
