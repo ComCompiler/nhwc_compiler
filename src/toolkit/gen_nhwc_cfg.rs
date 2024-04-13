@@ -41,9 +41,9 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab
                                     // 后序遍历 左边
                                     let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[0], decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
                                     let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
+                                    //如果结果和变量类型不同，添加自动转化instr
                                     let new_value_symidx = force_trans_type(cfg_graph, symtab, &var_type, &value_type, &value_symidx, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
                                     let assign_instr = NakedInstruction::new_assign(var_symidx, new_value_symidx).to_instr();
-
                                     push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
                                 },
                                 crate::toolkit::et_node::ExprOp::LPlusPlus => {
@@ -75,6 +75,7 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab
                                     }
                                 },
                                 crate::toolkit::et_node::ExprOp::MulAssign => {
+                                    //将*=取下面的两个子树，视作算术运算符进行自动类型转换
                                     let (mul_tmp_symidx,var_symidx,value_symidx,mul_tmp_type,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
                                     let mul_instr = NakedInstruction::new_mul(mul_tmp_symidx.clone(), var_symidx.clone(), value_symidx.clone(),mul_tmp_type.clone()).to_instr();
                                     push_instr!(mul_instr to cfg_bb in cfg_graph slab instr_slab);
@@ -86,6 +87,7 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab
                                     push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
                                 },
                                 crate::toolkit::et_node::ExprOp::DivAssign => {
+                                    //将/=取下面的两个子树，视作算术运算符进行自动类型转换
                                     let (div_tmp_symidx,var_symidx,value_symidx,div_tmp_type,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
                                     let div_instr = NakedInstruction::new_div(div_tmp_symidx.clone(), var_symidx.clone(), value_symidx.clone(),div_tmp_type.clone()).to_instr();
                                     push_instr!(div_instr to cfg_bb in cfg_graph slab instr_slab);
@@ -97,6 +99,7 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab
                                     push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
                                 },
                                 crate::toolkit::et_node::ExprOp::PlusAssign => {
+                                    //将+=取下面的两个子树，视作算术运算符进行自动类型转换
                                     let (add_tmp_symidx,var_symidx,value_symidx,add_tmp_type,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
                                     let add_instr = NakedInstruction::new_add(add_tmp_symidx.clone(), var_symidx.clone(), value_symidx.clone(),add_tmp_type.clone()).to_instr();
                                     push_instr!(add_instr to cfg_bb in cfg_graph slab instr_slab);
@@ -108,6 +111,7 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab
                                     push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
                                 },
                                 crate::toolkit::et_node::ExprOp::MinusAssign => {
+                                    //将-=取下面的两个子树，视作算术运算符进行自动类型转换
                                     let (sub_tmp_symidx,var_symidx,value_symidx,sub_tmp_type,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
                                     let sub_instr = NakedInstruction::new_sub(sub_tmp_symidx.clone(), var_symidx.clone(), value_symidx.clone(),sub_tmp_type.clone()).to_instr();
                                     push_instr!(sub_instr to cfg_bb in cfg_graph slab instr_slab);
@@ -119,7 +123,6 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab
                                     push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
                                 },
                                 _ => {
-                                    // let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
                                     panic!("statment初始运算符应有赋值性质,ast_node {} 符号出现错误",*ast_node);
                                 }
                             }
@@ -297,10 +300,11 @@ fn process_symbol(ast_tree:&AstTree,scope_tree:&ScopeTree,symtab:&mut SymTab,def
         },
     }
 }
-///具有赋值性质的会将value的类型强制转换为var的类型
+///具有赋值性质的会将value的类型强制转换为var的类型，返回转换后的symidx
 fn force_trans_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,to_trans_type:&Type,transed_type:&Type,transed_symidx:&SymIdx,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>)->SymIdx{
     match(transed_type,to_trans_type){
         (Type::I32,Type::F32)=>{ 
+            //创建f32类型的临时变量
             let ftmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::F32} to symtab debug symtab_graph);
             *counter += 1;
             let i2f_instr = NakedInstruction::new_int2float(transed_symidx.clone(), ftmp_type_symidx.clone()).to_instr();
@@ -308,9 +312,11 @@ fn force_trans_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,to_trans_type:&Ty
             return ftmp_type_symidx
         },
         (Type::I32, Type::I32)|(Type::F32, Type::F32)|(Type::I1, Type::I1) => {
+            //相同类型不需要转换
             return transed_symidx.clone()
         },
         (Type::I32, Type::I1) => {
+            //创建i1类型的变临时量
             let btmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
             *counter += 1;
             let izero_symidx = process_constant(symtab, &"0".to_string(), symtab_graph);
@@ -319,6 +325,7 @@ fn force_trans_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,to_trans_type:&Ty
             return btmp_type_symidx
         },
         (Type::F32, Type::I32) => {
+            //创建i32类型的临时变量
             let itmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I32} to symtab debug symtab_graph);
             *counter += 1;
             let f2i_instr = NakedInstruction::new_float2int(transed_symidx.clone(), itmp_type_symidx.clone()).to_instr();
@@ -326,6 +333,7 @@ fn force_trans_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,to_trans_type:&Ty
             return itmp_type_symidx
         },
         (Type::F32, Type::I1) => {
+            //创建i1类型临时变量
             let btmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
             *counter += 1;
             let fzero_symidx = process_constant(symtab, &"0.0".to_string(), symtab_graph);
@@ -334,6 +342,7 @@ fn force_trans_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,to_trans_type:&Ty
             return btmp_type_symidx
         },
         (Type::I1, Type::I32) => {
+            //创建i32类型临时变量
             let itmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I32} to symtab debug symtab_graph);
             *counter += 1;
             let b2i_instr = NakedInstruction::new_bool2int(transed_symidx.clone(), itmp_type_symidx.clone()).to_instr();
@@ -341,12 +350,15 @@ fn force_trans_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,to_trans_type:&Ty
             return itmp_type_symidx
         },
         (Type::I1,Type::F32)=>{
+            //i1转f32分两步，第一步i1转i32，第二步i32转f32
+            //第一步
             let itmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I32} to symtab debug symtab_graph);
-            *counter += 1;
-            let ftmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::F32} to symtab debug symtab_graph);
             *counter += 1;
             let b2i_instr = NakedInstruction::new_bool2int(transed_symidx.clone(), itmp_type_symidx.clone()).to_instr();
             push_instr!(b2i_instr to cfg_bb in cfg_graph slab instr_slab);
+            //第二步
+            let ftmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::F32} to symtab debug symtab_graph);
+            *counter += 1;
             let i2f_instr = NakedInstruction::new_int2float(itmp_type_symidx.clone(), ftmp_type_symidx.clone()).to_instr();
             push_instr!(i2f_instr to cfg_bb in cfg_graph slab instr_slab);
             return ftmp_type_symidx
@@ -356,63 +368,70 @@ fn force_trans_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,to_trans_type:&Ty
         }
     }
 }
-
+///算数运算符自动类型转换，返回转换后两个操作符的symidx
 fn autotrans_arith_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,l_type:&Type,l_symidx:&SymIdx,r_type:&Type,r_symidx:&SymIdx,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>)->(SymIdx,SymIdx){
     //adapt函数会去除掉不能进行运算的类型情况
     match(l_type.clone(),r_type.clone()){
         (Type::I32,Type::F32) =>{
-            let tmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::F32} to symtab debug symtab_graph);
+            //i32自动转换为f32
+            let ftmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::F32} to symtab debug symtab_graph);
             *counter += 1;
-            let i2f_instr = NakedInstruction::new_int2float(l_symidx.clone(), tmp_type_symidx.clone()).to_instr() ;
+            let i2f_instr = NakedInstruction::new_int2float(l_symidx.clone(), ftmp_type_symidx.clone()).to_instr() ;
             push_instr!(i2f_instr to cfg_bb in cfg_graph slab instr_slab);
-            return (tmp_type_symidx,r_symidx.clone())
+            return (ftmp_type_symidx,r_symidx.clone())
         },
         (Type::F32,Type::I32) =>{
-            let tmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::F32} to symtab debug symtab_graph);
+            //i32转f32
+            let ftmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::F32} to symtab debug symtab_graph);
             *counter += 1;
-            let i2f_instr = NakedInstruction::new_int2float(r_symidx.clone(), tmp_type_symidx.clone()).to_instr() ;
+            let i2f_instr = NakedInstruction::new_int2float(r_symidx.clone(), ftmp_type_symidx.clone()).to_instr() ;
             push_instr!(i2f_instr to cfg_bb in cfg_graph slab instr_slab);
-            return (l_symidx.clone(),tmp_type_symidx)
+            return (l_symidx.clone(),ftmp_type_symidx)
         },
         (Type::I1,Type::I32) =>{
-            let tmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I32} to symtab debug symtab_graph);
+            //i1转i32
+            let itmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I32} to symtab debug symtab_graph);
             *counter += 1;
-            let b2i_instr = NakedInstruction::new_bool2int(l_symidx.clone(), tmp_type_symidx.clone()).to_instr() ;
+            let b2i_instr = NakedInstruction::new_bool2int(l_symidx.clone(), itmp_type_symidx.clone()).to_instr() ;
             push_instr!(b2i_instr to cfg_bb in cfg_graph slab instr_slab);
-            return (tmp_type_symidx,r_symidx.clone())
+            return (itmp_type_symidx,r_symidx.clone())
         },
         (Type::I32,Type::I1)=>{
-            let tmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I32} to symtab debug symtab_graph);
+            //i1转i32
+            let itmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I32} to symtab debug symtab_graph);
             *counter += 1;
-            let b2i_instr = NakedInstruction::new_bool2int(r_symidx.clone(), tmp_type_symidx.clone()).to_instr() ;
+            let b2i_instr = NakedInstruction::new_bool2int(r_symidx.clone(), itmp_type_symidx.clone()).to_instr() ;
             push_instr!(b2i_instr to cfg_bb in cfg_graph slab instr_slab);
-            return (l_symidx.clone(),tmp_type_symidx)
+            return (l_symidx.clone(),itmp_type_symidx)
         },
         (Type::I1,Type::F32)=>{
-            let tmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I32} to symtab debug symtab_graph);
+            //先i1转i32
+            let itmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I32} to symtab debug symtab_graph);
             *counter += 1;
-            let b2i_instr = NakedInstruction::new_bool2int(l_symidx.clone(), tmp_type_symidx.clone()).to_instr() ;
+            let b2i_instr = NakedInstruction::new_bool2int(l_symidx.clone(), itmp_type_symidx.clone()).to_instr() ;
             push_instr!(b2i_instr to cfg_bb in cfg_graph slab instr_slab);
-
-            let tmp2_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::F32} to symtab debug symtab_graph);
+            //再i32转f32
+            let ftmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::F32} to symtab debug symtab_graph);
             *counter += 1;
-            let i2f_instr = NakedInstruction::new_int2float(tmp_type_symidx,tmp2_type_symidx.clone() ).to_instr();
+            let i2f_instr = NakedInstruction::new_int2float(itmp_type_symidx,ftmp_type_symidx.clone() ).to_instr();
             push_instr!(i2f_instr to cfg_bb in cfg_graph slab instr_slab);
-            return (tmp2_type_symidx,r_symidx.clone())
+            return (ftmp_type_symidx,r_symidx.clone())
         },
         (Type::F32,Type::I1)=>{
-            let tmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I32} to symtab debug symtab_graph);
+            //i1转i32
+            let itmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I32} to symtab debug symtab_graph);
             *counter += 1;
-            let b2i_instr = NakedInstruction::new_bool2int(r_symidx.clone(), tmp_type_symidx.clone()).to_instr() ;
+            let b2i_instr = NakedInstruction::new_bool2int(r_symidx.clone(), itmp_type_symidx.clone()).to_instr() ;
             push_instr!(b2i_instr to cfg_bb in cfg_graph slab instr_slab);
-
-            let tmp2_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::F32} to symtab debug symtab_graph);
+            //i32转f32
+            let ftmp2_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::F32} to symtab debug symtab_graph);
             *counter += 1;
-            let i2f_instr = NakedInstruction::new_int2float(tmp_type_symidx,tmp2_type_symidx.clone() ).to_instr();
+            let i2f_instr = NakedInstruction::new_int2float(itmp_type_symidx,ftmp2_type_symidx.clone() ).to_instr();
             push_instr!(i2f_instr to cfg_bb in cfg_graph slab instr_slab);
-            return (l_symidx.clone(),tmp2_type_symidx)
+            return (l_symidx.clone(),ftmp2_type_symidx)
         }
         (Type::I32,Type::I32)|(Type::F32,Type::F32)|(Type::I1,Type::I1) =>{
+            //相同不用转换
             return (l_symidx.clone(),r_symidx.clone())
         }
         _ =>{
@@ -420,39 +439,45 @@ fn autotrans_arith_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,l_type:&Type,
         },
     }
 }
-
+///逻辑运算符自动类型转换，返回转换后的两个操作符的symidx
 fn autotrans_logic_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,l_type:&Type,l_symidx:&SymIdx,r_type:&Type,r_symidx:&SymIdx,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>)->(SymIdx,SymIdx){
     //adapt函数会去除掉不能进行运算的类型情况
     match(l_type.clone(),r_type.clone()){
         (Type::I32,Type::F32) =>{
+            //i32转i1
+            //由于除了i1都要转为i1，这里变量名中ltmp指左操作符转换后的临时symidx，rtmp指右操作符
+            //处理左操作数，i32转i1
             let ltmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
             *counter += 1;
-            let rtmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
-            *counter += 1;
+            //转i1相当于和0进行不等比较，这里调用常数处理函数处理0
             let izero_symidx = process_constant(symtab, &"0".to_string(), symtab_graph);
-            println!("添加0");
             let i2b_instr = NakedInstruction::new_icmp(ltmp_type_symidx.clone(), IcmpPlan::Ne ,l_symidx.clone(), izero_symidx,Type::I1).to_instr();
             push_instr!(i2b_instr to cfg_bb in cfg_graph slab instr_slab);
+            //处理右操作数，f32转i1
+            let rtmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
+            *counter += 1;
             let fzero_symidx = process_constant(symtab, &"0.0".to_string(), symtab_graph);
-            println!("添加0。0");
             let f2b_instr = NakedInstruction::new_ucmp(rtmp_type_symidx.clone(), UcmpPlan::One ,r_symidx.clone(), fzero_symidx,Type::I1).to_instr();
             push_instr!(f2b_instr to cfg_bb in cfg_graph slab instr_slab);
             return (ltmp_type_symidx,rtmp_type_symidx)
         },
         (Type::F32,Type::I32) =>{
+            //左操作数f32转i1
             let ltmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
-            *counter += 1;
-            let rtmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
             *counter += 1;
             let izero_symidx = process_constant(symtab, &"0".to_string(), symtab_graph);
             let i2b_instr = NakedInstruction::new_icmp(ltmp_type_symidx.clone(), IcmpPlan::Ne ,r_symidx.clone(), izero_symidx,Type::I1).to_instr();
             push_instr!(i2b_instr to cfg_bb in cfg_graph slab instr_slab);
+            //右操作数i32转i1
+            let rtmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
+            *counter += 1;
             let fzero_symidx = process_constant(symtab, &"0.0".to_string(), symtab_graph);
             let f2b_instr = NakedInstruction::new_ucmp(ltmp_type_symidx.clone(), UcmpPlan::One ,l_symidx.clone(), fzero_symidx,Type::I1).to_instr();
             push_instr!(f2b_instr to cfg_bb in cfg_graph slab instr_slab);
             return (ltmp_type_symidx,rtmp_type_symidx)
         },
         (Type::I1,Type::I32) =>{
+            //处理右操作数i32转i1
             let rtmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
             *counter += 1;
             let izero_symidx = process_constant(symtab, &"0".to_string(), symtab_graph);
@@ -461,6 +486,7 @@ fn autotrans_logic_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,l_type:&Type,
             return (l_symidx.clone(),rtmp_type_symidx)
         },
         (Type::I32,Type::I1)=>{
+            //处理左操作数i32转i1
             let ltmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
             *counter += 1;
             let izero_symidx = process_constant(symtab, &"0".to_string(), symtab_graph);
@@ -469,6 +495,7 @@ fn autotrans_logic_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,l_type:&Type,
             return (ltmp_type_symidx.clone(),r_symidx.clone())
         },
         (Type::I1,Type::F32)=>{
+            //处理右操作数f32转i1
             let rtmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
             *counter += 1;
             let fzero_symidx = process_constant(symtab, &"0.0".to_string(), symtab_graph);
@@ -477,6 +504,7 @@ fn autotrans_logic_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,l_type:&Type,
             return (l_symidx.clone(),rtmp_type_symidx.clone())
         },
         (Type::F32,Type::I1)=>{
+            //左操作数f32转i1
             let ltmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
             *counter += 1;
             let fzero_symidx = process_constant(symtab, &"0.0".to_string(), symtab_graph);
@@ -485,25 +513,29 @@ fn autotrans_logic_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,l_type:&Type,
             return (ltmp_type_symidx.clone(),r_symidx.clone())
         }
         (Type::F32,Type::F32) => {
+            //左操作数f32转i1
             let ltmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
-            *counter += 1;
-            let rtmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
             *counter += 1;
             let fzero_symidx = process_constant(symtab, &"0.0".to_string(), symtab_graph);
             let lf2b_instr = NakedInstruction::new_ucmp(ltmp_type_symidx.clone(), UcmpPlan::One ,l_symidx.clone(), fzero_symidx.clone(),Type::I1).to_instr();
             push_instr!(lf2b_instr to cfg_bb in cfg_graph slab instr_slab);
+            //右操作数f32转i1
+            let rtmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
+            *counter += 1;
             let rf2b_instr = NakedInstruction::new_ucmp(ltmp_type_symidx.clone(), UcmpPlan::One ,r_symidx.clone(), fzero_symidx.clone(),Type::I1).to_instr();
             push_instr!(rf2b_instr to cfg_bb in cfg_graph slab instr_slab);
             return (ltmp_type_symidx,rtmp_type_symidx)
         }
         (Type::I32,Type::I32) => {
+            //左操作数i32转i1
             let ltmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
-            *counter += 1;
-            let rtmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
             *counter += 1;
             let izero_symidx = process_constant(symtab, &"0".to_string(), symtab_graph);
             let li2b_instr = NakedInstruction::new_icmp(ltmp_type_symidx.clone(), IcmpPlan::Ne ,l_symidx.clone(), izero_symidx.clone(),Type::I1).to_instr();
             push_instr!(li2b_instr to cfg_bb in cfg_graph slab instr_slab);
+            //右操作数i32转i1
+            let rtmp_type_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
+            *counter += 1;
             let ri2b_instr = NakedInstruction::new_icmp(ltmp_type_symidx.clone(), IcmpPlan::Ne ,r_symidx.clone(), izero_symidx.clone(),Type::I1).to_instr();
             push_instr!(ri2b_instr to cfg_bb in cfg_graph slab instr_slab);
             return (ltmp_type_symidx,rtmp_type_symidx)
@@ -518,22 +550,25 @@ fn autotrans_logic_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,l_type:&Type,
 }
 ///处理自增运算符，不分左右,统一返回增加instr和赋值instr
 fn process_self_increment(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,op_et_node:u32,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>) -> (SymIdx,SymIdx){
+    //取自增运算符下的symidx和type
     let var_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, op_et_node, scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
     let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    //读取变量的instr
     let tmp_loadvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
-    *counter += 1;
-    let tmp_addvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
     *counter += 1;
     let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
     push_instr!(load_instr to cfg_bb in cfg_graph slab instr_slab);
+    //自增的instr，以及类型转换
+    let tmp_addvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
+    *counter += 1;
     match var_type {
         Type::F32 => {
-            let fone_symidx = add_symbol!({Symbol::new(scope_node, "1.0".to_string())} with field TYPE:{Type::F32} to symtab debug symtab_graph);
+            let fone_symidx = process_constant(symtab, &"1.0".to_string(), symtab_graph);
             let add_instr = NakedInstruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), fone_symidx,var_type).to_instr();
             push_instr!(add_instr to cfg_bb in cfg_graph slab instr_slab);
         },
         Type::I32 => {
-            let ione_symidx = add_symbol!({Symbol::new(scope_node, "1".to_string())} with field TYPE:{Type::I32} to symtab debug symtab_graph);
+            let ione_symidx = process_constant(symtab, &"1".to_string(), symtab_graph);
             let add_instr = NakedInstruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), ione_symidx,var_type).to_instr();
             push_instr!(add_instr to cfg_bb in cfg_graph slab instr_slab);
         },
@@ -541,28 +576,32 @@ fn process_self_increment(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtT
             panic!("自增自减操作数不是数字类型的");
         },
     }
+    //自增后赋值的instr
     let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_addvar_symidx.clone()).to_instr();
     push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
     (tmp_addvar_symidx,tmp_loadvar_symidx)
 }
 ///处理自减运算符，不分左右
 fn process_self_attennuation(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,op_et_node:u32,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>) -> (SymIdx,SymIdx){
+    //取操作数的symidx和type
     let var_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, op_et_node, scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
     let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    //读取变量的instr
     let tmp_loadvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
-    *counter += 1;
-    let tmp_subvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
     *counter += 1;
     let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
     push_instr!(load_instr to cfg_bb in cfg_graph slab instr_slab);
+    //自减的instr
+    let tmp_subvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
+    *counter += 1;
     match var_type {
         Type::F32 => {
-            let fone_symidx = add_symbol!({Symbol::new(scope_node, "1.0".to_string())} with field TYPE:{Type::F32} to symtab debug symtab_graph);
+            let fone_symidx = process_constant(symtab, &"1.0".to_string(), symtab_graph);
             let sub_instr = NakedInstruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), fone_symidx,var_type).to_instr();
             push_instr!(sub_instr to cfg_bb in cfg_graph slab instr_slab);
         },
         Type::I32 => {
-            let ione_symidx = add_symbol!({Symbol::new(scope_node, "1".to_string())} with field TYPE:{Type::I32} to symtab debug symtab_graph);
+            let ione_symidx = process_constant(symtab, &"1".to_string(), symtab_graph);
             let sub_instr = NakedInstruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), ione_symidx,var_type).to_instr();
             push_instr!(sub_instr to cfg_bb in cfg_graph slab instr_slab);
         },
@@ -570,6 +609,7 @@ fn process_self_attennuation(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&
             panic!("自增自减操作数不是数字类型的");
         },
     }
+    //自减后的赋值instr
     let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_subvar_symidx.clone()).to_instr();
     push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
     (tmp_subvar_symidx,tmp_loadvar_symidx)
@@ -577,23 +617,30 @@ fn process_self_attennuation(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&
 ///处理操作符，获取下面的两个操作数，按算数操作符进行两个操作数的自动类型转换，返回（结果的临时变量，左操作数，右操作数，临时变量的类型）
 fn process_arithop(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,root_et_node:u32,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>)->(SymIdx,SymIdx,SymIdx,Type,Type){
     let next_nodes = direct_children_nodes!(at root_et_node in et_tree);
+    //取右操作数symidx和type
     let r_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
     let r_type = find!(field TYPE:Type at r_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    //取左操作数symidx和type
     let l_symidx = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
     let l_type = find!(field TYPE:Type at l_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    //将左右操作数进行类型自动转换
     let (l_symidx,r_symidx) = autotrans_arith_type(cfg_graph, symtab, &l_type, &l_symidx, &r_type, &r_symidx, scope_node, cfg_bb, counter, instr_slab, symtab_graph);
     let var_type=Type::adapt(&l_type, &r_type);
     let tmp_var_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
     *counter += 1;
+    //在复合操作符如+=这类操作符在类型转换后需要返回左操作数（即变量）的类型
     (tmp_var_symidx,l_symidx,r_symidx,var_type,l_type)
 }
 
 fn process_logicop(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,root_et_node:u32,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>)->(SymIdx,SymIdx,SymIdx){
     let next_nodes = direct_children_nodes!(at root_et_node in et_tree);
+    //取右操作数的symidx和type
     let r_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
     let r_type = find!(field TYPE:Type at r_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    //取左操作数的symidx和type
     let l_symidx = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
     let l_type = find!(field TYPE:Type at l_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    //左右操作数自动逻辑类型转换
     let (l_symidx,r_symidx) = autotrans_logic_type(cfg_graph, symtab, &l_type, &l_symidx, &r_type, &r_symidx, scope_node, cfg_bb, counter, instr_slab, symtab_graph);
     let tmp_var_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
     *counter += 1;
@@ -689,19 +736,20 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::LogicalNot => {
                     if let Some(next_node) = direct_child_node!(at et_node in et_tree ret option){
+                        //取操作数的symidx和type
                         let symbol_symidx = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph);
                         let symbol_type = find!(field TYPE:Type at symbol_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
-
+                        //将数字类型操作数转换为bool类型，bool类型不需要转换
                         let num2bool_tmp_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
                         *counter += 1;
                         match symbol_type {
                             Type::F32 => {
-                                let fzero_symidx = add_symbol!({Symbol::new(scope_node, "0.0".to_string())} with field TYPE:{Type::F32} to symtab debug symtab_graph);
+                                let fzero_symidx = process_constant(symtab, &"0.0".to_string(), symtab_graph);
                                 let f2b_instr = NakedInstruction::new_icmp(num2bool_tmp_symidx.clone(), IcmpPlan::Ne, symbol_symidx, fzero_symidx, Type::I1).to_instr();
                                 push_instr!(f2b_instr to cfg_bb in cfg_graph slab instr_slab);
                             },
                             Type::I32 => {
-                                let izero_symidx = add_symbol!({Symbol::new(scope_node, "0".to_string())} with field TYPE:{Type::I32} to symtab debug symtab_graph);
+                                let izero_symidx = process_constant(symtab, &"0".to_string(), symtab_graph);
                                 let i2b_instr = NakedInstruction::new_ucmp(num2bool_tmp_symidx.clone(), UcmpPlan::One, symbol_symidx, izero_symidx, Type::I1).to_instr();
                                 push_instr!(i2b_instr to cfg_bb in cfg_graph slab instr_slab);
                             },
