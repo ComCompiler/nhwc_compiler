@@ -29,7 +29,7 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab
             for et_node in et_nodes{
                 let et_struct = &node!(at et_node in et_tree).et_node_type;
                 match et_struct{
-                    EtNodeType::Operator { op, ast_node:_, text:_ } => {
+                    EtNodeType::Operator { op, ast_node, text:_ } => {
                         if let Some(_) = direct_child_node!(at et_node in et_tree ret option){
                             match op{
                                 crate::toolkit::et_node::ExprOp::Assign => {
@@ -37,177 +37,90 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab
 
                                     // 后序遍历 右边
                                     let value_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[1], decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
-                                    
+                                    let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
                                     // 后序遍历 左边
                                     let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[0], decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
-
-                                    let assign_instr = NakedInstruction::new_assign(var_symidx, value_symidx).to_instr();
+                                    let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
+                                    let new_value_symidx = force_trans_type(cfg_graph, symtab, &var_type, &value_type, &value_symidx, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
+                                    let assign_instr = NakedInstruction::new_assign(var_symidx, new_value_symidx).to_instr();
 
                                     push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
                                 },
                                 crate::toolkit::et_node::ExprOp::LPlusPlus => {
                                     if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option){
-                                        let var_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, decl_parent_scope,  cfg_bb, counter, instr_slab, symtab_g);
-                
-                                        let one_symidx = SymIdx::new(decl_parent_scope, "1".to_string()); 
-                
-                                        let tmp_loadvar_symidx = SymIdx::new(decl_parent_scope, format!("%{}",counter));
-                                        *counter += 1;
-                                        let tmp_addvar_symidx = SymIdx::new(decl_parent_scope, format!("%{}",counter));
-                                        *counter += 1;
-                                        let vartype=Type::new(decl_parent_scope, ast_tree);
-                
-                                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
-                                        let add_instr = NakedInstruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype).to_instr();
-                                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_addvar_symidx.clone()).to_instr();
-                
-                                        push_instr!(load_instr to cfg_bb in cfg_graph slab instr_slab);
-                                        push_instr!(add_instr to cfg_bb in cfg_graph slab instr_slab);
-                                        push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
+                                        let (_,_) = process_self_increment(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, symbol_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
                                     }else{
                                         panic!("操作符{}下缺少符号",et_node);
                                     }
                                 },
                                 crate::toolkit::et_node::ExprOp::RPlusPlus => {
                                     if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option){
-                                        let var_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, decl_parent_scope,  cfg_bb, counter, instr_slab, symtab_g);
-                
-                                        let one_symidx = SymIdx::new(decl_parent_scope, "1".to_string()); 
-                
-                                        let tmp_loadvar_symidx = SymIdx::new(decl_parent_scope, format!("%{}",counter));
-                                        *counter += 1;
-                                        let tmp_addvar_symidx = SymIdx::new(decl_parent_scope, format!("%{}",counter));
-                                        *counter += 1;
-                                        let vartype=Type::new(decl_parent_scope, ast_tree);
-                
-                                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
-                                        let add_instr = NakedInstruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype).to_instr();
-                                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_addvar_symidx.clone()).to_instr();
-                
-                                        push_instr!(load_instr to cfg_bb in cfg_graph slab instr_slab);
-                                        push_instr!(add_instr to cfg_bb in cfg_graph slab instr_slab);
-                                        push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
+                                        let (_,_) = process_self_increment(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, symbol_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
                                     }else{
                                         panic!("操作符{}下缺少符号",et_node);
                                     }
                                 },
                                 crate::toolkit::et_node::ExprOp::LMinusMinus => {
                                     if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option){
-                                        let var_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, decl_parent_scope,  cfg_bb, counter, instr_slab, symtab_g);
-                
-                                        let one_symidx = SymIdx::new(decl_parent_scope, "1".to_string());
-                
-                                        let tmp_loadvar_symidx = SymIdx::new(decl_parent_scope, format!("%{}",counter));
-                                        *counter += 1;
-                                        let tmp_subvar_symidx = SymIdx::new(decl_parent_scope, format!("%{}",counter));
-                                        *counter += 1;
-                                        let vartype=Type::new(decl_parent_scope, ast_tree);
-                                        
-                                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
-                                        let sub_instr = NakedInstruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype).to_instr();
-                                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_subvar_symidx.clone()).to_instr();
-                
-                                        push_instr!(load_instr to cfg_bb in cfg_graph slab instr_slab);
-                                        push_instr!(sub_instr to cfg_bb in cfg_graph slab instr_slab);
-                                        push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
+                                        let (_,_) = process_self_attennuation(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, symbol_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
                                     }else{
                                         panic!("操作符{}下缺少符号",et_node);
                                     }
                                 },
                                 crate::toolkit::et_node::ExprOp::RMinusMinus => {
                                     if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option){
-                                        let var_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, decl_parent_scope,  cfg_bb, counter, instr_slab, symtab_g);
-                
-                                        let one_symidx = SymIdx::new(decl_parent_scope, "1".to_string());
-                
-                                        let tmp_loadvar_symidx = SymIdx::new(decl_parent_scope, format!("%{}",counter));
-                                        *counter += 1;
-                                        let tmp_subvar_symidx = SymIdx::new(decl_parent_scope, format!("%{}",counter));
-                                        *counter += 1;
-                                        let vartype=Type::new(decl_parent_scope, ast_tree);
-                
-                                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
-                                        let sub_instr = NakedInstruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), one_symidx,vartype).to_instr();
-                                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_subvar_symidx.clone()).to_instr();
-                
-                                        push_instr!(load_instr to cfg_bb in cfg_graph slab instr_slab);
-                                        push_instr!(sub_instr to cfg_bb in cfg_graph slab instr_slab);
-                                        push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
+                                        let (_,_) = process_self_attennuation(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, symbol_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
                                     }else{
                                         panic!("操作符{}下缺少符号",et_node);
                                     }
                                 },
                                 crate::toolkit::et_node::ExprOp::MulAssign => {
-                                    let op_values = direct_children_nodes!(at et_node in et_tree);
-
-                                    let value_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[1], decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
-                                    
-                                    let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[0], decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
-
-                                    let tmp_var_symidx = SymIdx::new(decl_parent_scope, format!("%{}",counter));
-                                    *counter += 1;
-                                    let vartype=Type::new(decl_parent_scope, ast_tree);
-
-                                    let mul_instr = NakedInstruction::new_add(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx,vartype).to_instr();
-                                    let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_var_symidx).to_instr();
-                                    
+                                    let (mul_tmp_symidx,var_symidx,value_symidx,mul_tmp_type,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
+                                    let mul_instr = NakedInstruction::new_mul(mul_tmp_symidx.clone(), var_symidx.clone(), value_symidx.clone(),mul_tmp_type.clone()).to_instr();
                                     push_instr!(mul_instr to cfg_bb in cfg_graph slab instr_slab);
+                                    //赋值instr
+                                    let assign_tmp_symidx = force_trans_type(cfg_graph, symtab, &var_type, &mul_tmp_type,&mul_tmp_symidx ,decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
+                                    let tmp_var_symidx = add_symbol!({Symbol::new(decl_parent_scope,format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_g);
+                                    *counter += 1;
+                                    let assign_instr = NakedInstruction::new_assign(tmp_var_symidx,assign_tmp_symidx ).to_instr();
                                     push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
                                 },
                                 crate::toolkit::et_node::ExprOp::DivAssign => {
-                                    let op_values = direct_children_nodes!(at et_node in et_tree);
-
-                                    let value_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[1], decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
-                                    
-                                    let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[0], decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
-
-                                    let tmp_var_symidx = SymIdx::new(decl_parent_scope, format!("%{}",counter));
-                                    *counter += 1;
-                                    let vartype=Type::new(decl_parent_scope, ast_tree);
-
-                                    let div_instr = NakedInstruction::new_div(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx,vartype).to_instr();
-                                    let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_var_symidx).to_instr();
-
+                                    let (div_tmp_symidx,var_symidx,value_symidx,div_tmp_type,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
+                                    let div_instr = NakedInstruction::new_div(div_tmp_symidx.clone(), var_symidx.clone(), value_symidx.clone(),div_tmp_type.clone()).to_instr();
                                     push_instr!(div_instr to cfg_bb in cfg_graph slab instr_slab);
+                                    //赋值instr
+                                    let assign_tmp_symidx = force_trans_type(cfg_graph, symtab, &var_type, &div_tmp_type,&div_tmp_symidx ,decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
+                                    let tmp_var_symidx = add_symbol!({Symbol::new(decl_parent_scope,format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_g);
+                                    *counter += 1;
+                                    let assign_instr = NakedInstruction::new_assign(tmp_var_symidx,assign_tmp_symidx ).to_instr();
                                     push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
                                 },
                                 crate::toolkit::et_node::ExprOp::PlusAssign => {
-                                    let op_values = direct_children_nodes!(at et_node in et_tree);
-
-                                    let value_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[1], decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
-                                    
-                                    let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[0], decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
-
-                                    let tmp_var_symidx = SymIdx::new(decl_parent_scope, format!("%{}",counter));
-                                    *counter += 1;
-                                    let vartype=Type::new(decl_parent_scope, ast_tree);
-
-                                    let add_instr = NakedInstruction::new_add(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx,vartype).to_instr();
-                                    let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_var_symidx).to_instr();
-
+                                    let (add_tmp_symidx,var_symidx,value_symidx,add_tmp_type,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
+                                    let add_instr = NakedInstruction::new_add(add_tmp_symidx.clone(), var_symidx.clone(), value_symidx.clone(),add_tmp_type.clone()).to_instr();
                                     push_instr!(add_instr to cfg_bb in cfg_graph slab instr_slab);
+                                    //赋值instr
+                                    let assign_tmp_symidx = force_trans_type(cfg_graph, symtab, &var_type, &add_tmp_type,&add_tmp_symidx ,decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
+                                    let tmp_var_symidx = add_symbol!({Symbol::new(decl_parent_scope,format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_g);
+                                    *counter += 1;
+                                    let assign_instr = NakedInstruction::new_assign(tmp_var_symidx,assign_tmp_symidx ).to_instr();
                                     push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
                                 },
                                 crate::toolkit::et_node::ExprOp::MinusAssign => {
-                                    let op_values = direct_children_nodes!(at et_node in et_tree);
-
-                                    let value_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[1], decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
-                                    
-                                    let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, op_values[0], decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
-
-                                    let tmp_var_symidx = SymIdx::new(decl_parent_scope, format!("%{}",counter));
-                                    *counter += 1;
-                                    let vartype=Type::new(decl_parent_scope, ast_tree);
-
-                                    let sub_instr = NakedInstruction::new_sub(tmp_var_symidx.clone(), var_symidx.clone(), value_symidx,vartype).to_instr();
-                                    let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_var_symidx).to_instr();
-
+                                    let (sub_tmp_symidx,var_symidx,value_symidx,sub_tmp_type,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
+                                    let sub_instr = NakedInstruction::new_sub(sub_tmp_symidx.clone(), var_symidx.clone(), value_symidx.clone(),sub_tmp_type.clone()).to_instr();
                                     push_instr!(sub_instr to cfg_bb in cfg_graph slab instr_slab);
+                                    //赋值instr
+                                    let assign_tmp_symidx = force_trans_type(cfg_graph, symtab, &var_type, &sub_tmp_type,&sub_tmp_symidx ,decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
+                                    let tmp_var_symidx = add_symbol!({Symbol::new(decl_parent_scope,format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_g);
+                                    *counter += 1;
+                                    let assign_instr = NakedInstruction::new_assign(tmp_var_symidx,assign_tmp_symidx ).to_instr();
                                     push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
                                 },
                                 _ => {
-                                    let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
-                                    // panic!("statment初始运算符应有赋值性质,ast_node {} 符号出现错误",*ast_node);
+                                    // let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node, decl_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
+                                    panic!("statment初始运算符应有赋值性质,ast_node {} 符号出现错误",*ast_node);
                                 }
                             }
                         }else{
@@ -508,7 +421,7 @@ fn autotrans_arith_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,l_type:&Type,
     }
 }
 
-fn autotrans_logic_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,l_type:&Type,l_symidx:&SymIdx,r_type:&Type,r_symidx:&SymIdx,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>)->(SymIdx,SymIdx){
+fn autotrans_logic_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,l_type:&Type,l_symidx:&SymIdx,r_type:&Type,r_symidx:&SymIdx,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>)->(SymIdx,SymIdx){
     //adapt函数会去除掉不能进行运算的类型情况
     match(l_type.clone(),r_type.clone()){
         (Type::I32,Type::F32) =>{
@@ -603,8 +516,66 @@ fn autotrans_logic_type(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,ast2scope:&Ha
         },
     }
 }
-
-fn process_arithop(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,root_et_node:u32,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>)->(SymIdx,SymIdx,SymIdx,Type){
+///处理自增运算符，不分左右,统一返回增加instr和赋值instr
+fn process_self_increment(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,op_et_node:u32,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>) -> (SymIdx,SymIdx){
+    let var_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, op_et_node, scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
+    let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    let tmp_loadvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
+    *counter += 1;
+    let tmp_addvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
+    *counter += 1;
+    let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
+    push_instr!(load_instr to cfg_bb in cfg_graph slab instr_slab);
+    match var_type {
+        Type::F32 => {
+            let fone_symidx = add_symbol!({Symbol::new(scope_node, "1.0".to_string())} with field TYPE:{Type::F32} to symtab debug symtab_graph);
+            let add_instr = NakedInstruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), fone_symidx,var_type).to_instr();
+            push_instr!(add_instr to cfg_bb in cfg_graph slab instr_slab);
+        },
+        Type::I32 => {
+            let ione_symidx = add_symbol!({Symbol::new(scope_node, "1".to_string())} with field TYPE:{Type::I32} to symtab debug symtab_graph);
+            let add_instr = NakedInstruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), ione_symidx,var_type).to_instr();
+            push_instr!(add_instr to cfg_bb in cfg_graph slab instr_slab);
+        },
+        _ => {
+            panic!("自增自减操作数不是数字类型的");
+        },
+    }
+    let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_addvar_symidx.clone()).to_instr();
+    push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
+    (tmp_addvar_symidx,tmp_loadvar_symidx)
+}
+///处理自减运算符，不分左右
+fn process_self_attennuation(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,op_et_node:u32,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>) -> (SymIdx,SymIdx){
+    let var_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, op_et_node, scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
+    let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    let tmp_loadvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
+    *counter += 1;
+    let tmp_subvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
+    *counter += 1;
+    let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
+    push_instr!(load_instr to cfg_bb in cfg_graph slab instr_slab);
+    match var_type {
+        Type::F32 => {
+            let fone_symidx = add_symbol!({Symbol::new(scope_node, "1.0".to_string())} with field TYPE:{Type::F32} to symtab debug symtab_graph);
+            let sub_instr = NakedInstruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), fone_symidx,var_type).to_instr();
+            push_instr!(sub_instr to cfg_bb in cfg_graph slab instr_slab);
+        },
+        Type::I32 => {
+            let ione_symidx = add_symbol!({Symbol::new(scope_node, "1".to_string())} with field TYPE:{Type::I32} to symtab debug symtab_graph);
+            let sub_instr = NakedInstruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), ione_symidx,var_type).to_instr();
+            push_instr!(sub_instr to cfg_bb in cfg_graph slab instr_slab);
+        },
+        _ => {
+            panic!("自增自减操作数不是数字类型的");
+        },
+    }
+    let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_subvar_symidx.clone()).to_instr();
+    push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
+    (tmp_subvar_symidx,tmp_loadvar_symidx)
+}
+///处理操作符，获取下面的两个操作数，按算数操作符进行两个操作数的自动类型转换，返回（结果的临时变量，左操作数，右操作数，临时变量的类型）
+fn process_arithop(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,root_et_node:u32,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>)->(SymIdx,SymIdx,SymIdx,Type,Type){
     let next_nodes = direct_children_nodes!(at root_et_node in et_tree);
     let r_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, next_nodes[1], scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
     let r_type = find!(field TYPE:Type at r_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
@@ -614,7 +585,7 @@ fn process_arithop(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtTree,sco
     let var_type=Type::adapt(&l_type, &r_type);
     let tmp_var_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
     *counter += 1;
-    (tmp_var_symidx,l_symidx,r_symidx,var_type)
+    (tmp_var_symidx,l_symidx,r_symidx,var_type,l_type)
 }
 
 fn process_logicop(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,root_et_node:u32,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>)->(SymIdx,SymIdx,SymIdx){
@@ -623,7 +594,7 @@ fn process_logicop(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtTree,sco
     let r_type = find!(field TYPE:Type at r_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
     let l_symidx = process_et(ast_tree,cfg_graph, et_tree, scope_tree, symtab, ast2scope, next_nodes[0], scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
     let l_type = find!(field TYPE:Type at l_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
-    let (l_symidx,r_symidx) = autotrans_logic_type(cfg_graph, symtab, ast2scope, &l_type, &l_symidx, &r_type, &r_symidx, scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+    let (l_symidx,r_symidx) = autotrans_logic_type(cfg_graph, symtab, &l_type, &l_symidx, &r_type, &r_symidx, scope_node, cfg_bb, counter, instr_slab, symtab_graph);
     let tmp_var_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
     *counter += 1;
     
@@ -637,7 +608,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
             match op{
                 super::et_node::ExprOp::Mul => {
                     if let Some(_) = direct_child_node!(at et_node in et_tree ret option){
-                        let (tmp_var_symidx, l_symidx, r_symidx,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+                        let (tmp_var_symidx, l_symidx, r_symidx,var_type,_) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
                         let mul_instr = NakedInstruction::new_add(tmp_var_symidx.clone(), l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(mul_instr to cfg_bb in cfg_graph slab instr_slab);
                         tmp_var_symidx
@@ -647,7 +618,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::Add => {
                     if let Some(_) = direct_child_node!(at et_node in et_tree ret option){
-                        let (tmp_var_symidx, l_symidx, r_symidx,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+                        let (tmp_var_symidx, l_symidx, r_symidx,var_type,_) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
 
                         let add_instr = NakedInstruction::new_add(tmp_var_symidx.clone(), l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(add_instr to cfg_bb in cfg_graph slab instr_slab);
@@ -659,7 +630,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::Sub => {
                     if let Some(_) = direct_child_node!(at et_node in et_tree ret option){
-                        let (tmp_var_symidx, l_symidx, r_symidx,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+                        let (tmp_var_symidx, l_symidx, r_symidx,var_type,_) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
                         let sub_instr = NakedInstruction::new_sub(tmp_var_symidx.clone(), l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(sub_instr to cfg_bb in cfg_graph slab instr_slab);
 
@@ -670,7 +641,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::Div => {
                     if let Some(_) = direct_child_node!(at et_node in et_tree ret option){
-                        let (tmp_var_symidx, l_symidx, r_symidx,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+                        let (tmp_var_symidx, l_symidx, r_symidx,var_type,_) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
                         let div_instr = NakedInstruction::new_div(tmp_var_symidx.clone(), l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(div_instr to cfg_bb in cfg_graph slab instr_slab);
 
@@ -681,7 +652,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::Mod => {
                     if let Some(_) = direct_child_node!(at et_node in et_tree ret option){
-                        let (tmp_var_symidx, l_symidx, r_symidx,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+                        let (tmp_var_symidx, l_symidx, r_symidx,var_type,_) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
 
                         let mod_instr = NakedInstruction::new_mod(tmp_var_symidx.clone(), l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(mod_instr to cfg_bb in cfg_graph slab instr_slab);
@@ -759,7 +730,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 //比较运算符
                 super::et_node::ExprOp::Eq => {
                     if let Some(_) = direct_child_node!(at et_node in et_tree ret option){
-                        let (tmp_var_symidx, l_symidx, r_symidx,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+                        let (tmp_var_symidx, l_symidx, r_symidx,var_type,_) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
 
                         let eq_instr = NakedInstruction::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Eq ,l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(eq_instr to cfg_bb in cfg_graph slab instr_slab);
@@ -771,7 +742,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::NEq => {
                     if let Some(_) = direct_child_node!(at et_node in et_tree ret option){
-                        let (tmp_var_symidx, l_symidx, r_symidx,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+                        let (tmp_var_symidx, l_symidx, r_symidx,var_type,_) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
 
                         let neq_instr = NakedInstruction::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Ne ,l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(neq_instr to cfg_bb in cfg_graph slab instr_slab);
@@ -783,7 +754,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::Less => {
                     if let Some(_) = direct_child_node!(at et_node in et_tree ret option){
-                        let (tmp_var_symidx, l_symidx, r_symidx,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+                        let (tmp_var_symidx, l_symidx, r_symidx,var_type,_) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
 
                         let less_instr = NakedInstruction::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Slt ,l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(less_instr to cfg_bb in cfg_graph slab instr_slab);
@@ -795,7 +766,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::Greater => {
                     if let Some(_) = direct_child_node!(at et_node in et_tree ret option){
-                        let (tmp_var_symidx, l_symidx, r_symidx,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+                        let (tmp_var_symidx, l_symidx, r_symidx,var_type,_) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
 
                         let greater_instr = NakedInstruction::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Sgt ,l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(greater_instr to cfg_bb in cfg_graph slab instr_slab);
@@ -807,7 +778,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::LEq => {
                     if let Some(_) = direct_child_node!(at et_node in et_tree ret option){
-                        let (tmp_var_symidx, l_symidx, r_symidx,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+                        let (tmp_var_symidx, l_symidx, r_symidx,var_type,_) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
 
                         let lesseq_instr = NakedInstruction::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Sle ,l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(lesseq_instr to cfg_bb in cfg_graph slab instr_slab);
@@ -819,7 +790,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::GEq => {
                     if let Some(_) = direct_child_node!(at et_node in et_tree ret option){
-                        let (tmp_var_symidx, l_symidx, r_symidx,var_type) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+                        let (tmp_var_symidx, l_symidx, r_symidx,var_type,_) = process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, et_node,  scope_node, cfg_bb, counter, instr_slab, symtab_graph);
 
                         let greatereq_instr = NakedInstruction::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Sge ,l_symidx, r_symidx,var_type).to_instr();
                         push_instr!(greatereq_instr to cfg_bb in cfg_graph slab instr_slab);
@@ -867,31 +838,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 //单目运算符
                 super::et_node::ExprOp::LPlusPlus => {
                     if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option){
-                        let var_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
-                        let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
-                        let tmp_loadvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
-                        *counter += 1;
-                        let tmp_addvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
-                        *counter += 1;
-                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
-                        push_instr!(load_instr to cfg_bb in cfg_graph slab instr_slab);
-                        match var_type {
-                            Type::F32 => {
-                                let fone_symidx = add_symbol!({Symbol::new(scope_node, "1.0".to_string())} with field TYPE:{Type::F32} to symtab debug symtab_graph);
-                                let add_instr = NakedInstruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), fone_symidx,var_type).to_instr();
-                                push_instr!(add_instr to cfg_bb in cfg_graph slab instr_slab);
-                            },
-                            Type::I32 => {
-                                let ione_symidx = add_symbol!({Symbol::new(scope_node, "1".to_string())} with field TYPE:{Type::I32} to symtab debug symtab_graph);
-                                let add_instr = NakedInstruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), ione_symidx,var_type).to_instr();
-                                push_instr!(add_instr to cfg_bb in cfg_graph slab instr_slab);
-                            },
-                            _ => {
-                                panic!("自增自减操作数不是数字类型的");
-                            },
-                        }
-                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_addvar_symidx.clone()).to_instr();
-                        push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
+                        let (tmp_addvar_symidx,tmp_loadvar_symidx) = process_self_increment(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, symbol_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph);
                         tmp_addvar_symidx
                     }else{
                         panic!("操作符{}下缺少符号",et_node);
@@ -899,31 +846,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::RPlusPlus => {
                     if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option){
-                        let var_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
-                        let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
-                        let tmp_loadvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
-                        *counter += 1;
-                        let tmp_addvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
-                        *counter += 1;
-                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
-                        push_instr!(load_instr to cfg_bb in cfg_graph slab instr_slab);
-                        match var_type {
-                            Type::F32 => {
-                                let fone_symidx = add_symbol!({Symbol::new(scope_node, "1.0".to_string())} with field TYPE:{Type::F32} to symtab debug symtab_graph);
-                                let add_instr = NakedInstruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), fone_symidx,var_type).to_instr();
-                                push_instr!(add_instr to cfg_bb in cfg_graph slab instr_slab);
-                            },
-                            Type::I32 => {
-                                let ione_symidx = add_symbol!({Symbol::new(scope_node, "1".to_string())} with field TYPE:{Type::I32} to symtab debug symtab_graph);
-                                let add_instr = NakedInstruction::new_add(tmp_addvar_symidx.clone(), var_symidx.clone(), ione_symidx,var_type).to_instr();
-                                push_instr!(add_instr to cfg_bb in cfg_graph slab instr_slab);
-                            },
-                            _ => {
-                                panic!("自增自减操作数不是数字类型的");
-                            },
-                        }
-                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_addvar_symidx.clone()).to_instr();
-                        push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
+                        let (tmp_addvar_symidx,tmp_loadvar_symidx) = process_self_increment(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, symbol_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph);
                         tmp_loadvar_symidx
                     }else{
                         panic!("操作符{}下缺少符号",et_node);
@@ -931,32 +854,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::LMinusMinus => {
                     if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option){
-                        let var_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
-                        let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
-                        let tmp_loadvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
-                        *counter += 1;
-                        let tmp_subvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
-                        *counter += 1;
-                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
-                        push_instr!(load_instr to cfg_bb in cfg_graph slab instr_slab);
-                        match var_type {
-                            Type::F32 => {
-                                let fone_symidx = add_symbol!({Symbol::new(scope_node, "1.0".to_string())} with field TYPE:{Type::F32} to symtab debug symtab_graph);
-                                let sub_instr = NakedInstruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), fone_symidx,var_type).to_instr();
-                                push_instr!(sub_instr to cfg_bb in cfg_graph slab instr_slab);
-                            },
-                            Type::I32 => {
-                                let ione_symidx = add_symbol!({Symbol::new(scope_node, "1".to_string())} with field TYPE:{Type::I32} to symtab debug symtab_graph);
-                                let sub_instr = NakedInstruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), ione_symidx,var_type).to_instr();
-                                push_instr!(sub_instr to cfg_bb in cfg_graph slab instr_slab);
-                            },
-                            _ => {
-                                panic!("自增自减操作数不是数字类型的");
-                            },
-                        }
-                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_subvar_symidx.clone()).to_instr();
-                        push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
-
+                        let (tmp_subvar_symidx,tmp_loadvar_symidx) = process_self_attennuation(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, symbol_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph);
                         tmp_subvar_symidx
                     }else{
                         panic!("操作符{}下缺少符号",et_node);
@@ -964,32 +862,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::RMinusMinus => {
                     if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option){
-                        let var_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab, ast2scope, symbol_node, scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
-                        let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
-                        let tmp_loadvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
-                        *counter += 1;
-                        let tmp_subvar_symidx = add_symbol!({Symbol::new(scope_node, format!("temp_{}",counter))} with field TYPE:{var_type.clone()} to symtab debug symtab_graph);
-                        *counter += 1;
-                        let load_instr = NakedInstruction::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
-                        push_instr!(load_instr to cfg_bb in cfg_graph slab instr_slab);
-                        match var_type {
-                            Type::F32 => {
-                                let fone_symidx = add_symbol!({Symbol::new(scope_node, "1.0".to_string())} with field TYPE:{Type::F32} to symtab debug symtab_graph);
-                                let sub_instr = NakedInstruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), fone_symidx,var_type).to_instr();
-                                push_instr!(sub_instr to cfg_bb in cfg_graph slab instr_slab);
-                            },
-                            Type::I32 => {
-                                let ione_symidx = add_symbol!({Symbol::new(scope_node, "1".to_string())} with field TYPE:{Type::I32} to symtab debug symtab_graph);
-                                let sub_instr = NakedInstruction::new_sub(tmp_subvar_symidx.clone(), var_symidx.clone(), ione_symidx,var_type).to_instr();
-                                push_instr!(sub_instr to cfg_bb in cfg_graph slab instr_slab);
-                            },
-                            _ => {
-                                panic!("自增自减操作数不是数字类型的");
-                            },
-                        }
-                        let assign_instr = NakedInstruction::new_assign(var_symidx, tmp_subvar_symidx.clone()).to_instr();
-                        push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
-
+                        let (tmp_subvar_symidx,tmp_loadvar_symidx) = process_self_attennuation(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ast2scope, symbol_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph);
                         tmp_loadvar_symidx
                     }else{
                         panic!("操作符{}下缺少符号",et_node);
