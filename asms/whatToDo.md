@@ -19,7 +19,7 @@ cd riscv32-tools
 tar -zxvf riscv32-unknown-elf.gcc-rve-13.2.0.tar.gz  
 接下来把里面的bin目录添加进环境变量
 vim ~/.bashrc
-在PATH的最后,加上:/home/你的用户名/riscv32-tools/riscv32-unknown-elf.gcc-rve-13.2.0/bin
+在PATH的最后,加上:/home/你的用户名/riscv32-tools/bin
 加载bashrc
 source ~/.bashrc
 
