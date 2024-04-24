@@ -891,6 +891,7 @@ macro_rules! element {
 #[macro_export]
 macro_rules! reg_field_name{
     ($upper_field_name:ident)=>{
-        pub static $upper_field_name: &str = &stringify!(lower!($upper_field_name));
+        use paste::paste;
+        pub static $upper_field_name: &str = &stringify!($upper_field_name);
     };
 }

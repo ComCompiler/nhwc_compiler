@@ -2,7 +2,7 @@ use crate::{find, Args};
 
 use super::field::{Fields};
 use super::{context::Context, field::Field, symtab::SymIdx};
-use anyhow::Result;
+use anyhow::{Context as _, Result};
 use colored::Colorize;
 
 pub trait Pass {
@@ -28,9 +28,13 @@ impl PassManager {
     /// 调用这个函数运行 PassManager 中的所有函数
     pub fn execute_passes(&mut self) {
         for pass in &mut self.passes {
-            println!("Pass {} run", pass.get_pass_name());
-            if let Err(e) = pass.run(&mut self.ctx){
-                println!("{}",format!("{}",e).red());
+            match pass.run(&mut self.ctx).with_context(|| format!("Error occurred when running Pass {}",pass.get_pass_name())){
+                Ok(_) => {
+                    println!("{}",format!("Pass {} run successfully", pass.get_pass_name()).green());
+                },
+                Err(e) => {
+                    println!("{}",format!("{}",e).red());
+                },
             }
         }
     }
