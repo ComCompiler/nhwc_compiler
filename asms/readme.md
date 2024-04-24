@@ -1,3 +1,7 @@
+# 脚本使用
+
+运行
+./run_riscv.sh hello.s
 
 # risc-v
 
@@ -7,7 +11,7 @@ sudo apt-get install gcc-riscv64-linux-gnu
 
 sudo apt install binutils-riscv64-unknown-elf
 
-安装riscv32工具链
+安装riscv32工具链到d盘
 https://github.com/stnolting/riscv-gcc-prebuilt?tab=readme-ov-file
 下载后粘进home  
 cp /mnt/d/riscv32-unknown-elf.gcc-rve-13.2.0.tar.gz  ~  
