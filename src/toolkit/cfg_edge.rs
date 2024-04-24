@@ -1,42 +1,43 @@
-use crate::NodeIndex;
-use crate::node;
-use std::fmt::Debug;
 use super::ast_node::AstTree;
+use crate::node;
+use crate::NodeIndex;
+use std::fmt::Debug;
 #[derive(Clone)]
-pub struct CfgEdge{
-    cfg_edge_type:CfgEdgeType,
-    text: String
+pub struct CfgEdge {
+    cfg_edge_type: CfgEdgeType,
+    text: String,
 }
 #[derive(Clone)]
-pub enum CfgEdgeType{
-    IfFalse{ }, Direct{ },
-    IfTrue{ },
-    BodyHead{ },
-    BodyTail{ },
-    If2Gather{},
+pub enum CfgEdgeType {
+    IfFalse {},
+    Direct {},
+    IfTrue {},
+    BodyHead {},
+    BodyTail {},
+    If2Gather {},
 }
-impl CfgEdge{
-    pub fn load_ast_node_text(&mut self,ast_tree :&AstTree){
+impl CfgEdge {
+    pub fn load_ast_node_text(&mut self, ast_tree: &AstTree) {
         match self.cfg_edge_type {
             CfgEdgeType::IfTrue {} => self.text += "True",
             CfgEdgeType::IfFalse {} => self.text += "False",
             CfgEdgeType::Direct {} => self.text += "Direct",
             CfgEdgeType::BodyTail {} => self.text += "BodyTail",
             CfgEdgeType::BodyHead {} => self.text += "BodyHead",
-            CfgEdgeType::If2Gather{} => self.text += "If2Gather",
+            CfgEdgeType::If2Gather {} => self.text += "If2Gather",
         }
     }
 }
-impl CfgEdgeType{
-    pub fn to_cfg_edge(self) -> CfgEdge{
-        CfgEdge { cfg_edge_type: self, text: String::new() }
+impl CfgEdgeType {
+    pub fn to_cfg_edge(self) -> CfgEdge {
+        CfgEdge {
+            cfg_edge_type: self,
+            text: String::new(),
+        }
     }
 }
-impl Debug for CfgEdge{
+impl Debug for CfgEdge {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"{}",self.text)
+        write!(f, "{}", self.text)
     }
 }
-   
-
-

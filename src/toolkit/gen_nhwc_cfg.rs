@@ -1,10 +1,11 @@
 use std::collections::HashMap;
-use petgraph::stable_graph::NodeIndex;
+use anyhow::Result;
+use petgraph::{stable_graph::NodeIndex, visit::IntoEdgeReferences};
 
 use super::{cfg_node::CfgNodeType, dot::Config, field::Field, nhwc_instr::InstrSlab};
 use crate::{ add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList}, dfs_graph, direct_child_node, direct_children_nodes, find, find_nodes, node, node_mut, push_instr, rule_id, toolkit::{ast_node, etc::generate_png_by_graph, field::{Type, UseCounter}, nhwc_instr::{IcmpPlan, Instruction, Trans, UcmpPlan}, symbol::Symbol, symtab::{SymTabEdge, TYPE, USE_COUNTER}}};
 
-use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNodeType, EtTree}, field::FieldsOwner, gen_et::process_any_stmt, nhwc_instr::InstrType, scope_node::ScopeTree, symbol, symtab::{ SymIdx, SymTab, SymTabGraph}};
+use super::{ ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, context::Context, et_node::{Def_Or_Use, EtNodeType, EtTree}, gen_et::process_any_stmt, nhwc_instr::InstrType, scope_node::ScopeTree, symbol, symtab::{ SymIdx, SymTab, SymTabGraph}};
 
 /*
  这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有 
@@ -59,14 +60,14 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab
                             },
                             crate::toolkit::et_node::ExprOp::LMinusMinus => {
                                 if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option){
-                                    let (_,_) = process_self_attennuation(ast_tree, cfg_graph, et_tree, scope_tree, symtab, symbol_node, stmt_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
+                                    let (_,_) = process_self_decrement(ast_tree, cfg_graph, et_tree, scope_tree, symtab, symbol_node, stmt_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
                                 }else{
                                     panic!("操作符{}下缺少符号",et_node);
                                 }
                             },
                             crate::toolkit::et_node::ExprOp::RMinusMinus => {
                                 if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option){
-                                    let (_,_) = process_self_attennuation(ast_tree, cfg_graph, et_tree, scope_tree, symtab,  symbol_node, stmt_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
+                                    let (_,_) = process_self_decrement(ast_tree, cfg_graph, et_tree, scope_tree, symtab,  symbol_node, stmt_parent_scope, cfg_bb, counter, instr_slab, symtab_g);
                                 }else{
                                     panic!("操作符{}下缺少符号",et_node);
                                 }
@@ -755,7 +756,7 @@ fn process_self_increment(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtT
     (tmp_addvar_symidx,tmp_loadvar_symidx)
 }
 ///处理自减运算符，不分左右
-fn process_self_attennuation(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymTab,op_et_node:u32,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>) -> (SymIdx,SymIdx){
+fn process_self_decrement(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymTab,op_et_node:u32,scope_node:u32,cfg_bb:u32,counter:&mut u32,instr_slab:&mut InstrSlab,symtab_graph:&mut Option<&mut SymTabGraph>) -> (SymIdx,SymIdx){
     //取操作数的symidx和type
     let var_symidx = process_et(ast_tree,cfg_graph,et_tree, scope_tree, symtab,  op_et_node, scope_node,  cfg_bb, counter, instr_slab, symtab_graph);
     let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
@@ -822,8 +823,8 @@ fn process_logicop(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,et_tree:&EtTree,sco
 }
 
 fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_tree:&ScopeTree,symtab:&mut SymTab,et_node:u32,scope_node:u32,cfg_bb:u32,counter:&mut u32, instr_slab:&mut InstrSlab, symtab_graph:&mut Option<&mut SymTabGraph>)->SymIdx{
-    let nake_et = &node!(at et_node in et_tree).et_node_type;
-    match nake_et{
+    let et_type = &node!(at et_node in et_tree).et_node_type;
+    match et_type{
         EtNodeType::Operator { op, ast_node:_, text:_ } => {
             match op{
                 super::et_node::ExprOp::Mul => {
@@ -1026,27 +1027,31 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 // super::et_node::ExprOp::Cast => todo!(),
                 //调用函数
                 super::et_node::ExprOp::Call => {
-                    todo!();
                     // //取函数名和实参
-                    // let called_fun = direct_nodes!(at et_node in et_tree);
-                    // //函数名是数组第一个值，其余为参数
+                    let func_name_and_args = direct_children_nodes!(at et_node in et_tree);
+                    //函数名是数组第一个值，其余为参数
 
-                    // //待处理：检验函数形参
+                    //待处理：检验函数形参
 
-                    // let func_name = called_fun[0];
-                    // let func_name_struct = node!(at func_name in et_tree).et_naked_node;
-                    // let mut func_name_str = String::new();
-                    // match func_name_struct {
-                    //     EtNakedNode::Symbol { sym_idx, ast_node, text, def_or_use }=>{
-                    //     func_name_str = node!(at ast_node in ast_tree).text;
-                    //     },
-                    //     _ => {
-                    //         panic!("et生成错误，call节点下第一个不是函数名")
-                    //     },
-                    // }
-                    // let func_name_symidx = SymIdx::new(scope_node, func_name_str);
-                    // //
-                    // let call_instr = InstrType::new_func_call(assigned, func_name_symidx, args);
+                    let func_name_et_node = func_name_and_args[0];
+                    let et_type = &node!(at func_name_et_node in et_tree).et_node_type;
+                    let mut func_name_str = String::new();
+                    match et_type {
+                        EtNodeType::Symbol { sym_idx, ast_node, text, def_or_use }=>{
+                            let ast_node = *ast_node;
+                            func_name_str = node!(at ast_node in ast_tree).text.clone();
+                        },
+                        _ => {
+                            panic!("et生成错误，call节点下第一个不是函数名")
+                        },
+                    }
+                    let func_name_symidx = SymIdx::new(scope_node, func_name_str);
+                    let mut args_symidxs = vec![];
+                    for &arg_et_node in func_name_and_args[1..].iter(){
+                        args_symidxs.push(process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, arg_et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph))
+                    }
+                    let call_instr = InstrType::new_func_call(None, func_name_symidx.clone(), args_symidxs);
+                    func_name_symidx
                 },
                 //正负号
                 super::et_node::ExprOp::Negative => todo!(),
@@ -1075,7 +1080,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::LMinusMinus => {
                     if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option){
-                        let (tmp_subvar_symidx,tmp_loadvar_symidx) = process_self_attennuation(ast_tree, cfg_graph, et_tree, scope_tree, symtab, symbol_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+                        let (tmp_subvar_symidx,tmp_loadvar_symidx) = process_self_decrement(ast_tree, cfg_graph, et_tree, scope_tree, symtab, symbol_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph);
                         tmp_subvar_symidx
                     }else{
                         panic!("操作符{}下缺少符号",et_node);
@@ -1083,7 +1088,7 @@ fn process_et(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,et_tree:&EtTree,scope_t
                 },
                 super::et_node::ExprOp::RMinusMinus => {
                     if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option){
-                        let (tmp_subvar_symidx,tmp_loadvar_symidx) = process_self_attennuation(ast_tree, cfg_graph, et_tree, scope_tree, symtab,  symbol_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+                        let (tmp_subvar_symidx,tmp_loadvar_symidx) = process_self_decrement(ast_tree, cfg_graph, et_tree, scope_tree, symtab,  symbol_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph);
                         tmp_loadvar_symidx
                     }else{
                         panic!("操作符{}下缺少符号",et_node);
@@ -1220,17 +1225,18 @@ fn parse_func2nhwc(ast_tree:&AstTree,cfg_graph:&mut CfgGraph,symtab:&mut SymTab,
 
 /// 由于cfg 里面包含了其他的一些块和边，例如 branch 块和 after conditioned边
 /// 因此我们需要再做一次转化，把边转化成相应的跳转或者调整代码，把所有node 都转化成BasicBlock
-pub fn parse_cfg_into_nhwc_cfg(cfg_graph:&mut CfgGraph, scope_tree:&mut ScopeTree, ast_tree:&mut AstTree,symtab:&mut SymTab, et_tree:&mut EtTree, ast2scope:&mut HashMap<u32,u32> , mut counter:u32, instr_slab:&mut InstrSlab, symtab_g:&mut Option<&mut SymTabGraph>){
+pub fn parse_cfg_into_nhwc_cfg(cfg_graph:&mut CfgGraph, scope_tree:&mut ScopeTree, ast_tree:&mut AstTree,symtab:&mut SymTab, et_tree:&mut EtTree, ast2scope:&mut HashMap<u32,u32> , mut counter:u32, instr_slab:&mut InstrSlab, symtab_g:&mut Option<&mut SymTabGraph>)->Result<()>{
     // let (cfg_graph,scope_tree,ast_tree,symtab,et_tree,ast2scope)= (&mut context.cfg_graph , &mut context.scope_tree,&mut context.ast_tree,&mut context.symtab,&mut context.et_tree,&context.ast2scope);
+
 
     let start_node: NodeIndex<u32> = NodeIndex::new(0);
     //先遍历一遍函数名，将函数名加入到符号表中
     let cfg_funcs = direct_children_nodes!(at start_node in cfg_graph);
     for cfg_entry in cfg_funcs.clone(){
-        match node!(at cfg_entry in cfg_graph).cfg_type {
+        match node!(at cfg_entry in cfg_graph).get_cfg_node_type()? {
             CfgNodeType::Entry { ast_node,  calls_in_func:_ } => {
                 //查找函数名称所在节点
-                let func_def_ast_node = ast_node;
+                let func_def_ast_node = *ast_node;
                 let ast_funsign = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_directDeclarator at func_def_ast_node in ast_tree).unwrap();
 
                 parse_func2nhwc(ast_tree, cfg_graph,symtab, ast2scope,func_def_ast_node,ast_funsign,cfg_entry,instr_slab, symtab_g);
@@ -1246,7 +1252,7 @@ pub fn parse_cfg_into_nhwc_cfg(cfg_graph:&mut CfgGraph, scope_tree:&mut ScopeTre
         // dfs_vec.reverse();
         for cfg_node in dfs_vec{
             let cfgnode = node!(at cfg_node in cfg_graph);
-            match &cfgnode.cfg_type {
+            match &cfgnode.get_cfg_node_type()? {
                 CfgNodeType::Branch { ast_expr_node,  op_true_head_tail_nodes: true_head_tail_nodes, op_false_head_tail_nodes: false_head_tail_nodes, } =>{
                     parse_branch2nhwc(ast_tree, cfg_graph, scope_tree, et_tree, symtab, ast2scope, *ast_expr_node, cfg_node, &mut counter, instr_slab, symtab_g)
                 },
@@ -1266,4 +1272,11 @@ pub fn parse_cfg_into_nhwc_cfg(cfg_graph:&mut CfgGraph, scope_tree:&mut ScopeTre
             }
         }
     }
+    Ok(())
+}
+
+pub fn split_bb(bb_cfg_node:u32,cfg_graph:&mut CfgGraph){
+    // let cfg_node_struct = node!(at bb_cfg_node in cfg_graph);
+    // cfg_graph.edge_count();
+    // cfg_graph.edge_references()
 }

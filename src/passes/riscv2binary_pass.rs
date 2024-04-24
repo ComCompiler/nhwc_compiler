@@ -1,3 +1,4 @@
+use anyhow::Result;
 use petgraph::dot::Config;
 
 use crate::toolkit::{context::Context, etc::{generate_png_by_graph, read_file_content}, field::Field, gen_ast::parse_as_ast_tree,  pass_manager::Pass};
@@ -12,7 +13,7 @@ impl Riscv2BinaryPass{
 
 impl Pass for Riscv2BinaryPass{
     // 运行这个pass 
-    fn run(&mut self,ctx:&mut Context) {
+    fn run(&mut self,ctx:&mut Context) -> Result<()>{
         todo!();
     }
     // 返回pass的描述，具体作用

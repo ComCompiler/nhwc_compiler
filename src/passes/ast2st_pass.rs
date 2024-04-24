@@ -1,3 +1,4 @@
+use anyhow::Result;
 use crate::toolkit::{context::Context, dot::Config, etc::generate_png_by_graph, gen_scope::parse_ast_to_scope, pass_manager::Pass};
 #[derive(Debug)]
 pub struct Ast2StPass{
@@ -13,7 +14,7 @@ impl Ast2StPass{
 
 impl Pass for Ast2StPass{
     // 运行这个pass 
-    fn run(&mut self,ctx:&mut Context) {
+    fn run(&mut self,ctx:&mut Context) -> Result<()>{
         parse_ast_to_scope(ctx);
         // 3.1 生成对应的pn 
         if self.is_gen_png{
@@ -23,7 +24,7 @@ impl Pass for Ast2StPass{
             }
             generate_png_by_graph(&ctx.scope_tree, "scope_tree".to_string(),&[Config::EdgeNoLabel,Config::Record,Config::Title("scope_tree".to_string())]);
         }
-
+        Ok(())
     }
     // 返回pass的描述，具体作用
     fn get_desc(&self)->String{

@@ -1,3 +1,4 @@
+use anyhow::Result;
 use std::any::Any;
 use crate::toolkit::{context::Context, field::Field, nhwc_instr::InstrType, pass_manager::Pass};
 #[derive(Debug)]
@@ -12,8 +13,9 @@ impl Nhwc2RiscvDebugPass{
 
 impl Pass for Nhwc2RiscvDebugPass{
     // 运行这个pass 
-    fn run(&mut self,ctx:&mut Context) {
+    fn run(&mut self,ctx:&mut Context) -> Result<()>{
         // 拿到一个nhwc的vec,转化成汇编语言
+        Ok(())
     }
     // 返回pass的描述，具体作用
     fn get_desc(&self)->String{

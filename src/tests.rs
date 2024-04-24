@@ -2,14 +2,14 @@
 #[cfg(test)]
 mod tests{
     use core::panic;
+    use std::any::Any;
     use std::{path::PathBuf, str::FromStr, vec};
 
     use clap::Parser;
     use petgraph::{graph::NodeIndex, visit::Data};
     
     
-    use crate::{add_field, add_pass, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_children_nodes, direct_parent_node, find, find_nodes, node, node_mut, passes::pass_demo::PassDemo, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, dot::Config, et_node::{EtNodeType, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::{Type, Value}, gen_ast::parse_as_ast_tree, nhwc_instr::{InstrSlab, Instruction, InstrType}, pass_manager::{self, Pass, PassManager}, symbol::Symbol, symtab::SymTab}, Args};
-    use crate::toolkit::field::FieldsOwner;
+    use crate::{add_field, add_pass, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_children_nodes, direct_parent_node, find, find_nodes, node, node_mut, passes::pass_demo::PassDemo, toolkit::{self, ast_node::find_dfs_rule_ast, cfg_node::{CfgNode, CfgNodeType}, context::{Context, ContextBuilder }, dot::Config, et_node::{EtNode, EtNodeType, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::{Field, Type, Value}, gen_ast::parse_as_ast_tree, nhwc_instr::{InstrSlab, InstrType, Instruction}, pass_manager::{self, Pass, PassManager}, symbol::Symbol, symtab::SymTab}, Args};
 
 
     #[test]
@@ -136,7 +136,7 @@ mod tests{
     }
     #[test]
     fn find_symbol_field(){
-        let field_name = "type";
+        let field_name = "TYPE";
         let mut symtab = SymTab::new();
 
         let x = symtab.add(Symbol::new(0, "x".to_string()) );
@@ -169,7 +169,7 @@ mod tests{
     }
     #[test]
     fn try_instruction_fmt(){
-        const VALUE:&str = "value";
+        const VALUE:&str = "VALUE";
         let mut symtab = SymTab::new();
 
         let lhs = add_symbol!({"lhs".to_string()} of scope {0} with field VALUE:{Value::I32(None)} to symtab);

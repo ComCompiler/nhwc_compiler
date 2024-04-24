@@ -1,6 +1,7 @@
 use petgraph::prelude::NodeIndex;
 
 use crate::{add_edge, antlr_parser::cparser::{RULE_declaration, RULE_expression, RULE_forDeclaration}, toolkit::{self, ast_node::find_dfs_rule_ast, context::Context, dot::Config, et_node::EtNodeType, etc::generate_png_by_graph, pass_manager::Pass}};
+use anyhow::Result;
 #[derive(Debug)]
 pub struct Ast2EtDebugPass{
     is_gen_png:bool
@@ -15,7 +16,7 @@ impl Ast2EtDebugPass{
 
 impl Pass for Ast2EtDebugPass{
     // 运行这个pass 
-    fn run(&mut self,ctx:&mut Context) {
+    fn run(&mut self,ctx:&mut Context) ->Result<()> {
         let et_tree = &mut ctx.et_tree;
 
         //dfs遍历ast找到第一个 expr stmt
@@ -32,13 +33,14 @@ impl Pass for Ast2EtDebugPass{
         }
         //debug输出et_node内容
         for et_node in et_tree.node_weights_mut(){
-            et_node.load_ast_node_text(&ctx.ast_tree)
+            et_node.load_ast_node_text(&ctx.ast_tree)?
         }
         // 1.1 生成对应的png 
         if self.is_gen_png{
             generate_png_by_graph(&ctx.et_tree,"et_tree".to_string(),&[Config::EdgeNoLabel,Config::Record,Config::Title("et_tree".to_string())]);  
         }
 
+        Ok(())
     }
     // 返回pass的描述，具体作用
     fn get_desc(&self)->String{

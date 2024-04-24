@@ -1,33 +1,37 @@
 use crate::{find, Args};
 
+use super::field::{Fields};
 use super::{context::Context, field::Field, symtab::SymIdx};
-use super::field::{Fields, FieldsOwner};
+use anyhow::Result;
+use colored::Colorize;
 
-pub trait Pass{
-    fn run(&mut self,ctx:&mut Context);
-    fn get_desc(&self)->String;
-    fn get_pass_name(&self)->String;
+pub trait Pass {
+    fn run(&mut self, ctx: &mut Context) -> Result<()>;
+    fn get_desc(&self) -> String;
+    fn get_pass_name(&self) -> String;
 }
-pub struct PassManager{
-    /// 其中放置 所有pass 的运行顺序的string 
-    passes:Vec<Box<dyn Pass>>,
-    ctx :Context
+pub struct PassManager {
+    /// 其中放置 所有pass 的运行顺序的string
+    passes: Vec<Box<dyn Pass>>,
+    ctx: Context,
 }
 impl PassManager {
-    pub fn new(args:Args)-> Self{
-        PassManager{
+    pub fn new(args: Args) -> Self {
+        PassManager {
             passes: vec![],
             ctx: Context::new(args),
         }
     }
-    pub fn add_pass(&mut self,pass:Box<dyn Pass>){
+    pub fn add_pass(&mut self, pass: Box<dyn Pass>) {
         self.passes.push(pass);
     }
     /// 调用这个函数运行 PassManager 中的所有函数
-    pub fn execute_passes(&mut self){
-        for pass in &mut self.passes{
-            println!("Pass {} run",pass.get_pass_name());
-            pass.run(&mut self.ctx)
+    pub fn execute_passes(&mut self) {
+        for pass in &mut self.passes {
+            println!("Pass {} run", pass.get_pass_name());
+            if let Err(e) = pass.run(&mut self.ctx){
+                println!("{}",format!("{}",e).red());
+            }
         }
     }
 }

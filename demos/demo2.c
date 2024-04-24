@@ -18,6 +18,7 @@ int main()
             break;
         case 2:
             none();
+            none(3);
             int b = a= ++kill();
             c = 1+2;
             break;

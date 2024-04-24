@@ -1,4 +1,7 @@
-use std::{fmt::{self, Display, Write}, string};
+use std::{
+    fmt::{self, Display, Write},
+    string,
+};
 
 use petgraph::visit::{
     EdgeRef, GraphProp, IntoEdgeReferences, IntoNodeReferences, NodeIndexable, NodeRef,
@@ -117,13 +120,13 @@ pub enum Config {
     NodeNoLabel,
     /// Do not print the graph/digraph string.
     GraphContentOnly,
-    /// Rect with special label 
+    /// Rect with special label
     Record,
-    //// rounded style 
+    //// rounded style
     Rounded,
     /// symtab visualization
     SymTab,
-    
+
     #[doc(hidden)]
     _Incomplete(()),
 }
@@ -168,10 +171,10 @@ make_config_struct!(
     SymTab,
 );
 #[derive(Clone)]
-pub enum Title{
+pub enum Title {
     Title(Option<String>),
 }
-impl Debug for Title{
+impl Debug for Title {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Title::Title(Some(t)) => write!(f, "{:?}", t),
@@ -179,8 +182,8 @@ impl Debug for Title{
         }
     }
 }
-impl Title{
-    pub fn new(s:String)->Self{
+impl Title {
+    pub fn new(s: String) -> Self {
         Title::Title(Some(s))
     }
 }
@@ -188,19 +191,25 @@ impl<'a, G> Dot<'a, G>
 where
     G: IntoNodeReferences + IntoEdgeReferences + NodeIndexable + GraphProp,
 {
-    fn graph_fmt<NF, EF>(&self, f: &mut fmt::Formatter, node_fmt: NF, edge_fmt: EF ) -> fmt::Result
+    fn graph_fmt<NF, EF>(&self, f: &mut fmt::Formatter, node_fmt: NF, edge_fmt: EF) -> fmt::Result
     where
         NF: Fn(&G::NodeWeight, &mut fmt::Formatter) -> fmt::Result,
         EF: Fn(&G::EdgeWeight, &mut fmt::Formatter) -> fmt::Result,
     {
         let g = self.graph;
-        // 拿到 图  
+        // 拿到 图
         if !self.config.GraphContentOnly {
             writeln!(f, "{} {{", TYPE[g.is_directed() as usize])?;
         }
         // 给图添加标题
-        if  !self.config.Title.is_empty(){
-            writeln!(f,"{}label=\"{}\";\n{}fontsize=\"40\";", INDENT, self.config.Title.clone(), INDENT)?;
+        if !self.config.Title.is_empty() {
+            writeln!(
+                f,
+                "{}label=\"{}\";\n{}fontsize=\"40\";",
+                INDENT,
+                self.config.Title.clone(),
+                INDENT
+            )?;
         }
 
         // output all labels
@@ -217,11 +226,11 @@ where
                 if self.config.NodeIndexLabel {
                     write!(f, "{}", g.to_index(node.id()))?;
                 } else {
-                    if self.config.SymTab{
+                    if self.config.SymTab {
                         SymtabEscaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
-                    }else if self.config.Record{
+                    } else if self.config.Record {
                         RecordEscaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
-                    }else {
+                    } else {
                         Escaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
                     }
                 }
@@ -249,7 +258,7 @@ where
                 write!(f, "\" ")?;
             }
             // if !self.config.EdgeColorConfig.is_empty(){
-            //     // 匹配当前边属性:find_sym, add_sym, find_field, add_field 
+            //     // 匹配当前边属性:find_sym, add_sym, find_field, add_field
             //     write!(f,"color=\"{}\",",self.config.EdgeColorConfig);
             // }
             writeln!(f, "{}]", (self.get_edge_attributes)(g, edge))?;
@@ -402,7 +411,7 @@ struct SymtabEscaped<T>(T);
 
 impl<T> fmt::Display for SymtabEscaped<T>
 where
-    T: fmt::Display ,
+    T: fmt::Display,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if f.alternate() {
