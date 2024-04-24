@@ -1,19 +1,12 @@
 use core::panic;
-use std::{
-    collections::{BTreeMap, HashMap},
-    fmt::{Display, Formatter},
-};
-
+use std::{ collections::{BTreeMap, HashMap}, fmt::{Display, Formatter}, };
 use petgraph::stable_graph::StableDiGraph;
-
-use crate::find;
-
-use super::{
-    field::{self, Field, Type},
-    symbol::Symbol,
-};
+use crate::{find, reg_field_name};
+use super::{ field::{self, Field, Type}, symbol::Symbol, };
 use core::fmt::Debug;
 
+reg_field_name!(USE_COUNTER:use_counter);
+reg_field_name!(TYPE:type);
 pub type SymTabGraph = StableDiGraph<SymTab, SymTabEdge, u32>;
 
 #[derive(Clone)]
@@ -62,8 +55,6 @@ impl SymIdx {
     //     paste::item
     // }
 }
-pub static USE_COUNTER: &str = "use_counter";
-pub static TYPE: &str = "type";
 // macro_rules! make_get_field_func {
 //     ($($functionname:ident $field_name:ident:$field_type:ident),*) => {
 

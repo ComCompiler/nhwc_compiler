@@ -16,7 +16,7 @@ use super::nhwc_instr::InstrSlab;
 
 pub type CfgGraph = StableDiGraph<CfgNode, CfgEdge, u32>;
 // pub static CFG_NODE_TYPE: &str = "cfg_node_type";
-reg_field_name!(CFG_NODE_TYPE);
+reg_field_name!(CFG_NODE_TYPE:cfg_node_type);
 
 #[derive(Clone,Debug)]
 pub enum CfgNodeType {

@@ -890,8 +890,7 @@ macro_rules! element {
 
 #[macro_export]
 macro_rules! reg_field_name{
-    ($upper_field_name:ident)=>{
-        use paste::paste;
-        pub static $upper_field_name: &str = &stringify!($upper_field_name);
+    ($upper_field_name:ident:$display_name:ident)=>{
+        pub static $upper_field_name: &str = &stringify!($display_name);
     };
 }
