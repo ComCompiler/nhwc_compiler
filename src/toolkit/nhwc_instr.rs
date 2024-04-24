@@ -97,7 +97,7 @@ pub enum MemOp{
 // }
 
 #[derive(Clone)]
-pub enum NakedInstruction{
+pub enum InstrType{
     Label{
         label_symidx:SymIdx,
     },
@@ -143,7 +143,7 @@ pub enum NakedInstruction{
 }
 #[derive(Clone)]
 pub struct Instruction{
-    naked_instr:NakedInstruction,
+    naked_instr:InstrType,
     info:Fields
 }
 #[derive(Clone,Debug)]
@@ -216,7 +216,7 @@ impl Debug for Trans{
     }
 }
 // 以下是构造函数:
-impl NakedInstruction{
+impl InstrType{
     pub fn to_instr(self)->Instruction{
         Instruction{
             naked_instr: self,
@@ -357,7 +357,7 @@ impl Debug for PhiOp{
         todo!()
     }
 }
-impl Debug for NakedInstruction{ // 以类似llvm ir的格式打印输出
+impl Debug for InstrType{ // 以类似llvm ir的格式打印输出
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Arith { lhs, rhs } => 

@@ -8,7 +8,7 @@ mod tests{
     use petgraph::{graph::NodeIndex, visit::Data};
     
     
-    use crate::{add_field, add_pass, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_children_nodes, direct_parent_node, find, find_nodes, node, node_mut, passes::pass_demo::PassDemo, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, dot::Config, et_node::{EtNodeType, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::{Type, Value}, gen_ast::parse_as_ast_tree, nhwc_instr::{InstrSlab, Instruction, NakedInstruction}, pass_manager::{self, Pass, PassManager}, symbol::Symbol, symtab::SymTab}, Args};
+    use crate::{add_field, add_pass, add_symbol, antlr_parser::{clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}}, direct_children_nodes, direct_parent_node, find, find_nodes, node, node_mut, passes::pass_demo::PassDemo, toolkit::{self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder }, dot::Config, et_node::{EtNodeType, EtNode, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::{Type, Value}, gen_ast::parse_as_ast_tree, nhwc_instr::{InstrSlab, Instruction, InstrType}, pass_manager::{self, Pass, PassManager}, symbol::Symbol, symtab::SymTab}, Args};
     use crate::toolkit::field::FieldsOwner;
 
 
@@ -176,8 +176,8 @@ mod tests{
         let a = add_symbol!({"No.1".to_string()} of scope {0} to symtab);
         let b = add_symbol!({"No.2".to_string()} of scope {0} to symtab);
 
-        let instr=NakedInstruction::new_add(lhs.clone(), a.clone(), b.clone(),Type::I32);
-        let instr2 = NakedInstruction::new_add(lhs.clone(), a.clone(), b.clone(),Type::I32);
+        let instr=InstrType::new_add(lhs.clone(), a.clone(), b.clone(),Type::I32);
+        let instr2 = InstrType::new_add(lhs.clone(), a.clone(), b.clone(),Type::I32);
         println!("{:?}",instr);
         println!("{:?}",instr2);
     }

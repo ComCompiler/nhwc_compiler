@@ -77,6 +77,16 @@ impl Type{
             Type::I32
         }
     }
+    pub fn can_implicit_trans_to(another_type:&Type) -> bool{
+        match another_type{
+            Type::I32 => todo!(),
+            Type::F32 => todo!(),
+            Type::I1 => todo!(),
+            Type::Void => todo!(),
+            Type::Label => todo!(),
+            Type::Fn { arg_syms, ret_sym } => todo!(),
+        }
+    }
 }
 
 impl Debug for Type{
