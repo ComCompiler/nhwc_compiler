@@ -348,7 +348,8 @@ fn parse_whileloop2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&S
             let label_instr = InstrType::new_label(SymIdx::new(0, "while.head".to_string())).to_instr();
             push_instr!(label_instr to cfg_whileloop in cfg_graph slab instr_slab);
             if let Some(expr_scope) = ast2scope.get(&expr_ast){
-                let condition_result = parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *expr_scope,expr_ast, cfg_whileloop, counter, instr_slab, symtab_graph)?;
+                let jump_det = parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *expr_scope,expr_ast, cfg_whileloop, counter, instr_slab, symtab_graph)?;
+                node_mut!(at cfg_whileloop in cfg_graph).add_jump_det_with_debug(jump_det, symtab, symtab_graph);
             }else{
                 return Err(anyhow!("找不到astnode的scope"))
             }
@@ -384,7 +385,8 @@ fn parse_forloop2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&Sco
             let label_mid_instr = InstrType::new_label(label_mid_symidx).to_instr();
             push_instr!(label_mid_instr to cfg_forloop in cfg_graph slab instr_slab);
             if let Some(mid_scope) = ast2scope.get(&ast_mid_node){
-                let condition_result = parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *mid_scope,ast_mid_node, cfg_forloop, counter, instr_slab, symtab_graph)?;
+                let jump_det = parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *mid_scope,ast_mid_node, cfg_forloop, counter, instr_slab, symtab_graph)?;
+                node_mut!(at cfg_forloop in cfg_graph).add_jump_det_with_debug(jump_det, symtab, symtab_graph);
             }else{
                 return Err(anyhow!("找不到astnode的scope"))
             }
@@ -425,11 +427,12 @@ fn parse_forloop2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&Sco
     //     }
     // }
 //}
-fn parse_branch2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&ScopeTree,et_tree:&mut EtTree,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,ast_expr_node:u32,cfg_node:u32,counter:&mut u32, instr_slab:&mut InstrSlab, symtab_g:&mut Option<&mut SymTabGraph>)->Result<()>{
+fn parse_branch2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&ScopeTree,et_tree:&mut EtTree,symtab:&mut SymTab,ast2scope:&HashMap<u32,u32>,ast_expr_node:u32,cfg_branch_node:u32,counter:&mut u32, instr_slab:&mut InstrSlab, symtab_g:&mut Option<&mut SymTabGraph>)->Result<()>{
     match(rule_id!(at ast_expr_node in ast_tree),ast_expr_node){
         (RULE_expression,expr_node) =>{
             if let Some(expr_scope) = ast2scope.get(&expr_node){
-                let condition_result = parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *expr_scope,expr_node, cfg_node, counter, instr_slab, symtab_g)?;
+                let jump_det = parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *expr_scope,expr_node, cfg_branch_node, counter, instr_slab, symtab_g)?;
+                node_mut!(at cfg_branch_node in cfg_graph).add_jump_det(jump_det);
             }else{
                 return Err(anyhow!("找不到astnode的scope"))
             }

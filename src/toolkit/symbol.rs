@@ -22,8 +22,11 @@ impl Debug for Symbol {
         )
     }
 }
+/* 引用计数 */
 reg_field_name!(USE_COUNTER:use_counter);
+/* 符号的类型 */
 reg_field_name!(TYPE:type);
+
 make_get_field_fn_for_struct!{Symbol with fields fields}
 make_specialized_get_field_fn_for_struct!{Symbol USE_COUNTER:UseCounter,TYPE:Type with fields fields}
 

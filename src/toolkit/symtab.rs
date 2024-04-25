@@ -1,7 +1,7 @@
 use core::panic;
 use std::{ collections::{BTreeMap, HashMap}, fmt::{Display, Formatter}, };
 use petgraph::stable_graph::StableDiGraph;
-use crate::{find, reg_field_name};
+use crate::{find, make_field_trait_for_struct, reg_field_name};
 use super::{ field::{self, Field, Type}, symbol::Symbol, };
 use core::fmt::Debug;
 
@@ -32,6 +32,7 @@ pub struct SymIdx {
     pub symbol_name: String,
     pub index_ssa: Option<u32>,
 }
+make_field_trait_for_struct!(SymIdx);
 impl SymIdx {
     pub fn new(scope_node: u32, symbol_name: String) -> Self {
         SymIdx {

@@ -79,7 +79,6 @@ pub fn process_for( cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut S
         for_before_node,
         for_mid_node,
         for_after_node,
-        None,
     );
     let cfg_for_node = add_node!(branch_struct to cfg_graph);
     if let Some((st_head_node, st_tail_node)) = op_head_tail {
