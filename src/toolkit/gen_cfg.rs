@@ -1,3 +1,5 @@
+use std::io::empty;
+
 use crate::antlr_parser::cparser::{
     RULE_blockItem, RULE_blockItemList, RULE_declaration, RULE_expression,
     RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition,
@@ -5,6 +7,7 @@ use crate::antlr_parser::cparser::{
     RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement,
     RULE_switchSelection, RULE_whileIterationStatement,
 };
+use crate::{incoming_edge_weight, outgoing_edge_weight,};
 use anyhow::Context;
 use anyhow::Result;
 use crate::toolkit::ast_node::AstTree;
@@ -30,15 +33,18 @@ pub fn process_while( cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut
     let expr_node = find!(rule RULE_expression at current_while_node in ast_tree).unwrap();
     let statement_node = find!(rule RULE_statement at current_while_node in ast_tree).unwrap();
     let op_head_tail_nodes = process_stmt(cfg_graph, ast_tree, symtab, statement_node)?;
-    let loop_struct = CfgNode::new_while(expr_node, None, op_head_tail_nodes);
-    let cfg_loop_node = add_node!(loop_struct to cfg_graph);
+    let loop_struct = CfgNode::new_while(expr_node);
+    let cfg_while_node = add_node!(loop_struct to cfg_graph);
     if let Some((st_head_node, st_tail_node)) = op_head_tail_nodes {
-        add_edge!({CfgEdgeType::Direct {}.to_cfg_edge() } from cfg_loop_node to st_head_node in cfg_graph);
-        add_edge!({CfgEdgeType::Direct {}.to_cfg_edge()} from st_tail_node to cfg_loop_node in cfg_graph);
+        add_edge!({CfgEdge::new_body_head()} from cfg_while_node to st_head_node in cfg_graph);
+        add_edge!({CfgEdge::new_body_tail()} from st_tail_node to cfg_while_node in cfg_graph);
     } else {
-        add_edge!({CfgEdgeType::Direct {}.to_cfg_edge()} from cfg_loop_node to cfg_loop_node in cfg_graph);
+        let empty_bb_struct = CfgNode::new_bb(vec![]);
+        let empty_bb = add_node!(empty_bb_struct to cfg_graph);
+        add_edge!({CfgEdge::new_body_head()} from cfg_while_node to empty_bb in cfg_graph);
+        add_edge!({CfgEdge::new_body_tail()} from empty_bb to cfg_while_node in cfg_graph);
     }
-    Ok(Some((cfg_loop_node, cfg_loop_node)))
+    Ok(Some((cfg_while_node, cfg_while_node)))
 }
 
 ///处理循环过程的cfg节点处理和连接，返回branch和statement的idx
@@ -74,15 +80,17 @@ pub fn process_for( cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut S
         for_mid_node,
         for_after_node,
         None,
-        op_head_tail,
     );
     let cfg_for_node = add_node!(branch_struct to cfg_graph);
     if let Some((st_head_node, st_tail_node)) = op_head_tail {
-        add_edge!({CfgEdgeType::Direct {}.to_cfg_edge() } from cfg_for_node to st_head_node in cfg_graph);
-        add_edge!({CfgEdgeType::Direct {}.to_cfg_edge() } from st_tail_node to cfg_for_node in cfg_graph);
+        add_edge!({CfgEdge::new_body_head()} from cfg_for_node to st_head_node in cfg_graph);
+        add_edge!({CfgEdge::new_body_tail()} from st_tail_node to cfg_for_node in cfg_graph);
     } else {
-        // 说明这个 for body 里面是空的
-        add_edge!({CfgEdgeType::Direct {}.to_cfg_edge()} from cfg_for_node to cfg_for_node in cfg_graph);
+        // 说明这个 for body 里面是空的，可即便是空的我们也要加上一个空的basic block 便于后续处理
+        let empty_bb_struct = CfgNode::new_bb(vec![]);
+        let empty_bb = add_node!(empty_bb_struct to cfg_graph);
+        add_edge!({CfgEdge::new_body_head()} from cfg_for_node to empty_bb in cfg_graph);
+        add_edge!({CfgEdge::new_body_tail()} from empty_bb to cfg_for_node in cfg_graph);
     }
     Ok(Some((cfg_for_node, cfg_for_node)))
 }
@@ -160,14 +168,14 @@ pub fn process_if( cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut Sy
 
         match p0 {
             Some((st_head_node, st_tail_node)) => {
-                add_edge!({CfgEdgeType::IfTrue {}.to_cfg_edge() } from cfg_branch_node to st_head_node in cfg_graph);
-                add_edge!({CfgEdgeType::Direct {}.to_cfg_edge()} from st_tail_node to cfg_gather_node in cfg_graph);
+                add_edge!({CfgEdge::new_if_true()} from cfg_branch_node to st_head_node in cfg_graph);
+                add_edge!({CfgEdge::new_if2gather()} from st_tail_node to cfg_gather_node in cfg_graph);
             }
             None => {
-                add_edge!({CfgEdgeType::IfTrue {}.to_cfg_edge()} from cfg_branch_node to cfg_gather_node in cfg_graph);
+                add_edge!({CfgEdge::new_if_true()} from cfg_branch_node to cfg_gather_node in cfg_graph);
             }
         }
-        add_edge!({CfgEdgeType::Direct {}.to_cfg_edge()} from cfg_branch_node to cfg_gather_node in cfg_graph);
+        add_edge!({CfgEdge::new_if_false()} from cfg_branch_node to cfg_gather_node in cfg_graph);
         Ok(Some((cfg_branch_node, cfg_gather_node)))
     } else if statement_nodes.len() == 2 {
         let p0 = process_stmt(cfg_graph, ast_tree, symtab, statement_nodes[0])?;
@@ -181,20 +189,20 @@ pub fn process_if( cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut Sy
 
         match p0 {
             Some((st_head_node, st_tail_node)) => {
-                add_edge!({CfgEdgeType::IfTrue {}.to_cfg_edge() } from cfg_branch_node to st_head_node in cfg_graph);
-                add_edge!({CfgEdgeType::Direct {}.to_cfg_edge()  } from st_tail_node to cfg_gather_node in cfg_graph);
+                add_edge!({CfgEdge::new_if_true()} from cfg_branch_node to st_head_node in cfg_graph);
+                add_edge!({CfgEdge::new_if2gather()} from st_tail_node to cfg_gather_node in cfg_graph);
             }
             None => {
-                add_edge!({CfgEdgeType::IfTrue {}.to_cfg_edge()} from cfg_branch_node to cfg_gather_node in cfg_graph);
+                add_edge!({CfgEdge::new_if_true()} from cfg_branch_node to cfg_gather_node in cfg_graph);
             }
         }
         match p1 {
             Some((st_head_node, st_tail_node)) => {
-                add_edge!({CfgEdgeType::IfFalse {}.to_cfg_edge() } from cfg_branch_node to st_head_node in cfg_graph);
-                add_edge!({CfgEdgeType::Direct {}.to_cfg_edge()  } from st_tail_node to cfg_gather_node in cfg_graph);
+                add_edge!({CfgEdge::new_if_false()} from cfg_branch_node to st_head_node in cfg_graph);
+                add_edge!({CfgEdge::new_if2gather()} from st_tail_node to cfg_gather_node in cfg_graph);
             }
             None => {
-                add_edge!({CfgEdgeType::IfFalse {}.to_cfg_edge()} from cfg_branch_node to cfg_gather_node in cfg_graph);
+                add_edge!({CfgEdge::new_if_false()} from cfg_branch_node to cfg_gather_node in cfg_graph);
             }
         }
         Ok(Some((cfg_branch_node, cfg_gather_node)))
@@ -217,53 +225,53 @@ pub fn process_switch( cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mu
         find!(rule RULE_statement finally RULE_compoundStatement at switch_node in ast_tree)
             .unwrap();
     if let Some((st_head_node, st_tail_node)) = process_compound(cfg_graph, ast_tree, symtab, compound_stmt_node)? {
-        add_edge!({CfgEdgeType::Direct {}.to_cfg_edge()} from cfg_branch_node to st_head_node in cfg_graph);
-        add_edge!({CfgEdgeType::Direct {}.to_cfg_edge()} from st_tail_node to cfg_gather_node in cfg_graph);
+        add_edge!({CfgEdge::new_direct()} from cfg_branch_node to st_head_node in cfg_graph);
+        add_edge!({CfgEdge::new_direct()} from st_tail_node to cfg_gather_node in cfg_graph);
     }
     Ok(Some((cfg_branch_node, cfg_gather_node)))
 }
 
 /// 首先确保这两个节点直接相连,如果合并成功，返回合并后的 node ，如果合并失败，返回None
-/// 需要注意的是 一个gather 和一个空的 BasicBlock 合并也是一个gather
+/// 需要注意的是 一个gather 和一个空的 BasicBlock 不可以合并，其次我们需要保留边的属性
 pub fn try_unite( opt_node1: Option<u32>, opt_node2: Option<u32>, cfg_graph: &mut CfgGraph,) -> Result<Option<u32>> {
+    // return Ok(None);
     match (opt_node1, opt_node2) {
         (Some(node1), Some(node2)) => {
-            let (node_struct1, node_struct2) =
-                cfg_graph.index_twice_mut(NodeIndex::from(node1), NodeIndex::from(node2));
+            let (node_struct1, node_struct2) = cfg_graph.index_twice_mut(NodeIndex::from(node1), NodeIndex::from(node2));
             match (node_struct1.get_mut_cfg_node_type().with_context(||format!("unite 时找不到cfg_node对应的cfg_node_type"))?,
                 node_struct2.get_mut_cfg_node_type().with_context(||format!("unite 时找不到cfg_node对应的cfg_node_type"))?) {
                 ( CfgNodeType::BasicBlock { ast_nodes: ast_nodes1, }, CfgNodeType::BasicBlock { ast_nodes: ast_nodes2 }) => {
                     ast_nodes1.extend_from_slice(&ast_nodes2);
-                    let edges: Vec<u32> = cfg_graph
+                    let edges: Vec<_> = cfg_graph
                         .edges(NodeIndex::from(node2))
-                        .map(|x| x.id().index() as u32)
+                        .map(|x| (x.id().index() as u32, x.weight().clone()))
                         .collect();
-                    for edge in edges {
+                    for (edge,weight) in edges {
                         let dst = cfg_graph.edge_endpoints(EdgeIndex::from(edge)).unwrap().1;
-                        add_edge!({CfgEdgeType::Direct{}.to_cfg_edge() } from node1 to dst in cfg_graph);
+                        add_edge!({weight} from node1 to dst in cfg_graph);
                     }
                     cfg_graph.remove_node(NodeIndex::from(node2));
                     Ok(Some(node1))
                 }
-                ( _, CfgNodeType::BasicBlock { ast_nodes: ast_nodes2, },) => {
-                    // 检测如果 node2 里面 bb 内容为空 就删掉这个bb 并且转移它的边
-                    let edges: Vec<u32> = cfg_graph
-                        .edges(NodeIndex::from(node2))
-                        .map(|x| x.id().index() as u32)
-                        .collect();
-                    if edges.len() == 0 {
-                        for edge in edges {
-                            let dst = cfg_graph
-                                .edge_endpoints(EdgeIndex::from(edge))
-                                .unwrap()
-                                .1
-                                .index() as u32;
-                            add_edge!({CfgEdgeType::Direct {  }.to_cfg_edge()} from node1 to dst in cfg_graph);
-                        }
-                        cfg_graph.remove_node(NodeIndex::from(node2));
-                    }
-                    Ok(Some(node1))
-                }
+                // ( _, CfgNodeType::BasicBlock { ast_nodes: ast_nodes2, },) => {
+                //     // 检测如果 node2 里面 bb 内容为空 就删掉这个bb 并且转移它的边
+                //     let edges: Vec<u32> = cfg_graph
+                //         .edges(NodeIndex::from(node2))
+                //         .map(|x| x.id().index() as u32)
+                //         .collect();
+                //     if edges.len() == 0 {
+                //         for edge in edges {
+                //             let dst = cfg_graph
+                //                 .edge_endpoints(EdgeIndex::from(edge))
+                //                 .unwrap()
+                //                 .1
+                //                 .index() as u32;
+                //             add_edge!({CfgEdge::new_direct()} from node1 to dst in cfg_graph);
+                //         }
+                //         cfg_graph.remove_node(NodeIndex::from(node2));
+                //     }
+                //     Ok(Some(node1))
+                // }
                 _ => {
                     Ok(None)
                     // 如果其中都不是BasicBlock ，那么合并不了一点
@@ -296,7 +304,7 @@ pub fn process_compound( cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &
                     let opt_unite_bb_node = try_unite(opt_current_cfg_tail, opt_stmt_head, cfg_graph)?;
                     match (opt_unite_bb_node, opt_stmt_head, opt_current_cfg_tail) {
                         (None, Some(stmt_head), Some(current_cfg_tail)) => {
-                            add_edge!({CfgEdgeType::Direct{}.to_cfg_edge()} from current_cfg_tail to stmt_head in cfg_graph);
+                            add_edge!({CfgEdge::new_direct()} from current_cfg_tail to stmt_head in cfg_graph);
                         }
                         _ => {}
                     };
@@ -319,10 +327,10 @@ pub fn process_compound( cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &
                     let (opt_current_cfg_head, opt_current_cfg_tail) = opt_current_cfg_head_and_tail.unzip();
                     let opt_unite_bb_node = try_unite(opt_current_cfg_tail, opt_declare_head, cfg_graph)?;
                     match (opt_unite_bb_node, opt_declare_head, opt_current_cfg_tail) {
-                        _ => {}
                         (None, Some(declare_head), Some(current_cfg_tail)) => {
-                            add_edge!({CfgEdgeType::Direct{}.to_cfg_edge()} from current_cfg_tail to declare_head in cfg_graph);
+                            add_edge!({CfgEdge::new_direct()} from current_cfg_tail to declare_head in cfg_graph);
                         }
+                        _ => {}
                     }
                     Option::zip(
                         opt_current_cfg_head
@@ -354,7 +362,7 @@ pub fn parse_ast_to_cfg( ast_tree: &AstTree, cfg_graph: &mut CfgGraph, symtab: &
     for func_def_node in funcdef_nodes {
         let entry_struct = CfgNode::new_entry(func_def_node, 0);
         let cfg_entry_node = add_node!(entry_struct to cfg_graph);
-        add_edge!( {CfgEdgeType::Direct {  }.to_cfg_edge() } from  cfg_func_parent_node to cfg_entry_node in cfg_graph);
+        add_edge!( {CfgEdge::new_direct()} from  cfg_func_parent_node to cfg_entry_node in cfg_graph);
         let exit_struct = CfgNode::new_exit(func_def_node);
         let cfg_exit_node = add_node!(exit_struct to cfg_graph);
         // println!("funcdef {}",funcdef_node);
@@ -363,11 +371,11 @@ pub fn parse_ast_to_cfg( ast_tree: &AstTree, cfg_graph: &mut CfgGraph, symtab: &
 
         match process_compound(cfg_graph, ast_tree, symtab, current_compound_node)? {
             Some((cfg_head_node, cfg_tail_node)) => {
-                add_edge!( {CfgEdgeType::Direct {  }.to_cfg_edge()} from  cfg_entry_node to cfg_head_node in cfg_graph);
-                add_edge!( {CfgEdgeType::Direct {  }.to_cfg_edge()} from  cfg_tail_node to cfg_exit_node in cfg_graph);
+                add_edge!( {CfgEdge::new_direct()} from  cfg_entry_node to cfg_head_node in cfg_graph);
+                add_edge!( {CfgEdge::new_direct()} from  cfg_tail_node to cfg_exit_node in cfg_graph);
             }
             None => {
-                add_edge!( {CfgEdgeType::Direct {  }.to_cfg_edge()} from  cfg_entry_node to cfg_exit_node in cfg_graph);
+                add_edge!( {CfgEdge::new_direct()} from  cfg_entry_node to cfg_exit_node in cfg_graph);
             }
         }
     }

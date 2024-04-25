@@ -5,8 +5,6 @@ use crate::{find, reg_field_name};
 use super::{ field::{self, Field, Type}, symbol::Symbol, };
 use core::fmt::Debug;
 
-reg_field_name!(USE_COUNTER:use_counter);
-reg_field_name!(TYPE:type);
 pub type SymTabGraph = StableDiGraph<SymTab, SymTabEdge, u32>;
 
 #[derive(Clone)]
@@ -70,7 +68,7 @@ impl SymTab {
     }
 
     // 添加或更新符号，如果是更新，那么返回旧的符号
-    pub fn add(&mut self, sym: Symbol) -> SymIdx {
+    pub fn add_symbol(&mut self, sym: Symbol) -> SymIdx {
         let symidx = sym.symidx.clone();
         let symidx_cloned = sym.symidx.clone();
         match self.map.insert(symidx, sym) {
@@ -83,32 +81,32 @@ impl SymTab {
     }
 
     // 查找符号
-    pub fn get_verbose(&self, symbol_name: String, scope_node: u32) -> Option<&Symbol> {
+    pub fn get_symbol_verbose(&self, symbol_name: String, scope_node: u32) -> Option<&Symbol> {
         self.map.get(&SymIdx {
             scope_node,
             symbol_name,
             index_ssa: None,
         })
     }
-    pub fn get(&self, symbol_index: &SymIdx) -> Option<&Symbol> {
+    pub fn get_symbol(&self, symbol_index: &SymIdx) -> Option<&Symbol> {
         self.map.get(symbol_index)
     }
-    pub fn get_verbose_mut(&mut self, symbol_name: String, scope_node: u32) -> Option<&mut Symbol> {
+    pub fn get_mut_symbol_verbose(&mut self, symbol_name: String, scope_node: u32) -> Option<&mut Symbol> {
         self.map.get_mut(&SymIdx {
             scope_node,
             symbol_name,
             index_ssa: None,
         })
     }
-    pub fn get_mut(&mut self, symbol_index: &SymIdx) -> Option<&mut Symbol> {
+    pub fn get_mut_symbol(&mut self, symbol_index: &SymIdx) -> Option<&mut Symbol> {
         self.map.get_mut(symbol_index)
     }
 
     // 删除符号
-    pub fn remove(&mut self, symbol_index: &SymIdx) {
+    pub fn remove_symbol(&mut self, symbol_index: &SymIdx) {
         self.map.remove(symbol_index);
     }
-    pub fn remove_verbose(&mut self, symbol_name: String, scope_node: u32) {
+    pub fn remove_symbol_verbose(&mut self, symbol_name: String, scope_node: u32) {
         self.map.remove(&SymIdx {
             scope_node,
             symbol_name,

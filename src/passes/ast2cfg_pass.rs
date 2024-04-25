@@ -15,13 +15,16 @@ impl Ast2CfgPass{
 impl Pass for Ast2CfgPass{
     // 运行这个pass 
     fn run(&mut self,ctx:&mut Context) -> Result<()> {
-        parse_ast_to_cfg(&ctx.ast_tree,&mut ctx.cfg_graph,&mut ctx.symtab,&ctx.scope_tree);
+        parse_ast_to_cfg(&ctx.ast_tree,&mut ctx.cfg_graph,&mut ctx.symtab,&ctx.scope_tree)?;
         // 1.1 生成对应的png 
         for cfg_node in ctx.cfg_graph.node_weights_mut(){
-            cfg_node.load_ast_node_text(&ctx.ast_tree);
+            cfg_node.load_ast_node_text(&ctx.ast_tree)?;
+        }
+        for cfg_edge in ctx.cfg_graph.edge_weights_mut(){
+            cfg_edge.load_ast_node_text(&ctx.ast_tree)?;
         }
         if self.is_gen_png{
-            generate_png_by_graph(&ctx.cfg_graph,"cfg_graph".to_string(),&[Config::EdgeNoLabel,Config::Record,Config::Rounded,Config::Title("cfg_graph".to_string())]);  
+            f
         }
         Ok(())
     }

@@ -7,8 +7,7 @@ use std::{
 };
 
 use crate::{
-    direct_children_nodes,
-    toolkit::dot::{Config, Dot},
+    debug_info_yellow, direct_children_nodes, toolkit::dot::{Config, Dot}
 };
 use petgraph::stable_graph::NodeIndex;
 use petgraph::{stable_graph::StableGraph, EdgeType};
@@ -61,9 +60,12 @@ pub fn dfs<N, E, Ty>(
     dfs_vec.push(start_node);
 
     let nodes = direct_children_nodes!(at start_node in graph);
+    debug_info_yellow!("{} :neighbors {:?}",start_node,nodes);
+    
     for node in nodes {
         if !visited[node as usize] {
             dfs(graph, node, visited, dfs_vec);
         }
     }
 }
+

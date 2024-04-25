@@ -223,16 +223,18 @@ where
             }
             if !self.config.NodeNoLabel {
                 write!(f, "label = \"")?;
-                if self.config.NodeIndexLabel {
-                    write!(f, "{}", g.to_index(node.id()))?;
+                if self.config.SymTab {
+                    SymtabEscaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
+                } else if self.config.Record {
+                    RecordEscaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
+                    if self.config.NodeIndexLabel {
+                        write!(f, "\\lNodeIndex:[{}]", g.to_index(node.id()))?;
+                    } 
                 } else {
-                    if self.config.SymTab {
-                        SymtabEscaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
-                    } else if self.config.Record {
-                        RecordEscaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
-                    } else {
-                        Escaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
-                    }
+                    Escaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
+                    if self.config.NodeIndexLabel {
+                        write!(f, "\\lNodeIndex:[{}]", g.to_index(node.id()))?;
+                    } 
                 }
                 write!(f, "\" ")?;
             }

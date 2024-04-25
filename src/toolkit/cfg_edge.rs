@@ -1,13 +1,27 @@
 use super::ast_node::AstTree;
+use super::field;
+use super::field::Fields;
+use super::field::FieldsInit;
+use crate::make_field_trait_for_struct;
+use crate::make_get_field_fn_for_struct;
+use crate::make_specialized_get_field_fn_for_struct;
+use crate::reg_field_name;
 use crate::node;
 use crate::NodeIndex;
+use super::symtab::{SymTab,SymTabGraph,SymTabEdge};
+use super::field::Field;
 use std::fmt::Debug;
+use anyhow::Result;
 #[derive(Clone)]
 pub struct CfgEdge {
-    cfg_edge_type: CfgEdgeType,
+    info: Fields,
     text: String,
 }
-#[derive(Clone)]
+reg_field_name!(CFG_EDGE_TYPE:cfg_edge_type);
+make_field_trait_for_struct!(CfgEdgeType);
+make_get_field_fn_for_struct!(CfgEdge with fields info);
+make_specialized_get_field_fn_for_struct!(CfgEdge CFG_EDGE_TYPE:CfgEdgeType with fields info);
+#[derive(Clone,Debug)]
 pub enum CfgEdgeType {
     IfFalse {},
     Direct {},
@@ -17,8 +31,8 @@ pub enum CfgEdgeType {
     If2Gather {},
 }
 impl CfgEdge {
-    pub fn load_ast_node_text(&mut self, ast_tree: &AstTree) {
-        match self.cfg_edge_type {
+    pub fn load_ast_node_text(&mut self, ast_tree: &AstTree) -> Result<()>{
+        match self.get_cfg_edge_type()? {
             CfgEdgeType::IfTrue {} => self.text += "True",
             CfgEdgeType::IfFalse {} => self.text += "False",
             CfgEdgeType::Direct {} => self.text += "Direct",
@@ -26,14 +40,43 @@ impl CfgEdge {
             CfgEdgeType::BodyHead {} => self.text += "BodyHead",
             CfgEdgeType::If2Gather {} => self.text += "If2Gather",
         }
+        Ok(())
     }
-}
-impl CfgEdgeType {
-    pub fn to_cfg_edge(self) -> CfgEdge {
-        CfgEdge {
-            cfg_edge_type: self,
-            text: String::new(),
-        }
+    pub fn new_if_false()->Self{
+            CfgEdge {
+                info: Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::IfFalse {  })),
+                text: String::new(),
+            }
+    }
+    pub fn new_direct()->Self{
+            CfgEdge {
+                info: Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::Direct {  } )),
+                text: String::new(),
+            }
+    }
+    pub fn new_if_true()->Self{
+            CfgEdge {
+                info: Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::IfTrue {  } )),
+                text: String::new(),
+            }
+    }
+    pub fn new_body_head()->Self{
+            CfgEdge {
+                info: Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::BodyHead {  } )),
+                text: String::new(),
+            }
+    }
+    pub fn new_body_tail()->Self{
+            CfgEdge {
+                info: Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::BodyTail {  } )),
+                text: String::new(),
+            }
+    }
+    pub fn new_if2gather()->Self{
+            CfgEdge {
+                info: Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::If2Gather {  })),
+                text: String::new(),
+            }
     }
 }
 impl Debug for CfgEdge {

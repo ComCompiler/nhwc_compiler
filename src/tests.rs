@@ -117,18 +117,18 @@ mod tests{
     fn find_symbol(){
         let mut symtab = SymTab::new();
 
-        let x = symtab.add(Symbol::new(0, "x".to_string()) );
-        let y = symtab.add(Symbol::new(0, "y".to_string()) );
+        let x = symtab.add_symbol(Symbol::new(0, "x".to_string()) );
+        let y = symtab.add_symbol(Symbol::new(0, "y".to_string()) );
 
-        match symtab.get_verbose("x".to_string(), 0){
+        match symtab.get_symbol_verbose("x".to_string(), 0){
             Some(_) => {println!("找到了符号 x")},
             None => {panic!( "没有找到符号 x ");},
         }
-        match symtab.get_verbose("y".to_string(), 0){
+        match symtab.get_symbol_verbose("y".to_string(), 0){
             Some(_) => {println!("找到了符号 y")},
             None => {panic!( "没有找到符号 y ");},
         }
-        match symtab.get_verbose("z".to_string(), 0){
+        match symtab.get_symbol_verbose("z".to_string(), 0){
             Some(_) => {panic!("找到了符号 y")},
             None => {println!( "没有找到符号 y ");},
         }
@@ -139,10 +139,10 @@ mod tests{
         let field_name = "TYPE";
         let mut symtab = SymTab::new();
 
-        let x = symtab.add(Symbol::new(0, "x".to_string()) );
-        let y = symtab.add(Symbol::new(0, "y".to_string()) );
+        let x = symtab.add_symbol(Symbol::new(0, "x".to_string()) );
+        let y = symtab.add_symbol(Symbol::new(0, "y".to_string()) );
 
-        match symtab.get(&x){
+        match symtab.get_symbol(&x){
             Some(_) => {println!("找到了符号 x")},
             None => {panic!( "没有找到符号 x ");},
         }
