@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use anyhow::{Result,anyhow};
+use anyhow::{anyhow, Ok, Result};
 use petgraph::{csr::IndexType, stable_graph::NodeIndex, visit::{EdgeRef, IntoEdgeReferences, NodeRef}};
 
 use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, dot::Config, field::Field, nhwc_instr::InstrSlab};
@@ -157,7 +157,7 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab
     }
 }
 ///处理分支节点的语句，包括branch，for，while
-fn parse_conditional_expr(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab,scope_tree:&ScopeTree,et_tree:&mut EtTree,expr_scope:u32,expr_node:u32,cfg_node:u32,counter:&mut u32, instr_slab:&mut InstrSlab, symtab_graph:&mut Option<&mut SymTabGraph>)->Result<()>{
+fn parse_conditional_expr(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab,scope_tree:&ScopeTree,et_tree:&mut EtTree,expr_scope:u32,expr_node:u32,cfg_node:u32,counter:&mut u32, instr_slab:&mut InstrSlab, symtab_graph:&mut Option<&mut SymTabGraph>)->Result<SymIdx>{
     let expr_parent_scope = node!(at expr_scope in scope_tree).parent;
 
     let expr_et_root = process_any_stmt(et_tree, ast_tree, scope_tree, expr_node,expr_parent_scope);
@@ -172,6 +172,7 @@ fn parse_conditional_expr(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut
     
                             let logicor_instr = InstrType::new_logic_or(tmp_var_symidx.clone(), l_symidx, r_symidx,Type::I1).to_instr();
                             push_instr!(logicor_instr to cfg_node in cfg_graph slab instr_slab);
+                            return Ok(tmp_var_symidx)
                         }else{
                             return Err(anyhow!("操作符{:?}下缺少符号",op_et))
                         }
@@ -182,6 +183,7 @@ fn parse_conditional_expr(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut
     
                             let logicand_instr = InstrType::new_logic_and(tmp_var_symidx.clone(), l_symidx, r_symidx,Type::I1).to_instr();
                             push_instr!(logicand_instr to cfg_node in cfg_graph slab instr_slab);
+                            return Ok(tmp_var_symidx)
                         }else{
                             return Err(anyhow!("操作符{}下缺少符号",op_et))
                         }
@@ -213,8 +215,9 @@ fn parse_conditional_expr(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut
                             }
                             let tmp_var_symidx = add_symbol!({Symbol::new(expr_parent_scope,format!("temp_{}",counter))} with field TYPE:{Type::I1} to symtab debug symtab_graph);
                             *counter += 1;
-                            let logicnot_instr = InstrType::new_logic_not(tmp_var_symidx.clone(), num2bool_tmp_symidx, Type::I1).to_instr();
+                            let logicnot_instr = InstrType::new_logic_not(tmp_var_symidx.clone(), num2bool_tmp_symidx.clone(), Type::I1).to_instr();
                             push_instr!(logicnot_instr to cfg_node in cfg_graph slab instr_slab);
+                            return Ok(num2bool_tmp_symidx)
                         }else{
                             panic!("操作符{}下缺少符号",op_et);
                         }
@@ -225,6 +228,7 @@ fn parse_conditional_expr(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut
     
                             let eq_instr = InstrType::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Eq ,l_symidx, r_symidx,var_type).to_instr();
                             push_instr!(eq_instr to cfg_node in cfg_graph slab instr_slab);
+                            return Ok(tmp_var_symidx)
                         }else{
                             return Err(anyhow!("操作符{}下缺少符号",op_et))
                         }
@@ -235,6 +239,7 @@ fn parse_conditional_expr(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut
     
                             let neq_instr = InstrType::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Ne ,l_symidx, r_symidx,var_type).to_instr();
                             push_instr!(neq_instr to cfg_node in cfg_graph slab instr_slab);
+                            return Ok(tmp_var_symidx)
                         }else{
                             return Err(anyhow!("操作符{}下缺少符号",op_et))
                         }
@@ -245,6 +250,7 @@ fn parse_conditional_expr(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut
     
                             let less_instr = InstrType::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Slt ,l_symidx, r_symidx,var_type).to_instr();
                             push_instr!(less_instr to cfg_node in cfg_graph slab instr_slab);
+                            return Ok(tmp_var_symidx)
                         }else{
                             return Err(anyhow!("操作符{}下缺少符号",op_et))
                         }
@@ -255,6 +261,7 @@ fn parse_conditional_expr(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut
     
                             let greater_instr = InstrType::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Sgt ,l_symidx, r_symidx,var_type).to_instr();
                             push_instr!(greater_instr to cfg_node in cfg_graph slab instr_slab);
+                            return Ok(tmp_var_symidx)
                         }else{
                             return Err(anyhow!("操作符{}下缺少符号",op_et))
                         }
@@ -265,6 +272,7 @@ fn parse_conditional_expr(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut
     
                             let lesseq_instr = InstrType::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Sle ,l_symidx, r_symidx,var_type).to_instr();
                             push_instr!(lesseq_instr to cfg_node in cfg_graph slab instr_slab);
+                            return Ok(tmp_var_symidx)
                         }else{
                             return Err(anyhow!("操作符{}下缺少符号",op_et))
                         }
@@ -275,6 +283,7 @@ fn parse_conditional_expr(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut
     
                             let greatereq_instr = InstrType::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Sge ,l_symidx, r_symidx,var_type).to_instr();
                             push_instr!(greatereq_instr to cfg_node in cfg_graph slab instr_slab);
+                            return Ok(tmp_var_symidx)
                         }else{
                             return Err(anyhow!("操作符{}下缺少符号",op_et))
                         }
@@ -294,7 +303,6 @@ fn parse_conditional_expr(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut
                 return Err(anyhow!("错误的ettype"))
             }
         }
-        Ok(())
     }else{
         return Err(anyhow!("缺少et树"))
     }
@@ -340,7 +348,7 @@ fn parse_whileloop2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&S
             let label_instr = InstrType::new_label(SymIdx::new(0, "while.head".to_string())).to_instr();
             push_instr!(label_instr to cfg_whileloop in cfg_graph slab instr_slab);
             if let Some(expr_scope) = ast2scope.get(&expr_ast){
-                parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *expr_scope,expr_ast, cfg_whileloop, counter, instr_slab, symtab_graph)?
+                let condition_result = parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *expr_scope,expr_ast, cfg_whileloop, counter, instr_slab, symtab_graph)?;
             }else{
                 return Err(anyhow!("找不到astnode的scope"))
             }
@@ -376,7 +384,7 @@ fn parse_forloop2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&Sco
             let label_mid_instr = InstrType::new_label(label_mid_symidx).to_instr();
             push_instr!(label_mid_instr to cfg_forloop in cfg_graph slab instr_slab);
             if let Some(mid_scope) = ast2scope.get(&ast_mid_node){
-                parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *mid_scope,ast_mid_node, cfg_forloop, counter, instr_slab, symtab_graph)?
+                let condition_result = parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *mid_scope,ast_mid_node, cfg_forloop, counter, instr_slab, symtab_graph)?;
             }else{
                 return Err(anyhow!("找不到astnode的scope"))
             }
@@ -421,7 +429,7 @@ fn parse_branch2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&Scop
     match(rule_id!(at ast_expr_node in ast_tree),ast_expr_node){
         (RULE_expression,expr_node) =>{
             if let Some(expr_scope) = ast2scope.get(&expr_node){
-                parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *expr_scope,expr_node, cfg_node, counter, instr_slab, symtab_g)?
+                let condition_result = parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *expr_scope,expr_node, cfg_node, counter, instr_slab, symtab_g)?;
             }else{
                 return Err(anyhow!("找不到astnode的scope"))
             }
