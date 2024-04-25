@@ -157,7 +157,7 @@ fn parse_stmt2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab
     }
 }
 ///处理分支节点的语句，包括branch，for，while
-fn parse_expr(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab,scope_tree:&ScopeTree,et_tree:&mut EtTree,expr_scope:u32,expr_node:u32,cfg_node:u32,counter:&mut u32, instr_slab:&mut InstrSlab, symtab_graph:&mut Option<&mut SymTabGraph>)->Result<()>{
+fn parse_conditional_expr(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,symtab:&mut SymTab,scope_tree:&ScopeTree,et_tree:&mut EtTree,expr_scope:u32,expr_node:u32,cfg_node:u32,counter:&mut u32, instr_slab:&mut InstrSlab, symtab_graph:&mut Option<&mut SymTabGraph>)->Result<()>{
     let expr_parent_scope = node!(at expr_scope in scope_tree).parent;
 
     let expr_et_root = process_any_stmt(et_tree, ast_tree, scope_tree, expr_node,expr_parent_scope);
@@ -340,7 +340,7 @@ fn parse_whileloop2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&S
             let label_instr = InstrType::new_label(SymIdx::new(0, "while.head".to_string())).to_instr();
             push_instr!(label_instr to cfg_whileloop in cfg_graph slab instr_slab);
             if let Some(expr_scope) = ast2scope.get(&expr_ast){
-                parse_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *expr_scope,expr_ast, cfg_whileloop, counter, instr_slab, symtab_graph)?
+                parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *expr_scope,expr_ast, cfg_whileloop, counter, instr_slab, symtab_graph)?
             }else{
                 return Err(anyhow!("找不到astnode的scope"))
             }
@@ -376,7 +376,7 @@ fn parse_forloop2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&Sco
             let label_mid_instr = InstrType::new_label(label_mid_symidx).to_instr();
             push_instr!(label_mid_instr to cfg_forloop in cfg_graph slab instr_slab);
             if let Some(mid_scope) = ast2scope.get(&ast_mid_node){
-                parse_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *mid_scope,ast_mid_node, cfg_forloop, counter, instr_slab, symtab_graph)?
+                parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *mid_scope,ast_mid_node, cfg_forloop, counter, instr_slab, symtab_graph)?
             }else{
                 return Err(anyhow!("找不到astnode的scope"))
             }
@@ -394,7 +394,7 @@ fn parse_forloop2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&Sco
 
             push_instr!(label_after_instr to cfg_body_tail_node in cfg_graph slab instr_slab);
             if let Some(after_scope) = ast2scope.get(&ast_after_node){
-                parse_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *after_scope,ast_after_node, cfg_body_tail_node, counter, instr_slab, symtab_graph)?;
+                parse_stmt2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *after_scope,ast_after_node, cfg_body_tail_node, counter, instr_slab, symtab_graph)?;
             }else{
                 return Err(anyhow!("找不到astnode的scope"))
             }
@@ -421,7 +421,7 @@ fn parse_branch2nhwc(ast_tree:&AstTree,cfg_graph: &mut CfgGraph,scope_tree:&Scop
     match(rule_id!(at ast_expr_node in ast_tree),ast_expr_node){
         (RULE_expression,expr_node) =>{
             if let Some(expr_scope) = ast2scope.get(&expr_node){
-                parse_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *expr_scope,expr_node, cfg_node, counter, instr_slab, symtab_g)?
+                parse_conditional_expr(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *expr_scope,expr_node, cfg_node, counter, instr_slab, symtab_g)?
             }else{
                 return Err(anyhow!("找不到astnode的scope"))
             }
@@ -1245,6 +1245,7 @@ pub fn parse_cfg_into_nhwc_cfg(cfg_graph:&mut CfgGraph, scope_tree:&mut ScopeTre
     //再遍历一遍entry，对于每个函数做dfs,处理函数体
     for cfg_entry in cfg_funcs.clone(){
         let dfs_vec = dfs_graph!(at cfg_entry in cfg_graph for dfs);
+        // dfs_vec.sort_by(|node| )
         // dfs_vec.reverse();
         for cfg_node in dfs_vec{
             debug_info_yellow!("dfs current is {:?}",cfg_node);
