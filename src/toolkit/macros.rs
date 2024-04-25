@@ -379,14 +379,7 @@ macro_rules! direct_child_node {
         $graph
             .neighbors(petgraph::matrix_graph::NodeIndex::from($node))
             .next()
-            .expect(
-                format!(
-                    "no direct child node of {:?} in {:?}",
-                    $graph.node_weight(petgraph::matrix_graph::NodeIndex::from($node)),
-                    $graph
-                )
-                .as_str(),
-            )
+            .expect(format!("no direct child node of {:?} in {:?}", $graph.node_weight(petgraph::matrix_graph::NodeIndex::from($node)), $graph).as_str())
             .index() as u32
     }};
     (at $node:ident in $graph:ident ret option) => {{
@@ -398,122 +391,83 @@ macro_rules! direct_child_node {
 macro_rules! direct_parent_node {
     (at $node:ident in $graph:ident) => {{
         use petgraph::visit::EdgeRef;
-        let mut edges =
-            $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming);
+        let mut edges = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming);
         let op_first_parent_node = edges.next();
         let op_second_parent_node = edges.next();
         if let Some(_) = op_second_parent_node {
             panic!("这个 node 有多个parent 不符合调用 direct_parent_node 的条件");
         } else {
             op_first_parent_node
-                .expect(
-                    format!(
-                        "no direct parent node of {:?} in {:?}",
-                        $graph.node_weight(petgraph::matrix_graph::NodeIndex::from($node)),
-                        $graph
-                    )
-                    .as_str(),
-                )
+                .expect(format!("no direct parent node of {:?} in {:?}", $graph.node_weight(petgraph::matrix_graph::NodeIndex::from($node)), $graph).as_str())
                 .source()
                 .index() as u32
         }
-    }}; 
+    }};
 }
-
-
-
-
-
-
-
-
-
 
 #[macro_export]
 /// 找到这个点的所有出边 EdgeRef
 /// 用法 outgoing_edges(at $node in $graph)
 macro_rules! outgoing_edges {
-    (at $node:ident in $graph:ident) => {
-        {
-            use petgraph::visit::EdgeRef;
-            let mut edges =  $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing).collect();
-            edges
-        }
-    };
+    (at $node:ident in $graph:ident) => {{
+        let edges = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing).collect();
+        edges
+    }};
 }
 #[macro_export]
 /// 找到这个点的唯一出边的weight
 /// 用法 outoing_edge_weight(at $node in $graph)
 macro_rules! outgoing_edge_weight {
-    (at $node:ident in $graph:ident) => {
-        {
-            use petgraph::visit::EdgeRef;
-            let mut edges:Vec<_> =  $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing);
-            edges.next().expect("这个node 没有边").weight()
-        }
-    };
+    (at $node:ident in $graph:ident) => {{
+        use petgraph::visit::EdgeRef;
+        let mut edges: Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing);
+        edges.next().expect("这个node 没有边").weight()
+    }};
 }
 #[macro_export]
 /// 找到这个点的唯一出边的weight
 /// 用法 outoing_edge_weight(at $node in $graph)
 macro_rules! outgoing_edge_weights {
-    (at $node:ident in $graph:ident) => {
-        {
-            use petgraph::visit::EdgeRef;
-            let mut edges:Vec<_> =  $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing).map(|edge|edge.weight());
-            edges
-        }
-    };
+    (at $node:ident in $graph:ident) => {{
+        use petgraph::visit::EdgeRef;
+        let mut edges: Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing).map(|edge| edge.weight());
+        edges
+    }};
 }
 #[macro_export]
 /// 找到这个点的所有出边 EdgeRef
 /// 用法 incoming_edges(at $node in $graph)
 macro_rules! incoming_edges {
-    (at $node:ident in $graph:ident) => {
-        {
-            use petgraph::visit::EdgeRef;
-            let mut edges:Vec<_> =  $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming).collect();
-            edges
-        }
-    };
+    (at $node:ident in $graph:ident) => {{
+        let edges: Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming).collect();
+        edges
+    }};
 }
 #[macro_export]
 /// 找到这个点的所有入边weight
 /// 用法 incoming_edges(at $node in $graph)
 macro_rules! incoming_edge_weights {
-    (at $node:ident in $graph:ident) => {
-        {
-            use petgraph::visit::EdgeRef;
-            let edges:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming).map(|edge|edge.weight()).collect();
-            edges
-        }
-    };
+    (at $node:ident in $graph:ident) => {{
+        use petgraph::visit::EdgeRef;
+        let edges: Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming).map(|edge| edge.weight()).collect();
+        edges
+    }};
 }
 #[macro_export]
 /// 找到这个点的唯一出边weight
 /// 用法 outgoing_edges(at $node in $graph)
 macro_rules! incoming_edge_weight {
-    (at $node:ident in $graph:ident) => {
-        {
-            use petgraph::visit::EdgeRef;
-            let mut edges =  $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming);
-            edges.next().expect("这个node 没有边").weight()
-        }
-    };
+    (at $node:ident in $graph:ident) => {{
+        use petgraph::visit::EdgeRef;
+        let mut edges = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming);
+        edges.next().expect("这个node 没有边").weight()
+    }};
 }
-
-
-
-
-
-
 
 #[macro_export]
 macro_rules! direct_children_nodes {
     (at $node:ident in $graph:ident) => {{
-        let iter = $graph
-            .neighbors(petgraph::matrix_graph::NodeIndex::from($node))
-            .map(|x| x.index() as u32);
+        let iter = $graph.neighbors(petgraph::matrix_graph::NodeIndex::from($node)).map(|x| x.index() as u32);
         let mut nodes: Vec<u32> = iter.collect();
         nodes.reverse();
         nodes
@@ -526,33 +480,20 @@ macro_rules! direct_edge {
         $graph
             .edges(petgraph::matrix_graph::NodeIndex::from($node))
             .next()
-            .expect(
-                format!(
-                    "no direct edge of {:?} in {:?}",
-                    $graph.node_weight(petgraph::matrix_graph::NodeIndex::from($node)),
-                    $graph
-                )
-                .as_str(),
-            )
+            .expect(format!("no direct edge of {:?} in {:?}", $graph.node_weight(petgraph::matrix_graph::NodeIndex::from($node)), $graph).as_str())
             .index() as u32
     }};
 }
 #[macro_export]
 macro_rules! add_edge {
     ($edge_struct:block from  $a:ident to $b:ident in $cfg_graph:ident) => {
-        $cfg_graph
-            .add_edge(petgraph::matrix_graph::NodeIndex::from($a), petgraph::matrix_graph::NodeIndex::from($b), $edge_struct)
-            .index() as u32
+        $cfg_graph.add_edge(petgraph::matrix_graph::NodeIndex::from($a), petgraph::matrix_graph::NodeIndex::from($b), $edge_struct).index() as u32
     };
     ($a:ident to $b:ident in $ast_tree:ident) => {
-        $ast_tree
-            .add_edge(petgraph::matrix_graph::NodeIndex::from($a), petgraph::matrix_graph::NodeIndex::from($b), ())
-            .index() as u32
+        $ast_tree.add_edge(petgraph::matrix_graph::NodeIndex::from($a), petgraph::matrix_graph::NodeIndex::from($b), ()).index() as u32
     };
     (from $a:ident to $b:ident in $scope_tree:ident) => {
-        $scope_tree
-            .add_edge(petgraph::matrix_graph::NodeIndex::from($a), petgraph::matrix_graph::NodeIndex::from($b), ())
-            .index() as u32
+        $scope_tree.add_edge(petgraph::matrix_graph::NodeIndex::from($a), petgraph::matrix_graph::NodeIndex::from($b), ()).index() as u32
     };
 }
 #[macro_export]
@@ -560,7 +501,7 @@ macro_rules! add_edge {
 /// add_node($node_struct:ident to $graph:ident)
 /// 另一种则是
 /// add_node($node_struct:block to $graph:ident)
-/// 一个允许block 一个 允许 ident 
+/// 一个允许block 一个 允许 ident
 macro_rules! add_node {
     ($node_struct:ident to $graph:ident) => {
         $graph.add_node($node_struct).index() as u32
@@ -579,11 +520,7 @@ macro_rules! add_node_with_edge {
     }};
     ($node_struct:ident with edge $edgestruct:ident from $from_node:ident in $graph:ident) => {{
         let node_id = $graph.add_node($node_struct).index() as u32;
-        $graph.add_edge(
-            petgraph::matrix_graph::NodeIndex::from($from_node),
-            petgraph::matrix_graph::NodeIndex::from(node_id),
-            $edgestruct,
-        );
+        $graph.add_edge(petgraph::matrix_graph::NodeIndex::from($from_node), petgraph::matrix_graph::NodeIndex::from(node_id), $edgestruct);
         node_id
     }};
     ($node_struct:block from $from_node:ident in $graph:ident) => {{
@@ -593,11 +530,7 @@ macro_rules! add_node_with_edge {
     }};
     ($node_struct:block with edge $edgestruct:block from $from_node:ident in $graph:ident) => {{
         let node_id = $graph.add_node($node_struct).index() as u32;
-        $graph.add_edge(
-            petgraph::matrix_graph::NodeIndex::from($from_node),
-            petgraph::matrix_graph::NodeIndex::from(node_id),
-            $edgestruct,
-        );
+        $graph.add_edge(petgraph::matrix_graph::NodeIndex::from($from_node), petgraph::matrix_graph::NodeIndex::from(node_id), $edgestruct);
         node_id
     }};
 }
@@ -717,23 +650,17 @@ macro_rules! add_field {
 #[macro_export]
 macro_rules! node {
     (at $node:ident in $graph:ident) => {{
-        $graph
-            .node_weight(petgraph::matrix_graph::NodeIndex::from($node))
-            .expect("找不到 index 对应的 node ")
+        $graph.node_weight(petgraph::matrix_graph::NodeIndex::from($node)).expect("找不到 index 对应的 node ")
     }};
     (at $node:block in $graph:ident) => {{
-        $graph
-            .node_weight(petgraph::matrix_graph::NodeIndex::from($node))
-            .expect("找不到 index 对应的 node ")
+        $graph.node_weight(petgraph::matrix_graph::NodeIndex::from($node)).expect("找不到 index 对应的 node ")
     }};
 }
 
 #[macro_export]
 macro_rules! node_mut {
     (at $node:ident in $graph:ident) => {{
-        $graph
-            .node_weight_mut(petgraph::matrix_graph::NodeIndex::from($node))
-            .expect("找不到 index 对应的 node ")
+        $graph.node_weight_mut(petgraph::matrix_graph::NodeIndex::from($node)).expect("找不到 index 对应的 node ")
     }};
 }
 
@@ -840,23 +767,15 @@ macro_rules! make_field_trait_for_struct {
 // }
 #[macro_export]
 macro_rules! downcast_op_any {
-    (ref $field_type:ident,$op_field:ident) => {
-        {
-            match $op_field {
-                None=>{
-                    anyhow::Result::Err(anyhow::anyhow!("can't find this field"))
-                }
-                Some(field)=>{
-                    match field.as_any().downcast_ref::<$field_type>(){
-                        Some(data) => {
-                            anyhow::Result::Ok(data)
-                        },
-                        None => anyhow::Result::Err(anyhow::anyhow!(concat!("这个field ",stringify!($field_name), "不是",stringify!($field_type), "类型"))),
-                    }
-                }
-            }
+    (ref $field_type:ident,$op_field:ident) => {{
+        match $op_field {
+            None => anyhow::Result::Err(anyhow::anyhow!("can't find this field")),
+            Some(field) => match field.as_any().downcast_ref::<$field_type>() {
+                Some(data) => anyhow::Result::Ok(data),
+                None => anyhow::Result::Err(anyhow::anyhow!(concat!("这个field ", stringify!($field_name), "不是", stringify!($field_type), "类型"))),
+            },
         }
-    };
+    }};
     // ($field_type:ident,$op_field:ident) => {
     //     {
     //         match $op_field {
@@ -874,32 +793,23 @@ macro_rules! downcast_op_any {
     //         }
     //     }
     // };
-    (mut $field_type:ident,$op_field_mut:ident) => {
-        {
-            match $op_field_mut {
-                None=>{
-                    anyhow::Result::Err(anyhow::anyhow!("can't find this field"))
-                }
-                Some(field)=>{
-                    match field.as_any_mut().downcast_mut::<$field_type>(){
-                        Some(data) => {
-                            anyhow::Result::Ok(data)
-                        },
-                        None => anyhow::Result::Err(anyhow::anyhow!(concat!("这个field ",stringify!($field_name), "不是",stringify!($field_type), "类型"))),
-                    }
-                }
-            }
+    (mut $field_type:ident,$op_field_mut:ident) => {{
+        match $op_field_mut {
+            None => anyhow::Result::Err(anyhow::anyhow!("can't find this field")),
+            Some(field) => match field.as_any_mut().downcast_mut::<$field_type>() {
+                Some(data) => anyhow::Result::Ok(data),
+                None => anyhow::Result::Err(anyhow::anyhow!(concat!("这个field ", stringify!($field_name), "不是", stringify!($field_type), "类型"))),
+            },
         }
-    };
+    }};
 }
-
 
 #[macro_export]
 /// 生成特化的get  get_mut remove add 函数  
 /// 类似于 get_cfg_node_type() 这种函数
-/// 用法: makespecialized_get_field_fn_for_struct{struct_name 
-///     upper_field_name1:field_type1, 
-///     upper_field_name2:field_type2 
+/// 用法: makespecialized_get_field_fn_for_struct{struct_name
+///     upper_field_name1:field_type1,
+///     upper_field_name2:field_type2
 ///     with fields member_of_fields_type}
 macro_rules! make_specialized_get_field_fn_for_struct {
     ($struct_name:ident $($upper_field_name:ident:$field_type:ident),+ with fields $fields:ident) => {
@@ -915,7 +825,7 @@ macro_rules! make_specialized_get_field_fn_for_struct {
                     $crate::downcast_op_any!(mut $field_type,op_field_mut)
                 }
                 pub fn [<add_ $upper_field_name:lower>](&mut self, field:$field_type) {
-                    let op_field = self.$fields.insert($upper_field_name,Box::new(field));
+                    let _op_field = self.$fields.insert($upper_field_name,Box::new(field));
                     // let op_field_ref = op_field.as_ref();
                     // $crate::downcast_op_any!($field_type,op_field)
                 }
@@ -1073,31 +983,31 @@ macro_rules! element {
 }
 
 #[macro_export]
-macro_rules! reg_field_name{
-    ($upper_field_name:ident:$display_name:ident)=>{
+macro_rules! reg_field_name {
+    ($upper_field_name:ident:$display_name:ident) => {
         pub static $upper_field_name: &str = &stringify!($display_name);
     };
 }
 
-#[macro_export ]
+#[macro_export]
 macro_rules! debug_info_blue{
     ($($t:tt)*) => {{
         println!("\x1B[34m debuginfo {}\x1B[0m",format!($($t)*))
     }};
 }
-#[macro_export ]
+#[macro_export]
 macro_rules! debug_info_yellow{
     ($($t:tt)*) => {{
         println!("\x1B[33m debuginfo {}\x1B[0m",format!($($t)*))
     }};
 }
-#[macro_export ]
+#[macro_export]
 macro_rules! debug_info_green{
     ($($t:tt)*) => {{
         println!("\x1B[32m debuginfo {}\x1B[0m",format!($($t)*))
     }};
 }
-#[macro_export ]
+#[macro_export]
 macro_rules! debug_info_red{
     ($($t:tt)*) => {{
         println!("\x1B[31m debuginfo {}\x1B[0m",format!($($t)*))

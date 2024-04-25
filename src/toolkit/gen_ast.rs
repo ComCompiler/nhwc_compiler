@@ -5,10 +5,8 @@ use petgraph::csr::NodeIndex;
 use crate::antlr_parser::rule_walkers::TerminalRuleListener;
 use crate::{
     antlr_parser::{
-        clexer::CLexer,
-        cparser::{CParser, CTreeWalker},
-    },
-    toolkit::ast_node::AstNode,
+        clexer::CLexer, cparser::{CParser, CTreeWalker}
+    }, toolkit::ast_node::AstNode
 };
 
 use super::context::Context;
@@ -38,11 +36,7 @@ pub fn parse_as_ast_tree(context: &mut Context) {
                         }
                         false => node_id - 1,
                     };
-                    g.add_edge(
-                        NodeIndex::from(father_id as u32),
-                        NodeIndex::from(node_id as u32),
-                        (),
-                    );
+                    g.add_edge(NodeIndex::from(father_id as u32), NodeIndex::from(node_id as u32), ());
                     // {   println!("{:?}",ASTNode::new(ctx.get_rule_index(),ctx.get_text()));}
                     // save_dot_and_generate_png(&*g.borrow(),format!("{}",node_id));
                     // debug 专用

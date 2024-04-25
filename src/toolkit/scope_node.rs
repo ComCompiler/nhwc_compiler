@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use std::mem;
 
-use petgraph::stable_graph::{NodeIndex, StableDiGraph};
+use petgraph::stable_graph::StableDiGraph;
 
 use crate::node;
 

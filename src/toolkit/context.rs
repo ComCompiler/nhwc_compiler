@@ -5,12 +5,7 @@ use derive_builder::Builder;
 use crate::Args;
 
 use super::{
-    ast_node::AstTree,
-    cfg_node::CfgGraph,
-    et_node::EtTree,
-    nhwc_instr::InstrSlab,
-    scope_node::ScopeTree,
-    symtab::{SymTab, SymTabGraph},
+    ast_node::AstTree, cfg_node::CfgGraph, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symtab::{SymTab, SymTabGraph}
 };
 
 #[derive(Default, Builder)]

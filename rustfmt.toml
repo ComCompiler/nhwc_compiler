@@ -1,0 +1,20 @@
+# 尽可能减少代码行数
+max_width = 200  # 最大行宽100字符，你可以根据需要调整
+# hard_tabs = false  # 使用空格而非制表符进行缩进
+# tab_spaces = 2  # 缩进使用2个空格，少于通常的4个空格可以减少横向空间
+# newline_style = "Unix"  # 使用Unix风格的换行符
+
+# 参数和元素布局
+fn_args_layout = "Compressed"  # 函数参数尽可能在一行显示
+struct_lit_single_line = true  # 结构体字面量在一行显示
+fn_single_line = true  # 尽可能将整个函数定义在一行
+chain_width = 150  # 方法链如果小于80字符尝试保持在一行
+use_small_heuristics = "Max"  # 使用最大化紧凑的启发式方法
+
+# 控制分隔符和括号
+space_before_colon = false  # 冒号前不加空格
+space_after_colon = true  # 冒号后加空格，为了保持一致的阅读体验
+spaces_around_ranges = false  # 范围表达式两边不加空格
+
+# 控制导入布局
+imports_layout = "Horizontal"  # 将imports尽可能布局在一行

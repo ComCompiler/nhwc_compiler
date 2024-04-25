@@ -1,11 +1,6 @@
-use std::{
-    fmt::{self, Display, Write},
-    string,
-};
+use std::fmt::{self, Display, Write};
 
-use petgraph::visit::{
-    EdgeRef, GraphProp, IntoEdgeReferences, IntoNodeReferences, NodeIndexable, NodeRef,
-};
+use petgraph::visit::{EdgeRef, GraphProp, IntoEdgeReferences, IntoNodeReferences, NodeIndexable, NodeRef};
 
 use core::fmt::Debug;
 /// `Dot` implements output to graphviz .dot format for a graph.
@@ -69,30 +64,16 @@ where
 {
     /// Create a `Dot` formatting wrapper with default configuration.
     #[inline]
-    pub fn new(graph: G) -> Self {
-        Self::with_config(graph, &[])
-    }
+    pub fn new(graph: G) -> Self { Self::with_config(graph, &[]) }
 
     /// Create a `Dot` formatting wrapper with custom configuration.
     #[inline]
-    pub fn with_config(graph: G, config: &'a [Config]) -> Self {
-        Self::with_attr_getters(graph, config, &|_, _| String::new(), &|_, _| String::new())
-    }
+    pub fn with_config(graph: G, config: &'a [Config]) -> Self { Self::with_attr_getters(graph, config, &|_, _| String::new(), &|_, _| String::new()) }
 
     #[inline]
-    pub fn with_attr_getters(
-        graph: G,
-        config: &'a [Config],
-        get_edge_attributes: &'a dyn Fn(G, G::EdgeRef) -> String,
-        get_node_attributes: &'a dyn Fn(G, G::NodeRef) -> String,
-    ) -> Self {
+    pub fn with_attr_getters(graph: G, config: &'a [Config], get_edge_attributes: &'a dyn Fn(G, G::EdgeRef) -> String, get_node_attributes: &'a dyn Fn(G, G::NodeRef) -> String) -> Self {
         let config = Configs::extract(config);
-        Dot {
-            graph,
-            get_edge_attributes,
-            get_node_attributes,
-            config,
-        }
+        Dot { graph, get_edge_attributes, get_node_attributes, config }
     }
 }
 
@@ -183,9 +164,7 @@ impl Debug for Title {
     }
 }
 impl Title {
-    pub fn new(s: String) -> Self {
-        Title::Title(Some(s))
-    }
+    pub fn new(s: String) -> Self { Title::Title(Some(s)) }
 }
 impl<'a, G> Dot<'a, G>
 where
@@ -203,13 +182,7 @@ where
         }
         // 给图添加标题
         if !self.config.Title.is_empty() {
-            writeln!(
-                f,
-                "{}label=\"{}\";\n{}fontsize=\"40\";",
-                INDENT,
-                self.config.Title.clone(),
-                INDENT
-            )?;
+            writeln!(f, "{}label=\"{}\";\n{}fontsize=\"40\";", INDENT, self.config.Title.clone(), INDENT)?;
         }
 
         // output all labels
@@ -229,12 +202,12 @@ where
                     RecordEscaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
                     if self.config.NodeIndexLabel {
                         write!(f, "\\lNodeIndex:[{}]", g.to_index(node.id()))?;
-                    } 
+                    }
                 } else {
                     Escaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
                     if self.config.NodeIndexLabel {
                         write!(f, "\\lNodeIndex:[{}]", g.to_index(node.id()))?;
-                    } 
+                    }
                 }
                 write!(f, "\" ")?;
             }
@@ -242,14 +215,7 @@ where
         }
         // output all edges
         for (i, edge) in g.edge_references().enumerate() {
-            write!(
-                f,
-                "{}{} {} {} [ ",
-                INDENT,
-                g.to_index(edge.source()),
-                EDGE[g.is_directed() as usize],
-                g.to_index(edge.target()),
-            )?;
+            write!(f, "{}{} {} {} [ ", INDENT, g.to_index(edge.source()), EDGE[g.is_directed() as usize], g.to_index(edge.target()),)?;
             if !self.config.EdgeNoLabel {
                 write!(f, "label = \"")?;
                 if self.config.EdgeIndexLabel {
@@ -279,9 +245,7 @@ where
     G::EdgeWeight: fmt::Display,
     G::NodeWeight: fmt::Display,
 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.graph_fmt(f, fmt::Display::fmt, fmt::Display::fmt)
-    }
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { self.graph_fmt(f, fmt::Display::fmt, fmt::Display::fmt) }
 }
 
 impl<'a, G> fmt::Debug for Dot<'a, G>
@@ -290,9 +254,7 @@ where
     G::EdgeWeight: fmt::Debug,
     G::NodeWeight: fmt::Debug,
 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.graph_fmt(f, fmt::Debug::fmt, fmt::Debug::fmt)
-    }
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { self.graph_fmt(f, fmt::Debug::fmt, fmt::Debug::fmt) }
 }
 
 /// Escape for Graphviz
@@ -431,9 +393,7 @@ impl<'a, T, F> fmt::Display for FnFmt<'a, T, F>
 where
     F: Fn(&'a T, &mut fmt::Formatter<'_>) -> fmt::Result,
 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.1(self.0, f)
-    }
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { self.1(self.0, f) }
 }
 
 #[cfg(test)]
@@ -486,10 +446,7 @@ mod test {
     fn test_nodenolable_option() {
         let graph = simple_graph();
         let dot = format!("{:?}", Dot::with_config(&graph, &[Config::NodeNoLabel]));
-        assert_eq!(
-            dot,
-            "digraph {\n    0 [ ]\n    1 [ ]\n    0 -> 1 [ label = \"\\\"edge_label\\\"\" ]\n}\n"
-        );
+        assert_eq!(dot, "digraph {\n    0 [ ]\n    1 [ ]\n    0 -> 1 [ label = \"\\\"edge_label\\\"\" ]\n}\n");
     }
 
     #[test]
@@ -497,12 +454,10 @@ mod test {
         let graph = simple_graph();
         let dot = format!(
             "{:?}",
-            Dot::with_attr_getters(
-                &graph,
-                &[Config::NodeNoLabel, Config::EdgeNoLabel],
-                &|_, er| format!("label = \"{}\"", er.weight().to_uppercase()),
-                &|_, nr| format!("label = \"{}\"", nr.weight().to_lowercase()),
-            ),
+            Dot::with_attr_getters(&graph, &[Config::NodeNoLabel, Config::EdgeNoLabel], &|_, er| format!("label = \"{}\"", er.weight().to_uppercase()), &|_, nr| format!(
+                "label = \"{}\"",
+                nr.weight().to_lowercase()
+            ),),
         );
         assert_eq!(dot, "digraph {\n    0 [ label = \"a\"]\n    1 [ label = \"b\"]\n    0 -> 1 [ label = \"EDGE_LABEL\"]\n}\n");
     }

@@ -1,13 +1,8 @@
 use std::{any::Any, collections::HashMap, fmt::Debug};
 
-use petgraph::visit::Data;
-use anyhow::anyhow;
-use anyhow::Result;
-
 use super::ast_node::AstTree;
 use super::symtab::SymIdx;
-use crate::NodeIndex;
-use crate::{add_field, find, make_field_trait_for_struct, node};
+use crate::{add_field, make_field_trait_for_struct, node};
 
 pub type Fields = HashMap<&'static str, Box<dyn Field>>;
 
@@ -42,30 +37,17 @@ pub enum Type {
     I1,
     Void,
     Label,
-    Fn {
-        arg_syms: Vec<SymIdx>,
-        ret_sym: SymIdx,
-    },
+    Fn { arg_syms: Vec<SymIdx>, ret_sym: SymIdx },
 }
 impl Clone for Box<dyn Field> {
-    fn clone(&self) -> Box<dyn Field> {
-        self.clone_box()
-    }
+    fn clone(&self) -> Box<dyn Field> { self.clone_box() }
 }
 
 impl Value {
-    pub fn new_i32(value: i32) -> Self {
-        Value::I32(Some(value))
-    }
-    pub fn new_f32(value: f32) -> Self {
-        Value::F32(Some(value))
-    }
-    pub fn new_i1(value: bool) -> Self {
-        Value::I1(Some(value))
-    }
-    pub fn new_void() -> Self {
-        Value::Void
-    }
+    pub fn new_i32(value: i32) -> Self { Value::I32(Some(value)) }
+    pub fn new_f32(value: f32) -> Self { Value::F32(Some(value)) }
+    pub fn new_i1(value: bool) -> Self { Value::I1(Some(value)) }
+    pub fn new_void() -> Self { Value::Void }
 }
 impl Type {
     pub fn new(ast_node: u32, ast_tree: &AstTree) -> Self {
@@ -94,7 +76,7 @@ impl Type {
             Type::I1 => todo!(),
             Type::Void => todo!(),
             Type::Label => todo!(),
-            Type::Fn { arg_syms, ret_sym } => todo!(),
+            Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
         }
     }
 }
@@ -105,10 +87,9 @@ impl Debug for Type {
             Type::I32 => write!(f, "i32"),
             Type::F32 => write!(f, "f32"),
             Type::I1 => write!(f, "i1"),
-            Type::Fn {
-                arg_syms: args_types,
-                ret_sym: ret_type,
-            } => write!(f, "Fn{:?}->{:?}", args_types, ret_type),
+            Type::Fn { arg_syms: args_types, ret_sym: ret_type } => {
+                write!(f, "Fn{:?}->{:?}", args_types, ret_type)
+            }
             Type::Void => write!(f, "void"),
             Type::Label => write!(f, "label"),
         }
@@ -139,7 +120,5 @@ pub struct UseCounter {
 }
 
 impl Debug for UseCounter {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.use_count)
-    }
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{}", self.use_count) }
 }
