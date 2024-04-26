@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use std::mem;
 
-use petgraph::stable_graph::{NodeIndex, StableDiGraph};
+use petgraph::stable_graph::StableDiGraph;
 
 use crate::node;
 
@@ -11,13 +11,13 @@ pub type ScopeTree = StableDiGraph<ScopeNode, (), u32>;
 
 #[derive(Clone)]
 pub struct ScopeNode {
-    pub ast_node: u32,
-    pub text: String,
-    pub parent: u32,
-    pub scope_type: ScopeType,
+    pub ast_node:u32,
+    pub text:String,
+    pub parent:u32,
+    pub scope_type:ScopeType,
 }
 impl ScopeNode {
-    pub fn load_ast_node_text(&mut self, ast_tree: &AstTree) {
+    pub fn load_ast_node_text(&mut self, ast_tree:&AstTree) {
         let ast_node = self.ast_node;
         let new_str = node!(at ast_node in ast_tree).text.clone();
         let _ = mem::replace(&mut self.text, new_str);
@@ -38,7 +38,7 @@ impl ScopeNode {
 // }
 
 impl Debug for ScopeNode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "{} \n {:?} {}",
