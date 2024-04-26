@@ -12,7 +12,7 @@ use crate::{
 use super::context::Context;
 
 /// 把代码生成为AST树 code 为代码文本的字符串
-pub fn parse_as_ast_tree(context: &mut Context) {
+pub fn parse_as_ast_tree(context:&mut Context) {
     let code = &context.code;
     let ast_tree = &mut context.ast_tree;
 
@@ -20,8 +20,8 @@ pub fn parse_as_ast_tree(context: &mut Context) {
     {
         let mut count = 0;
         let listener = TerminalRuleListener {
-            st: (Vec::<usize>::new(), false, ast_tree, &mut count),
-            enter_rule_f: Box::new(|ctx, s, is_terminal, type_idx| {
+            st:(Vec::<usize>::new(), false, ast_tree, &mut count),
+            enter_rule_f:Box::new(|ctx, s, is_terminal, type_idx| {
                 let (node_count_under_depth, is_last_wrap_drop, g, count) = s;
                 let mut ast_node = AstNode::new(type_idx, ctx.get_text(), is_terminal);
                 ast_node.node_index = **count;
@@ -47,7 +47,7 @@ pub fn parse_as_ast_tree(context: &mut Context) {
                 (0..node_count_under_depth.len() - 1).for_each(|i| node_count_under_depth[i] += 1);
                 *is_last_wrap_drop = false;
             }),
-            exit_rule_f: Box::new(|_ctx, s, _is_terminal, _type_idx| {
+            exit_rule_f:Box::new(|_ctx, s, _is_terminal, _type_idx| {
                 let (node_count_under_depth, is_last_wrap_drop, _g, count) = s;
                 node_count_under_depth.pop();
                 *is_last_wrap_drop = true;

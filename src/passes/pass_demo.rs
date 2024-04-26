@@ -20,7 +20,7 @@ impl PassDemo {
 
 impl Pass for PassDemo {
     // 运行这个pass
-    fn run(&mut self, _ctx: &mut Context) -> Result<()> { Ok(()) }
+    fn run(&mut self, _ctx:&mut Context) -> Result<()> { Ok(()) }
     // 返回pass的描述，具体作用
     fn get_desc(&self) -> String { return "pass demo description".to_string(); }
 

@@ -3,12 +3,13 @@ use std::{
 };
 
 use crate::{
-    debug_info_yellow, direct_children_nodes, toolkit::dot::{Config, Dot}
+    direct_children_nodes, toolkit::dot::{Config, Dot}
 };
 use petgraph::{stable_graph::StableGraph, EdgeType};
+use anyhow::{anyhow,Result};
 
 /// 生成树(可以是任何树)对应的png ，将此png 放在命令行*当前*目录下
-pub fn generate_png_by_graph<N: Debug, E: Debug, Ty: EdgeType>(g: &StableGraph<N, E, Ty>, name: String, graph_config: &[Config]) {
+pub fn generate_png_by_graph<N:Debug, E:Debug, Ty:EdgeType>(g:&StableGraph<N, E, Ty>, name:String, graph_config:&[Config]) {
     println!("current working dir is {:?}", env::current_dir());
     let png_name = name.clone() + ".png";
     let dot_name = name + ".dot";
@@ -23,13 +24,13 @@ pub fn generate_png_by_graph<N: Debug, E: Debug, Ty: EdgeType>(g: &StableGraph<N
 }
 
 /// 从指定文件中读取所有文本
-pub fn read_file_content(path: String) -> String {
+pub fn read_file_content(path:String) -> String {
     let mut buf = String::new();
     File::open(path).expect("文件读取异常").read_to_string(&mut buf).expect("读取失败");
     buf
 }
 
-pub fn dfs<N, E, Ty>(graph: &mut StableGraph<N, E, Ty, u32>, start_node: u32, visited: &mut Vec<bool>, dfs_vec: &mut Vec<u32>)
+pub fn dfs<N, E, Ty>(graph:&mut StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, dfs_vec:&mut Vec<u32>)
 where
     Ty: EdgeType,
 {
@@ -40,11 +41,20 @@ where
     dfs_vec.push(start_node);
 
     let nodes = direct_children_nodes!(at start_node in graph);
-    debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
+    // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
 
     for node in nodes {
         if !visited[node as usize] {
             dfs(graph, node, visited, dfs_vec);
         }
+    }
+}
+
+pub fn element_remained_after_exclusion_in_vec<T:PartialEq+Clone>(v:Vec<T>,element1:T) -> Result<T>{
+    if v.len()!=2 { return Err(anyhow!("待排除的Vec元素数目不为2")) }
+    if v[0] == element1{
+        Ok(v[1].clone())
+    }else {
+        Ok(v[0].clone())
     }
 }

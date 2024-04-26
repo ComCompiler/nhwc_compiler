@@ -404,6 +404,16 @@ macro_rules! direct_parent_node {
         }
     }};
 }
+#[macro_export]
+/// 用法: direct_parent_nodes!(at $node in $graph)
+macro_rules! direct_parent_nodes {
+    (at $node:ident in $graph:ident) => {{
+        use petgraph::visit::EdgeRef;
+        let edges_vec:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming)
+            .map(|e|e.source().index() as u32).collect();
+        edges_vec
+    }};
+}
 
 #[macro_export]
 /// 找到这个点的所有出边 EdgeRef
@@ -420,7 +430,7 @@ macro_rules! outgoing_edges {
 macro_rules! outgoing_edge_weight {
     (at $node:ident in $graph:ident) => {{
         use petgraph::visit::EdgeRef;
-        let mut edges: Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing);
+        let mut edges:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing);
         edges.next().expect("这个node 没有边").weight()
     }};
 }
@@ -430,7 +440,7 @@ macro_rules! outgoing_edge_weight {
 macro_rules! outgoing_edge_weights {
     (at $node:ident in $graph:ident) => {{
         use petgraph::visit::EdgeRef;
-        let mut edges: Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing).map(|edge| edge.weight());
+        let mut edges:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing).map(|edge| edge.weight());
         edges
     }};
 }
@@ -439,7 +449,7 @@ macro_rules! outgoing_edge_weights {
 /// 用法 incoming_edges(at $node in $graph)
 macro_rules! incoming_edges {
     (at $node:ident in $graph:ident) => {{
-        let edges: Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming).collect();
+        let edges:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming).collect();
         edges
     }};
 }
@@ -449,7 +459,7 @@ macro_rules! incoming_edges {
 macro_rules! incoming_edge_weights {
     (at $node:ident in $graph:ident) => {{
         use petgraph::visit::EdgeRef;
-        let edges: Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming).map(|edge| edge.weight()).collect();
+        let edges:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming).map(|edge| edge.weight()).collect();
         edges
     }};
 }
@@ -468,7 +478,7 @@ macro_rules! incoming_edge_weight {
 macro_rules! direct_children_nodes {
     (at $node:ident in $graph:ident) => {{
         let iter = $graph.neighbors(petgraph::matrix_graph::NodeIndex::from($node)).map(|x| x.index() as u32);
-        let mut nodes: Vec<u32> = iter.collect();
+        let mut nodes:Vec<u32> = iter.collect();
         nodes.reverse();
         nodes
     }};
@@ -485,6 +495,7 @@ macro_rules! direct_edge {
     }};
 }
 #[macro_export]
+/// 用法 add_edge!($edge from $a to $b in $graph)
 macro_rules! add_edge {
     ($edge_struct:block from  $a:ident to $b:ident in $cfg_graph:ident) => {
         $cfg_graph.add_edge(petgraph::matrix_graph::NodeIndex::from($a), petgraph::matrix_graph::NodeIndex::from($b), $edge_struct).index() as u32
@@ -512,6 +523,8 @@ macro_rules! add_node {
 }
 
 #[macro_export]
+/// 用法 add_node_with_edge!($node_struct with edge $edgestruct from $node in $graph)
+/// 或你可以省略Edge(当你这个图中Edge确实定义是空的时候) add_node_with_edge!($node_struct $edgestruct from $node in $graph)
 macro_rules! add_node_with_edge {
     ($node_struct:ident from $from_node:ident in $graph:ident) => {{
         let node_id = $graph.add_node($node_struct).index() as u32;
@@ -690,8 +703,8 @@ macro_rules! term_id {
 #[macro_export]
 macro_rules! dfs_graph {
     (at $node:ident in $graph:ident for dfs) => {{
-        let mut visited: Vec<bool> = vec![false; $graph.node_count()];
-        let mut dfs_vec: Vec<u32> = vec![];
+        let mut visited:Vec<bool> = vec![false; $graph.node_count()];
+        let mut dfs_vec:Vec<u32> = vec![];
 
         crate::toolkit::etc::dfs($graph, $node, &mut visited, &mut dfs_vec);
         dfs_vec
@@ -985,7 +998,7 @@ macro_rules! element {
 #[macro_export]
 macro_rules! reg_field_name {
     ($upper_field_name:ident:$display_name:ident) => {
-        pub static $upper_field_name: &str = &stringify!($display_name);
+        pub static $upper_field_name:&str = &stringify!($display_name);
     };
 }
 

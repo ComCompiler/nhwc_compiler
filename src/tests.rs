@@ -26,7 +26,7 @@ mod tests {
         parse_as_ast_tree(&mut context);
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
-        let node_ids: Vec<u32> = find_dfs_rule_ast(&ast_tree, 0, RULE_functionDefinition).collect();
+        let node_ids:Vec<u32> = find_dfs_rule_ast(&ast_tree, 0, RULE_functionDefinition).collect();
         assert_eq!(node_ids, vec![3, 179], "找到的 node id 不对");
     }
 
@@ -58,7 +58,7 @@ mod tests {
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
         let node = find_dfs_rule_ast(ast_tree, 0, RULE_blockItemList).next().unwrap(); // 三号节点是一个 function def
-        let node_ids: Vec<u32> = find_nodes!(rule RULE_blockItem at node in ast_tree);
+        let node_ids:Vec<u32> = find_nodes!(rule RULE_blockItem at node in ast_tree);
         assert_eq!(node_ids, vec![17, 34, 153], "找到的 node id 不对");
     }
     #[test]
@@ -167,7 +167,7 @@ mod tests {
 
     #[test]
     fn find_symbol_macro_test() {
-        const VALUE: &str = "VALUE";
+        const VALUE:&str = "VALUE";
         let mut symtab = SymTab::new();
 
         let x = add_symbol!({Symbol::new(0, "x".to_string())} to symtab );
@@ -189,7 +189,7 @@ mod tests {
     }
     #[test]
     fn try_instruction_fmt() {
-        const VALUE: &str = "VALUE";
+        const VALUE:&str = "VALUE";
         let mut symtab = SymTab::new();
 
         let lhs = add_symbol!({"lhs".to_string()} of scope {0} with field VALUE:{Value::I32(None)} to symtab);
@@ -226,7 +226,7 @@ mod tests {
         parse_as_ast_tree(&mut ctx);
         let mut et_tree = EtTree::new();
         //dfs遍历ast找到第一个 expr stmt
-        let expr_stmt_nodes: Vec<u32> = find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expressionStatement).collect(); // 三号节点是一个 function def
+        let expr_stmt_nodes:Vec<u32> = find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expressionStatement).collect(); // 三号节点是一个 function def
         et_tree.add_node(EtNode::new(EtNodeType::new_sep(0)));
         for expr_stmt_node in expr_stmt_nodes {
             toolkit::gen_et::process_any_stmt(&mut et_tree, &ctx.ast_tree, &ctx.scope_tree, expr_stmt_node, 0);
@@ -270,7 +270,7 @@ mod tests {
         args.c_file_path = PathBuf::from_str("./demos/demo_calculate.c").unwrap();
         let code = read_file_content(args.c_file_path.to_string_lossy().into_owned());
         let mut _context = ContextBuilder::default().code(code).build().unwrap();
-        let mut et_tree: petgraph::prelude::StableGraph<EtNode, ()> = EtTree::new();
+        let mut et_tree:petgraph::prelude::StableGraph<EtNode, ()> = EtTree::new();
         et_tree.add_node(EtNode::new(EtNodeType::new_sep(0)));
         println!("{:?}", eval_et(&mut et_tree, 0));
 

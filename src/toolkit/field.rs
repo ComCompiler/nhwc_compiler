@@ -7,7 +7,7 @@ use crate::{add_field, make_field_trait_for_struct, node};
 pub type Fields = HashMap<&'static str, Box<dyn Field>>;
 
 pub trait FieldsInit {
-    fn new_from_single_field(field_name: &'static str, field: Box<dyn Field>) -> Fields {
+    fn new_from_single_field(field_name:&'static str, field:Box<dyn Field>) -> Fields {
         let mut fields = Fields::new();
         add_field!(field_name:{field} to fields);
         fields
@@ -37,20 +37,20 @@ pub enum Type {
     I1,
     Void,
     Label,
-    Fn { arg_syms: Vec<SymIdx>, ret_sym: SymIdx },
+    Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
 }
 impl Clone for Box<dyn Field> {
     fn clone(&self) -> Box<dyn Field> { self.clone_box() }
 }
 
 impl Value {
-    pub fn new_i32(value: i32) -> Self { Value::I32(Some(value)) }
-    pub fn new_f32(value: f32) -> Self { Value::F32(Some(value)) }
-    pub fn new_i1(value: bool) -> Self { Value::I1(Some(value)) }
+    pub fn new_i32(value:i32) -> Self { Value::I32(Some(value)) }
+    pub fn new_f32(value:f32) -> Self { Value::F32(Some(value)) }
+    pub fn new_i1(value:bool) -> Self { Value::I1(Some(value)) }
     pub fn new_void() -> Self { Value::Void }
 }
 impl Type {
-    pub fn new(ast_node: u32, ast_tree: &AstTree) -> Self {
+    pub fn new(ast_node:u32, ast_tree:&AstTree) -> Self {
         // 在asttree中找到node的u32所在节点的类型,返回I32或F32
         let text = node!(at ast_node in ast_tree).text.as_str();
         match text {
@@ -62,14 +62,14 @@ impl Type {
         }
     }
 
-    pub fn new_from_const(const_str: &String) -> Self {
+    pub fn new_from_const(const_str:&String) -> Self {
         if const_str.contains(".") {
             Type::F32
         } else {
             Type::I32
         }
     }
-    pub fn can_implicit_trans_to(another_type: &Type) -> bool {
+    pub fn can_implicit_trans_to(another_type:&Type) -> bool {
         match another_type {
             Type::I32 => todo!(),
             Type::F32 => todo!(),
@@ -82,7 +82,7 @@ impl Type {
 }
 
 impl Debug for Type {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Type::I32 => write!(f, "i32"),
             Type::F32 => write!(f, "f32"),
@@ -96,7 +96,7 @@ impl Debug for Type {
     }
 }
 impl Type {
-    pub fn adapt(ty1: &Type, ty2: &Type) -> Self {
+    pub fn adapt(ty1:&Type, ty2:&Type) -> Self {
         match (ty1, ty2) {
             (Type::I32, Type::I32) => Type::I32,
             (Type::I32, Type::F32) => Type::F32,
@@ -116,9 +116,9 @@ impl Type {
 make_field_trait_for_struct!(Type, Value, UseCounter);
 #[derive(Clone)]
 pub struct UseCounter {
-    pub use_count: u32,
+    pub use_count:u32,
 }
 
 impl Debug for UseCounter {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{}", self.use_count) }
+    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{}", self.use_count) }
 }

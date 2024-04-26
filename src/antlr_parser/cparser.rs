@@ -39,223 +39,223 @@ use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
 use std::sync::Arc;
 
-pub const T__0: isize = 1;
-pub const T__1: isize = 2;
-pub const T__2: isize = 3;
-pub const T__3: isize = 4;
-pub const T__4: isize = 5;
-pub const T__5: isize = 6;
-pub const T__6: isize = 7;
-pub const T__7: isize = 8;
-pub const T__8: isize = 9;
-pub const T__9: isize = 10;
-pub const T__10: isize = 11;
-pub const T__11: isize = 12;
-pub const T__12: isize = 13;
-pub const T__13: isize = 14;
-pub const T__14: isize = 15;
-pub const T__15: isize = 16;
-pub const T__16: isize = 17;
-pub const Auto: isize = 18;
-pub const Break: isize = 19;
-pub const Case: isize = 20;
-pub const Char: isize = 21;
-pub const Const: isize = 22;
-pub const Continue: isize = 23;
-pub const Default: isize = 24;
-pub const Do: isize = 25;
-pub const Double: isize = 26;
-pub const Else: isize = 27;
-pub const Enum: isize = 28;
-pub const Extern: isize = 29;
-pub const Float: isize = 30;
-pub const For: isize = 31;
-pub const Goto: isize = 32;
-pub const If: isize = 33;
-pub const Inline: isize = 34;
-pub const Int: isize = 35;
-pub const Long: isize = 36;
-pub const Register: isize = 37;
-pub const Restrict: isize = 38;
-pub const Return: isize = 39;
-pub const Short: isize = 40;
-pub const Signed: isize = 41;
-pub const Sizeof: isize = 42;
-pub const Static: isize = 43;
-pub const Struct: isize = 44;
-pub const Switch: isize = 45;
-pub const Typedef: isize = 46;
-pub const Union: isize = 47;
-pub const Unsigned: isize = 48;
-pub const Void: isize = 49;
-pub const Volatile: isize = 50;
-pub const While: isize = 51;
-pub const Alignas: isize = 52;
-pub const Alignof: isize = 53;
-pub const Atomic: isize = 54;
-pub const Bool: isize = 55;
-pub const Complex: isize = 56;
-pub const Generic: isize = 57;
-pub const Imaginary: isize = 58;
-pub const Noreturn: isize = 59;
-pub const StaticAssert: isize = 60;
-pub const ThreadLocal: isize = 61;
-pub const LeftParen: isize = 62;
-pub const RightParen: isize = 63;
-pub const LeftBracket: isize = 64;
-pub const RightBracket: isize = 65;
-pub const LeftBrace: isize = 66;
-pub const RightBrace: isize = 67;
-pub const Less: isize = 68;
-pub const LessEqual: isize = 69;
-pub const Greater: isize = 70;
-pub const GreaterEqual: isize = 71;
-pub const LeftShift: isize = 72;
-pub const RightShift: isize = 73;
-pub const Plus: isize = 74;
-pub const PlusPlus: isize = 75;
-pub const Minus: isize = 76;
-pub const MinusMinus: isize = 77;
-pub const Star: isize = 78;
-pub const Div: isize = 79;
-pub const Mod: isize = 80;
-pub const And: isize = 81;
-pub const Or: isize = 82;
-pub const AndAnd: isize = 83;
-pub const OrOr: isize = 84;
-pub const Caret: isize = 85;
-pub const Not: isize = 86;
-pub const Tilde: isize = 87;
-pub const Question: isize = 88;
-pub const Colon: isize = 89;
-pub const Semi: isize = 90;
-pub const Comma: isize = 91;
-pub const Assign: isize = 92;
-pub const MulAssign: isize = 93;
-pub const DivAssign: isize = 94;
-pub const ModAssign: isize = 95;
-pub const PlusAssign: isize = 96;
-pub const MinusAssign: isize = 97;
-pub const LeftShiftAssign: isize = 98;
-pub const RightShiftAssign: isize = 99;
-pub const AndAssign: isize = 100;
-pub const XorAssign: isize = 101;
-pub const OrAssign: isize = 102;
-pub const Equal: isize = 103;
-pub const NotEqual: isize = 104;
-pub const Arrow: isize = 105;
-pub const Dot: isize = 106;
-pub const Ellipsis: isize = 107;
-pub const Identifier: isize = 108;
-pub const Constant: isize = 109;
-pub const DigitSequence: isize = 110;
-pub const StringLiteral: isize = 111;
-pub const MultiLineMacro: isize = 112;
-pub const Directive: isize = 113;
-pub const AsmBlock: isize = 114;
-pub const Whitespace: isize = 115;
-pub const Newline: isize = 116;
-pub const BlockComment: isize = 117;
-pub const LineComment: isize = 118;
-pub const RULE_primaryExpression: usize = 0;
-pub const RULE_genericSelection: usize = 1;
-pub const RULE_genericAssocList: usize = 2;
-pub const RULE_genericAssociation: usize = 3;
-pub const RULE_postfixExpression: usize = 4;
-pub const RULE_argumentExpressionList: usize = 5;
-pub const RULE_unaryExpression: usize = 6;
-pub const RULE_unaryOperator: usize = 7;
-pub const RULE_castExpression: usize = 8;
-pub const RULE_multiplicativeExpression: usize = 9;
-pub const RULE_additiveExpression: usize = 10;
-pub const RULE_shiftExpression: usize = 11;
-pub const RULE_relationalExpression: usize = 12;
-pub const RULE_equalityExpression: usize = 13;
-pub const RULE_andExpression: usize = 14;
-pub const RULE_exclusiveOrExpression: usize = 15;
-pub const RULE_inclusiveOrExpression: usize = 16;
-pub const RULE_logicalAndExpression: usize = 17;
-pub const RULE_logicalOrExpression: usize = 18;
-pub const RULE_conditionalExpression: usize = 19;
-pub const RULE_assignmentExpression: usize = 20;
-pub const RULE_assignmentOperator: usize = 21;
-pub const RULE_expression: usize = 22;
-pub const RULE_constantExpression: usize = 23;
-pub const RULE_declaration: usize = 24;
-pub const RULE_declarationSpecifiers: usize = 25;
-pub const RULE_declarationSpecifiers2: usize = 26;
-pub const RULE_declarationSpecifier: usize = 27;
-pub const RULE_initDeclaratorList: usize = 28;
-pub const RULE_initDeclarator: usize = 29;
-pub const RULE_storageClassSpecifier: usize = 30;
-pub const RULE_typeSpecifier: usize = 31;
-pub const RULE_structOrUnionSpecifier: usize = 32;
-pub const RULE_structOrUnion: usize = 33;
-pub const RULE_structDeclarationList: usize = 34;
-pub const RULE_structDeclaration: usize = 35;
-pub const RULE_specifierQualifierList: usize = 36;
-pub const RULE_structDeclaratorList: usize = 37;
-pub const RULE_structDeclarator: usize = 38;
-pub const RULE_enumSpecifier: usize = 39;
-pub const RULE_enumeratorList: usize = 40;
-pub const RULE_enumerator: usize = 41;
-pub const RULE_enumerationConstant: usize = 42;
-pub const RULE_atomicTypeSpecifier: usize = 43;
-pub const RULE_typeQualifier: usize = 44;
-pub const RULE_functionSpecifier: usize = 45;
-pub const RULE_alignmentSpecifier: usize = 46;
-pub const RULE_declarator: usize = 47;
-pub const RULE_directDeclarator: usize = 48;
-pub const RULE_vcSpecificModifer: usize = 49;
-pub const RULE_gccDeclaratorExtension: usize = 50;
-pub const RULE_gccAttributeSpecifier: usize = 51;
-pub const RULE_gccAttributeList: usize = 52;
-pub const RULE_gccAttribute: usize = 53;
-pub const RULE_nestedParenthesesBlock: usize = 54;
-pub const RULE_pointer: usize = 55;
-pub const RULE_typeQualifierList: usize = 56;
-pub const RULE_parameterTypeList: usize = 57;
-pub const RULE_parameterList: usize = 58;
-pub const RULE_parameterDeclaration: usize = 59;
-pub const RULE_identifierList: usize = 60;
-pub const RULE_typeName: usize = 61;
-pub const RULE_abstractDeclarator: usize = 62;
-pub const RULE_directAbstractDeclarator: usize = 63;
-pub const RULE_typedefName: usize = 64;
-pub const RULE_initializer: usize = 65;
-pub const RULE_initializerList: usize = 66;
-pub const RULE_designation: usize = 67;
-pub const RULE_designatorList: usize = 68;
-pub const RULE_designator: usize = 69;
-pub const RULE_staticAssertDeclaration: usize = 70;
-pub const RULE_statement: usize = 71;
-pub const RULE_labeledStatement: usize = 72;
-pub const RULE_compoundStatement: usize = 73;
-pub const RULE_blockItemList: usize = 74;
-pub const RULE_blockItem: usize = 75;
-pub const RULE_expressionStatement: usize = 76;
-pub const RULE_selectionStatement: usize = 77;
-pub const RULE_ifSelection: usize = 78;
-pub const RULE_switchSelection: usize = 79;
-pub const RULE_iterationStatement: usize = 80;
-pub const RULE_forIterationStatement: usize = 81;
-pub const RULE_whileIterationStatement: usize = 82;
-pub const RULE_doWhileIterationStatement: usize = 83;
-pub const RULE_forCondition: usize = 84;
-pub const RULE_forDeclaration: usize = 85;
-pub const RULE_forBeforeExpression: usize = 86;
-pub const RULE_forAfterExpression: usize = 87;
-pub const RULE_forMidExpression: usize = 88;
-pub const RULE_jumpStatement: usize = 89;
-pub const RULE_continueStatement: usize = 90;
-pub const RULE_breakStatement: usize = 91;
-pub const RULE_returnStatement: usize = 92;
-pub const RULE_compilationUnit: usize = 93;
-pub const RULE_translationUnit: usize = 94;
-pub const RULE_externalDeclaration: usize = 95;
-pub const RULE_functionDefinition: usize = 96;
-pub const RULE_declarationList: usize = 97;
-pub const ruleNames: [&'static str; 98] = [
+pub const T__0:isize = 1;
+pub const T__1:isize = 2;
+pub const T__2:isize = 3;
+pub const T__3:isize = 4;
+pub const T__4:isize = 5;
+pub const T__5:isize = 6;
+pub const T__6:isize = 7;
+pub const T__7:isize = 8;
+pub const T__8:isize = 9;
+pub const T__9:isize = 10;
+pub const T__10:isize = 11;
+pub const T__11:isize = 12;
+pub const T__12:isize = 13;
+pub const T__13:isize = 14;
+pub const T__14:isize = 15;
+pub const T__15:isize = 16;
+pub const T__16:isize = 17;
+pub const Auto:isize = 18;
+pub const Break:isize = 19;
+pub const Case:isize = 20;
+pub const Char:isize = 21;
+pub const Const:isize = 22;
+pub const Continue:isize = 23;
+pub const Default:isize = 24;
+pub const Do:isize = 25;
+pub const Double:isize = 26;
+pub const Else:isize = 27;
+pub const Enum:isize = 28;
+pub const Extern:isize = 29;
+pub const Float:isize = 30;
+pub const For:isize = 31;
+pub const Goto:isize = 32;
+pub const If:isize = 33;
+pub const Inline:isize = 34;
+pub const Int:isize = 35;
+pub const Long:isize = 36;
+pub const Register:isize = 37;
+pub const Restrict:isize = 38;
+pub const Return:isize = 39;
+pub const Short:isize = 40;
+pub const Signed:isize = 41;
+pub const Sizeof:isize = 42;
+pub const Static:isize = 43;
+pub const Struct:isize = 44;
+pub const Switch:isize = 45;
+pub const Typedef:isize = 46;
+pub const Union:isize = 47;
+pub const Unsigned:isize = 48;
+pub const Void:isize = 49;
+pub const Volatile:isize = 50;
+pub const While:isize = 51;
+pub const Alignas:isize = 52;
+pub const Alignof:isize = 53;
+pub const Atomic:isize = 54;
+pub const Bool:isize = 55;
+pub const Complex:isize = 56;
+pub const Generic:isize = 57;
+pub const Imaginary:isize = 58;
+pub const Noreturn:isize = 59;
+pub const StaticAssert:isize = 60;
+pub const ThreadLocal:isize = 61;
+pub const LeftParen:isize = 62;
+pub const RightParen:isize = 63;
+pub const LeftBracket:isize = 64;
+pub const RightBracket:isize = 65;
+pub const LeftBrace:isize = 66;
+pub const RightBrace:isize = 67;
+pub const Less:isize = 68;
+pub const LessEqual:isize = 69;
+pub const Greater:isize = 70;
+pub const GreaterEqual:isize = 71;
+pub const LeftShift:isize = 72;
+pub const RightShift:isize = 73;
+pub const Plus:isize = 74;
+pub const PlusPlus:isize = 75;
+pub const Minus:isize = 76;
+pub const MinusMinus:isize = 77;
+pub const Star:isize = 78;
+pub const Div:isize = 79;
+pub const Mod:isize = 80;
+pub const And:isize = 81;
+pub const Or:isize = 82;
+pub const AndAnd:isize = 83;
+pub const OrOr:isize = 84;
+pub const Caret:isize = 85;
+pub const Not:isize = 86;
+pub const Tilde:isize = 87;
+pub const Question:isize = 88;
+pub const Colon:isize = 89;
+pub const Semi:isize = 90;
+pub const Comma:isize = 91;
+pub const Assign:isize = 92;
+pub const MulAssign:isize = 93;
+pub const DivAssign:isize = 94;
+pub const ModAssign:isize = 95;
+pub const PlusAssign:isize = 96;
+pub const MinusAssign:isize = 97;
+pub const LeftShiftAssign:isize = 98;
+pub const RightShiftAssign:isize = 99;
+pub const AndAssign:isize = 100;
+pub const XorAssign:isize = 101;
+pub const OrAssign:isize = 102;
+pub const Equal:isize = 103;
+pub const NotEqual:isize = 104;
+pub const Arrow:isize = 105;
+pub const Dot:isize = 106;
+pub const Ellipsis:isize = 107;
+pub const Identifier:isize = 108;
+pub const Constant:isize = 109;
+pub const DigitSequence:isize = 110;
+pub const StringLiteral:isize = 111;
+pub const MultiLineMacro:isize = 112;
+pub const Directive:isize = 113;
+pub const AsmBlock:isize = 114;
+pub const Whitespace:isize = 115;
+pub const Newline:isize = 116;
+pub const BlockComment:isize = 117;
+pub const LineComment:isize = 118;
+pub const RULE_primaryExpression:usize = 0;
+pub const RULE_genericSelection:usize = 1;
+pub const RULE_genericAssocList:usize = 2;
+pub const RULE_genericAssociation:usize = 3;
+pub const RULE_postfixExpression:usize = 4;
+pub const RULE_argumentExpressionList:usize = 5;
+pub const RULE_unaryExpression:usize = 6;
+pub const RULE_unaryOperator:usize = 7;
+pub const RULE_castExpression:usize = 8;
+pub const RULE_multiplicativeExpression:usize = 9;
+pub const RULE_additiveExpression:usize = 10;
+pub const RULE_shiftExpression:usize = 11;
+pub const RULE_relationalExpression:usize = 12;
+pub const RULE_equalityExpression:usize = 13;
+pub const RULE_andExpression:usize = 14;
+pub const RULE_exclusiveOrExpression:usize = 15;
+pub const RULE_inclusiveOrExpression:usize = 16;
+pub const RULE_logicalAndExpression:usize = 17;
+pub const RULE_logicalOrExpression:usize = 18;
+pub const RULE_conditionalExpression:usize = 19;
+pub const RULE_assignmentExpression:usize = 20;
+pub const RULE_assignmentOperator:usize = 21;
+pub const RULE_expression:usize = 22;
+pub const RULE_constantExpression:usize = 23;
+pub const RULE_declaration:usize = 24;
+pub const RULE_declarationSpecifiers:usize = 25;
+pub const RULE_declarationSpecifiers2:usize = 26;
+pub const RULE_declarationSpecifier:usize = 27;
+pub const RULE_initDeclaratorList:usize = 28;
+pub const RULE_initDeclarator:usize = 29;
+pub const RULE_storageClassSpecifier:usize = 30;
+pub const RULE_typeSpecifier:usize = 31;
+pub const RULE_structOrUnionSpecifier:usize = 32;
+pub const RULE_structOrUnion:usize = 33;
+pub const RULE_structDeclarationList:usize = 34;
+pub const RULE_structDeclaration:usize = 35;
+pub const RULE_specifierQualifierList:usize = 36;
+pub const RULE_structDeclaratorList:usize = 37;
+pub const RULE_structDeclarator:usize = 38;
+pub const RULE_enumSpecifier:usize = 39;
+pub const RULE_enumeratorList:usize = 40;
+pub const RULE_enumerator:usize = 41;
+pub const RULE_enumerationConstant:usize = 42;
+pub const RULE_atomicTypeSpecifier:usize = 43;
+pub const RULE_typeQualifier:usize = 44;
+pub const RULE_functionSpecifier:usize = 45;
+pub const RULE_alignmentSpecifier:usize = 46;
+pub const RULE_declarator:usize = 47;
+pub const RULE_directDeclarator:usize = 48;
+pub const RULE_vcSpecificModifer:usize = 49;
+pub const RULE_gccDeclaratorExtension:usize = 50;
+pub const RULE_gccAttributeSpecifier:usize = 51;
+pub const RULE_gccAttributeList:usize = 52;
+pub const RULE_gccAttribute:usize = 53;
+pub const RULE_nestedParenthesesBlock:usize = 54;
+pub const RULE_pointer:usize = 55;
+pub const RULE_typeQualifierList:usize = 56;
+pub const RULE_parameterTypeList:usize = 57;
+pub const RULE_parameterList:usize = 58;
+pub const RULE_parameterDeclaration:usize = 59;
+pub const RULE_identifierList:usize = 60;
+pub const RULE_typeName:usize = 61;
+pub const RULE_abstractDeclarator:usize = 62;
+pub const RULE_directAbstractDeclarator:usize = 63;
+pub const RULE_typedefName:usize = 64;
+pub const RULE_initializer:usize = 65;
+pub const RULE_initializerList:usize = 66;
+pub const RULE_designation:usize = 67;
+pub const RULE_designatorList:usize = 68;
+pub const RULE_designator:usize = 69;
+pub const RULE_staticAssertDeclaration:usize = 70;
+pub const RULE_statement:usize = 71;
+pub const RULE_labeledStatement:usize = 72;
+pub const RULE_compoundStatement:usize = 73;
+pub const RULE_blockItemList:usize = 74;
+pub const RULE_blockItem:usize = 75;
+pub const RULE_expressionStatement:usize = 76;
+pub const RULE_selectionStatement:usize = 77;
+pub const RULE_ifSelection:usize = 78;
+pub const RULE_switchSelection:usize = 79;
+pub const RULE_iterationStatement:usize = 80;
+pub const RULE_forIterationStatement:usize = 81;
+pub const RULE_whileIterationStatement:usize = 82;
+pub const RULE_doWhileIterationStatement:usize = 83;
+pub const RULE_forCondition:usize = 84;
+pub const RULE_forDeclaration:usize = 85;
+pub const RULE_forBeforeExpression:usize = 86;
+pub const RULE_forAfterExpression:usize = 87;
+pub const RULE_forMidExpression:usize = 88;
+pub const RULE_jumpStatement:usize = 89;
+pub const RULE_continueStatement:usize = 90;
+pub const RULE_breakStatement:usize = 91;
+pub const RULE_returnStatement:usize = 92;
+pub const RULE_compilationUnit:usize = 93;
+pub const RULE_translationUnit:usize = 94;
+pub const RULE_externalDeclaration:usize = 95;
+pub const RULE_functionDefinition:usize = 96;
+pub const RULE_declarationList:usize = 97;
+pub const ruleNames:[&'static str; 98] = [
     "primaryExpression",
     "genericSelection",
     "genericAssocList",
@@ -356,7 +356,7 @@ pub const ruleNames: [&'static str; 98] = [
     "declarationList",
 ];
 
-pub const _LITERAL_NAMES: [Option<&'static str>; 108] = [
+pub const _LITERAL_NAMES:[Option<&'static str>; 108] = [
     None,
     Some("'__extension__'"),
     Some("'__m128'"),
@@ -466,7 +466,7 @@ pub const _LITERAL_NAMES: [Option<&'static str>; 108] = [
     Some("'.'"),
     Some("'...'"),
 ];
-pub const _SYMBOLIC_NAMES: [Option<&'static str>; 119] = [
+pub const _SYMBOLIC_NAMES:[Option<&'static str>; 119] = [
     None,
     None,
     None,
@@ -605,10 +605,10 @@ where
     I: TokenStream<'input, TF = LocalTokenFactory<'input>> + TidAble<'input>,
     H: ErrorStrategy<'input, BaseParserType<'input, I>>,
 {
-    base: BaseParserType<'input, I>,
-    interpreter: Arc<ParserATNSimulator>,
-    _shared_context_cache: Box<PredictionContextCache>,
-    pub err_handler: H,
+    base:BaseParserType<'input, I>,
+    interpreter:Arc<ParserATNSimulator>,
+    _shared_context_cache:Box<PredictionContextCache>,
+    pub err_handler:H,
 }
 
 impl<'input, I, H> CParser<'input, I, H>
@@ -618,16 +618,16 @@ where
 {
     pub fn get_serialized_atn() -> &'static str { _serializedATN }
 
-    pub fn set_error_strategy(&mut self, strategy: H) { self.err_handler = strategy }
+    pub fn set_error_strategy(&mut self, strategy:H) { self.err_handler = strategy }
 
-    pub fn with_strategy(input: I, strategy: H) -> Self {
+    pub fn with_strategy(input:I, strategy:H) -> Self {
         antlr_rust::recognizer::check_version("0", "3");
         let interpreter = Arc::new(ParserATNSimulator::new(_ATN.clone(), _decision_to_DFA.clone(), _shared_context_cache.clone()));
         Self {
-            base: BaseParser::new_base_parser(input, Arc::clone(&interpreter), CParserExt { _pd: Default::default() }),
+            base:BaseParser::new_base_parser(input, Arc::clone(&interpreter), CParserExt { _pd:Default::default() }),
             interpreter,
-            _shared_context_cache: Box::new(PredictionContextCache::new()),
-            err_handler: strategy,
+            _shared_context_cache:Box::new(PredictionContextCache::new()),
+            err_handler:strategy,
         }
     }
 }
@@ -638,14 +638,14 @@ impl<'input, I> CParser<'input, I, DynStrategy<'input, I>>
 where
     I: TokenStream<'input, TF = LocalTokenFactory<'input>> + TidAble<'input>,
 {
-    pub fn with_dyn_strategy(input: I) -> Self { Self::with_strategy(input, Box::new(DefaultErrorStrategy::new())) }
+    pub fn with_dyn_strategy(input:I) -> Self { Self::with_strategy(input, Box::new(DefaultErrorStrategy::new())) }
 }
 
 impl<'input, I> CParser<'input, I, DefaultErrorStrategy<'input, CParserContextType>>
 where
     I: TokenStream<'input, TF = LocalTokenFactory<'input>> + TidAble<'input>,
 {
-    pub fn new(input: I) -> Self { Self::with_strategy(input, DefaultErrorStrategy::new()) }
+    pub fn new(input:I) -> Self { Self::with_strategy(input, DefaultErrorStrategy::new()) }
 }
 
 /// Trait for monomorphized trait object that corresponds to the nodes of parse tree generated for CParser
@@ -660,7 +660,7 @@ impl<'input, 'x, T> VisitableDyn<T> for dyn CParserContext<'input> + 'input
 where
     T: CVisitor<'input> + 'x,
 {
-    fn accept_dyn(&self, visitor: &mut T) { self.accept(visitor as &mut (dyn CVisitor<'input> + 'x)) }
+    fn accept_dyn(&self, visitor:&mut T) { self.accept(visitor as &mut (dyn CVisitor<'input> + 'x)) }
 }
 
 impl<'input> CParserContext<'input> for TerminalNode<'input, CParserContextType> {}
@@ -697,7 +697,7 @@ where
 }
 
 pub struct CParserExt<'input> {
-    _pd: PhantomData<&'input str>,
+    _pd:PhantomData<&'input str>,
 }
 
 impl<'input> CParserExt<'input> {}
@@ -707,15 +707,15 @@ impl<'input> TokenAware<'input> for CParserExt<'input> {
     type TF = LocalTokenFactory<'input>;
 }
 
-impl<'input, I: TokenStream<'input, TF = LocalTokenFactory<'input>> + TidAble<'input>> ParserRecog<'input, BaseParserType<'input, I>> for CParserExt<'input> {}
+impl<'input, I:TokenStream<'input, TF = LocalTokenFactory<'input>> + TidAble<'input>> ParserRecog<'input, BaseParserType<'input, I>> for CParserExt<'input> {}
 
-impl<'input, I: TokenStream<'input, TF = LocalTokenFactory<'input>> + TidAble<'input>> Actions<'input, BaseParserType<'input, I>> for CParserExt<'input> {
+impl<'input, I:TokenStream<'input, TF = LocalTokenFactory<'input>> + TidAble<'input>> Actions<'input, BaseParserType<'input, I>> for CParserExt<'input> {
     fn get_grammar_file_name(&self) -> &str { "C.g4" }
 
     fn get_rule_names(&self) -> &[&str] { &ruleNames }
 
     fn get_vocabulary(&self) -> &dyn Vocabulary { &**VOCABULARY }
-    fn sempred(_localctx: Option<&(dyn CParserContext<'input> + 'input)>, rule_index: isize, pred_index: isize, recog: &mut BaseParserType<'input, I>) -> bool {
+    fn sempred(_localctx:Option<&(dyn CParserContext<'input> + 'input)>, rule_index:isize, pred_index:isize, recog:&mut BaseParserType<'input, I>) -> bool {
         match rule_index {
             4 => CParser::<'input, I, _>::postfixExpression_sempred(_localctx.and_then(|x| x.downcast_ref()), pred_index, recog),
             48 => CParser::<'input, I, _>::directDeclarator_sempred(_localctx.and_then(|x| x.downcast_ref()), pred_index, recog),
@@ -729,13 +729,13 @@ impl<'input, I> CParser<'input, I, DefaultErrorStrategy<'input, CParserContextTy
 where
     I: TokenStream<'input, TF = LocalTokenFactory<'input>> + TidAble<'input>,
 {
-    fn postfixExpression_sempred(_localctx: Option<&PostfixExpressionContext<'input>>, pred_index: isize, recog: &mut <Self as Deref>::Target) -> bool {
+    fn postfixExpression_sempred(_localctx:Option<&PostfixExpressionContext<'input>>, pred_index:isize, recog:&mut <Self as Deref>::Target) -> bool {
         match pred_index {
             0 => recog.precpred(None, 2),
             _ => true,
         }
     }
-    fn directDeclarator_sempred(_localctx: Option<&DirectDeclaratorContext<'input>>, pred_index: isize, recog: &mut <Self as Deref>::Target) -> bool {
+    fn directDeclarator_sempred(_localctx:Option<&DirectDeclaratorContext<'input>>, pred_index:isize, recog:&mut <Self as Deref>::Target) -> bool {
         match pred_index {
             1 => recog.precpred(None, 7),
             2 => recog.precpred(None, 6),
@@ -744,7 +744,7 @@ where
             _ => true,
         }
     }
-    fn directAbstractDeclarator_sempred(_localctx: Option<&DirectAbstractDeclaratorContext<'input>>, pred_index: isize, recog: &mut <Self as Deref>::Target) -> bool {
+    fn directAbstractDeclarator_sempred(_localctx:Option<&DirectAbstractDeclaratorContext<'input>>, pred_index:isize, recog:&mut <Self as Deref>::Target) -> bool {
         match pred_index {
             5 => recog.precpred(None, 5),
             6 => recog.precpred(None, 4),
@@ -762,24 +762,24 @@ pub type PrimaryExpressionContext<'input> = BaseParserRuleContext<'input, Primar
 
 #[derive(Clone)]
 pub struct PrimaryExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for PrimaryExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for PrimaryExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_primaryExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_primaryExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for PrimaryExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_primaryExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_primaryExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for PrimaryExpressionContextExt<'input> {
@@ -791,8 +791,8 @@ impl<'input> CustomRuleContext<'input> for PrimaryExpressionContextExt<'input> {
 antlr_rust::tid! {PrimaryExpressionContextExt<'a>}
 
 impl<'input> PrimaryExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<PrimaryExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, PrimaryExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<PrimaryExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, PrimaryExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -822,7 +822,7 @@ pub trait PrimaryExpressionContextAttrs<'input>: CParserContext<'input> + Borrow
     }
     /// Retrieves 'i's TerminalNode corresponding to token StringLiteral, starting from 0.
     /// Returns `None` if number of children corresponding to token StringLiteral is less or equal than `i`.
-    fn StringLiteral(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn StringLiteral(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -864,9 +864,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = PrimaryExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 0, RULE_primaryExpression);
-        let mut _localctx: Rc<PrimaryExpressionContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
-            let mut _alt: isize;
+        let mut _localctx:Rc<PrimaryExpressionContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
+            let mut _alt:isize;
             recog.base.set_state(207);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.base.input.la(1) {
@@ -955,24 +955,24 @@ pub type GenericSelectionContext<'input> = BaseParserRuleContext<'input, Generic
 
 #[derive(Clone)]
 pub struct GenericSelectionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for GenericSelectionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for GenericSelectionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_genericSelection(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_genericSelection(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for GenericSelectionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_genericSelection(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_genericSelection(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for GenericSelectionContextExt<'input> {
@@ -984,8 +984,8 @@ impl<'input> CustomRuleContext<'input> for GenericSelectionContextExt<'input> {
 antlr_rust::tid! {GenericSelectionContextExt<'a>}
 
 impl<'input> GenericSelectionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<GenericSelectionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, GenericSelectionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<GenericSelectionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, GenericSelectionContextExt { ph:PhantomData }))
     }
 }
 
@@ -1048,8 +1048,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = GenericSelectionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 2, RULE_genericSelection);
-        let mut _localctx: Rc<GenericSelectionContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<GenericSelectionContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -1096,24 +1096,24 @@ pub type GenericAssocListContext<'input> = BaseParserRuleContext<'input, Generic
 
 #[derive(Clone)]
 pub struct GenericAssocListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for GenericAssocListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for GenericAssocListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_genericAssocList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_genericAssocList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for GenericAssocListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_genericAssocList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_genericAssocList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for GenericAssocListContextExt<'input> {
@@ -1125,8 +1125,8 @@ impl<'input> CustomRuleContext<'input> for GenericAssocListContextExt<'input> {
 antlr_rust::tid! {GenericAssocListContextExt<'a>}
 
 impl<'input> GenericAssocListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<GenericAssocListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, GenericAssocListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<GenericAssocListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, GenericAssocListContextExt { ph:PhantomData }))
     }
 }
 
@@ -1137,7 +1137,7 @@ pub trait GenericAssocListContextAttrs<'input>: CParserContext<'input> + BorrowM
     {
         self.children_of_type()
     }
-    fn genericAssociation(&self, i: usize) -> Option<Rc<GenericAssociationContextAll<'input>>>
+    fn genericAssociation(&self, i:usize) -> Option<Rc<GenericAssociationContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -1152,7 +1152,7 @@ pub trait GenericAssocListContextAttrs<'input>: CParserContext<'input> + BorrowM
     }
     /// Retrieves 'i's TerminalNode corresponding to token Comma, starting from 0.
     /// Returns `None` if number of children corresponding to token Comma is less or equal than `i`.
-    fn Comma(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Comma(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -1172,9 +1172,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = GenericAssocListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 4, RULE_genericAssocList);
-        let mut _localctx: Rc<GenericAssocListContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<GenericAssocListContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -1224,24 +1224,24 @@ pub type GenericAssociationContext<'input> = BaseParserRuleContext<'input, Gener
 
 #[derive(Clone)]
 pub struct GenericAssociationContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for GenericAssociationContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for GenericAssociationContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_genericAssociation(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_genericAssociation(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for GenericAssociationContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_genericAssociation(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_genericAssociation(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for GenericAssociationContextExt<'input> {
@@ -1253,8 +1253,8 @@ impl<'input> CustomRuleContext<'input> for GenericAssociationContextExt<'input> 
 antlr_rust::tid! {GenericAssociationContextExt<'a>}
 
 impl<'input> GenericAssociationContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<GenericAssociationContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, GenericAssociationContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<GenericAssociationContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, GenericAssociationContextExt { ph:PhantomData }))
     }
 }
 
@@ -1301,8 +1301,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = GenericAssociationContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 6, RULE_genericAssociation);
-        let mut _localctx: Rc<GenericAssociationContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<GenericAssociationContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -1355,24 +1355,24 @@ pub type PostfixExpressionContext<'input> = BaseParserRuleContext<'input, Postfi
 
 #[derive(Clone)]
 pub struct PostfixExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for PostfixExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for PostfixExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_postfixExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_postfixExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for PostfixExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_postfixExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_postfixExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for PostfixExpressionContextExt<'input> {
@@ -1384,8 +1384,8 @@ impl<'input> CustomRuleContext<'input> for PostfixExpressionContextExt<'input> {
 antlr_rust::tid! {PostfixExpressionContextExt<'a>}
 
 impl<'input> PostfixExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<PostfixExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, PostfixExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<PostfixExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, PostfixExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -1497,18 +1497,18 @@ where
 {
     pub fn postfixExpression(&mut self) -> Result<Rc<PostfixExpressionContextAll<'input>>, ANTLRError> { self.postfixExpression_rec(0) }
 
-    fn postfixExpression_rec(&mut self, _p: isize) -> Result<Rc<PostfixExpressionContextAll<'input>>, ANTLRError> {
+    fn postfixExpression_rec(&mut self, _p:isize) -> Result<Rc<PostfixExpressionContextAll<'input>>, ANTLRError> {
         let recog = self;
         let _parentctx = recog.ctx.take();
         let _parentState = recog.base.get_state();
         let mut _localctx = PostfixExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_recursion_rule(_localctx.clone(), 8, RULE_postfixExpression, _p);
-        let mut _localctx: Rc<PostfixExpressionContextAll> = _localctx;
+        let mut _localctx:Rc<PostfixExpressionContextAll> = _localctx;
         let mut _prevctx = _localctx.clone();
         let _startState = 8;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
-            let mut _alt: isize;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
+            let mut _alt:isize;
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -1652,24 +1652,24 @@ pub type ArgumentExpressionListContext<'input> = BaseParserRuleContext<'input, A
 
 #[derive(Clone)]
 pub struct ArgumentExpressionListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ArgumentExpressionListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ArgumentExpressionListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_argumentExpressionList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_argumentExpressionList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ArgumentExpressionListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_argumentExpressionList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_argumentExpressionList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ArgumentExpressionListContextExt<'input> {
@@ -1681,8 +1681,8 @@ impl<'input> CustomRuleContext<'input> for ArgumentExpressionListContextExt<'inp
 antlr_rust::tid! {ArgumentExpressionListContextExt<'a>}
 
 impl<'input> ArgumentExpressionListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ArgumentExpressionListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ArgumentExpressionListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ArgumentExpressionListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ArgumentExpressionListContextExt { ph:PhantomData }))
     }
 }
 
@@ -1693,7 +1693,7 @@ pub trait ArgumentExpressionListContextAttrs<'input>: CParserContext<'input> + B
     {
         self.children_of_type()
     }
-    fn assignmentExpression(&self, i: usize) -> Option<Rc<AssignmentExpressionContextAll<'input>>>
+    fn assignmentExpression(&self, i:usize) -> Option<Rc<AssignmentExpressionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -1708,7 +1708,7 @@ pub trait ArgumentExpressionListContextAttrs<'input>: CParserContext<'input> + B
     }
     /// Retrieves 'i's TerminalNode corresponding to token Comma, starting from 0.
     /// Returns `None` if number of children corresponding to token Comma is less or equal than `i`.
-    fn Comma(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Comma(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -1728,9 +1728,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ArgumentExpressionListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 10, RULE_argumentExpressionList);
-        let mut _localctx: Rc<ArgumentExpressionListContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ArgumentExpressionListContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -1780,24 +1780,24 @@ pub type UnaryExpressionContext<'input> = BaseParserRuleContext<'input, UnaryExp
 
 #[derive(Clone)]
 pub struct UnaryExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for UnaryExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for UnaryExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_unaryExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_unaryExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for UnaryExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_unaryExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_unaryExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for UnaryExpressionContextExt<'input> {
@@ -1809,8 +1809,8 @@ impl<'input> CustomRuleContext<'input> for UnaryExpressionContextExt<'input> {
 antlr_rust::tid! {UnaryExpressionContextExt<'a>}
 
 impl<'input> UnaryExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<UnaryExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, UnaryExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<UnaryExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, UnaryExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -1885,9 +1885,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = UnaryExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 12, RULE_unaryExpression);
-        let mut _localctx: Rc<UnaryExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<UnaryExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -1965,24 +1965,24 @@ pub type UnaryOperatorContext<'input> = BaseParserRuleContext<'input, UnaryOpera
 
 #[derive(Clone)]
 pub struct UnaryOperatorContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for UnaryOperatorContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for UnaryOperatorContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_unaryOperator(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_unaryOperator(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for UnaryOperatorContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_unaryOperator(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_unaryOperator(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for UnaryOperatorContextExt<'input> {
@@ -1994,8 +1994,8 @@ impl<'input> CustomRuleContext<'input> for UnaryOperatorContextExt<'input> {
 antlr_rust::tid! {UnaryOperatorContextExt<'a>}
 
 impl<'input> UnaryOperatorContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<UnaryOperatorContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, UnaryOperatorContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<UnaryOperatorContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, UnaryOperatorContextExt { ph:PhantomData }))
     }
 }
 
@@ -2078,9 +2078,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = UnaryOperatorContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 14, RULE_unaryOperator);
-        let mut _localctx: Rc<UnaryOperatorContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<UnaryOperatorContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -2131,24 +2131,24 @@ pub type CastExpressionContext<'input> = BaseParserRuleContext<'input, CastExpre
 
 #[derive(Clone)]
 pub struct CastExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for CastExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for CastExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_castExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_castExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for CastExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_castExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_castExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for CastExpressionContextExt<'input> {
@@ -2160,8 +2160,8 @@ impl<'input> CustomRuleContext<'input> for CastExpressionContextExt<'input> {
 antlr_rust::tid! {CastExpressionContextExt<'a>}
 
 impl<'input> CastExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<CastExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, CastExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<CastExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, CastExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -2214,9 +2214,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = CastExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 16, RULE_castExpression);
-        let mut _localctx: Rc<CastExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<CastExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(285);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.interpreter.adaptive_predict(10, &mut recog.base)? {
@@ -2284,24 +2284,24 @@ pub type MultiplicativeExpressionContext<'input> = BaseParserRuleContext<'input,
 
 #[derive(Clone)]
 pub struct MultiplicativeExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for MultiplicativeExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for MultiplicativeExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_multiplicativeExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_multiplicativeExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for MultiplicativeExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_multiplicativeExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_multiplicativeExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for MultiplicativeExpressionContextExt<'input> {
@@ -2313,8 +2313,8 @@ impl<'input> CustomRuleContext<'input> for MultiplicativeExpressionContextExt<'i
 antlr_rust::tid! {MultiplicativeExpressionContextExt<'a>}
 
 impl<'input> MultiplicativeExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<MultiplicativeExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, MultiplicativeExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<MultiplicativeExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, MultiplicativeExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -2325,7 +2325,7 @@ pub trait MultiplicativeExpressionContextAttrs<'input>: CParserContext<'input> +
     {
         self.children_of_type()
     }
-    fn castExpression(&self, i: usize) -> Option<Rc<CastExpressionContextAll<'input>>>
+    fn castExpression(&self, i:usize) -> Option<Rc<CastExpressionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -2340,7 +2340,7 @@ pub trait MultiplicativeExpressionContextAttrs<'input>: CParserContext<'input> +
     }
     /// Retrieves 'i's TerminalNode corresponding to token Star, starting from 0.
     /// Returns `None` if number of children corresponding to token Star is less or equal than `i`.
-    fn Star(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Star(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -2355,7 +2355,7 @@ pub trait MultiplicativeExpressionContextAttrs<'input>: CParserContext<'input> +
     }
     /// Retrieves 'i's TerminalNode corresponding to token Div, starting from 0.
     /// Returns `None` if number of children corresponding to token Div is less or equal than `i`.
-    fn Div(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Div(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -2370,7 +2370,7 @@ pub trait MultiplicativeExpressionContextAttrs<'input>: CParserContext<'input> +
     }
     /// Retrieves 'i's TerminalNode corresponding to token Mod, starting from 0.
     /// Returns `None` if number of children corresponding to token Mod is less or equal than `i`.
-    fn Mod(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Mod(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -2390,9 +2390,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = MultiplicativeExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 18, RULE_multiplicativeExpression);
-        let mut _localctx: Rc<MultiplicativeExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<MultiplicativeExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -2450,24 +2450,24 @@ pub type AdditiveExpressionContext<'input> = BaseParserRuleContext<'input, Addit
 
 #[derive(Clone)]
 pub struct AdditiveExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for AdditiveExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for AdditiveExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_additiveExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_additiveExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for AdditiveExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_additiveExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_additiveExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for AdditiveExpressionContextExt<'input> {
@@ -2479,8 +2479,8 @@ impl<'input> CustomRuleContext<'input> for AdditiveExpressionContextExt<'input> 
 antlr_rust::tid! {AdditiveExpressionContextExt<'a>}
 
 impl<'input> AdditiveExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<AdditiveExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, AdditiveExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<AdditiveExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, AdditiveExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -2491,7 +2491,7 @@ pub trait AdditiveExpressionContextAttrs<'input>: CParserContext<'input> + Borro
     {
         self.children_of_type()
     }
-    fn multiplicativeExpression(&self, i: usize) -> Option<Rc<MultiplicativeExpressionContextAll<'input>>>
+    fn multiplicativeExpression(&self, i:usize) -> Option<Rc<MultiplicativeExpressionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -2506,7 +2506,7 @@ pub trait AdditiveExpressionContextAttrs<'input>: CParserContext<'input> + Borro
     }
     /// Retrieves 'i's TerminalNode corresponding to token Plus, starting from 0.
     /// Returns `None` if number of children corresponding to token Plus is less or equal than `i`.
-    fn Plus(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Plus(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -2521,7 +2521,7 @@ pub trait AdditiveExpressionContextAttrs<'input>: CParserContext<'input> + Borro
     }
     /// Retrieves 'i's TerminalNode corresponding to token Minus, starting from 0.
     /// Returns `None` if number of children corresponding to token Minus is less or equal than `i`.
-    fn Minus(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Minus(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -2541,9 +2541,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = AdditiveExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 20, RULE_additiveExpression);
-        let mut _localctx: Rc<AdditiveExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<AdditiveExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -2601,24 +2601,24 @@ pub type ShiftExpressionContext<'input> = BaseParserRuleContext<'input, ShiftExp
 
 #[derive(Clone)]
 pub struct ShiftExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ShiftExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ShiftExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_shiftExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_shiftExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ShiftExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_shiftExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_shiftExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ShiftExpressionContextExt<'input> {
@@ -2630,8 +2630,8 @@ impl<'input> CustomRuleContext<'input> for ShiftExpressionContextExt<'input> {
 antlr_rust::tid! {ShiftExpressionContextExt<'a>}
 
 impl<'input> ShiftExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ShiftExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ShiftExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ShiftExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ShiftExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -2642,7 +2642,7 @@ pub trait ShiftExpressionContextAttrs<'input>: CParserContext<'input> + BorrowMu
     {
         self.children_of_type()
     }
-    fn additiveExpression(&self, i: usize) -> Option<Rc<AdditiveExpressionContextAll<'input>>>
+    fn additiveExpression(&self, i:usize) -> Option<Rc<AdditiveExpressionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -2657,7 +2657,7 @@ pub trait ShiftExpressionContextAttrs<'input>: CParserContext<'input> + BorrowMu
     }
     /// Retrieves 'i's TerminalNode corresponding to token LeftShift, starting from 0.
     /// Returns `None` if number of children corresponding to token LeftShift is less or equal than `i`.
-    fn LeftShift(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn LeftShift(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -2672,7 +2672,7 @@ pub trait ShiftExpressionContextAttrs<'input>: CParserContext<'input> + BorrowMu
     }
     /// Retrieves 'i's TerminalNode corresponding to token RightShift, starting from 0.
     /// Returns `None` if number of children corresponding to token RightShift is less or equal than `i`.
-    fn RightShift(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn RightShift(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -2692,9 +2692,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ShiftExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 22, RULE_shiftExpression);
-        let mut _localctx: Rc<ShiftExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ShiftExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -2752,24 +2752,24 @@ pub type RelationalExpressionContext<'input> = BaseParserRuleContext<'input, Rel
 
 #[derive(Clone)]
 pub struct RelationalExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for RelationalExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for RelationalExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_relationalExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_relationalExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for RelationalExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_relationalExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_relationalExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for RelationalExpressionContextExt<'input> {
@@ -2781,8 +2781,8 @@ impl<'input> CustomRuleContext<'input> for RelationalExpressionContextExt<'input
 antlr_rust::tid! {RelationalExpressionContextExt<'a>}
 
 impl<'input> RelationalExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<RelationalExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, RelationalExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<RelationalExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, RelationalExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -2793,7 +2793,7 @@ pub trait RelationalExpressionContextAttrs<'input>: CParserContext<'input> + Bor
     {
         self.children_of_type()
     }
-    fn shiftExpression(&self, i: usize) -> Option<Rc<ShiftExpressionContextAll<'input>>>
+    fn shiftExpression(&self, i:usize) -> Option<Rc<ShiftExpressionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -2808,7 +2808,7 @@ pub trait RelationalExpressionContextAttrs<'input>: CParserContext<'input> + Bor
     }
     /// Retrieves 'i's TerminalNode corresponding to token Less, starting from 0.
     /// Returns `None` if number of children corresponding to token Less is less or equal than `i`.
-    fn Less(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Less(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -2823,7 +2823,7 @@ pub trait RelationalExpressionContextAttrs<'input>: CParserContext<'input> + Bor
     }
     /// Retrieves 'i's TerminalNode corresponding to token Greater, starting from 0.
     /// Returns `None` if number of children corresponding to token Greater is less or equal than `i`.
-    fn Greater(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Greater(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -2838,7 +2838,7 @@ pub trait RelationalExpressionContextAttrs<'input>: CParserContext<'input> + Bor
     }
     /// Retrieves 'i's TerminalNode corresponding to token LessEqual, starting from 0.
     /// Returns `None` if number of children corresponding to token LessEqual is less or equal than `i`.
-    fn LessEqual(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn LessEqual(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -2853,7 +2853,7 @@ pub trait RelationalExpressionContextAttrs<'input>: CParserContext<'input> + Bor
     }
     /// Retrieves 'i's TerminalNode corresponding to token GreaterEqual, starting from 0.
     /// Returns `None` if number of children corresponding to token GreaterEqual is less or equal than `i`.
-    fn GreaterEqual(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn GreaterEqual(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -2873,9 +2873,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = RelationalExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 24, RULE_relationalExpression);
-        let mut _localctx: Rc<RelationalExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<RelationalExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -2938,24 +2938,24 @@ pub type EqualityExpressionContext<'input> = BaseParserRuleContext<'input, Equal
 
 #[derive(Clone)]
 pub struct EqualityExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for EqualityExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for EqualityExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_equalityExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_equalityExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for EqualityExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_equalityExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_equalityExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for EqualityExpressionContextExt<'input> {
@@ -2967,8 +2967,8 @@ impl<'input> CustomRuleContext<'input> for EqualityExpressionContextExt<'input> 
 antlr_rust::tid! {EqualityExpressionContextExt<'a>}
 
 impl<'input> EqualityExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<EqualityExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, EqualityExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<EqualityExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, EqualityExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -2979,7 +2979,7 @@ pub trait EqualityExpressionContextAttrs<'input>: CParserContext<'input> + Borro
     {
         self.children_of_type()
     }
-    fn relationalExpression(&self, i: usize) -> Option<Rc<RelationalExpressionContextAll<'input>>>
+    fn relationalExpression(&self, i:usize) -> Option<Rc<RelationalExpressionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -2994,7 +2994,7 @@ pub trait EqualityExpressionContextAttrs<'input>: CParserContext<'input> + Borro
     }
     /// Retrieves 'i's TerminalNode corresponding to token Equal, starting from 0.
     /// Returns `None` if number of children corresponding to token Equal is less or equal than `i`.
-    fn Equal(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Equal(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -3009,7 +3009,7 @@ pub trait EqualityExpressionContextAttrs<'input>: CParserContext<'input> + Borro
     }
     /// Retrieves 'i's TerminalNode corresponding to token NotEqual, starting from 0.
     /// Returns `None` if number of children corresponding to token NotEqual is less or equal than `i`.
-    fn NotEqual(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn NotEqual(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -3029,9 +3029,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = EqualityExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 26, RULE_equalityExpression);
-        let mut _localctx: Rc<EqualityExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<EqualityExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -3089,24 +3089,24 @@ pub type AndExpressionContext<'input> = BaseParserRuleContext<'input, AndExpress
 
 #[derive(Clone)]
 pub struct AndExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for AndExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for AndExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_andExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_andExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for AndExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_andExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_andExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for AndExpressionContextExt<'input> {
@@ -3118,8 +3118,8 @@ impl<'input> CustomRuleContext<'input> for AndExpressionContextExt<'input> {
 antlr_rust::tid! {AndExpressionContextExt<'a>}
 
 impl<'input> AndExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<AndExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, AndExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<AndExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, AndExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -3130,7 +3130,7 @@ pub trait AndExpressionContextAttrs<'input>: CParserContext<'input> + BorrowMut<
     {
         self.children_of_type()
     }
-    fn equalityExpression(&self, i: usize) -> Option<Rc<EqualityExpressionContextAll<'input>>>
+    fn equalityExpression(&self, i:usize) -> Option<Rc<EqualityExpressionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -3145,7 +3145,7 @@ pub trait AndExpressionContextAttrs<'input>: CParserContext<'input> + BorrowMut<
     }
     /// Retrieves 'i's TerminalNode corresponding to token And, starting from 0.
     /// Returns `None` if number of children corresponding to token And is less or equal than `i`.
-    fn And(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn And(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -3165,9 +3165,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = AndExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 28, RULE_andExpression);
-        let mut _localctx: Rc<AndExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<AndExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -3217,24 +3217,24 @@ pub type ExclusiveOrExpressionContext<'input> = BaseParserRuleContext<'input, Ex
 
 #[derive(Clone)]
 pub struct ExclusiveOrExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ExclusiveOrExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ExclusiveOrExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_exclusiveOrExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_exclusiveOrExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ExclusiveOrExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_exclusiveOrExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_exclusiveOrExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ExclusiveOrExpressionContextExt<'input> {
@@ -3246,8 +3246,8 @@ impl<'input> CustomRuleContext<'input> for ExclusiveOrExpressionContextExt<'inpu
 antlr_rust::tid! {ExclusiveOrExpressionContextExt<'a>}
 
 impl<'input> ExclusiveOrExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ExclusiveOrExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ExclusiveOrExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ExclusiveOrExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ExclusiveOrExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -3258,7 +3258,7 @@ pub trait ExclusiveOrExpressionContextAttrs<'input>: CParserContext<'input> + Bo
     {
         self.children_of_type()
     }
-    fn andExpression(&self, i: usize) -> Option<Rc<AndExpressionContextAll<'input>>>
+    fn andExpression(&self, i:usize) -> Option<Rc<AndExpressionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -3273,7 +3273,7 @@ pub trait ExclusiveOrExpressionContextAttrs<'input>: CParserContext<'input> + Bo
     }
     /// Retrieves 'i's TerminalNode corresponding to token Caret, starting from 0.
     /// Returns `None` if number of children corresponding to token Caret is less or equal than `i`.
-    fn Caret(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Caret(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -3293,9 +3293,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ExclusiveOrExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 30, RULE_exclusiveOrExpression);
-        let mut _localctx: Rc<ExclusiveOrExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ExclusiveOrExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -3345,24 +3345,24 @@ pub type InclusiveOrExpressionContext<'input> = BaseParserRuleContext<'input, In
 
 #[derive(Clone)]
 pub struct InclusiveOrExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for InclusiveOrExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for InclusiveOrExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_inclusiveOrExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_inclusiveOrExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for InclusiveOrExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_inclusiveOrExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_inclusiveOrExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for InclusiveOrExpressionContextExt<'input> {
@@ -3374,8 +3374,8 @@ impl<'input> CustomRuleContext<'input> for InclusiveOrExpressionContextExt<'inpu
 antlr_rust::tid! {InclusiveOrExpressionContextExt<'a>}
 
 impl<'input> InclusiveOrExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<InclusiveOrExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, InclusiveOrExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<InclusiveOrExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, InclusiveOrExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -3386,7 +3386,7 @@ pub trait InclusiveOrExpressionContextAttrs<'input>: CParserContext<'input> + Bo
     {
         self.children_of_type()
     }
-    fn exclusiveOrExpression(&self, i: usize) -> Option<Rc<ExclusiveOrExpressionContextAll<'input>>>
+    fn exclusiveOrExpression(&self, i:usize) -> Option<Rc<ExclusiveOrExpressionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -3401,7 +3401,7 @@ pub trait InclusiveOrExpressionContextAttrs<'input>: CParserContext<'input> + Bo
     }
     /// Retrieves 'i's TerminalNode corresponding to token Or, starting from 0.
     /// Returns `None` if number of children corresponding to token Or is less or equal than `i`.
-    fn Or(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Or(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -3421,9 +3421,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = InclusiveOrExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 32, RULE_inclusiveOrExpression);
-        let mut _localctx: Rc<InclusiveOrExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<InclusiveOrExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -3473,24 +3473,24 @@ pub type LogicalAndExpressionContext<'input> = BaseParserRuleContext<'input, Log
 
 #[derive(Clone)]
 pub struct LogicalAndExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for LogicalAndExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for LogicalAndExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_logicalAndExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_logicalAndExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for LogicalAndExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_logicalAndExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_logicalAndExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for LogicalAndExpressionContextExt<'input> {
@@ -3502,8 +3502,8 @@ impl<'input> CustomRuleContext<'input> for LogicalAndExpressionContextExt<'input
 antlr_rust::tid! {LogicalAndExpressionContextExt<'a>}
 
 impl<'input> LogicalAndExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<LogicalAndExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, LogicalAndExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<LogicalAndExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, LogicalAndExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -3514,7 +3514,7 @@ pub trait LogicalAndExpressionContextAttrs<'input>: CParserContext<'input> + Bor
     {
         self.children_of_type()
     }
-    fn inclusiveOrExpression(&self, i: usize) -> Option<Rc<InclusiveOrExpressionContextAll<'input>>>
+    fn inclusiveOrExpression(&self, i:usize) -> Option<Rc<InclusiveOrExpressionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -3529,7 +3529,7 @@ pub trait LogicalAndExpressionContextAttrs<'input>: CParserContext<'input> + Bor
     }
     /// Retrieves 'i's TerminalNode corresponding to token AndAnd, starting from 0.
     /// Returns `None` if number of children corresponding to token AndAnd is less or equal than `i`.
-    fn AndAnd(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn AndAnd(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -3549,9 +3549,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = LogicalAndExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 34, RULE_logicalAndExpression);
-        let mut _localctx: Rc<LogicalAndExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<LogicalAndExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -3601,24 +3601,24 @@ pub type LogicalOrExpressionContext<'input> = BaseParserRuleContext<'input, Logi
 
 #[derive(Clone)]
 pub struct LogicalOrExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for LogicalOrExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for LogicalOrExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_logicalOrExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_logicalOrExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for LogicalOrExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_logicalOrExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_logicalOrExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for LogicalOrExpressionContextExt<'input> {
@@ -3630,8 +3630,8 @@ impl<'input> CustomRuleContext<'input> for LogicalOrExpressionContextExt<'input>
 antlr_rust::tid! {LogicalOrExpressionContextExt<'a>}
 
 impl<'input> LogicalOrExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<LogicalOrExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, LogicalOrExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<LogicalOrExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, LogicalOrExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -3642,7 +3642,7 @@ pub trait LogicalOrExpressionContextAttrs<'input>: CParserContext<'input> + Borr
     {
         self.children_of_type()
     }
-    fn logicalAndExpression(&self, i: usize) -> Option<Rc<LogicalAndExpressionContextAll<'input>>>
+    fn logicalAndExpression(&self, i:usize) -> Option<Rc<LogicalAndExpressionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -3657,7 +3657,7 @@ pub trait LogicalOrExpressionContextAttrs<'input>: CParserContext<'input> + Borr
     }
     /// Retrieves 'i's TerminalNode corresponding to token OrOr, starting from 0.
     /// Returns `None` if number of children corresponding to token OrOr is less or equal than `i`.
-    fn OrOr(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn OrOr(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -3677,9 +3677,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = LogicalOrExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 36, RULE_logicalOrExpression);
-        let mut _localctx: Rc<LogicalOrExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<LogicalOrExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -3729,24 +3729,24 @@ pub type ConditionalExpressionContext<'input> = BaseParserRuleContext<'input, Co
 
 #[derive(Clone)]
 pub struct ConditionalExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ConditionalExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ConditionalExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_conditionalExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_conditionalExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ConditionalExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_conditionalExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_conditionalExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ConditionalExpressionContextExt<'input> {
@@ -3758,8 +3758,8 @@ impl<'input> CustomRuleContext<'input> for ConditionalExpressionContextExt<'inpu
 antlr_rust::tid! {ConditionalExpressionContextExt<'a>}
 
 impl<'input> ConditionalExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ConditionalExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ConditionalExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ConditionalExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ConditionalExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -3812,9 +3812,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ConditionalExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 38, RULE_conditionalExpression);
-        let mut _localctx: Rc<ConditionalExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ConditionalExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -3866,24 +3866,24 @@ pub type AssignmentExpressionContext<'input> = BaseParserRuleContext<'input, Ass
 
 #[derive(Clone)]
 pub struct AssignmentExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for AssignmentExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for AssignmentExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_assignmentExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_assignmentExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for AssignmentExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_assignmentExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_assignmentExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for AssignmentExpressionContextExt<'input> {
@@ -3895,8 +3895,8 @@ impl<'input> CustomRuleContext<'input> for AssignmentExpressionContextExt<'input
 antlr_rust::tid! {AssignmentExpressionContextExt<'a>}
 
 impl<'input> AssignmentExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<AssignmentExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, AssignmentExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<AssignmentExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, AssignmentExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -3947,8 +3947,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = AssignmentExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 40, RULE_assignmentExpression);
-        let mut _localctx: Rc<AssignmentExpressionContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<AssignmentExpressionContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(381);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.interpreter.adaptive_predict(22, &mut recog.base)? {
@@ -4012,24 +4012,24 @@ pub type AssignmentOperatorContext<'input> = BaseParserRuleContext<'input, Assig
 
 #[derive(Clone)]
 pub struct AssignmentOperatorContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for AssignmentOperatorContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for AssignmentOperatorContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_assignmentOperator(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_assignmentOperator(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for AssignmentOperatorContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_assignmentOperator(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_assignmentOperator(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for AssignmentOperatorContextExt<'input> {
@@ -4041,8 +4041,8 @@ impl<'input> CustomRuleContext<'input> for AssignmentOperatorContextExt<'input> 
 antlr_rust::tid! {AssignmentOperatorContextExt<'a>}
 
 impl<'input> AssignmentOperatorContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<AssignmentOperatorContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, AssignmentOperatorContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<AssignmentOperatorContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, AssignmentOperatorContextExt { ph:PhantomData }))
     }
 }
 
@@ -4149,9 +4149,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = AssignmentOperatorContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 42, RULE_assignmentOperator);
-        let mut _localctx: Rc<AssignmentOperatorContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<AssignmentOperatorContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -4205,24 +4205,24 @@ pub type ExpressionContext<'input> = BaseParserRuleContext<'input, ExpressionCon
 
 #[derive(Clone)]
 pub struct ExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_expression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_expression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_expression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_expression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ExpressionContextExt<'input> {
@@ -4234,8 +4234,8 @@ impl<'input> CustomRuleContext<'input> for ExpressionContextExt<'input> {
 antlr_rust::tid! {ExpressionContextExt<'a>}
 
 impl<'input> ExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -4246,7 +4246,7 @@ pub trait ExpressionContextAttrs<'input>: CParserContext<'input> + BorrowMut<Exp
     {
         self.children_of_type()
     }
-    fn assignmentExpression(&self, i: usize) -> Option<Rc<AssignmentExpressionContextAll<'input>>>
+    fn assignmentExpression(&self, i:usize) -> Option<Rc<AssignmentExpressionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -4261,7 +4261,7 @@ pub trait ExpressionContextAttrs<'input>: CParserContext<'input> + BorrowMut<Exp
     }
     /// Retrieves 'i's TerminalNode corresponding to token Comma, starting from 0.
     /// Returns `None` if number of children corresponding to token Comma is less or equal than `i`.
-    fn Comma(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Comma(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -4281,9 +4281,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 44, RULE_expression);
-        let mut _localctx: Rc<ExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -4333,24 +4333,24 @@ pub type ConstantExpressionContext<'input> = BaseParserRuleContext<'input, Const
 
 #[derive(Clone)]
 pub struct ConstantExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ConstantExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ConstantExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_constantExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_constantExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ConstantExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_constantExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_constantExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ConstantExpressionContextExt<'input> {
@@ -4362,8 +4362,8 @@ impl<'input> CustomRuleContext<'input> for ConstantExpressionContextExt<'input> 
 antlr_rust::tid! {ConstantExpressionContextExt<'a>}
 
 impl<'input> ConstantExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ConstantExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ConstantExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ConstantExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ConstantExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -4388,8 +4388,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ConstantExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 46, RULE_constantExpression);
-        let mut _localctx: Rc<ConstantExpressionContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ConstantExpressionContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -4420,24 +4420,24 @@ pub type DeclarationContext<'input> = BaseParserRuleContext<'input, DeclarationC
 
 #[derive(Clone)]
 pub struct DeclarationContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for DeclarationContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for DeclarationContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_declaration(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_declaration(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for DeclarationContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_declaration(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_declaration(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for DeclarationContextExt<'input> {
@@ -4449,8 +4449,8 @@ impl<'input> CustomRuleContext<'input> for DeclarationContextExt<'input> {
 antlr_rust::tid! {DeclarationContextExt<'a>}
 
 impl<'input> DeclarationContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<DeclarationContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DeclarationContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<DeclarationContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DeclarationContextExt { ph:PhantomData }))
     }
 }
 
@@ -4495,8 +4495,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = DeclarationContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 48, RULE_declaration);
-        let mut _localctx: Rc<DeclarationContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<DeclarationContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(400);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.base.input.la(1) {
@@ -4553,24 +4553,24 @@ pub type DeclarationSpecifiersContext<'input> = BaseParserRuleContext<'input, De
 
 #[derive(Clone)]
 pub struct DeclarationSpecifiersContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for DeclarationSpecifiersContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for DeclarationSpecifiersContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_declarationSpecifiers(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_declarationSpecifiers(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for DeclarationSpecifiersContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_declarationSpecifiers(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_declarationSpecifiers(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for DeclarationSpecifiersContextExt<'input> {
@@ -4582,8 +4582,8 @@ impl<'input> CustomRuleContext<'input> for DeclarationSpecifiersContextExt<'inpu
 antlr_rust::tid! {DeclarationSpecifiersContextExt<'a>}
 
 impl<'input> DeclarationSpecifiersContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<DeclarationSpecifiersContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DeclarationSpecifiersContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<DeclarationSpecifiersContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DeclarationSpecifiersContextExt { ph:PhantomData }))
     }
 }
 
@@ -4594,7 +4594,7 @@ pub trait DeclarationSpecifiersContextAttrs<'input>: CParserContext<'input> + Bo
     {
         self.children_of_type()
     }
-    fn declarationSpecifier(&self, i: usize) -> Option<Rc<DeclarationSpecifierContextAll<'input>>>
+    fn declarationSpecifier(&self, i:usize) -> Option<Rc<DeclarationSpecifierContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -4614,9 +4614,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = DeclarationSpecifiersContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 50, RULE_declarationSpecifiers);
-        let mut _localctx: Rc<DeclarationSpecifiersContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
-            let mut _alt: isize;
+        let mut _localctx:Rc<DeclarationSpecifiersContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
+            let mut _alt:isize;
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -4666,24 +4666,24 @@ pub type DeclarationSpecifiers2Context<'input> = BaseParserRuleContext<'input, D
 
 #[derive(Clone)]
 pub struct DeclarationSpecifiers2ContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for DeclarationSpecifiers2Context<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for DeclarationSpecifiers2Context<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_declarationSpecifiers2(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_declarationSpecifiers2(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for DeclarationSpecifiers2Context<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_declarationSpecifiers2(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_declarationSpecifiers2(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for DeclarationSpecifiers2ContextExt<'input> {
@@ -4695,8 +4695,8 @@ impl<'input> CustomRuleContext<'input> for DeclarationSpecifiers2ContextExt<'inp
 antlr_rust::tid! {DeclarationSpecifiers2ContextExt<'a>}
 
 impl<'input> DeclarationSpecifiers2ContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<DeclarationSpecifiers2ContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DeclarationSpecifiers2ContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<DeclarationSpecifiers2ContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DeclarationSpecifiers2ContextExt { ph:PhantomData }))
     }
 }
 
@@ -4707,7 +4707,7 @@ pub trait DeclarationSpecifiers2ContextAttrs<'input>: CParserContext<'input> + B
     {
         self.children_of_type()
     }
-    fn declarationSpecifier(&self, i: usize) -> Option<Rc<DeclarationSpecifierContextAll<'input>>>
+    fn declarationSpecifier(&self, i:usize) -> Option<Rc<DeclarationSpecifierContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -4727,9 +4727,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = DeclarationSpecifiers2ContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 52, RULE_declarationSpecifiers2);
-        let mut _localctx: Rc<DeclarationSpecifiers2ContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<DeclarationSpecifiers2ContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -4818,24 +4818,24 @@ pub type DeclarationSpecifierContext<'input> = BaseParserRuleContext<'input, Dec
 
 #[derive(Clone)]
 pub struct DeclarationSpecifierContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for DeclarationSpecifierContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for DeclarationSpecifierContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_declarationSpecifier(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_declarationSpecifier(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for DeclarationSpecifierContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_declarationSpecifier(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_declarationSpecifier(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for DeclarationSpecifierContextExt<'input> {
@@ -4847,8 +4847,8 @@ impl<'input> CustomRuleContext<'input> for DeclarationSpecifierContextExt<'input
 antlr_rust::tid! {DeclarationSpecifierContextExt<'a>}
 
 impl<'input> DeclarationSpecifierContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<DeclarationSpecifierContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DeclarationSpecifierContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<DeclarationSpecifierContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DeclarationSpecifierContextExt { ph:PhantomData }))
     }
 }
 
@@ -4897,8 +4897,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = DeclarationSpecifierContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 54, RULE_declarationSpecifier);
-        let mut _localctx: Rc<DeclarationSpecifierContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<DeclarationSpecifierContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(417);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.interpreter.adaptive_predict(27, &mut recog.base)? {
@@ -4973,24 +4973,24 @@ pub type InitDeclaratorListContext<'input> = BaseParserRuleContext<'input, InitD
 
 #[derive(Clone)]
 pub struct InitDeclaratorListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for InitDeclaratorListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for InitDeclaratorListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_initDeclaratorList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_initDeclaratorList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for InitDeclaratorListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_initDeclaratorList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_initDeclaratorList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for InitDeclaratorListContextExt<'input> {
@@ -5002,8 +5002,8 @@ impl<'input> CustomRuleContext<'input> for InitDeclaratorListContextExt<'input> 
 antlr_rust::tid! {InitDeclaratorListContextExt<'a>}
 
 impl<'input> InitDeclaratorListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<InitDeclaratorListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, InitDeclaratorListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<InitDeclaratorListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, InitDeclaratorListContextExt { ph:PhantomData }))
     }
 }
 
@@ -5014,7 +5014,7 @@ pub trait InitDeclaratorListContextAttrs<'input>: CParserContext<'input> + Borro
     {
         self.children_of_type()
     }
-    fn initDeclarator(&self, i: usize) -> Option<Rc<InitDeclaratorContextAll<'input>>>
+    fn initDeclarator(&self, i:usize) -> Option<Rc<InitDeclaratorContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -5029,7 +5029,7 @@ pub trait InitDeclaratorListContextAttrs<'input>: CParserContext<'input> + Borro
     }
     /// Retrieves 'i's TerminalNode corresponding to token Comma, starting from 0.
     /// Returns `None` if number of children corresponding to token Comma is less or equal than `i`.
-    fn Comma(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Comma(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -5049,9 +5049,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = InitDeclaratorListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 56, RULE_initDeclaratorList);
-        let mut _localctx: Rc<InitDeclaratorListContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<InitDeclaratorListContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -5101,24 +5101,24 @@ pub type InitDeclaratorContext<'input> = BaseParserRuleContext<'input, InitDecla
 
 #[derive(Clone)]
 pub struct InitDeclaratorContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for InitDeclaratorContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for InitDeclaratorContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_initDeclarator(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_initDeclarator(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for InitDeclaratorContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_initDeclarator(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_initDeclarator(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for InitDeclaratorContextExt<'input> {
@@ -5130,8 +5130,8 @@ impl<'input> CustomRuleContext<'input> for InitDeclaratorContextExt<'input> {
 antlr_rust::tid! {InitDeclaratorContextExt<'a>}
 
 impl<'input> InitDeclaratorContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<InitDeclaratorContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, InitDeclaratorContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<InitDeclaratorContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, InitDeclaratorContextExt { ph:PhantomData }))
     }
 }
 
@@ -5170,9 +5170,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = InitDeclaratorContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 58, RULE_initDeclarator);
-        let mut _localctx: Rc<InitDeclaratorContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<InitDeclaratorContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -5217,24 +5217,24 @@ pub type StorageClassSpecifierContext<'input> = BaseParserRuleContext<'input, St
 
 #[derive(Clone)]
 pub struct StorageClassSpecifierContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for StorageClassSpecifierContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for StorageClassSpecifierContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_storageClassSpecifier(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_storageClassSpecifier(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for StorageClassSpecifierContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_storageClassSpecifier(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_storageClassSpecifier(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for StorageClassSpecifierContextExt<'input> {
@@ -5246,8 +5246,8 @@ impl<'input> CustomRuleContext<'input> for StorageClassSpecifierContextExt<'inpu
 antlr_rust::tid! {StorageClassSpecifierContextExt<'a>}
 
 impl<'input> StorageClassSpecifierContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<StorageClassSpecifierContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StorageClassSpecifierContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<StorageClassSpecifierContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StorageClassSpecifierContextExt { ph:PhantomData }))
     }
 }
 
@@ -5314,9 +5314,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = StorageClassSpecifierContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 60, RULE_storageClassSpecifier);
-        let mut _localctx: Rc<StorageClassSpecifierContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<StorageClassSpecifierContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -5360,24 +5360,24 @@ pub type TypeSpecifierContext<'input> = BaseParserRuleContext<'input, TypeSpecif
 
 #[derive(Clone)]
 pub struct TypeSpecifierContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for TypeSpecifierContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for TypeSpecifierContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_typeSpecifier(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_typeSpecifier(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for TypeSpecifierContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_typeSpecifier(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_typeSpecifier(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for TypeSpecifierContextExt<'input> {
@@ -5389,8 +5389,8 @@ impl<'input> CustomRuleContext<'input> for TypeSpecifierContextExt<'input> {
 antlr_rust::tid! {TypeSpecifierContextExt<'a>}
 
 impl<'input> TypeSpecifierContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<TypeSpecifierContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, TypeSpecifierContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<TypeSpecifierContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, TypeSpecifierContextExt { ph:PhantomData }))
     }
 }
 
@@ -5543,9 +5543,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = TypeSpecifierContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 62, RULE_typeSpecifier);
-        let mut _localctx: Rc<TypeSpecifierContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<TypeSpecifierContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(461);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.base.input.la(1) {
@@ -5785,24 +5785,24 @@ pub type StructOrUnionSpecifierContext<'input> = BaseParserRuleContext<'input, S
 
 #[derive(Clone)]
 pub struct StructOrUnionSpecifierContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for StructOrUnionSpecifierContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for StructOrUnionSpecifierContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_structOrUnionSpecifier(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_structOrUnionSpecifier(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for StructOrUnionSpecifierContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_structOrUnionSpecifier(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_structOrUnionSpecifier(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for StructOrUnionSpecifierContextExt<'input> {
@@ -5814,8 +5814,8 @@ impl<'input> CustomRuleContext<'input> for StructOrUnionSpecifierContextExt<'inp
 antlr_rust::tid! {StructOrUnionSpecifierContextExt<'a>}
 
 impl<'input> StructOrUnionSpecifierContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<StructOrUnionSpecifierContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StructOrUnionSpecifierContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<StructOrUnionSpecifierContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StructOrUnionSpecifierContextExt { ph:PhantomData }))
     }
 }
 
@@ -5870,9 +5870,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = StructOrUnionSpecifierContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 64, RULE_structOrUnionSpecifier);
-        let mut _localctx: Rc<StructOrUnionSpecifierContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<StructOrUnionSpecifierContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(474);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.interpreter.adaptive_predict(32, &mut recog.base)? {
@@ -5943,24 +5943,24 @@ pub type StructOrUnionContext<'input> = BaseParserRuleContext<'input, StructOrUn
 
 #[derive(Clone)]
 pub struct StructOrUnionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for StructOrUnionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for StructOrUnionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_structOrUnion(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_structOrUnion(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for StructOrUnionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_structOrUnion(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_structOrUnion(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for StructOrUnionContextExt<'input> {
@@ -5972,8 +5972,8 @@ impl<'input> CustomRuleContext<'input> for StructOrUnionContextExt<'input> {
 antlr_rust::tid! {StructOrUnionContextExt<'a>}
 
 impl<'input> StructOrUnionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<StructOrUnionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StructOrUnionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<StructOrUnionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StructOrUnionContextExt { ph:PhantomData }))
     }
 }
 
@@ -6008,9 +6008,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = StructOrUnionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 66, RULE_structOrUnion);
-        let mut _localctx: Rc<StructOrUnionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<StructOrUnionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -6049,24 +6049,24 @@ pub type StructDeclarationListContext<'input> = BaseParserRuleContext<'input, St
 
 #[derive(Clone)]
 pub struct StructDeclarationListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for StructDeclarationListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for StructDeclarationListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_structDeclarationList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_structDeclarationList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for StructDeclarationListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_structDeclarationList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_structDeclarationList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for StructDeclarationListContextExt<'input> {
@@ -6078,8 +6078,8 @@ impl<'input> CustomRuleContext<'input> for StructDeclarationListContextExt<'inpu
 antlr_rust::tid! {StructDeclarationListContextExt<'a>}
 
 impl<'input> StructDeclarationListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<StructDeclarationListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StructDeclarationListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<StructDeclarationListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StructDeclarationListContextExt { ph:PhantomData }))
     }
 }
 
@@ -6090,7 +6090,7 @@ pub trait StructDeclarationListContextAttrs<'input>: CParserContext<'input> + Bo
     {
         self.children_of_type()
     }
-    fn structDeclaration(&self, i: usize) -> Option<Rc<StructDeclarationContextAll<'input>>>
+    fn structDeclaration(&self, i:usize) -> Option<Rc<StructDeclarationContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -6110,9 +6110,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = StructDeclarationListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 68, RULE_structDeclarationList);
-        let mut _localctx: Rc<StructDeclarationListContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<StructDeclarationListContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -6189,24 +6189,24 @@ pub type StructDeclarationContext<'input> = BaseParserRuleContext<'input, Struct
 
 #[derive(Clone)]
 pub struct StructDeclarationContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for StructDeclarationContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for StructDeclarationContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_structDeclaration(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_structDeclaration(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for StructDeclarationContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_structDeclaration(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_structDeclaration(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for StructDeclarationContextExt<'input> {
@@ -6218,8 +6218,8 @@ impl<'input> CustomRuleContext<'input> for StructDeclarationContextExt<'input> {
 antlr_rust::tid! {StructDeclarationContextExt<'a>}
 
 impl<'input> StructDeclarationContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<StructDeclarationContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StructDeclarationContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<StructDeclarationContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StructDeclarationContextExt { ph:PhantomData }))
     }
 }
 
@@ -6264,8 +6264,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = StructDeclarationContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 70, RULE_structDeclaration);
-        let mut _localctx: Rc<StructDeclarationContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<StructDeclarationContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(491);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.interpreter.adaptive_predict(34, &mut recog.base)? {
@@ -6332,24 +6332,24 @@ pub type SpecifierQualifierListContext<'input> = BaseParserRuleContext<'input, S
 
 #[derive(Clone)]
 pub struct SpecifierQualifierListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for SpecifierQualifierListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for SpecifierQualifierListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_specifierQualifierList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_specifierQualifierList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for SpecifierQualifierListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_specifierQualifierList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_specifierQualifierList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for SpecifierQualifierListContextExt<'input> {
@@ -6361,8 +6361,8 @@ impl<'input> CustomRuleContext<'input> for SpecifierQualifierListContextExt<'inp
 antlr_rust::tid! {SpecifierQualifierListContextExt<'a>}
 
 impl<'input> SpecifierQualifierListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<SpecifierQualifierListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, SpecifierQualifierListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<SpecifierQualifierListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, SpecifierQualifierListContextExt { ph:PhantomData }))
     }
 }
 
@@ -6399,8 +6399,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = SpecifierQualifierListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 72, RULE_specifierQualifierList);
-        let mut _localctx: Rc<SpecifierQualifierListContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<SpecifierQualifierListContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -6461,24 +6461,24 @@ pub type StructDeclaratorListContext<'input> = BaseParserRuleContext<'input, Str
 
 #[derive(Clone)]
 pub struct StructDeclaratorListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for StructDeclaratorListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for StructDeclaratorListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_structDeclaratorList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_structDeclaratorList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for StructDeclaratorListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_structDeclaratorList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_structDeclaratorList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for StructDeclaratorListContextExt<'input> {
@@ -6490,8 +6490,8 @@ impl<'input> CustomRuleContext<'input> for StructDeclaratorListContextExt<'input
 antlr_rust::tid! {StructDeclaratorListContextExt<'a>}
 
 impl<'input> StructDeclaratorListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<StructDeclaratorListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StructDeclaratorListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<StructDeclaratorListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StructDeclaratorListContextExt { ph:PhantomData }))
     }
 }
 
@@ -6502,7 +6502,7 @@ pub trait StructDeclaratorListContextAttrs<'input>: CParserContext<'input> + Bor
     {
         self.children_of_type()
     }
-    fn structDeclarator(&self, i: usize) -> Option<Rc<StructDeclaratorContextAll<'input>>>
+    fn structDeclarator(&self, i:usize) -> Option<Rc<StructDeclaratorContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -6517,7 +6517,7 @@ pub trait StructDeclaratorListContextAttrs<'input>: CParserContext<'input> + Bor
     }
     /// Retrieves 'i's TerminalNode corresponding to token Comma, starting from 0.
     /// Returns `None` if number of children corresponding to token Comma is less or equal than `i`.
-    fn Comma(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Comma(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -6537,9 +6537,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = StructDeclaratorListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 74, RULE_structDeclaratorList);
-        let mut _localctx: Rc<StructDeclaratorListContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<StructDeclaratorListContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -6589,24 +6589,24 @@ pub type StructDeclaratorContext<'input> = BaseParserRuleContext<'input, StructD
 
 #[derive(Clone)]
 pub struct StructDeclaratorContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for StructDeclaratorContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for StructDeclaratorContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_structDeclarator(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_structDeclarator(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for StructDeclaratorContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_structDeclarator(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_structDeclarator(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for StructDeclaratorContextExt<'input> {
@@ -6618,8 +6618,8 @@ impl<'input> CustomRuleContext<'input> for StructDeclaratorContextExt<'input> {
 antlr_rust::tid! {StructDeclaratorContextExt<'a>}
 
 impl<'input> StructDeclaratorContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<StructDeclaratorContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StructDeclaratorContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<StructDeclaratorContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StructDeclaratorContextExt { ph:PhantomData }))
     }
 }
 
@@ -6658,9 +6658,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = StructDeclaratorContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 76, RULE_structDeclarator);
-        let mut _localctx: Rc<StructDeclaratorContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<StructDeclaratorContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(514);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.interpreter.adaptive_predict(39, &mut recog.base)? {
@@ -6725,24 +6725,24 @@ pub type EnumSpecifierContext<'input> = BaseParserRuleContext<'input, EnumSpecif
 
 #[derive(Clone)]
 pub struct EnumSpecifierContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for EnumSpecifierContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for EnumSpecifierContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_enumSpecifier(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_enumSpecifier(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for EnumSpecifierContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_enumSpecifier(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_enumSpecifier(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for EnumSpecifierContextExt<'input> {
@@ -6754,8 +6754,8 @@ impl<'input> CustomRuleContext<'input> for EnumSpecifierContextExt<'input> {
 antlr_rust::tid! {EnumSpecifierContextExt<'a>}
 
 impl<'input> EnumSpecifierContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<EnumSpecifierContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, EnumSpecifierContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<EnumSpecifierContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, EnumSpecifierContextExt { ph:PhantomData }))
     }
 }
 
@@ -6820,9 +6820,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = EnumSpecifierContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 78, RULE_enumSpecifier);
-        let mut _localctx: Rc<EnumSpecifierContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<EnumSpecifierContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(529);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.interpreter.adaptive_predict(42, &mut recog.base)? {
@@ -6901,24 +6901,24 @@ pub type EnumeratorListContext<'input> = BaseParserRuleContext<'input, Enumerato
 
 #[derive(Clone)]
 pub struct EnumeratorListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for EnumeratorListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for EnumeratorListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_enumeratorList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_enumeratorList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for EnumeratorListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_enumeratorList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_enumeratorList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for EnumeratorListContextExt<'input> {
@@ -6930,8 +6930,8 @@ impl<'input> CustomRuleContext<'input> for EnumeratorListContextExt<'input> {
 antlr_rust::tid! {EnumeratorListContextExt<'a>}
 
 impl<'input> EnumeratorListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<EnumeratorListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, EnumeratorListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<EnumeratorListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, EnumeratorListContextExt { ph:PhantomData }))
     }
 }
 
@@ -6942,7 +6942,7 @@ pub trait EnumeratorListContextAttrs<'input>: CParserContext<'input> + BorrowMut
     {
         self.children_of_type()
     }
-    fn enumerator(&self, i: usize) -> Option<Rc<EnumeratorContextAll<'input>>>
+    fn enumerator(&self, i:usize) -> Option<Rc<EnumeratorContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -6957,7 +6957,7 @@ pub trait EnumeratorListContextAttrs<'input>: CParserContext<'input> + BorrowMut
     }
     /// Retrieves 'i's TerminalNode corresponding to token Comma, starting from 0.
     /// Returns `None` if number of children corresponding to token Comma is less or equal than `i`.
-    fn Comma(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Comma(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -6977,9 +6977,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = EnumeratorListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 80, RULE_enumeratorList);
-        let mut _localctx: Rc<EnumeratorListContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
-            let mut _alt: isize;
+        let mut _localctx:Rc<EnumeratorListContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
+            let mut _alt:isize;
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -7031,24 +7031,24 @@ pub type EnumeratorContext<'input> = BaseParserRuleContext<'input, EnumeratorCon
 
 #[derive(Clone)]
 pub struct EnumeratorContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for EnumeratorContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for EnumeratorContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_enumerator(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_enumerator(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for EnumeratorContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_enumerator(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_enumerator(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for EnumeratorContextExt<'input> {
@@ -7060,8 +7060,8 @@ impl<'input> CustomRuleContext<'input> for EnumeratorContextExt<'input> {
 antlr_rust::tid! {EnumeratorContextExt<'a>}
 
 impl<'input> EnumeratorContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<EnumeratorContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, EnumeratorContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<EnumeratorContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, EnumeratorContextExt { ph:PhantomData }))
     }
 }
 
@@ -7100,9 +7100,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = EnumeratorContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 82, RULE_enumerator);
-        let mut _localctx: Rc<EnumeratorContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<EnumeratorContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -7147,24 +7147,24 @@ pub type EnumerationConstantContext<'input> = BaseParserRuleContext<'input, Enum
 
 #[derive(Clone)]
 pub struct EnumerationConstantContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for EnumerationConstantContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for EnumerationConstantContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_enumerationConstant(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_enumerationConstant(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for EnumerationConstantContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_enumerationConstant(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_enumerationConstant(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for EnumerationConstantContextExt<'input> {
@@ -7176,8 +7176,8 @@ impl<'input> CustomRuleContext<'input> for EnumerationConstantContextExt<'input>
 antlr_rust::tid! {EnumerationConstantContextExt<'a>}
 
 impl<'input> EnumerationConstantContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<EnumerationConstantContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, EnumerationConstantContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<EnumerationConstantContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, EnumerationConstantContextExt { ph:PhantomData }))
     }
 }
 
@@ -7204,8 +7204,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = EnumerationConstantContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 84, RULE_enumerationConstant);
-        let mut _localctx: Rc<EnumerationConstantContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<EnumerationConstantContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -7235,24 +7235,24 @@ pub type AtomicTypeSpecifierContext<'input> = BaseParserRuleContext<'input, Atom
 
 #[derive(Clone)]
 pub struct AtomicTypeSpecifierContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for AtomicTypeSpecifierContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for AtomicTypeSpecifierContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_atomicTypeSpecifier(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_atomicTypeSpecifier(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for AtomicTypeSpecifierContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_atomicTypeSpecifier(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_atomicTypeSpecifier(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for AtomicTypeSpecifierContextExt<'input> {
@@ -7264,8 +7264,8 @@ impl<'input> CustomRuleContext<'input> for AtomicTypeSpecifierContextExt<'input>
 antlr_rust::tid! {AtomicTypeSpecifierContextExt<'a>}
 
 impl<'input> AtomicTypeSpecifierContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<AtomicTypeSpecifierContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, AtomicTypeSpecifierContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<AtomicTypeSpecifierContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, AtomicTypeSpecifierContextExt { ph:PhantomData }))
     }
 }
 
@@ -7314,8 +7314,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = AtomicTypeSpecifierContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 86, RULE_atomicTypeSpecifier);
-        let mut _localctx: Rc<AtomicTypeSpecifierContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<AtomicTypeSpecifierContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -7355,24 +7355,24 @@ pub type TypeQualifierContext<'input> = BaseParserRuleContext<'input, TypeQualif
 
 #[derive(Clone)]
 pub struct TypeQualifierContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for TypeQualifierContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for TypeQualifierContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_typeQualifier(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_typeQualifier(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for TypeQualifierContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_typeQualifier(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_typeQualifier(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for TypeQualifierContextExt<'input> {
@@ -7384,8 +7384,8 @@ impl<'input> CustomRuleContext<'input> for TypeQualifierContextExt<'input> {
 antlr_rust::tid! {TypeQualifierContextExt<'a>}
 
 impl<'input> TypeQualifierContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<TypeQualifierContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, TypeQualifierContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<TypeQualifierContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, TypeQualifierContextExt { ph:PhantomData }))
     }
 }
 
@@ -7436,9 +7436,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = TypeQualifierContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 88, RULE_typeQualifier);
-        let mut _localctx: Rc<TypeQualifierContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<TypeQualifierContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -7477,24 +7477,24 @@ pub type FunctionSpecifierContext<'input> = BaseParserRuleContext<'input, Functi
 
 #[derive(Clone)]
 pub struct FunctionSpecifierContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for FunctionSpecifierContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for FunctionSpecifierContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_functionSpecifier(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_functionSpecifier(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for FunctionSpecifierContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_functionSpecifier(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_functionSpecifier(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for FunctionSpecifierContextExt<'input> {
@@ -7506,8 +7506,8 @@ impl<'input> CustomRuleContext<'input> for FunctionSpecifierContextExt<'input> {
 antlr_rust::tid! {FunctionSpecifierContextExt<'a>}
 
 impl<'input> FunctionSpecifierContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<FunctionSpecifierContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, FunctionSpecifierContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<FunctionSpecifierContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, FunctionSpecifierContextExt { ph:PhantomData }))
     }
 }
 
@@ -7572,8 +7572,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = FunctionSpecifierContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 90, RULE_functionSpecifier);
-        let mut _localctx: Rc<FunctionSpecifierContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<FunctionSpecifierContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(562);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.base.input.la(1) {
@@ -7666,24 +7666,24 @@ pub type AlignmentSpecifierContext<'input> = BaseParserRuleContext<'input, Align
 
 #[derive(Clone)]
 pub struct AlignmentSpecifierContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for AlignmentSpecifierContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for AlignmentSpecifierContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_alignmentSpecifier(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_alignmentSpecifier(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for AlignmentSpecifierContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_alignmentSpecifier(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_alignmentSpecifier(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for AlignmentSpecifierContextExt<'input> {
@@ -7695,8 +7695,8 @@ impl<'input> CustomRuleContext<'input> for AlignmentSpecifierContextExt<'input> 
 antlr_rust::tid! {AlignmentSpecifierContextExt<'a>}
 
 impl<'input> AlignmentSpecifierContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<AlignmentSpecifierContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, AlignmentSpecifierContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<AlignmentSpecifierContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, AlignmentSpecifierContextExt { ph:PhantomData }))
     }
 }
 
@@ -7751,8 +7751,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = AlignmentSpecifierContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 92, RULE_alignmentSpecifier);
-        let mut _localctx: Rc<AlignmentSpecifierContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<AlignmentSpecifierContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -7808,24 +7808,24 @@ pub type DeclaratorContext<'input> = BaseParserRuleContext<'input, DeclaratorCon
 
 #[derive(Clone)]
 pub struct DeclaratorContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for DeclaratorContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for DeclaratorContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_declarator(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_declarator(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for DeclaratorContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_declarator(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_declarator(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for DeclaratorContextExt<'input> {
@@ -7837,8 +7837,8 @@ impl<'input> CustomRuleContext<'input> for DeclaratorContextExt<'input> {
 antlr_rust::tid! {DeclaratorContextExt<'a>}
 
 impl<'input> DeclaratorContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<DeclaratorContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DeclaratorContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<DeclaratorContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DeclaratorContextExt { ph:PhantomData }))
     }
 }
 
@@ -7861,7 +7861,7 @@ pub trait DeclaratorContextAttrs<'input>: CParserContext<'input> + BorrowMut<Dec
     {
         self.children_of_type()
     }
-    fn gccDeclaratorExtension(&self, i: usize) -> Option<Rc<GccDeclaratorExtensionContextAll<'input>>>
+    fn gccDeclaratorExtension(&self, i:usize) -> Option<Rc<GccDeclaratorExtensionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -7881,9 +7881,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = DeclaratorContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 94, RULE_declarator);
-        let mut _localctx: Rc<DeclaratorContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<DeclaratorContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -7941,24 +7941,24 @@ pub type DirectDeclaratorContext<'input> = BaseParserRuleContext<'input, DirectD
 
 #[derive(Clone)]
 pub struct DirectDeclaratorContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for DirectDeclaratorContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for DirectDeclaratorContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_directDeclarator(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_directDeclarator(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for DirectDeclaratorContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_directDeclarator(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_directDeclarator(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for DirectDeclaratorContextExt<'input> {
@@ -7970,8 +7970,8 @@ impl<'input> CustomRuleContext<'input> for DirectDeclaratorContextExt<'input> {
 antlr_rust::tid! {DirectDeclaratorContextExt<'a>}
 
 impl<'input> DirectDeclaratorContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<DirectDeclaratorContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DirectDeclaratorContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<DirectDeclaratorContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DirectDeclaratorContextExt { ph:PhantomData }))
     }
 }
 
@@ -8093,18 +8093,18 @@ where
 {
     pub fn directDeclarator(&mut self) -> Result<Rc<DirectDeclaratorContextAll<'input>>, ANTLRError> { self.directDeclarator_rec(0) }
 
-    fn directDeclarator_rec(&mut self, _p: isize) -> Result<Rc<DirectDeclaratorContextAll<'input>>, ANTLRError> {
+    fn directDeclarator_rec(&mut self, _p:isize) -> Result<Rc<DirectDeclaratorContextAll<'input>>, ANTLRError> {
         let recog = self;
         let _parentctx = recog.ctx.take();
         let _parentState = recog.base.get_state();
         let mut _localctx = DirectDeclaratorContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_recursion_rule(_localctx.clone(), 96, RULE_directDeclarator, _p);
-        let mut _localctx: Rc<DirectDeclaratorContextAll> = _localctx;
+        let mut _localctx:Rc<DirectDeclaratorContextAll> = _localctx;
         let mut _prevctx = _localctx.clone();
         let _startState = 96;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
-            let mut _alt: isize;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
+            let mut _alt:isize;
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -8355,24 +8355,24 @@ pub type VcSpecificModiferContext<'input> = BaseParserRuleContext<'input, VcSpec
 
 #[derive(Clone)]
 pub struct VcSpecificModiferContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for VcSpecificModiferContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for VcSpecificModiferContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_vcSpecificModifer(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_vcSpecificModifer(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for VcSpecificModiferContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_vcSpecificModifer(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_vcSpecificModifer(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for VcSpecificModiferContextExt<'input> {
@@ -8384,8 +8384,8 @@ impl<'input> CustomRuleContext<'input> for VcSpecificModiferContextExt<'input> {
 antlr_rust::tid! {VcSpecificModiferContextExt<'a>}
 
 impl<'input> VcSpecificModiferContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<VcSpecificModiferContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, VcSpecificModiferContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<VcSpecificModiferContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, VcSpecificModiferContextExt { ph:PhantomData }))
     }
 }
 
@@ -8403,9 +8403,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = VcSpecificModiferContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 98, RULE_vcSpecificModifer);
-        let mut _localctx: Rc<VcSpecificModiferContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<VcSpecificModiferContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -8444,24 +8444,24 @@ pub type GccDeclaratorExtensionContext<'input> = BaseParserRuleContext<'input, G
 
 #[derive(Clone)]
 pub struct GccDeclaratorExtensionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for GccDeclaratorExtensionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for GccDeclaratorExtensionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_gccDeclaratorExtension(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_gccDeclaratorExtension(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for GccDeclaratorExtensionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_gccDeclaratorExtension(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_gccDeclaratorExtension(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for GccDeclaratorExtensionContextExt<'input> {
@@ -8473,8 +8473,8 @@ impl<'input> CustomRuleContext<'input> for GccDeclaratorExtensionContextExt<'inp
 antlr_rust::tid! {GccDeclaratorExtensionContextExt<'a>}
 
 impl<'input> GccDeclaratorExtensionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<GccDeclaratorExtensionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, GccDeclaratorExtensionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<GccDeclaratorExtensionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, GccDeclaratorExtensionContextExt { ph:PhantomData }))
     }
 }
 
@@ -8504,7 +8504,7 @@ pub trait GccDeclaratorExtensionContextAttrs<'input>: CParserContext<'input> + B
     }
     /// Retrieves 'i's TerminalNode corresponding to token StringLiteral, starting from 0.
     /// Returns `None` if number of children corresponding to token StringLiteral is less or equal than `i`.
-    fn StringLiteral(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn StringLiteral(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -8530,9 +8530,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = GccDeclaratorExtensionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 100, RULE_gccDeclaratorExtension);
-        let mut _localctx: Rc<GccDeclaratorExtensionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<GccDeclaratorExtensionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(644);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.base.input.la(1) {
@@ -8603,24 +8603,24 @@ pub type GccAttributeSpecifierContext<'input> = BaseParserRuleContext<'input, Gc
 
 #[derive(Clone)]
 pub struct GccAttributeSpecifierContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for GccAttributeSpecifierContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for GccAttributeSpecifierContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_gccAttributeSpecifier(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_gccAttributeSpecifier(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for GccAttributeSpecifierContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_gccAttributeSpecifier(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_gccAttributeSpecifier(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for GccAttributeSpecifierContextExt<'input> {
@@ -8632,8 +8632,8 @@ impl<'input> CustomRuleContext<'input> for GccAttributeSpecifierContextExt<'inpu
 antlr_rust::tid! {GccAttributeSpecifierContextExt<'a>}
 
 impl<'input> GccAttributeSpecifierContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<GccAttributeSpecifierContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, GccAttributeSpecifierContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<GccAttributeSpecifierContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, GccAttributeSpecifierContextExt { ph:PhantomData }))
     }
 }
 
@@ -8647,7 +8647,7 @@ pub trait GccAttributeSpecifierContextAttrs<'input>: CParserContext<'input> + Bo
     }
     /// Retrieves 'i's TerminalNode corresponding to token LeftParen, starting from 0.
     /// Returns `None` if number of children corresponding to token LeftParen is less or equal than `i`.
-    fn LeftParen(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn LeftParen(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -8668,7 +8668,7 @@ pub trait GccAttributeSpecifierContextAttrs<'input>: CParserContext<'input> + Bo
     }
     /// Retrieves 'i's TerminalNode corresponding to token RightParen, starting from 0.
     /// Returns `None` if number of children corresponding to token RightParen is less or equal than `i`.
-    fn RightParen(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn RightParen(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -8688,8 +8688,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = GccAttributeSpecifierContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 102, RULE_gccAttributeSpecifier);
-        let mut _localctx: Rc<GccAttributeSpecifierContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<GccAttributeSpecifierContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -8735,24 +8735,24 @@ pub type GccAttributeListContext<'input> = BaseParserRuleContext<'input, GccAttr
 
 #[derive(Clone)]
 pub struct GccAttributeListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for GccAttributeListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for GccAttributeListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_gccAttributeList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_gccAttributeList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for GccAttributeListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_gccAttributeList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_gccAttributeList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for GccAttributeListContextExt<'input> {
@@ -8764,8 +8764,8 @@ impl<'input> CustomRuleContext<'input> for GccAttributeListContextExt<'input> {
 antlr_rust::tid! {GccAttributeListContextExt<'a>}
 
 impl<'input> GccAttributeListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<GccAttributeListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, GccAttributeListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<GccAttributeListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, GccAttributeListContextExt { ph:PhantomData }))
     }
 }
 
@@ -8776,7 +8776,7 @@ pub trait GccAttributeListContextAttrs<'input>: CParserContext<'input> + BorrowM
     {
         self.children_of_type()
     }
-    fn gccAttribute(&self, i: usize) -> Option<Rc<GccAttributeContextAll<'input>>>
+    fn gccAttribute(&self, i:usize) -> Option<Rc<GccAttributeContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -8791,7 +8791,7 @@ pub trait GccAttributeListContextAttrs<'input>: CParserContext<'input> + BorrowM
     }
     /// Retrieves 'i's TerminalNode corresponding to token Comma, starting from 0.
     /// Returns `None` if number of children corresponding to token Comma is less or equal than `i`.
-    fn Comma(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Comma(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -8811,9 +8811,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = GccAttributeListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 104, RULE_gccAttributeList);
-        let mut _localctx: Rc<GccAttributeListContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<GccAttributeListContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -9131,24 +9131,24 @@ pub type GccAttributeContext<'input> = BaseParserRuleContext<'input, GccAttribut
 
 #[derive(Clone)]
 pub struct GccAttributeContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for GccAttributeContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for GccAttributeContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_gccAttribute(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_gccAttribute(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for GccAttributeContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_gccAttribute(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_gccAttribute(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for GccAttributeContextExt<'input> {
@@ -9160,8 +9160,8 @@ impl<'input> CustomRuleContext<'input> for GccAttributeContextExt<'input> {
 antlr_rust::tid! {GccAttributeContextExt<'a>}
 
 impl<'input> GccAttributeContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<GccAttributeContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, GccAttributeContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<GccAttributeContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, GccAttributeContextExt { ph:PhantomData }))
     }
 }
 
@@ -9183,7 +9183,7 @@ pub trait GccAttributeContextAttrs<'input>: CParserContext<'input> + BorrowMut<G
     }
     /// Retrieves 'i's TerminalNode corresponding to token LeftParen, starting from 0.
     /// Returns `None` if number of children corresponding to token LeftParen is less or equal than `i`.
-    fn LeftParen(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn LeftParen(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -9198,7 +9198,7 @@ pub trait GccAttributeContextAttrs<'input>: CParserContext<'input> + BorrowMut<G
     }
     /// Retrieves 'i's TerminalNode corresponding to token RightParen, starting from 0.
     /// Returns `None` if number of children corresponding to token RightParen is less or equal than `i`.
-    fn RightParen(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn RightParen(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -9224,9 +9224,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = GccAttributeContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 106, RULE_gccAttribute);
-        let mut _localctx: Rc<GccAttributeContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<GccAttributeContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -9304,24 +9304,24 @@ pub type NestedParenthesesBlockContext<'input> = BaseParserRuleContext<'input, N
 
 #[derive(Clone)]
 pub struct NestedParenthesesBlockContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for NestedParenthesesBlockContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for NestedParenthesesBlockContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_nestedParenthesesBlock(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_nestedParenthesesBlock(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for NestedParenthesesBlockContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_nestedParenthesesBlock(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_nestedParenthesesBlock(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for NestedParenthesesBlockContextExt<'input> {
@@ -9333,8 +9333,8 @@ impl<'input> CustomRuleContext<'input> for NestedParenthesesBlockContextExt<'inp
 antlr_rust::tid! {NestedParenthesesBlockContextExt<'a>}
 
 impl<'input> NestedParenthesesBlockContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<NestedParenthesesBlockContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, NestedParenthesesBlockContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<NestedParenthesesBlockContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, NestedParenthesesBlockContextExt { ph:PhantomData }))
     }
 }
 
@@ -9348,7 +9348,7 @@ pub trait NestedParenthesesBlockContextAttrs<'input>: CParserContext<'input> + B
     }
     /// Retrieves 'i's TerminalNode corresponding to token LeftParen, starting from 0.
     /// Returns `None` if number of children corresponding to token LeftParen is less or equal than `i`.
-    fn LeftParen(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn LeftParen(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -9360,7 +9360,7 @@ pub trait NestedParenthesesBlockContextAttrs<'input>: CParserContext<'input> + B
     {
         self.children_of_type()
     }
-    fn nestedParenthesesBlock(&self, i: usize) -> Option<Rc<NestedParenthesesBlockContextAll<'input>>>
+    fn nestedParenthesesBlock(&self, i:usize) -> Option<Rc<NestedParenthesesBlockContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -9375,7 +9375,7 @@ pub trait NestedParenthesesBlockContextAttrs<'input>: CParserContext<'input> + B
     }
     /// Retrieves 'i's TerminalNode corresponding to token RightParen, starting from 0.
     /// Returns `None` if number of children corresponding to token RightParen is less or equal than `i`.
-    fn RightParen(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn RightParen(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -9395,9 +9395,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = NestedParenthesesBlockContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 108, RULE_nestedParenthesesBlock);
-        let mut _localctx: Rc<NestedParenthesesBlockContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<NestedParenthesesBlockContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -9603,24 +9603,24 @@ pub type PointerContext<'input> = BaseParserRuleContext<'input, PointerContextEx
 
 #[derive(Clone)]
 pub struct PointerContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for PointerContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for PointerContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_pointer(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_pointer(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for PointerContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_pointer(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_pointer(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for PointerContextExt<'input> {
@@ -9632,8 +9632,8 @@ impl<'input> CustomRuleContext<'input> for PointerContextExt<'input> {
 antlr_rust::tid! {PointerContextExt<'a>}
 
 impl<'input> PointerContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<PointerContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, PointerContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<PointerContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, PointerContextExt { ph:PhantomData }))
     }
 }
 
@@ -9647,7 +9647,7 @@ pub trait PointerContextAttrs<'input>: CParserContext<'input> + BorrowMut<Pointe
     }
     /// Retrieves 'i's TerminalNode corresponding to token Star, starting from 0.
     /// Returns `None` if number of children corresponding to token Star is less or equal than `i`.
-    fn Star(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Star(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -9662,7 +9662,7 @@ pub trait PointerContextAttrs<'input>: CParserContext<'input> + BorrowMut<Pointe
     }
     /// Retrieves 'i's TerminalNode corresponding to token Caret, starting from 0.
     /// Returns `None` if number of children corresponding to token Caret is less or equal than `i`.
-    fn Caret(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Caret(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -9674,7 +9674,7 @@ pub trait PointerContextAttrs<'input>: CParserContext<'input> + BorrowMut<Pointe
     {
         self.children_of_type()
     }
-    fn typeQualifierList(&self, i: usize) -> Option<Rc<TypeQualifierListContextAll<'input>>>
+    fn typeQualifierList(&self, i:usize) -> Option<Rc<TypeQualifierListContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -9694,9 +9694,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = PointerContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 110, RULE_pointer);
-        let mut _localctx: Rc<PointerContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<PointerContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -9760,24 +9760,24 @@ pub type TypeQualifierListContext<'input> = BaseParserRuleContext<'input, TypeQu
 
 #[derive(Clone)]
 pub struct TypeQualifierListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for TypeQualifierListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for TypeQualifierListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_typeQualifierList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_typeQualifierList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for TypeQualifierListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_typeQualifierList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_typeQualifierList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for TypeQualifierListContextExt<'input> {
@@ -9789,8 +9789,8 @@ impl<'input> CustomRuleContext<'input> for TypeQualifierListContextExt<'input> {
 antlr_rust::tid! {TypeQualifierListContextExt<'a>}
 
 impl<'input> TypeQualifierListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<TypeQualifierListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, TypeQualifierListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<TypeQualifierListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, TypeQualifierListContextExt { ph:PhantomData }))
     }
 }
 
@@ -9801,7 +9801,7 @@ pub trait TypeQualifierListContextAttrs<'input>: CParserContext<'input> + Borrow
     {
         self.children_of_type()
     }
-    fn typeQualifier(&self, i: usize) -> Option<Rc<TypeQualifierContextAll<'input>>>
+    fn typeQualifier(&self, i:usize) -> Option<Rc<TypeQualifierContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -9821,9 +9821,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = TypeQualifierListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 112, RULE_typeQualifierList);
-        let mut _localctx: Rc<TypeQualifierListContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<TypeQualifierListContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -9869,24 +9869,24 @@ pub type ParameterTypeListContext<'input> = BaseParserRuleContext<'input, Parame
 
 #[derive(Clone)]
 pub struct ParameterTypeListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ParameterTypeListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ParameterTypeListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_parameterTypeList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_parameterTypeList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ParameterTypeListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_parameterTypeList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_parameterTypeList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ParameterTypeListContextExt<'input> {
@@ -9898,8 +9898,8 @@ impl<'input> CustomRuleContext<'input> for ParameterTypeListContextExt<'input> {
 antlr_rust::tid! {ParameterTypeListContextExt<'a>}
 
 impl<'input> ParameterTypeListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ParameterTypeListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ParameterTypeListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ParameterTypeListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ParameterTypeListContextExt { ph:PhantomData }))
     }
 }
 
@@ -9940,9 +9940,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ParameterTypeListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 114, RULE_parameterTypeList);
-        let mut _localctx: Rc<ParameterTypeListContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ParameterTypeListContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -9986,24 +9986,24 @@ pub type ParameterListContext<'input> = BaseParserRuleContext<'input, ParameterL
 
 #[derive(Clone)]
 pub struct ParameterListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ParameterListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ParameterListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_parameterList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_parameterList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ParameterListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_parameterList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_parameterList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ParameterListContextExt<'input> {
@@ -10015,8 +10015,8 @@ impl<'input> CustomRuleContext<'input> for ParameterListContextExt<'input> {
 antlr_rust::tid! {ParameterListContextExt<'a>}
 
 impl<'input> ParameterListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ParameterListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ParameterListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ParameterListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ParameterListContextExt { ph:PhantomData }))
     }
 }
 
@@ -10027,7 +10027,7 @@ pub trait ParameterListContextAttrs<'input>: CParserContext<'input> + BorrowMut<
     {
         self.children_of_type()
     }
-    fn parameterDeclaration(&self, i: usize) -> Option<Rc<ParameterDeclarationContextAll<'input>>>
+    fn parameterDeclaration(&self, i:usize) -> Option<Rc<ParameterDeclarationContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -10042,7 +10042,7 @@ pub trait ParameterListContextAttrs<'input>: CParserContext<'input> + BorrowMut<
     }
     /// Retrieves 'i's TerminalNode corresponding to token Comma, starting from 0.
     /// Returns `None` if number of children corresponding to token Comma is less or equal than `i`.
-    fn Comma(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Comma(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -10062,9 +10062,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ParameterListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 116, RULE_parameterList);
-        let mut _localctx: Rc<ParameterListContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
-            let mut _alt: isize;
+        let mut _localctx:Rc<ParameterListContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
+            let mut _alt:isize;
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -10116,24 +10116,24 @@ pub type ParameterDeclarationContext<'input> = BaseParserRuleContext<'input, Par
 
 #[derive(Clone)]
 pub struct ParameterDeclarationContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ParameterDeclarationContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ParameterDeclarationContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_parameterDeclaration(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_parameterDeclaration(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ParameterDeclarationContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_parameterDeclaration(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_parameterDeclaration(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ParameterDeclarationContextExt<'input> {
@@ -10145,8 +10145,8 @@ impl<'input> CustomRuleContext<'input> for ParameterDeclarationContextExt<'input
 antlr_rust::tid! {ParameterDeclarationContextExt<'a>}
 
 impl<'input> ParameterDeclarationContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ParameterDeclarationContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ParameterDeclarationContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ParameterDeclarationContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ParameterDeclarationContextExt { ph:PhantomData }))
     }
 }
 
@@ -10189,9 +10189,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ParameterDeclarationContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 118, RULE_parameterDeclaration);
-        let mut _localctx: Rc<ParameterDeclarationContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ParameterDeclarationContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(716);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.interpreter.adaptive_predict(71, &mut recog.base)? {
@@ -10256,24 +10256,24 @@ pub type IdentifierListContext<'input> = BaseParserRuleContext<'input, Identifie
 
 #[derive(Clone)]
 pub struct IdentifierListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for IdentifierListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for IdentifierListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_identifierList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_identifierList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for IdentifierListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_identifierList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_identifierList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for IdentifierListContextExt<'input> {
@@ -10285,8 +10285,8 @@ impl<'input> CustomRuleContext<'input> for IdentifierListContextExt<'input> {
 antlr_rust::tid! {IdentifierListContextExt<'a>}
 
 impl<'input> IdentifierListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<IdentifierListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, IdentifierListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<IdentifierListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, IdentifierListContextExt { ph:PhantomData }))
     }
 }
 
@@ -10300,7 +10300,7 @@ pub trait IdentifierListContextAttrs<'input>: CParserContext<'input> + BorrowMut
     }
     /// Retrieves 'i's TerminalNode corresponding to token Identifier, starting from 0.
     /// Returns `None` if number of children corresponding to token Identifier is less or equal than `i`.
-    fn Identifier(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Identifier(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -10315,7 +10315,7 @@ pub trait IdentifierListContextAttrs<'input>: CParserContext<'input> + BorrowMut
     }
     /// Retrieves 'i's TerminalNode corresponding to token Comma, starting from 0.
     /// Returns `None` if number of children corresponding to token Comma is less or equal than `i`.
-    fn Comma(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Comma(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -10335,9 +10335,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = IdentifierListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 120, RULE_identifierList);
-        let mut _localctx: Rc<IdentifierListContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<IdentifierListContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -10385,24 +10385,24 @@ pub type TypeNameContext<'input> = BaseParserRuleContext<'input, TypeNameContext
 
 #[derive(Clone)]
 pub struct TypeNameContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for TypeNameContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for TypeNameContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_typeName(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_typeName(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for TypeNameContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_typeName(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_typeName(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for TypeNameContextExt<'input> {
@@ -10414,8 +10414,8 @@ impl<'input> CustomRuleContext<'input> for TypeNameContextExt<'input> {
 antlr_rust::tid! {TypeNameContextExt<'a>}
 
 impl<'input> TypeNameContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<TypeNameContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, TypeNameContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<TypeNameContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, TypeNameContextExt { ph:PhantomData }))
     }
 }
 
@@ -10446,9 +10446,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = TypeNameContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 122, RULE_typeName);
-        let mut _localctx: Rc<TypeNameContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<TypeNameContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -10490,24 +10490,24 @@ pub type AbstractDeclaratorContext<'input> = BaseParserRuleContext<'input, Abstr
 
 #[derive(Clone)]
 pub struct AbstractDeclaratorContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for AbstractDeclaratorContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for AbstractDeclaratorContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_abstractDeclarator(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_abstractDeclarator(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for AbstractDeclaratorContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_abstractDeclarator(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_abstractDeclarator(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for AbstractDeclaratorContextExt<'input> {
@@ -10519,8 +10519,8 @@ impl<'input> CustomRuleContext<'input> for AbstractDeclaratorContextExt<'input> 
 antlr_rust::tid! {AbstractDeclaratorContextExt<'a>}
 
 impl<'input> AbstractDeclaratorContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<AbstractDeclaratorContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, AbstractDeclaratorContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<AbstractDeclaratorContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, AbstractDeclaratorContextExt { ph:PhantomData }))
     }
 }
 
@@ -10543,7 +10543,7 @@ pub trait AbstractDeclaratorContextAttrs<'input>: CParserContext<'input> + Borro
     {
         self.children_of_type()
     }
-    fn gccDeclaratorExtension(&self, i: usize) -> Option<Rc<GccDeclaratorExtensionContextAll<'input>>>
+    fn gccDeclaratorExtension(&self, i:usize) -> Option<Rc<GccDeclaratorExtensionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -10563,9 +10563,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = AbstractDeclaratorContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 124, RULE_abstractDeclarator);
-        let mut _localctx: Rc<AbstractDeclaratorContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<AbstractDeclaratorContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(741);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.interpreter.adaptive_predict(76, &mut recog.base)? {
@@ -10640,24 +10640,24 @@ pub type DirectAbstractDeclaratorContext<'input> = BaseParserRuleContext<'input,
 
 #[derive(Clone)]
 pub struct DirectAbstractDeclaratorContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for DirectAbstractDeclaratorContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for DirectAbstractDeclaratorContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_directAbstractDeclarator(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_directAbstractDeclarator(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for DirectAbstractDeclaratorContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_directAbstractDeclarator(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_directAbstractDeclarator(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for DirectAbstractDeclaratorContextExt<'input> {
@@ -10669,8 +10669,8 @@ impl<'input> CustomRuleContext<'input> for DirectAbstractDeclaratorContextExt<'i
 antlr_rust::tid! {DirectAbstractDeclaratorContextExt<'a>}
 
 impl<'input> DirectAbstractDeclaratorContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<DirectAbstractDeclaratorContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DirectAbstractDeclaratorContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<DirectAbstractDeclaratorContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DirectAbstractDeclaratorContextExt { ph:PhantomData }))
     }
 }
 
@@ -10703,7 +10703,7 @@ pub trait DirectAbstractDeclaratorContextAttrs<'input>: CParserContext<'input> +
     {
         self.children_of_type()
     }
-    fn gccDeclaratorExtension(&self, i: usize) -> Option<Rc<GccDeclaratorExtensionContextAll<'input>>>
+    fn gccDeclaratorExtension(&self, i:usize) -> Option<Rc<GccDeclaratorExtensionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -10776,18 +10776,18 @@ where
 {
     pub fn directAbstractDeclarator(&mut self) -> Result<Rc<DirectAbstractDeclaratorContextAll<'input>>, ANTLRError> { self.directAbstractDeclarator_rec(0) }
 
-    fn directAbstractDeclarator_rec(&mut self, _p: isize) -> Result<Rc<DirectAbstractDeclaratorContextAll<'input>>, ANTLRError> {
+    fn directAbstractDeclarator_rec(&mut self, _p:isize) -> Result<Rc<DirectAbstractDeclaratorContextAll<'input>>, ANTLRError> {
         let recog = self;
         let _parentctx = recog.ctx.take();
         let _parentState = recog.base.get_state();
         let mut _localctx = DirectAbstractDeclaratorContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_recursion_rule(_localctx.clone(), 126, RULE_directAbstractDeclarator, _p);
-        let mut _localctx: Rc<DirectAbstractDeclaratorContextAll> = _localctx;
+        let mut _localctx:Rc<DirectAbstractDeclaratorContextAll> = _localctx;
         let mut _prevctx = _localctx.clone();
         let _startState = 126;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
-            let mut _alt: isize;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
+            let mut _alt:isize;
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -11293,24 +11293,24 @@ pub type TypedefNameContext<'input> = BaseParserRuleContext<'input, TypedefNameC
 
 #[derive(Clone)]
 pub struct TypedefNameContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for TypedefNameContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for TypedefNameContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_typedefName(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_typedefName(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for TypedefNameContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_typedefName(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_typedefName(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for TypedefNameContextExt<'input> {
@@ -11322,8 +11322,8 @@ impl<'input> CustomRuleContext<'input> for TypedefNameContextExt<'input> {
 antlr_rust::tid! {TypedefNameContextExt<'a>}
 
 impl<'input> TypedefNameContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<TypedefNameContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, TypedefNameContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<TypedefNameContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, TypedefNameContextExt { ph:PhantomData }))
     }
 }
 
@@ -11350,8 +11350,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = TypedefNameContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 128, RULE_typedefName);
-        let mut _localctx: Rc<TypedefNameContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<TypedefNameContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -11381,24 +11381,24 @@ pub type InitializerContext<'input> = BaseParserRuleContext<'input, InitializerC
 
 #[derive(Clone)]
 pub struct InitializerContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for InitializerContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for InitializerContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_initializer(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_initializer(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for InitializerContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_initializer(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_initializer(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for InitializerContextExt<'input> {
@@ -11410,8 +11410,8 @@ impl<'input> CustomRuleContext<'input> for InitializerContextExt<'input> {
 antlr_rust::tid! {InitializerContextExt<'a>}
 
 impl<'input> InitializerContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<InitializerContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, InitializerContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<InitializerContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, InitializerContextExt { ph:PhantomData }))
     }
 }
 
@@ -11466,9 +11466,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = InitializerContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 130, RULE_initializer);
-        let mut _localctx: Rc<InitializerContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<InitializerContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(847);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.base.input.la(1) {
@@ -11533,24 +11533,24 @@ pub type InitializerListContext<'input> = BaseParserRuleContext<'input, Initiali
 
 #[derive(Clone)]
 pub struct InitializerListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for InitializerListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for InitializerListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_initializerList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_initializerList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for InitializerListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_initializerList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_initializerList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for InitializerListContextExt<'input> {
@@ -11562,8 +11562,8 @@ impl<'input> CustomRuleContext<'input> for InitializerListContextExt<'input> {
 antlr_rust::tid! {InitializerListContextExt<'a>}
 
 impl<'input> InitializerListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<InitializerListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, InitializerListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<InitializerListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, InitializerListContextExt { ph:PhantomData }))
     }
 }
 
@@ -11574,7 +11574,7 @@ pub trait InitializerListContextAttrs<'input>: CParserContext<'input> + BorrowMu
     {
         self.children_of_type()
     }
-    fn initializer(&self, i: usize) -> Option<Rc<InitializerContextAll<'input>>>
+    fn initializer(&self, i:usize) -> Option<Rc<InitializerContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -11586,7 +11586,7 @@ pub trait InitializerListContextAttrs<'input>: CParserContext<'input> + BorrowMu
     {
         self.children_of_type()
     }
-    fn designation(&self, i: usize) -> Option<Rc<DesignationContextAll<'input>>>
+    fn designation(&self, i:usize) -> Option<Rc<DesignationContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -11601,7 +11601,7 @@ pub trait InitializerListContextAttrs<'input>: CParserContext<'input> + BorrowMu
     }
     /// Retrieves 'i's TerminalNode corresponding to token Comma, starting from 0.
     /// Returns `None` if number of children corresponding to token Comma is less or equal than `i`.
-    fn Comma(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Comma(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -11621,10 +11621,10 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = InitializerListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 132, RULE_initializerList);
-        let mut _localctx: Rc<InitializerListContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
-            let mut _alt: isize;
+        let mut _localctx:Rc<InitializerListContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
+            let mut _alt:isize;
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -11698,24 +11698,24 @@ pub type DesignationContext<'input> = BaseParserRuleContext<'input, DesignationC
 
 #[derive(Clone)]
 pub struct DesignationContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for DesignationContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for DesignationContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_designation(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_designation(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for DesignationContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_designation(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_designation(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for DesignationContextExt<'input> {
@@ -11727,8 +11727,8 @@ impl<'input> CustomRuleContext<'input> for DesignationContextExt<'input> {
 antlr_rust::tid! {DesignationContextExt<'a>}
 
 impl<'input> DesignationContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<DesignationContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DesignationContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<DesignationContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DesignationContextExt { ph:PhantomData }))
     }
 }
 
@@ -11761,8 +11761,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = DesignationContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 134, RULE_designation);
-        let mut _localctx: Rc<DesignationContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<DesignationContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -11796,24 +11796,24 @@ pub type DesignatorListContext<'input> = BaseParserRuleContext<'input, Designato
 
 #[derive(Clone)]
 pub struct DesignatorListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for DesignatorListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for DesignatorListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_designatorList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_designatorList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for DesignatorListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_designatorList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_designatorList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for DesignatorListContextExt<'input> {
@@ -11825,8 +11825,8 @@ impl<'input> CustomRuleContext<'input> for DesignatorListContextExt<'input> {
 antlr_rust::tid! {DesignatorListContextExt<'a>}
 
 impl<'input> DesignatorListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<DesignatorListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DesignatorListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<DesignatorListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DesignatorListContextExt { ph:PhantomData }))
     }
 }
 
@@ -11837,7 +11837,7 @@ pub trait DesignatorListContextAttrs<'input>: CParserContext<'input> + BorrowMut
     {
         self.children_of_type()
     }
-    fn designator(&self, i: usize) -> Option<Rc<DesignatorContextAll<'input>>>
+    fn designator(&self, i:usize) -> Option<Rc<DesignatorContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -11857,9 +11857,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = DesignatorListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 136, RULE_designatorList);
-        let mut _localctx: Rc<DesignatorListContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<DesignatorListContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -11905,24 +11905,24 @@ pub type DesignatorContext<'input> = BaseParserRuleContext<'input, DesignatorCon
 
 #[derive(Clone)]
 pub struct DesignatorContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for DesignatorContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for DesignatorContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_designator(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_designator(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for DesignatorContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_designator(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_designator(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for DesignatorContextExt<'input> {
@@ -11934,8 +11934,8 @@ impl<'input> CustomRuleContext<'input> for DesignatorContextExt<'input> {
 antlr_rust::tid! {DesignatorContextExt<'a>}
 
 impl<'input> DesignatorContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<DesignatorContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DesignatorContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<DesignatorContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DesignatorContextExt { ph:PhantomData }))
     }
 }
 
@@ -11992,8 +11992,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = DesignatorContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 138, RULE_designator);
-        let mut _localctx: Rc<DesignatorContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<DesignatorContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(877);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.base.input.la(1) {
@@ -12050,24 +12050,24 @@ pub type StaticAssertDeclarationContext<'input> = BaseParserRuleContext<'input, 
 
 #[derive(Clone)]
 pub struct StaticAssertDeclarationContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for StaticAssertDeclarationContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for StaticAssertDeclarationContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_staticAssertDeclaration(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_staticAssertDeclaration(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for StaticAssertDeclarationContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_staticAssertDeclaration(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_staticAssertDeclaration(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for StaticAssertDeclarationContextExt<'input> {
@@ -12079,8 +12079,8 @@ impl<'input> CustomRuleContext<'input> for StaticAssertDeclarationContextExt<'in
 antlr_rust::tid! {StaticAssertDeclarationContextExt<'a>}
 
 impl<'input> StaticAssertDeclarationContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<StaticAssertDeclarationContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StaticAssertDeclarationContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<StaticAssertDeclarationContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StaticAssertDeclarationContextExt { ph:PhantomData }))
     }
 }
 
@@ -12140,7 +12140,7 @@ pub trait StaticAssertDeclarationContextAttrs<'input>: CParserContext<'input> + 
     }
     /// Retrieves 'i's TerminalNode corresponding to token StringLiteral, starting from 0.
     /// Returns `None` if number of children corresponding to token StringLiteral is less or equal than `i`.
-    fn StringLiteral(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn StringLiteral(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -12160,9 +12160,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = StaticAssertDeclarationContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 140, RULE_staticAssertDeclaration);
-        let mut _localctx: Rc<StaticAssertDeclarationContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<StaticAssertDeclarationContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -12225,24 +12225,24 @@ pub type StatementContext<'input> = BaseParserRuleContext<'input, StatementConte
 
 #[derive(Clone)]
 pub struct StatementContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for StatementContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for StatementContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_statement(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_statement(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for StatementContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_statement(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_statement(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for StatementContextExt<'input> {
@@ -12254,8 +12254,8 @@ impl<'input> CustomRuleContext<'input> for StatementContextExt<'input> {
 antlr_rust::tid! {StatementContextExt<'a>}
 
 impl<'input> StatementContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<StatementContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StatementContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<StatementContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, StatementContextExt { ph:PhantomData }))
     }
 }
 
@@ -12334,7 +12334,7 @@ pub trait StatementContextAttrs<'input>: CParserContext<'input> + BorrowMut<Stat
     {
         self.children_of_type()
     }
-    fn logicalOrExpression(&self, i: usize) -> Option<Rc<LogicalOrExpressionContextAll<'input>>>
+    fn logicalOrExpression(&self, i:usize) -> Option<Rc<LogicalOrExpressionContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -12349,7 +12349,7 @@ pub trait StatementContextAttrs<'input>: CParserContext<'input> + BorrowMut<Stat
     }
     /// Retrieves 'i's TerminalNode corresponding to token Colon, starting from 0.
     /// Returns `None` if number of children corresponding to token Colon is less or equal than `i`.
-    fn Colon(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Colon(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -12364,7 +12364,7 @@ pub trait StatementContextAttrs<'input>: CParserContext<'input> + BorrowMut<Stat
     }
     /// Retrieves 'i's TerminalNode corresponding to token Comma, starting from 0.
     /// Returns `None` if number of children corresponding to token Comma is less or equal than `i`.
-    fn Comma(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Comma(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -12384,9 +12384,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = StatementContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 142, RULE_statement);
-        let mut _localctx: Rc<StatementContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<StatementContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(928);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.interpreter.adaptive_predict(104, &mut recog.base)? {
@@ -12609,24 +12609,24 @@ pub type LabeledStatementContext<'input> = BaseParserRuleContext<'input, Labeled
 
 #[derive(Clone)]
 pub struct LabeledStatementContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for LabeledStatementContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for LabeledStatementContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_labeledStatement(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_labeledStatement(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for LabeledStatementContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_labeledStatement(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_labeledStatement(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for LabeledStatementContextExt<'input> {
@@ -12638,8 +12638,8 @@ impl<'input> CustomRuleContext<'input> for LabeledStatementContextExt<'input> {
 antlr_rust::tid! {LabeledStatementContextExt<'a>}
 
 impl<'input> LabeledStatementContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<LabeledStatementContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, LabeledStatementContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<LabeledStatementContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, LabeledStatementContextExt { ph:PhantomData }))
     }
 }
 
@@ -12702,8 +12702,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = LabeledStatementContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 144, RULE_labeledStatement);
-        let mut _localctx: Rc<LabeledStatementContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<LabeledStatementContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(941);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.base.input.la(1) {
@@ -12784,24 +12784,24 @@ pub type CompoundStatementContext<'input> = BaseParserRuleContext<'input, Compou
 
 #[derive(Clone)]
 pub struct CompoundStatementContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for CompoundStatementContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for CompoundStatementContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_compoundStatement(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_compoundStatement(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for CompoundStatementContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_compoundStatement(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_compoundStatement(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for CompoundStatementContextExt<'input> {
@@ -12813,8 +12813,8 @@ impl<'input> CustomRuleContext<'input> for CompoundStatementContextExt<'input> {
 antlr_rust::tid! {CompoundStatementContextExt<'a>}
 
 impl<'input> CompoundStatementContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<CompoundStatementContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, CompoundStatementContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<CompoundStatementContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, CompoundStatementContextExt { ph:PhantomData }))
     }
 }
 
@@ -12855,8 +12855,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = CompoundStatementContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 146, RULE_compoundStatement);
-        let mut _localctx: Rc<CompoundStatementContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<CompoundStatementContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -12893,24 +12893,24 @@ pub type BlockItemListContext<'input> = BaseParserRuleContext<'input, BlockItemL
 
 #[derive(Clone)]
 pub struct BlockItemListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for BlockItemListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for BlockItemListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_blockItemList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_blockItemList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for BlockItemListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_blockItemList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_blockItemList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for BlockItemListContextExt<'input> {
@@ -12922,8 +12922,8 @@ impl<'input> CustomRuleContext<'input> for BlockItemListContextExt<'input> {
 antlr_rust::tid! {BlockItemListContextExt<'a>}
 
 impl<'input> BlockItemListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<BlockItemListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, BlockItemListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<BlockItemListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, BlockItemListContextExt { ph:PhantomData }))
     }
 }
 
@@ -12934,7 +12934,7 @@ pub trait BlockItemListContextAttrs<'input>: CParserContext<'input> + BorrowMut<
     {
         self.children_of_type()
     }
-    fn blockItem(&self, i: usize) -> Option<Rc<BlockItemContextAll<'input>>>
+    fn blockItem(&self, i:usize) -> Option<Rc<BlockItemContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -12954,9 +12954,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = BlockItemListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 148, RULE_blockItemList);
-        let mut _localctx: Rc<BlockItemListContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<BlockItemListContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -13072,24 +13072,24 @@ pub type BlockItemContext<'input> = BaseParserRuleContext<'input, BlockItemConte
 
 #[derive(Clone)]
 pub struct BlockItemContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for BlockItemContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for BlockItemContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_blockItem(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_blockItem(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for BlockItemContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_blockItem(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_blockItem(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for BlockItemContextExt<'input> {
@@ -13101,8 +13101,8 @@ impl<'input> CustomRuleContext<'input> for BlockItemContextExt<'input> {
 antlr_rust::tid! {BlockItemContextExt<'a>}
 
 impl<'input> BlockItemContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<BlockItemContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, BlockItemContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<BlockItemContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, BlockItemContextExt { ph:PhantomData }))
     }
 }
 
@@ -13133,8 +13133,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = BlockItemContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 150, RULE_blockItem);
-        let mut _localctx: Rc<BlockItemContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<BlockItemContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(955);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.interpreter.adaptive_predict(107, &mut recog.base)? {
@@ -13182,24 +13182,24 @@ pub type ExpressionStatementContext<'input> = BaseParserRuleContext<'input, Expr
 
 #[derive(Clone)]
 pub struct ExpressionStatementContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ExpressionStatementContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ExpressionStatementContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_expressionStatement(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_expressionStatement(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ExpressionStatementContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_expressionStatement(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_expressionStatement(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ExpressionStatementContextExt<'input> {
@@ -13211,8 +13211,8 @@ impl<'input> CustomRuleContext<'input> for ExpressionStatementContextExt<'input>
 antlr_rust::tid! {ExpressionStatementContextExt<'a>}
 
 impl<'input> ExpressionStatementContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ExpressionStatementContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ExpressionStatementContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ExpressionStatementContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ExpressionStatementContextExt { ph:PhantomData }))
     }
 }
 
@@ -13245,9 +13245,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ExpressionStatementContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 152, RULE_expressionStatement);
-        let mut _localctx: Rc<ExpressionStatementContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ExpressionStatementContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -13303,24 +13303,24 @@ pub type SelectionStatementContext<'input> = BaseParserRuleContext<'input, Selec
 
 #[derive(Clone)]
 pub struct SelectionStatementContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for SelectionStatementContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for SelectionStatementContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_selectionStatement(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_selectionStatement(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for SelectionStatementContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_selectionStatement(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_selectionStatement(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for SelectionStatementContextExt<'input> {
@@ -13332,8 +13332,8 @@ impl<'input> CustomRuleContext<'input> for SelectionStatementContextExt<'input> 
 antlr_rust::tid! {SelectionStatementContextExt<'a>}
 
 impl<'input> SelectionStatementContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<SelectionStatementContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, SelectionStatementContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<SelectionStatementContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, SelectionStatementContextExt { ph:PhantomData }))
     }
 }
 
@@ -13364,8 +13364,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = SelectionStatementContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 154, RULE_selectionStatement);
-        let mut _localctx: Rc<SelectionStatementContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<SelectionStatementContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(964);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.base.input.la(1) {
@@ -13414,24 +13414,24 @@ pub type IfSelectionContext<'input> = BaseParserRuleContext<'input, IfSelectionC
 
 #[derive(Clone)]
 pub struct IfSelectionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for IfSelectionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for IfSelectionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_ifSelection(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_ifSelection(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for IfSelectionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_ifSelection(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_ifSelection(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for IfSelectionContextExt<'input> {
@@ -13443,8 +13443,8 @@ impl<'input> CustomRuleContext<'input> for IfSelectionContextExt<'input> {
 antlr_rust::tid! {IfSelectionContextExt<'a>}
 
 impl<'input> IfSelectionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<IfSelectionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, IfSelectionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<IfSelectionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, IfSelectionContextExt { ph:PhantomData }))
     }
 }
 
@@ -13485,7 +13485,7 @@ pub trait IfSelectionContextAttrs<'input>: CParserContext<'input> + BorrowMut<If
     {
         self.children_of_type()
     }
-    fn statement(&self, i: usize) -> Option<Rc<StatementContextAll<'input>>>
+    fn statement(&self, i:usize) -> Option<Rc<StatementContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -13513,8 +13513,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = IfSelectionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 156, RULE_ifSelection);
-        let mut _localctx: Rc<IfSelectionContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<IfSelectionContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -13575,24 +13575,24 @@ pub type SwitchSelectionContext<'input> = BaseParserRuleContext<'input, SwitchSe
 
 #[derive(Clone)]
 pub struct SwitchSelectionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for SwitchSelectionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for SwitchSelectionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_switchSelection(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_switchSelection(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for SwitchSelectionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_switchSelection(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_switchSelection(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for SwitchSelectionContextExt<'input> {
@@ -13604,8 +13604,8 @@ impl<'input> CustomRuleContext<'input> for SwitchSelectionContextExt<'input> {
 antlr_rust::tid! {SwitchSelectionContextExt<'a>}
 
 impl<'input> SwitchSelectionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<SwitchSelectionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, SwitchSelectionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<SwitchSelectionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, SwitchSelectionContextExt { ph:PhantomData }))
     }
 }
 
@@ -13660,8 +13660,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = SwitchSelectionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 158, RULE_switchSelection);
-        let mut _localctx: Rc<SwitchSelectionContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<SwitchSelectionContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -13705,24 +13705,24 @@ pub type IterationStatementContext<'input> = BaseParserRuleContext<'input, Itera
 
 #[derive(Clone)]
 pub struct IterationStatementContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for IterationStatementContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for IterationStatementContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_iterationStatement(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_iterationStatement(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for IterationStatementContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_iterationStatement(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_iterationStatement(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for IterationStatementContextExt<'input> {
@@ -13734,8 +13734,8 @@ impl<'input> CustomRuleContext<'input> for IterationStatementContextExt<'input> 
 antlr_rust::tid! {IterationStatementContextExt<'a>}
 
 impl<'input> IterationStatementContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<IterationStatementContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, IterationStatementContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<IterationStatementContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, IterationStatementContextExt { ph:PhantomData }))
     }
 }
 
@@ -13772,8 +13772,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = IterationStatementContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 160, RULE_iterationStatement);
-        let mut _localctx: Rc<IterationStatementContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<IterationStatementContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(984);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.base.input.la(1) {
@@ -13832,24 +13832,24 @@ pub type ForIterationStatementContext<'input> = BaseParserRuleContext<'input, Fo
 
 #[derive(Clone)]
 pub struct ForIterationStatementContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ForIterationStatementContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ForIterationStatementContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_forIterationStatement(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_forIterationStatement(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ForIterationStatementContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_forIterationStatement(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_forIterationStatement(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ForIterationStatementContextExt<'input> {
@@ -13861,8 +13861,8 @@ impl<'input> CustomRuleContext<'input> for ForIterationStatementContextExt<'inpu
 antlr_rust::tid! {ForIterationStatementContextExt<'a>}
 
 impl<'input> ForIterationStatementContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ForIterationStatementContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ForIterationStatementContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ForIterationStatementContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ForIterationStatementContextExt { ph:PhantomData }))
     }
 }
 
@@ -13917,8 +13917,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ForIterationStatementContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 162, RULE_forIterationStatement);
-        let mut _localctx: Rc<ForIterationStatementContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ForIterationStatementContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -13962,24 +13962,24 @@ pub type WhileIterationStatementContext<'input> = BaseParserRuleContext<'input, 
 
 #[derive(Clone)]
 pub struct WhileIterationStatementContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for WhileIterationStatementContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for WhileIterationStatementContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_whileIterationStatement(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_whileIterationStatement(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for WhileIterationStatementContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_whileIterationStatement(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_whileIterationStatement(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for WhileIterationStatementContextExt<'input> {
@@ -13991,8 +13991,8 @@ impl<'input> CustomRuleContext<'input> for WhileIterationStatementContextExt<'in
 antlr_rust::tid! {WhileIterationStatementContextExt<'a>}
 
 impl<'input> WhileIterationStatementContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<WhileIterationStatementContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, WhileIterationStatementContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<WhileIterationStatementContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, WhileIterationStatementContextExt { ph:PhantomData }))
     }
 }
 
@@ -14047,8 +14047,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = WhileIterationStatementContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 164, RULE_whileIterationStatement);
-        let mut _localctx: Rc<WhileIterationStatementContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<WhileIterationStatementContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -14092,24 +14092,24 @@ pub type DoWhileIterationStatementContext<'input> = BaseParserRuleContext<'input
 
 #[derive(Clone)]
 pub struct DoWhileIterationStatementContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for DoWhileIterationStatementContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for DoWhileIterationStatementContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_doWhileIterationStatement(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_doWhileIterationStatement(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for DoWhileIterationStatementContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_doWhileIterationStatement(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_doWhileIterationStatement(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for DoWhileIterationStatementContextExt<'input> {
@@ -14121,8 +14121,8 @@ impl<'input> CustomRuleContext<'input> for DoWhileIterationStatementContextExt<'
 antlr_rust::tid! {DoWhileIterationStatementContextExt<'a>}
 
 impl<'input> DoWhileIterationStatementContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<DoWhileIterationStatementContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DoWhileIterationStatementContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<DoWhileIterationStatementContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DoWhileIterationStatementContextExt { ph:PhantomData }))
     }
 }
 
@@ -14193,8 +14193,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = DoWhileIterationStatementContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 166, RULE_doWhileIterationStatement);
-        let mut _localctx: Rc<DoWhileIterationStatementContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<DoWhileIterationStatementContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -14244,24 +14244,24 @@ pub type ForConditionContext<'input> = BaseParserRuleContext<'input, ForConditio
 
 #[derive(Clone)]
 pub struct ForConditionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ForConditionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ForConditionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_forCondition(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_forCondition(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ForConditionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_forCondition(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_forCondition(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ForConditionContextExt<'input> {
@@ -14273,8 +14273,8 @@ impl<'input> CustomRuleContext<'input> for ForConditionContextExt<'input> {
 antlr_rust::tid! {ForConditionContextExt<'a>}
 
 impl<'input> ForConditionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ForConditionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ForConditionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ForConditionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ForConditionContextExt { ph:PhantomData }))
     }
 }
 
@@ -14294,7 +14294,7 @@ pub trait ForConditionContextAttrs<'input>: CParserContext<'input> + BorrowMut<F
     }
     /// Retrieves 'i's TerminalNode corresponding to token Semi, starting from 0.
     /// Returns `None` if number of children corresponding to token Semi is less or equal than `i`.
-    fn Semi(&self, i: usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
+    fn Semi(&self, i:usize) -> Option<Rc<TerminalNode<'input, CParserContextType>>>
     where
         Self: Sized,
     {
@@ -14326,9 +14326,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ForConditionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 168, RULE_forCondition);
-        let mut _localctx: Rc<ForConditionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ForConditionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -14417,24 +14417,24 @@ pub type ForDeclarationContext<'input> = BaseParserRuleContext<'input, ForDeclar
 
 #[derive(Clone)]
 pub struct ForDeclarationContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ForDeclarationContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ForDeclarationContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_forDeclaration(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_forDeclaration(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ForDeclarationContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_forDeclaration(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_forDeclaration(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ForDeclarationContextExt<'input> {
@@ -14446,8 +14446,8 @@ impl<'input> CustomRuleContext<'input> for ForDeclarationContextExt<'input> {
 antlr_rust::tid! {ForDeclarationContextExt<'a>}
 
 impl<'input> ForDeclarationContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ForDeclarationContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ForDeclarationContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ForDeclarationContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ForDeclarationContextExt { ph:PhantomData }))
     }
 }
 
@@ -14478,9 +14478,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ForDeclarationContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 170, RULE_forDeclaration);
-        let mut _localctx: Rc<ForDeclarationContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ForDeclarationContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -14525,24 +14525,24 @@ pub type ForBeforeExpressionContext<'input> = BaseParserRuleContext<'input, ForB
 
 #[derive(Clone)]
 pub struct ForBeforeExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ForBeforeExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ForBeforeExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_forBeforeExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_forBeforeExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ForBeforeExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_forBeforeExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_forBeforeExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ForBeforeExpressionContextExt<'input> {
@@ -14554,8 +14554,8 @@ impl<'input> CustomRuleContext<'input> for ForBeforeExpressionContextExt<'input>
 antlr_rust::tid! {ForBeforeExpressionContextExt<'a>}
 
 impl<'input> ForBeforeExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ForBeforeExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ForBeforeExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ForBeforeExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ForBeforeExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -14586,9 +14586,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ForBeforeExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 172, RULE_forBeforeExpression);
-        let mut _localctx: Rc<ForBeforeExpressionContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ForBeforeExpressionContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -14660,24 +14660,24 @@ pub type ForAfterExpressionContext<'input> = BaseParserRuleContext<'input, ForAf
 
 #[derive(Clone)]
 pub struct ForAfterExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ForAfterExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ForAfterExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_forAfterExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_forAfterExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ForAfterExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_forAfterExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_forAfterExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ForAfterExpressionContextExt<'input> {
@@ -14689,8 +14689,8 @@ impl<'input> CustomRuleContext<'input> for ForAfterExpressionContextExt<'input> 
 antlr_rust::tid! {ForAfterExpressionContextExt<'a>}
 
 impl<'input> ForAfterExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ForAfterExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ForAfterExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ForAfterExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ForAfterExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -14715,8 +14715,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ForAfterExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 174, RULE_forAfterExpression);
-        let mut _localctx: Rc<ForAfterExpressionContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ForAfterExpressionContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -14747,24 +14747,24 @@ pub type ForMidExpressionContext<'input> = BaseParserRuleContext<'input, ForMidE
 
 #[derive(Clone)]
 pub struct ForMidExpressionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ForMidExpressionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ForMidExpressionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_forMidExpression(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_forMidExpression(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ForMidExpressionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_forMidExpression(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_forMidExpression(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ForMidExpressionContextExt<'input> {
@@ -14776,8 +14776,8 @@ impl<'input> CustomRuleContext<'input> for ForMidExpressionContextExt<'input> {
 antlr_rust::tid! {ForMidExpressionContextExt<'a>}
 
 impl<'input> ForMidExpressionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ForMidExpressionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ForMidExpressionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ForMidExpressionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ForMidExpressionContextExt { ph:PhantomData }))
     }
 }
 
@@ -14802,8 +14802,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ForMidExpressionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 176, RULE_forMidExpression);
-        let mut _localctx: Rc<ForMidExpressionContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ForMidExpressionContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -14834,24 +14834,24 @@ pub type JumpStatementContext<'input> = BaseParserRuleContext<'input, JumpStatem
 
 #[derive(Clone)]
 pub struct JumpStatementContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for JumpStatementContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for JumpStatementContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_jumpStatement(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_jumpStatement(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for JumpStatementContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_jumpStatement(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_jumpStatement(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for JumpStatementContextExt<'input> {
@@ -14863,8 +14863,8 @@ impl<'input> CustomRuleContext<'input> for JumpStatementContextExt<'input> {
 antlr_rust::tid! {JumpStatementContextExt<'a>}
 
 impl<'input> JumpStatementContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<JumpStatementContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, JumpStatementContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<JumpStatementContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, JumpStatementContextExt { ph:PhantomData }))
     }
 }
 
@@ -14901,8 +14901,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = JumpStatementContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 178, RULE_jumpStatement);
-        let mut _localctx: Rc<JumpStatementContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<JumpStatementContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(1032);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.base.input.la(1) {
@@ -14961,24 +14961,24 @@ pub type ContinueStatementContext<'input> = BaseParserRuleContext<'input, Contin
 
 #[derive(Clone)]
 pub struct ContinueStatementContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ContinueStatementContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ContinueStatementContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_continueStatement(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_continueStatement(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ContinueStatementContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_continueStatement(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_continueStatement(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ContinueStatementContextExt<'input> {
@@ -14990,8 +14990,8 @@ impl<'input> CustomRuleContext<'input> for ContinueStatementContextExt<'input> {
 antlr_rust::tid! {ContinueStatementContextExt<'a>}
 
 impl<'input> ContinueStatementContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ContinueStatementContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ContinueStatementContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ContinueStatementContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ContinueStatementContextExt { ph:PhantomData }))
     }
 }
 
@@ -15026,8 +15026,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ContinueStatementContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 180, RULE_continueStatement);
-        let mut _localctx: Rc<ContinueStatementContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ContinueStatementContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -15060,24 +15060,24 @@ pub type BreakStatementContext<'input> = BaseParserRuleContext<'input, BreakStat
 
 #[derive(Clone)]
 pub struct BreakStatementContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for BreakStatementContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for BreakStatementContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_breakStatement(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_breakStatement(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for BreakStatementContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_breakStatement(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_breakStatement(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for BreakStatementContextExt<'input> {
@@ -15089,8 +15089,8 @@ impl<'input> CustomRuleContext<'input> for BreakStatementContextExt<'input> {
 antlr_rust::tid! {BreakStatementContextExt<'a>}
 
 impl<'input> BreakStatementContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<BreakStatementContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, BreakStatementContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<BreakStatementContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, BreakStatementContextExt { ph:PhantomData }))
     }
 }
 
@@ -15125,8 +15125,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = BreakStatementContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 182, RULE_breakStatement);
-        let mut _localctx: Rc<BreakStatementContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<BreakStatementContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -15159,24 +15159,24 @@ pub type ReturnStatementContext<'input> = BaseParserRuleContext<'input, ReturnSt
 
 #[derive(Clone)]
 pub struct ReturnStatementContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ReturnStatementContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ReturnStatementContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_returnStatement(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_returnStatement(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ReturnStatementContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_returnStatement(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_returnStatement(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ReturnStatementContextExt<'input> {
@@ -15188,8 +15188,8 @@ impl<'input> CustomRuleContext<'input> for ReturnStatementContextExt<'input> {
 antlr_rust::tid! {ReturnStatementContextExt<'a>}
 
 impl<'input> ReturnStatementContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ReturnStatementContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ReturnStatementContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ReturnStatementContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ReturnStatementContextExt { ph:PhantomData }))
     }
 }
 
@@ -15230,9 +15230,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ReturnStatementContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 184, RULE_returnStatement);
-        let mut _localctx: Rc<ReturnStatementContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ReturnStatementContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -15291,24 +15291,24 @@ pub type CompilationUnitContext<'input> = BaseParserRuleContext<'input, Compilat
 
 #[derive(Clone)]
 pub struct CompilationUnitContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for CompilationUnitContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for CompilationUnitContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_compilationUnit(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_compilationUnit(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for CompilationUnitContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_compilationUnit(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_compilationUnit(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for CompilationUnitContextExt<'input> {
@@ -15320,8 +15320,8 @@ impl<'input> CustomRuleContext<'input> for CompilationUnitContextExt<'input> {
 antlr_rust::tid! {CompilationUnitContextExt<'a>}
 
 impl<'input> CompilationUnitContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<CompilationUnitContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, CompilationUnitContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<CompilationUnitContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, CompilationUnitContextExt { ph:PhantomData }))
     }
 }
 
@@ -15354,9 +15354,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = CompilationUnitContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 186, RULE_compilationUnit);
-        let mut _localctx: Rc<CompilationUnitContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<CompilationUnitContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -15442,24 +15442,24 @@ pub type TranslationUnitContext<'input> = BaseParserRuleContext<'input, Translat
 
 #[derive(Clone)]
 pub struct TranslationUnitContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for TranslationUnitContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for TranslationUnitContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_translationUnit(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_translationUnit(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for TranslationUnitContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_translationUnit(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_translationUnit(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for TranslationUnitContextExt<'input> {
@@ -15471,8 +15471,8 @@ impl<'input> CustomRuleContext<'input> for TranslationUnitContextExt<'input> {
 antlr_rust::tid! {TranslationUnitContextExt<'a>}
 
 impl<'input> TranslationUnitContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<TranslationUnitContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, TranslationUnitContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<TranslationUnitContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, TranslationUnitContextExt { ph:PhantomData }))
     }
 }
 
@@ -15483,7 +15483,7 @@ pub trait TranslationUnitContextAttrs<'input>: CParserContext<'input> + BorrowMu
     {
         self.children_of_type()
     }
-    fn externalDeclaration(&self, i: usize) -> Option<Rc<ExternalDeclarationContextAll<'input>>>
+    fn externalDeclaration(&self, i:usize) -> Option<Rc<ExternalDeclarationContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -15503,9 +15503,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = TranslationUnitContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 188, RULE_translationUnit);
-        let mut _localctx: Rc<TranslationUnitContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<TranslationUnitContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -15596,24 +15596,24 @@ pub type ExternalDeclarationContext<'input> = BaseParserRuleContext<'input, Exte
 
 #[derive(Clone)]
 pub struct ExternalDeclarationContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for ExternalDeclarationContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for ExternalDeclarationContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_externalDeclaration(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_externalDeclaration(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for ExternalDeclarationContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_externalDeclaration(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_externalDeclaration(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for ExternalDeclarationContextExt<'input> {
@@ -15625,8 +15625,8 @@ impl<'input> CustomRuleContext<'input> for ExternalDeclarationContextExt<'input>
 antlr_rust::tid! {ExternalDeclarationContextExt<'a>}
 
 impl<'input> ExternalDeclarationContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<ExternalDeclarationContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ExternalDeclarationContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<ExternalDeclarationContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, ExternalDeclarationContextExt { ph:PhantomData }))
     }
 }
 
@@ -15665,8 +15665,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = ExternalDeclarationContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 190, RULE_externalDeclaration);
-        let mut _localctx: Rc<ExternalDeclarationContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<ExternalDeclarationContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             recog.base.set_state(1059);
             recog.err_handler.sync(&mut recog.base)?;
             match recog.interpreter.adaptive_predict(121, &mut recog.base)? {
@@ -15722,24 +15722,24 @@ pub type FunctionDefinitionContext<'input> = BaseParserRuleContext<'input, Funct
 
 #[derive(Clone)]
 pub struct FunctionDefinitionContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for FunctionDefinitionContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for FunctionDefinitionContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_functionDefinition(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_functionDefinition(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for FunctionDefinitionContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_functionDefinition(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_functionDefinition(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for FunctionDefinitionContextExt<'input> {
@@ -15751,8 +15751,8 @@ impl<'input> CustomRuleContext<'input> for FunctionDefinitionContextExt<'input> 
 antlr_rust::tid! {FunctionDefinitionContextExt<'a>}
 
 impl<'input> FunctionDefinitionContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<FunctionDefinitionContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, FunctionDefinitionContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<FunctionDefinitionContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, FunctionDefinitionContextExt { ph:PhantomData }))
     }
 }
 
@@ -15789,8 +15789,8 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = FunctionDefinitionContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 192, RULE_functionDefinition);
-        let mut _localctx: Rc<FunctionDefinitionContextAll> = _localctx;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<FunctionDefinitionContextAll> = _localctx;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -15829,24 +15829,24 @@ pub type DeclarationListContext<'input> = BaseParserRuleContext<'input, Declarat
 
 #[derive(Clone)]
 pub struct DeclarationListContextExt<'input> {
-    ph: PhantomData<&'input str>,
+    ph:PhantomData<&'input str>,
 }
 
 impl<'input> CParserContext<'input> for DeclarationListContext<'input> {}
 
 impl<'input, 'a> Listenable<dyn CListener<'input> + 'a> for DeclarationListContext<'input> {
-    fn enter(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn enter(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.enter_every_rule(self);
         listener.enter_declarationList(self);
     }
-    fn exit(&self, listener: &mut (dyn CListener<'input> + 'a)) {
+    fn exit(&self, listener:&mut (dyn CListener<'input> + 'a)) {
         listener.exit_declarationList(self);
         listener.exit_every_rule(self);
     }
 }
 
 impl<'input, 'a> Visitable<dyn CVisitor<'input> + 'a> for DeclarationListContext<'input> {
-    fn accept(&self, visitor: &mut (dyn CVisitor<'input> + 'a)) { visitor.visit_declarationList(self); }
+    fn accept(&self, visitor:&mut (dyn CVisitor<'input> + 'a)) { visitor.visit_declarationList(self); }
 }
 
 impl<'input> CustomRuleContext<'input> for DeclarationListContextExt<'input> {
@@ -15858,8 +15858,8 @@ impl<'input> CustomRuleContext<'input> for DeclarationListContextExt<'input> {
 antlr_rust::tid! {DeclarationListContextExt<'a>}
 
 impl<'input> DeclarationListContextExt<'input> {
-    fn new(parent: Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state: isize) -> Rc<DeclarationListContextAll<'input>> {
-        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DeclarationListContextExt { ph: PhantomData }))
+    fn new(parent:Option<Rc<dyn CParserContext<'input> + 'input>>, invoking_state:isize) -> Rc<DeclarationListContextAll<'input>> {
+        Rc::new(BaseParserRuleContext::new_parser_ctx(parent, invoking_state, DeclarationListContextExt { ph:PhantomData }))
     }
 }
 
@@ -15870,7 +15870,7 @@ pub trait DeclarationListContextAttrs<'input>: CParserContext<'input> + BorrowMu
     {
         self.children_of_type()
     }
-    fn declaration(&self, i: usize) -> Option<Rc<DeclarationContextAll<'input>>>
+    fn declaration(&self, i:usize) -> Option<Rc<DeclarationContextAll<'input>>>
     where
         Self: Sized,
     {
@@ -15890,9 +15890,9 @@ where
         let _parentctx = recog.ctx.take();
         let mut _localctx = DeclarationListContextExt::new(_parentctx.clone(), recog.base.get_state());
         recog.base.enter_rule(_localctx.clone(), 194, RULE_declarationList);
-        let mut _localctx: Rc<DeclarationListContextAll> = _localctx;
-        let mut _la: isize = -1;
-        let result: Result<(), ANTLRError> = (|| {
+        let mut _localctx:Rc<DeclarationListContextAll> = _localctx;
+        let mut _la:isize = -1;
+        let result:Result<(), ANTLRError> = (|| {
             //recog.base.enter_outer_alt(_localctx.clone(), 1);
             recog.base.enter_outer_alt(None, 1);
             {
@@ -15988,7 +15988,7 @@ lazy_static! {
     };
 }
 
-const _serializedATN: &'static str = "\x03\u{608b}\u{a72a}\u{8133}\u{b9ed}\u{417c}\u{3be7}\u{7786}\u{5964}\x03\
+const _serializedATN:&'static str = "\x03\u{608b}\u{a72a}\u{8133}\u{b9ed}\u{417c}\u{3be7}\u{7786}\u{5964}\x03\
 	\x78\u{431}\x04\x02\x09\x02\x04\x03\x09\x03\x04\x04\x09\x04\x04\x05\x09\
 	\x05\x04\x06\x09\x06\x04\x07\x09\x07\x04\x08\x09\x08\x04\x09\x09\x09\x04\
 	\x0a\x09\x0a\x04\x0b\x09\x0b\x04\x0c\x09\x0c\x04\x0d\x09\x0d\x04\x0e\x09\

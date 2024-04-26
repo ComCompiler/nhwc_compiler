@@ -4,19 +4,19 @@ use crate::{
 use anyhow::Result;
 #[derive(Debug)]
 pub struct Ast2EtDebugPass {
-    is_gen_png: bool,
+    is_gen_png:bool,
 }
 impl Ast2EtDebugPass {
-    pub fn new(is_gen_png: bool) -> Self { Ast2EtDebugPass { is_gen_png } }
+    pub fn new(is_gen_png:bool) -> Self { Ast2EtDebugPass { is_gen_png } }
 }
 
 impl Pass for Ast2EtDebugPass {
     // 运行这个pass
-    fn run(&mut self, ctx: &mut Context) -> Result<()> {
+    fn run(&mut self, ctx:&mut Context) -> Result<()> {
         let et_tree = &mut ctx.et_tree;
 
         //dfs遍历ast找到第一个 expr stmt
-        let mut nodes: Vec<u32> = vec![];
+        let mut nodes:Vec<u32> = vec![];
         nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_declaration));
         // nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expressionStatement));
         nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expression));

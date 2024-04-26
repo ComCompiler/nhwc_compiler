@@ -15,7 +15,7 @@ use super::{ast_node::AstTree, scope_node::ScopeTree};
 
 // 这个函数 返回 separator node
 // 只能处理三类  expr_stmt & declaration & expr
-pub fn process_any_stmt(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, any_stmt_node: u32, scope_node: u32) -> u32 {
+pub fn process_any_stmt(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, any_stmt_node:u32, scope_node:u32) -> u32 {
     match node!(at any_stmt_node in ast_tree).rule_id {
         RULE_expressionStatement => {
             let sep_node = add_node!({EtNodeType::new_sep(any_stmt_node).to_et_node()} to et_tree);
@@ -56,7 +56,7 @@ pub fn process_any_stmt(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &S
         _ => panic!("试图解析不合法的 ast_node {} with rule_id {:?} 为表达式树(et_tree)", any_stmt_node, node!(at any_stmt_node in ast_tree).rule_id),
     }
 }
-fn process_declaration(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, decl_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_declaration(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, decl_node:u32, scope_node:u32, parent_et_node:u32) {
     let type_ast_node = find!(
         rule RULE_declarationSpecifiers
         // 这里我们假定只有一个 修饰符
@@ -73,7 +73,7 @@ fn process_declaration(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &Sc
         process_init_declarator(et_tree, ast_tree, scope_tree, init_decl_node, type_ast_node, scope_node, parent_et_node);
     }
 }
-fn process_for_before_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, for_before_expr: u32, scope_node: u32, parent_et_node: u32) {
+fn process_for_before_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, for_before_expr:u32, scope_node:u32, parent_et_node:u32) {
     let for_declaration_or_expr_node = direct_child_node!(at for_before_expr in ast_tree);
     match (rule_id!(at for_declaration_or_expr_node in ast_tree), for_declaration_or_expr_node) {
         (RULE_forDeclaration, for_declaration_node) => process_declaration(et_tree, ast_tree, scope_tree, for_declaration_node, scope_node, parent_et_node),
@@ -81,7 +81,7 @@ fn process_for_before_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree:
         _ => panic!("在这个 for before expression 底下既没有 forDeclaration 也没有 expression"),
     }
 }
-fn process_init_declarator(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, init_decl_node: u32, type_ast_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_init_declarator(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, init_decl_node:u32, type_ast_node:u32, scope_node:u32, parent_et_node:u32) {
     let declarator_node = find!(rule RULE_declarator at init_decl_node in ast_tree).unwrap();
 
     // 考虑到direct_decl_node 可能有 数组运算符，所以要进行进一步解析
@@ -105,7 +105,7 @@ fn process_init_declarator(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree:
     }
 }
 
-fn process_direct_decl(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, direct_decl_node: u32, type_ast_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_direct_decl(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, direct_decl_node:u32, type_ast_node:u32, scope_node:u32, parent_et_node:u32) {
     if let Some(para_type_list_node) = find!(rule RULE_parameterTypeList at direct_decl_node in ast_tree) {
         // 这说明这是一个至少有一个参数的 函数 声明
     } else if let Some(ident_node) = find!(term Identifier at direct_decl_node in ast_tree) {
@@ -120,7 +120,7 @@ fn process_direct_decl(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &Sc
     }
 }
 
-fn process_expr_stmt(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, expr_stmt_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_expr_stmt(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, expr_stmt_node:u32, scope_node:u32, parent_et_node:u32) {
     let op_expr_node = find!(rule RULE_expression at expr_stmt_node in ast_tree);
     match op_expr_node {
         Some(expr_node) => process_expr(et_tree, ast_tree, scope_tree, expr_node, scope_node, parent_et_node),
@@ -130,9 +130,9 @@ fn process_expr_stmt(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &Scop
     }
 }
 
-fn process_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, expr_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, expr_node:u32, scope_node:u32, parent_et_node:u32) {
     // expr 节点下面 至少有一个 assignment expression
-    let assign_expr_nodes: Vec<u32> = find_nodes!(rule RULE_assignmentExpression at expr_node in ast_tree);
+    let assign_expr_nodes:Vec<u32> = find_nodes!(rule RULE_assignmentExpression at expr_node in ast_tree);
     if assign_expr_nodes.is_empty() {
         panic!("这个 expression {} 里面没有任何 assign_expr", expr_node);
     }
@@ -141,7 +141,7 @@ fn process_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree
     }
 }
 /// assignment expr 是 assignmentOperator( =  /= *= += -= %= <<= >>= &= ^= |= )右边的式子
-fn process_assign_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, assign_expr_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_assign_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, assign_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     let op_assign_operator = find!(rule RULE_assignmentOperator at assign_expr_node in ast_tree);
     match op_assign_operator {
         // 有 term 说明这一层,是 a=3 这样的形式
@@ -198,11 +198,11 @@ fn process_assign_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &Sc
         None => process_cond_expr(et_tree, ast_tree, scope_tree, direct_child_node!(at assign_expr_node in ast_tree), scope_node, parent_et_node),
     }
 }
-fn process_cond_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, cond_expr_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_cond_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, cond_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     let logical_or_node = find!(rule RULE_logicalOrExpression at cond_expr_node in ast_tree).expect(format!("cond_node_id {}", cond_expr_node).as_str());
     process_logical_or_expr(et_tree, ast_tree, scope_tree, logical_or_node, scope_node, parent_et_node);
 }
-fn process_logical_or_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, logical_or_expr_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_logical_or_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, logical_or_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     let logical_and_nodes = find_nodes!(rule RULE_logicalAndExpression at logical_or_expr_node in ast_tree);
     let mut op_last_ep_or_node = None;
     if logical_and_nodes.len() > 1 {
@@ -226,7 +226,7 @@ fn process_logical_or_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree:
         panic!("夭寿了,logical_and_expression 在这个logical_or_expression下一个也没有")
     }
 }
-fn process_logical_and_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, logical_and_expr: u32, scope_node: u32, parent_et_node: u32) {
+fn process_logical_and_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, logical_and_expr:u32, scope_node:u32, parent_et_node:u32) {
     let inclusive_or_nodes = find_nodes!(rule RULE_inclusiveOrExpression at logical_and_expr in ast_tree);
     let mut op_last_ep_logical_and_node = None;
     if inclusive_or_nodes.len() > 1 {
@@ -250,7 +250,7 @@ fn process_logical_and_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree
         panic!("夭寿了,inclusive_or_expression 在这个logical_and_expression下一个也没有")
     }
 }
-fn process_inclusive_or_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, inclusive_or_expr: u32, scope_node: u32, parent_et_node: u32) {
+fn process_inclusive_or_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, inclusive_or_expr:u32, scope_node:u32, parent_et_node:u32) {
     let exclusive_or_nodes = find_nodes!(rule RULE_exclusiveOrExpression at inclusive_or_expr in ast_tree);
     let mut op_last_ep_inclusive_or_node = None;
     if exclusive_or_nodes.len() > 1 {
@@ -274,7 +274,7 @@ fn process_inclusive_or_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tre
         panic!("夭寿了,exclusive_or_expression 在这个inclusive_or_expression {} 下一个也没有", inclusive_or_expr)
     }
 }
-fn process_exclusive_or_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, exclusive_or_expr_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_exclusive_or_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, exclusive_or_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     let and_expr_nodes = find_nodes!(rule RULE_andExpression at exclusive_or_expr_node in ast_tree);
     let mut op_last_ep_and_node = None;
     if and_expr_nodes.len() > 1 {
@@ -298,7 +298,7 @@ fn process_exclusive_or_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tre
         panic!("夭寿了,and_expr 在这个exclusive_or_expr下一个也没有")
     }
 }
-fn process_and_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, and_expr_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_and_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, and_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     let equality_expr_nodes = find_nodes!(rule RULE_equalityExpression at and_expr_node in ast_tree);
     let mut op_last_ep_equality_node = None;
     if equality_expr_nodes.len() > 1 {
@@ -322,7 +322,7 @@ fn process_and_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &Scope
     }
 }
 
-fn process_equality_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, equality_expr_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_equality_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, equality_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     let relational_expr_nodes = find_nodes!(rule RULE_relationalExpression at equality_expr_node in ast_tree);
     let op_nodes = find_nodes!(term at equality_expr_node in ast_tree);
     let get_expr_node_of_op_node = |op_node_index| {
@@ -363,7 +363,7 @@ fn process_equality_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &
     }
 }
 
-fn process_relational_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, relational_expr_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_relational_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, relational_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     let shift_expr_nodes = find_nodes!(rule RULE_shiftExpression at relational_expr_node in ast_tree);
     let op_nodes = find_nodes!(term at relational_expr_node in ast_tree);
     let get_expr_node_of_op_node = |op_node_index| {
@@ -400,7 +400,7 @@ fn process_relational_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree:
     }
 }
 
-fn process_shift_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, shift_expr_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_shift_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, shift_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     let additive_expr_nodes = find_nodes!(rule RULE_additiveExpression at shift_expr_node in ast_tree);
     let op_nodes = find_nodes!(term at shift_expr_node in ast_tree);
     let get_expr_node_of_op_node = |op_node_index| {
@@ -437,7 +437,7 @@ fn process_shift_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &Sco
     }
 }
 
-fn process_additive_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, additive_expr_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_additive_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, additive_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     let multiplicative_expr_nodes = find_nodes!(rule RULE_multiplicativeExpression at additive_expr_node in ast_tree);
     let op_nodes = find_nodes!(term at additive_expr_node in ast_tree);
     let get_expr_node_of_op_node = |op_node_index| {
@@ -475,7 +475,7 @@ fn process_additive_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &
     }
 }
 
-fn process_multiplicative_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, multiplicative_expr_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_multiplicative_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, multiplicative_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     let cast_expr_nodes = find_nodes!(rule RULE_castExpression at multiplicative_expr_node in ast_tree);
     let op_nodes = find_nodes!(term at multiplicative_expr_node in ast_tree);
     let get_expr_node_of_op_node = |op_node_index| {
@@ -514,7 +514,7 @@ fn process_multiplicative_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_t
     }
 }
 
-fn process_cast_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, cast_expr_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_cast_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, cast_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     // 检查 castExpression 节点是否是类型转换的情况
     if let Some(type_name_node) = find!(rule RULE_typeName at cast_expr_node in ast_tree) {
         // 如果存在 typeName，说明是类型转换的情况
@@ -534,7 +534,7 @@ fn process_cast_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &Scop
     }
 }
 
-pub fn process_unary_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, unary_expr_node: u32, scope_node: u32, parent_et_node: u32) {
+pub fn process_unary_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, unary_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     let get_expr_node_of_unary_op_node = |op_node| match term_id!(at op_node in ast_tree) {
         And => EtNodeType::new_op_addr_of(unary_expr_node).to_et_node(),
         Star => EtNodeType::new_op_deref(unary_expr_node).to_et_node(),
@@ -563,7 +563,7 @@ pub fn process_unary_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: 
     }
 }
 
-fn process_postfix_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, postfix_expr_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_postfix_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, postfix_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     if let Some(expr_node) = find!(rule RULE_expression at postfix_expr_node in ast_tree) {
         //说明这是个带下标的语法 with subscript
         let postfix_expr_node = find!(rule RULE_postfixExpression at postfix_expr_node in ast_tree).unwrap();
@@ -604,13 +604,13 @@ fn process_postfix_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &S
         process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, parent_et_node)
     }
 }
-fn process_arg_expr_list(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, arg_expr_list_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_arg_expr_list(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, arg_expr_list_node:u32, scope_node:u32, parent_et_node:u32) {
     let assign_expr_nodes = find_nodes!(rule RULE_assignmentExpression at arg_expr_list_node in ast_tree);
     for assign_expr_node in assign_expr_nodes {
         process_assign_expr(et_tree, ast_tree, scope_tree, assign_expr_node, scope_node, parent_et_node)
     }
 }
-fn process_primary_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, primary_expr_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_primary_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, primary_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     if let Some(const_node) = find!(term Constant at primary_expr_node in ast_tree) {
         // println!("constant {}",const_node);
         process_constant(et_tree, ast_tree, scope_tree, const_node, scope_node, parent_et_node);
@@ -625,7 +625,7 @@ fn process_primary_expr(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &S
     }
 }
 
-fn process_initializer_list(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, initializer_list_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_initializer_list(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, initializer_list_node:u32, scope_node:u32, parent_et_node:u32) {
     // 有两种，一种是 initializer 套 initializer 一种是 assignment_expr
     let initializer_nodes = find_nodes!(rule RULE_initializer at initializer_list_node in ast_tree);
     for initializer_node in initializer_nodes {
@@ -633,7 +633,7 @@ fn process_initializer_list(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree
     }
 }
 
-fn process_initializer(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, initializer_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_initializer(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, initializer_node:u32, scope_node:u32, parent_et_node:u32) {
     if let Some(initializer_list_node) = find!(rule RULE_initializerList at initializer_node in ast_tree) {
         let et_array_wrapper_node = add_node_with_edge!({EtNodeType::new_op_array_wrapper(initializer_node).to_et_node()} from parent_et_node in et_tree);
         process_initializer_list(et_tree, ast_tree, scope_tree, initializer_list_node, scope_node, et_array_wrapper_node)
@@ -644,7 +644,7 @@ fn process_initializer(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &Sc
 
 /// 会把表达式中的符号添加到 symtab 中
 /// ? 这个过程并不需要符号表，因为符号表是用来检查 def use 是否合法的，比如变量在 定义前被使用了就是非法
-fn process_ident(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, ident_node: u32, scope_node: u32, parent_et_node: u32, def_or_use: DefOrUse) {
+fn process_ident(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, ident_node:u32, scope_node:u32, parent_et_node:u32, def_or_use:DefOrUse) {
     let sym_name = node!(at ident_node in ast_tree).text.clone();
     // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 
@@ -652,7 +652,7 @@ fn process_ident(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTre
     // let symbol = symtab.add(symbol_struct);
     add_node_with_edge!({EtNodeType::new_symbol(ident_node, sym_idx, def_or_use).to_et_node()} from parent_et_node in et_tree);
 }
-fn process_constant(et_tree: &mut EtTree, ast_tree: &AstTree, scope_tree: &ScopeTree, const_node: u32, scope_node: u32, parent_et_node: u32) {
+fn process_constant(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, const_node:u32, scope_node:u32, parent_et_node:u32) {
     let sym_name = node!(at const_node in ast_tree).text.clone();
     // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 

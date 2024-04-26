@@ -16,7 +16,7 @@ use super::scope_node::ScopeTree;
 use super::symtab::SymTab;
 /// 这个文件中没有在命名中提到是哪一中图中的节点，那么统一是 scope_node
 
-pub fn process_while(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut SymTab, current_while_node: u32) -> Result<Option<(u32, u32)>> {
+pub fn process_while(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, current_while_node:u32) -> Result<Option<(u32, u32)>> {
     //expression做成whileloop节点
     let expr_node = find!(rule RULE_expression at current_while_node in ast_tree).unwrap();
     let statement_node = find!(rule RULE_statement at current_while_node in ast_tree).unwrap();
@@ -36,7 +36,7 @@ pub fn process_while(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut 
 }
 
 ///处理循环过程的cfg节点处理和连接，返回branch和statement的idx
-pub fn process_iteration(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut SymTab, current_iteration_node: u32) -> Result<Option<(u32, u32)>> {
+pub fn process_iteration(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, current_iteration_node:u32) -> Result<Option<(u32, u32)>> {
     //处理branch的构造
     let which_iteration_node = direct_child_node!(at current_iteration_node in ast_tree);
     match (rule_id!(at which_iteration_node in ast_tree), which_iteration_node) {
@@ -45,7 +45,7 @@ pub fn process_iteration(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &
         (_, _) => panic!("循环不属于for或while循环"),
     }
 }
-pub fn process_for(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut SymTab, current_for_node: u32) -> Result<Option<(u32, u32)>> {
+pub fn process_for(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, current_for_node:u32) -> Result<Option<(u32, u32)>> {
     //forconditioin做成branch节点
     let for_condition_node = find!(rule RULE_forCondition at current_for_node in ast_tree).unwrap();
     let for_before_node = find!(rule RULE_forBeforeExpression at for_condition_node in ast_tree).unwrap();
@@ -70,7 +70,7 @@ pub fn process_for(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut Sy
 }
 
 /// 返回 生成CFG nodes 的 Option<(头,尾)>
-pub fn process_stmt(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut SymTab, current_statement_node: u32) -> Result<Option<(u32, u32)>> {
+pub fn process_stmt(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, current_statement_node:u32) -> Result<Option<(u32, u32)>> {
     let which_statement = direct_child_node!(at current_statement_node in ast_tree);
     //匹配循环体内部的大括号，单语句，分支语句情况
     match (rule_id!(at which_statement in ast_tree), which_statement) {
@@ -92,18 +92,18 @@ pub fn process_stmt(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut S
         (_, _) => panic!("不属于任何statement下等语句,ast树有错误 node:{}", which_statement),
     }
 }
-pub fn process_declartion(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut SymTab, current_declare_node: u32) -> Result<Option<(u32, u32)>> {
+pub fn process_declartion(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, current_declare_node:u32) -> Result<Option<(u32, u32)>> {
     let bb_struct = CfgNode::new_bb(vec![current_declare_node]);
     let cfg_basicblock_node = add_node!(bb_struct to cfg_graph);
     Ok(Some((cfg_basicblock_node, cfg_basicblock_node)))
 }
-pub fn process_expression(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut SymTab, current_expression_node: u32) -> Result<Option<(u32, u32)>> {
+pub fn process_expression(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, current_expression_node:u32) -> Result<Option<(u32, u32)>> {
     let bb_struct = CfgNode::new_bb(vec![current_expression_node]);
     let cfg_basicblock_node = add_node!(bb_struct to cfg_graph);
     Ok(Some((cfg_basicblock_node, cfg_basicblock_node)))
 }
 ///处理选择分支节点，内部区分if，switch，head_node连接到branch，gather连接到tail_node
-pub fn process_selection(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut SymTab, current_selection_node: u32) -> Result<Option<(u32, u32)>> {
+pub fn process_selection(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, current_selection_node:u32) -> Result<Option<(u32, u32)>> {
     //处理if和switch
     let which_selection_node = direct_child_node!(at current_selection_node in ast_tree);
     match (rule_id!(at which_selection_node in ast_tree), which_selection_node) {
@@ -113,12 +113,12 @@ pub fn process_selection(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &
     }
 }
 
-pub fn process_if(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut SymTab, if_node: u32) -> Result<Option<(u32, u32)>> {
+pub fn process_if(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, if_node:u32) -> Result<Option<(u32, u32)>> {
     //将expression做成branch
     let expression_node = find!(rule RULE_expression at if_node in ast_tree).unwrap();
 
     //处理statement
-    let statement_nodes: Vec<u32> = find_nodes!(rule RULE_statement at if_node in ast_tree);
+    let statement_nodes:Vec<u32> = find_nodes!(rule RULE_statement at if_node in ast_tree);
     if statement_nodes.len() == 1 {
         let p0 = process_stmt(cfg_graph, ast_tree, symtab, statement_nodes[0])?;
 
@@ -172,7 +172,7 @@ pub fn process_if(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut Sym
         panic!("不对, selectionStatement 下面不可能有两个以上的Statement");
     }
 }
-pub fn process_switch(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut SymTab, switch_node: u32) -> Result<Option<(u32, u32)>> {
+pub fn process_switch(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, switch_node:u32) -> Result<Option<(u32, u32)>> {
     //将expression做成branch
     let expression_node = find!(rule RULE_expression at switch_node in ast_tree).unwrap();
 
@@ -193,7 +193,7 @@ pub fn process_switch(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut
 
 /// 首先确保这两个节点直接相连,如果合并成功，返回合并后的 node ，如果合并失败，返回None
 /// 需要注意的是 一个gather 和一个空的 BasicBlock 不可以合并，其次我们需要保留边的属性
-pub fn try_unite(opt_node1: Option<u32>, opt_node2: Option<u32>, cfg_graph: &mut CfgGraph) -> Result<Option<u32>> {
+pub fn try_unite(opt_node1:Option<u32>, opt_node2:Option<u32>, cfg_graph:&mut CfgGraph) -> Result<Option<u32>> {
     // return Ok(None);
     match (opt_node1, opt_node2) {
         (Some(node1), Some(node2)) => {
@@ -204,7 +204,7 @@ pub fn try_unite(opt_node1: Option<u32>, opt_node2: Option<u32>, cfg_graph: &mut
             ) {
                 (CfgNodeType::BasicBlock { ast_nodes: ast_nodes1 }, CfgNodeType::BasicBlock { ast_nodes: ast_nodes2 }) => {
                     ast_nodes1.extend_from_slice(&ast_nodes2);
-                    let edges: Vec<_> = cfg_graph.edges(NodeIndex::from(node2)).map(|x| (x.id().index() as u32, x.weight().clone())).collect();
+                    let edges:Vec<_> = cfg_graph.edges(NodeIndex::from(node2)).map(|x| (x.id().index() as u32, x.weight().clone())).collect();
                     for (edge, weight) in edges {
                         let dst = cfg_graph.edge_endpoints(EdgeIndex::from(edge)).unwrap().1;
                         add_edge!({weight} from node1 to dst in cfg_graph);
@@ -243,12 +243,12 @@ pub fn try_unite(opt_node1: Option<u32>, opt_node2: Option<u32>, cfg_graph: &mut
     }
 }
 
-pub fn process_compound(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &mut SymTab, current_compound_node: u32) -> Result<Option<(u32, u32)>> {
+pub fn process_compound(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, current_compound_node:u32) -> Result<Option<(u32, u32)>> {
     // 一开始 没有head也没有 tail
     let mut opt_current_cfg_head_and_tail = None;
     //查找compoundstatement,下找blocklist以及blockitem
     let blockitemlist_node = find!(rule RULE_blockItemList at current_compound_node in ast_tree).expect(format!("unwrap failed at ast_node:{}", current_compound_node).as_str());
-    let blockitem_nodes: Vec<u32> = find_nodes!(rule RULE_blockItem at blockitemlist_node in ast_tree);
+    let blockitem_nodes:Vec<u32> = find_nodes!(rule RULE_blockItem at blockitemlist_node in ast_tree);
 
     // 这里 rev 是因为 adj 只能返回  rev 的部分
     for blockitem_node in blockitem_nodes {
@@ -295,10 +295,10 @@ pub fn process_compound(cfg_graph: &mut CfgGraph, ast_tree: &AstTree, symtab: &m
 }
 
 /// 这个函数依赖 ast
-pub fn parse_ast_to_cfg(ast_tree: &AstTree, cfg_graph: &mut CfgGraph, symtab: &mut SymTab, scope_tree: &ScopeTree) -> Result<()> {
+pub fn parse_ast_to_cfg(ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab, scope_tree:&ScopeTree) -> Result<()> {
     let ast_root_node = 0;
 
-    let funcdef_nodes: Vec<u32> = find_nodes_by_dfs!(rule RULE_functionDefinition at ast_root_node in ast_tree);
+    let funcdef_nodes:Vec<u32> = find_nodes_by_dfs!(rule RULE_functionDefinition at ast_root_node in ast_tree);
     let cfg_func_parent = CfgNode::new_root();
     // 为每一个function 创建一个共享的根节点
     let cfg_func_parent_node = cfg_graph.add_node(cfg_func_parent);

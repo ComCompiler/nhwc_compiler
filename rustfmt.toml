@@ -13,7 +13,7 @@ use_small_heuristics = "Max"  # 使用最大化紧凑的启发式方法
 
 # 控制分隔符和括号
 space_before_colon = false  # 冒号前不加空格
-space_after_colon = true  # 冒号后加空格，为了保持一致的阅读体验
+space_after_colon = false  # 冒号后加空格，为了保持一致的阅读体验
 spaces_around_ranges = false  # 范围表达式两边不加空格
 
 # 控制导入布局

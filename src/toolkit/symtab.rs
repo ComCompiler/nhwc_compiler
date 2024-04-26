@@ -9,29 +9,29 @@ pub type SymTabGraph = StableDiGraph<SymTab, SymTabEdge, u32>;
 
 #[derive(Clone)]
 pub struct SymTab {
-    map: BTreeMap<SymIdx, Symbol>,
+    map:BTreeMap<SymIdx, Symbol>,
 }
 #[derive(Clone)]
 pub struct SymTabEdge {
-    text: String,
+    text:String,
 }
 impl Debug for SymTabEdge {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result { write!(f, "{}", self.text) }
+    fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result { write!(f, "{}", self.text) }
 }
 impl SymTabEdge {
-    pub fn new(text: String) -> Self { SymTabEdge { text } }
+    pub fn new(text:String) -> Self { SymTabEdge { text } }
 }
 /// 由于我们对 Symbol 的索引必须同时考虑 symbol 所在的scope 的层级以及 symbol的名字，不如直接改成结构体SymbolIndex
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SymIdx {
-    pub scope_node: u32,
-    pub symbol_name: String,
-    pub index_ssa: Option<u32>,
+    pub scope_node:u32,
+    pub symbol_name:String,
+    pub index_ssa:Option<u32>,
 }
 make_field_trait_for_struct!(SymIdx);
 impl SymIdx {
-    pub fn new(scope_node: u32, symbol_name: String) -> Self { SymIdx { scope_node, symbol_name, index_ssa: None } }
-    pub fn new_verbose(scope_node: u32, symbol_name: String, index_ssa: Option<u32>) -> Self { SymIdx { scope_node, symbol_name, index_ssa } }
+    pub fn new(scope_node:u32, symbol_name:String) -> Self { SymIdx { scope_node, symbol_name, index_ssa:None } }
+    pub fn new_verbose(scope_node:u32, symbol_name:String, index_ssa:Option<u32>) -> Self { SymIdx { scope_node, symbol_name, index_ssa } }
 
     // pub fn get_use_counter(&mut self,symtab:&mut SymTab) -> Option<&mut UseCounter>{
     //     find!(field mut USE_COUNTER:UseCounter at self in symtab)
@@ -46,10 +46,10 @@ impl SymIdx {
 
 impl SymTab {
     // 创建一个新的符号表
-    pub fn new() -> SymTab { SymTab { map: BTreeMap::new() } }
+    pub fn new() -> SymTab { SymTab { map:BTreeMap::new() } }
 
     // 添加或更新符号，如果是更新，那么返回旧的符号
-    pub fn add_symbol(&mut self, sym: Symbol) -> SymIdx {
+    pub fn add_symbol(&mut self, sym:Symbol) -> SymIdx {
         let symidx = sym.symidx.clone();
         let symidx_cloned = sym.symidx.clone();
         match self.map.insert(symidx, sym) {
@@ -59,20 +59,20 @@ impl SymTab {
     }
 
     // 查找符号
-    pub fn get_symbol_verbose(&self, symbol_name: String, scope_node: u32) -> Option<&Symbol> { self.map.get(&SymIdx { scope_node, symbol_name, index_ssa: None }) }
-    pub fn get_symbol(&self, symbol_index: &SymIdx) -> Option<&Symbol> { self.map.get(symbol_index) }
-    pub fn get_mut_symbol_verbose(&mut self, symbol_name: String, scope_node: u32) -> Option<&mut Symbol> { self.map.get_mut(&SymIdx { scope_node, symbol_name, index_ssa: None }) }
-    pub fn get_mut_symbol(&mut self, symbol_index: &SymIdx) -> Option<&mut Symbol> { self.map.get_mut(symbol_index) }
+    pub fn get_symbol_verbose(&self, symbol_name:String, scope_node:u32) -> Option<&Symbol> { self.map.get(&SymIdx { scope_node, symbol_name, index_ssa:None }) }
+    pub fn get_symbol(&self, symbol_index:&SymIdx) -> Option<&Symbol> { self.map.get(symbol_index) }
+    pub fn get_mut_symbol_verbose(&mut self, symbol_name:String, scope_node:u32) -> Option<&mut Symbol> { self.map.get_mut(&SymIdx { scope_node, symbol_name, index_ssa:None }) }
+    pub fn get_mut_symbol(&mut self, symbol_index:&SymIdx) -> Option<&mut Symbol> { self.map.get_mut(symbol_index) }
 
     // 删除符号
-    pub fn remove_symbol(&mut self, symbol_index: &SymIdx) { self.map.remove(symbol_index); }
-    pub fn remove_symbol_verbose(&mut self, symbol_name: String, scope_node: u32) { self.map.remove(&SymIdx { scope_node, symbol_name, index_ssa: None }); }
+    pub fn remove_symbol(&mut self, symbol_index:&SymIdx) { self.map.remove(symbol_index); }
+    pub fn remove_symbol_verbose(&mut self, symbol_name:String, scope_node:u32) { self.map.remove(&SymIdx { scope_node, symbol_name, index_ssa:None }); }
 }
 impl Default for SymTab {
-    fn default() -> Self { Self { map: Default::default() } }
+    fn default() -> Self { Self { map:Default::default() } }
 }
 impl Debug for SymIdx {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
         match self.index_ssa {
             Some(index_ssa) => write!(f, "{}_s{}_i{}", self.symbol_name, self.scope_node, index_ssa),
             None => write!(f, "{}_s{}", self.symbol_name, self.scope_node),
@@ -80,7 +80,7 @@ impl Debug for SymIdx {
     }
 }
 impl Debug for SymTab {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
         let mut s = String::from("#sym_name@fields$");
         for (symidx, sym) in self.map.iter() {
             s.push_str(format!("@ # {:?} @ {:?} $", symidx, sym.fields).as_str());

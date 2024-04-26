@@ -28,129 +28,129 @@ use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
 use std::sync::Arc;
 
-pub const T__0: isize = 1;
-pub const T__1: isize = 2;
-pub const T__2: isize = 3;
-pub const T__3: isize = 4;
-pub const T__4: isize = 5;
-pub const T__5: isize = 6;
-pub const T__6: isize = 7;
-pub const T__7: isize = 8;
-pub const T__8: isize = 9;
-pub const T__9: isize = 10;
-pub const T__10: isize = 11;
-pub const T__11: isize = 12;
-pub const T__12: isize = 13;
-pub const T__13: isize = 14;
-pub const T__14: isize = 15;
-pub const T__15: isize = 16;
-pub const T__16: isize = 17;
-pub const Auto: isize = 18;
-pub const Break: isize = 19;
-pub const Case: isize = 20;
-pub const Char: isize = 21;
-pub const Const: isize = 22;
-pub const Continue: isize = 23;
-pub const Default: isize = 24;
-pub const Do: isize = 25;
-pub const Double: isize = 26;
-pub const Else: isize = 27;
-pub const Enum: isize = 28;
-pub const Extern: isize = 29;
-pub const Float: isize = 30;
-pub const For: isize = 31;
-pub const Goto: isize = 32;
-pub const If: isize = 33;
-pub const Inline: isize = 34;
-pub const Int: isize = 35;
-pub const Long: isize = 36;
-pub const Register: isize = 37;
-pub const Restrict: isize = 38;
-pub const Return: isize = 39;
-pub const Short: isize = 40;
-pub const Signed: isize = 41;
-pub const Sizeof: isize = 42;
-pub const Static: isize = 43;
-pub const Struct: isize = 44;
-pub const Switch: isize = 45;
-pub const Typedef: isize = 46;
-pub const Union: isize = 47;
-pub const Unsigned: isize = 48;
-pub const Void: isize = 49;
-pub const Volatile: isize = 50;
-pub const While: isize = 51;
-pub const Alignas: isize = 52;
-pub const Alignof: isize = 53;
-pub const Atomic: isize = 54;
-pub const Bool: isize = 55;
-pub const Complex: isize = 56;
-pub const Generic: isize = 57;
-pub const Imaginary: isize = 58;
-pub const Noreturn: isize = 59;
-pub const StaticAssert: isize = 60;
-pub const ThreadLocal: isize = 61;
-pub const LeftParen: isize = 62;
-pub const RightParen: isize = 63;
-pub const LeftBracket: isize = 64;
-pub const RightBracket: isize = 65;
-pub const LeftBrace: isize = 66;
-pub const RightBrace: isize = 67;
-pub const Less: isize = 68;
-pub const LessEqual: isize = 69;
-pub const Greater: isize = 70;
-pub const GreaterEqual: isize = 71;
-pub const LeftShift: isize = 72;
-pub const RightShift: isize = 73;
-pub const Plus: isize = 74;
-pub const PlusPlus: isize = 75;
-pub const Minus: isize = 76;
-pub const MinusMinus: isize = 77;
-pub const Star: isize = 78;
-pub const Div: isize = 79;
-pub const Mod: isize = 80;
-pub const And: isize = 81;
-pub const Or: isize = 82;
-pub const AndAnd: isize = 83;
-pub const OrOr: isize = 84;
-pub const Caret: isize = 85;
-pub const Not: isize = 86;
-pub const Tilde: isize = 87;
-pub const Question: isize = 88;
-pub const Colon: isize = 89;
-pub const Semi: isize = 90;
-pub const Comma: isize = 91;
-pub const Assign: isize = 92;
-pub const MulAssign: isize = 93;
-pub const DivAssign: isize = 94;
-pub const ModAssign: isize = 95;
-pub const PlusAssign: isize = 96;
-pub const MinusAssign: isize = 97;
-pub const LeftShiftAssign: isize = 98;
-pub const RightShiftAssign: isize = 99;
-pub const AndAssign: isize = 100;
-pub const XorAssign: isize = 101;
-pub const OrAssign: isize = 102;
-pub const Equal: isize = 103;
-pub const NotEqual: isize = 104;
-pub const Arrow: isize = 105;
-pub const Dot: isize = 106;
-pub const Ellipsis: isize = 107;
-pub const Identifier: isize = 108;
-pub const Constant: isize = 109;
-pub const DigitSequence: isize = 110;
-pub const StringLiteral: isize = 111;
-pub const MultiLineMacro: isize = 112;
-pub const Directive: isize = 113;
-pub const AsmBlock: isize = 114;
-pub const Whitespace: isize = 115;
-pub const Newline: isize = 116;
-pub const BlockComment: isize = 117;
-pub const LineComment: isize = 118;
-pub const channelNames: [&'static str; 0 + 2] = ["DEFAULT_TOKEN_CHANNEL", "HIDDEN"];
+pub const T__0:isize = 1;
+pub const T__1:isize = 2;
+pub const T__2:isize = 3;
+pub const T__3:isize = 4;
+pub const T__4:isize = 5;
+pub const T__5:isize = 6;
+pub const T__6:isize = 7;
+pub const T__7:isize = 8;
+pub const T__8:isize = 9;
+pub const T__9:isize = 10;
+pub const T__10:isize = 11;
+pub const T__11:isize = 12;
+pub const T__12:isize = 13;
+pub const T__13:isize = 14;
+pub const T__14:isize = 15;
+pub const T__15:isize = 16;
+pub const T__16:isize = 17;
+pub const Auto:isize = 18;
+pub const Break:isize = 19;
+pub const Case:isize = 20;
+pub const Char:isize = 21;
+pub const Const:isize = 22;
+pub const Continue:isize = 23;
+pub const Default:isize = 24;
+pub const Do:isize = 25;
+pub const Double:isize = 26;
+pub const Else:isize = 27;
+pub const Enum:isize = 28;
+pub const Extern:isize = 29;
+pub const Float:isize = 30;
+pub const For:isize = 31;
+pub const Goto:isize = 32;
+pub const If:isize = 33;
+pub const Inline:isize = 34;
+pub const Int:isize = 35;
+pub const Long:isize = 36;
+pub const Register:isize = 37;
+pub const Restrict:isize = 38;
+pub const Return:isize = 39;
+pub const Short:isize = 40;
+pub const Signed:isize = 41;
+pub const Sizeof:isize = 42;
+pub const Static:isize = 43;
+pub const Struct:isize = 44;
+pub const Switch:isize = 45;
+pub const Typedef:isize = 46;
+pub const Union:isize = 47;
+pub const Unsigned:isize = 48;
+pub const Void:isize = 49;
+pub const Volatile:isize = 50;
+pub const While:isize = 51;
+pub const Alignas:isize = 52;
+pub const Alignof:isize = 53;
+pub const Atomic:isize = 54;
+pub const Bool:isize = 55;
+pub const Complex:isize = 56;
+pub const Generic:isize = 57;
+pub const Imaginary:isize = 58;
+pub const Noreturn:isize = 59;
+pub const StaticAssert:isize = 60;
+pub const ThreadLocal:isize = 61;
+pub const LeftParen:isize = 62;
+pub const RightParen:isize = 63;
+pub const LeftBracket:isize = 64;
+pub const RightBracket:isize = 65;
+pub const LeftBrace:isize = 66;
+pub const RightBrace:isize = 67;
+pub const Less:isize = 68;
+pub const LessEqual:isize = 69;
+pub const Greater:isize = 70;
+pub const GreaterEqual:isize = 71;
+pub const LeftShift:isize = 72;
+pub const RightShift:isize = 73;
+pub const Plus:isize = 74;
+pub const PlusPlus:isize = 75;
+pub const Minus:isize = 76;
+pub const MinusMinus:isize = 77;
+pub const Star:isize = 78;
+pub const Div:isize = 79;
+pub const Mod:isize = 80;
+pub const And:isize = 81;
+pub const Or:isize = 82;
+pub const AndAnd:isize = 83;
+pub const OrOr:isize = 84;
+pub const Caret:isize = 85;
+pub const Not:isize = 86;
+pub const Tilde:isize = 87;
+pub const Question:isize = 88;
+pub const Colon:isize = 89;
+pub const Semi:isize = 90;
+pub const Comma:isize = 91;
+pub const Assign:isize = 92;
+pub const MulAssign:isize = 93;
+pub const DivAssign:isize = 94;
+pub const ModAssign:isize = 95;
+pub const PlusAssign:isize = 96;
+pub const MinusAssign:isize = 97;
+pub const LeftShiftAssign:isize = 98;
+pub const RightShiftAssign:isize = 99;
+pub const AndAssign:isize = 100;
+pub const XorAssign:isize = 101;
+pub const OrAssign:isize = 102;
+pub const Equal:isize = 103;
+pub const NotEqual:isize = 104;
+pub const Arrow:isize = 105;
+pub const Dot:isize = 106;
+pub const Ellipsis:isize = 107;
+pub const Identifier:isize = 108;
+pub const Constant:isize = 109;
+pub const DigitSequence:isize = 110;
+pub const StringLiteral:isize = 111;
+pub const MultiLineMacro:isize = 112;
+pub const Directive:isize = 113;
+pub const AsmBlock:isize = 114;
+pub const Whitespace:isize = 115;
+pub const Newline:isize = 116;
+pub const BlockComment:isize = 117;
+pub const LineComment:isize = 118;
+pub const channelNames:[&'static str; 0 + 2] = ["DEFAULT_TOKEN_CHANNEL", "HIDDEN"];
 
-pub const modeNames: [&'static str; 1] = ["DEFAULT_MODE"];
+pub const modeNames:[&'static str; 1] = ["DEFAULT_MODE"];
 
-pub const ruleNames: [&'static str; 156] = [
+pub const ruleNames:[&'static str; 156] = [
     "T__0",
     "T__1",
     "T__2",
@@ -309,7 +309,7 @@ pub const ruleNames: [&'static str; 156] = [
     "LineComment",
 ];
 
-pub const _LITERAL_NAMES: [Option<&'static str>; 108] = [
+pub const _LITERAL_NAMES:[Option<&'static str>; 108] = [
     None,
     Some("'__extension__'"),
     Some("'__m128'"),
@@ -419,7 +419,7 @@ pub const _LITERAL_NAMES: [Option<&'static str>; 108] = [
     Some("'.'"),
     Some("'...'"),
 ];
-pub const _SYMBOLIC_NAMES: [Option<&'static str>; 119] = [
+pub const _SYMBOLIC_NAMES:[Option<&'static str>; 119] = [
     None,
     None,
     None,
@@ -550,23 +550,23 @@ pub type LocalTokenFactory<'input> = CommonTokenFactory;
 
 type From<'a> = <LocalTokenFactory<'a> as TokenFactory<'a>>::From;
 
-pub struct CLexer<'input, Input: CharStream<From<'input>>> {
-    base: BaseLexer<'input, CLexerActions, Input, LocalTokenFactory<'input>>,
+pub struct CLexer<'input, Input:CharStream<From<'input>>> {
+    base:BaseLexer<'input, CLexerActions, Input, LocalTokenFactory<'input>>,
 }
 
 antlr_rust::tid! { impl<'input,Input> TidAble<'input> for CLexer<'input,Input> where Input:CharStream<From<'input> > }
 
-impl<'input, Input: CharStream<From<'input>>> Deref for CLexer<'input, Input> {
+impl<'input, Input:CharStream<From<'input>>> Deref for CLexer<'input, Input> {
     type Target = BaseLexer<'input, CLexerActions, Input, LocalTokenFactory<'input>>;
 
     fn deref(&self) -> &Self::Target { &self.base }
 }
 
-impl<'input, Input: CharStream<From<'input>>> DerefMut for CLexer<'input, Input> {
+impl<'input, Input:CharStream<From<'input>>> DerefMut for CLexer<'input, Input> {
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.base }
 }
 
-impl<'input, Input: CharStream<From<'input>>> CLexer<'input, Input> {
+impl<'input, Input:CharStream<From<'input>>> CLexer<'input, Input> {
     fn get_rule_names(&self) -> &'static [&'static str] { &ruleNames }
     fn get_literal_names(&self) -> &[Option<&str>] { &_LITERAL_NAMES }
 
@@ -574,33 +574,33 @@ impl<'input, Input: CharStream<From<'input>>> CLexer<'input, Input> {
 
     fn get_grammar_file_name(&self) -> &'static str { "CLexer.g4" }
 
-    pub fn new_with_token_factory(input: Input, tf: &'input LocalTokenFactory<'input>) -> Self {
+    pub fn new_with_token_factory(input:Input, tf:&'input LocalTokenFactory<'input>) -> Self {
         antlr_rust::recognizer::check_version("0", "3");
-        Self { base: BaseLexer::new_base_lexer(input, LexerATNSimulator::new_lexer_atnsimulator(_ATN.clone(), _decision_to_DFA.clone(), _shared_context_cache.clone()), CLexerActions {}, tf) }
+        Self { base:BaseLexer::new_base_lexer(input, LexerATNSimulator::new_lexer_atnsimulator(_ATN.clone(), _decision_to_DFA.clone(), _shared_context_cache.clone()), CLexerActions {}, tf) }
     }
 }
 
-impl<'input, Input: CharStream<From<'input>>> CLexer<'input, Input>
+impl<'input, Input:CharStream<From<'input>>> CLexer<'input, Input>
 where
     &'input LocalTokenFactory<'input>: Default,
 {
-    pub fn new(input: Input) -> Self { CLexer::new_with_token_factory(input, <&LocalTokenFactory<'input> as Default>::default()) }
+    pub fn new(input:Input) -> Self { CLexer::new_with_token_factory(input, <&LocalTokenFactory<'input> as Default>::default()) }
 }
 
 pub struct CLexerActions {}
 
 impl CLexerActions {}
 
-impl<'input, Input: CharStream<From<'input>>> Actions<'input, BaseLexer<'input, CLexerActions, Input, LocalTokenFactory<'input>>> for CLexerActions {}
+impl<'input, Input:CharStream<From<'input>>> Actions<'input, BaseLexer<'input, CLexerActions, Input, LocalTokenFactory<'input>>> for CLexerActions {}
 
-impl<'input, Input: CharStream<From<'input>>> CLexer<'input, Input> {}
+impl<'input, Input:CharStream<From<'input>>> CLexer<'input, Input> {}
 
-impl<'input, Input: CharStream<From<'input>>> LexerRecog<'input, BaseLexer<'input, CLexerActions, Input, LocalTokenFactory<'input>>> for CLexerActions {}
+impl<'input, Input:CharStream<From<'input>>> LexerRecog<'input, BaseLexer<'input, CLexerActions, Input, LocalTokenFactory<'input>>> for CLexerActions {}
 impl<'input> TokenAware<'input> for CLexerActions {
     type TF = LocalTokenFactory<'input>;
 }
 
-impl<'input, Input: CharStream<From<'input>>> TokenSource<'input> for CLexer<'input, Input> {
+impl<'input, Input:CharStream<From<'input>>> TokenSource<'input> for CLexer<'input, Input> {
     type TF = LocalTokenFactory<'input>;
 
     fn next_token(&mut self) -> <Self::TF as TokenFactory<'input>>::Tok { self.base.next_token() }
@@ -628,7 +628,7 @@ lazy_static! {
     };
 }
 
-const _serializedATN: &'static str = "\x03\u{608b}\u{a72a}\u{8133}\u{b9ed}\u{417c}\u{3be7}\u{7786}\u{5964}\x02\
+const _serializedATN:&'static str = "\x03\u{608b}\u{a72a}\u{8133}\u{b9ed}\u{417c}\u{3be7}\u{7786}\u{5964}\x02\
 		\x78\u{509}\x08\x01\x04\x02\x09\x02\x04\x03\x09\x03\x04\x04\x09\x04\x04\
 		\x05\x09\x05\x04\x06\x09\x06\x04\x07\x09\x07\x04\x08\x09\x08\x04\x09\x09\
 		\x09\x04\x0a\x09\x0a\x04\x0b\x09\x0b\x04\x0c\x09\x0c\x04\x0d\x09\x0d\x04\

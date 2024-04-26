@@ -11,8 +11,8 @@ use anyhow::Result;
 use std::fmt::Debug;
 #[derive(Clone)]
 pub struct CfgEdge {
-    info: Fields,
-    text: String,
+    info:Fields,
+    text:String,
 }
 reg_field_name!(CFG_EDGE_TYPE:cfg_edge_type);
 make_field_trait_for_struct!(CfgEdgeType);
@@ -28,7 +28,7 @@ pub enum CfgEdgeType {
     If2Gather {},
 }
 impl CfgEdge {
-    pub fn load_ast_node_text(&mut self, ast_tree: &AstTree) -> Result<()> {
+    pub fn load_ast_node_text(&mut self, ast_tree:&AstTree) -> Result<()> {
         match self.get_cfg_edge_type()? {
             CfgEdgeType::IfTrue {} => self.text += "True",
             CfgEdgeType::IfFalse {} => self.text += "False",
@@ -39,13 +39,13 @@ impl CfgEdge {
         }
         Ok(())
     }
-    pub fn new_if_false() -> Self { CfgEdge { info: Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::IfFalse {})), text: String::new() } }
-    pub fn new_direct() -> Self { CfgEdge { info: Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::Direct {})), text: String::new() } }
-    pub fn new_if_true() -> Self { CfgEdge { info: Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::IfTrue {})), text: String::new() } }
-    pub fn new_body_head() -> Self { CfgEdge { info: Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::BodyHead {})), text: String::new() } }
-    pub fn new_body_tail() -> Self { CfgEdge { info: Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::BodyTail {})), text: String::new() } }
-    pub fn new_if2gather() -> Self { CfgEdge { info: Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::If2Gather {})), text: String::new() } }
+    pub fn new_if_false() -> Self { CfgEdge { info:Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::IfFalse {})), text:String::new() } }
+    pub fn new_direct() -> Self { CfgEdge { info:Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::Direct {})), text:String::new() } }
+    pub fn new_if_true() -> Self { CfgEdge { info:Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::IfTrue {})), text:String::new() } }
+    pub fn new_body_head() -> Self { CfgEdge { info:Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::BodyHead {})), text:String::new() } }
+    pub fn new_body_tail() -> Self { CfgEdge { info:Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::BodyTail {})), text:String::new() } }
+    pub fn new_if2gather() -> Self { CfgEdge { info:Fields::new_from_single_field(CFG_EDGE_TYPE, Box::new(CfgEdgeType::If2Gather {})), text:String::new() } }
 }
 impl Debug for CfgEdge {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{}", self.text) }
+    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{}", self.text) }
 }

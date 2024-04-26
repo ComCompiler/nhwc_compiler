@@ -1,19 +1,19 @@
-use anyhow::{anyhow, Ok, Result};
+use anyhow::{anyhow, Context, Ok, Result};
 use petgraph::{
-    csr::IndexType, stable_graph::NodeIndex, visit::{EdgeRef, NodeRef}
+    csr::IndexType, graph::node_index, stable_graph::NodeIndex, visit::{EdgeRef, NodeRef}
 };
 use std::collections::HashMap;
 
-use super::symbol::{TYPE, USE_COUNTER};
+use super::{cfg_edge::CfgEdge, symbol::{TYPE, USE_COUNTER}};
 use super::{
     ast_node::AstTree, cfg_node::CfgGraph, et_node::{DefOrUse, EtNodeType, EtTree}, gen_et::process_any_stmt, nhwc_instr::InstrType, scope_node::ScopeTree, symtab::{SymIdx, SymTab, SymTabGraph}
 };
 use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, dot::Config, field::Field, nhwc_instr::InstrSlab};
 use crate::{
-    add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{
+    add_edge, add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{
         RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
-    }, debug_info_yellow, dfs_graph, direct_child_node, direct_children_nodes, find, find_nodes, incoming_edges, node, node_mut, outgoing_edges, push_instr, rule_id, toolkit::{
-        etc::generate_png_by_graph, field::{Type, UseCounter}, nhwc_instr::{IcmpPlan, UcmpPlan}, symbol::Symbol, symtab::SymTabEdge
+    }, dfs_graph, direct_child_node, direct_children_nodes, direct_parent_nodes, find, find_nodes, incoming_edges, node, node_mut, outgoing_edges, push_instr, rule_id, toolkit::{
+        cfg_node::CfgNode, etc::{self, generate_png_by_graph}, field::{Type, UseCounter}, nhwc_instr::{IcmpPlan, UcmpPlan}, symbol::Symbol, symtab::SymTabEdge
     }
 };
 use colored::Colorize;
@@ -26,8 +26,8 @@ pub type NhwcCfg = CfgGraph;
 
 /// 这个函数根据stmt对instrs push instruction
 fn parse_stmt2nhwc(
-    ast_tree: &AstTree, cfg_graph: &mut CfgGraph, symtab: &mut SymTab, scope_tree: &ScopeTree, et_tree: &mut EtTree, scope_node: u32, ast_stmt_node: u32, cfg_bb: u32, counter: &mut u32,
-    instr_slab: &mut InstrSlab, symtab_graph: &mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab, scope_tree:&ScopeTree, et_tree:&mut EtTree, scope_node:u32, ast_stmt_node:u32, cfg_bb:u32, counter:&mut u32,
+    instr_slab:&mut InstrSlab, symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
     let stmt_parent_scope = node!(at scope_node in scope_tree).parent;
 
@@ -173,8 +173,8 @@ fn parse_stmt2nhwc(
 }
 ///处理分支节点的语句，包括branch，for，while
 fn parse_conditional_expr(
-    ast_tree: &AstTree, cfg_graph: &mut CfgGraph, symtab: &mut SymTab, scope_tree: &ScopeTree, et_tree: &mut EtTree, expr_scope: u32, expr_node: u32, cfg_node: u32, counter: &mut u32,
-    instr_slab: &mut InstrSlab, symtab_graph: &mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab, scope_tree:&ScopeTree, et_tree:&mut EtTree, expr_scope:u32, expr_node:u32, cfg_node:u32, counter:&mut u32,
+    instr_slab:&mut InstrSlab, symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<SymIdx> {
     let expr_parent_scope = node!(at expr_scope in scope_tree).parent;
 
@@ -329,8 +329,8 @@ fn parse_conditional_expr(
 }
 
 fn parse_bb2nhwc(
-    ast_tree: &AstTree, cfg_graph: &mut CfgGraph, scope_tree: &ScopeTree, et_tree: &mut EtTree, symtab: &mut SymTab, ast2scope: &HashMap<u32, u32>, ast_nodes: Vec<u32>, cfg_bb: u32,
-    counter: &mut u32, instr_slab: &mut InstrSlab, symtab_g: &mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, scope_tree:&ScopeTree, et_tree:&mut EtTree, symtab:&mut SymTab, ast2scope:&HashMap<u32, u32>, ast_nodes:Vec<u32>, cfg_bb:u32, counter:&mut u32,
+    instr_slab:&mut InstrSlab, symtab_g:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
     for astnode in ast_nodes {
         match (rule_id!(at astnode in ast_tree), astnode) {
@@ -362,8 +362,8 @@ fn parse_bb2nhwc(
     Ok(())
 }
 fn parse_whileloop2nhwc(
-    ast_tree: &AstTree, cfg_graph: &mut CfgGraph, scope_tree: &ScopeTree, et_tree: &mut EtTree, symtab: &mut SymTab, ast2scope: &HashMap<u32, u32>, ast_expr_node: u32, cfg_whileloop: u32,
-    counter: &mut u32, instr_slab: &mut InstrSlab, symtab_graph: &mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, scope_tree:&ScopeTree, et_tree:&mut EtTree, symtab:&mut SymTab, ast2scope:&HashMap<u32, u32>, ast_expr_node:u32, cfg_whileloop:u32, counter:&mut u32,
+    instr_slab:&mut InstrSlab, symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
     match (rule_id!(at ast_expr_node in ast_tree), ast_expr_node) {
         (RULE_expression, expr_ast) => {
@@ -381,18 +381,24 @@ fn parse_whileloop2nhwc(
     Ok(())
 }
 fn parse_forloop2nhwc(
-    ast_tree: &AstTree, cfg_graph: &mut CfgGraph, scope_tree: &ScopeTree, et_tree: &mut EtTree, symtab: &mut SymTab, ast2scope: &HashMap<u32, u32>, ast_before_node: u32, ast_mid_node: u32,
-    ast_after_node: u32, cfg_forloop: u32, counter: &mut u32, instr_slab: &mut InstrSlab, symtab_graph: &mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, scope_tree:&ScopeTree, et_tree:&mut EtTree, symtab:&mut SymTab, ast2scope:&HashMap<u32, u32>, ast_before_node:u32, ast_mid_node:u32,
+    ast_after_node:u32, cfg_forloop:u32, counter:&mut u32, instr_slab:&mut InstrSlab, symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
+    let (cfg_body_head_node, cfg_body_tail_node) = get_head_tail_of_while_or_for_node(cfg_forloop, cfg_graph)?;
     match rule_id!(at ast_before_node in ast_tree) {
         RULE_forBeforeExpression => {
             // push before instr label
             let label_before_symidx = add_symbol!({Symbol::new(*ast2scope.get(&ast_before_node).unwrap(), "for.before:".to_string())} with field TYPE:{Type::Label} to symtab);
             let label_before_instr = InstrType::new_label(label_before_symidx).to_instr();
-            push_instr!(label_before_instr to cfg_forloop in cfg_graph slab instr_slab);
+
+            let cfg_for_parent_node = etc::element_remained_after_exclusion_in_vec(direct_parent_nodes!(at cfg_forloop in cfg_graph), cfg_body_tail_node)?;
+            // debug_info_yellow!("{:?}",direct_parent_nodes!(at cfg_forloop in cfg_graph));
+            let cfg_new_bb_node = insert_bb_between(cfg_for_parent_node, cfg_forloop, cfg_graph)?;
+
+            push_instr!(label_before_instr to cfg_new_bb_node in cfg_graph slab instr_slab);
             if let Some(before_scope) = ast2scope.get(&ast_before_node) {
                 let before_ast = direct_child_node!(at ast_before_node in ast_tree);
-                parse_declaration2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *before_scope, before_ast, cfg_forloop, counter, instr_slab, symtab_graph)?
+                parse_declaration2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *before_scope, before_ast, cfg_new_bb_node, counter, instr_slab, symtab_graph)?
             } else {
                 return Err(anyhow!("找不到astnode的scope"));
             }
@@ -419,11 +425,11 @@ fn parse_forloop2nhwc(
             // push before instr label
             let label_after_symidx = add_symbol!({Symbol::new(*ast2scope.get(&ast_after_node).unwrap(), "for.after:".to_string())} with field TYPE:{Type::Label} to symtab);
             let label_after_instr = InstrType::new_label(label_after_symidx).to_instr();
-            let (cfg_body_head_node, cfg_body_tail_node) = get_head_tail_of_while_or_for_node(cfg_forloop, cfg_graph)?;
 
-            push_instr!(label_after_instr to cfg_body_tail_node in cfg_graph slab instr_slab);
+            let cfg_new_bb_node = insert_bb_between(cfg_body_tail_node, cfg_forloop, cfg_graph)?;
+            push_instr!(label_after_instr to cfg_new_bb_node in cfg_graph slab instr_slab);
             if let Some(after_scope) = ast2scope.get(&ast_after_node) {
-                parse_stmt2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *after_scope, ast_after_node, cfg_body_tail_node, counter, instr_slab, symtab_graph)?;
+                parse_stmt2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *after_scope, ast_after_node, cfg_new_bb_node, counter, instr_slab, symtab_graph)?;
             } else {
                 return Err(anyhow!("找不到astnode的scope"));
             }
@@ -445,8 +451,8 @@ fn parse_forloop2nhwc(
 // }
 //}
 fn parse_branch2nhwc(
-    ast_tree: &AstTree, cfg_graph: &mut CfgGraph, scope_tree: &ScopeTree, et_tree: &mut EtTree, symtab: &mut SymTab, ast2scope: &HashMap<u32, u32>, ast_expr_node: u32, cfg_branch_node: u32,
-    counter: &mut u32, instr_slab: &mut InstrSlab, symtab_g: &mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, scope_tree:&ScopeTree, et_tree:&mut EtTree, symtab:&mut SymTab, ast2scope:&HashMap<u32, u32>, ast_expr_node:u32, cfg_branch_node:u32, counter:&mut u32,
+    instr_slab:&mut InstrSlab, symtab_g:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
     match (rule_id!(at ast_expr_node in ast_tree), ast_expr_node) {
         (RULE_expression, expr_node) => {
@@ -461,7 +467,7 @@ fn parse_branch2nhwc(
     }
     Ok(())
 }
-fn process_constant(symtab: &mut SymTab, const_literal: &String, symtab_graph: &mut Option<&mut SymTabGraph>) -> Result<SymIdx> {
+fn process_constant(symtab:&mut SymTab, const_literal:&String, symtab_graph:&mut Option<&mut SymTabGraph>) -> Result<SymIdx> {
     // 我们认为 constant 的scope node 都是全局的
     // match find!(symbol mut {const_literal.clone()} of scope {0} in symtab debug symtab_graph symtab_graph){
     match symtab.get_mut_symbol_verbose(const_literal.clone(), 0) {
@@ -483,7 +489,7 @@ fn process_constant(symtab: &mut SymTab, const_literal: &String, symtab_graph: &
 }
 
 fn process_symbol(
-    ast_tree: &AstTree, scope_tree: &ScopeTree, symtab: &mut SymTab, def_or_use: &DefOrUse, symbol_name: &String, scope_node: u32, symtab_graph: &mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, scope_tree:&ScopeTree, symtab:&mut SymTab, def_or_use:&DefOrUse, symbol_name:&String, scope_node:u32, symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<SymIdx> {
     let mut symbol_scope = scope_node;
     match def_or_use {
@@ -509,8 +515,8 @@ fn process_symbol(
 }
 ///具有赋值性质的会将value的类型强制转换为var的类型，返回转换后的symidx
 fn force_trans_type(
-    cfg_graph: &mut CfgGraph, symtab: &mut SymTab, to_trans_type: &Type, transed_type: &Type, transed_symidx: &SymIdx, scope_node: u32, cfg_bb: u32, counter: &mut u32, instr_slab: &mut InstrSlab,
-    symtab_graph: &mut Option<&mut SymTabGraph>,
+    cfg_graph:&mut CfgGraph, symtab:&mut SymTab, to_trans_type:&Type, transed_type:&Type, transed_symidx:&SymIdx, scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
+    symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<SymIdx> {
     match (transed_type, to_trans_type) {
         (Type::I32, Type::F32) => {
@@ -578,8 +584,8 @@ fn force_trans_type(
 }
 ///算数运算符自动类型转换，返回转换后两个操作符的symidx
 fn autotrans_arith_type(
-    cfg_graph: &mut CfgGraph, symtab: &mut SymTab, l_type: &Type, l_symidx: &SymIdx, r_type: &Type, r_symidx: &SymIdx, scope_node: u32, cfg_bb: u32, counter: &mut u32, instr_slab: &mut InstrSlab,
-    symtab_graph: &mut Option<&mut SymTabGraph>,
+    cfg_graph:&mut CfgGraph, symtab:&mut SymTab, l_type:&Type, l_symidx:&SymIdx, r_type:&Type, r_symidx:&SymIdx, scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
+    symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<(SymIdx, SymIdx)> {
     //adapt函数会去除掉不能进行运算的类型情况
     match (l_type.clone(), r_type.clone()) {
@@ -650,8 +656,8 @@ fn autotrans_arith_type(
 }
 ///逻辑运算符自动类型转换，返回转换后的两个操作符的symidx
 fn autotrans_logic_type(
-    cfg_graph: &mut CfgGraph, symtab: &mut SymTab, l_type: &Type, l_symidx: &SymIdx, r_type: &Type, r_symidx: &SymIdx, scope_node: u32, cfg_bb: u32, counter: &mut u32, instr_slab: &mut InstrSlab,
-    symtab_graph: &mut Option<&mut SymTabGraph>,
+    cfg_graph:&mut CfgGraph, symtab:&mut SymTab, l_type:&Type, l_symidx:&SymIdx, r_type:&Type, r_symidx:&SymIdx, scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
+    symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<(SymIdx, SymIdx)> {
     //adapt函数会去除掉不能进行运算的类型情况
     match (l_type.clone(), r_type.clone()) {
@@ -758,8 +764,8 @@ fn autotrans_logic_type(
 }
 ///处理自增运算符，不分左右,统一返回增加instr和赋值instr
 fn process_self_increment(
-    ast_tree: &AstTree, cfg_graph: &mut CfgGraph, et_tree: &EtTree, scope_tree: &ScopeTree, symtab: &mut SymTab, op_et_node: u32, scope_node: u32, cfg_bb: u32, counter: &mut u32,
-    instr_slab: &mut InstrSlab, symtab_graph: &mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, et_tree:&EtTree, scope_tree:&ScopeTree, symtab:&mut SymTab, op_et_node:u32, scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
+    symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<(SymIdx, SymIdx)> {
     //取自增运算符下的symidx和type
     let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
@@ -792,8 +798,8 @@ fn process_self_increment(
 }
 ///处理自减运算符，不分左右
 fn process_self_attennuation(
-    ast_tree: &AstTree, cfg_graph: &mut CfgGraph, et_tree: &EtTree, scope_tree: &ScopeTree, symtab: &mut SymTab, op_et_node: u32, scope_node: u32, cfg_bb: u32, counter: &mut u32,
-    instr_slab: &mut InstrSlab, symtab_graph: &mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, et_tree:&EtTree, scope_tree:&ScopeTree, symtab:&mut SymTab, op_et_node:u32, scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
+    symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<(SymIdx, SymIdx)> {
     //取操作数的symidx和type
     let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
@@ -828,8 +834,8 @@ fn process_self_attennuation(
 }
 ///处理操作符，获取下面的两个操作数，按算数操作符进行两个操作数的自动类型转换，返回（结果的临时变量，左操作数，右操作数，临时变量的类型）
 fn process_arithop(
-    ast_tree: &AstTree, cfg_graph: &mut CfgGraph, et_tree: &EtTree, scope_tree: &ScopeTree, symtab: &mut SymTab, root_et_node: u32, scope_node: u32, cfg_bb: u32, counter: &mut u32,
-    instr_slab: &mut InstrSlab, symtab_graph: &mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, et_tree:&EtTree, scope_tree:&ScopeTree, symtab:&mut SymTab, root_et_node:u32, scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
+    symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<(SymIdx, SymIdx, SymIdx, Type, Type)> {
     let next_nodes = direct_children_nodes!(at root_et_node in et_tree);
     //取右操作数symidx和type
@@ -848,8 +854,8 @@ fn process_arithop(
 }
 
 fn process_logicop(
-    ast_tree: &AstTree, cfg_graph: &mut CfgGraph, et_tree: &EtTree, scope_tree: &ScopeTree, symtab: &mut SymTab, op_et_node: u32, scope_node: u32, cfg_bb: u32, counter: &mut u32,
-    instr_slab: &mut InstrSlab, symtab_graph: &mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, et_tree:&EtTree, scope_tree:&ScopeTree, symtab:&mut SymTab, op_et_node:u32, scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
+    symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<(SymIdx, SymIdx, SymIdx)> {
     let next_nodes = direct_children_nodes!(at op_et_node in et_tree);
     //取右操作数的symidx和type
@@ -867,8 +873,8 @@ fn process_logicop(
 }
 
 fn process_et(
-    ast_tree: &AstTree, cfg_graph: &mut CfgGraph, et_tree: &EtTree, scope_tree: &ScopeTree, symtab: &mut SymTab, et_node: u32, scope_node: u32, cfg_bb: u32, counter: &mut u32,
-    instr_slab: &mut InstrSlab, symtab_graph: &mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, et_tree:&EtTree, scope_tree:&ScopeTree, symtab:&mut SymTab, et_node:u32, scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
+    symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<SymIdx> {
     let nake_et = &node!(at et_node in et_tree).et_node_type;
     match nake_et {
@@ -1174,8 +1180,8 @@ fn process_et(
 
 ///定义变量的decl转为ir，并通过et查找元素是否合法
 fn parse_declaration2nhwc(
-    ast_tree: &AstTree, cfg_graph: &mut CfgGraph, symtab: &mut SymTab, scope_tree: &ScopeTree, et_tree: &mut EtTree, decl_scope: u32, ast_decl_node: u32, cfg_bb: u32, counter: &mut u32,
-    instr_slab: &mut InstrSlab, symtab_g: &mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab, scope_tree:&ScopeTree, et_tree:&mut EtTree, decl_scope:u32, ast_decl_node:u32, cfg_bb:u32, counter:&mut u32,
+    instr_slab:&mut InstrSlab, symtab_g:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
     let decl_prt_scope = node!(at decl_scope in scope_tree).parent;
 
@@ -1229,8 +1235,8 @@ fn parse_declaration2nhwc(
 
 ///将函数名存入符号表，将函数签名处理为ir，并处理函数体内的语句
 fn parse_func2nhwc(
-    ast_tree: &AstTree, cfg_graph: &mut CfgGraph, symtab: &mut SymTab, ast2scope: &HashMap<u32, u32>, ast_fun: u32, ast_funsign: u32, cfg_entry: u32, instr_slab: &mut InstrSlab,
-    symtab_graph: &mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab, ast2scope:&HashMap<u32, u32>, ast_fun:u32, ast_funsign:u32, cfg_entry:u32, instr_slab:&mut InstrSlab,
+    symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
     let def_func_instr_struct = InstrType::new_def_func(SymIdx::new(ast_fun, String::new()), SymIdx::new(ast_fun, String::new()), Vec::new()).to_instr();
     push_instr!(def_func_instr_struct to cfg_entry in cfg_graph slab instr_slab);
@@ -1246,7 +1252,7 @@ fn parse_func2nhwc(
         let type_symidx = SymIdx::new(*func_scope, fun_rettype.to_string());
 
         //获取参数列表
-        let mut arg_syms: Vec<SymIdx> = vec![];
+        let mut arg_syms:Vec<SymIdx> = vec![];
         //函数有参数
         if let Some(para) = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_parameterTypeList at ast_fun in ast_tree) {
             let ast_func_args = find_nodes!(rule RULE_parameterList finally RULE_parameterDeclaration at para in ast_tree);
@@ -1280,12 +1286,12 @@ fn parse_func2nhwc(
 /// 由于cfg 里面包含了其他的一些块和边，例如 branch 块和 after conditioned边
 /// 因此我们需要再做一次转化，把边转化成相应的跳转或者调整代码，把所有node 都转化成BasicBlock
 pub fn parse_cfg_into_nhwc_cfg(
-    cfg_graph: &mut CfgGraph, scope_tree: &mut ScopeTree, ast_tree: &mut AstTree, symtab: &mut SymTab, et_tree: &mut EtTree, ast2scope: &mut HashMap<u32, u32>, mut counter: u32,
-    instr_slab: &mut InstrSlab, symtab_graph: &mut Option<&mut SymTabGraph>,
+    cfg_graph:&mut CfgGraph, scope_tree:&mut ScopeTree, ast_tree:&mut AstTree, symtab:&mut SymTab, et_tree:&mut EtTree, ast2scope:&mut HashMap<u32, u32>, mut counter:u32, instr_slab:&mut InstrSlab,
+    symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
     // let (cfg_graph,scope_tree,ast_tree,symtab,et_tree,ast2scope)= (&mut context.cfg_graph , &mut context.scope_tree,&mut context.ast_tree,&mut context.symtab,&mut context.et_tree,&context.ast2scope);
 
-    let start_node: NodeIndex<u32> = NodeIndex::new(0);
+    let start_node:NodeIndex<u32> = NodeIndex::new(0);
     //先遍历一遍函数名，将函数名加入到符号表中
     let cfg_funcs = direct_children_nodes!(at start_node in cfg_graph);
     for cfg_entry in cfg_funcs.clone() {
@@ -1306,7 +1312,7 @@ pub fn parse_cfg_into_nhwc_cfg(
         // dfs_vec.sort_by(|node| )
         // dfs_vec.reverse();
         for cfg_node in dfs_vec {
-            debug_info_yellow!("dfs current is {:?}", cfg_node);
+            // debug_info_yellow!("dfs current is {:?}", cfg_node);
             let cfgnode = node!(at cfg_node in cfg_graph);
             match &cfgnode.get_cfg_node_type()? {
                 CfgNodeType::Branch { ast_expr_node } => {
@@ -1342,19 +1348,48 @@ pub fn parse_cfg_into_nhwc_cfg(
             }
         }
     }
-    debug_info_yellow!("success end");
+    // debug_info_yellow!("success end");
     Ok(())
 }
-
-pub fn split_bb(bb_cfg_node: u32, cfg_graph: &mut CfgGraph) {
-    // let cfg_node_struct = node!(at bb_cfg_node in cfg_graph);
-    // cfg_graph.edge_count();
-    // cfg_graph.edge_references()
+/// 在两个cfg node 之间插入一个bb ，并保留 边的属性，函数会自动判断究竟把带属性的边放到哪里(因为插入一个bb会多生成一条Direct边，需要判断把这条边放在什么位置)
+/// 以下条件满足之一可以insert new bb 
+/// 1. cfg_node1 和 cfg_node2 之间是一条 Direct 普通边
+/// 2. cfg_node1 和 cfg_node2 其中有一个是 BasicBlock
+pub fn insert_bb_between(cfg_node1:u32, cfg_node2:u32, cfg_graph:&mut CfgGraph) -> Result<u32>{
+    let cfg_former_edge_idx = cfg_graph.find_edge(node_index(cfg_node1 as usize), node_index(cfg_node2 as usize)).ok_or(anyhow!("找不到连接 cfg_node[{}] 和 cfg_node[{}]的边",cfg_node1,cfg_node2))
+        .with_context(|| format!("在插入 cfg_node[{}] 和 cfg_node[{}]之间bb 失败",cfg_node1,cfg_node2))?;
+    let cfg_former_edge_cloned = cfg_graph.edge_weight(cfg_former_edge_idx).unwrap().clone();
+    // 删除旧的边
+    cfg_graph.remove_edge(cfg_former_edge_idx);
+    let (cfg_node_type1, cfg_node_type2) = (node!(at cfg_node1 in cfg_graph).get_cfg_node_type()?,node!(at cfg_node2 in cfg_graph).get_cfg_node_type()?);
+    if let CfgEdgeType::Direct {  } = cfg_former_edge_cloned.get_cfg_edge_type()? {
+        // 如果这条边本身就是一条普通边，那么就允许insert
+        let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with edge {cfg_former_edge_cloned} from cfg_node1 in cfg_graph);
+        add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node2 in cfg_graph);
+        Ok(new_bb)
+    }else{
+        match (cfg_node_type1,cfg_node_type2){
+            (_,CfgNodeType::BasicBlock { ast_nodes })=>{
+                let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with edge {cfg_former_edge_cloned} from cfg_node1 in cfg_graph);
+                add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node2 in cfg_graph);
+                Ok(new_bb)
+            }
+            (CfgNodeType::BasicBlock { ast_nodes },_)=>{
+                let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with edge {CfgEdge::new_direct()} from cfg_node1 in cfg_graph);
+                add_edge!({cfg_former_edge_cloned} from new_bb to cfg_node2 in cfg_graph);
+                Ok(new_bb)
+            }
+            _ => {
+                Err(anyhow!("两个节点cfg_node[{}] cfg_node[{}]中都不存在bb",cfg_node1,cfg_node2))
+            }
+        }
+    }
 }
 
-pub fn get_head_tail_of_while_or_for_node(cfg_node: u32, cfg_graph: &mut CfgGraph) -> Result<(u32, u32)> {
+
+pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph) -> Result<(u32, u32)> {
     let head = {
-        let outgoing_edges: Vec<_> = outgoing_edges!(at cfg_node in cfg_graph);
+        let outgoing_edges:Vec<_> = outgoing_edges!(at cfg_node in cfg_graph);
         let mut edge_iter = outgoing_edges.iter();
         let mut head = None;
         while let Some(edge) = edge_iter.next() {
@@ -1365,7 +1400,7 @@ pub fn get_head_tail_of_while_or_for_node(cfg_node: u32, cfg_graph: &mut CfgGrap
         head
     };
     let tail = {
-        let incoming_edges: Vec<_> = incoming_edges!(at cfg_node in cfg_graph);
+        let incoming_edges:Vec<_> = incoming_edges!(at cfg_node in cfg_graph);
         let mut edge_iter = incoming_edges.iter();
         let mut tail = None;
         while let Some(edge) = edge_iter.next() {

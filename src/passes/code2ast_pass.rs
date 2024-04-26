@@ -4,15 +4,15 @@ use crate::toolkit::{
 use anyhow::Result;
 #[derive(Debug)]
 pub struct Code2AstPass {
-    is_gen_png: bool,
+    is_gen_png:bool,
 }
 impl Code2AstPass {
-    pub fn new(is_gen_png: bool) -> Self { Code2AstPass { is_gen_png } }
+    pub fn new(is_gen_png:bool) -> Self { Code2AstPass { is_gen_png } }
 }
 
 impl Pass for Code2AstPass {
     // 运行这个pass
-    fn run(&mut self, ctx: &mut Context) -> Result<()> {
+    fn run(&mut self, ctx:&mut Context) -> Result<()> {
         ctx.code = read_file_content(ctx.args.c_file_path.to_string_lossy().into_owned());
         parse_as_ast_tree(ctx);
         // 生成对应的png

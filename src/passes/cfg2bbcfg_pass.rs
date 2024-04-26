@@ -2,15 +2,15 @@ use crate::toolkit::{context::Context, dot::Config, etc::generate_png_by_graph, 
 use anyhow::Result;
 #[derive(Debug)]
 pub struct Cfg2BbCfgPass {
-    is_gen_png: bool,
+    is_gen_png:bool,
 }
 impl Cfg2BbCfgPass {
-    pub fn new(_is_gen_png: bool) -> Self { Cfg2BbCfgPass { is_gen_png: true } }
+    pub fn new(_is_gen_png:bool) -> Self { Cfg2BbCfgPass { is_gen_png:true } }
 }
 
 impl Pass for Cfg2BbCfgPass {
     // 运行这个pass
-    fn run(&mut self, ctx: &mut Context) -> Result<()> {
+    fn run(&mut self, ctx:&mut Context) -> Result<()> {
         // 3.1 生成对应的png
         if self.is_gen_png {
             // let symt = self.op_cfg_graph.unwrap();

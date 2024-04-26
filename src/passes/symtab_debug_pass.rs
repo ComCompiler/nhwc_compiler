@@ -7,15 +7,15 @@ use crate::toolkit::symtab::{SymTabEdge, SymTabGraph};
 use crate::toolkit::{context::Context, etc::generate_png_by_graph, pass_manager::Pass};
 #[derive(Debug)]
 pub struct SymtabDebugPass {
-    is_gen_png: bool,
+    is_gen_png:bool,
 }
 impl SymtabDebugPass {
-    pub fn new(is_gen_png: bool) -> Self { SymtabDebugPass { is_gen_png } }
+    pub fn new(is_gen_png:bool) -> Self { SymtabDebugPass { is_gen_png } }
 }
 
 impl Pass for SymtabDebugPass {
     // 运行这个pass
-    fn run(&mut self, ctx: &mut Context) -> Result<()> {
+    fn run(&mut self, ctx:&mut Context) -> Result<()> {
         //4.1可视化
         if self.is_gen_png {
             let mut symtab_g = SymTabGraph::new();

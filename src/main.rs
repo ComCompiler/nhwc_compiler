@@ -17,7 +17,7 @@ use crate::toolkit::pass_manager::PassManager;
 pub struct Args {
     ///设置文件地址
     #[arg(short, long, value_name = "FILE", default_value = "./demos/demo1.c")]
-    c_file_path: PathBuf,
+    c_file_path:PathBuf,
     // #[arg(short, long, default_value = "true")]
     // gen_png : bool
 }

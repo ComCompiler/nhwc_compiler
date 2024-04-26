@@ -48,15 +48,15 @@ pub struct Dot<'a, G>
 where
     G: IntoEdgeReferences + IntoNodeReferences,
 {
-    graph: G,
-    get_edge_attributes: &'a dyn Fn(G, G::EdgeRef) -> String,
-    get_node_attributes: &'a dyn Fn(G, G::NodeRef) -> String,
-    config: Configs,
+    graph:G,
+    get_edge_attributes:&'a dyn Fn(G, G::EdgeRef) -> String,
+    get_node_attributes:&'a dyn Fn(G, G::NodeRef) -> String,
+    config:Configs,
 }
 
-static TYPE: [&str; 2] = ["graph", "digraph"];
-static EDGE: [&str; 2] = ["--", "->"];
-static INDENT: &str = "    ";
+static TYPE:[&str; 2] = ["graph", "digraph"];
+static EDGE:[&str; 2] = ["--", "->"];
+static INDENT:&str = "    ";
 
 impl<'a, G> Dot<'a, G>
 where
@@ -64,14 +64,14 @@ where
 {
     /// Create a `Dot` formatting wrapper with default configuration.
     #[inline]
-    pub fn new(graph: G) -> Self { Self::with_config(graph, &[]) }
+    pub fn new(graph:G) -> Self { Self::with_config(graph, &[]) }
 
     /// Create a `Dot` formatting wrapper with custom configuration.
     #[inline]
-    pub fn with_config(graph: G, config: &'a [Config]) -> Self { Self::with_attr_getters(graph, config, &|_, _| String::new(), &|_, _| String::new()) }
+    pub fn with_config(graph:G, config:&'a [Config]) -> Self { Self::with_attr_getters(graph, config, &|_, _| String::new(), &|_, _| String::new()) }
 
     #[inline]
-    pub fn with_attr_getters(graph: G, config: &'a [Config], get_edge_attributes: &'a dyn Fn(G, G::EdgeRef) -> String, get_node_attributes: &'a dyn Fn(G, G::NodeRef) -> String) -> Self {
+    pub fn with_attr_getters(graph:G, config:&'a [Config], get_edge_attributes:&'a dyn Fn(G, G::EdgeRef) -> String, get_node_attributes:&'a dyn Fn(G, G::NodeRef) -> String) -> Self {
         let config = Configs::extract(config);
         Dot { graph, get_edge_attributes, get_node_attributes, config }
     }
@@ -156,7 +156,7 @@ pub enum Title {
     Title(Option<String>),
 }
 impl Debug for Title {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f:&mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Title::Title(Some(t)) => write!(f, "{:?}", t),
             Title::Title(None) => write!(f, "None"),
@@ -164,13 +164,13 @@ impl Debug for Title {
     }
 }
 impl Title {
-    pub fn new(s: String) -> Self { Title::Title(Some(s)) }
+    pub fn new(s:String) -> Self { Title::Title(Some(s)) }
 }
 impl<'a, G> Dot<'a, G>
 where
     G: IntoNodeReferences + IntoEdgeReferences + NodeIndexable + GraphProp,
 {
-    fn graph_fmt<NF, EF>(&self, f: &mut fmt::Formatter, node_fmt: NF, edge_fmt: EF) -> fmt::Result
+    fn graph_fmt<NF, EF>(&self, f:&mut fmt::Formatter, node_fmt:NF, edge_fmt:EF) -> fmt::Result
     where
         NF: Fn(&G::NodeWeight, &mut fmt::Formatter) -> fmt::Result,
         EF: Fn(&G::EdgeWeight, &mut fmt::Formatter) -> fmt::Result,
@@ -245,7 +245,7 @@ where
     G::EdgeWeight: fmt::Display,
     G::NodeWeight: fmt::Display,
 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { self.graph_fmt(f, fmt::Display::fmt, fmt::Display::fmt) }
+    fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result { self.graph_fmt(f, fmt::Display::fmt, fmt::Display::fmt) }
 }
 
 impl<'a, G> fmt::Debug for Dot<'a, G>
@@ -254,7 +254,7 @@ where
     G::EdgeWeight: fmt::Debug,
     G::NodeWeight: fmt::Debug,
 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { self.graph_fmt(f, fmt::Debug::fmt, fmt::Debug::fmt) }
+    fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result { self.graph_fmt(f, fmt::Debug::fmt, fmt::Debug::fmt) }
 }
 
 /// Escape for Graphviz
@@ -264,14 +264,14 @@ impl<W> fmt::Write for Escaper<W>
 where
     W: fmt::Write,
 {
-    fn write_str(&mut self, s: &str) -> fmt::Result {
+    fn write_str(&mut self, s:&str) -> fmt::Result {
         for c in s.chars() {
             self.write_char(c)?;
         }
         Ok(())
     }
 
-    fn write_char(&mut self, c: char) -> fmt::Result {
+    fn write_char(&mut self, c:char) -> fmt::Result {
         match c {
             '"' | '\\' => self.0.write_char('\\')?,
             // \l is for left justified linebreak
@@ -287,14 +287,14 @@ impl<W> fmt::Write for RecordEscaper<W>
 where
     W: fmt::Write,
 {
-    fn write_str(&mut self, s: &str) -> fmt::Result {
+    fn write_str(&mut self, s:&str) -> fmt::Result {
         for c in s.chars() {
             self.write_char(c)?;
         }
         Ok(())
     }
 
-    fn write_char(&mut self, c: char) -> fmt::Result {
+    fn write_char(&mut self, c:char) -> fmt::Result {
         match c {
             '"' | '\\' => self.0.write_char('\\')?,
             // \l is for left justified linebreak
@@ -316,14 +316,14 @@ impl<W> fmt::Write for SymtabEscaper<W>
 where
     W: fmt::Write,
 {
-    fn write_str(&mut self, s: &str) -> fmt::Result {
+    fn write_str(&mut self, s:&str) -> fmt::Result {
         for c in s.chars() {
             self.write_char(c)?;
         }
         Ok(())
     }
 
-    fn write_char(&mut self, c: char) -> fmt::Result {
+    fn write_char(&mut self, c:char) -> fmt::Result {
         match c {
             '"' | '\\' => self.0.write_char('\\')?,
             // \l is for left justified linebreak
@@ -348,7 +348,7 @@ impl<T> fmt::Display for Escaped<T>
 where
     T: fmt::Display,
 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
         if f.alternate() {
             writeln!(&mut Escaper(f), "{:#}", &self.0)
         } else {
@@ -363,7 +363,7 @@ impl<T> fmt::Display for RecordEscaped<T>
 where
     T: fmt::Display,
 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
         if f.alternate() {
             writeln!(&mut RecordEscaper(f), "{:#}", &self.0)
         } else {
@@ -377,7 +377,7 @@ impl<T> fmt::Display for SymtabEscaped<T>
 where
     T: fmt::Display,
 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
         if f.alternate() {
             writeln!(&mut SymtabEscaper(f), "{:#}", &self.0)
         } else {
@@ -393,7 +393,7 @@ impl<'a, T, F> fmt::Display for FnFmt<'a, T, F>
 where
     F: Fn(&'a T, &mut fmt::Formatter<'_>) -> fmt::Result,
 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { self.1(self.0, f) }
+    fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result { self.1(self.0, f) }
 }
 
 #[cfg(test)]

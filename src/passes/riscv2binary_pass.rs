@@ -9,7 +9,7 @@ impl Riscv2BinaryPass {
 
 impl Pass for Riscv2BinaryPass {
     // 运行这个pass
-    fn run(&mut self, ctx: &mut Context) -> Result<()> {
+    fn run(&mut self, ctx:&mut Context) -> Result<()> {
         todo!();
     }
     // 返回pass的描述，具体作用
