@@ -465,7 +465,7 @@ impl Debug for InstrType {
             Self::Jump { op } => write!(f, "{:?}", op),
 
             Self::Phi { lhs, rhs } => write!(f, "phi函数,但是还没写呢"),
-            Self::SimpleAssign { lhs, rhs } => write!(f, "Assign {:?},{:?}\n", lhs, rhs),
+            Self::SimpleAssign { lhs, rhs } => write!(f, " {:?} = {:?}\n", lhs, rhs),
             Self::Def_Func {
                 func_symidx: funname,
                 ret_type: rettype,
