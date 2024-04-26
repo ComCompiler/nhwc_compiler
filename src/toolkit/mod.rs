@@ -18,3 +18,5 @@ pub mod pass_manager;
 pub mod scope_node;
 pub mod symbol;
 pub mod symtab;
+pub mod gen_djg;
+pub mod dj_edge;

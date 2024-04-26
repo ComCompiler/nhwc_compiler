@@ -11,7 +11,7 @@ use antlr_parser::cparser::{RULE_compoundStatement, RULE_functionDefinition};
 use clap::Parser;
 use passes::{ast2cfg_pass::Ast2CfgPass, ast2et_debug_pass::Ast2EtDebugPass, ast2st_pass::Ast2StPass, cfg2ncfg_pass::Cfg2NcfgPass, code2ast_pass::Code2AstPass};
 
-use crate::toolkit::pass_manager::PassManager;
+use crate::{passes::{ncfg2djg_pass::Ncfg2DjgPass, ssa_pass::{SsaPass}}, toolkit::pass_manager::PassManager};
 #[derive(Parser, Clone, Default)]
 #[command(author, version, about)]
 pub struct Args {
@@ -44,6 +44,8 @@ fn main() {
     let ast2et_debug_pass = Ast2EtDebugPass::new(true);
     let cfg2ncfg_pass = Cfg2NcfgPass::new(true, true);
     let ast2st_pass = Ast2StPass::new(true);
+    let ncfg2djg_pass = Ncfg2DjgPass::new(true);
+    let ssa_pass = SsaPass::new(true);
     // let symtab_debug_pass = SymtabDebugPass::new(true);
     add_passes!(
         code2ast_pass
@@ -51,6 +53,8 @@ fn main() {
         then ast2st_pass
         then ast2cfg_pass
         then cfg2ncfg_pass
+        then ncfg2djg_pass
+        then ssa_pass
         // then symtab_debug_pass
         to pass_manager
     );

@@ -390,17 +390,19 @@ macro_rules! direct_child_node {
 #[macro_export]
 macro_rules! direct_parent_node {
     (at $node:ident in $graph:ident) => {{
-        use petgraph::visit::EdgeRef;
-        let mut edges = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming);
-        let op_first_parent_node = edges.next();
-        let op_second_parent_node = edges.next();
-        if let Some(_) = op_second_parent_node {
-            panic!("这个 node 有多个parent 不符合调用 direct_parent_node 的条件");
-        } else {
-            op_first_parent_node
-                .expect(format!("no direct parent node of {:?} in {:?}", $graph.node_weight(petgraph::matrix_graph::NodeIndex::from($node)), $graph).as_str())
-                .source()
-                .index() as u32
+        let nodes = $crate::direct_parent_nodes!(at $node in $graph );
+        if nodes.len() ==1 {
+            nodes[0]
+        }else{
+            panic!("该节点 有多个parent_node,无法使用 direct_parent_node")
+        }
+    }};
+    (at $node:ident in $graph:ident with_predicate $f:block ) => {{
+        let nodes = $crate::direct_parent_nodes!(at $node in $graph with_predicate $f);
+        if nodes.len() ==1 {
+            nodes[0]
+        }else{
+            panic!("该节点 有多个parent_node,无法使用 direct_parent_node")
         }
     }};
 }
@@ -410,6 +412,13 @@ macro_rules! direct_parent_nodes {
     (at $node:ident in $graph:ident) => {{
         use petgraph::visit::EdgeRef;
         let edges_vec:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming)
+            .map(|e|e.source().index() as u32).collect();
+        edges_vec
+    }};
+    (at $node:ident in $graph:ident with_predicate $f:block )=> {{
+        use petgraph::visit::EdgeRef;
+        let edges_vec:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Incoming)
+            .filter($f)
             .map(|e|e.source().index() as u32).collect();
         edges_vec
     }};
@@ -738,7 +747,7 @@ macro_rules! add_passes {
 
 #[macro_export]
 macro_rules! make_field_trait_for_struct {
-    ($($struct_name:ident),+) => {
+    ($($struct_name:ty),+) => {
         $(
         impl Field for $struct_name {
             fn as_any(&self) -> &dyn std::any::Any {
@@ -780,7 +789,7 @@ macro_rules! make_field_trait_for_struct {
 // }
 #[macro_export]
 macro_rules! downcast_op_any {
-    (ref $field_type:ident,$op_field:ident) => {{
+    (ref $field_type:ty,$op_field:ident) => {{
         match $op_field {
             None => anyhow::Result::Err(anyhow::anyhow!("can't find this field")),
             Some(field) => match field.as_any().downcast_ref::<$field_type>() {
@@ -806,7 +815,7 @@ macro_rules! downcast_op_any {
     //         }
     //     }
     // };
-    (mut $field_type:ident,$op_field_mut:ident) => {{
+    (mut $field_type:ty,$op_field_mut:ident) => {{
         match $op_field_mut {
             None => anyhow::Result::Err(anyhow::anyhow!("can't find this field")),
             Some(field) => match field.as_any_mut().downcast_mut::<$field_type>() {
@@ -825,7 +834,7 @@ macro_rules! downcast_op_any {
 ///     upper_field_name2:field_type2
 ///     with fields member_of_fields_type}
 macro_rules! make_specialized_get_field_fn_for_struct {
-    ($struct_name:ident $($upper_field_name:ident:$field_type:ident),+ with fields $fields:ident) => {
+    ($struct_name:ident {$($upper_field_name:ident:$field_type:ty,)+} with fields $fields:ident) => {
         impl $struct_name {
             paste::paste!{
             $(
