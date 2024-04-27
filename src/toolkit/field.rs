@@ -1,10 +1,11 @@
-use std::{any::Any, collections::HashMap, fmt::Debug};
+use std::{any::Any,  fmt::Debug};
+use ahash::AHashMap;
 
 use super::ast_node::AstTree;
 use super::symtab::SymIdx;
 use crate::{add_field, make_field_trait_for_struct, node};
 
-pub type Fields = HashMap<&'static str, Box<dyn Field>>;
+pub type Fields = AHashMap<&'static str, Box<dyn Field>>;
 
 pub trait FieldsInit {
     fn new_from_single_field(field_name:&'static str, field:Box<dyn Field>) -> Fields {

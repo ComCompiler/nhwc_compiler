@@ -1,5 +1,5 @@
 use super::et_node::{EtNodeType, EtTree};
-use crate::{direct_children_nodes, node, toolkit::symtab::SymIdx};
+use crate::{direct_child_nodes, node, toolkit::symtab::SymIdx};
 use core::panic;
 
 pub fn dfs_et_tree(et_tree:&mut EtTree, et_node:u32, visited:&mut Vec<u32>, dfs_vec:&mut Vec<u32>) -> () {
@@ -7,7 +7,7 @@ pub fn dfs_et_tree(et_tree:&mut EtTree, et_node:u32, visited:&mut Vec<u32>, dfs_
         return;
     }
     visited[et_node as usize] = 1;
-    let sub_nodes = direct_children_nodes!(at et_node in et_tree);
+    let sub_nodes = direct_child_nodes!(at et_node in et_tree);
     for sub_node in sub_nodes.iter() {
         dfs_et_tree(et_tree, *sub_node, visited, dfs_vec);
     }
@@ -21,7 +21,7 @@ pub fn eval_et(et_tree:&mut EtTree, any_et_node:u32) -> SymIdx {
         EtNodeType::Constant { const_sym_idx, ast_node: _, text: _ } => const_sym_idx,
 
         EtNodeType::Operator { ast_node: _, text: _, op } => {
-            let sub_nodes = direct_children_nodes!(at any_et_node in et_tree); //里面的u32是节点编号
+            let sub_nodes = direct_child_nodes!(at any_et_node in et_tree); //里面的u32是节点编号
             let mut sub_nodes_sym_idx:Vec<SymIdx> = Vec::new();
             for sub_node in sub_nodes {
                 sub_nodes_sym_idx.push(eval_et(et_tree, sub_node));

@@ -5,11 +5,10 @@ use derive_builder::Builder;
 use crate::Args;
 
 use super::{
-    ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symtab::{SymTab, SymTabGraph}
+    ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, dj_node::DjNode, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symtab::{SymTab, SymTabGraph}
 };
 use super::dj_edge::DjEdge;
 
-pub type DjNode = CfgNode;
 pub type DjGraph = petgraph::stable_graph::StableDiGraph<DjNode, DjEdge, u32>;
 
 #[derive(Default, Builder)]

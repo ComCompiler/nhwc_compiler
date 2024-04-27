@@ -20,3 +20,4 @@ pub mod symbol;
 pub mod symtab;
 pub mod gen_djg;
 pub mod dj_edge;
+pub mod dj_node;

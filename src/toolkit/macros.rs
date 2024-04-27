@@ -484,12 +484,26 @@ macro_rules! incoming_edge_weight {
 }
 
 #[macro_export]
-macro_rules! direct_children_nodes {
+macro_rules! direct_child_nodes {
     (at $node:ident in $graph:ident) => {{
         let iter = $graph.neighbors(petgraph::matrix_graph::NodeIndex::from($node)).map(|x| x.index() as u32);
         let mut nodes:Vec<u32> = iter.collect();
         nodes.reverse();
         nodes
+    }};
+    (at $node:ident in $graph:ident with_predicate $f:block )=> {{
+        use petgraph::visit::EdgeRef;
+        let edges_vec:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing)
+            .filter($f)
+            .map(|e|e.target().index() as u32).collect();
+        edges_vec
+    }};
+    (at $node:ident in $graph:ident with_predicate $f:ident )=> {{
+        use petgraph::visit::EdgeRef;
+        let edges_vec:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing)
+            .filter($f)
+            .map(|e|e.target().index() as u32).collect();
+        edges_vec
     }};
 }
 /// 这个宏返回指定节点的outgoing 边，你必须保证这个节点的出边只有一条
@@ -708,16 +722,6 @@ macro_rules! term_id {
             (node!(at $node in $ast_tree).rule_id as isize).try_into().expect("无法将此 term_id 转化为 isize 类型")
         }
     };
-}
-#[macro_export]
-macro_rules! dfs_graph {
-    (at $node:ident in $graph:ident for dfs) => {{
-        let mut visited:Vec<bool> = vec![false; $graph.node_count()];
-        let mut dfs_vec:Vec<u32> = vec![];
-
-        crate::toolkit::etc::dfs($graph, $node, &mut visited, &mut dfs_vec);
-        dfs_vec
-    }};
 }
 
 #[macro_export]
