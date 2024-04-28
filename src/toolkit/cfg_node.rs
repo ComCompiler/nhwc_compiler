@@ -132,17 +132,20 @@ impl CfgNode {
                 self.text += "\n";
             }
         }
+        self.text +="\n";
         Ok(())
     }
     pub fn load_instrs_text(&mut self, instr_slab:&InstrSlab) {
-        self.text +="Instrs \n";
+        if self.instrs.len()>0  {self.text +="Instrs: \n\n";}
         for &instr in self.instrs.iter() {
             self.text += format!("{:?} \n", instr!(at instr in instr_slab).unwrap()).as_str();
         }
-        self.text += "PhiInstrs \n";
+        self.text +="\n";
+        if self.phi_instrs.len()>0  {self.text += "PhiInstrs: \n\n";}
         for &phi_instr in self.phi_instrs.iter() {
             self.text += format!("{:?} \n", instr!(at phi_instr in instr_slab).unwrap()).as_str();
         }
+        self.text +="\n";
     }
     pub fn clear_text(&mut self){
         self.text = String::new();
@@ -244,38 +247,38 @@ impl Debug for CfgNode {
         match &self.get_cfg_node_type().map_err(|e| std::fmt::Error)? {
             // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::Entry { ast_node, calls_in_func: _ } => {
-                write!(f, " #{} {} \n {} $ @ # {} \n {:#?} $  ", "Entry", ast_node, self.text, "Fields", self.info)
+                write!(f, " #{} {} \n {} $ @ # {} \n {:#?} $  ", "Entry\n", ast_node, self.text, "Fields", self.info)
             }
             // 4元  输出为4格 {{1 @ 1} @ { 1 @ 1}}
             CfgNodeType::Exit { ast_node: _ } => {
-                write!(f, " # {} \n {} $ @ # {} \n{:?} $", "Exit", self.text, "Fields", self.info)
+                write!(f, " # {} \n {} $ @ # {} \n{:#?} $", "Exit\n", self.text, "Fields", self.info)
             }
             // 5元  输出为4格 {{2 @ 1} @ { 1 @ 1}}
             CfgNodeType::Branch {
                 ast_expr_node,
                 // op_true_head_tail_nodes: _true_head_tail_nodes, op_false_head_tail_nodes: _false_head_tail_nodes,
             } => {
-                write!(f,  " # {} {} \n {} $ @ # {} \n {:#?} $ ", "Branch", ast_expr_node, self.text, "Fields", self.info)
+                write!(f,  " # {} {} \n {} $ @ # {} \n {:#?} $ ", "Branch\n", ast_expr_node, self.text, "Fields", self.info)
             }
             // 3元  输出为3格 {1 | 1 | 1}
-            CfgNodeType::Gather {} => write!(f, " {} @ {}\n {:?} ", "Gather", "Fields", self.info),
+            CfgNodeType::Gather {} => write!(f, " {} @ {}\n {:#?} ", "Gather\n", "Fields", self.info),
             // 4元  输出为4格 {{1 | 1} | { 1 | 1}}
             CfgNodeType::BasicBlock { ast_nodes: _ast_node_idxes } => {
-                write!(f, " # {} \n {} $ @ # {} \n{:?} $", "BasicBlock", self.text, "Fields", self.info)
+                write!(f, " # {} \n {} $ @ # {} \n{:#?} $", "BasicBlock\n", self.text, "Fields", self.info)
             }
             // 3元  输出为3格 {1 | 1 | 1}
-            CfgNodeType::Root {} => write!(f, " {} @ {}\n {:?} ", "root", "Fields", self.info),
+            CfgNodeType::Root {} => write!(f, " {} @ {}\n {:#?} ", "root\n", "Fields", self.info),
             // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::ForLoop { ast_before_node, ast_mid_node: _, ast_after_node: _ } => {
-                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} $ ", "For", ast_before_node, self.text, "Fields", self.info)
+                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} $ ", "For\n", ast_before_node, self.text, "Fields", self.info)
             }
             // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::WhileLoop { ast_expr_node } => {
-                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} $ ", "While", ast_expr_node, self.text, "Fields", self.info)
+                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} $ ", "While\n", ast_expr_node, self.text, "Fields", self.info)
             }
             // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::Switch { ast_expr_node } => {
-                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} $ ", "Switch", ast_expr_node, self.text, "Fields", self.info)
+                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} $ ", "Switch\n", ast_expr_node, self.text, "Fields", self.info)
             }
         }
     }

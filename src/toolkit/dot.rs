@@ -1,6 +1,5 @@
 use std::fmt::{self, Display, Write};
 
-use antlr_rust::CoerceTo;
 use petgraph::visit::{EdgeRef, GraphProp, IntoEdgeReferences, IntoNodeReferences, NodeIndexable, NodeRef};
 
 use core::fmt::Debug;

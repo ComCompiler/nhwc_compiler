@@ -17,7 +17,7 @@ impl Pass for SsaPass {
                 cfg_node.load_ast_node_text(&ctx.ast_tree);
                 cfg_node.load_instrs_text(&ctx.instr_slab);
             }
-            generate_png_by_graph(&ctx.cfg_graph, "nhwc_cfg_graph_after_ssa".to_string(), &[Config::Record, Config::Rounded, Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel]);
+            generate_png_by_graph(&ctx.cfg_graph, "nhwc_cfg_graph_after_ssa".to_string(), &[Config::Record, Config::Rounded, Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel, Config::CfgBlock]);
         }
 
         Ok(()) 

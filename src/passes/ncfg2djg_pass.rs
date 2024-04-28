@@ -15,7 +15,7 @@ impl Pass for Ncfg2DjgPass {
             generate_png_by_graph(&ctx.dj_graph, "dj_graph".to_string(),&[Config::Record, Config::Rounded, Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel] )
         }
         if self.is_ncfg_png{
-            generate_png_by_graph(&ctx.cfg_graph, "nhwc_cfg_graph".to_string(),&[Config::Record, Config::Rounded, Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel] )
+            generate_png_by_graph(&ctx.cfg_graph, "nhwc_cfg_graph".to_string(),&[Config::Record, Config::Rounded, Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel, Config::CfgBlock] )
         }
         Ok(()) 
     }

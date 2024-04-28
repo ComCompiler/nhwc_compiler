@@ -30,7 +30,7 @@ impl Pass for Cfg2NcfgPass {
                 Config::Rounded, Config::CfgBlock,Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel]);
         }
         if self.is_gen_symtab_graph_png {
-            generate_png_by_graph(&ctx.symtab_graph, "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab, Config::Title("symtab_graph".to_string())]);
+            generate_png_by_graph(&ctx.symtab_graph, "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab, Config::Title("symtab_graph".to_string()),Config::CfgBlock]);
         }
         Ok(())
     }
