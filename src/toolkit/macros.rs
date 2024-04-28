@@ -679,7 +679,7 @@ macro_rules! add_field {
             }
             None => {},
         })?
-        $fields.insert($field_name,$field);
+        $fields.insert($field_name.to_string(),$field);
     };
 }
 
@@ -726,21 +726,28 @@ macro_rules! term_id {
 
 #[macro_export]
 macro_rules! push_instr {
-    ($instr:ident to $node:ident in $graph:ident slab $instrsslab:ident) =>{
+    ($instr:ident to $node:ident in $graph:ident slab $instrslab:ident) =>{
         {
             let cfg_node = node_mut!(at $node in $graph);
-            let instr = $instrsslab.insert($instr);
+            let instr = $instrslab.insert_instr($instr);
             cfg_node.instrs.push(instr);
+            instr
+        }
+    };
+}
+#[macro_export]
+/// push_phi_instr!(instr to node in grpah slab instr_slab);
+macro_rules! push_phi_instr {
+    ($instr:ident to $node:ident in $graph:ident slab $instrslab:ident) =>{
+        {
+            let cfg_node = node_mut!(at $node in $graph);
+            let instr = $instrslab.insert_instr($instr);
+            cfg_node.phi_instrs.push(instr);
+            instr
         }
     };
 }
 
-#[macro_export]
-macro_rules! add_pass {
-    ($pass:ident to $pass_manager:ident) => {
-        $pass_manager.add_pass(Box::new($pass));
-    };
-}
 #[macro_export]
 macro_rules! add_passes {
     ($first_pass:ident $(then $next_pass:ident)* to $pass_manager:ident) => {
@@ -795,7 +802,7 @@ macro_rules! make_field_trait_for_struct {
 macro_rules! downcast_op_any {
     (ref $field_type:ty,$op_field:ident) => {{
         match $op_field {
-            None => anyhow::Result::Err(anyhow::anyhow!("can't find this field")),
+            None => anyhow::Result::Err(anyhow::anyhow!("can't find field {} {}",stringify!($field_type),stringify!($op_field))),
             Some(field) => match field.as_any().downcast_ref::<$field_type>() {
                 Some(data) => anyhow::Result::Ok(data),
                 None => anyhow::Result::Err(anyhow::anyhow!(concat!("这个field ", stringify!($field_name), "不是", stringify!($field_type), "类型"))),
@@ -821,7 +828,7 @@ macro_rules! downcast_op_any {
     // };
     (mut $field_type:ty,$op_field_mut:ident) => {{
         match $op_field_mut {
-            None => anyhow::Result::Err(anyhow::anyhow!("can't find this field")),
+            None => anyhow::Result::Err(anyhow::anyhow!("can't find field {} {}",stringify!($field_type),stringify!($op_field_mut))),
             Some(field) => match field.as_any_mut().downcast_mut::<$field_type>() {
                 Some(data) => anyhow::Result::Ok(data),
                 None => anyhow::Result::Err(anyhow::anyhow!(concat!("这个field ", stringify!($field_name), "不是", stringify!($field_type), "类型"))),
@@ -844,14 +851,14 @@ macro_rules! make_specialized_get_field_fn_for_struct {
             $(
                 pub fn [<get_ $upper_field_name:lower>](&self) -> anyhow::Result<&$field_type>{
                     let op_field = self.$fields.get($upper_field_name);
-                    $crate::downcast_op_any!(ref $field_type,op_field)
+                    $crate::downcast_op_any!(ref $field_type,op_field).with_context(|| format!("downcast_op_any 失败 {} {} {}",stringify!($upper_field_name),file!(),line!()))
                 }
                 pub fn [<get_mut_ $upper_field_name:lower>](&mut self) -> anyhow::Result<&mut $field_type>{
                     let op_field_mut = self.$fields.get_mut($upper_field_name);
-                    $crate::downcast_op_any!(mut $field_type,op_field_mut)
+                    $crate::downcast_op_any!(mut $field_type,op_field_mut).with_context(|| format!("downcast_op_any 失败 {} {} {}",stringify!($upper_field_name),file!(),line!()))
                 }
                 pub fn [<add_ $upper_field_name:lower>](&mut self, field:$field_type) {
-                    let _op_field = self.$fields.insert($upper_field_name,Box::new(field));
+                    let _op_field = self.$fields.insert($upper_field_name.to_string(),Box::new(field));
                     // let op_field_ref = op_field.as_ref();
                     // $crate::downcast_op_any!($field_type,op_field)
                 }
@@ -873,7 +880,7 @@ macro_rules! make_specialized_get_field_fn_for_struct {
                         }
                         None => {},
                     }
-                    $crate::downcast_op_any!(ref $field_type,op_field)
+                    $crate::downcast_op_any!(ref $field_type,op_field).with_context(|| format!("downcast_op_any 失败 {} {} {}",stringify!($upper_field_name),file!(),line!()))
                 }
                 pub fn [<get_mut_ $upper_field_name:lower _with_debug>](&mut self,symtab:&SymTab,symtab_graph:&mut Option<&mut SymTabGraph>) -> anyhow::Result<&mut $field_type>{
                     let op_field_mut = self.$fields.get_mut($upper_field_name);
@@ -890,10 +897,10 @@ macro_rules! make_specialized_get_field_fn_for_struct {
                         }
                         None => {},
                     }
-                    $crate::downcast_op_any!(mut $field_type,op_field_mut)
+                    $crate::downcast_op_any!(mut $field_type,op_field_mut).with_context(|| format!("downcast_op_any 失败 {} {} {}",stringify!($upper_field_name),file!(),line!()))
                 }
                 pub fn [<add_ $upper_field_name:lower _with_debug>](&mut self, field:$field_type,symtab:&SymTab,symtab_graph:&mut Option<&mut SymTabGraph>) {
-                    let op_field = self.$fields.insert($upper_field_name,Box::new(field));
+                    let op_field = self.$fields.insert($upper_field_name.to_string(),Box::new(field));
                     // let op_field_ref = op_field.as_ref();
                     // $crate::downcast_op_any!($field_type,op_field)
                     match symtab_graph{
@@ -925,6 +932,7 @@ macro_rules! make_specialized_get_field_fn_for_struct {
                         None => {},
                     }
                     self.$fields.remove($upper_field_name);
+                    //.with_context(|| format!("downcast_op_any 失败 {} {} {}",stringify!($upper_field_name),file!(),line!()))
                 }
 
             )+
@@ -944,8 +952,8 @@ macro_rules! make_get_field_fn_for_struct {
             pub fn get_mut_field(&mut self, field_name:&str) -> Option<&mut Box<dyn Field>>{
                 self.$fields.get_mut(field_name)
             }
-            pub fn add_field(&mut self, field_name:&'static str ,field:Box<dyn Field>) -> Option<Box<dyn Field>>{
-                self.$fields.insert(field_name,field)
+            pub fn add_field(&mut self, field_name:&str ,field:Box<dyn Field>) -> Option<Box<dyn Field>>{
+                self.$fields.insert(field_name.to_string().to_string(),field)
             }
 
             // this is for debug 会把这个记录显示在 symttab graph 上，一般建议使用这个
@@ -981,7 +989,7 @@ macro_rules! make_get_field_fn_for_struct {
                 };
                 self.$fields.get_mut(field_name)
             }
-            pub fn add_field_with_debug(&mut self, field_name:&'static str ,field:Box<dyn Field>,symtab:&SymTab,symtab_graph:&mut Option<&mut SymTabGraph>) -> Option<Box<dyn Field>>{
+            pub fn add_field_with_debug(&mut self, field_name:&str ,field:Box<dyn Field>,symtab:&SymTab,symtab_graph:&mut Option<&mut SymTabGraph>) -> Option<Box<dyn Field>>{
                 match symtab_graph{
                     Some(symg) => {
                         let mut idx:u32=(symg.node_count()).try_into().unwrap();
@@ -995,16 +1003,16 @@ macro_rules! make_get_field_fn_for_struct {
                     }
                     None => {},
                 }
-                self.$fields.insert(field_name,field)
+                self.$fields.insert(field_name.to_string(),field)
             }
         }
     };
 }
 
 #[macro_export]
-macro_rules! element {
+macro_rules! instr {
     (at $idx:ident in $slab:ident) => {
-        $slab.get($idx)
+        $slab.get_instr($idx)
     };
 }
 

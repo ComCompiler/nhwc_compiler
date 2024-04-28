@@ -6,7 +6,7 @@ mod tests {
     use clap::Parser;
 
     use crate::{
-        add_field, add_pass, add_symbol, antlr_parser::{
+        add_field,add_passes, add_symbol, antlr_parser::{
             clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}
         }, direct_child_nodes, direct_parent_node, find, find_nodes, passes::pass_demo::PassDemo, toolkit::{
             self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder}, dot::Config, et_node::{EtNode, EtNodeType, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::{Type, Value}, gen_ast::parse_as_ast_tree, nhwc_instr::{InstrSlab, InstrType}, pass_manager::{Pass, PassManager}, symbol::Symbol, symtab::SymTab
@@ -120,26 +120,26 @@ mod tests {
         let y = symtab.add_symbol(Symbol::new(0, "y".to_string()));
 
         match symtab.get_symbol_verbose("x".to_string(), 0) {
-            Some(_) => {
+            Ok(_) => {
                 println!("找到了符号 x")
             }
-            None => {
+            Err(_) => {
                 panic!("没有找到符号 x ");
             }
         }
         match symtab.get_symbol_verbose("y".to_string(), 0) {
-            Some(_) => {
+            Ok(_) => {
                 println!("找到了符号 y")
             }
-            None => {
+            Err(_) => {
                 panic!("没有找到符号 y ");
             }
         }
         match symtab.get_symbol_verbose("z".to_string(), 0) {
-            Some(_) => {
+            Ok(_) => {
                 panic!("找到了符号 y")
             }
-            None => {
+            Err(_) => {
                 println!("没有找到符号 y ");
             }
         }
@@ -154,10 +154,10 @@ mod tests {
         let y = symtab.add_symbol(Symbol::new(0, "y".to_string()));
 
         match symtab.get_symbol(&x) {
-            Some(_) => {
+            Ok(_) => {
                 println!("找到了符号 x")
             }
-            None => {
+            Err(_) => {
                 panic!("没有找到符号 x ");
             }
         }
@@ -175,11 +175,11 @@ mod tests {
 
         add_field!(VALUE:{Value::I32(None)} to x in symtab);
         let x_sym = match find!(symbol mut at x in symtab) {
-            Some(x) => {
+            Ok(x) => {
                 println!("找到了符号 x");
                 x
             }
-            None => {
+            Err(_) => {
                 panic!("没有找到符号 x ");
             }
         };
@@ -286,7 +286,7 @@ mod tests {
         let mut pass_manager = PassManager::new(args);
         let pass1 = PassDemo::new();
         println!("{}", pass1.get_desc());
-        add_pass!(pass1 to pass_manager);
+        add_passes!(pass1 to pass_manager);
         pass_manager.execute_passes();
     }
 

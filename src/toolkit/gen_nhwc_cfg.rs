@@ -1,19 +1,19 @@
-use anyhow::{anyhow, Context, Ok, Result};
+use anyhow::{anyhow, Context, Result};
 use petgraph::{
     csr::IndexType, graph::node_index, stable_graph::NodeIndex, visit::{EdgeRef, NodeRef}
 };
 use std::collections::HashMap;
 
-use super::{cfg_edge::CfgEdge, symbol::{TYPE, USE_COUNTER}};
+use super::{cfg_edge::CfgEdge, nhwc_instr::Instruction, symbol::{TYPE, USE_COUNTER}};
 use super::{
-    ast_node::AstTree, cfg_node::CfgGraph, et_node::{DefOrUse, EtNodeType, EtTree}, gen_et::process_any_stmt, nhwc_instr::InstrType, scope_node::ScopeTree, symtab::{SymIdx, SymTab, SymTabGraph}
+    ast_node::AstTree, cfg_node::CfgGraph, et_node::{DeclOrDefOrUse, EtNodeType, EtTree}, gen_et::process_any_stmt, nhwc_instr::InstrType, scope_node::ScopeTree, symtab::{SymIdx, SymTab, SymTabGraph}
 };
-use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, dot::Config, field::Field, nhwc_instr::InstrSlab};
+use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_instr::InstrSlab};
 use crate::{
     add_edge, add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{
-        RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
-    }, direct_child_node, direct_child_nodes, direct_parent_nodes, find, find_nodes, incoming_edges, node, node_mut, outgoing_edges, push_instr, rule_id, toolkit::{
-        cfg_node::CfgNode, etc::{self, generate_png_by_graph}, field::{Type, UseCounter}, nhwc_instr::{IcmpPlan, UcmpPlan}, symbol::Symbol, symtab::SymTabEdge
+        RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_jumpStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
+    }, direct_child_node, direct_child_nodes, direct_parent_nodes, find, find_nodes, incoming_edges, make_field_trait_for_struct, make_specialized_get_field_fn_for_struct, node, node_mut, outgoing_edges, push_instr, reg_field_name, rule_id, toolkit::{
+        cfg_node::CfgNode, etc::{self}, field::{Type, UseCounter}, nhwc_instr::{IcmpPlan, UcmpPlan}, symbol::Symbol, symtab::SymTabEdge
     }
 };
 use colored::Colorize;
@@ -22,7 +22,37 @@ use colored::Colorize;
 这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有
 */
 
-pub type NhwcCfg = CfgGraph;
+
+
+reg_field_name!(DEF_INSTRS:defs_instrs);
+reg_field_name!(DEF_CFG_NODE_VEC:def_cfg_node_vec);
+// for variables symbol
+make_specialized_get_field_fn_for_struct!(Symbol {
+        DEF_INSTRS:Vec<u32>,
+        DEF_CFG_NODE_VEC:Vec<u32>,
+    } with fields fields);
+// for compilation unit symbol
+make_field_trait_for_struct!(Vec<SymIdx>);
+reg_field_name!(ALL_CFG_FUNC_NAME_ENTRY_TUPLES:all_cfg_func_name_entry_tuple);
+make_specialized_get_field_fn_for_struct!(Symbol {
+        ALL_CFG_FUNC_NAME_ENTRY_TUPLES:Vec<SymIdx>,
+    } with fields fields);
+reg_field_name!(DECLARED_VARS:declared_vars);
+// for func symbol
+make_specialized_get_field_fn_for_struct!(Symbol {
+        DECLARED_VARS:Vec<SymIdx>,
+    } with fields fields);
+reg_field_name!(COR_FUNC_SYMIDX:cor_func_symidx);
+reg_field_name!(DEF_SYMIDX_VEC:def_symidx_vec);
+make_specialized_get_field_fn_for_struct!(CfgNode {
+    COR_FUNC_SYMIDX:SymIdx,
+    DEF_SYMIDX_VEC:Vec<SymIdx>,
+} with fields info);
+// for Instruction
+reg_field_name!(COR_CFG_NODE:cor_cfg_node);
+make_specialized_get_field_fn_for_struct!(Instruction {
+        COR_CFG_NODE:u32,
+    } with fields info);
 
 /// 这个函数根据stmt对instrs push instruction
 fn parse_stmt2nhwc(
@@ -56,7 +86,8 @@ fn parse_stmt2nhwc(
                                 let var_type = symtab.get_symbol(&var_symidx).unwrap().get_type_with_debug(symtab, symtab_graph)?.clone();
                                 //如果结果和变量类型不同，添加自动转化instr
                                 let new_value_symidx = force_trans_type(cfg_graph, symtab, &var_type, &value_type, &value_symidx, stmt_parent_scope, cfg_bb, counter, instr_slab, symtab_graph)?;
-                                let assign_instr = InstrType::new_assign(var_symidx, new_value_symidx).to_instr();
+                                let mut assign_instr = InstrType::new_assign(var_symidx, new_value_symidx).to_instr();
+                                assign_instr.add_cor_cfg_node(cfg_bb);
                                 push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
                             }
                             crate::toolkit::et_node::ExprOp::LPlusPlus => {
@@ -155,7 +186,7 @@ fn parse_stmt2nhwc(
                     let type_node = find!(rule RULE_declarationSpecifiers at ast_stmt_node in ast_tree).unwrap();
                     // let type_str = node!(at type_node in ast_tree).text.clone();
                     let var_type = Type::new(type_node, ast_tree);
-                    let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab, &def_or_use, &text, stmt_parent_scope, symtab_graph)?;
+                    let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab, &def_or_use, &text, stmt_parent_scope, symtab_graph,cfg_bb,cfg_graph)?;
 
                     //创建空值
                     let value_symidx = SymIdx::new(stmt_parent_scope, "".to_string());
@@ -471,13 +502,13 @@ fn process_constant(symtab:&mut SymTab, const_literal:&String, symtab_graph:&mut
     // 我们认为 constant 的scope node 都是全局的
     // match find!(symbol mut {const_literal.clone()} of scope {0} in symtab debug symtab_graph symtab_graph){
     match symtab.get_mut_symbol_verbose(const_literal.clone(), 0) {
-        Some(const_sym) => {
+        Ok(const_sym) => {
             // do nothing 找到了同样的常量
             // let use_counter = find!(field mut USE_COUNTER:UseCounter in const_sym).unwrap();
             let use_counter = const_sym.get_mut_use_counter()?;
             use_counter.use_count += 1;
         }
-        None => {
+        Err(_) => {
             add_symbol!({Symbol::new(0, const_literal.clone())} 
                 with field USE_COUNTER:{UseCounter{ use_count: 1}} 
                 with field TYPE:{Type::new_from_const(const_literal)} 
@@ -489,28 +520,47 @@ fn process_constant(symtab:&mut SymTab, const_literal:&String, symtab_graph:&mut
 }
 
 fn process_symbol(
-    ast_tree:&AstTree, scope_tree:&ScopeTree, symtab:&mut SymTab, def_or_use:&DefOrUse, symbol_name:&String, scope_node:u32, symtab_graph:&mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, scope_tree:&ScopeTree, symtab:&mut SymTab, decldef_def_or_use:&DeclOrDefOrUse, symbol_name:&String, scope_node:u32, symtab_graph:&mut Option<&mut SymTabGraph>,
+    cfg_node:u32,cfg_graph:&mut CfgGraph
 ) -> Result<SymIdx> {
     let mut symbol_scope = scope_node;
-    match def_or_use {
-        DefOrUse::Def { type_ast_node } => {
+    match decldef_def_or_use {
+        DeclOrDefOrUse::DeclDef { type_ast_node } => {
             let symbol_str = symbol_name.clone();
             let var_type = Type::new(*type_ast_node, ast_tree);
-            let symbol_symidx = add_symbol!({Symbol::new(scope_node,symbol_str)} with field TYPE:{var_type} to symtab debug symtab_graph);
-            Ok(symbol_symidx)
+            let symidx = add_symbol!({Symbol::new(scope_node,symbol_str)}
+                with field TYPE:{var_type}
+                with field DEF_CFG_NODE_VEC:{vec![cfg_node]}
+            to symtab debug symtab_graph);
+            let func_symidx = node_mut!(at cfg_node in cfg_graph).get_cor_func_symidx()?;
+            symtab.get_mut_symbol(&func_symidx)?.get_mut_declared_vars()?.push(symidx.clone());
+            node_mut!(at cfg_node in cfg_graph).get_mut_def_symidx_vec()?.push(symidx.clone());
+            Ok(symidx)
         }
-        DefOrUse::Use => {
-            while let None = find!(symbol {symbol_name.clone()} of scope symbol_scope in symtab debug symtab_graph symtab_graph ) {
-                let ast = node!(at symbol_scope in scope_tree).ast_node;
+        DeclOrDefOrUse::Use => {
+            while let Err(_) = find!(symbol {symbol_name.clone()} of scope symbol_scope in symtab debug symtab_graph symtab_graph ) {
                 if symbol_scope == 0 {
-                    generate_png_by_graph(&symtab_graph.as_ref().unwrap(), "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab]);
+                    // generate_png_by_graph(&symtab_graph.as_ref().unwrap(), "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab]);
                     return Err(anyhow!("scope为{}符号表中未找到{:?}", symbol_scope, symbol_name.clone()));
                 }
                 symbol_scope = node!(at symbol_scope in scope_tree).parent;
             }
-            let symbol_symidx = SymIdx::new(symbol_scope, symbol_name.clone());
-            Ok(symbol_symidx)
+            let symidx = SymIdx::new(symbol_scope, symbol_name.clone());
+            Ok(symidx)
         }
+        DeclOrDefOrUse::Def => {
+            while let Err(_) = find!(symbol {symbol_name.clone()} of scope symbol_scope in symtab debug symtab_graph symtab_graph ) {
+                if symbol_scope == 0 {
+                    // generate_png_by_graph(&symtab_graph.as_ref().unwrap(), "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab]);
+                    return Err(anyhow!("scope为{}符号表中未找到{:?}", symbol_scope, symbol_name.clone()));
+                }
+                symbol_scope = node!(at symbol_scope in scope_tree).parent;
+            }
+            let symidx = SymIdx::new(symbol_scope, symbol_name.clone());
+            symtab.get_mut_symbol(&symidx).unwrap().get_mut_def_cfg_node_vec()?.push(cfg_node);
+            node_mut!(at cfg_node in cfg_graph).get_mut_def_symidx_vec()?.push(symidx.clone());
+            Ok(symidx)
+        },
     }
 }
 ///具有赋值性质的会将value的类型强制转换为var的类型，返回转换后的symidx
@@ -1171,7 +1221,7 @@ fn process_et(
         EtNodeType::Symbol { sym_idx: _, ast_node, text: _, def_or_use } => {
             let ast_node = *ast_node;
             let symbol_literal = &node!(at ast_node in ast_tree).text;
-            let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab, def_or_use, symbol_literal, scope_node, symtab_graph)?;
+            let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab, def_or_use, symbol_literal, scope_node, symtab_graph,cfg_bb,cfg_graph)?;
             Ok(symbol_symidx)
         }
         _ => return Err(anyhow!("{}不应出现sep类型的et", et_node)),
@@ -1218,7 +1268,7 @@ fn parse_declaration2nhwc(
                     let var_type = Type::new(var, ast_tree);
                     let ast_node = *ast_node;
                     let var_str = &node!(at ast_node in ast_tree).text;
-                    let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab, &def_or_use, var_str, decl_prt_scope, symtab_g)?;
+                    let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab, &def_or_use, var_str, decl_prt_scope, symtab_g,cfg_bb,cfg_graph)?;
                     //创建空值
                     let value_symidx = SymIdx::new(decl_prt_scope, "".to_string());
                     let def_instr = InstrType::new_def_var(var_type, symbol_symidx, value_symidx).to_instr();
@@ -1241,20 +1291,20 @@ fn parse_func2nhwc(
     let def_func_instr_struct = InstrType::new_def_func(SymIdx::new(ast_fun, String::new()), SymIdx::new(ast_fun, String::new()), Vec::new()).to_instr();
     push_instr!(def_func_instr_struct to cfg_entry in cfg_graph slab instr_slab);
     //获取函数所对应的scopenode
-    if let Some(func_scope) = ast2scope.get(&ast_fun) {
+    if let Some(&func_scope) = ast2scope.get(&ast_fun) {
         //获取函数名称
-        let fun_name = &node!(at ast_funsign in ast_tree).text;
-        let name_symidx = SymIdx::new(*func_scope, fun_name.to_string());
+        let func_name = &node!(at ast_funsign in ast_tree).text;
+        let name_symidx = SymIdx::new(func_scope, func_name.to_string());
 
         //获取返回类型
         let ast_retype = find!(rule RULE_declarationSpecifiers at ast_fun in ast_tree).unwrap();
-        let fun_rettype = &node!(at ast_retype in ast_tree).text;
-        let type_symidx = SymIdx::new(*func_scope, fun_rettype.to_string());
+        let func_rettype = &node!(at ast_retype in ast_tree).text;
+        let type_symidx = SymIdx::new(func_scope, func_rettype.to_string());
 
         //获取参数列表
         let mut arg_syms:Vec<SymIdx> = vec![];
         //函数有参数
-        if let Some(para) = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_parameterTypeList at ast_fun in ast_tree) {
+        let func_symidx = if let Some(para) = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_parameterTypeList at ast_fun in ast_tree) {
             let ast_func_args = find_nodes!(rule RULE_parameterList finally RULE_parameterDeclaration at para in ast_tree);
             //将函数签名转为ir
             for ast_func_arg in ast_func_args {
@@ -1262,19 +1312,29 @@ fn parse_func2nhwc(
                 let ast_arg_type = find!(rule RULE_declarationSpecifiers at ast_func_arg in ast_tree).unwrap();
                 let arg_type = Type::new(ast_arg_type, ast_tree);
                 let func_arg_str = &node!(at ast_para_sym in ast_tree).text;
-                let arg_symidx = SymIdx::new(*func_scope, func_arg_str.clone());
+                let arg_symidx = SymIdx::new(func_scope, func_arg_str.clone());
                 arg_syms.push(arg_symidx);
-                add_symbol!({Symbol::new(*func_scope,func_arg_str.to_string())} with field TYPE:{arg_type} to symtab debug symtab_graph);
+                add_symbol!({Symbol::new(func_scope,func_arg_str.to_string())} with field TYPE:{arg_type} to symtab debug symtab_graph);
             }
-            //添加到符号表中
-            let func_symbol = Symbol::new(cfg_entry, fun_name.to_string());
-            add_symbol!(func_symbol with field TYPE:{Type::Fn { arg_syms: arg_syms.clone(), ret_sym:type_symidx.clone()}} to symtab debug symtab_graph);
+            //添加到符号表中，
+            let func_symbol = Symbol::new(cfg_entry, func_name.clone());
+            add_symbol!(func_symbol with field TYPE:{Type::Fn { arg_syms: arg_syms.clone(), ret_sym:type_symidx.clone()}} to symtab debug symtab_graph)
         }
         //函数无参数，则不需要处理参数部分
         else {
-        }
+            let func_symbol = Symbol::new(cfg_entry, func_name.clone());
+            add_symbol!(func_symbol with field TYPE:{Type::Fn { arg_syms: vec![], ret_sym:type_symidx.clone()}} to symtab debug symtab_graph)
+        };
         //做成instr放在cfg的entry里面
         let func_instr = InstrType::new_def_func(name_symidx, type_symidx, arg_syms).to_instr();
+        // 把信息加入到 ！compilation_unit 中
+        symtab.get_mut_global_info().get_mut_all_cfg_func_name_entry_tuples()?.push(func_symidx.clone());
+        //对所有旗下的cfg_node 加入函数信息
+        let _:Vec<_> = etc::dfs(cfg_graph, cfg_entry).iter().map(|&cfg_node|{node_mut!(at cfg_node in cfg_graph).add_cor_func_symidx(SymIdx::new_verbose(func_scope,func_name.clone(),None))}).collect();
+        // 初始化field declared
+        symtab.get_mut_symbol(&func_symidx)?.add_declared_vars(vec![]);
+
+
 
         push_instr!(func_instr to cfg_entry in cfg_graph slab instr_slab);
     } else {
@@ -1294,7 +1354,7 @@ pub fn parse_cfg_into_nhwc_cfg(
     let start_node:NodeIndex<u32> = NodeIndex::new(0);
     //先遍历一遍函数名，将函数名加入到符号表中
     let cfg_funcs = direct_child_nodes!(at start_node in cfg_graph);
-    for cfg_entry in cfg_funcs.clone() {
+    for &cfg_entry in cfg_funcs.iter() {
         match node!(at cfg_entry in cfg_graph).get_cfg_node_type()? {
             CfgNodeType::Entry { ast_node, calls_in_func: _ } => {
                 //查找函数名称所在节点
@@ -1307,7 +1367,7 @@ pub fn parse_cfg_into_nhwc_cfg(
         }
     }
     //再遍历一遍entry，对于每个函数做dfs,处理函数体
-    for cfg_entry in cfg_funcs.clone() {
+    for &cfg_entry in cfg_funcs.iter() {
         let dfs_vec = etc::dfs(cfg_graph, cfg_entry);
         // dfs_vec.sort_by(|node| )
         // dfs_vec.reverse();
@@ -1364,7 +1424,9 @@ pub fn insert_bb_between(cfg_node1:u32, cfg_node2:u32, cfg_graph:&mut CfgGraph) 
     let (cfg_node_type1, cfg_node_type2) = (node!(at cfg_node1 in cfg_graph).get_cfg_node_type()?,node!(at cfg_node2 in cfg_graph).get_cfg_node_type()?);
     if let CfgEdgeType::Direct {  } = cfg_former_edge_cloned.get_cfg_edge_type()? {
         // 如果这条边本身就是一条普通边，那么就允许insert
-        let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with edge {cfg_former_edge_cloned} from cfg_node1 in cfg_graph);
+        let mut bb_struct = CfgNode::new_bb(vec![]);
+        bb_struct.add_cor_func_symidx(node!(at cfg_node1 in cfg_graph).get_cor_func_symidx()?.clone());
+        let new_bb = add_node_with_edge!({bb_struct} with edge {cfg_former_edge_cloned} from cfg_node1 in cfg_graph);
         add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node2 in cfg_graph);
         Ok(new_bb)
     }else{

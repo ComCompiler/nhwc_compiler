@@ -25,7 +25,7 @@ impl PassManager {
                     println!("{}", format!("Pass {} run successfully", pass.get_pass_name()).green());
                 }
                 Err(e) => {
-                    println!("{}", format!("{:?}", e).red());
+                    println!("{}", format!("{:?}{}", e,e.backtrace()).red());
                 }
             }
         }

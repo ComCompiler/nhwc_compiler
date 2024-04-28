@@ -1,10 +1,33 @@
 use slab::Slab;
-use std::fmt::{Debug, Formatter};
+use std::{fmt::{Debug, Formatter}, vec};
+use anyhow::{anyhow,Result};
 
 use super::{
     field::{Fields, Type, Value}, symtab::SymIdx
 };
-pub type InstrSlab = Slab<Instruction>;
+
+
+#[derive(Clone,Default,Debug)]
+pub struct InstrSlab {
+    instr_slab : Slab<Instruction>,
+    pub info : Fields,
+}
+
+impl InstrSlab{
+    pub fn new() -> Self {
+        Self { instr_slab: Slab::new(), info: Fields::new() }
+    }
+    pub fn insert_instr(&mut self,instr:Instruction) -> usize{
+        self.instr_slab.insert(instr)
+    }
+    pub fn get_instr(&self,idx:usize) -> Result<&Instruction>{
+        self.instr_slab.get(idx).ok_or(anyhow!("在 instr_slab 中找不到对应的instruction"))
+    }
+    pub fn get_mut_instr(&mut self,idx:usize) -> Result<&mut Instruction>{
+        self.instr_slab.get_mut(idx).ok_or(anyhow!("在 instr_slab 中找不到对应的instruction"))
+    }
+}
+
 
 #[derive(Clone)]
 pub enum ArithOp {
@@ -66,14 +89,40 @@ pub struct FuncOp {
     func:SymIdx,
     args:Vec<SymIdx>, //存储所有的实参
 }
-#[derive(Clone)]
+#[derive(Clone,PartialEq,Eq)]
 pub struct PhiPair {
-    variable:SymIdx,
-    bb:SymIdx,
+    pub symidx:SymIdx,
+    pub bb:u32,
 }
 #[derive(Clone)]
 pub struct PhiOp {
-    syms:Vec<PhiPair>,
+    pub(crate) phi_pairs:Vec<PhiPair>,
+}
+impl PhiOp{
+    // 注意要避免重复添加，如果是重复添加则err
+    pub fn push_phi_pair(&mut self,phi_pair_to_insert:PhiPair)->Result<()>{
+        for phi_pair in self.phi_pairs.iter(){
+            if phi_pair.symidx == phi_pair_to_insert.symidx {
+                // return Err(anyhow!("对已存在的phi node 执行 push_phi_pair 失败,已经存在phi_pair包含symidx:{:?}",phi_pair.symidx))
+            }
+            if phi_pair.symidx.to_src_symidx() == phi_pair_to_insert.symidx.to_src_symidx() && phi_pair.bb == phi_pair_to_insert.bb {
+                // return Err(anyhow!("对已存在的phi node 执行 push_phi_pair 失败,已经存在phi_pair包含symidx:{:?} with bb:{}",phi_pair.symidx,phi_pair_to_insert.bb))
+            }
+        }
+        self.phi_pairs.push(phi_pair_to_insert);
+        Ok(())
+    }
+    pub fn remove_phi_pair(&mut self,phi_pair_to_insert:PhiPair)->Result<()>{
+        let mut idx_to_rm = None;
+        for (idx,phi_pair) in self.phi_pairs.iter().enumerate(){
+            if phi_pair == &phi_pair_to_insert{
+                idx_to_rm = Some(idx);
+                break;
+            }
+        }
+        self.phi_pairs.remove(idx_to_rm.ok_or(anyhow!("在 {:?} 中没有找到要删除的 phi_pair",self))?);
+        Ok(())
+    }
 }
 #[derive(Clone)]
 pub enum MemOp {
@@ -92,9 +141,9 @@ pub enum MemOp {
 pub enum InstrType {
     Label { label_symidx:SymIdx },
     //定义函数
-    Def_Func { func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx> },
+    DefineFunc { func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx> },
     //定义变量
-    Def_Var { var_symidx:SymIdx, vartype:Type, value:SymIdx },
+    DefineVar { var_symidx:SymIdx, vartype:Type, value:SymIdx },
     // 算数运算符 + - * / etc.
     Arith { lhs:SymIdx, rhs:ArithOp },
     SimpleAssign { lhs:SymIdx, rhs:SymIdx },
@@ -109,8 +158,37 @@ pub enum InstrType {
 #[derive(Clone)]
 pub struct Instruction {
     pub instr_type:InstrType,
-    info:Fields,
+    pub info:Fields,
 }
+impl Instruction {
+    pub fn get_def_vec(&self)->Option<Vec<SymIdx>>{
+        match &self.instr_type{
+            InstrType::Label { label_symidx } => None,
+            InstrType::DefineFunc { func_symidx, ret_type, args } => {
+                Some({
+                    let mut symidx_vec= vec![func_symidx.clone()];
+                    symidx_vec.extend_from_slice(args);
+                    symidx_vec
+                })
+            },
+            InstrType::DefineVar { var_symidx, vartype, value } => {
+                Some(vec![var_symidx.clone()])
+            },
+            InstrType::Arith { lhs, rhs } => { Some(vec![lhs.clone()]) },
+            InstrType::SimpleAssign { lhs, rhs } => {
+                 Some(vec![lhs.clone()]) 
+            },
+            InstrType::Call { assigned, func_op } => if let  Some(symidx)= assigned{
+                Some(vec![symidx.clone()])
+            }else{
+                None
+            },
+            InstrType::Jump { op } => None,
+            InstrType::Phi { lhs, rhs } => Some(vec![lhs.clone()]),
+            InstrType::TranType { lhs, op } => Some(vec![lhs.clone()]),
+        }
+    }
+} 
 #[derive(Clone, Debug)]
 pub enum IcmpPlan {
     Eq,
@@ -182,11 +260,14 @@ impl Debug for Trans {
 // 以下是构造函数:
 impl InstrType {
     pub fn to_instr(self) -> Instruction { Instruction { instr_type:self, info:Fields::new() } }
-    pub fn new_def_func(func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx>) -> Self { Self::Def_Func { func_symidx, ret_type, args } }
+    pub fn new_def_func(func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx>) -> Self { Self::DefineFunc { func_symidx, ret_type, args } }
     pub fn new_label(label_symidx:SymIdx) -> Self { Self::Label { label_symidx } }
 
-    pub fn new_def_var(vartype:Type, varname:SymIdx, value:SymIdx) -> Self { Self::Def_Var { var_symidx:varname, vartype, value } }
+    pub fn new_def_var(vartype:Type, varname:SymIdx, value:SymIdx) -> Self { Self::DefineVar { var_symidx:varname, vartype, value } }
     pub fn new_assign(lhs:SymIdx, rhs:SymIdx) -> Self { Self::SimpleAssign { lhs, rhs } }
+    pub fn new_phi_node(lhs:SymIdx, phi_op:PhiOp) -> Self{
+        Self::Phi { lhs, rhs: phi_op }
+    }
 
     // Instruction -> Arith -> ArithOp
     pub fn new_add(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::Add { a, b, vartype } } }
@@ -270,8 +351,12 @@ impl Debug for JumpOp {
 
 impl Debug for PhiOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        // write!(f,"phi type [{}, {}], [{},{}]",)
-        todo!()
+        // for 
+        let mut s = String::new();
+        for phi_pair in self.phi_pairs.iter(){
+            s+=format!("[{:?}, {}],",phi_pair.symidx,phi_pair.bb).as_str();
+        }
+        write!(f,"phi {}",s)
     }
 }
 impl Debug for InstrType {
@@ -288,12 +373,12 @@ impl Debug for InstrType {
 
             Self::Jump { op } => write!(f, "{:?}", op),
 
-            Self::Phi { lhs, rhs } => write!(f, "phi函数,但是还没写呢"),
+            Self::Phi { lhs, rhs } => write!(f, "{:?} = {:?}",lhs,rhs),
             Self::SimpleAssign { lhs, rhs } => write!(f, "Assign {:?},{:?}\n", lhs, rhs),
-            Self::Def_Func { func_symidx: funname, ret_type: rettype, args: paralst } => {
+            Self::DefineFunc { func_symidx: funname, ret_type: rettype, args: paralst } => {
                 write!(f, "Define {:?} {:?} {:?}\n", rettype, funname, paralst)
             }
-            Self::Def_Var { var_symidx: varname, vartype, value } => {
+            Self::DefineVar { var_symidx: varname, vartype, value } => {
                 if value.symbol_name.is_empty() {
                     Ok(write!(f, "Alloc {:?} %{:?}\n", vartype, varname)?)
                 } else {

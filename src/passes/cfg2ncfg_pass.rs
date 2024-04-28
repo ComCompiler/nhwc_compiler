@@ -8,7 +8,7 @@ pub struct Cfg2NcfgPass {
     is_gen_symtab_graph_png:bool,
 }
 impl Cfg2NcfgPass {
-    pub fn new(is_gen_png:bool, is_gen_symtab_png:bool) -> Self { Cfg2NcfgPass { is_gen_ncfg_png:is_gen_png, is_gen_symtab_graph_png:is_gen_symtab_png } }
+    pub fn new(is_gen_ncfg_png:bool, is_gen_symtab_png:bool) -> Self { Cfg2NcfgPass { is_gen_ncfg_png, is_gen_symtab_graph_png:is_gen_symtab_png } }
 }
 
 impl Pass for Cfg2NcfgPass {

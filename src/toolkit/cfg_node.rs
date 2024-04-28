@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Result,Context};
 use strum_macros::EnumIs;
 use std::fmt::Debug;
 use std::vec;
@@ -8,7 +8,7 @@ use petgraph::stable_graph::StableDiGraph;
 use super::symtab::{SymIdx, SymTab, SymTabEdge, SymTabGraph};
 use crate::toolkit::cfg_edge::CfgEdge;
 use crate::toolkit::field::{Field, FieldsInit};
-use crate::{element, toolkit::ast_node::AstTree};
+use crate::{instr, toolkit::ast_node::AstTree};
 use crate::{make_field_trait_for_struct, make_specialized_get_field_fn_for_struct, node, reg_field_name};
 
 use super::field::Fields;
@@ -64,6 +64,7 @@ make_field_trait_for_struct!(CfgNodeType);
 
 #[derive(Clone)]
 pub struct CfgNode {
+    pub phi_instrs:Vec<usize>,
     pub instrs:Vec<usize>,
     pub text:String,
     pub info:Fields,
@@ -134,14 +135,25 @@ impl CfgNode {
         Ok(())
     }
     pub fn load_instrs_text(&mut self, instr_slab:&InstrSlab) {
-        for instr in self.instrs.iter() {
-            let instr = *instr;
-            self.text += format!("{:?} \n ", element!(at instr in instr_slab).unwrap()).as_str();
+        self.text +="Instrs \n";
+        for &instr in self.instrs.iter() {
+            self.text += format!("{:?} \n", instr!(at instr in instr_slab).unwrap()).as_str();
+        }
+        self.text += "PhiInstrs \n";
+        for &phi_instr in self.phi_instrs.iter() {
+            self.text += format!("{:?} \n", instr!(at phi_instr in instr_slab).unwrap()).as_str();
         }
     }
-    pub fn new_bb(ast_nodes:Vec<u32>) -> Self { Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::BasicBlock { ast_nodes })) } }
-    pub fn new_gather() -> Self { Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Gather {})) } }
-    pub fn new_root() -> Self { Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Root {})) } }
+    pub fn clear_text(&mut self){
+        self.text = String::new();
+    }
+    pub fn new_bb(ast_nodes:Vec<u32>) -> Self { 
+        let mut cfg_node_struct = Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::BasicBlock { ast_nodes })), phi_instrs: vec![] } ;
+        cfg_node_struct.add_def_symidx_vec(vec![]);
+        cfg_node_struct
+    }
+    pub fn new_gather() -> Self { Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Gather {})), phi_instrs: vec![] } }
+    pub fn new_root() -> Self { Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Root {})), phi_instrs: vec![] } }
     pub fn new_branch(ast_node:u32) -> Self {
         Self {
             instrs:vec![],
@@ -154,6 +166,7 @@ impl CfgNode {
                     // op_false_head_tail_nodes: false_head_tail_nodes,
                 }),
             ),
+            phi_instrs: vec![],
         }
     }
     pub fn new_for(
@@ -176,6 +189,7 @@ impl CfgNode {
                     // op_body_head_tail_nodes: body_head_tail_nodes,
                 }),
             ),
+            phi_instrs: vec![],
         }
     }
     pub fn new_while(
@@ -194,13 +208,15 @@ impl CfgNode {
                     // body_node,
                 }),
             ),
+            phi_instrs: vec![],
         }
     }
-    pub fn new_switch(ast_expr_node:u32) -> Self { Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Switch { ast_expr_node })) } }
+    pub fn new_switch(ast_expr_node:u32) -> Self { Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Switch { ast_expr_node })), phi_instrs: vec![] } }
     pub fn new_entry(ast_node:u32, _instr:usize) -> Self {
-        Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Entry { ast_node, calls_in_func:vec![] })) }
+        Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Entry { ast_node, calls_in_func:vec![] })), phi_instrs: vec![] }
     }
-    pub fn new_exit(ast_node:u32) -> Self { Self { text:String::new(), instrs:vec![], info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Exit { ast_node })) } }
+    pub fn new_exit(ast_node:u32) -> Self { Self { text:String::new(), instrs:vec![], info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Exit { ast_node })), phi_instrs: vec![] } }
+    
 }
 
 impl Debug for CfgNode {

@@ -10,7 +10,7 @@ use crate::antlr_parser::cparser::{
 use crate::toolkit::symtab::SymIdx;
 use crate::{add_node, add_node_with_edge, direct_child_node, find, find_nodes, node, rule_id, term_id};
 
-use super::et_node::{DefOrUse, EtNodeType, EtTree};
+use super::et_node::{DeclOrDefOrUse, EtNodeType, EtTree};
 use super::{ast_node::AstTree, scope_node::ScopeTree};
 
 // 这个函数 返回 separator node
@@ -106,11 +106,11 @@ fn process_init_declarator(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&S
 }
 
 fn process_direct_decl(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, direct_decl_node:u32, type_ast_node:u32, scope_node:u32, parent_et_node:u32) {
-    if let Some(para_type_list_node) = find!(rule RULE_parameterTypeList at direct_decl_node in ast_tree) {
+    if let Some(_para_type_list_node) = find!(rule RULE_parameterTypeList at direct_decl_node in ast_tree) {
         // 这说明这是一个至少有一个参数的 函数 声明
     } else if let Some(ident_node) = find!(term Identifier at direct_decl_node in ast_tree) {
         // 这说明这只是一个简单的 ident
-        process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, parent_et_node, DefOrUse::Def { type_ast_node });
+        process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, parent_et_node, DeclOrDefOrUse::DeclDef { type_ast_node });
     } else if let Some(assign_expr_node) = find!(rule RULE_assignmentExpression at direct_decl_node in ast_tree) {
         // 说明这是一个数组，其中索引有表达式 assign_expr_node
         let et_direct_decl_node = add_node_with_edge!({EtNodeType::new_op_array_idx(direct_decl_node).to_et_node()} from parent_et_node in et_tree);
@@ -149,44 +149,44 @@ fn process_assign_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Scope
             let operator_node = direct_child_node!(at assign_operator_node in ast_tree);
             match (term_id!(at operator_node in ast_tree), operator_node) {
                 // ?暂时只支持五个 assign 类算符
-                (Assign, assign_operator) => {
+                (Assign, _assign_operator) => {
                     let et_assign_node = add_node_with_edge!({EtNodeType::new_op_assign(assign_expr_node).to_et_node()} from parent_et_node in et_tree );
                     let unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
-                    process_unary_expr(et_tree, ast_tree, scope_tree, unary_expr_node, scope_node, et_assign_node);
+                    process_unary_expr(et_tree, ast_tree, scope_tree, unary_expr_node, scope_node, et_assign_node,DeclOrDefOrUse::Def);
                     process_assign_expr(et_tree, ast_tree, scope_tree, right_assign_expr_ndoe, scope_node, et_assign_node);
                 }
-                (MulAssign, mul_assign_operator) => {
+                (MulAssign, _mul_assign_operator) => {
                     // 这里要添加两个node 一个是 赋值 = 一个是 *
                     let et_mul_assign_node = add_node_with_edge!({EtNodeType::new_op_mul_assign(scope_node).to_et_node()} from parent_et_node in et_tree );
 
                     let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
-                    process_unary_expr(et_tree, ast_tree, scope_tree, left_unary_expr_node, scope_node, et_mul_assign_node);
+                    process_unary_expr(et_tree, ast_tree, scope_tree, left_unary_expr_node, scope_node, et_mul_assign_node,DeclOrDefOrUse::Def);
                     process_assign_expr(et_tree, ast_tree, scope_tree, right_assign_expr_ndoe, scope_node, et_mul_assign_node);
                 }
-                (DivAssign, div_assign_operator) => {
+                (DivAssign, _div_assign_operator) => {
                     let et_div_assign_node = add_node_with_edge!({EtNodeType::new_op_div_assign(scope_node).to_et_node()} from parent_et_node in et_tree );
 
                     let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
-                    process_unary_expr(et_tree, ast_tree, scope_tree, left_unary_expr_node, scope_node, et_div_assign_node);
+                    process_unary_expr(et_tree, ast_tree, scope_tree, left_unary_expr_node, scope_node, et_div_assign_node,DeclOrDefOrUse::Def);
                     process_assign_expr(et_tree, ast_tree, scope_tree, right_assign_expr_ndoe, scope_node, et_div_assign_node);
                 }
-                (PlusAssign, plus_assign_operator) => {
+                (PlusAssign, _plus_assign_operator) => {
                     let et_plus_assign_node = add_node_with_edge!({EtNodeType::new_op_plus_assign(scope_node).to_et_node()} from parent_et_node in et_tree );
 
                     let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
-                    process_unary_expr(et_tree, ast_tree, scope_tree, left_unary_expr_node, scope_node, et_plus_assign_node);
+                    process_unary_expr(et_tree, ast_tree, scope_tree, left_unary_expr_node, scope_node, et_plus_assign_node,DeclOrDefOrUse::Def);
                     process_assign_expr(et_tree, ast_tree, scope_tree, right_assign_expr_ndoe, scope_node, et_plus_assign_node);
                 }
-                (MinusAssign, minus_assign_operator) => {
+                (MinusAssign, _minus_assign_operator) => {
                     let et_minus_assign_node = add_node_with_edge!({EtNodeType::new_op_minus_assign(scope_node).to_et_node()} from parent_et_node in et_tree );
 
                     let left_unary_expr_node = find!(rule RULE_unaryExpression at assign_expr_node in ast_tree).unwrap();
                     let right_assign_expr_ndoe = find!(rule RULE_assignmentExpression at assign_expr_node in ast_tree).unwrap();
-                    process_unary_expr(et_tree, ast_tree, scope_tree, left_unary_expr_node, scope_node, et_minus_assign_node);
+                    process_unary_expr(et_tree, ast_tree, scope_tree, left_unary_expr_node, scope_node, et_minus_assign_node,DeclOrDefOrUse::Def);
                     process_assign_expr(et_tree, ast_tree, scope_tree, right_assign_expr_ndoe, scope_node, et_minus_assign_node);
                 }
                 _ => {
@@ -521,20 +521,20 @@ fn process_cast_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTr
         let type_sym = SymIdx::new(scope_node, node!(at type_name_node in ast_tree).text.clone());
         let cast_node = add_node_with_edge!({EtNodeType::new_op_cast( cast_expr_node).to_et_node()} from parent_et_node in et_tree);
         // 添加 cast op 节点的左节点，这是个 type symbol
-        add_node_with_edge!({EtNodeType::new_symbol(scope_node,type_sym,DefOrUse::Use).to_et_node()} from cast_node in et_tree);
+        add_node_with_edge!({EtNodeType::new_symbol(scope_node,type_sym,DeclOrDefOrUse::Use).to_et_node()} from cast_node in et_tree);
 
         // 递归处理 castExpression
         let child_cast_expr_node = find!(rule RULE_castExpression at cast_expr_node in ast_tree).expect(format!("在 节点 {} 下找不到 castExpr", type_name_node).as_str());
         process_cast_expr(et_tree, ast_tree, scope_tree, child_cast_expr_node, scope_node, cast_node);
     } else if let Some(unary_expr_node) = find!(rule RULE_unaryExpression at cast_expr_node in ast_tree) {
         // 如果是 unaryExpression，直接处理
-        process_unary_expr(et_tree, ast_tree, scope_tree, unary_expr_node, scope_node, parent_et_node);
+        process_unary_expr(et_tree, ast_tree, scope_tree, unary_expr_node, scope_node, parent_et_node,DeclOrDefOrUse::Use);
     } else {
         panic!("Unexpected condition in cast_expr");
     }
 }
 
-pub fn process_unary_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, unary_expr_node:u32, scope_node:u32, parent_et_node:u32) {
+pub fn process_unary_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, unary_expr_node:u32, scope_node:u32, parent_et_node:u32, def_or_use:DeclOrDefOrUse) {
     let get_expr_node_of_unary_op_node = |op_node| match term_id!(at op_node in ast_tree) {
         And => EtNodeType::new_op_addr_of(unary_expr_node).to_et_node(),
         Star => EtNodeType::new_op_deref(unary_expr_node).to_et_node(),
@@ -557,51 +557,51 @@ pub fn process_unary_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Sc
         process_cast_expr(et_tree, ast_tree, scope_tree, child_cast_expr_node, scope_node, op_node);
     } else if let Some(postfix_expr_node) = find!(rule RULE_postfixExpression at unary_expr_node in ast_tree) {
         // 如果是 postfixExpression，直接处理
-        process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, parent_et_node);
+        process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, parent_et_node,def_or_use);
     } else {
         panic!("Unexpected condition in unary_expr");
     }
 }
 
-fn process_postfix_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, postfix_expr_node:u32, scope_node:u32, parent_et_node:u32) {
+fn process_postfix_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, postfix_expr_node:u32, scope_node:u32, parent_et_node:u32,def_or_use:DeclOrDefOrUse) {
     if let Some(expr_node) = find!(rule RULE_expression at postfix_expr_node in ast_tree) {
         //说明这是个带下标的语法 with subscript
         let postfix_expr_node = find!(rule RULE_postfixExpression at postfix_expr_node in ast_tree).unwrap();
         let et_array_wrapper_node = add_node_with_edge!({EtNodeType::new_op_array_idx(postfix_expr_node).to_et_node()} from parent_et_node in et_tree);
-        process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_array_wrapper_node);
+        process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_array_wrapper_node,def_or_use);
         process_expr(et_tree, ast_tree, scope_tree, expr_node, scope_node, et_array_wrapper_node);
     } else if let Some(arg_expr_list_node) = find!(rule RULE_argumentExpressionList at postfix_expr_node in ast_tree) {
         //说明这是个函数调用的语法 call
         let et_call_node = add_node_with_edge!({EtNodeType::new_op_call( postfix_expr_node).to_et_node()} from parent_et_node in et_tree);
         let postfix_expr_node = find!(rule RULE_postfixExpression at postfix_expr_node in ast_tree).unwrap();
-        process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_call_node);
+        process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_call_node,def_or_use);
         process_arg_expr_list(et_tree, ast_tree, scope_tree, arg_expr_list_node, scope_node, et_call_node);
     } else if let Some(_dot_node) = find!(term Dot at postfix_expr_node in ast_tree) {
         //说明这是个结构体成员访问的语法 dot member access
         let et_dot_member_node = add_node_with_edge!({EtNodeType::new_op_dot_member( postfix_expr_node).to_et_node()} from parent_et_node in et_tree);
         let postfix_expr_node = find!(rule RULE_postfixExpression at postfix_expr_node in ast_tree).unwrap();
         let ident_node = find!(term Identifier at postfix_expr_node in ast_tree).unwrap();
-        process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_dot_member_node);
-        process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, et_dot_member_node, DefOrUse::Use);
+        process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_dot_member_node,def_or_use);
+        process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, et_dot_member_node, DeclOrDefOrUse::Use);
     } else if let Some(_arrow_node) = find!(term Arrow at postfix_expr_node in ast_tree) {
         //说明这是个结构体成员访问的语法 arrow member access
         let et_arrow_member_node = add_node_with_edge!({EtNodeType::new_op_arrow_member( postfix_expr_node).to_et_node()} from parent_et_node in et_tree);
         let postfix_expr_node = find!(rule RULE_postfixExpression at postfix_expr_node in ast_tree).unwrap();
         let ident_node = find!(term Identifier at postfix_expr_node in ast_tree).unwrap();
-        process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_arrow_member_node);
-        process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, et_arrow_member_node, DefOrUse::Use);
+        process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_arrow_member_node,def_or_use);
+        process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, et_arrow_member_node, DeclOrDefOrUse::Use);
     } else if let Some(_string_node) = find!(term PlusPlus at postfix_expr_node in ast_tree) {
         //说明这是个++的语法
         let et_plusplus_node = add_node_with_edge!({EtNodeType::new_op_right_plusplus( postfix_expr_node).to_et_node()} from parent_et_node in et_tree);
         let postfix_expr_node = find!(rule RULE_postfixExpression at postfix_expr_node in ast_tree).expect(format!("process_postfix_expr error at ast_node{}", postfix_expr_node).as_str());
-        process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_plusplus_node);
+        process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_plusplus_node,DeclOrDefOrUse::Def);
     } else if let Some(_string_node) = find!(term MinusMinus at postfix_expr_node in ast_tree) {
         //说明这是个--的语法
         let et_minusminus_node = add_node_with_edge!({EtNodeType::new_op_right_minusminus( postfix_expr_node).to_et_node()} from parent_et_node in et_tree);
         let postfix_expr_node = find!(rule RULE_postfixExpression at postfix_expr_node in ast_tree).unwrap();
-        process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_minusminus_node);
+        process_postfix_expr(et_tree, ast_tree, scope_tree, postfix_expr_node, scope_node, et_minusminus_node,DeclOrDefOrUse::Def);
     } else if let Some(primary_expr_node) = find!(rule RULE_primaryExpression at postfix_expr_node in ast_tree) {
-        process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, parent_et_node)
+        process_primary_expr(et_tree, ast_tree, scope_tree, primary_expr_node, scope_node, parent_et_node,def_or_use)
     }
 }
 fn process_arg_expr_list(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, arg_expr_list_node:u32, scope_node:u32, parent_et_node:u32) {
@@ -610,13 +610,13 @@ fn process_arg_expr_list(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Sco
         process_assign_expr(et_tree, ast_tree, scope_tree, assign_expr_node, scope_node, parent_et_node)
     }
 }
-fn process_primary_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, primary_expr_node:u32, scope_node:u32, parent_et_node:u32) {
+fn process_primary_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, primary_expr_node:u32, scope_node:u32, parent_et_node:u32,def_or_use:DeclOrDefOrUse) {
     if let Some(const_node) = find!(term Constant at primary_expr_node in ast_tree) {
         // println!("constant {}",const_node);
         process_constant(et_tree, ast_tree, scope_tree, const_node, scope_node, parent_et_node);
     } else if let Some(ident_node) = find!(term Identifier at primary_expr_node in ast_tree) {
         // println!("ident {}",ident_node);
-        process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, parent_et_node, DefOrUse::Use);
+        process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, parent_et_node, def_or_use);
     } else if let Some(expr_node) = find!(rule RULE_expression at primary_expr_node in ast_tree) {
         // println!("expr found under {}",primary_expr_node );
         process_expr(et_tree, ast_tree, scope_tree, expr_node, scope_node, parent_et_node);
@@ -644,7 +644,7 @@ fn process_initializer(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Scope
 
 /// 会把表达式中的符号添加到 symtab 中
 /// ? 这个过程并不需要符号表，因为符号表是用来检查 def use 是否合法的，比如变量在 定义前被使用了就是非法
-fn process_ident(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, ident_node:u32, scope_node:u32, parent_et_node:u32, def_or_use:DefOrUse) {
+fn process_ident(et_tree:&mut EtTree, ast_tree:&AstTree, _scope_tree:&ScopeTree, ident_node:u32, scope_node:u32, parent_et_node:u32, def_or_use:DeclOrDefOrUse) {
     let sym_name = node!(at ident_node in ast_tree).text.clone();
     // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 
@@ -652,7 +652,7 @@ fn process_ident(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, 
     // let symbol = symtab.add(symbol_struct);
     add_node_with_edge!({EtNodeType::new_symbol(ident_node, sym_idx, def_or_use).to_et_node()} from parent_et_node in et_tree);
 }
-fn process_constant(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, const_node:u32, scope_node:u32, parent_et_node:u32) {
+fn process_constant(et_tree:&mut EtTree, ast_tree:&AstTree, _scope_tree:&ScopeTree, const_node:u32, scope_node:u32, parent_et_node:u32) {
     let sym_name = node!(at const_node in ast_tree).text.clone();
     // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 

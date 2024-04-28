@@ -1,7 +1,8 @@
-use super::{field::Field, symbol::Symbol};
+use super::{context::COMPILATION_UNIT, field::Field, symbol::Symbol};
 use crate::make_field_trait_for_struct;
 use core::fmt::Debug;
 use core::panic;
+use anyhow::{anyhow,Result};
 use petgraph::stable_graph::StableDiGraph;
 use std::{collections::BTreeMap, fmt::Formatter};
 
@@ -32,11 +33,24 @@ make_field_trait_for_struct!(SymIdx);
 impl SymIdx {
     pub fn new(scope_node:u32, symbol_name:String) -> Self { SymIdx { scope_node, symbol_name, index_ssa:None } }
     pub fn new_verbose(scope_node:u32, symbol_name:String, index_ssa:Option<u32>) -> Self { SymIdx { scope_node, symbol_name, index_ssa } }
-
-    // pub fn get_use_counter(&mut self,symtab:&mut SymTab) -> Option<&mut UseCounter>{
-    //     find!(field mut USE_COUNTER:UseCounter at self in symtab)
-    //     paste::item
-    // }
+    pub fn to_src_symidx(&self)-> SymIdx{
+        let mut cloned = self.clone();
+        cloned.index_ssa = None;
+        cloned
+    }
+    pub fn as_src_symidx(&mut self)-> &mut SymIdx{
+        self.index_ssa = None;
+        self
+    }
+    pub fn to_ssa_symidx(&self,index_ssa:u32)->SymIdx{
+        let mut cloned = self.clone();
+        cloned.index_ssa = Some(index_ssa);
+        cloned
+    }
+    pub fn as_ssa_symidx(&mut self,index_ssa:u32)-> &mut SymIdx{
+        self.index_ssa = Some(index_ssa);
+        self
+    }
 }
 // macro_rules! make_get_field_func {
 //     ($($functionname:ident $field_name:ident:$field_type:ident),*) => {
@@ -59,14 +73,21 @@ impl SymTab {
     }
 
     // 查找符号
-    pub fn get_symbol_verbose(&self, symbol_name:String, scope_node:u32) -> Option<&Symbol> { self.map.get(&SymIdx { scope_node, symbol_name, index_ssa:None }) }
-    pub fn get_symbol(&self, symbol_index:&SymIdx) -> Option<&Symbol> { self.map.get(symbol_index) }
-    pub fn get_mut_symbol_verbose(&mut self, symbol_name:String, scope_node:u32) -> Option<&mut Symbol> { self.map.get_mut(&SymIdx { scope_node, symbol_name, index_ssa:None }) }
-    pub fn get_mut_symbol(&mut self, symbol_index:&SymIdx) -> Option<&mut Symbol> { self.map.get_mut(symbol_index) }
+    pub fn get_symbol_verbose(&self, symbol_name:String, scope_node:u32) -> Result<&Symbol> {let symidx = SymIdx { scope_node, symbol_name, index_ssa:None}; self.map.get(&symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx)) }
+    pub fn get_symbol(&self, symbol_index:&SymIdx) -> Result<&Symbol> { self.map.get(symbol_index).ok_or(anyhow!("找不到{:?}对应的symbol",symbol_index)) }
+    pub fn get_mut_symbol_verbose(&mut self, symbol_name:String, scope_node:u32) -> Result<&mut Symbol> { let symidx = SymIdx { scope_node, symbol_name, index_ssa:None }; self.map.get_mut(&symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx )) }
+    pub fn get_mut_symbol(&mut self, symbol_index:&SymIdx) -> Result<&mut Symbol> { self.map.get_mut(symbol_index).ok_or(anyhow!("找不到{:?}对应的symbol",symbol_index)) }
 
     // 删除符号
     pub fn remove_symbol(&mut self, symbol_index:&SymIdx) { self.map.remove(symbol_index); }
     pub fn remove_symbol_verbose(&mut self, symbol_name:String, scope_node:u32) { self.map.remove(&SymIdx { scope_node, symbol_name, index_ssa:None }); }
+
+    pub fn get_mut_global_info(&mut self) -> &mut Symbol{
+        self.get_mut_symbol_verbose(COMPILATION_UNIT.to_string(),0).unwrap()
+    }
+    pub fn get_global_info(&self) -> &Symbol{
+        self.get_symbol_verbose(COMPILATION_UNIT.to_string(),0).unwrap()
+    }
 }
 impl Default for SymTab {
     fn default() -> Self { Self { map:Default::default() } }
@@ -75,7 +96,8 @@ impl Debug for SymIdx {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
         match self.index_ssa {
             Some(index_ssa) => write!(f, "{}_s{}_i{}", self.symbol_name, self.scope_node, index_ssa),
-            None => write!(f, "{}_s{}", self.symbol_name, self.scope_node),
+            // None => write!(f, "{}_s{}", self.symbol_name, self.scope_node),
+            None => write!(f, "{}", self.symbol_name),
         }
     }
 }

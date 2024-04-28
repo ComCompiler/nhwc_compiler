@@ -5,7 +5,7 @@ use derive_builder::Builder;
 use crate::Args;
 
 use super::{
-    ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, dj_node::DjNode, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symtab::{SymTab, SymTabGraph}
+    ast_node::AstTree, cfg_node::CfgGraph, dj_node::DjNode, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symbol::Symbol, symtab::{SymTab, SymTabGraph}
 };
 use super::dj_edge::DjEdge;
 
@@ -27,13 +27,18 @@ pub struct Context {
     pub symtab_graph:SymTabGraph,
     pub instr_slab:InstrSlab,
 }
+pub(crate) static COMPILATION_UNIT:&str = "!compilation_unit";
 impl Context {
     pub fn new(args:Args) -> Self {
         Context {
             args,
             cfg_graph:CfgGraph::new(),
             ast_tree:AstTree::new(),
-            symtab:SymTab::new(),
+            symtab:{let mut symtab = SymTab::new(); 
+                    let mut symbol = Symbol::new_verbose(0, COMPILATION_UNIT.to_string(), None);
+                    symbol.add_all_cfg_func_name_entry_tuples(vec![]);
+                    let compilation_symidx = symtab.add_symbol(symbol);
+                    symtab},
             code:String::new(),
             scope_tree:ScopeTree::new(),
             et_tree:EtTree::new(),

@@ -1,4 +1,3 @@
-use derive_new::new;
 
 use crate::make_get_field_fn_for_struct;
 

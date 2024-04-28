@@ -1,5 +1,4 @@
 use core::fmt::Debug;
-use std::collections::HashMap;
 
 use ahash::AHashMap;
 
@@ -9,6 +8,7 @@ use super::field::{Fields, Type, UseCounter};
 use super::symtab::SymTab;
 use super::symtab::{SymTabEdge, SymTabGraph};
 use super::{field::Field, symtab::SymIdx};
+use anyhow::{Context};
 
 #[derive(Clone)]
 pub struct Symbol {

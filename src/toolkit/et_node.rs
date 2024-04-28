@@ -12,9 +12,10 @@ use petgraph::stable_graph::StableDiGraph;
 pub type EtTree = StableDiGraph<EtNode, (), u32>;
 
 #[derive(Clone)]
-pub enum DefOrUse {
-    Def { type_ast_node:u32 },
+pub enum DeclOrDefOrUse {
+    DeclDef { type_ast_node:u32 },
     Use,
+    Def 
 }
 #[derive(Clone)]
 pub enum EtNodeType {
@@ -24,7 +25,7 @@ pub enum EtNodeType {
     // 在这里 constant 也是一个 Symbol ，到时候在 SymbolField 里面加上 Constant 标记 就可以了
     Constant { const_sym_idx:SymIdx, ast_node:u32, text:String },
     // Def_Or_Use 是一个枚举类型，要么是 Def 要么是 Use
-    Symbol { sym_idx:SymIdx, ast_node:u32, text:String, def_or_use:DefOrUse },
+    Symbol { sym_idx:SymIdx, ast_node:u32, text:String, def_or_use:DeclOrDefOrUse },
     // array symbol 一个 array 是 array symbol
     // ArraySym{sym_idx:SymbolIndex,ast_node:u32,text:String,def_or_use:Def_Or_Use},
     // // 考虑到 可能出现  a=3,b=2; 这样的语句，因此需要规定一个Separator
@@ -195,7 +196,7 @@ impl EtNodeType {
     pub fn new_op_plus_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::PlusAssign, ast_node, text:String::new() } }
     //你必须确保这个symbol 是一个 constant
     pub fn new_constant(ast_node:u32, const_symbol:SymIdx) -> Self { EtNodeType::Constant { const_sym_idx:const_symbol, ast_node, text:String::new() } }
-    pub fn new_symbol(ast_node:u32, sym_idx:SymIdx, def_or_use:DefOrUse) -> Self { EtNodeType::Symbol { sym_idx, ast_node, text:String::new(), def_or_use:def_or_use } }
+    pub fn new_symbol(ast_node:u32, sym_idx:SymIdx, def_or_use:DeclOrDefOrUse) -> Self { EtNodeType::Symbol { sym_idx, ast_node, text:String::new(), def_or_use:def_or_use } }
     // pub fn new_array_symbol(ast_node:u32,sym_idx:SymbolIndex ,def_or_use:Def_Or_Use)->Self{
     //     EtNakedNode::ArraySym  {sym_idx,ast_node,text:String::new(), def_or_use:def_or_use  }
     // }
@@ -251,7 +252,7 @@ impl EtNodeType {
             let ast_node = *ast_node;
             let _ = mem::replace(text, node!(at ast_node in ast_tree).text.clone());
         } else if let EtNodeType::Symbol { sym_idx: _, ast_node: _, text, def_or_use } = self {
-            if let DefOrUse::Def { type_ast_node } = def_or_use {
+            if let DeclOrDefOrUse::DeclDef { type_ast_node } = def_or_use {
                 let type_ast_node = *type_ast_node;
                 let _ = mem::replace(text, node!(at type_ast_node in ast_tree).text.clone());
             }
@@ -278,11 +279,12 @@ impl Debug for EtNodeType {
     }
 }
 
-impl Debug for DefOrUse {
+impl Debug for DeclOrDefOrUse {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            DefOrUse::Def { type_ast_node: _ } => write!(f, "def"),
-            DefOrUse::Use => write!(f, "use"),
+            DeclOrDefOrUse::DeclDef { type_ast_node: _ } => write!(f, "decl"),
+            DeclOrDefOrUse::Use => write!(f, "use"),
+            DeclOrDefOrUse::Def => write!(f, "def"),
         }
     }
 }

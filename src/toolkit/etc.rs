@@ -1,6 +1,7 @@
 use std::{
     env, fmt::Debug, fs::File, io::{Read, Write}, process::Command
 };
+use colored::Colorize;
 
 use crate::{
     direct_child_nodes, toolkit::dot::{Config, Dot}
@@ -12,7 +13,7 @@ use anyhow::{anyhow,Result};
 pub fn generate_png_by_graph<N:Debug, E:Debug, Ty:EdgeType>(g:&StableGraph<N, E, Ty>, name:String, graph_config:&[Config]) {
     println!("current working dir is {:?}", env::current_dir());
     let png_name = name.clone() + ".png";
-    let dot_name = name + ".dot";
+    let dot_name = name.clone() + ".dot";
     let mut f = File::create(dot_name.clone()).expect("无法写入文件");
     f.write_all(format!("{:?}", Dot::with_config(&g, graph_config)).as_bytes()).expect("写入失败");
     // f.write_all(format!("{:?}", Dot::with_config(&g, as_bytes())
@@ -20,7 +21,7 @@ pub fn generate_png_by_graph<N:Debug, E:Debug, Ty:EdgeType>(g:&StableGraph<N, E,
 
     let output = Command::new("dot").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().expect("执行失败");
     // println!("{:?}", Command::new("dot") .args(["-Tpng","./graph.dot","-o","./graph.png"]));
-    println!("Transform to png {:?}", output);
+    println!("Successfully Transform to png {}.png {:?}", name.green(),output);
 }
 
 /// 从指定文件中读取所有文本
@@ -30,14 +31,14 @@ pub fn read_file_content(path:String) -> String {
     buf
 }
 
-pub fn dfs<N, E, Ty>(graph:&mut StableGraph<N, E, Ty, u32>, start_node:u32) -> Vec<u32>
+pub fn dfs<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32) -> Vec<u32>
 where
     Ty: EdgeType,
 {
     dfs_with_predicate(graph, start_node, |e |true)
 }   
 /// dfs,但是添加了对边的判定
-pub fn dfs_with_predicate<N, E, Ty>(graph:&mut StableGraph<N, E, Ty, u32>, start_node:u32, mut predicate:impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->bool)-> Vec<u32>
+pub fn dfs_with_predicate<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, mut predicate:impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->bool)-> Vec<u32>
 where
     Ty: EdgeType,
 {
@@ -48,7 +49,7 @@ where
     _dfs_with_predicate(graph, start_node, &mut visited, &mut dfs_vec, &mut predicate);
     dfs_vec
 }
-fn _dfs_with_predicate<N, E, Ty>(graph:&mut StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, dfs_vec:&mut Vec<u32>, predicate:&mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->bool)
+fn _dfs_with_predicate<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, dfs_vec:&mut Vec<u32>, predicate:&mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->bool)
 where
     Ty: EdgeType,
 {
