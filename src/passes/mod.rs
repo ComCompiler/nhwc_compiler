@@ -8,3 +8,5 @@ pub mod nhwc2riscv_pass;
 pub mod pass_demo;
 pub mod riscv2binary_pass;
 pub mod symtab_debug_pass;
+pub mod ssa_pass;
+pub mod ncfg2djg_pass;

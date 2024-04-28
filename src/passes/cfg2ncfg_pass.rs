@@ -14,7 +14,6 @@ impl Cfg2NcfgPass {
 impl Pass for Cfg2NcfgPass {
     // 运行这个pass
     fn run(&mut self, ctx:&mut Context) -> Result<()> {
-        ctx.nhwc_cfg = ctx.cfg_graph.clone();
         // 不要在函数中对context进行解包,解包应在pass阶段完成
         let (cfg_graph, scope_tree, ast_tree, symtab, et_tree, ast2scope, symtab_graph) =
             (&mut ctx.cfg_graph, &mut ctx.scope_tree, &mut ctx.ast_tree, &mut ctx.symtab, &mut ctx.et_tree, &mut ctx.ast2scope, &mut ctx.symtab_graph);

@@ -5,8 +5,11 @@ use derive_builder::Builder;
 use crate::Args;
 
 use super::{
-    ast_node::AstTree, cfg_node::CfgGraph, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symtab::{SymTab, SymTabGraph}
+    ast_node::AstTree, cfg_node::{CfgGraph, CfgNode}, dj_node::DjNode, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symtab::{SymTab, SymTabGraph}
 };
+use super::dj_edge::DjEdge;
+
+pub type DjGraph = petgraph::stable_graph::StableDiGraph<DjNode, DjEdge, u32>;
 
 #[derive(Default, Builder)]
 #[builder(default)]
@@ -17,7 +20,8 @@ pub struct Context {
     pub cfg_graph:CfgGraph,
     pub symtab:SymTab,
     pub scope_tree:ScopeTree,
-    pub nhwc_cfg:CfgGraph,
+    pub dj_graph:DjGraph,
+    pub ssa_nhwc_cfg:CfgGraph,
     pub et_tree:EtTree,
     pub ast2scope:HashMap<u32, u32>,
     pub symtab_graph:SymTabGraph,
@@ -28,7 +32,6 @@ impl Context {
         Context {
             args,
             cfg_graph:CfgGraph::new(),
-            nhwc_cfg:CfgGraph::new(),
             ast_tree:AstTree::new(),
             symtab:SymTab::new(),
             code:String::new(),
@@ -37,6 +40,8 @@ impl Context {
             ast2scope:HashMap::new(),
             symtab_graph:SymTabGraph::new(),
             instr_slab:InstrSlab::new(),
+            ssa_nhwc_cfg:CfgGraph::new() ,
+            dj_graph: DjGraph::new(),
         }
     }
 }

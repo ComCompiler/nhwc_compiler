@@ -108,7 +108,7 @@ pub enum InstrType {
 }
 #[derive(Clone)]
 pub struct Instruction {
-    naked_instr:InstrType,
+    pub instr_type:InstrType,
     info:Fields,
 }
 #[derive(Clone, Debug)]
@@ -181,7 +181,7 @@ impl Debug for Trans {
 }
 // 以下是构造函数:
 impl InstrType {
-    pub fn to_instr(self) -> Instruction { Instruction { naked_instr:self, info:Fields::new() } }
+    pub fn to_instr(self) -> Instruction { Instruction { instr_type:self, info:Fields::new() } }
     pub fn new_def_func(func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx>) -> Self { Self::Def_Func { func_symidx, ret_type, args } }
     pub fn new_label(label_symidx:SymIdx) -> Self { Self::Label { label_symidx } }
 
@@ -214,6 +214,15 @@ impl InstrType {
     pub fn new_float2int(float_symidx:SymIdx, int_symidx:SymIdx) -> Self { Self::TranType { lhs:int_symidx, op:Trans::Fptosi { float_symidx } } }
     pub fn new_bool2int(bool_symidx:SymIdx, int_symidx:SymIdx) -> Self { Self::TranType { lhs:int_symidx, op:Trans::Zext { bool_symidx } } }
     pub fn new_ptr2ptr(lptr:SymIdx, lptr_type:Type, rptr:SymIdx, rptr_type:Type) -> Self { Self::TranType { lhs:lptr, op:Trans::Bitcast { rptr_symidx:rptr, rptr_type, lptr_type } } }
+
+    pub fn get_lhs(&self)->Option<SymIdx>{
+        match self{
+            InstrType::Arith { lhs, rhs } => Some(lhs.clone()),
+            InstrType::SimpleAssign { lhs, rhs } => Some(lhs.clone()),
+            InstrType::Phi { lhs, rhs } => Some(lhs.clone()),
+            _=>None
+        }
+    }
 }
 impl Debug for ArithOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -549,6 +558,6 @@ impl Debug for Stores {
 impl Debug for Instruction {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
         // write!(f,"{:?} ------{:?}",self.naked_instr,self.info)
-        write!(f, "{:?} ", self.naked_instr)
+        write!(f, "{:?} ", self.instr_type)
     }
 }

@@ -8,7 +8,7 @@ mod tests {
     use crate::{
         add_field, add_pass, add_symbol, antlr_parser::{
             clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}
-        }, direct_children_nodes, direct_parent_node, find, find_nodes, passes::pass_demo::PassDemo, toolkit::{
+        }, direct_child_nodes, direct_parent_node, find, find_nodes, passes::pass_demo::PassDemo, toolkit::{
             self, ast_node::find_dfs_rule_ast, context::{Context, ContextBuilder}, dot::Config, et_node::{EtNode, EtNodeType, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::{Type, Value}, gen_ast::parse_as_ast_tree, nhwc_instr::{InstrSlab, InstrType}, pass_manager::{Pass, PassManager}, symbol::Symbol, symtab::SymTab
         }, Args
     };
@@ -245,7 +245,7 @@ mod tests {
         let ast_tree = &mut context.ast_tree;
         //dfs遍历ast
         let node = find_dfs_rule_ast(ast_tree, 0, RULE_translationUnit).next().unwrap();
-        let nodes = direct_children_nodes!(at node in ast_tree);
+        let nodes = direct_child_nodes!(at node in ast_tree);
         assert_eq!(nodes.len(), 2, "找到的 nodes 数量 不对 {:?}", nodes);
     }
     #[test]

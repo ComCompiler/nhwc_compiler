@@ -1,4 +1,5 @@
 use anyhow::Result;
+use strum_macros::EnumIs;
 use std::fmt::Debug;
 use std::vec;
 
@@ -22,7 +23,7 @@ reg_field_name!(CFG_NODE_TYPE:cfg_node_type);
 用于存储这个变量的 symidx */
 reg_field_name!(JUMP_DET:jump_det);
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, EnumIs)]
 pub enum CfgNodeType {
     Entry {
         ast_node:u32,
@@ -69,9 +70,11 @@ pub struct CfgNode {
     // instructions of this basic block (第二步才生成这个 instrs)
 }
 make_specialized_get_field_fn_for_struct!(
-    CfgNode 
-    CFG_NODE_TYPE:CfgNodeType,
-    JUMP_DET:SymIdx   
+    CfgNode
+    { 
+        CFG_NODE_TYPE:CfgNodeType,
+        JUMP_DET:SymIdx, 
+    }
     with fields info);
 impl CfgNode {
     pub fn load_ast_node_text(&mut self, ast_tree:&AstTree) -> Result<()> {

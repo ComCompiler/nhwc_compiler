@@ -5,7 +5,7 @@ pub struct Ast2StPass {
     is_gen_png:bool,
 }
 impl Ast2StPass {
-    pub fn new(_is_gen_png:bool) -> Self { Ast2StPass { is_gen_png:true } }
+    pub fn new(is_gen_png:bool) -> Self { Ast2StPass { is_gen_png} }
 }
 
 impl Pass for Ast2StPass {

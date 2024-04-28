@@ -11,7 +11,7 @@ use antlr_parser::cparser::{RULE_compoundStatement, RULE_functionDefinition};
 use clap::Parser;
 use passes::{ast2cfg_pass::Ast2CfgPass, ast2et_debug_pass::Ast2EtDebugPass, ast2st_pass::Ast2StPass, cfg2ncfg_pass::Cfg2NcfgPass, code2ast_pass::Code2AstPass};
 
-use crate::toolkit::pass_manager::PassManager;
+use crate::{passes::{ncfg2djg_pass::Ncfg2DjgPass, ssa_pass::{SsaPass}}, toolkit::pass_manager::PassManager};
 #[derive(Parser, Clone, Default)]
 #[command(author, version, about)]
 pub struct Args {
@@ -37,13 +37,16 @@ fn main() {
     // 读取命令选项，诸如 -c 表示代码文件地址
     // 你也可以通过运行 cargo run -- --help 来查看所有可用选项
     let args = Args::parse();
+    let is_gen_png_global = false;
     // args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
     let mut pass_manager = PassManager::new(args);
-    let code2ast_pass = Code2AstPass::new(true);
-    let ast2cfg_pass = Ast2CfgPass::new(true);
-    let ast2et_debug_pass = Ast2EtDebugPass::new(true);
-    let cfg2ncfg_pass = Cfg2NcfgPass::new(true, true);
-    let ast2st_pass = Ast2StPass::new(true);
+    let code2ast_pass = Code2AstPass::new(true && is_gen_png_global);
+    let ast2cfg_pass = Ast2CfgPass::new(true && is_gen_png_global);
+    let ast2et_debug_pass = Ast2EtDebugPass::new(true && is_gen_png_global);
+    let cfg2ncfg_pass = Cfg2NcfgPass::new(false && is_gen_png_global, true && is_gen_png_global);
+    let ast2st_pass = Ast2StPass::new(true && is_gen_png_global);
+    let ncfg2djg_pass = Ncfg2DjgPass::new(true && is_gen_png_global);
+    let ssa_pass = SsaPass::new(true && is_gen_png_global);
     // let symtab_debug_pass = SymtabDebugPass::new(true);
     add_passes!(
         code2ast_pass
@@ -51,6 +54,8 @@ fn main() {
         then ast2st_pass
         then ast2cfg_pass
         then cfg2ncfg_pass
+        then ncfg2djg_pass
+        then ssa_pass
         // then symtab_debug_pass
         to pass_manager
     );

@@ -12,7 +12,7 @@ use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, dot::Config, field::Fi
 use crate::{
     add_edge, add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{
         RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
-    }, dfs_graph, direct_child_node, direct_children_nodes, direct_parent_nodes, find, find_nodes, incoming_edges, node, node_mut, outgoing_edges, push_instr, rule_id, toolkit::{
+    }, direct_child_node, direct_child_nodes, direct_parent_nodes, find, find_nodes, incoming_edges, node, node_mut, outgoing_edges, push_instr, rule_id, toolkit::{
         cfg_node::CfgNode, etc::{self, generate_png_by_graph}, field::{Type, UseCounter}, nhwc_instr::{IcmpPlan, UcmpPlan}, symbol::Symbol, symtab::SymTabEdge
     }
 };
@@ -36,7 +36,7 @@ fn parse_stmt2nhwc(
 
     //如果该节点有子树
     if let Some(_) = direct_child_node!(at et_root in et_tree ret option) {
-        let et_nodes = direct_children_nodes!(at et_root in et_tree);
+        let et_nodes = direct_child_nodes!(at et_root in et_tree);
         for et_node in et_nodes {
             let et_struct = &node!(at et_node in et_tree).et_node_type;
             match et_struct {
@@ -44,7 +44,7 @@ fn parse_stmt2nhwc(
                     if let Some(_) = direct_child_node!(at et_node in et_tree ret option) {
                         match op {
                             crate::toolkit::et_node::ExprOp::Assign => {
-                                let op_values = direct_children_nodes!(at et_node in et_tree);
+                                let op_values = direct_child_nodes!(at et_node in et_tree);
 
                                 // 后序遍历 右边
                                 let value_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[1], stmt_parent_scope, cfg_bb, counter, instr_slab, symtab_graph)?;
@@ -837,7 +837,7 @@ fn process_arithop(
     ast_tree:&AstTree, cfg_graph:&mut CfgGraph, et_tree:&EtTree, scope_tree:&ScopeTree, symtab:&mut SymTab, root_et_node:u32, scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
     symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<(SymIdx, SymIdx, SymIdx, Type, Type)> {
-    let next_nodes = direct_children_nodes!(at root_et_node in et_tree);
+    let next_nodes = direct_child_nodes!(at root_et_node in et_tree);
     //取右操作数symidx和type
     let r_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_nodes[1], scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
     let r_type = find!(field TYPE:Type at r_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
@@ -857,7 +857,7 @@ fn process_logicop(
     ast_tree:&AstTree, cfg_graph:&mut CfgGraph, et_tree:&EtTree, scope_tree:&ScopeTree, symtab:&mut SymTab, op_et_node:u32, scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
     symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<(SymIdx, SymIdx, SymIdx)> {
-    let next_nodes = direct_children_nodes!(at op_et_node in et_tree);
+    let next_nodes = direct_child_nodes!(at op_et_node in et_tree);
     //取右操作数的symidx和type
     let r_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_nodes[1], scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
     let r_type = find!(field TYPE:Type at r_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
@@ -1090,7 +1090,7 @@ fn process_et(
                 //调用函数
                 super::et_node::ExprOp::Call => {
                     // //取函数名和实参
-                    let func_name_and_args = direct_children_nodes!(at et_node in et_tree);
+                    let func_name_and_args = direct_child_nodes!(at et_node in et_tree);
                     //函数名是数组第一个值，其余为参数
 
                     //待处理：检验函数形参
@@ -1190,13 +1190,13 @@ fn parse_declaration2nhwc(
 
     //如果该节点有子树
     if let Some(_) = direct_child_node!(at et_root in et_tree ret option) {
-        let detail_ets = direct_children_nodes!(at et_root in et_tree);
+        let detail_ets = direct_child_nodes!(at et_root in et_tree);
         for detail_et in detail_ets {
             let etnode = &node!(at detail_et in et_tree).et_node_type;
             match etnode {
                 EtNodeType::Operator { op: _, ast_node: _, text: _ } => {
                     if let Some(_) = direct_child_node!(at detail_et in et_tree ret option) {
-                        let op_values = direct_children_nodes!(at detail_et in et_tree);
+                        let op_values = direct_child_nodes!(at detail_et in et_tree);
                         //获得变量类型，做成symidx
                         let vartype_node = find!(rule RULE_declarationSpecifiers at ast_decl_node in ast_tree).unwrap();
                         let var_type = Type::new(vartype_node, ast_tree);
@@ -1293,7 +1293,7 @@ pub fn parse_cfg_into_nhwc_cfg(
 
     let start_node:NodeIndex<u32> = NodeIndex::new(0);
     //先遍历一遍函数名，将函数名加入到符号表中
-    let cfg_funcs = direct_children_nodes!(at start_node in cfg_graph);
+    let cfg_funcs = direct_child_nodes!(at start_node in cfg_graph);
     for cfg_entry in cfg_funcs.clone() {
         match node!(at cfg_entry in cfg_graph).get_cfg_node_type()? {
             CfgNodeType::Entry { ast_node, calls_in_func: _ } => {
@@ -1308,7 +1308,7 @@ pub fn parse_cfg_into_nhwc_cfg(
     }
     //再遍历一遍entry，对于每个函数做dfs,处理函数体
     for cfg_entry in cfg_funcs.clone() {
-        let dfs_vec = dfs_graph!(at cfg_entry in cfg_graph for dfs);
+        let dfs_vec = etc::dfs(cfg_graph, cfg_entry);
         // dfs_vec.sort_by(|node| )
         // dfs_vec.reverse();
         for cfg_node in dfs_vec {
