@@ -363,10 +363,10 @@ impl Debug for InstrType {
     // 以类似llvm ir的格式打印输出
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Arith { lhs, rhs } => write!(f, "{:?} = {:?}\n", lhs, rhs),
+            Self::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
 
             Self::Call { assigned, func_op } => match assigned {
-                Some(symidx) => write!(f, "{:?} = {:?}\n", symidx, func_op),
+                Some(symidx) => write!(f, "{:?} = {:?}", symidx, func_op),
 
                 None => write!(f, "{:?}", func_op),
             },
@@ -374,21 +374,21 @@ impl Debug for InstrType {
             Self::Jump { op } => write!(f, "{:?}", op),
 
             Self::Phi { lhs, rhs } => write!(f, "{:?} = {:?}",lhs,rhs),
-            Self::SimpleAssign { lhs, rhs } => write!(f, "Assign {:?},{:?}\n", lhs, rhs),
+            Self::SimpleAssign { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
             Self::DefineFunc { func_symidx: funname, ret_type: rettype, args: paralst } => {
-                write!(f, "Define {:?} {:?} {:?}\n", rettype, funname, paralst)
+                write!(f, "Define {:?} {:?} {:?}", rettype, funname, paralst)
             }
             Self::DefineVar { var_symidx: varname, vartype, value } => {
                 if value.symbol_name.is_empty() {
-                    Ok(write!(f, "Alloc {:?} %{:?}\n", vartype, varname)?)
+                    Ok(write!(f, "Alloc {:?} %{:?}", vartype, varname)?)
                 } else {
-                    Ok(write!(f, "Alloc {:?} %{:?} = {:?}\n", vartype, varname, value)?)
+                    Ok(write!(f, "Alloc {:?} %{:?} = {:?}", vartype, varname, value)?)
                 }
             }
             Self::Label { label_symidx } => {
-                write!(f, "label {:?}:\n", label_symidx)
+                write!(f, "     label {:?}:", label_symidx)
             }
-            Self::TranType { lhs, op } => write!(f, "{:?} = {:?}\n", lhs, op),
+            Self::TranType { lhs, op } => write!(f, "{:?} = {:?}", lhs, op),
         }
     }
 }

@@ -218,35 +218,64 @@ impl CfgNode {
     pub fn new_exit(ast_node:u32) -> Self { Self { text:String::new(), instrs:vec![], info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Exit { ast_node })), phi_instrs: vec![] } }
     
 }
+trait CfgNodeTypeTrait {
+    // 3元
+    fn debug_for_ternary(&self ,f:&mut std::fmt::Formatter<'_>, node_type:String, field:String, n:CfgNode);
+    // 4元
+    fn debug_for_quaternary(&self, f:&mut std::fmt::Formatter<'_>, node_type:String, field:String, n:CfgNode);
+    // 5元
+    fn debug_for_quinary(&self, f:&mut std::fmt::Formatter<'_>, node_type:String, field:String, n:CfgNode, ast_node:u32);
+}
+impl CfgNodeTypeTrait for CfgNodeType {
+    fn debug_for_ternary(&self , f:&mut std::fmt::Formatter<'_>, node_type:String, field:String, n:CfgNode) {
+        write!(f, "{{ {} \\| {} \\|{:?} }}", node_type, field, n.info);
+    }
 
+    fn debug_for_quaternary(&self, f:&mut std::fmt::Formatter<'_>, node_type:String, field:String, n:CfgNode) {
+        write!(f, "{{ {{ {} | {} }} \\| {{ {} \\| {:#?} }} }}", node_type, n.text, field, n.info);
+    }
+
+    fn debug_for_quinary(&self, f:&mut std::fmt::Formatter<'_>, node_type:String, field:String, n:CfgNode, ast_node:u32) {
+        write!(f, "{{ {{{} {} \\| {} }} \\| {{ {} \\| {:#?} }} }}", node_type, ast_node, n.text, field, n.info);
+    }
+}
 impl Debug for CfgNode {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.get_cfg_node_type().map_err(|e| std::fmt::Error)? {
+            // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::Entry { ast_node, calls_in_func: _ } => {
-                write!(f, "{} {} \n{} \n{}\n{:#?}", "Entry", ast_node, self.text, "Fields", self.info)
+                write!(f, " #{} {} \n {} $ @ # {} \n {:#?} $  ", "Entry", ast_node, self.text, "Fields", self.info)
             }
+            // 4元  输出为4格 {{1 @ 1} @ { 1 @ 1}}
             CfgNodeType::Exit { ast_node: _ } => {
-                write!(f, "{}  \n{}\n{}\n{:?}", "Exit", self.text, "Fields", self.info)
+                write!(f, " # {} \n {} $ @ # {} \n{:?} $", "Exit", self.text, "Fields", self.info)
             }
+            // 5元  输出为4格 {{2 @ 1} @ { 1 @ 1}}
             CfgNodeType::Branch {
                 ast_expr_node,
                 // op_true_head_tail_nodes: _true_head_tail_nodes, op_false_head_tail_nodes: _false_head_tail_nodes,
             } => {
-                write!(f, "{} {} \n{}\n{}\n{:#?}", "Branch", ast_expr_node, self.text, "Fields", self.info)
+                write!(f,  " # {} {} \n {} $ @ # {} \n {:#?} $ ", "Branch", ast_expr_node, self.text, "Fields", self.info)
             }
-            CfgNodeType::Gather {} => write!(f, "{} \n{}\n{:?}", "Gather", "Fields", self.info),
+            // 3元  输出为3格 {1 | 1 | 1}
+            CfgNodeType::Gather {} => write!(f, " {} @ {}\n {:?} ", "Gather", "Fields", self.info),
+            // 4元  输出为4格 {{1 | 1} | { 1 | 1}}
             CfgNodeType::BasicBlock { ast_nodes: _ast_node_idxes } => {
-                write!(f, "{}: \n{}\n{}\n{:#?}", "BasicBlock", self.text, "Fields", self.info)
+                write!(f, " # {} \n {} $ @ # {} \n{:?} $", "BasicBlock", self.text, "Fields", self.info)
             }
-            CfgNodeType::Root {} => write!(f, "{}\n{}\n{:?}", "root", "Fields", self.info),
+            // 3元  输出为3格 {1 | 1 | 1}
+            CfgNodeType::Root {} => write!(f, " {} @ {}\n {:?} ", "root", "Fields", self.info),
+            // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::ForLoop { ast_before_node, ast_mid_node: _, ast_after_node: _ } => {
-                write!(f, "{} {} \n{}\n{}\n{:#?}", "For", ast_before_node, self.text, "Fields", self.info)
+                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} $ ", "For", ast_before_node, self.text, "Fields", self.info)
             }
+            // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::WhileLoop { ast_expr_node } => {
-                write!(f, "{} {} \n{}\n{}\n{:#?}", "While", ast_expr_node, self.text, "Fields", self.info)
+                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} $ ", "While", ast_expr_node, self.text, "Fields", self.info)
             }
+            // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::Switch { ast_expr_node } => {
-                write!(f, "{} {} \n{}\n{}\n{:#?}", "Switch", ast_expr_node, self.text, "Fields", self.info)
+                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} $ ", "Switch", ast_expr_node, self.text, "Fields", self.info)
             }
         }
     }

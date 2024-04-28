@@ -4,10 +4,13 @@
 人类可读,但是是x86的
 clang -S demo1.c -o demo1.ll
 
-# 得到llvm ir文件
+# .c -> llvmIR
+
 
 emit-llvm 表示要我要反汇编llvm IR,否则得到x86目标架构的汇编格式
 clang -S -emit-llvm demo1.c -o demo1.ll
+
+## llvmIR优化
 
 优化llvm IR , 把变量从内存移到寄存器中
 -Xclang -disable-O0-optnone     额外的声明向clang说明IR将被opt进一步转换,如果不使用此标志,llvm会将optnone限定符添加到IR中的函数,将阻止程序被优化
