@@ -1,5 +1,6 @@
 use std::fmt::{self, Display, Write};
 
+use antlr_rust::CoerceTo;
 use petgraph::visit::{EdgeRef, GraphProp, IntoEdgeReferences, IntoNodeReferences, NodeIndexable, NodeRef};
 
 use core::fmt::Debug;
@@ -107,6 +108,8 @@ pub enum Config {
     Rounded,
     /// symtab visualization
     SymTab,
+    /// Cfg graph with subblocks
+    CfgBlock,
 
     #[doc(hidden)]
     _Incomplete(()),
@@ -150,6 +153,7 @@ make_config_struct!(
     Record,
     Rounded,
     SymTab,
+    CfgBlock,
 );
 #[derive(Clone)]
 pub enum Title {
@@ -199,10 +203,19 @@ where
                 if self.config.SymTab {
                     SymtabEscaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
                 } else if self.config.Record {
-                    RecordEscaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
-                    if self.config.NodeIndexLabel {
-                        write!(f, "\\lNodeIndex:[{}]", g.to_index(node.id()))?;
+                    if self.config.CfgBlock {
+                        // RecordEscaped会把'{','}'替换为'\\{','\\}',因此考虑使用密码本的symtab
+                        SymtabEscaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
+                        if self.config.NodeIndexLabel {
+                            write!(f, "|{{NodeIndex | [{}]}}", g.to_index(node.id()))?;
+                        }
+                    }else{
+                        RecordEscaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
+                        if self.config.NodeIndexLabel {
+                            write!(f, "\\lNodeIndex:[{}]", g.to_index(node.id()))?;
+                        }
                     }
+                        
                 } else {
                     Escaped(FnFmt(node.weight(), &node_fmt)).fmt(f)?;
                     if self.config.NodeIndexLabel {
@@ -331,6 +344,7 @@ where
             '{' => return self.0.write_str("\\{"),
             '}' => return self.0.write_str("\\}"),
             '|' => return self.0.write_str("\\|"),
+            '<' => return self.0.write_str("\\<"),
             '>' => return self.0.write_str("\\>"),
             '@' => return self.0.write_str("|"),
             '#' => return self.0.write_str("{"),
@@ -356,6 +370,7 @@ where
         }
     }
 }
+
 /// Pass Display formatting through a simple escaping filter
 struct RecordEscaped<T>(T);
 

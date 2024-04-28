@@ -25,7 +25,10 @@ impl Pass for Cfg2NcfgPass {
             for cfg_node in ctx.cfg_graph.node_weights_mut() {
                 cfg_node.load_instrs_text(&ctx.instr_slab);
             }
-            generate_png_by_graph(&ctx.cfg_graph, "nhwc_cfg_graph".to_string(), &[Config::Record, Config::Rounded, Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel]);
+            generate_png_by_graph(&ctx.cfg_graph, "nhwc_cfg_graph".to_string(), 
+            &[
+                Config::Record, 
+                Config::Rounded, Config::CfgBlock,Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel]);
         }
         if self.is_gen_symtab_graph_png {
             generate_png_by_graph(&ctx.symtab_graph, "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab, Config::Title("symtab_graph".to_string())]);
