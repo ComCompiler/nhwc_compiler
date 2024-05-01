@@ -539,7 +539,7 @@ fn process_func_symbol(
     ast_tree:&AstTree, scope_tree:&ScopeTree, symtab:&mut SymTab,  op_symtab_graph:&mut Option<&mut SymTabGraph>,
     cfg_entry:u32,cfg_graph:&mut CfgGraph, func_name:&String, func_scope:u32
 )->Result<SymIdx>{
-    let func_symidx = add_symbol!({Symbol::new(func_scope, func_name.clone())} 
+    let func_symidx = add_symbol!({Symbol::new(0, func_name.clone())} 
         with_field DECLARED_VARS:{Vec::<SymIdx>::new()}
         with_field REACHING_DEF:{None} 
         with_field IS_CONST:{true} 
@@ -1161,14 +1161,15 @@ fn process_et(
                             func_name_str = node!(at ast_node in ast_tree).text.clone();
                         }
                         _ => {
-                            panic!("et生成错误，call节点下第一个不是函数名")
+                            return Err(anyhow!("et生成错误，call节点下第一个不是函数名"))
                         }
                     }
-                    let func_name_symidx = SymIdx::new(scope_node, func_name_str);
+                    let func_name_symidx = SymIdx::new(0, func_name_str);
                     let mut args_symidxs = vec![];
                     for &arg_et_node in func_name_and_args[1..].iter() {
                         args_symidxs.push(process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, arg_et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?)
                     }
+                    //这里缺少检查函数名和参数列表
                     let call_instr = InstrType::new_func_call(None, func_name_symidx.clone(), args_symidxs);
                     Ok(func_name_symidx)
                 }
@@ -1300,7 +1301,7 @@ fn parse_func2nhwc(
     if let Some(&func_scope) = ast2scope.get(&ast_fun) {
         //获取函数名称
         let func_name = &node!(at ast_funsign in ast_tree).text;
-        let name_symidx = SymIdx::new(func_scope, func_name.to_string());
+        // let name_symidx = SymIdx::new(0, func_name.to_string());
 
         //获取返回类型
         let ast_retype = find!(rule RULE_declarationSpecifiers at ast_fun in ast_tree).unwrap();
@@ -1309,11 +1310,10 @@ fn parse_func2nhwc(
 
         //获取参数列表
         let mut arg_syms:Vec<SymIdx> = vec![];
-        //函数有参数
         //添加到符号表中，
         let func_symidx = process_func_symbol(ast_tree, scope_tree, symtab,  op_symtab_graph,cfg_entry, cfg_graph,   func_name, func_scope)?;
         let _:Vec<_> = etc::dfs(cfg_graph, cfg_entry).iter().map(|&cfg_node|{node_mut!(at cfg_node in cfg_graph).add_cor_func_symidx(func_symidx.clone())}).collect();
-
+        //函数有参数
         if let Some(para) = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_parameterTypeList at ast_fun in ast_tree) {
             let ast_func_args = find_nodes!(rule RULE_parameterList finally RULE_parameterDeclaration at para in ast_tree);
             //将函数签名转为ir
@@ -1335,9 +1335,9 @@ fn parse_func2nhwc(
         };
         //对所有旗下的cfg_node 加入函数信息
         //做成instr放在cfg的entry里面
-        let func_instr = InstrType::new_def_func(name_symidx, type_symidx, arg_syms).to_instr();
+        let func_instr = InstrType::new_def_func(func_symidx.clone(), type_symidx, arg_syms).to_instr();
         // 把信息加入到 ！compilation_unit 中
-        symtab.get_mut_global_info().get_mut_all_cfg_func_name_entry_tuples()?.push((func_symidx.clone(),cfg_entry));
+        symtab.get_mut_global_info().get_mut_all_cfg_func_name_entry_tuples()?.push((func_symidx,cfg_entry));
 
 
 
