@@ -25,9 +25,21 @@ impl PassManager {
                     println!("{}", format!("Pass {} run successfully", pass.get_pass_name()).green());
                 }
                 Err(e) => {
-                    println!("{}", format!("{:?}{}", e,e.backtrace()).red());
+                    println!("{}", format!("{:?}", e).red());
                 }
             }
         }
+    }
+    pub fn await_all_io_tasks(&mut self){
+        for handle in self.ctx.io_task_list.drain(..){
+            match handle.join() {
+                Ok(_) => {
+                }
+                Err(e) => {
+                    println!("{}", format!("{:?}", e).red());
+                }
+            }
+        }
+
     }
 }

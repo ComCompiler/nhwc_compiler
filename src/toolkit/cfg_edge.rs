@@ -17,8 +17,8 @@ pub struct CfgEdge {
 }
 reg_field_name!(CFG_EDGE_TYPE:cfg_edge_type);
 make_field_trait_for_struct!(CfgEdgeType);
-make_get_field_fn_for_struct!(CfgEdge with fields info);
-make_specialized_get_field_fn_for_struct!(CfgEdge {CFG_EDGE_TYPE:CfgEdgeType,} with fields info);
+make_get_field_fn_for_struct!(CfgEdge with_fields info);
+make_specialized_get_field_fn_for_struct!(CfgEdge {CFG_EDGE_TYPE:CfgEdgeType,} with_fields info);
 #[derive(Clone, Debug, EnumIs)]
 pub enum CfgEdgeType {
     IfFalse {},

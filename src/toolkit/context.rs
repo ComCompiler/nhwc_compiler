@@ -1,18 +1,16 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, thread::JoinHandle};
 
-use derive_builder::Builder;
+use anyhow::Result;
 
 use crate::Args;
 
 use super::{
-    ast_node::AstTree, cfg_node::CfgGraph, dj_node::DjNode, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symbol::Symbol, symtab::{SymTab, SymTabGraph}
+    ast_node::AstTree, cfg_node::CfgGraph, decl_def_use_node::DduGraph, dj_node::DjNode, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symbol::Symbol, symtab::{SymTab, SymTabGraph}
 };
 use super::dj_edge::DjEdge;
 
 pub type DjGraph = petgraph::stable_graph::StableDiGraph<DjNode, DjEdge, u32>;
 
-#[derive(Default, Builder)]
-#[builder(default)]
 pub struct Context {
     pub args:Args,
     pub code:String,
@@ -21,11 +19,12 @@ pub struct Context {
     pub symtab:SymTab,
     pub scope_tree:ScopeTree,
     pub dj_graph:DjGraph,
-    pub ssa_nhwc_cfg:CfgGraph,
     pub et_tree:EtTree,
     pub ast2scope:HashMap<u32, u32>,
     pub symtab_graph:SymTabGraph,
     pub instr_slab:InstrSlab,
+    pub ddu_graph:DduGraph,
+    pub io_task_list: Vec<JoinHandle<Result<()>>>,
 }
 pub(crate) static COMPILATION_UNIT:&str = "!compilation_unit";
 impl Context {
@@ -45,8 +44,9 @@ impl Context {
             ast2scope:HashMap::new(),
             symtab_graph:SymTabGraph::new(),
             instr_slab:InstrSlab::new(),
-            ssa_nhwc_cfg:CfgGraph::new() ,
             dj_graph: DjGraph::new(),
+            ddu_graph: DduGraph::new(),
+            io_task_list: vec![]
         }
     }
 }

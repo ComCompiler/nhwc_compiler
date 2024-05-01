@@ -1,6 +1,8 @@
+use itertools::Itertools;
 use slab::Slab;
 use std::{fmt::{Debug, Formatter}, vec};
 use anyhow::{anyhow,Result};
+use delegate::delegate;
 
 use super::{
     field::{Fields, Type, Value}, symtab::SymIdx
@@ -25,6 +27,14 @@ impl InstrSlab{
     }
     pub fn get_mut_instr(&mut self,idx:usize) -> Result<&mut Instruction>{
         self.instr_slab.get_mut(idx).ok_or(anyhow!("在 instr_slab 中找不到对应的instruction"))
+    }
+    delegate!{
+        to self.instr_slab {
+            pub fn iter(&self) -> slab::Iter<'_, Instruction> ;
+        }
+        to self.instr_slab {
+            pub fn iter_mut(&mut self) -> slab::IterMut<'_, Instruction> ;
+        }
     }
 }
 
@@ -86,13 +96,21 @@ pub enum ArithOp {
 }
 #[derive(Clone)]
 pub struct FuncOp {
-    func:SymIdx,
-    args:Vec<SymIdx>, //存储所有的实参
+    pub func:SymIdx,
+    pub args:Vec<SymIdx>, //存储所有的实参
 }
 #[derive(Clone,PartialEq,Eq)]
 pub struct PhiPair {
     pub symidx:SymIdx,
-    pub bb:u32,
+    pub def_instr:usize,
+}
+impl PhiPair{
+    pub fn new(symidx:SymIdx ,  def_instr:usize)->Self{
+        Self{
+            symidx,
+            def_instr: def_instr,
+        }
+    }
 }
 #[derive(Clone)]
 pub struct PhiOp {
@@ -105,7 +123,7 @@ impl PhiOp{
             if phi_pair.symidx == phi_pair_to_insert.symidx {
                 // return Err(anyhow!("对已存在的phi node 执行 push_phi_pair 失败,已经存在phi_pair包含symidx:{:?}",phi_pair.symidx))
             }
-            if phi_pair.symidx.to_src_symidx() == phi_pair_to_insert.symidx.to_src_symidx() && phi_pair.bb == phi_pair_to_insert.bb {
+            if phi_pair.symidx.to_src_symidx() == phi_pair_to_insert.symidx.to_src_symidx() && phi_pair.def_instr == phi_pair_to_insert.def_instr {
                 // return Err(anyhow!("对已存在的phi node 执行 push_phi_pair 失败,已经存在phi_pair包含symidx:{:?} with bb:{}",phi_pair.symidx,phi_pair_to_insert.bb))
             }
         }
@@ -150,7 +168,7 @@ pub enum InstrType {
     // 调用函数
     Call { assigned:Option<SymIdx>, func_op:FuncOp },
     // 跳转  break continue  return  etc.
-    Jump { op:JumpOp },
+    Jump { jump_op:JumpOp },
     // phi node
     Phi { lhs:SymIdx, rhs:PhiOp },
     TranType { lhs:SymIdx, op:Trans },
@@ -159,35 +177,155 @@ pub enum InstrType {
 pub struct Instruction {
     pub instr_type:InstrType,
     pub info:Fields,
+    pub text:String,
 }
 impl Instruction {
-    pub fn get_def_vec(&self)->Option<Vec<SymIdx>>{
+    pub fn load_idx_text(&mut self,instr:usize){
+        self.text += format!("{}",instr).as_str()
+    }
+    pub fn get_def_symidx_vec(&self)->Vec<&SymIdx>{
         match &self.instr_type{
-            InstrType::Label { label_symidx } => None,
+            InstrType::Label { label_symidx } => vec![],
             InstrType::DefineFunc { func_symidx, ret_type, args } => {
-                Some({
-                    let mut symidx_vec= vec![func_symidx.clone()];
-                    symidx_vec.extend_from_slice(args);
+                {
+                    let mut symidx_vec= vec![func_symidx];
+                    args.iter().map(|arg| symidx_vec.push(arg)).count();
                     symidx_vec
-                })
+                }
             },
             InstrType::DefineVar { var_symidx, vartype, value } => {
-                Some(vec![var_symidx.clone()])
+                vec![var_symidx]
             },
-            InstrType::Arith { lhs, rhs } => { Some(vec![lhs.clone()]) },
+            InstrType::Arith { lhs, rhs } => { vec![lhs] },
             InstrType::SimpleAssign { lhs, rhs } => {
-                 Some(vec![lhs.clone()]) 
+                 vec![lhs] 
             },
             InstrType::Call { assigned, func_op } => if let  Some(symidx)= assigned{
-                Some(vec![symidx.clone()])
+                vec![symidx]
             }else{
-                None
+                vec![]
             },
-            InstrType::Jump { op } => None,
-            InstrType::Phi { lhs, rhs } => Some(vec![lhs.clone()]),
-            InstrType::TranType { lhs, op } => Some(vec![lhs.clone()]),
+            InstrType::Jump { jump_op: op } => vec![],
+            InstrType::Phi { lhs, rhs } => vec![lhs],
+            InstrType::TranType { lhs, op } => vec![lhs],
         }
     }
+    pub fn get_use_symidx_vec(&self)->Vec<&SymIdx>{
+        match &self.instr_type{
+            InstrType::Label { label_symidx } => vec![],
+            InstrType::DefineFunc { func_symidx, ret_type, args } => {
+                vec![]
+            },
+            InstrType::DefineVar { var_symidx, vartype, value } => {
+                vec![]
+            },
+            InstrType::Arith { lhs, rhs } => { match rhs{
+                ArithOp::Add { a, b, vartype } => vec![a,b],
+                ArithOp::Mul { a, b, vartype } => vec![a,b],
+                ArithOp::Div { a, b, vartype } => vec![a,b],
+                ArithOp::Sub { a, b, vartype } => vec![a,b],
+                ArithOp::Mod { a, b, vartype } => vec![a,b],
+                ArithOp::Icmp { plan, a, b, vartype } => vec![a,b],
+                ArithOp::Ucmp { plan, a, b, vartype } => vec![a,b],
+                ArithOp::LogicAnd { a, b, vartype } => vec![a,b],
+                ArithOp::LogicOr { a, b, vartype } => vec![a,b],
+                ArithOp::LogicNot { a, vartype } => vec![a],
+            }},
+            InstrType::SimpleAssign { lhs, rhs } => {
+                 vec![rhs] 
+            },
+            InstrType::Call { assigned, func_op } => if let  symidx= assigned{
+                func_op.args.iter().collect_vec()
+            }else{
+                vec![]
+            },
+            InstrType::Jump { jump_op } => vec![],
+            InstrType::Phi { lhs, rhs } => rhs.phi_pairs.iter().map(|p| &p.symidx).collect_vec(),
+            InstrType::TranType { lhs, op } => match op{
+                Trans::Fptosi { float_symidx } => vec![float_symidx],
+                Trans::Sitofp { int_symidx } => vec![int_symidx],
+                Trans::Zext { bool_symidx } => vec![bool_symidx],
+                Trans::Bitcast { rptr_symidx, rptr_type, lptr_type } => vec![rptr_symidx],
+            }
+            ,
+        }
+    }
+        pub fn get_mut_def_symidx_vec(&mut self)->Vec<&mut SymIdx>{
+        match &mut self.instr_type{
+            InstrType::Label { label_symidx } => vec![],
+            InstrType::DefineFunc { func_symidx, ret_type, args } => {
+                {
+                    let mut symidx_vec= vec![func_symidx];
+                    args.iter_mut().map(|arg| symidx_vec.push(arg)).count();
+                    symidx_vec
+
+                }
+            },
+            InstrType::DefineVar { var_symidx, vartype, value } => {
+                vec![var_symidx]
+            },
+            InstrType::Arith { lhs, rhs } => { vec![lhs] },
+            InstrType::SimpleAssign { lhs, rhs } => {
+                 vec![lhs] 
+            },
+            InstrType::Call { assigned, func_op } => if let  Some(symidx)= assigned{
+                vec![symidx]
+            }else{
+                vec![]
+            },
+            InstrType::Jump { jump_op: op } => vec![],
+            InstrType::Phi { lhs, rhs } => vec![lhs],
+            InstrType::TranType { lhs, op } => vec![lhs],
+        }
+    }
+    pub fn get_mut_use_symidx_vec(&mut self)->Vec<&mut SymIdx>{
+        match &mut self.instr_type{
+            InstrType::Label { label_symidx } => vec![],
+            InstrType::DefineFunc { func_symidx, ret_type, args } => {
+                vec![]
+            },
+            InstrType::DefineVar { var_symidx, vartype, value } => {
+                vec![]
+            },
+            InstrType::Arith { lhs, rhs } => { match rhs{
+                ArithOp::Add { a, b, vartype } => vec![a,b],
+                ArithOp::Mul { a, b, vartype } => vec![a,b],
+                ArithOp::Div { a, b, vartype } => vec![a,b],
+                ArithOp::Sub { a, b, vartype } => vec![a,b],
+                ArithOp::Mod { a, b, vartype } => vec![a,b],
+                ArithOp::Icmp { plan, a, b, vartype } => vec![a,b],
+                ArithOp::Ucmp { plan, a, b, vartype } => vec![a,b],
+                ArithOp::LogicAnd { a, b, vartype } => vec![a,b],
+                ArithOp::LogicOr { a, b, vartype } => vec![a,b],
+                ArithOp::LogicNot { a, vartype } => vec![a],
+            }},
+            InstrType::SimpleAssign { lhs, rhs } => {
+                 vec![rhs] 
+            },
+            InstrType::Call { assigned, func_op } => if let  symidx= assigned{
+                func_op.args.iter_mut().collect_vec()
+            }else{
+                vec![]
+            },
+            InstrType::Jump { jump_op } => vec![],
+            InstrType::Phi { lhs, rhs } => rhs.phi_pairs.iter_mut().map(|p|&mut p.symidx).collect_vec(),
+            InstrType::TranType { lhs, op } => match op{
+                Trans::Fptosi { float_symidx } => vec![float_symidx],
+                Trans::Sitofp { int_symidx } => vec![int_symidx],
+                Trans::Zext { bool_symidx } => vec![bool_symidx],
+                Trans::Bitcast { rptr_symidx, rptr_type, lptr_type } => vec![rptr_symidx],
+            }
+            ,
+        }
+    }
+    pub fn is_phi(&self)->bool{
+        if let InstrType::Phi { lhs, rhs } = &self.instr_type{
+            true
+        }else{
+            false
+        }
+    }
+
 } 
 #[derive(Clone, Debug)]
 pub enum IcmpPlan {
@@ -259,14 +397,14 @@ impl Debug for Trans {
 }
 // 以下是构造函数:
 impl InstrType {
-    pub fn to_instr(self) -> Instruction { Instruction { instr_type:self, info:Fields::new() } }
+    pub fn to_instr(self) -> Instruction { Instruction { instr_type:self, info:Fields::new(), text: String::new() } }
     pub fn new_def_func(func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx>) -> Self { Self::DefineFunc { func_symidx, ret_type, args } }
     pub fn new_label(label_symidx:SymIdx) -> Self { Self::Label { label_symidx } }
 
     pub fn new_def_var(vartype:Type, varname:SymIdx, value:SymIdx) -> Self { Self::DefineVar { var_symidx:varname, vartype, value } }
     pub fn new_assign(lhs:SymIdx, rhs:SymIdx) -> Self { Self::SimpleAssign { lhs, rhs } }
-    pub fn new_phi_node(lhs:SymIdx, phi_op:PhiOp) -> Self{
-        Self::Phi { lhs, rhs: phi_op }
+    pub fn new_phi_node(lhs:SymIdx, phi_pair_vec:Vec<PhiPair>) -> Self{
+        Self::Phi { lhs, rhs: PhiOp { phi_pairs:phi_pair_vec  } }
     }
 
     // Instruction -> Arith -> ArithOp
@@ -286,10 +424,10 @@ impl InstrType {
         Self::Call { assigned, func_op:FuncOp { func, args } }
     }
     // Instruction -> Jump ->JumpOp
-    pub fn new_ret(ret_sym:SymIdx) -> Self { Self::Jump { op:JumpOp::Ret { ret_sym } } }
-    pub fn new_br(cond:SymIdx, t1:SymIdx, t2:SymIdx) -> Self { Self::Jump { op:JumpOp::Br { cond:cond, t1, t2 } } }
-    pub fn new_switch(cond:SymIdx, default:SymIdx, compared:Vec<ComparedPair>) -> Self { Self::Jump { op:JumpOp::Switch { cond, default, compared } } }
-    pub fn new_jump(cfg_dst_label:u32) -> Self { Self::Jump { op:JumpOp::DirectJump { cfg_dst_label } } }
+    pub fn new_ret(ret_sym:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::Ret { ret_sym } } }
+    pub fn new_br(cond:SymIdx, t1:SymIdx, t2:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::Br { cond:cond, t1, t2 } } }
+    pub fn new_switch(cond:SymIdx, default:SymIdx, compared:Vec<ComparedPair>) -> Self { Self::Jump { jump_op:JumpOp::Switch { cond, default, compared } } }
+    pub fn new_jump(cfg_dst_label:u32) -> Self { Self::Jump { jump_op:JumpOp::DirectJump { cfg_dst_label } } }
     //自动类型转换
     pub fn new_int2float(int_symidx:SymIdx, float_symidx:SymIdx) -> Self { Self::TranType { lhs:float_symidx, op:Trans::Sitofp { int_symidx } } }
     pub fn new_float2int(float_symidx:SymIdx, int_symidx:SymIdx) -> Self { Self::TranType { lhs:int_symidx, op:Trans::Fptosi { float_symidx } } }
@@ -354,7 +492,7 @@ impl Debug for PhiOp {
         // for 
         let mut s = String::new();
         for phi_pair in self.phi_pairs.iter(){
-            s+=format!("[{:?}, {}],",phi_pair.symidx,phi_pair.bb).as_str();
+            s+=format!("[{:?},instr:{}],",phi_pair.symidx,phi_pair.def_instr).as_str();
         }
         write!(f,"phi {}",s)
     }
@@ -371,7 +509,7 @@ impl Debug for InstrType {
                 None => write!(f, "{:?}", func_op),
             },
 
-            Self::Jump { op } => write!(f, "{:?}", op),
+            Self::Jump { jump_op: op } => write!(f, "{:?}", op),
 
             Self::Phi { lhs, rhs } => write!(f, "{:?} = {:?}",lhs,rhs),
             Self::SimpleAssign { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
@@ -642,7 +780,7 @@ impl Debug for Stores {
 }
 impl Debug for Instruction {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
-        // write!(f,"{:?} ------{:?}",self.naked_instr,self.info)
-        write!(f, "{:?} ", self.instr_type)
+        write!(f, " {:5}{:?} ", self.text,self.instr_type)
+        // write!(f, "{} {:?} ", self.text,self.instr_type)
     }
 }

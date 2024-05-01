@@ -22,7 +22,7 @@ impl Pass for Ast2EtDebugPass {
         nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expression));
         nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_forDeclaration));
         let root = 0;
-        et_tree.add_node(EtNodeType::new_sep(root).to_et_node());
+        et_tree.add_node(EtNodeType::new_sep(root).as_et_node());
         for node in nodes {
             let any_root = toolkit::gen_et::process_any_stmt(et_tree, &ctx.ast_tree, &ctx.scope_tree, node, 0);
             add_edge!(from root to any_root in et_tree);
@@ -33,7 +33,7 @@ impl Pass for Ast2EtDebugPass {
         }
         // 1.1 生成对应的png
         if self.is_gen_png {
-            generate_png_by_graph(&ctx.et_tree, "et_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("et_tree".to_string())]);
+            generate_png_by_graph(&ctx.et_tree.clone(), "et_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("et_tree".to_string())],&mut ctx.io_task_list)?;
         }
 
         Ok(())

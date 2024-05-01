@@ -1,5 +1,5 @@
 use std::{
-    env, fmt::Debug, fs::File, io::{Read, Write}, process::Command
+    env, fmt::Debug, fs::File, io::{Read, Write}, process::Command, thread::{spawn, JoinHandle}
 };
 use colored::Colorize;
 
@@ -7,21 +7,27 @@ use crate::{
     direct_child_nodes, toolkit::dot::{Config, Dot}
 };
 use petgraph::{stable_graph::StableGraph, EdgeType};
-use anyhow::{anyhow,Result};
+use anyhow::{anyhow, Context, Result};
 
 /// 生成树(可以是任何树)对应的png ，将此png 放在命令行*当前*目录下
-pub fn generate_png_by_graph<N:Debug, E:Debug, Ty:EdgeType>(g:&StableGraph<N, E, Ty>, name:String, graph_config:&[Config]) {
-    println!("current working dir is {:?}", env::current_dir());
-    let png_name = name.clone() + ".png";
-    let dot_name = name.clone() + ".dot";
-    let mut f = File::create(dot_name.clone()).expect("无法写入文件");
-    f.write_all(format!("{:?}", Dot::with_config(&g, graph_config)).as_bytes()).expect("写入失败");
+pub fn generate_png_by_graph<N:Debug, E:Debug, Ty:EdgeType>(g:&StableGraph<N, E, Ty>, name:String, graph_config:&[Config],io_task_list:&mut Vec<JoinHandle<Result<()>>>) -> Result<()>{
     // f.write_all(format!("{:?}", Dot::with_config(&g, as_bytes())
     //     .expect("写入失败");
-
-    let output = Command::new("dot").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().expect("执行失败");
+    let png_name = name.clone() + ".png";
+    let dot_name = name.clone() + ".dot";
+    let mut f = File::create(dot_name.clone()).with_context(||"无法写入文件")?;
+    let dot_string = format!("{:?}", Dot::with_config(&g, &graph_config));
+    io_task_list.push(
+        spawn(move ||->Result<()> {
+            f.write_all(dot_string.as_bytes()).expect("写入失败");
+            println!("dot write finished {:?}", env::current_dir());
+            let output = Command::new("dot").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().with_context(||"执行失败")?;
+            println!("Successfully Transform to png {}.png {:?}", name.green(),output);
+            Ok(())
+        })
+    );
     // println!("{:?}", Command::new("dot") .args(["-Tpng","./graph.dot","-o","./graph.png"]));
-    println!("Successfully Transform to png {}.png {:?}", name.green(),output);
+    Ok(())
 }
 
 /// 从指定文件中读取所有文本
