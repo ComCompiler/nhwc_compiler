@@ -1,28 +1,21 @@
 use std::cmp::Ordering;
 
-use crate::{add_field, add_symbol, debug_info_green, debug_info_yellow, direct_child_nodes, direct_parent_nodes, instr, make_field_trait_for_struct, make_specialized_get_field_fn_for_struct, node, node_mut, push_phi_instr, reg_field_name};
+use crate::{add_field, add_symbol, debug_info_green, debug_info_yellow, direct_child_nodes, direct_parent_nodes, instr,  reg_field_for_struct, node, node_mut, push_phi_instr};
 use itertools::{Itertools};
 
 use crate::toolkit::symtab::{SymTabEdge,SymTabGraph};
 use super::{cfg_node::{CfgGraph, CfgInstrIdx}, context::DjGraph, decl_def_use_node::DduGraph, etc, nhwc_instr::{InstrSlab, InstrType, PhiPair}, symbol::{Symbol}, symtab::{SymIdx, SymTab}};
 use anyhow::{anyhow, Result, Context};
 
-reg_field_name!(REACHING_DEF:reaching_def);
-reg_field_name!(MAX_SSA_IDX:max_ssa_idx);
-// make_specialized_get_field_fn_for_struct!(CfgNode { PHI_INSTRS:Vec<u32>, } with fields info);
-make_field_trait_for_struct!(Option<SymIdx>);
-make_specialized_get_field_fn_for_struct!(Symbol {
+reg_field_for_struct!(Symbol {
     REACHING_DEF:Option<SymIdx>,
     MAX_SSA_IDX:SymIdx,
 } with_fields fields);
 // 由于 每个 ssa symbol 都有唯一定义，因此我们可以把这个instr 存在里面
-
-reg_field_name!(INSTR:instr);
-make_field_trait_for_struct!(usize);
-make_specialized_get_field_fn_for_struct!(Symbol {
+// reg_field_name!(INSTR);
+reg_field_for_struct!(Symbol {
     INSTR:usize,
 } with_fields fields);
-
 
 pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab, ddu_grpah:&mut DduGraph, op_symtab_graph:&mut Option<&mut SymTabGraph>)->Result<()>{
     for (func_symidx,_cfg_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.iter(){
@@ -40,7 +33,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
             let def_cfg_nodes:Vec<u32> = cfg_node_instr_groups.iter().map(|x|x.0).collect();
             while !cfg_node_instr_groups.is_empty(){
                 let (cfg_node,instr) = cfg_node_instr_groups.pop().unwrap();
-                let domiance_frontiers = node!(at cfg_node in cfg_graph).get_domiance_frontier_nodes()?.clone();
+                let domiance_frontiers = node!(at cfg_node in cfg_graph).get_domiance_frontier_cfg_nodes()?.clone();
                 for cfg_df_node in domiance_frontiers{
                     if let Some(vec_idx) = find_first_def_in_instr_vec(&node_mut!(at cfg_df_node in cfg_graph).phi_instrs, variable, instr_slab, Ordering::Less,None)?{
                         let phi_instr = node!(at cfg_df_node in cfg_graph).phi_instrs[vec_idx];
@@ -77,7 +70,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
     Ok(())
 }
 pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab, ddu_grpah:&mut DduGraph, op_symtab_graph:&mut Option<&mut SymTabGraph>)->Result<()>{
-        // 添加 ssa_index 0 作为NULl ，一开始所有变量的 reaching_def 都是 NULl
+    // 添加 ssa_index 0 作为NULl ，一开始所有变量的 reaching_def 都是 NULl
     for (func_symidx,_cfg_func_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.clone().iter(){
         for src_symidx in symtab.get_symbol(func_symidx)?.get_declared_vars()?.clone(){
             // let symbol = symtab.get_mut_symbol(&src_symidx)?;
@@ -91,7 +84,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
         }
     }
 
-    for (func_symidx,cfg_func_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.clone().iter(){
+    for (_func_symidx,cfg_func_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.clone().iter(){
         let cfg_func_entry = *cfg_func_entry;
         let &dj_func_entry = node!(at cfg_func_entry in cfg_graph).get_cor_dj_node()?;
         // 开始 对这一个 func 进行 dfs
@@ -338,4 +331,13 @@ pub fn cfg_is_dominated_by(cfg_node1:u32, cfg_node2:u32, cfg_graph:&CfgGraph,dj_
         }
     }
     Ok(false)
+}
+
+pub fn phi_node_deconstruction(instr:usize,src_symidx:&SymIdx,symtab:&mut SymTab,cfg_graph:&CfgGraph, dj_graph:&DjGraph,instr_slab:&InstrSlab)->Result<()>{
+    for (func_symidx,_cfg_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.iter(){
+        // for dj_node in etc::dfs_with_predicate(dj_graph, , |e| e.weight().is_dom()){
+            
+        // }
+    }
+    Ok(())
 }

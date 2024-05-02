@@ -5,16 +5,16 @@ use petgraph::{
 };
 use std::{collections::HashMap, fmt::format};
 
-use super::{cfg_edge::CfgEdge, nhwc_instr::Instruction, symbol::{TYPE, USE_COUNTER}};
+use super::{cfg_edge::CfgEdge, nhwc_instr::Instruction};
 use super::{
     ast_node::AstTree, cfg_node::CfgGraph, et_node::{DeclOrDefOrUse, EtNodeType, EtTree}, gen_et::process_any_stmt, nhwc_instr::InstrType, scope_node::ScopeTree, symtab::{SymIdx, SymTab, SymTabGraph}
 };
 use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_instr::InstrSlab};
 use crate::{
-    add_edge, add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{
+    add_edge, add_node_with_edge, add_symbol, antlr_parser::cparser::{
         RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_jumpStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
-    }, direct_child_node, direct_child_nodes, direct_parent_nodes, find, find_nodes, incoming_edges, instr, make_field_trait_for_struct, make_specialized_get_field_fn_for_struct, node, node_mut, outgoing_edges, push_instr, reg_field_name, rule_id, toolkit::{
-        cfg_node::{CfgInstrIdx, CfgNode}, etc, field::{Type, UseCounter}, gen_ssa::REACHING_DEF, nhwc_instr::{IcmpPlan, UcmpPlan}, symbol::Symbol, symtab::SymTabEdge
+    }, direct_child_node, direct_child_nodes, direct_parent_nodes, find, find_nodes, incoming_edges, instr, make_field_trait_for_struct, node, node_mut, outgoing_edges, push_instr, reg_field_for_struct, rule_id, toolkit::{
+        cfg_node::{CfgInstrIdx, CfgNode}, etc, field::{Type, UseCounter}, nhwc_instr::{IcmpPlan, UcmpPlan}, symbol::Symbol, symtab::SymTabEdge
     }
 };
 use colored::Colorize;
@@ -23,41 +23,42 @@ use colored::Colorize;
 这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有
 */
 
-reg_field_name!(IS_CONST:is_const);
-reg_field_name!(IS_TEMP:is_temp);
-make_field_trait_for_struct!(bool);
-reg_field_name!(DEF_INSTRS_VEC:defs_instrs);
-reg_field_name!(DEF_CFG_NODE_VEC:def_cfg_node_vec);
+make_field_trait_for_struct!(
+    SymIdx,
+    Vec<u32>,
+    Vec<usize>,
+    Vec<(SymIdx,u32)>,
+    Vec<(SymIdx,usize)>,
+    Vec<SymIdx>,
+    usize,
+    u32,
+    UseCounter,
+    bool,
+    Type,
+    Option<SymIdx>,
+    CfgInstrIdx
+);
+
 // for variables symbol
-make_specialized_get_field_fn_for_struct!(Symbol {
+reg_field_for_struct!(Symbol {
         DEF_INSTRS_VEC:Vec<usize>,
+        DEF_CFG_NODE_VEC:Vec<u32>,
         IS_CONST:bool,
         IS_TEMP:bool,
     } with_fields fields);
 // for compilation unit symbol
-make_field_trait_for_struct!(Vec<SymIdx>);
-make_field_trait_for_struct!(Vec<usize>);
-make_field_trait_for_struct!(Vec<(SymIdx,u32)>);
-make_specialized_get_field_fn_for_struct!(Symbol {
+reg_field_for_struct!(Symbol {
         ALL_CFG_FUNC_NAME_ENTRY_TUPLES:Vec<(SymIdx,u32)>,
     } with_fields fields);
-reg_field_name!(DECLARED_VARS:declared_vars);
-// for func symbol
-make_specialized_get_field_fn_for_struct!(Symbol {
+reg_field_for_struct!(Symbol {
         DECLARED_VARS:Vec<SymIdx>,
     } with_fields fields);
-reg_field_name!(COR_FUNC_SYMIDX:cor_func_symidx);
-reg_field_name!(DEF_SYMIDX_INSTR_TUPLE_VEC:def_symidx_cfg_node_idx_tuple_vec);
-reg_field_name!(ALL_CFG_FUNC_NAME_ENTRY_TUPLES:all_cfg_func_name_entry_tuple);
-make_field_trait_for_struct!(Vec<(SymIdx,usize)>);
-make_specialized_get_field_fn_for_struct!(CfgNode {
+reg_field_for_struct!(CfgNode {
     COR_FUNC_SYMIDX:SymIdx,
     DEF_SYMIDX_INSTR_TUPLE_VEC:Vec<(SymIdx,usize)>,
 } with_fields info);
 // for Instruction
-reg_field_name!(CFG_INSTR_IDX:cfg_instr_idx);
-make_field_trait_for_struct!(CfgInstrIdx);
-make_specialized_get_field_fn_for_struct!(Instruction {
+reg_field_for_struct!(Instruction {
         CFG_INSTR_IDX:CfgInstrIdx,
     } with_fields info);
 
@@ -597,7 +598,7 @@ fn process_func_symbol(
 )->Result<SymIdx>{
     let func_symidx = add_symbol!({Symbol::new(0, func_name.clone())} 
         with_field DECLARED_VARS:{Vec::<SymIdx>::new()}
-        with_field REACHING_DEF:{None} 
+        with_field REACHING_DEF:{Option::<SymIdx>::None} 
         with_field IS_CONST:{true} 
         with_field IS_TEMP:{false} 
     to symtab debug op_symtab_graph);
@@ -626,7 +627,7 @@ fn process_symbol(
             Ok(symidx)
         }
         DeclOrDefOrUse::Use => {
-            while let Err(_) = find!(symbol {symbol_name.clone()} of scope symbol_scope in symtab debug symtab_graph op_symtab_graph ) {
+            while let Err(_) = symtab.get_symbol_verbose(symbol_name.clone(),symbol_scope) {
                 if symbol_scope == 0 {
                     // generate_png_by_graph(&symtab_graph.as_ref().unwrap(), "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab]);
                     return Err(anyhow!("scope为{}符号表中未找到{:?}", symbol_scope, symbol_name.clone()));
@@ -637,7 +638,7 @@ fn process_symbol(
             Ok(symidx)
         }
         DeclOrDefOrUse::Def => {
-            while let Err(_) = find!(symbol {symbol_name.clone()} of scope symbol_scope in symtab debug symtab_graph op_symtab_graph ) {
+            while let Err(_) = symtab.get_symbol_verbose(symbol_name.clone(),symbol_scope) {
                 if symbol_scope == 0 {
                     // generate_png_by_graph(&symtab_graph.as_ref().unwrap(), "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab]);
                     return Err(anyhow!("scope为{}符号表中未找到{:?}", symbol_scope, symbol_name.clone()));
@@ -892,7 +893,7 @@ fn process_self_increment(
 ) -> Result<(SymIdx, SymIdx)> {
     //取自增运算符下的symidx和type
     let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-    let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    let var_type = symtab.get_symbol(&var_symidx)?.get_type()?.clone();
     //读取变量的instr
     let tmp_loadvar_symidx = process_temp_symbol(cfg_graph, symtab, var_type.clone(), scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
     let load_instr = InstrType::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
@@ -924,7 +925,7 @@ fn process_self_attennuation(
 ) -> Result<(SymIdx, SymIdx)> {
     //取操作数的symidx和type
     let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-    let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    let var_type = symtab.get_symbol(&var_symidx)?.get_type()?.clone();
     //读取变量的instr
     let tmp_loadvar_symidx = process_temp_symbol(cfg_graph, symtab, var_type.clone(), scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
     let load_instr = InstrType::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
@@ -959,10 +960,12 @@ fn process_arithop(
     let next_nodes = direct_child_nodes!(at root_et_node in et_tree);
     //取右操作数symidx和type
     let r_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_nodes[1], scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-    let r_type = find!(field TYPE:Type at r_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    let r_type = symtab.get_symbol(&r_symidx)?.get_type()?.clone();
+
     //取左操作数symidx和type
     let l_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_nodes[0], scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-    let l_type = find!(field TYPE:Type at l_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    let l_type = symtab.get_symbol(&l_symidx)?.get_type()?.clone();
+
     //将左右操作数进行类型自动转换
     let (l_symidx, r_symidx) = autotrans_arith_type(cfg_graph, symtab, &l_type, &l_symidx, &r_type, &r_symidx, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
     let var_type = Type::adapt(&l_type, &r_type);
@@ -978,10 +981,11 @@ fn process_logicop(
     let next_nodes = direct_child_nodes!(at op_et_node in et_tree);
     //取右操作数的symidx和type
     let r_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_nodes[1], scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-    let r_type = find!(field TYPE:Type at r_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    let r_type = symtab.get_symbol(&r_symidx)?.get_type()?.clone();
     //取左操作数的symidx和type
     let l_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_nodes[0], scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-    let l_type = find!(field TYPE:Type at l_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    let l_type = symtab.get_symbol(&l_symidx)?.get_type()?.clone();
+
     //左右操作数自动逻辑类型转换
     let (l_symidx, r_symidx) = autotrans_logic_type(cfg_graph, symtab, &l_type, &l_symidx, &r_type, &r_symidx, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
     let tmp_var_symidx = process_temp_symbol(cfg_graph, symtab, Type::I1, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
@@ -1138,7 +1142,8 @@ fn process_et(
                     if let Some(next_node) = direct_child_node!(at et_node in et_tree ret option) {
                         //取操作数的symidx和type
                         let symbol_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-                        let symbol_type = find!(field TYPE:Type at symbol_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+                        let symbol_type = symtab.get_symbol(&symbol_symidx)?.get_type()?.clone();
+
                         //将数字类型操作数转换为bool类型，bool类型不需要转换
                         let num2bool_tmp_symidx = process_temp_symbol(cfg_graph, symtab, Type::I1, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
                         match symbol_type {
@@ -1457,7 +1462,7 @@ pub fn parse_cfg_into_nhwc_cfg(
     //先遍历一遍函数名，将函数名加入到符号表中
     let cfg_funcs = direct_child_nodes!(at start_node in cfg_graph);
     for &cfg_entry in cfg_funcs.iter() {
-        match node!(at cfg_entry in cfg_graph).get_cfg_node_type()? {
+        match &node!(at cfg_entry in cfg_graph).cfg_node_type {
             CfgNodeType::Entry { ast_node, calls_in_func: _ } => {
                 //查找函数名称所在节点
                 let func_def_ast_node = *ast_node;
@@ -1476,7 +1481,7 @@ pub fn parse_cfg_into_nhwc_cfg(
         for cfg_node in dfs_vec {
             // debug_info_yellow!("dfs current is {:?}", cfg_node);
             let cfgnode = node!(at cfg_node in cfg_graph);
-            match &cfgnode.get_cfg_node_type()? {
+            match &cfgnode.cfg_node_type {
                 CfgNodeType::Branch { ast_expr_node } => {
                     parse_branch2nhwc(ast_tree, cfg_graph, scope_tree, et_tree, symtab, ast2scope, *ast_expr_node, cfg_node, &mut counter, instr_slab, symtab_graph)?
                 }
@@ -1523,8 +1528,8 @@ pub fn insert_bb_between(cfg_node1:u32, cfg_node2:u32, cfg_graph:&mut CfgGraph) 
     let cfg_former_edge_cloned = cfg_graph.edge_weight(cfg_former_edge_idx).unwrap().clone();
     // 删除旧的边
     cfg_graph.remove_edge(cfg_former_edge_idx);
-    let (cfg_node_type1, cfg_node_type2) = (node!(at cfg_node1 in cfg_graph).get_cfg_node_type()?,node!(at cfg_node2 in cfg_graph).get_cfg_node_type()?);
-    if let CfgEdgeType::Direct {  } = cfg_former_edge_cloned.get_cfg_edge_type()? {
+    let (cfg_node_type1, cfg_node_type2) = (&node!(at cfg_node1 in cfg_graph).cfg_node_type,&node!(at cfg_node2 in cfg_graph).cfg_node_type);
+    if let CfgEdgeType::Direct {  } = &cfg_former_edge_cloned.cfg_edge_type {
         // 如果这条边本身就是一条普通边，那么就允许insert
         let mut bb_struct = CfgNode::new_bb(vec![]);
         bb_struct.add_cor_func_symidx(node!(at cfg_node1 in cfg_graph).get_cor_func_symidx()?.clone());
@@ -1557,7 +1562,7 @@ pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph)
         let mut edge_iter = outgoing_edges.iter();
         let mut head = None;
         while let Some(edge) = edge_iter.next() {
-            if let CfgEdgeType::BodyHead {} = edge.weight().get_cfg_edge_type()? {
+            if let CfgEdgeType::BodyHead {} = &edge.weight().cfg_edge_type {
                 head = Some(edge.target().index() as u32)
             }
         }
@@ -1568,7 +1573,7 @@ pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph)
         let mut edge_iter = incoming_edges.iter();
         let mut tail = None;
         while let Some(edge) = edge_iter.next() {
-            if let CfgEdgeType::BodyTail {} = edge.weight().get_cfg_edge_type()? {
+            if let CfgEdgeType::BodyTail {} = &edge.weight().cfg_edge_type {
                 tail = Some(edge.source().index() as u32)
             }
         }

@@ -4,19 +4,9 @@ use strum_macros::EnumIs;
 
 use super::ast_node::AstTree;
 use super::symtab::SymIdx;
-use crate::{add_field, make_field_trait_for_struct, node};
+use crate::{node};
 
 pub type Fields = HashMap<&'static str, Box<dyn Field>>;
-
-pub trait FieldsInit {
-    fn new_from_single_field(field_name:&'static str, field:Box<dyn Field>) -> Fields {
-        let mut fields = Fields::new();
-        add_field!(
-            with_field field_name:{field} to fields);
-        fields
-    }
-}
-impl FieldsInit for Fields {}
 
 /// 你实现的类型必须继承这个 trait
 pub trait Field: Any + Debug {
@@ -25,6 +15,21 @@ pub trait Field: Any + Debug {
     fn as_any_mut(&mut self) -> &mut dyn Any;
     fn clone_box(&self) -> Box<dyn Field>;
 }
+// if you implement this 会栈溢出，很神奇
+// impl<T:Clone+Any+Debug> Field for T{
+//     fn as_any(&self) -> &dyn std::any::Any {
+//         self
+//     }
+//     fn as_any_move(self) -> Box<dyn std::any::Any>{
+//         Box::new(self)
+//     }
+//     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+//         self
+//     }
+//     fn clone_box(&self)->Box<dyn crate::toolkit::field::Field> {
+//         Box::new(self.clone())
+//     }
+// }
 
 #[derive(Debug, Clone)]
 pub enum Value {
@@ -117,7 +122,6 @@ impl Type {
         }
     }
 }
-make_field_trait_for_struct!(Type, Value, UseCounter);
 #[derive(Clone)]
 pub struct UseCounter {
     pub use_count:u32,
