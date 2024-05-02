@@ -3,7 +3,6 @@ use super::field::Field;
 use super::field::Fields;
 use super::symtab::{SymTab, SymTabEdge, SymTabGraph};
 use strum_macros::EnumIs;
-use crate::make_get_field_fn_for_struct;
 use crate::reg_field_for_struct;
 use anyhow::{Result,Context};
 use std::fmt::Debug;
@@ -13,7 +12,6 @@ pub struct CfgEdge {
     info:Fields,
     text:String,
 }
-make_get_field_fn_for_struct!(CfgEdge with_fields info);
 #[derive(Clone, Debug, EnumIs)]
 pub enum CfgEdgeType {
     IfFalse {},

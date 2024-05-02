@@ -2,7 +2,7 @@ use core::fmt::Debug;
 use std::collections::HashMap;
 
 
-use crate::{make_get_field_fn_for_struct, reg_field_for_struct, _reg_field_name};
+use crate::{ reg_field_for_struct};
 
 use super::field::{Fields, Type, UseCounter};
 use super::symtab::SymTab;
@@ -20,7 +20,6 @@ impl Debug for Symbol {
 }
 /* 引用计数 */
 /* 符号的类型 */
-make_get_field_fn_for_struct! {Symbol with_fields fields}
 reg_field_for_struct! {Symbol { USE_COUNTER:UseCounter,TYPE:Type, } with_fields fields}
 
 impl Symbol {

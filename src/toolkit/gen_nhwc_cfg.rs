@@ -571,7 +571,7 @@ fn process_symbol(
             Ok(symidx)
         }
         DeclOrDefOrUse::Use => {
-            while let Err(_) = find!(symbol {symbol_name.clone()} of scope symbol_scope in symtab debug symtab_graph op_symtab_graph ) {
+            while let Err(_) = symtab.get_symbol_verbose(symbol_name.clone(),symbol_scope) {
                 if symbol_scope == 0 {
                     // generate_png_by_graph(&symtab_graph.as_ref().unwrap(), "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab]);
                     return Err(anyhow!("scope为{}符号表中未找到{:?}", symbol_scope, symbol_name.clone()));
@@ -582,7 +582,7 @@ fn process_symbol(
             Ok(symidx)
         }
         DeclOrDefOrUse::Def => {
-            while let Err(_) = find!(symbol {symbol_name.clone()} of scope symbol_scope in symtab debug symtab_graph op_symtab_graph ) {
+            while let Err(_) = symtab.get_symbol_verbose(symbol_name.clone(),symbol_scope) {
                 if symbol_scope == 0 {
                     // generate_png_by_graph(&symtab_graph.as_ref().unwrap(), "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab]);
                     return Err(anyhow!("scope为{}符号表中未找到{:?}", symbol_scope, symbol_name.clone()));
@@ -835,7 +835,7 @@ fn process_self_increment(
 ) -> Result<(SymIdx, SymIdx)> {
     //取自增运算符下的symidx和type
     let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-    let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    let var_type = symtab.get_symbol(&var_symidx)?.get_type()?.clone();
     //读取变量的instr
     let tmp_loadvar_symidx = process_temp_symbol(cfg_graph, symtab, var_type.clone(), scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
     let load_instr = InstrType::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
@@ -867,7 +867,7 @@ fn process_self_attennuation(
 ) -> Result<(SymIdx, SymIdx)> {
     //取操作数的symidx和type
     let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-    let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    let var_type = symtab.get_symbol(&var_symidx)?.get_type()?.clone();
     //读取变量的instr
     let tmp_loadvar_symidx = process_temp_symbol(cfg_graph, symtab, var_type.clone(), scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
     let load_instr = InstrType::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone()).to_instr();
@@ -902,10 +902,12 @@ fn process_arithop(
     let next_nodes = direct_child_nodes!(at root_et_node in et_tree);
     //取右操作数symidx和type
     let r_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_nodes[1], scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-    let r_type = find!(field TYPE:Type at r_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    let r_type = symtab.get_symbol(&r_symidx)?.get_type()?.clone();
+
     //取左操作数symidx和type
     let l_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_nodes[0], scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-    let l_type = find!(field TYPE:Type at l_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    let l_type = symtab.get_symbol(&l_symidx)?.get_type()?.clone();
+
     //将左右操作数进行类型自动转换
     let (l_symidx, r_symidx) = autotrans_arith_type(cfg_graph, symtab, &l_type, &l_symidx, &r_type, &r_symidx, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
     let var_type = Type::adapt(&l_type, &r_type);
@@ -921,10 +923,11 @@ fn process_logicop(
     let next_nodes = direct_child_nodes!(at op_et_node in et_tree);
     //取右操作数的symidx和type
     let r_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_nodes[1], scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-    let r_type = find!(field TYPE:Type at r_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    let r_type = symtab.get_symbol(&r_symidx)?.get_type()?.clone();
     //取左操作数的symidx和type
     let l_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_nodes[0], scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-    let l_type = find!(field TYPE:Type at l_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+    let l_type = symtab.get_symbol(&l_symidx)?.get_type()?.clone();
+
     //左右操作数自动逻辑类型转换
     let (l_symidx, r_symidx) = autotrans_logic_type(cfg_graph, symtab, &l_type, &l_symidx, &r_type, &r_symidx, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
     let tmp_var_symidx = process_temp_symbol(cfg_graph, symtab, Type::I1, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
@@ -1030,7 +1033,8 @@ fn process_et(
                     if let Some(next_node) = direct_child_node!(at et_node in et_tree ret option) {
                         //取操作数的symidx和type
                         let symbol_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-                        let symbol_type = find!(field TYPE:Type at symbol_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
+                        let symbol_type = symtab.get_symbol(&symbol_symidx)?.get_type()?.clone();
+
                         //将数字类型操作数转换为bool类型，bool类型不需要转换
                         let num2bool_tmp_symidx = process_temp_symbol(cfg_graph, symtab, Type::I1, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
                         match symbol_type {
@@ -1261,7 +1265,8 @@ fn parse_declaration2nhwc(
                         let var_type = Type::new(vartype_node, ast_tree);
                         let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[0], decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
                         let value_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[1], decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
-                        let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
+                        let value_type = symtab.get_symbol(&value_symidx )?.get_type()?.clone();
+
                         let transed_value_symidx = force_trans_type(cfg_graph, symtab, &var_type, &value_type, &value_symidx, decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
                         let defvar_instr = InstrType::new_def_var(var_type, var_symidx, transed_value_symidx).to_instr();
 
