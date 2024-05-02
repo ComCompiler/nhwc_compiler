@@ -12,7 +12,7 @@ use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_ins
 use crate::{
     add_edge, add_node_with_edge, add_symbol, antlr_parser::cparser::{
         RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_jumpStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
-    }, direct_child_node, direct_child_nodes, direct_parent_nodes, find, find_nodes, incoming_edges, instr,  reg_field_for_struct, node, node_mut, outgoing_edges, push_instr, rule_id, toolkit::{
+    }, direct_child_node, direct_child_nodes, direct_parent_nodes, find, find_nodes, incoming_edges, instr, make_field_trait_for_struct, node, node_mut, outgoing_edges, push_instr, reg_field_for_struct, rule_id, toolkit::{
         cfg_node::{CfgInstrIdx, CfgNode}, etc, field::{Type, UseCounter}, nhwc_instr::{IcmpPlan, UcmpPlan}, symbol::Symbol, symtab::SymTabEdge
     }
 };
@@ -21,6 +21,22 @@ use colored::Colorize;
 /*
 这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有
 */
+
+make_field_trait_for_struct!(
+    SymIdx,
+    Vec<u32>,
+    Vec<usize>,
+    Vec<(SymIdx,u32)>,
+    Vec<(SymIdx,usize)>,
+    Vec<SymIdx>,
+    usize,
+    u32,
+    UseCounter,
+    bool,
+    Type,
+    Option<SymIdx>,
+    CfgInstrIdx
+);
 
 // for variables symbol
 reg_field_for_struct!(Symbol {

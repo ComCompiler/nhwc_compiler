@@ -13,20 +13,21 @@ pub trait Field: Any + Debug {
     fn as_any_mut(&mut self) -> &mut dyn Any;
     fn clone_box(&self) -> Box<dyn Field>;
 }
-impl<T:Clone+Any+Debug> Field for T{
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
-    fn as_any_move(self) -> Box<dyn std::any::Any>{
-        Box::new(self)
-    }
-    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
-        self
-    }
-    fn clone_box(&self)->Box<dyn crate::toolkit::field::Field> {
-        Box::new(self.clone())
-    }
-}
+// if you implement this 会栈溢出，很神奇
+// impl<T:Clone+Any+Debug> Field for T{
+//     fn as_any(&self) -> &dyn std::any::Any {
+//         self
+//     }
+//     fn as_any_move(self) -> Box<dyn std::any::Any>{
+//         Box::new(self)
+//     }
+//     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+//         self
+//     }
+//     fn clone_box(&self)->Box<dyn crate::toolkit::field::Field> {
+//         Box::new(self.clone())
+//     }
+// }
 
 #[derive(Debug, Clone)]
 pub enum Value {

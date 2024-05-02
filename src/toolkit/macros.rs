@@ -663,6 +663,27 @@ macro_rules! reg_field_for_struct {
         }
     };
 }
+#[macro_export]
+macro_rules! make_field_trait_for_struct {
+    ($($struct_name:ty),+) => {
+        $(
+        impl Field for $struct_name {
+            fn as_any(&self) -> &dyn std::any::Any {
+                self
+            }
+            fn as_any_move(self) -> Box<dyn std::any::Any>{
+                Box::new(self)
+            }
+            fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+                self
+            }
+            fn clone_box(&self)->Box<dyn Field> {
+                Box::new(self.clone())
+            }
+        }
+        )*
+    };
+}
 // #[macro_export]
 // /// 生成 get 和 get_mut 函数  
 // /// 用法: make_get_field_fn_for_struct（structname with fields member_of_type_fields)
