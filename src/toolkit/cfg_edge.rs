@@ -1,10 +1,7 @@
 use super::ast_node::AstTree;
-use super::field::Field;
 use super::field::Fields;
-use super::symtab::{SymTab, SymTabEdge, SymTabGraph};
 use strum_macros::EnumIs;
-use crate::reg_field_for_struct;
-use anyhow::{Result,Context};
+use anyhow::{Result};
 use std::fmt::Debug;
 #[derive(Clone)]
 pub struct CfgEdge {

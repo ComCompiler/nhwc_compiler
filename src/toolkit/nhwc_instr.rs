@@ -5,7 +5,7 @@ use anyhow::{anyhow,Result};
 use delegate::delegate;
 
 use super::{
-    field::{Fields, Type, Value}, symtab::SymIdx
+    field::{Fields, Type}, symtab::SymIdx
 };
 
 

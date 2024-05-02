@@ -1,6 +1,5 @@
 
-use super::field::{Fields,Field};
-use super::symtab::{SymTab,SymTabEdge,SymTabGraph};
+use super::field::{Fields};
 
 #[derive(Clone,Debug)]
 pub struct DjNode {

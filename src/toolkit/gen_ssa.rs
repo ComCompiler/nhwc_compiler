@@ -1,26 +1,21 @@
 use std::cmp::Ordering;
 
-use crate::{add_field, add_symbol, debug_info_green, debug_info_yellow, direct_child_nodes, direct_parent_nodes, instr,  reg_field_for_struct, node, node_mut, push_phi_instr, _reg_field_name};
+use crate::{add_field, add_symbol, debug_info_green, debug_info_yellow, direct_child_nodes, direct_parent_nodes, instr,  reg_field_for_struct, node, node_mut, push_phi_instr};
 use itertools::{Itertools};
 
 use crate::toolkit::symtab::{SymTabEdge,SymTabGraph};
 use super::{cfg_node::{CfgGraph, CfgInstrIdx}, context::DjGraph, decl_def_use_node::DduGraph, etc, nhwc_instr::{InstrSlab, InstrType, PhiPair}, symbol::{Symbol}, symtab::{SymIdx, SymTab}};
 use anyhow::{anyhow, Result, Context};
 
-// reg_field_name!(REACHING_DEF);
-// reg_field_name!(MAX_SSA_IDX);
-// make_specialized_get_field_fn_for_struct!(CfgNode { PHI_INSTRS:Vec<u32>, } with fields info);
 reg_field_for_struct!(Symbol {
     REACHING_DEF:Option<SymIdx>,
     MAX_SSA_IDX:SymIdx,
 } with_fields fields);
 // 由于 每个 ssa symbol 都有唯一定义，因此我们可以把这个instr 存在里面
-
 // reg_field_name!(INSTR);
 reg_field_for_struct!(Symbol {
     INSTR:usize,
 } with_fields fields);
-
 
 pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab, ddu_grpah:&mut DduGraph, op_symtab_graph:&mut Option<&mut SymTabGraph>)->Result<()>{
     for (func_symidx,_cfg_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.iter(){
@@ -81,7 +76,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
             // let symbol = symtab.get_mut_symbol(&src_symidx)?;
             // symbol.add_reaching_def_with_debug(None, symtab, op_symtab_graph)
             add_field!(
-                with_field REACHING_DEF:{Option::<SymIdx>::None}
+                with_field REACHING_DEF:{None}
                 with_field MAX_SSA_IDX:{src_symidx.clone()}
                 to src_symidx in symtab
             );
@@ -128,7 +123,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                             with_field INSTR:{instr}
                             // with field DEF_INSTRS_VEC:{Vec::<usize>::new()}
                             // with field REACHING_DEF:{symtab.get_symbol(src_symidx)?.get_type()?.clone()}
-                            with_field REACHING_DEF:{Option::<SymIdx>::None}
+                            with_field REACHING_DEF:{None}
                         to symtab debug op_symtab_graph);
 
                         let src_symidx  = def_symidx.clone();

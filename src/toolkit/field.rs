@@ -2,7 +2,7 @@ use std::{any::Any, collections::HashMap, fmt::Debug};
 
 use super::ast_node::AstTree;
 use super::symtab::SymIdx;
-use crate::{add_field,  node};
+use crate::{node};
 
 pub type Fields = HashMap<&'static str, Box<dyn Field>>;
 

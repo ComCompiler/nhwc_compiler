@@ -1,16 +1,14 @@
 #[cfg(test)]
 mod tests {
     use core::panic;
-    use std::{path::PathBuf, str::FromStr, vec};
+    
 
     use clap::Parser;
-    use anyhow::Result;
+    
 
     use crate::{
-        add_field,add_passes, add_symbol, antlr_parser::{
-            clexer::Return, cparser::{RULE_blockItem, RULE_blockItemList, RULE_compoundStatement, RULE_expressionStatement, RULE_functionDefinition, RULE_translationUnit}
-        }, direct_child_nodes, direct_parent_node, find, find_nodes, passes::pass_demo::PassDemo, toolkit::{
-            self, ast_node::find_dfs_rule_ast, context::{Context}, dot::Config, et_node::{EtNode, EtNodeType, EtTree}, etc::{generate_png_by_graph, read_file_content}, eval::eval_et, field::{Type, Value}, gen_ast::parse_as_ast_tree, nhwc_instr::{InstrSlab, InstrType}, pass_manager::{Pass, PassManager}, symbol::Symbol, symtab::SymTab
+        add_passes, passes::pass_demo::PassDemo, toolkit::{
+            nhwc_instr::{InstrSlab}, pass_manager::{Pass, PassManager}, symbol::Symbol, symtab::SymTab
         }, Args
     };
 

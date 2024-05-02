@@ -4,16 +4,16 @@ use petgraph::{
 };
 use std::collections::HashMap;
 
-use super::{cfg_edge::CfgEdge, nhwc_instr::Instruction, symbol::{TYPE, USE_COUNTER}};
+use super::{cfg_edge::CfgEdge, nhwc_instr::Instruction};
 use super::{
     ast_node::AstTree, cfg_node::CfgGraph, et_node::{DeclOrDefOrUse, EtNodeType, EtTree}, gen_et::process_any_stmt, nhwc_instr::InstrType, scope_node::ScopeTree, symtab::{SymIdx, SymTab, SymTabGraph}
 };
 use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_instr::InstrSlab};
 use crate::{
-    add_edge, add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{
+    add_edge, add_node_with_edge, add_symbol, antlr_parser::cparser::{
         RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_jumpStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
-    }, direct_child_node, direct_child_nodes, direct_parent_nodes, find, find_nodes, incoming_edges, instr,  reg_field_for_struct, node, node_mut, outgoing_edges, push_instr, _reg_field_name, rule_id, toolkit::{
-        cfg_node::{CfgInstrIdx, CfgNode}, etc, field::{Type, UseCounter}, gen_ssa::REACHING_DEF, nhwc_instr::{IcmpPlan, UcmpPlan}, symbol::Symbol, symtab::SymTabEdge
+    }, direct_child_node, direct_child_nodes, direct_parent_nodes, find, find_nodes, incoming_edges, instr,  reg_field_for_struct, node, node_mut, outgoing_edges, push_instr, rule_id, toolkit::{
+        cfg_node::{CfgInstrIdx, CfgNode}, etc, field::{Type, UseCounter}, nhwc_instr::{IcmpPlan, UcmpPlan}, symbol::Symbol, symtab::SymTabEdge
     }
 };
 use colored::Colorize;
@@ -22,11 +22,6 @@ use colored::Colorize;
 这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有
 */
 
-// reg_field_name!(IS_CONST);
-// reg_field_name!(IS_TEMP);
-// make_field_trait_for_struct!(bool);
-// reg_field_name!(DEF_INSTRS_VEC);
-// reg_field_name!(DEF_CFG_NODE_VEC);
 // for variables symbol
 reg_field_for_struct!(Symbol {
         DEF_INSTRS_VEC:Vec<usize>,
@@ -35,28 +30,17 @@ reg_field_for_struct!(Symbol {
         IS_TEMP:bool,
     } with_fields fields);
 // for compilation unit symbol
-// make_field_trait_for_struct!(Vec<SymIdx>);
-// make_field_trait_for_struct!(Vec<usize>);
-// make_field_trait_for_struct!(Vec<(SymIdx,u32)>);
 reg_field_for_struct!(Symbol {
         ALL_CFG_FUNC_NAME_ENTRY_TUPLES:Vec<(SymIdx,u32)>,
     } with_fields fields);
-// reg_field_name!(DECLARED_VARS);
-// for func symbol
 reg_field_for_struct!(Symbol {
         DECLARED_VARS:Vec<SymIdx>,
     } with_fields fields);
-// reg_field_name!(COR_FUNC_SYMIDX);
-// reg_field_name!(DEF_SYMIDX_INSTR_TUPLE_VEC);
-// reg_field_name!(ALL_CFG_FUNC_NAME_ENTRY_TUPLES);
-// make_field_trait_for_struct!(Vec<(SymIdx,usize)>);
 reg_field_for_struct!(CfgNode {
     COR_FUNC_SYMIDX:SymIdx,
     DEF_SYMIDX_INSTR_TUPLE_VEC:Vec<(SymIdx,usize)>,
 } with_fields info);
 // for Instruction
-// reg_field_name!(CFG_INSTR_IDX);
-// make_field_trait_for_struct!(CfgInstrIdx);
 reg_field_for_struct!(Instruction {
         CFG_INSTR_IDX:CfgInstrIdx,
     } with_fields info);
