@@ -98,6 +98,7 @@ pub enum ArithOp {
 pub struct FuncOp {
     pub func:SymIdx,
     pub args:Vec<SymIdx>, //存储所有的实参
+    pub ret_type:Type
 }
 #[derive(Clone,PartialEq,Eq)]
 pub struct PhiPair {
@@ -185,53 +186,53 @@ impl Instruction {
     }
     pub fn get_def_symidx_vec(&self)->Vec<&SymIdx>{
         match &self.instr_type{
-            InstrType::Label { label_symidx } => vec![],
-            InstrType::DefineFunc { func_symidx, ret_type, args } => {
+            InstrType::Label { label_symidx:_ } => vec![],
+            InstrType::DefineFunc { func_symidx, ret_type:_, args } => {
                 {
                     let mut symidx_vec= vec![func_symidx];
                     args.iter().map(|arg| symidx_vec.push(arg)).count();
                     symidx_vec
                 }
             },
-            InstrType::DefineVar { var_symidx, vartype, value } => {
+            InstrType::DefineVar { var_symidx, vartype:_, value:_ } => {
                 vec![var_symidx]
             },
-            InstrType::Arith { lhs, rhs } => { vec![lhs] },
-            InstrType::SimpleAssign { lhs, rhs } => {
+            InstrType::Arith { lhs, rhs:_ } => { vec![lhs] },
+            InstrType::SimpleAssign { lhs, rhs:_ } => {
                  vec![lhs] 
             },
-            InstrType::Call { assigned, func_op } => if let  Some(symidx)= assigned{
+            InstrType::Call { assigned, func_op:_} => if let  Some(symidx)= assigned{
                 vec![symidx]
             }else{
                 vec![]
             },
             InstrType::Jump { jump_op: op } => vec![],
-            InstrType::Phi { lhs, rhs } => vec![lhs],
+            InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op } => vec![lhs],
         }
     }
     pub fn get_use_symidx_vec(&self)->Vec<&SymIdx>{
         match &self.instr_type{
-            InstrType::Label { label_symidx } => vec![],
-            InstrType::DefineFunc { func_symidx, ret_type, args } => {
+            InstrType::Label { label_symidx:_ } => vec![],
+            InstrType::DefineFunc { func_symidx:_, ret_type:_, args:_ } => {
                 vec![]
             },
-            InstrType::DefineVar { var_symidx, vartype, value } => {
+            InstrType::DefineVar { var_symidx:_, vartype:_, value:_ } => {
                 vec![]
             },
-            InstrType::Arith { lhs, rhs } => { match rhs{
-                ArithOp::Add { a, b, vartype } => vec![a,b],
-                ArithOp::Mul { a, b, vartype } => vec![a,b],
-                ArithOp::Div { a, b, vartype } => vec![a,b],
-                ArithOp::Sub { a, b, vartype } => vec![a,b],
-                ArithOp::Mod { a, b, vartype } => vec![a,b],
-                ArithOp::Icmp { plan, a, b, vartype } => vec![a,b],
-                ArithOp::Ucmp { plan, a, b, vartype } => vec![a,b],
-                ArithOp::LogicAnd { a, b, vartype } => vec![a,b],
-                ArithOp::LogicOr { a, b, vartype } => vec![a,b],
-                ArithOp::LogicNot { a, vartype } => vec![a],
+            InstrType::Arith { lhs:_, rhs } => { match rhs{
+                ArithOp::Add { a, b, vartype:_ } => vec![a,b],
+                ArithOp::Mul { a, b, vartype:_ } => vec![a,b],
+                ArithOp::Div { a, b, vartype:_ } => vec![a,b],
+                ArithOp::Sub { a, b, vartype:_ } => vec![a,b],
+                ArithOp::Mod { a, b, vartype:_ } => vec![a,b],
+                ArithOp::Icmp { plan:_, a, b, vartype:_ } => vec![a,b],
+                ArithOp::Ucmp { plan:_, a, b, vartype:_ } => vec![a,b],
+                ArithOp::LogicAnd { a, b, vartype:_ } => vec![a,b],
+                ArithOp::LogicOr { a, b, vartype:_ } => vec![a,b],
+                ArithOp::LogicNot { a, vartype:_ } => vec![a],
             }},
-            InstrType::SimpleAssign { lhs, rhs } => {
+            InstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
             InstrType::Call { assigned, func_op } => if let  symidx= assigned{
@@ -239,21 +240,21 @@ impl Instruction {
             }else{
                 vec![]
             },
-            InstrType::Jump { jump_op } => vec![],
-            InstrType::Phi { lhs, rhs } => rhs.phi_pairs.iter().map(|p| &p.symidx).collect_vec(),
-            InstrType::TranType { lhs, op } => match op{
+            InstrType::Jump { jump_op:_ } => vec![],
+            InstrType::Phi { lhs:_, rhs } => rhs.phi_pairs.iter().map(|p| &p.symidx).collect_vec(),
+            InstrType::TranType { lhs:_, op } => match op{
                 Trans::Fptosi { float_symidx } => vec![float_symidx],
                 Trans::Sitofp { int_symidx } => vec![int_symidx],
                 Trans::Zext { bool_symidx } => vec![bool_symidx],
-                Trans::Bitcast { rptr_symidx, rptr_type, lptr_type } => vec![rptr_symidx],
+                Trans::Bitcast { rptr_symidx, rptr_type:_, lptr_type:_ } => vec![rptr_symidx],
             }
             ,
         }
     }
         pub fn get_mut_def_symidx_vec(&mut self)->Vec<&mut SymIdx>{
         match &mut self.instr_type{
-            InstrType::Label { label_symidx } => vec![],
-            InstrType::DefineFunc { func_symidx, ret_type, args } => {
+            InstrType::Label { label_symidx:_ } => vec![],
+            InstrType::DefineFunc { func_symidx, ret_type:_, args } => {
                 {
                     let mut symidx_vec= vec![func_symidx];
                     args.iter_mut().map(|arg| symidx_vec.push(arg)).count();
@@ -261,45 +262,45 @@ impl Instruction {
 
                 }
             },
-            InstrType::DefineVar { var_symidx, vartype, value } => {
+            InstrType::DefineVar { var_symidx, vartype:_, value:_ } => {
                 vec![var_symidx]
             },
-            InstrType::Arith { lhs, rhs } => { vec![lhs] },
-            InstrType::SimpleAssign { lhs, rhs } => {
+            InstrType::Arith { lhs, rhs:_ } => { vec![lhs] },
+            InstrType::SimpleAssign { lhs, rhs:_ } => {
                  vec![lhs] 
             },
-            InstrType::Call { assigned, func_op } => if let  Some(symidx)= assigned{
+            InstrType::Call { assigned, func_op:_ } => if let  Some(symidx)= assigned{
                 vec![symidx]
             }else{
                 vec![]
             },
             InstrType::Jump { jump_op: op } => vec![],
-            InstrType::Phi { lhs, rhs } => vec![lhs],
-            InstrType::TranType { lhs, op } => vec![lhs],
+            InstrType::Phi { lhs, rhs:_ } => vec![lhs],
+            InstrType::TranType { lhs, op:_ } => vec![lhs],
         }
     }
     pub fn get_mut_use_symidx_vec(&mut self)->Vec<&mut SymIdx>{
         match &mut self.instr_type{
-            InstrType::Label { label_symidx } => vec![],
-            InstrType::DefineFunc { func_symidx, ret_type, args } => {
+            InstrType::Label { label_symidx:_ } => vec![],
+            InstrType::DefineFunc { func_symidx:_, ret_type:_, args:_ } => {
                 vec![]
             },
-            InstrType::DefineVar { var_symidx, vartype, value } => {
+            InstrType::DefineVar { var_symidx:_, vartype:_, value:_ } => {
                 vec![]
             },
-            InstrType::Arith { lhs, rhs } => { match rhs{
-                ArithOp::Add { a, b, vartype } => vec![a,b],
-                ArithOp::Mul { a, b, vartype } => vec![a,b],
-                ArithOp::Div { a, b, vartype } => vec![a,b],
-                ArithOp::Sub { a, b, vartype } => vec![a,b],
-                ArithOp::Mod { a, b, vartype } => vec![a,b],
-                ArithOp::Icmp { plan, a, b, vartype } => vec![a,b],
-                ArithOp::Ucmp { plan, a, b, vartype } => vec![a,b],
-                ArithOp::LogicAnd { a, b, vartype } => vec![a,b],
-                ArithOp::LogicOr { a, b, vartype } => vec![a,b],
-                ArithOp::LogicNot { a, vartype } => vec![a],
+            InstrType::Arith { lhs:_, rhs } => { match rhs{
+                ArithOp::Add { a, b, vartype:_ } => vec![a,b],
+                ArithOp::Mul { a, b, vartype:_ } => vec![a,b],
+                ArithOp::Div { a, b, vartype:_ } => vec![a,b],
+                ArithOp::Sub { a, b, vartype:_ } => vec![a,b],
+                ArithOp::Mod { a, b, vartype:_ } => vec![a,b],
+                ArithOp::Icmp { plan:_, a, b, vartype:_ } => vec![a,b],
+                ArithOp::Ucmp { plan:_, a, b, vartype:_ } => vec![a,b],
+                ArithOp::LogicAnd { a, b, vartype:_ } => vec![a,b],
+                ArithOp::LogicOr { a, b, vartype:_ } => vec![a,b],
+                ArithOp::LogicNot { a, vartype :_} => vec![a],
             }},
-            InstrType::SimpleAssign { lhs, rhs } => {
+            InstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
             InstrType::Call { assigned, func_op } => if let  symidx= assigned{
@@ -307,19 +308,19 @@ impl Instruction {
             }else{
                 vec![]
             },
-            InstrType::Jump { jump_op } => vec![],
-            InstrType::Phi { lhs, rhs } => rhs.phi_pairs.iter_mut().map(|p|&mut p.symidx).collect_vec(),
-            InstrType::TranType { lhs, op } => match op{
+            InstrType::Jump { jump_op:_ } => vec![],
+            InstrType::Phi { lhs:_, rhs } => rhs.phi_pairs.iter_mut().map(|p|&mut p.symidx).collect_vec(),
+            InstrType::TranType { lhs:_, op } => match op{
                 Trans::Fptosi { float_symidx } => vec![float_symidx],
                 Trans::Sitofp { int_symidx } => vec![int_symidx],
                 Trans::Zext { bool_symidx } => vec![bool_symidx],
-                Trans::Bitcast { rptr_symidx, rptr_type, lptr_type } => vec![rptr_symidx],
+                Trans::Bitcast { rptr_symidx, rptr_type:_, lptr_type:_ } => vec![rptr_symidx],
             }
             ,
         }
     }
     pub fn is_phi(&self)->bool{
-        if let InstrType::Phi { lhs, rhs } = &self.instr_type{
+        if let InstrType::Phi { lhs:_, rhs:_ } = &self.instr_type{
             true
         }else{
             false
@@ -419,9 +420,9 @@ impl InstrType {
     pub fn new_logic_or(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::LogicOr { a, b, vartype } } }
     pub fn new_logic_not(lhs:SymIdx, a:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::LogicNot { a, vartype } } }
     // Instruction -> Call -> FuncOp
-    pub fn new_func_call(assigned:Option<SymIdx>, func:SymIdx, args:Vec<SymIdx>) -> Self {
+    pub fn new_func_call(assigned:Option<SymIdx>, func:SymIdx, args:Vec<SymIdx>,ret_type:Type) -> Self {
         //也许可以直接传入一个Func结构体
-        Self::Call { assigned, func_op:FuncOp { func, args } }
+        Self::Call { assigned, func_op:FuncOp { func, args,ret_type } }
     }
     // Instruction -> Jump ->JumpOp
     pub fn new_ret(ret_sym:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::Ret { ret_sym } } }
@@ -468,7 +469,7 @@ impl Debug for FuncOp {
         let new_str:Vec<&str> = self.args.iter().map(|x| x.symbol_name.as_str()).collect();
         let arg = new_str.join(", ");
 
-        write!(f, "call type {:?}(type {:?})", self.func, arg)
+        write!(f, " Call {:?} {:?}({})", self.ret_type,self.func, arg)
     }
 }
 impl Debug for JumpOp {
@@ -504,7 +505,7 @@ impl Debug for InstrType {
             Self::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
 
             Self::Call { assigned, func_op } => match assigned {
-                Some(symidx) => write!(f, "{:?} = {:?}", symidx, func_op),
+                Some(symidx) => write!(f, "{:?} = {:?}",symidx, func_op),
 
                 None => write!(f, "{:?}", func_op),
             },
@@ -532,7 +533,7 @@ impl Debug for InstrType {
 }
 impl Debug for Instruction {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, " {:?}{:?} ", self.text,self.instr_type)
+        write!(f, " {:5}{:?} ", self.text,self.instr_type)
         // write!(f, "{} {:?} ", self.text,self.instr_type)
     }
 }

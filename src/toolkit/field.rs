@@ -1,5 +1,7 @@
 use std::{any::Any, collections::HashMap, fmt::Debug};
 
+use strum_macros::EnumIs;
+
 use super::ast_node::AstTree;
 use super::symtab::SymIdx;
 use crate::{add_field, make_field_trait_for_struct, node};
@@ -31,7 +33,7 @@ pub enum Value {
     I1(Option<bool>),
     Void,
 }
-#[derive(Clone)]
+#[derive(Clone,EnumIs,PartialEq)]
 pub enum Type {
     I32,
     F32,
@@ -59,6 +61,7 @@ impl Type {
             "float" => Type::F32,
             "bool" => Type::I1,
             "double" => Type::F32,
+            "void" => Type::Void,
             _ => panic!("text中类型错误 找到不支持的类型 {}", text),
         }
     }
