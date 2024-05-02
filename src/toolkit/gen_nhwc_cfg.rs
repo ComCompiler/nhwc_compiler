@@ -1361,7 +1361,7 @@ pub fn parse_cfg_into_nhwc_cfg(
     //先遍历一遍函数名，将函数名加入到符号表中
     let cfg_funcs = direct_child_nodes!(at start_node in cfg_graph);
     for &cfg_entry in cfg_funcs.iter() {
-        match node!(at cfg_entry in cfg_graph).get_cfg_node_type()? {
+        match &node!(at cfg_entry in cfg_graph).cfg_node_type {
             CfgNodeType::Entry { ast_node, calls_in_func: _ } => {
                 //查找函数名称所在节点
                 let func_def_ast_node = *ast_node;
@@ -1380,7 +1380,7 @@ pub fn parse_cfg_into_nhwc_cfg(
         for cfg_node in dfs_vec {
             // debug_info_yellow!("dfs current is {:?}", cfg_node);
             let cfgnode = node!(at cfg_node in cfg_graph);
-            match &cfgnode.get_cfg_node_type()? {
+            match &cfgnode.cfg_node_type {
                 CfgNodeType::Branch { ast_expr_node } => {
                     parse_branch2nhwc(ast_tree, cfg_graph, scope_tree, et_tree, symtab, ast2scope, *ast_expr_node, cfg_node, &mut counter, instr_slab, symtab_graph)?
                 }
@@ -1427,8 +1427,8 @@ pub fn insert_bb_between(cfg_node1:u32, cfg_node2:u32, cfg_graph:&mut CfgGraph) 
     let cfg_former_edge_cloned = cfg_graph.edge_weight(cfg_former_edge_idx).unwrap().clone();
     // 删除旧的边
     cfg_graph.remove_edge(cfg_former_edge_idx);
-    let (cfg_node_type1, cfg_node_type2) = (node!(at cfg_node1 in cfg_graph).get_cfg_node_type()?,node!(at cfg_node2 in cfg_graph).get_cfg_node_type()?);
-    if let CfgEdgeType::Direct {  } = cfg_former_edge_cloned.get_cfg_edge_type()? {
+    let (cfg_node_type1, cfg_node_type2) = (&node!(at cfg_node1 in cfg_graph).cfg_node_type,&node!(at cfg_node2 in cfg_graph).cfg_node_type);
+    if let CfgEdgeType::Direct {  } = &cfg_former_edge_cloned.cfg_edge_type {
         // 如果这条边本身就是一条普通边，那么就允许insert
         let mut bb_struct = CfgNode::new_bb(vec![]);
         bb_struct.add_cor_func_symidx(node!(at cfg_node1 in cfg_graph).get_cor_func_symidx()?.clone());
@@ -1461,7 +1461,7 @@ pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph)
         let mut edge_iter = outgoing_edges.iter();
         let mut head = None;
         while let Some(edge) = edge_iter.next() {
-            if let CfgEdgeType::BodyHead {} = edge.weight().get_cfg_edge_type()? {
+            if let CfgEdgeType::BodyHead {} = &edge.weight().cfg_edge_type {
                 head = Some(edge.target().index() as u32)
             }
         }
@@ -1472,7 +1472,7 @@ pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph)
         let mut edge_iter = incoming_edges.iter();
         let mut tail = None;
         while let Some(edge) = edge_iter.next() {
-            if let CfgEdgeType::BodyTail {} = edge.weight().get_cfg_edge_type()? {
+            if let CfgEdgeType::BodyTail {} = &edge.weight().cfg_edge_type {
                 tail = Some(edge.source().index() as u32)
             }
         }

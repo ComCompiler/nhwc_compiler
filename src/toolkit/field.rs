@@ -6,16 +6,6 @@ use crate::{add_field,  node};
 
 pub type Fields = HashMap<&'static str, Box<dyn Field>>;
 
-pub trait FieldsInit {
-    fn new_from_single_field(field_name:&'static str, field:Box<dyn Field>) -> Fields {
-        let mut fields = Fields::new();
-        add_field!(
-            with_field field_name:{field} to fields);
-        fields
-    }
-}
-impl FieldsInit for Fields {}
-
 /// 你实现的类型必须继承这个 trait
 pub trait Field: Any + Debug {
     fn as_any(&self) -> &dyn Any;

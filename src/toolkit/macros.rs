@@ -793,33 +793,16 @@ macro_rules! downcast_op_any {
             None => anyhow::Result::Err(anyhow::anyhow!("can't find field {} type:{}",stringify!($field_type),stringify!($op_field))),
             Some(field) => match field.as_any().downcast_ref::<$field_type>() {
                 Some(data) => anyhow::Result::Ok(data),
-                None => anyhow::Result::Err(anyhow::anyhow!(concat!("这个field ", stringify!($field_name), "不是", stringify!($field_type), "类型"))),
+                None => anyhow::Result::Err(anyhow::anyhow!(concat!("downcast_ref 这个field ",  "不是", stringify!($field_type), "类型"))),
             },
         }
     }};
-    // ($field_type:ident,$op_field:ident) => {
-    //     {
-    //         match $op_field {
-    //             None=>{
-    //                 None
-    //             }
-    //             Some(field)=>{
-    //                 match field.as_any_move().downcast::<$field_type>(){
-    //                     Ok(data) => {
-    //                         Some(data)
-    //                     },
-    //                     Err(_) => panic!(concat!("这个field ",stringify!($field_name), "不是",stringify!($field_type), "类型")),
-    //                 }
-    //             }
-    //         }
-    //     }
-    // };
     (mut $field_type:ty,$op_field_mut:ident) => {{
         match $op_field_mut {
             None => anyhow::Result::Err(anyhow::anyhow!("can't find field {} {}",stringify!($field_type),stringify!($op_field_mut))),
             Some(field) => match field.as_any_mut().downcast_mut::<$field_type>() {
                 Some(data) => anyhow::Result::Ok(data),
-                None => anyhow::Result::Err(anyhow::anyhow!(concat!("这个field ", stringify!($field_name), "不是", stringify!($field_type), "类型"))),
+                None => anyhow::Result::Err(anyhow::anyhow!(concat!("downcast_mut 这个field ",  "不是", stringify!($field_type), "类型"))),
             },
         }
     }};
@@ -840,11 +823,11 @@ macro_rules! reg_field_for_struct {
             $(
                 pub fn [<get_ $upper_field_name:lower>](&self) -> anyhow::Result<&$field_type>{
                     let op_field = self.$fields.get($upper_field_name);
-                    $crate::downcast_op_any!(ref $field_type,op_field).with_context(|| format!("{} {:?} downcast_op_any 失败 field_name:{} {} {}",stringify!($struct_name),self,stringify!($upper_field_name),file!(),line!()))
+                    $crate::downcast_op_any!(ref $field_type,op_field).with_context(|| format!("{} {:?} downcast_op_any 失败 field_name:{}:{} {} {}",stringify!($struct_name),self,stringify!($upper_field_name),$upper_field_name,file!(),line!()))
                 }
                 pub fn [<get_mut_ $upper_field_name:lower>](&mut self) -> anyhow::Result<&mut $field_type>{
                     let op_field_mut = self.$fields.get_mut($upper_field_name);
-                    $crate::downcast_op_any!(mut $field_type,op_field_mut).with_context(|| format!("{} downcast_op_any 失败 field_name:{} {} {}",stringify!($struct_name),stringify!($upper_field_name),file!(),line!()))
+                    $crate::downcast_op_any!(mut $field_type,op_field_mut).with_context(|| format!("{} downcast_op_any 失败 field_name:{} {} {} {}",stringify!($struct_name),stringify!($upper_field_name),$upper_field_name,file!(),line!()))
                 }
                 pub fn [<add_ $upper_field_name:lower>](&mut self, field:$field_type) {
                     let _op_field = self.$fields.insert($upper_field_name,Box::new(field));
@@ -936,17 +919,20 @@ macro_rules! make_get_field_fn_for_struct {
     ($struct_name:ident with_fields $fields:ident) => {
         impl $struct_name {
             pub fn get_field(&self,field_name:&'static str) -> Option<&Box<dyn Field>>{
+                // println!("get field:{}",field_name);
                 self.$fields.get(field_name)
             }
-            pub fn get_mut_field(&mut self, field_name:&str) -> Option<&mut Box<dyn Field>>{
+            pub fn get_mut_field(&mut self, field_name:&'static str) -> Option<&mut Box<dyn Field>>{
+                // println!("get mut field:{}",field_name);
                 self.$fields.get_mut(field_name)
             }
             pub fn add_field(&mut self, field_name:&'static str ,field:Box<dyn Field>) -> Option<Box<dyn Field>>{
+                // println!("add field:{}",field_name);
                 self.$fields.insert(field_name,field)
             }
 
             // this is for debug 会把这个记录显示在 symttab graph 上，一般建议使用这个
-            pub fn get_field_with_debug(&self,field_name:&str,symtab:&SymTab,symtab_graph:&mut Option<&mut SymTabGraph>) -> Option<&Box<dyn Field>>{
+            pub fn get_field_with_debug(&self,field_name:&'static str,symtab:&SymTab,symtab_graph:&mut Option<&mut SymTabGraph>) -> Option<&Box<dyn Field>>{
                 match symtab_graph{
                     Some(symg) => {
                         let mut idx:u32=(symg.node_count()).try_into().unwrap();
@@ -1016,7 +1002,8 @@ macro_rules! instr_mut {
 macro_rules! _reg_field_name {
     ($upper_field_name:ident) => {
         paste::paste!{
-            pub static $upper_field_name:&str = concat!(stringify!([<$upper_field_name:lower>])," ","(",file!(),")");
+            // pub static $upper_field_name:&str = concat!(stringify!([<$upper_field_name:lower>])," ","(",file!(),")");
+            pub static $upper_field_name:&str = stringify!([<$upper_field_name:lower>]);
         }
     };
 }

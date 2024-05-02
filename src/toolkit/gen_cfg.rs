@@ -198,10 +198,7 @@ pub fn try_unite(opt_node1:Option<u32>, opt_node2:Option<u32>, cfg_graph:&mut Cf
     match (opt_node1, opt_node2) {
         (Some(node1), Some(node2)) => {
             let (node_struct1, node_struct2) = cfg_graph.index_twice_mut(NodeIndex::from(node1), NodeIndex::from(node2));
-            match (
-                node_struct1.get_mut_cfg_node_type().with_context(|| format!("unite 时找不到cfg_node对应的cfg_node_type"))?,
-                node_struct2.get_mut_cfg_node_type().with_context(|| format!("unite 时找不到cfg_node对应的cfg_node_type"))?,
-            ) {
+            match ( &mut node_struct1.cfg_node_type,&mut node_struct2.cfg_node_type) {
                 (CfgNodeType::BasicBlock { ast_nodes: ast_nodes1 }, CfgNodeType::BasicBlock { ast_nodes: ast_nodes2 }) => {
                     ast_nodes1.extend_from_slice(&ast_nodes2);
                     let edges:Vec<_> = cfg_graph.edges(NodeIndex::from(node2)).map(|x| (x.id().index() as u32, x.weight().clone())).collect();
