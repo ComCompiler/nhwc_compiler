@@ -2,23 +2,21 @@ use std::vec;
 
 use petgraph::{adj::NodeIndex, algo::dominators::simple_fast, visit::EdgeRef};
 
-use crate::{add_edge, add_node, direct_child_nodes, direct_parent_nodes, make_field_trait_for_struct, make_specialized_get_field_fn_for_struct, node, node_mut, reg_field_name, toolkit::{dj_edge::DjEdge, dj_node::DjNode}};
+use crate::{add_edge, add_node, direct_child_nodes, direct_parent_nodes, reg_field_for_struct, node, node_mut, _reg_field_name, toolkit::{dj_edge::DjEdge, dj_node::DjNode}};
 
 use super::{cfg_node::{CfgGraph, CfgNode}, context::DjGraph, etc::{dfs_with_predicate}};
 use super::symtab::{SymTab,SymTabEdge,SymTabGraph};
 use super::field::Field;
 use anyhow::{Result,Context};
 
-reg_field_name!(COR_DJ_NODE:cor_dj_node);
-reg_field_name!(DEPTH:depth);
-make_field_trait_for_struct!(u32);
-make_specialized_get_field_fn_for_struct!(CfgNode { COR_DJ_NODE:u32, } with_fields info);
-make_specialized_get_field_fn_for_struct!(DjNode { DEPTH:u32, } with_fields info);
+// reg_field_name!(COR_DJ_NODE);
+// reg_field_name!(DEPTH);
+reg_field_for_struct!(CfgNode { COR_DJ_NODE:u32, } with_fields info);
+reg_field_for_struct!(DjNode { DEPTH:u32, } with_fields info);
 
-reg_field_name!(DOMIANCE_FRONTIER_NODES:domiance_frontier_nodes);
-make_field_trait_for_struct!(Vec<u32>);
-make_specialized_get_field_fn_for_struct!(CfgNode { DOMIANCE_FRONTIER_NODES:Vec<u32>,  } with_fields info);
-make_specialized_get_field_fn_for_struct!(DjNode { DOMIANCE_FRONTIER_NODES:Vec<u32>,  } with_fields info);
+// reg_field_name!(DOMIANCE_FRONTIER_NODES);
+reg_field_for_struct!(CfgNode { DOMIANCE_FRONTIER_CFG_NODES:Vec<u32>,  } with_fields info);
+reg_field_for_struct!(DjNode { DOMIANCE_FRONTIER_DJ_NODES:Vec<u32>,  } with_fields info);
 
 pub fn parse_ncfg2dj_graph(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph)->Result<()>{
     let root =  NodeIndex::from(0);
@@ -28,8 +26,8 @@ pub fn parse_ncfg2dj_graph(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph)->Resul
         let dj_node = add_node!({DjNode::new(cfg_node) } to dj_graph);
         node_mut!(at cfg_node in cfg_graph).add_cor_dj_node(dj_node);
         // 为每个 cfg_node 初始化 domiance_frontier
-        node_mut!(at cfg_node in cfg_graph).add_domiance_frontier_nodes(vec![]);
-        node_mut!(at dj_node in dj_graph).add_domiance_frontier_nodes(vec![]);
+        node_mut!(at cfg_node in cfg_graph).add_domiance_frontier_cfg_nodes(vec![]);
+        node_mut!(at dj_node in dj_graph).add_domiance_frontier_dj_nodes(vec![]);
     }
     let dj_node_indices:Vec<_> = dj_graph.node_indices().collect();
     for dj_node_idx in dj_node_indices{
@@ -76,8 +74,8 @@ pub fn parse_ncfg2dj_graph(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph)->Resul
             );
             let cfg_join_targets:Vec<_> = dj_join_targets.iter().map(|&dj_node|node!(at dj_node in dj_graph).cor_cfg_node).collect();
             if !dj_join_targets.is_empty(){
-                node_mut!(at cfg_node in cfg_graph).get_mut_domiance_frontier_nodes()?.extend(cfg_join_targets);
-                node_mut!(at dj_cor_node in dj_graph).get_mut_domiance_frontier_nodes()?.extend(dj_join_targets);
+                node_mut!(at cfg_node in cfg_graph).get_mut_domiance_frontier_cfg_nodes()?.extend(cfg_join_targets);
+                node_mut!(at dj_cor_node in dj_graph).get_mut_domiance_frontier_dj_nodes()?.extend(dj_join_targets);
             }
         }
     }

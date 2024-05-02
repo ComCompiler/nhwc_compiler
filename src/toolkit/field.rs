@@ -2,7 +2,7 @@ use std::{any::Any, collections::HashMap, fmt::Debug};
 
 use super::ast_node::AstTree;
 use super::symtab::SymIdx;
-use crate::{add_field, make_field_trait_for_struct, node};
+use crate::{add_field,  node};
 
 pub type Fields = HashMap<&'static str, Box<dyn Field>>;
 
@@ -22,6 +22,20 @@ pub trait Field: Any + Debug {
     fn as_any_move(self) -> Box<dyn Any>;
     fn as_any_mut(&mut self) -> &mut dyn Any;
     fn clone_box(&self) -> Box<dyn Field>;
+}
+impl<T:Clone+Any+Debug> Field for T{
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+    fn as_any_move(self) -> Box<dyn std::any::Any>{
+        Box::new(self)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
+    fn clone_box(&self)->Box<dyn crate::toolkit::field::Field> {
+        Box::new(self.clone())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -114,7 +128,6 @@ impl Type {
         }
     }
 }
-make_field_trait_for_struct!(Type, Value, UseCounter);
 #[derive(Clone)]
 pub struct UseCounter {
     pub use_count:u32,

@@ -765,27 +765,6 @@ macro_rules! add_passes {
     };
 }
 
-#[macro_export]
-macro_rules! make_field_trait_for_struct {
-    ($($struct_name:ty),+) => {
-        $(
-        impl crate::toolkit::field::Field for $struct_name {
-            fn as_any(&self) -> &dyn std::any::Any {
-                self
-            }
-            fn as_any_move(self) -> Box<dyn std::any::Any>{
-                Box::new(self)
-            }
-            fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
-                self
-            }
-            fn clone_box(&self)->Box<dyn crate::toolkit::field::Field> {
-                Box::new(self.clone())
-            }
-        }
-        )*
-    };
-}
 // #[macro_export]
 // macro_rules! make_field_owner_trait_for_struct {
 //     ($($struct_name:ident),+ with fields $fields:ident) => {
@@ -853,8 +832,9 @@ macro_rules! downcast_op_any {
 ///     upper_field_name1:field_type1,
 ///     upper_field_name2:field_type2
 ///     with fields member_of_fields_type}
-macro_rules! make_specialized_get_field_fn_for_struct {
+macro_rules! reg_field_for_struct {
     ($struct_name:ident {$($upper_field_name:ident:$field_type:ty,)+} with_fields $fields:ident) => {
+        $($crate::_reg_field_name!($upper_field_name);)+
         impl $struct_name {
             paste::paste!{
             $(
@@ -1031,11 +1011,19 @@ macro_rules! instr_mut {
     };
 }
 
-
+/// 注册一个 field_name，这个name 用于注册一个
 #[macro_export]
-macro_rules! reg_field_name {
-    ($upper_field_name:ident:$display_name:ident) => {
-        pub static $upper_field_name:&str = &stringify!($display_name);
+macro_rules! _reg_field_name {
+    ($upper_field_name:ident) => {
+        paste::paste!{
+            pub static $upper_field_name:&str = concat!(stringify!([<$upper_field_name:lower>])," ","(",file!(),")");
+        }
+    };
+}
+#[macro_export]
+macro_rules! create_lower_string_from_two_ident {
+    ($ident1:ident,$ident2:ident) => {
+        stringify!([<$ident1:lower _ $file:lower>]);       
     };
 }
 

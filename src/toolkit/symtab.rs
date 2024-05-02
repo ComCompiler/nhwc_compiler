@@ -1,5 +1,5 @@
 use super::{context::COMPILATION_UNIT, symbol::Symbol};
-use crate::{add_node, add_node_with_edge, make_field_trait_for_struct};
+use crate::{add_node, add_node_with_edge };
 use core::fmt::Debug;
 use anyhow::{anyhow,Result};
 use petgraph::stable_graph::StableDiGraph;
@@ -28,7 +28,6 @@ pub struct SymIdx {
     pub symbol_name:String,
     pub index_ssa:Option<u32>,
 }
-make_field_trait_for_struct!(SymIdx);
 impl SymIdx {
     pub fn new(scope_node:u32, symbol_name:String) -> Self { SymIdx { scope_node, symbol_name, index_ssa:None } }
     pub fn new_verbose(scope_node:u32, symbol_name:String, index_ssa:Option<u32>) -> Self { SymIdx { scope_node, symbol_name, index_ssa } }

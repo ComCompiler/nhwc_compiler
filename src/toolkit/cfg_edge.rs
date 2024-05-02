@@ -3,11 +3,9 @@ use super::field::Field;
 use super::field::Fields;
 use super::field::FieldsInit;
 use super::symtab::{SymTab, SymTabEdge, SymTabGraph};
-use crate::make_field_trait_for_struct;
 use strum_macros::EnumIs;
 use crate::make_get_field_fn_for_struct;
-use crate::make_specialized_get_field_fn_for_struct;
-use crate::reg_field_name;
+use crate::reg_field_for_struct;
 use anyhow::{Result,Context};
 use std::fmt::Debug;
 #[derive(Clone)]
@@ -15,10 +13,8 @@ pub struct CfgEdge {
     info:Fields,
     text:String,
 }
-reg_field_name!(CFG_EDGE_TYPE:cfg_edge_type);
-make_field_trait_for_struct!(CfgEdgeType);
 make_get_field_fn_for_struct!(CfgEdge with_fields info);
-make_specialized_get_field_fn_for_struct!(CfgEdge {CFG_EDGE_TYPE:CfgEdgeType,} with_fields info);
+reg_field_for_struct!(CfgEdge {CFG_EDGE_TYPE:CfgEdgeType,} with_fields info);
 #[derive(Clone, Debug, EnumIs)]
 pub enum CfgEdgeType {
     IfFalse {},

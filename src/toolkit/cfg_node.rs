@@ -9,7 +9,7 @@ use super::symtab::{SymIdx, SymTab, SymTabEdge, SymTabGraph};
 use crate::toolkit::cfg_edge::CfgEdge;
 use crate::toolkit::field::{Field, FieldsInit};
 use crate::{instr, toolkit::ast_node::AstTree};
-use crate::{make_field_trait_for_struct, make_specialized_get_field_fn_for_struct, node, reg_field_name};
+use crate::{ reg_field_for_struct, node, _reg_field_name};
 
 use super::field::Fields;
 use super::nhwc_instr::{InstrSlab};
@@ -18,10 +18,8 @@ use super::nhwc_instr::{InstrSlab};
 
 pub type CfgGraph = StableDiGraph<CfgNode, CfgEdge, u32>;
 /* 用于指示这个cfg_node 的类型 */
-reg_field_name!(CFG_NODE_TYPE:cfg_node_type);
 /* jump determinant 例如 branch 类型的cfg_node 会产生一个变量指示 之后究竟是往 IfTrue 边 走 还是往 IfFalse 边走，因此需要加入这个字段
 用于存储这个变量的 symidx */
-reg_field_name!(JUMP_DET:jump_det);
 
 #[derive(Clone, Debug, EnumIs)]
 pub enum CfgNodeType {
@@ -60,7 +58,6 @@ pub enum CfgNodeType {
     },
     Root {},
 }
-make_field_trait_for_struct!(CfgNodeType);
 
 #[derive(Clone)]
 pub struct CfgNode {
@@ -70,7 +67,7 @@ pub struct CfgNode {
     pub info:Fields,
     // instructions of this basic block (第二步才生成这个 instrs)
 }
-make_specialized_get_field_fn_for_struct!(
+reg_field_for_struct!(
     CfgNode
     { 
         CFG_NODE_TYPE:CfgNodeType,

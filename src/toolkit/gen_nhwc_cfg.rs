@@ -12,7 +12,7 @@ use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_ins
 use crate::{
     add_edge, add_node, add_node_with_edge, add_symbol, antlr_parser::cparser::{
         RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_jumpStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
-    }, direct_child_node, direct_child_nodes, direct_parent_nodes, find, find_nodes, incoming_edges, instr, make_field_trait_for_struct, make_specialized_get_field_fn_for_struct, node, node_mut, outgoing_edges, push_instr, reg_field_name, rule_id, toolkit::{
+    }, direct_child_node, direct_child_nodes, direct_parent_nodes, find, find_nodes, incoming_edges, instr,  reg_field_for_struct, node, node_mut, outgoing_edges, push_instr, _reg_field_name, rule_id, toolkit::{
         cfg_node::{CfgInstrIdx, CfgNode}, etc, field::{Type, UseCounter}, gen_ssa::REACHING_DEF, nhwc_instr::{IcmpPlan, UcmpPlan}, symbol::Symbol, symtab::SymTabEdge
     }
 };
@@ -22,41 +22,42 @@ use colored::Colorize;
 这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有
 */
 
-reg_field_name!(IS_CONST:is_const);
-reg_field_name!(IS_TEMP:is_temp);
-make_field_trait_for_struct!(bool);
-reg_field_name!(DEF_INSTRS_VEC:defs_instrs);
-reg_field_name!(DEF_CFG_NODE_VEC:def_cfg_node_vec);
+// reg_field_name!(IS_CONST);
+// reg_field_name!(IS_TEMP);
+// make_field_trait_for_struct!(bool);
+// reg_field_name!(DEF_INSTRS_VEC);
+// reg_field_name!(DEF_CFG_NODE_VEC);
 // for variables symbol
-make_specialized_get_field_fn_for_struct!(Symbol {
+reg_field_for_struct!(Symbol {
         DEF_INSTRS_VEC:Vec<usize>,
+        DEF_CFG_NODE_VEC:Vec<u32>,
         IS_CONST:bool,
         IS_TEMP:bool,
     } with_fields fields);
 // for compilation unit symbol
-make_field_trait_for_struct!(Vec<SymIdx>);
-make_field_trait_for_struct!(Vec<usize>);
-make_field_trait_for_struct!(Vec<(SymIdx,u32)>);
-make_specialized_get_field_fn_for_struct!(Symbol {
+// make_field_trait_for_struct!(Vec<SymIdx>);
+// make_field_trait_for_struct!(Vec<usize>);
+// make_field_trait_for_struct!(Vec<(SymIdx,u32)>);
+reg_field_for_struct!(Symbol {
         ALL_CFG_FUNC_NAME_ENTRY_TUPLES:Vec<(SymIdx,u32)>,
     } with_fields fields);
-reg_field_name!(DECLARED_VARS:declared_vars);
+// reg_field_name!(DECLARED_VARS);
 // for func symbol
-make_specialized_get_field_fn_for_struct!(Symbol {
+reg_field_for_struct!(Symbol {
         DECLARED_VARS:Vec<SymIdx>,
     } with_fields fields);
-reg_field_name!(COR_FUNC_SYMIDX:cor_func_symidx);
-reg_field_name!(DEF_SYMIDX_INSTR_TUPLE_VEC:def_symidx_cfg_node_idx_tuple_vec);
-reg_field_name!(ALL_CFG_FUNC_NAME_ENTRY_TUPLES:all_cfg_func_name_entry_tuple);
-make_field_trait_for_struct!(Vec<(SymIdx,usize)>);
-make_specialized_get_field_fn_for_struct!(CfgNode {
+// reg_field_name!(COR_FUNC_SYMIDX);
+// reg_field_name!(DEF_SYMIDX_INSTR_TUPLE_VEC);
+// reg_field_name!(ALL_CFG_FUNC_NAME_ENTRY_TUPLES);
+// make_field_trait_for_struct!(Vec<(SymIdx,usize)>);
+reg_field_for_struct!(CfgNode {
     COR_FUNC_SYMIDX:SymIdx,
     DEF_SYMIDX_INSTR_TUPLE_VEC:Vec<(SymIdx,usize)>,
 } with_fields info);
 // for Instruction
-reg_field_name!(CFG_INSTR_IDX:cfg_instr_idx);
-make_field_trait_for_struct!(CfgInstrIdx);
-make_specialized_get_field_fn_for_struct!(Instruction {
+// reg_field_name!(CFG_INSTR_IDX);
+// make_field_trait_for_struct!(CfgInstrIdx);
+reg_field_for_struct!(Instruction {
         CFG_INSTR_IDX:CfgInstrIdx,
     } with_fields info);
 
@@ -541,7 +542,7 @@ fn process_func_symbol(
 )->Result<SymIdx>{
     let func_symidx = add_symbol!({Symbol::new(0, func_name.clone())} 
         with_field DECLARED_VARS:{Vec::<SymIdx>::new()}
-        with_field REACHING_DEF:{None} 
+        with_field REACHING_DEF:{Option::<SymIdx>::None} 
         with_field IS_CONST:{true} 
         with_field IS_TEMP:{false} 
     to symtab debug op_symtab_graph);
