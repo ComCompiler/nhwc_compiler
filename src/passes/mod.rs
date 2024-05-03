@@ -9,3 +9,4 @@ pub mod riscv2binary_pass;
 pub mod symtab_debug_pass;
 pub mod ssa_pass;
 pub mod ncfg2djg_pass;
+pub mod cfg_debug_pass;

@@ -22,4 +22,5 @@ pub mod gen_djg;
 pub mod dj_edge;
 pub mod dj_node;
 pub mod gen_ssa;
+pub mod decl_def_use_node;
 pub mod simulator;

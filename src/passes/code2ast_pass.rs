@@ -18,7 +18,7 @@ impl Pass for Code2AstPass {
         // 生成对应的png
         if self.is_gen_png {
             let ast_tree = &mut ctx.ast_tree;
-            generate_png_by_graph(&ast_tree, "ast_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("ast_tree".to_string())]);
+            generate_png_by_graph(&ast_tree.clone(), "ast_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("ast_tree".to_string())],&mut ctx.io_task_list);
         }
         Ok(())
     }

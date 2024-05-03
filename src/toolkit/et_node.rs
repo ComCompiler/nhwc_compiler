@@ -174,7 +174,7 @@ impl Debug for ExprOp {
 }
 
 impl EtNodeType {
-    pub fn to_et_node(self) -> EtNode { EtNode::new(self) }
+    pub fn as_et_node(self) -> EtNode { EtNode::new(self) }
     pub fn new_op_array_idx(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::ArrayIndex, ast_node, text:String::new() } }
     pub fn new_op_array_wrapper(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node, text:String::new() } }
     pub fn new_op_add(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Add, ast_node, text:String::new() } }
@@ -195,7 +195,7 @@ impl EtNodeType {
     pub fn new_op_div_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::DivAssign, ast_node, text:String::new() } }
     pub fn new_op_plus_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::PlusAssign, ast_node, text:String::new() } }
     //你必须确保这个symbol 是一个 constant
-    pub fn new_constant(ast_node:u32, const_symbol:SymIdx) -> Self { EtNodeType::Constant { const_sym_idx:const_symbol, ast_node, text:String::new() } }
+    pub fn new_constant(ast_node:u32, const_symidx:SymIdx) -> Self { EtNodeType::Constant { const_sym_idx:const_symidx, ast_node, text:String::new() } }
     pub fn new_symbol(ast_node:u32, sym_idx:SymIdx, def_or_use:DeclOrDefOrUse) -> Self { EtNodeType::Symbol { sym_idx, ast_node, text:String::new(), def_or_use:def_or_use } }
     // pub fn new_array_symbol(ast_node:u32,sym_idx:SymbolIndex ,def_or_use:Def_Or_Use)->Self{
     //     EtNakedNode::ArraySym  {sym_idx,ast_node,text:String::new(), def_or_use:def_or_use  }
@@ -265,7 +265,7 @@ impl Debug for EtNodeType {
         match self {
             EtNodeType::Operator { op, ast_node: _, text: _ } => write!(f, "{:?}", op),
             EtNodeType::Constant { const_sym_idx, ast_node: _, text: _ } => {
-                write!(f, "{}", const_sym_idx.symbol_name)
+                write!(f, "const {}", const_sym_idx.symbol_name)
             }
             EtNodeType::Symbol { sym_idx, ast_node: _, text, def_or_use } => {
                 write!(f, "{:?} {} {}", def_or_use, text, sym_idx.symbol_name)

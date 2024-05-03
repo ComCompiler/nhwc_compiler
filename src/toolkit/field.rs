@@ -1,20 +1,12 @@
-use std::{any::Any,  fmt::Debug};
-use ahash::AHashMap;
+use std::{any::Any, collections::HashMap, fmt::Debug};
+
+use strum_macros::EnumIs;
 
 use super::ast_node::AstTree;
 use super::symtab::SymIdx;
-use crate::{add_field, make_field_trait_for_struct, node};
+use crate::{node};
 
-pub type Fields = AHashMap<String, Box<dyn Field>>;
-
-pub trait FieldsInit {
-    fn new_from_single_field(field_name:&str, field:Box<dyn Field>) -> Fields {
-        let mut fields = Fields::new();
-        add_field!(field_name:{field} to fields);
-        fields
-    }
-}
-impl FieldsInit for Fields {}
+pub type Fields = HashMap<&'static str, Box<dyn Field>>;
 
 /// 你实现的类型必须继承这个 trait
 pub trait Field: Any + Debug {
@@ -23,6 +15,21 @@ pub trait Field: Any + Debug {
     fn as_any_mut(&mut self) -> &mut dyn Any;
     fn clone_box(&self) -> Box<dyn Field>;
 }
+// if you implement this 会栈溢出，很神奇
+// impl<T:Clone+Any+Debug> Field for T{
+//     fn as_any(&self) -> &dyn std::any::Any {
+//         self
+//     }
+//     fn as_any_move(self) -> Box<dyn std::any::Any>{
+//         Box::new(self)
+//     }
+//     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+//         self
+//     }
+//     fn clone_box(&self)->Box<dyn crate::toolkit::field::Field> {
+//         Box::new(self.clone())
+//     }
+// }
 
 #[derive(Debug, Clone)]
 pub enum Value {
@@ -31,7 +38,7 @@ pub enum Value {
     I1(Option<bool>),
     Void,
 }
-#[derive(Clone)]
+#[derive(Clone,EnumIs,PartialEq)]
 pub enum Type {
     I32,
     F32,
@@ -59,6 +66,7 @@ impl Type {
             "float" => Type::F32,
             "bool" => Type::I1,
             "double" => Type::F32,
+            "void" => Type::Void,
             _ => panic!("text中类型错误 找到不支持的类型 {}", text),
         }
     }
@@ -114,7 +122,6 @@ impl Type {
         }
     }
 }
-make_field_trait_for_struct!(Type, Value, UseCounter);
 #[derive(Clone)]
 pub struct UseCounter {
     pub use_count:u32,

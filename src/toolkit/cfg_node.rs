@@ -1,4 +1,4 @@
-use anyhow::{Result,Context};
+use anyhow::{Result,Context,anyhow};
 use strum_macros::EnumIs;
 use std::fmt::Debug;
 use std::vec;
@@ -7,21 +7,19 @@ use petgraph::stable_graph::StableDiGraph;
 
 use super::symtab::{SymIdx, SymTab, SymTabEdge, SymTabGraph};
 use crate::toolkit::cfg_edge::CfgEdge;
-use crate::toolkit::field::{Field, FieldsInit};
+use crate::toolkit::field::{Field};
 use crate::{instr, toolkit::ast_node::AstTree};
-use crate::{make_field_trait_for_struct, make_specialized_get_field_fn_for_struct, node, reg_field_name};
+use crate::{ reg_field_for_struct, node};
 
 use super::field::Fields;
-use super::nhwc_instr::InstrSlab;
+use super::nhwc_instr::{InstrSlab};
 
 //use crate::toolkit::ast_node::AstNode;
 
 pub type CfgGraph = StableDiGraph<CfgNode, CfgEdge, u32>;
 /* 用于指示这个cfg_node 的类型 */
-reg_field_name!(CFG_NODE_TYPE:cfg_node_type);
 /* jump determinant 例如 branch 类型的cfg_node 会产生一个变量指示 之后究竟是往 IfTrue 边 走 还是往 IfFalse 边走，因此需要加入这个字段
 用于存储这个变量的 symidx */
-reg_field_name!(JUMP_DET:jump_det);
 
 #[derive(Clone, Debug, EnumIs)]
 pub enum CfgNodeType {
@@ -60,26 +58,25 @@ pub enum CfgNodeType {
     },
     Root {},
 }
-make_field_trait_for_struct!(CfgNodeType);
 
 #[derive(Clone)]
 pub struct CfgNode {
+    pub cfg_node_type:CfgNodeType,
     pub phi_instrs:Vec<usize>,
     pub instrs:Vec<usize>,
     pub text:String,
     pub info:Fields,
     // instructions of this basic block (第二步才生成这个 instrs)
 }
-make_specialized_get_field_fn_for_struct!(
+reg_field_for_struct!(
     CfgNode
     { 
-        CFG_NODE_TYPE:CfgNodeType,
         JUMP_DET:SymIdx, 
     }
-    with fields info);
+    with_fields info);
 impl CfgNode {
-    pub fn load_ast_node_text(&mut self, ast_tree:&AstTree) -> Result<()> {
-        match self.get_mut_cfg_node_type()?.clone() {
+    pub fn load_ast_node_text(&mut self, ast_tree:&AstTree)  -> Result<()>{
+        match self.cfg_node_type.clone() {
             CfgNodeType::Entry { ast_node, calls_in_func: _ } => {
                 let node_text = node!(at ast_node in ast_tree).text.as_str();
                 self.text += node_text;
@@ -135,91 +132,53 @@ impl CfgNode {
         self.text +="\n";
         Ok(())
     }
-    pub fn load_instrs_text(&mut self, instr_slab:&InstrSlab) {
-        if self.instrs.len()>0  {self.text +="Instrs: \n\n";}
-        for &instr in self.instrs.iter() {
-            self.text += format!("{:?} \n", instr!(at instr in instr_slab).unwrap()).as_str();
-        }
-        self.text +="\n";
+    pub fn load_instrs_text(&mut self, instr_slab:&InstrSlab) -> Result<()>{
         if self.phi_instrs.len()>0  {self.text += "PhiInstrs: \n\n";}
         for &phi_instr in self.phi_instrs.iter() {
-            self.text += format!("{:?} \n", instr!(at phi_instr in instr_slab).unwrap()).as_str();
+            self.text += format!("{:?} \n", instr!(at phi_instr in instr_slab)?).as_str();
         }
         self.text +="\n";
+        if self.instrs.len()>0  {self.text +="Instrs: \n\n";}
+        for &instr in self.instrs.iter() {
+            self.text += format!("{:?} \n", instr!(at instr in instr_slab)?).as_str();
+        }
+        self.text +="\n";
+        Ok(())
     }
     pub fn clear_text(&mut self){
         self.text = String::new();
     }
     pub fn new_bb(ast_nodes:Vec<u32>) -> Self { 
-        let mut cfg_node_struct = Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::BasicBlock { ast_nodes })), phi_instrs: vec![] } ;
-        cfg_node_struct.add_def_symidx_vec(vec![]);
+        let mut cfg_node_struct = Self { instrs:vec![], text:String::new(), info:Fields::new(), phi_instrs: vec![], cfg_node_type: CfgNodeType::BasicBlock { ast_nodes } } ;
+        cfg_node_struct.add_def_symidx_instr_tuple_vec(vec![]);
         cfg_node_struct
     }
-    pub fn new_gather() -> Self { Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Gather {})), phi_instrs: vec![] } }
-    pub fn new_root() -> Self { Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Root {})), phi_instrs: vec![] } }
+    pub fn new_gather() -> Self { Self { instrs:vec![], text:String::new(), info:Fields::new(),cfg_node_type: CfgNodeType::Gather {}, phi_instrs: vec![] } }
+    pub fn new_root() -> Self { Self { instrs:vec![], text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Root {}, phi_instrs: vec![] } }
     pub fn new_branch(ast_node:u32) -> Self {
-        Self {
-            instrs:vec![],
-            text:String::new(),
-            info:Fields::new_from_single_field(
-                CFG_NODE_TYPE,
-                Box::new(CfgNodeType::Branch {
-                    ast_expr_node:ast_node,
-                    // op_true_head_tail_nodes: true_head_tail_nodes,
-                    // op_false_head_tail_nodes: false_head_tail_nodes,
-                }),
-            ),
-            phi_instrs: vec![],
-        }
+        Self { instrs:vec![], text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Branch { ast_expr_node:ast_node, }, phi_instrs: vec![], }
     }
-    pub fn new_for(
-        ast_before_node:u32,
-        ast_mid_node:u32,
-        ast_after_node:u32,
-        // exit_node: Option<u32>,
-        // body_head_tail_nodes: Option<(u32, u32)>,
-    ) -> Self {
+    pub fn new_for( ast_before_node:u32, ast_mid_node:u32, ast_after_node:u32,) -> Self {
         Self {
             text:String::new(),
             instrs:vec![],
-            info:Fields::new_from_single_field(
-                CFG_NODE_TYPE,
-                Box::new(CfgNodeType::ForLoop {
-                    ast_before_node,
-                    ast_mid_node,
-                    ast_after_node,
-                    // exit_node,
-                    // op_body_head_tail_nodes: body_head_tail_nodes,
-                }),
-            ),
+            info:Fields::new(),cfg_node_type:CfgNodeType::ForLoop { ast_before_node, ast_mid_node, ast_after_node, },
             phi_instrs: vec![],
         }
     }
     pub fn new_while(
         ast_expr_node:u32,
-        // exit_node: Option<u32>,
-        // body_node: Option<(u32, u32)>,
     ) -> Self {
-        Self {
-            instrs:vec![],
-            text:String::new(),
-            info:Fields::new_from_single_field(
-                CFG_NODE_TYPE,
-                Box::new(CfgNodeType::WhileLoop {
-                    ast_expr_node,
-                    // exit_node,
-                    // body_node,
-                }),
-            ),
-            phi_instrs: vec![],
-        }
+        Self { instrs:vec![], text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::WhileLoop { ast_expr_node, }, phi_instrs: vec![], }
     }
-    pub fn new_switch(ast_expr_node:u32) -> Self { Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Switch { ast_expr_node })), phi_instrs: vec![] } }
+    pub fn new_switch(ast_expr_node:u32) -> Self { Self { instrs:vec![], text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Switch { ast_expr_node }, phi_instrs: vec![] } }
     pub fn new_entry(ast_node:u32, _instr:usize) -> Self {
-        Self { instrs:vec![], text:String::new(), info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Entry { ast_node, calls_in_func:vec![] })), phi_instrs: vec![] }
+        Self { instrs:vec![], text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Entry { ast_node, calls_in_func:vec![] }, phi_instrs: vec![] }
     }
-    pub fn new_exit(ast_node:u32) -> Self { Self { text:String::new(), instrs:vec![], info:Fields::new_from_single_field(CFG_NODE_TYPE, Box::new(CfgNodeType::Exit { ast_node })), phi_instrs: vec![] } }
-    
+    pub fn new_exit(ast_node:u32) -> Self { Self { text:String::new(), instrs:vec![], info:Fields::new(),cfg_node_type:CfgNodeType::Exit { ast_node }, phi_instrs: vec![] } }
+    pub fn get_all_instrs_iter(&self)->impl Iterator<Item=&usize>+'_{
+        self.phi_instrs.iter().chain(self.instrs.iter())
+    }
 }
 trait CfgNodeTypeTrait {
     // 3元
@@ -244,7 +203,7 @@ impl CfgNodeTypeTrait for CfgNodeType {
 }
 impl Debug for CfgNode {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &self.get_cfg_node_type().map_err(|e| std::fmt::Error)? {
+        match &self.cfg_node_type {
             // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::Entry { ast_node, calls_in_func: _ } => {
                 write!(f, " #{} {} \n {} $ @ # {} \n {:#?} $  ", "Entry\n", ast_node, self.text, "Fields", self.info)
@@ -261,7 +220,7 @@ impl Debug for CfgNode {
                 write!(f,  " # {} {} \n {} $ @ # {} \n {:#?} $ ", "Branch\n", ast_expr_node, self.text, "Fields", self.info)
             }
             // 3元  输出为3格 {1 | 1 | 1}
-            CfgNodeType::Gather {} => write!(f, " {} @ {}\n {:#?} ", "Gather\n", "Fields", self.info),
+            CfgNodeType::Gather {} => write!(f, " # {} {} $ @ # {}\n {:#?} $", "Gather\n", self.text ,"Fields", self.info),
             // 4元  输出为4格 {{1 | 1} | { 1 | 1}}
             CfgNodeType::BasicBlock { ast_nodes: _ast_node_idxes } => {
                 write!(f, " # {} \n {} $ @ # {} \n{:#?} $", "BasicBlock\n", self.text, "Fields", self.info)
@@ -312,3 +271,28 @@ impl Debug for CfgNode {
 //     let mut cfg_node_struct = node_mut!(at cfg_node in cfg_graph);
 //     cfg_node_struct
 // }
+
+
+
+#[derive(Clone,Debug,PartialEq, PartialOrd,Eq,Ord)]
+pub struct CfgInstrIdx{
+    pub cfg_node:u32,
+    pub instr_pos:usize,
+    pub is_in_phi:bool,
+}
+
+impl CfgInstrIdx{
+    pub fn get_instr(&self,cfg_graph:&CfgGraph)-> Result<usize>{
+        let cfg_node = self.cfg_node;
+        let instr_set  = if self.is_in_phi{
+            &node!(at cfg_node in cfg_graph).phi_instrs
+        }else{
+            &node!(at cfg_node in cfg_graph).instrs
+        };
+        instr_set.get(self.instr_pos).map(|s|*s).ok_or(anyhow!("在 cfg_node:{} 找不到这个instr_pos:{}对应的instruction",cfg_node,self.instr_pos))
+        // 如果找不到，直接抛出Err
+    }
+    pub fn new(cfg_node:u32,instr_pos:usize,is_in_phi:bool)->Self{
+        Self { cfg_node, instr_pos, is_in_phi  }
+    }
+}

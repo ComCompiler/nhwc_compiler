@@ -20,7 +20,7 @@ impl Pass for Ast2CfgPass {
             cfg_edge.load_ast_node_text(&ctx.ast_tree)?;
         }
         if self.is_gen_png {
-            generate_png_by_graph(&ctx.cfg_graph, "cfg_graph".to_string(), &[Config::Record, Config::Rounded, Config::Title("cfg_graph".to_string()), Config::NodeIndexLabel]);
+            generate_png_by_graph(&ctx.cfg_graph.clone(), "cfg_graph".to_string(), &[Config::Record, Config::Rounded, Config::Title("cfg_graph".to_string()), Config::NodeIndexLabel],&mut ctx.io_task_list)?;
         }
         Ok(())
     }
