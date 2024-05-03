@@ -1,6 +1,7 @@
-use std::{any::Any, collections::HashMap, fmt::Debug};
+use std::{any::Any, collections::HashMap, fmt::Debug, ops::{Add, Div, Mul, Sub}};
 
 use strum_macros::EnumIs;
+use anyhow::*;
 
 use super::ast_node::AstTree;
 use super::symtab::SymIdx;
@@ -56,6 +57,53 @@ impl Value {
     pub fn new_f32(value:f32) -> Self { Value::F32(Some(value)) }
     pub fn new_i1(value:bool) -> Self { Value::I1(Some(value)) }
     pub fn new_void() -> Self { Value::Void }
+    pub fn to_specific_type(&self,ty:&Type) -> Result<Value>{
+        match (&self,&ty) {
+            (Value::I32(v), Type::I32) => todo!(),
+            (Value::I32(v), Type::F32) => Ok(Value::new_f32(v.context("I32 to F32 but not a i32")? as f32)),
+            (Value::I32(v), Type::I1) => todo!(),
+            (Value::I32(v), Type::Void) => todo!(),
+            (Value::I32(v), Type::Label) => todo!(),
+            (Value::I32(v), Type::Fn { arg_syms, ret_sym }) => todo!(),
+            (Value::F32(v), Type::I32) => todo!(),
+            (Value::F32(v), Type::F32) => todo!(),
+            (Value::F32(v), Type::I1) => todo!(),
+            (Value::F32(v), Type::Void) => todo!(),
+            (Value::F32(v), Type::Label) => todo!(),
+            (Value::F32(v), Type::Fn { arg_syms, ret_sym }) => todo!(),
+            (Value::I1(v), Type::I32) => Ok(Value::new_i32(v.context("I32 to I1 but not a i1")?.into())),
+            (Value::I1(v), Type::F32) => Ok(Value::new_f32(v.context("F32 to I1 but not a f32")?.into())),
+            (Value::I1(v), Type::I1) => Ok(Value::new_i1(v.context("I1 to I1 but not a I1")?.into())),
+            (Value::I1(v), Type::Void) => todo!(),
+            (Value::I1(v), Type::Label) => todo!(),
+            (Value::I1(v), Type::Fn { arg_syms, ret_sym }) => todo!(),
+            (Value::Void, t) => Err(anyhow!("void 类型不能转化为 {:?} 类型",t)),
+        }
+    }
+    // pub fn as_specific_type(self) -> Self {
+
+    // }
+    pub fn from_string(s:&String,ty:&Type)->Result<Value>{
+        Ok(match &ty{
+            Type::I32 => Value::new_i32(s.parse()?),
+            Type::F32 => Value::new_f32(s.parse()?),
+            Type::I1 => Value::new_i1(s.parse()?),
+            Type::Void => Err(anyhow!("不能从string 转化为 Void 类型的value"))?,
+            Type::Label => Err(anyhow!("不能从string 转化为 Label 类型的value"))?,
+            Type::Fn { arg_syms, ret_sym } => Err(anyhow!("不能从string 转化为 Fn 类型的value"))?,
+        })
+    }
+    pub fn to_type(&self)->Type{
+        match self{
+            Value::I32(_) => Type::I32,
+            Value::F32(_) => Type::F32,
+            Value::I1(_) => Type::I1,
+            Value::Void => Type::Void,
+        }
+    }
+    pub fn adapt(&self, value2:&Value) -> Type {
+        Type::adapt(&self.to_type() ,&value2.to_type())  
+    }
 }
 impl Type {
     pub fn new(ast_node:u32, ast_tree:&AstTree) -> Self {
@@ -119,6 +167,74 @@ impl Type {
             _ => {
                 panic!("{:?}和{:?}不能进行兼容", ty1, ty2);
             }
+        }
+    }
+}
+impl Add for Value{
+    type Output=Value;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        let pub_ty=self.adapt(&rhs);
+        let l_val=self.to_specific_type(&pub_ty).unwrap();
+        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        match (l_val,r_val) {
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1+v2),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_f32(v1+v2),
+            (Value::I1(Some(v1)), Value::I1(Some(v2))) => panic!("problem"),
+            (Value::Void, Value::Void) => panic!("problem"),
+            (_,_) => panic!("有"),
+        }
+        
+
+    }
+}
+impl Sub for Value{
+    type Output=Value;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        let pub_ty=self.adapt(&rhs);
+        let l_val=self.to_specific_type(&pub_ty).unwrap();
+        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        match (l_val,r_val) {
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 - v2),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_f32(v1 - v2),
+            (Value::I1(Some(v1)), Value::I1(Some(v2))) => panic!("problem"),
+            (Value::Void, Value::Void) => panic!("problem"),
+            (_,_) => panic!("有"),
+        }
+        
+
+    }
+}
+impl Mul for Value{
+    type Output = Value;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        let pub_ty=self.adapt(&rhs);
+        let l_val=self.to_specific_type(&pub_ty).unwrap();
+        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        match (l_val,r_val) {
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 * v2),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_f32(v1 * v2),
+            (Value::I1(Some(v1)), Value::I1(Some(v2))) => panic!("problem"),
+            (Value::Void, Value::Void) => panic!("problem"),
+            (_,_) => panic!("有"),
+        }
+    }
+}
+impl Div for Value{
+    type Output = Value;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        let pub_ty=self.adapt(&rhs);
+        let l_val=self.to_specific_type(&pub_ty).unwrap();
+        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        match (l_val,r_val) {
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 / v2),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_f32(v1 / v2),
+            (Value::I1(Some(v1)), Value::I1(Some(v2))) => panic!("problem"),
+            (Value::Void, Value::Void) => panic!("problem"),
+            (_,_) => panic!("有"),
         }
     }
 }
