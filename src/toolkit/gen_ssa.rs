@@ -4,7 +4,7 @@ use crate::{add_field, add_symbol, debug_info_green, debug_info_yellow, direct_c
 use itertools::{Itertools};
 
 use crate::toolkit::symtab::{SymTabEdge,SymTabGraph};
-use super::{cfg_node::{CfgGraph, CfgInstrIdx}, context::DjGraph, decl_def_use_node::DduGraph, etc, nhwc_instr::{InstrSlab, InstrType, PhiPair}, symbol::{Symbol}, symtab::{SymIdx, SymTab}};
+use super::{cfg_node::{CfgGraph, CfgInstrIdx, InstrList}, context::DjGraph, decl_def_use_node::DduGraph, etc, nhwc_instr::{InstrSlab, InstrType, PhiPair}, symbol::Symbol, symtab::{SymIdx, SymTab}};
 use anyhow::{anyhow, Result, Context};
 
 reg_field_for_struct!(Symbol {
@@ -18,6 +18,7 @@ reg_field_for_struct!(Symbol {
 } with_fields fields);
 
 pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab, ddu_grpah:&mut DduGraph, op_symtab_graph:&mut Option<&mut SymTabGraph>)->Result<()>{
+    refresh_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
     for (func_symidx,_cfg_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.iter(){
         for variable in symtab.get_symbol(func_symidx)?.get_declared_vars()?{
             let mut cfg_instr_idx_vec:Vec<_> = symtab.get_symbol(variable)?.get_def_instrs_vec()?.iter().map(|&instr|instr!(at instr in instr_slab).unwrap().get_cfg_instr_idx().unwrap()).collect();
@@ -37,7 +38,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
                 for cfg_df_node in domiance_frontiers{
                     if let Some(vec_idx) = find_first_def_in_instr_vec(&node_mut!(at cfg_df_node in cfg_graph).phi_instrs, variable, instr_slab, Ordering::Less,None)?{
                         let phi_instr = node!(at cfg_df_node in cfg_graph).phi_instrs[vec_idx];
-                        debug_info_yellow!("append {:?} {:?}",(cfg_df_node,phi_instr),instr_slab.get_mut_instr(phi_instr)?);
+                        // debug_info_yellow!("append {:?} {:?}",(cfg_df_node,phi_instr),instr_slab.get_mut_instr(phi_instr)?);
                         // if let InstrType::Phi { lhs, rhs }=&mut instr_slab.get_mut_instr(phi_instr)?.instr_type{
                         //     rhs.push_phi_pair(PhiPair::new(lhs.clone(),instr ))?;
                         // }else{
@@ -55,7 +56,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
                         // 如果 def_cfg_nodes 不包含 这个 cfg_node ，那么需要把这个cfg_node 添加到 work_list 中，进行phi_node的再生产 reproduction
                         if !def_cfg_nodes.contains(&cfg_df_node) {
                             cfg_node_instr_groups.push((cfg_df_node,new_phi_instr));
-                            debug_info_yellow!("push {:?}",(cfg_df_node,new_phi_instr));
+                            // debug_info_yellow!("push {:?}",(cfg_df_node,new_phi_instr));
                         }
                     }
                 }
@@ -70,6 +71,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
     Ok(())
 }
 pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab, ddu_grpah:&mut DduGraph, op_symtab_graph:&mut Option<&mut SymTabGraph>)->Result<()>{
+    refresh_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
     // 添加 ssa_index 0 作为NULl ，一开始所有变量的 reaching_def 都是 NULl
     for (func_symidx,_cfg_func_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.clone().iter(){
         for src_symidx in symtab.get_symbol(func_symidx)?.get_declared_vars()?.clone(){
@@ -91,7 +93,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
         for dj_node in etc::dfs_with_predicate(dj_graph, dj_func_entry, |e| e.weight().is_dom()){
             let cfg_node = node!(at dj_node in dj_graph).cor_cfg_node;
             for &instr in node!(at cfg_node in cfg_graph).get_all_instrs_iter(){
-                debug_info_green!("renaming instr {} in cfg_node {}",instr, cfg_node);
+                // debug_info_green!("renaming instr {} in cfg_node {}",instr, cfg_node);
                 let mut instr_struct = instr_slab.get_instr(instr)?.clone();
                 // for non-phi-instr i
                 if !instr_struct.is_phi(){
@@ -115,7 +117,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                         let new_ssa_symidx = symtab.get_symbol(def_symidx)?.get_max_ssa_idx()?.get_next_ssa_symidx();
                         *symtab.get_mut_symbol(def_symidx)?.get_mut_max_ssa_idx()? = new_ssa_symidx.clone();
 
-                        debug_info_yellow!("reach_def_symidx {:?} in instr {}",def_symidx,instr);
+                        // debug_info_yellow!("reach_def_symidx {:?} in instr {}",def_symidx,instr);
                         update_reaching_def(instr, def_symidx, symtab, cfg_graph, dj_graph, instr_slab)?;
 
                         let new_symidx = add_symbol!({new_ssa_symidx.into_symbol()}
@@ -142,11 +144,11 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
             }
             for &child_cfg_node in direct_child_nodes!(at cfg_node in cfg_graph).iter(){
                 for &phi_instr in node!(at child_cfg_node in cfg_graph).phi_instrs.iter(){
-                    debug_info_yellow!("process_successor_phi_instr {}",phi_instr);
+                    // debug_info_yellow!("process_successor_phi_instr {}",phi_instr);
                     let mut phi_instr_struct = instr_slab.get_instr(phi_instr)?.clone();
                     if let InstrType::Phi { lhs, rhs } = &mut phi_instr_struct.instr_type{
                         let phi_def_symidx =  lhs.to_src_symidx();
-                        debug_info_yellow!("transform {:?} to {:?}",phi_def_symidx,symtab.get_symbol(&phi_def_symidx)?.get_reaching_def()?);
+                        // debug_info_yellow!("transform {:?} to {:?}",phi_def_symidx,symtab.get_symbol(&phi_def_symidx)?.get_reaching_def()?);
                         let phi_use_symidx = symtab.get_symbol(&phi_def_symidx)?.get_reaching_def()?.clone().context("这个symbol 的reaching def = None")?;
                         rhs.push_phi_pair(PhiPair::new(phi_use_symidx, 0))?;
                         update_reaching_def(phi_instr, &phi_def_symidx, symtab, cfg_graph, dj_graph, instr_slab)?;
@@ -164,20 +166,20 @@ pub fn update_reaching_def(instr:usize,src_symidx:&SymIdx,symtab:&mut SymTab,cfg
     // src_symidx 的 reaching_def 一开始被设置为None,
     let mut r = symtab.get_symbol(src_symidx)?.get_reaching_def()?.clone();
     while r != None && !{
-        debug_info_yellow!("get_instr_of {:?}",r);
+        // debug_info_yellow!("get_instr_of {:?}",r);
         let &instr2 = symtab.get_symbol(r.as_ref().unwrap())?.get_instr()?;
         if instr_is_dominated_by(instr,instr2, cfg_graph, dj_graph, instr_slab)?{
-            debug_info_yellow!("instr {} is_dominated_by instr {}",instr,instr2);
+            // debug_info_yellow!("instr {} is_dominated_by instr {}",instr,instr2);
             true
         }else{
-            debug_info_yellow!("instr {} is_not_dominated_by instr {}",instr,instr2);
+            // debug_info_yellow!("instr {} is_not_dominated_by instr {}",instr,instr2);
             false
         }
     }{
         r = symtab.get_symbol(r.as_ref().unwrap())?.get_reaching_def()?.clone();
-        debug_info_yellow!("while_executed_set {:?} to {:?}",r,symtab.get_symbol(r.as_ref().unwrap())?.get_reaching_def()?.clone());
+        // debug_info_yellow!("while_executed_set {:?} to {:?}",r,symtab.get_symbol(r.as_ref().unwrap())?.get_reaching_def()?.clone());
     }
-    debug_info_yellow!("update {:?}'s reaching_def to {:?}",src_symidx,r);
+    // debug_info_yellow!("update {:?}'s reaching_def to {:?}",src_symidx,r);
     *symtab.get_mut_symbol(src_symidx)?.get_mut_reaching_def()? = r;
     Ok(())
 }
@@ -240,7 +242,7 @@ pub fn find_recent_dom_instr_before(check_phi_instrs:bool,cfg_node:u32,symidx:Sy
 }
 
 /// 返回找到包含此 symbol 的instruction 的在给定Vec中的下标，其中有两个ordering 选项，greater or less 如果是rev 查找，那么就只需要指定 Ordering::Less就行了，反之Greater
-pub fn find_first_def_in_instr_vec(instrs:&Vec<usize>,symidx:&SymIdx,instr_slab:&mut InstrSlab, order:Ordering, op_start_from:Option<usize>) -> Result<Option<usize>>{
+pub fn find_first_def_in_instr_vec(instrs:&InstrList,symidx:&SymIdx,instr_slab:&mut InstrSlab, order:Ordering, op_start_from:Option<usize>) -> Result<Option<usize>>{
     let instrs_iter:Box<dyn Iterator<Item =_>> = match (order,op_start_from){
         (Ordering::Less, None) => { Box::new(instrs.iter().enumerate().rev()) },
         (Ordering::Less, Some(start_from)) => { Box::new(instrs.iter().enumerate().take(start_from).rev())},
@@ -250,9 +252,9 @@ pub fn find_first_def_in_instr_vec(instrs:&Vec<usize>,symidx:&SymIdx,instr_slab:
     };
     for (vec_idx,&instr) in instrs_iter{
         let instr_struct = instr_slab.get_instr(instr).unwrap();
-        debug_info_yellow!("visit {:?}",instr_struct);
+        // debug_info_yellow!("visit {:?}",instr_struct);
         let defs_vec =  instr_struct.get_def_symidx_vec();
-        debug_info_yellow!("get_defs {:?}",defs_vec);
+        // debug_info_yellow!("get_defs {:?}",defs_vec);
 
         let defs_vec:Vec<_> = defs_vec.iter().map(|f|{SymIdx::to_src_symidx(f)}).collect();
         // debug_info_yellow!("get_xmed_defs {:?}",defs_vec);
@@ -264,7 +266,7 @@ pub fn find_first_def_in_instr_vec(instrs:&Vec<usize>,symidx:&SymIdx,instr_slab:
     }
     Ok(None)
 }
-pub fn find_all_defs_in_instr_vec(instrs:&Vec<usize>,symidx:&SymIdx,instr_slab:&mut InstrSlab, order:Ordering,op_start_from:Option<usize>) -> Result<Vec<usize>>{
+pub fn find_all_defs_in_instr_vec(instrs:&InstrList,symidx:&SymIdx,instr_slab:&mut InstrSlab, order:Ordering,op_start_from:Option<usize>) -> Result<Vec<usize>>{
     let instrs_iter:Box<dyn Iterator<Item =_>> = match (order,op_start_from){
         (Ordering::Less, None) => { Box::new(instrs.iter().enumerate().rev()) },
         (Ordering::Less, Some(start_from)) => { Box::new(instrs.iter().enumerate().take(start_from).rev())},
@@ -288,7 +290,7 @@ pub fn find_all_defs_in_instr_vec(instrs:&Vec<usize>,symidx:&SymIdx,instr_slab:&
 /// 判断 instr1 是否被 instr2 支配
 pub fn instr_is_dominated_by(instr1:usize, instr2:usize, cfg_graph:&CfgGraph, dj_graph:&DjGraph, instr_slab:&InstrSlab)->Result<bool>{
     // 这里分两种情况，一种是instr1 和 instr2 在同一节点中，一种instr1所在的cfg_node1 支配 instr2 所在的cfg_node2
-    debug_info_yellow!("check_whether instr {} is dominated by instr {}",instr1,instr2);
+    // debug_info_yellow!("check_whether instr {} is dominated by instr {}",instr1,instr2);
     let cfg_instr_idx1 = instr_slab.get_instr(instr1)?.get_cfg_instr_idx()?;
     let cfg_instr_idx2 = instr_slab.get_instr(instr2)?.get_cfg_instr_idx()?;
     if cfg_instr_idx1.cfg_node == cfg_instr_idx2.cfg_node {
@@ -338,6 +340,46 @@ pub fn phi_node_deconstruction(instr:usize,src_symidx:&SymIdx,symtab:&mut SymTab
         // for dj_node in etc::dfs_with_predicate(dj_graph, , |e| e.weight().is_dom()){
             
         // }
+    }
+    Ok(())
+}
+
+pub fn refresh_cfg_instr_idx_in_cfg_graph(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab)->Result<()>{
+    for cfg_node in etc::dfs(cfg_graph, 0) {
+        refresh_cfg_instr_idx_in_cfg_node(cfg_graph, cfg_node, symtab, instr_slab)?;
+    }
+    Ok(())
+}
+pub fn refresh_cfg_instr_idx_in_cfg_node(cfg_graph:&mut CfgGraph,cfg_node:u32,symtab:&mut SymTab,instr_slab:&mut InstrSlab)->Result<()>{
+    refresh_cfg_instr_idx_in_cfg_node_instrs(cfg_graph, cfg_node, symtab, instr_slab)?;
+    refresh_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph, cfg_node, symtab, instr_slab)?;
+    Ok(())
+}
+pub fn refresh_cfg_instr_idx_in_cfg_node_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,symtab:&mut SymTab,instr_slab:&mut InstrSlab)->Result<()>{
+    let outdated = &mut node_mut!(at cfg_node in cfg_graph).instrs.outdated ;
+    // 只有当instrList 是outdated 状态才进行操作
+    if !*outdated {
+        return Ok(());
+    }
+    *outdated = false;
+    // debug_info_yellow!("refresh node {}",cfg_node);
+
+    for (instr_pos,&instr) in node_mut!(at cfg_node in cfg_graph).instrs.iter().enumerate() {
+        instr_slab.get_mut_instr(instr).unwrap().add_cfg_instr_idx(CfgInstrIdx::new(cfg_node, instr_pos, false));   
+    }
+    Ok(())
+}
+pub fn refresh_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,symtab:&mut SymTab,instr_slab:&mut InstrSlab)->Result<()>{
+    let outdated = &mut node_mut!(at cfg_node in cfg_graph).phi_instrs.outdated ;
+    // 只有当instrList 是outdated 状态才进行操作
+    if !*outdated {
+        return Ok(());
+    }
+    *outdated = false;
+    // debug_info_yellow!("refresh phi node {}",cfg_node);
+
+    for (instr_pos,&phi_instr) in node_mut!(at cfg_node in cfg_graph).phi_instrs.iter().enumerate() {
+        instr_slab.get_mut_instr(phi_instr).unwrap().add_cfg_instr_idx(CfgInstrIdx::new(cfg_node, instr_pos, true));   
     }
     Ok(())
 }

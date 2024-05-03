@@ -51,6 +51,7 @@ reg_field_for_struct!(Symbol {
     } with_fields fields);
 reg_field_for_struct!(Symbol {
         DECLARED_VARS:Vec<SymIdx>,
+        FUNC_CALL_VEC:Vec<SymIdx>,
     } with_fields fields);
 reg_field_for_struct!(CfgNode {
     COR_FUNC_SYMIDX:SymIdx,
