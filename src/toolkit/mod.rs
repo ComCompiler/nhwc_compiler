@@ -22,3 +22,4 @@ pub mod gen_djg;
 pub mod dj_edge;
 pub mod dj_node;
 pub mod gen_ssa;
+pub mod simulator;
