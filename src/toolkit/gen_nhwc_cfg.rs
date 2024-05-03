@@ -4,6 +4,7 @@ use petgraph::{
 };
 use std::collections::HashMap;
 
+use super::symbol;
 use super::{cfg_edge::CfgEdge, nhwc_instr::Instruction};
 use super::{
     ast_node::AstTree, cfg_node::CfgGraph, et_node::{DeclOrDefOrUse, EtNodeType, EtTree}, gen_et::process_any_stmt, nhwc_instr::InstrType, scope_node::ScopeTree, symtab::{SymIdx, SymTab, SymTabGraph}
@@ -189,6 +190,76 @@ fn  parse_stmt_or_expr2nhwc(
                                     (Some(instr),None)
                                 }
                             },
+                            crate::toolkit::et_node::ExprOp::LogicalOr => {
+                                let (or_tmp_symidx, l_symidx, r_symidx) =
+                                    process_logicop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, stmt_parent_scope, cfg_node, counter, instr_slab, symtab_graph)?;
+                                let or_instr = InstrType::new_logic_or(or_tmp_symidx.clone(), l_symidx.clone(), r_symidx.clone(), Type::I1).to_instr();
+                                (Some(push_instr!(or_instr to cfg_node in cfg_graph slab instr_slab)),Some(or_tmp_symidx))
+                            },
+                            crate::toolkit::et_node::ExprOp::LogicalAnd => {
+                                let (and_tmp_symidx, l_symidx, r_symidx) =
+                                    process_logicop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, stmt_parent_scope, cfg_node, counter, instr_slab, symtab_graph)?;
+                                let or_instr = InstrType::new_logic_and(and_tmp_symidx.clone(), l_symidx.clone(), r_symidx.clone(), Type::I1).to_instr();
+                                (Some(push_instr!(or_instr to cfg_node in cfg_graph slab instr_slab)),Some(and_tmp_symidx))
+                            },
+                            crate::toolkit::et_node::ExprOp::LogicalNot => {
+                                let symbol_node = direct_child_nodes!(at et_node in et_tree);
+                                let symbol_symidx;
+                                if symbol_node.len()>1{
+                                    return Err(anyhow!("逻辑否运算符只能有一个操作对象"))
+                                }else if symbol_node.len()==0{
+                                    return Err(anyhow!("逻辑否缺少操作对象"))
+                                }else{
+                                    symbol_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_node, counter, instr_slab, symtab_graph)?;
+                                }
+                                let symbol_type = symtab.get_symbol(&symbol_symidx)?.get_type()?.clone();
+                                if let Type::I1 = symbol_type{
+                                    let logicnot_tmp_var = process_temp_symbol(cfg_graph, symtab, Type::I1, scope_node, cfg_node, counter, instr_slab, symtab_graph)?;
+                                    let logicnot_instr = InstrType::new_logic_not(logicnot_tmp_var.clone(), symbol_symidx, Type::I1).to_instr();
+                                    (Some(push_instr!(logicnot_instr to cfg_node in cfg_graph slab instr_slab)),Some(logicnot_tmp_var))
+                                }else{
+                                    let transed_var_symidx = force_trans_type(cfg_graph, symtab, &Type::I1, &symbol_type, &symbol_symidx, scope_node, cfg_node, counter, instr_slab, symtab_graph)?;
+                                    let logicnot_tmp_var = process_temp_symbol(cfg_graph, symtab, Type::I1, scope_node, cfg_node, counter, instr_slab, symtab_graph)?;
+                                    let logicnot_instr = InstrType::new_logic_not(logicnot_tmp_var.clone(), transed_var_symidx, Type::I1).to_instr();
+                                    (Some(push_instr!(logicnot_instr to cfg_node in cfg_graph slab instr_slab)),Some(logicnot_tmp_var))
+                                }
+                            },
+                            crate::toolkit::et_node::ExprOp::Eq => {
+                                let (eq_tmp_symidx, l_symidx, r_symidx) =
+                                    process_logicop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, stmt_parent_scope, cfg_node, counter, instr_slab, symtab_graph)?;
+                                let eq_instr = InstrType::new_icmp(eq_tmp_symidx.clone(),IcmpPlan::Eq,l_symidx.clone(), r_symidx.clone(), Type::I1).to_instr();
+                                (Some(push_instr!(eq_instr to cfg_node in cfg_graph slab instr_slab)),Some(eq_tmp_symidx))
+                            },
+                            crate::toolkit::et_node::ExprOp::NEq => {
+                                let (ne_tmp_symidx, l_symidx, r_symidx) =
+                                    process_logicop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, stmt_parent_scope, cfg_node, counter, instr_slab, symtab_graph)?;
+                                let ne_instr = InstrType::new_icmp(ne_tmp_symidx.clone(),IcmpPlan::Ne,l_symidx.clone(), r_symidx.clone(), Type::I1).to_instr();
+                                (Some(push_instr!(ne_instr to cfg_node in cfg_graph slab instr_slab)),Some(ne_tmp_symidx))
+                            },
+                            crate::toolkit::et_node::ExprOp::Less => {
+                                let (less_tmp_symidx, l_symidx, r_symidx) =
+                                    process_logicop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, stmt_parent_scope, cfg_node, counter, instr_slab, symtab_graph)?;
+                                let less_instr = InstrType::new_icmp(less_tmp_symidx.clone(),IcmpPlan::Slt,l_symidx.clone(), r_symidx.clone(), Type::I1).to_instr();
+                                (Some(push_instr!(less_instr to cfg_node in cfg_graph slab instr_slab)),Some(less_tmp_symidx))
+                            },
+                            crate::toolkit::et_node::ExprOp::Greater => {
+                                let (greater_tmp_symidx, l_symidx, r_symidx) =
+                                    process_logicop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, stmt_parent_scope, cfg_node, counter, instr_slab, symtab_graph)?;
+                                let greater_instr = InstrType::new_icmp(greater_tmp_symidx.clone(),IcmpPlan::Sgt,l_symidx.clone(), r_symidx.clone(), Type::I1).to_instr();
+                                (Some(push_instr!(greater_instr to cfg_node in cfg_graph slab instr_slab)),Some(greater_tmp_symidx))
+                            },
+                            crate::toolkit::et_node::ExprOp::LEq => {
+                                let (leq_tmp_symidx, l_symidx, r_symidx) =
+                                    process_logicop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, stmt_parent_scope, cfg_node, counter, instr_slab, symtab_graph)?;
+                                let leq_instr = InstrType::new_icmp(leq_tmp_symidx.clone(),IcmpPlan::Sle,l_symidx.clone(), r_symidx.clone(), Type::I1).to_instr();
+                                (Some(push_instr!(leq_instr to cfg_node in cfg_graph slab instr_slab)),Some(leq_tmp_symidx))
+                            },
+                            crate::toolkit::et_node::ExprOp::GEq => {
+                                let (geq_tmp_symidx, l_symidx, r_symidx) =
+                                    process_logicop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, stmt_parent_scope, cfg_node, counter, instr_slab, symtab_graph)?;
+                                let geq_instr = InstrType::new_icmp(geq_tmp_symidx.clone(),IcmpPlan::Sge,l_symidx.clone(), r_symidx.clone(), Type::I1).to_instr();
+                                (Some(push_instr!(geq_instr to cfg_node in cfg_graph slab instr_slab)),Some(geq_tmp_symidx))
+                            },
                             _ => {
                                 return Err(anyhow!("statment初始运算符应有赋值性质,ast_node {} 符号出现错误", *ast_node));
                             }
@@ -310,6 +381,7 @@ fn parse_whileloop2nhwc(
 fn process_label_symbol(scope_node:u32,label_name:String,symtab:&mut SymTab)->Result<SymIdx>{
     let label_symidx = add_symbol!({Symbol::new(scope_node,label_name)} 
         with_field TYPE:{Type::Label} 
+        with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
     to symtab);
     Ok(label_symidx)
 }
@@ -436,7 +508,8 @@ fn process_func_symbol(
 )->Result<SymIdx>{
     let func_symidx = add_symbol!({Symbol::new(0, func_name.clone())} 
         with_field DECLARED_VARS:{Vec::<SymIdx>::new()}
-        with_field REACHING_DEF:{Option::<SymIdx>::None} 
+        with_field REACHING_DEF:{Option::<SymIdx>::None}
+        with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
         with_field IS_CONST:{true} 
         with_field IS_TEMP:{false} 
     to symtab debug op_symtab_graph);
@@ -493,6 +566,7 @@ fn process_temp_symbol(
     symtab_graph:&mut Option<&mut SymTabGraph>)->Result<SymIdx>{
         let temp_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} 
             with_field TYPE:{temp_type.clone()} 
+            with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
             with_field IS_TEMP:{true} 
             with_field IS_CONST:{false}
             to symtab debug symtab_graph);
