@@ -1,15 +1,15 @@
 use anyhow::{anyhow, Context, Ok, Result};
-use clap::builder::StyledStr;
 use petgraph::{
-    csr::IndexType, graph::node_index, stable_graph::NodeIndex, visit::{EdgeRef, NodeRef}
+    graph::node_index, stable_graph::NodeIndex, visit::EdgeRef
 };
-use std::{collections::HashMap, fmt::format};
+use std::collections::HashMap;
 
 use super::{cfg_edge::CfgEdge, nhwc_instr::Instruction};
 use super::{
     ast_node::AstTree, cfg_node::CfgGraph, et_node::{DeclOrDefOrUse, EtNodeType, EtTree}, gen_et::process_any_stmt, nhwc_instr::InstrType, scope_node::ScopeTree, symtab::{SymIdx, SymTab, SymTabGraph}
 };
 use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_instr::InstrSlab};
+use crate::antlr_parser::cparser::RULE_returnStatement;
 use crate::{
     add_edge, add_node_with_edge, add_symbol, antlr_parser::cparser::{
         RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_jumpStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
@@ -17,7 +17,6 @@ use crate::{
         cfg_node::{CfgInstrIdx, CfgNode}, etc, field::{Type, UseCounter}, nhwc_instr::{IcmpPlan, UcmpPlan}, symbol::Symbol, symtab::SymTabEdge
     }
 };
-use colored::Colorize;
 
 /*
 这个文件主要是对  cfg_graph 进行后一步处理，因为cfg_graph 在此之前还没有
@@ -209,7 +208,7 @@ fn  parse_stmt_or_expr2nhwc(
                     let const_symidx = process_constant(symtab, const_literal, symtab_graph)?;
                     sep_symidx_vec.push(Some(const_symidx))
                 }
-                EtNodeType::Symbol { sym_idx: _, ast_node, text, def_or_use } => {
+                EtNodeType::Symbol { sym_idx: _, ast_node, text:_, def_or_use } => {
                     let ast_node = *ast_node;
                     let symbol_str = &node!(at ast_node in ast_tree).text;
                     let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab, def_or_use, symbol_str, scope_node, symtab_graph, cfg_node, cfg_graph)?;
@@ -254,8 +253,12 @@ fn parse_bb2nhwc(
             (RULE_jumpStatement, jump_node) => {
                 if let Some(&jump_scope) = ast2scope.get(&jump_node){
                     let jump_parent_scope = node!(at jump_scope in scope_tree).parent;
-                    let jump_et = process_any_stmt(et_tree, ast_tree, scope_tree, jump_node, jump_parent_scope);
-                    if let EtNodeType::Separator { ast_node, text } = &node!(at jump_et in et_tree).et_node_type{
+                    let ret_expr_ast = find!(rule RULE_returnStatement finally RULE_expression at jump_node in ast_tree);
+                    if let None = ret_expr_ast{
+                        return Err(anyhow!("return语句缺少返回的表达式"))
+                    }else{}
+                    let jump_et = process_any_stmt(et_tree, ast_tree, scope_tree, ret_expr_ast.unwrap(), jump_parent_scope);
+                    if let EtNodeType::Separator { ast_node:_, text:_ } = &node!(at jump_et in et_tree).et_node_type{
                         let jump_stmt = direct_child_nodes!(at jump_et in et_tree);
                         if jump_stmt.len()>1{
                             return Err(anyhow!("return语句只能返回一个参数类型"))
@@ -313,7 +316,7 @@ fn parse_forloop2nhwc(
     ast_tree:&AstTree, cfg_graph:&mut CfgGraph, scope_tree:&ScopeTree, et_tree:&mut EtTree, symtab:&mut SymTab, ast2scope:&HashMap<u32, u32>, ast_before_node:u32, ast_mid_node:u32,
     ast_after_node:u32, cfg_forloop:u32, counter:&mut u32, instr_slab:&mut InstrSlab, symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
-    let (cfg_body_head_node, cfg_body_tail_node) = get_head_tail_of_while_or_for_node(cfg_forloop, cfg_graph)?;
+    let (_, cfg_body_tail_node) = get_head_tail_of_while_or_for_node(cfg_forloop, cfg_graph)?;
     match rule_id!(at ast_before_node in ast_tree) {
         RULE_forBeforeExpression => {
             // push before instr label
@@ -428,8 +431,7 @@ fn process_constant(symtab:&mut SymTab, const_literal:&String, symtab_graph:&mut
     Ok(const_symidx)
 }
 fn process_func_symbol(
-    ast_tree:&AstTree, scope_tree:&ScopeTree, symtab:&mut SymTab,  op_symtab_graph:&mut Option<&mut SymTabGraph>,
-    cfg_entry:u32,cfg_graph:&mut CfgGraph, func_name:&String, func_scope:u32
+    symtab:&mut SymTab,op_symtab_graph:&mut Option<&mut SymTabGraph>, func_name:&String,
 )->Result<SymIdx>{
     let func_symidx = add_symbol!({Symbol::new(0, func_name.clone())} 
         with_field DECLARED_VARS:{Vec::<SymIdx>::new()}
@@ -838,7 +840,7 @@ fn process_call(
     let et_type = &node!(at func_name_et_node in et_tree).et_node_type;
     let mut func_name_str = String::new();
     match et_type {
-        EtNodeType::Symbol { sym_idx, ast_node, text, def_or_use } => {
+        EtNodeType::Symbol { sym_idx:_, ast_node, text:_, def_or_use:_ } => {
             let ast_node = *ast_node;
             func_name_str = node!(at ast_node in ast_tree).text.clone();
         }
@@ -1115,7 +1117,7 @@ fn process_et(
                 //单目运算符
                 super::et_node::ExprOp::LPlusPlus => {
                     if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option) {
-                        let (tmp_addvar_symidx, tmp_loadvar_symidx) =
+                        let (tmp_addvar_symidx, _) =
                             process_self_increment(ast_tree, cfg_graph, et_tree, scope_tree, symtab, symbol_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
                         Ok(tmp_addvar_symidx)
                     } else {
@@ -1124,7 +1126,7 @@ fn process_et(
                 }
                 super::et_node::ExprOp::RPlusPlus => {
                     if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option) {
-                        let (tmp_addvar_symidx, tmp_loadvar_symidx) =
+                        let (_, tmp_loadvar_symidx) =
                             process_self_increment(ast_tree, cfg_graph, et_tree, scope_tree, symtab, symbol_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
                         Ok(tmp_loadvar_symidx)
                     } else {
@@ -1133,7 +1135,7 @@ fn process_et(
                 }
                 super::et_node::ExprOp::LMinusMinus => {
                     if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option) {
-                        let (tmp_subvar_symidx, tmp_loadvar_symidx) =
+                        let (tmp_subvar_symidx, _) =
                             process_self_attennuation(ast_tree, cfg_graph, et_tree, scope_tree, symtab, symbol_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
                         Ok(tmp_subvar_symidx)
                     } else {
@@ -1142,7 +1144,7 @@ fn process_et(
                 }
                 super::et_node::ExprOp::RMinusMinus => {
                     if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option) {
-                        let (tmp_subvar_symidx, tmp_loadvar_symidx) =
+                        let (_, tmp_loadvar_symidx) =
                             process_self_attennuation(ast_tree, cfg_graph, et_tree, scope_tree, symtab, symbol_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
                         Ok(tmp_loadvar_symidx)
                     } else {
@@ -1192,7 +1194,7 @@ fn parse_declaration2nhwc(
                         let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[0], decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
                         let value_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[1], decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
                         let mut value_type = symtab.get_symbol(&value_symidx)?.get_type()?.clone();
-                        if let Type::Fn { arg_syms, ret_sym }= value_type{
+                        if let Type::Fn { arg_syms:_, ret_sym }= value_type{
                             value_type = symtab.get_symbol(&ret_sym)?.get_type()?.clone();
                         }
                         // let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
@@ -1205,7 +1207,7 @@ fn parse_declaration2nhwc(
                     }
                 }
                 EtNodeType::Constant { const_sym_idx: _, ast_node: _, text: _ } => todo!(),
-                EtNodeType::Symbol { sym_idx: _, ast_node, text, def_or_use } => {
+                EtNodeType::Symbol { sym_idx: _, ast_node, text:_, def_or_use } => {
                     //获得变量类型，做成symidx
                     let var = find!(rule RULE_declarationSpecifiers at ast_decl_node in ast_tree).unwrap();
                     let var_type = Type::new(var, ast_tree);
@@ -1246,7 +1248,7 @@ fn parse_func2nhwc(
         //获取参数列表
         let mut arg_syms:Vec<SymIdx> = vec![];
         //添加到符号表中，
-        let func_symidx = process_func_symbol(ast_tree, scope_tree, symtab,  op_symtab_graph,cfg_entry, cfg_graph,   func_name, func_scope)?;
+        let func_symidx = process_func_symbol(symtab,  op_symtab_graph,func_name)?;
         let _:Vec<_> = etc::dfs(cfg_graph, cfg_entry).iter().map(|&cfg_node|{node_mut!(at cfg_node in cfg_graph).add_cor_func_symidx(func_symidx.clone())}).collect();
         //函数有参数
         if let Some(para) = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_parameterTypeList at ast_fun in ast_tree) {
@@ -1320,7 +1322,7 @@ pub fn parse_cfg_into_nhwc_cfg(
                 CfgNodeType::Branch { ast_expr_node } => {
                     parse_branch2nhwc(ast_tree, cfg_graph, scope_tree, et_tree, symtab, ast2scope, *ast_expr_node, cfg_node, &mut counter, instr_slab, symtab_graph)?
                 }
-                CfgNodeType::Switch { ast_expr_node } => {
+                CfgNodeType::Switch { ast_expr_node:_ } => {
                     // parse_branch2nhwc(ast_tree, cfg_graph, scope_tree, et_tree, symtab, ast2scope, *ast_expr_node, cfg_node, counter, symtab_g)
                 }
                 CfgNodeType::ForLoop { ast_before_node, ast_mid_node, ast_after_node } => {
@@ -1373,12 +1375,12 @@ pub fn insert_bb_between(cfg_node1:u32, cfg_node2:u32, cfg_graph:&mut CfgGraph) 
         Ok(new_bb)
     }else{
         match (cfg_node_type1,cfg_node_type2){
-            (_,CfgNodeType::BasicBlock { ast_nodes })=>{
+            (_,CfgNodeType::BasicBlock { ast_nodes:_ })=>{
                 let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with edge {cfg_former_edge_cloned} from cfg_node1 in cfg_graph);
                 add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node2 in cfg_graph);
                 Ok(new_bb)
             }
-            (CfgNodeType::BasicBlock { ast_nodes },_)=>{
+            (CfgNodeType::BasicBlock { ast_nodes:_ },_)=>{
                 let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with edge {CfgEdge::new_direct()} from cfg_node1 in cfg_graph);
                 add_edge!({cfg_former_edge_cloned} from new_bb to cfg_node2 in cfg_graph);
                 Ok(new_bb)
