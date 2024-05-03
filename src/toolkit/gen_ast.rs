@@ -48,7 +48,7 @@ pub fn parse_as_ast_tree(context:&mut Context) {
                 *is_last_wrap_drop = false;
             }),
             exit_rule_f:Box::new(|_ctx, s, _is_terminal, _type_idx| {
-                let (node_count_under_depth, is_last_wrap_drop, _g, count) = s;
+                let (node_count_under_depth, is_last_wrap_drop, _g, _count) = s;
                 node_count_under_depth.pop();
                 *is_last_wrap_drop = true;
                 // println!("exit rule {}  ",ctx.get_text());

@@ -1,27 +1,28 @@
 use core::panic;
-use std::{fmt::Pointer, result};
+
 use crate::toolkit::nhwc_instr::ArithOp::{Add , Sub, Mul, Div};
 use anyhow::*;
-use eval::eval;
-use crate::{make_field_trait_for_struct, reg_field_for_struct};
-use super::field::Type::{I1, I32, F32};
 
-use super::{field::{Field, Value}, nhwc_instr::{ArithOp::*, InstrSlab, InstrType::*, Instruction}, symbol::Symbol, symtab::{SymTab, SymTabEdge, SymTabGraph}};
+use crate::{make_field_trait_for_struct, reg_field_for_struct};
+use super::cfg_node::InstrList;
+use super::field::Type::{I32, F32};
+
+use super::{field::{Field, Value}, nhwc_instr::{ArithOp::*, InstrSlab, InstrType::*}, symbol::Symbol, symtab::{SymTab, SymTabEdge, SymTabGraph}};
 make_field_trait_for_struct!(Value);
 reg_field_for_struct!(Symbol{
     VALUE:Value,
 }with_fields fields);
 pub struct Simulator{
-    symtab:SymTab,
+    pub symtab:SymTab,
 }
 impl Simulator{
-    pub fn execute(&mut self,instr:Vec<usize>,instr_slab:&InstrSlab) -> Result<()>{
+    pub fn execute(&mut self,instr:&InstrList,instr_slab:&InstrSlab) -> Result<()>{
         self.symtab = SymTab::new();
-        for i in instr{
+        for &i in instr.iter(){
             let instr_struct = instr_slab.get_instr(i)?.clone();
             match &instr_struct.instr_type{
-                Label { label_symidx } => todo!(),
-                DefineFunc { func_symidx, ret_type, args } => todo!(),
+                Label { label_symidx: _ } => todo!(),
+                DefineFunc { func_symidx: _, ret_type: _, args: _ } => todo!(),
                 DefineVar { var_symidx, vartype, value } => {
                     //add_symbol!({var_symidx.symbol_name} of scope {var_symidx.scope_node} with field )
                     // 我需要向symtab中加一个symbol的什么部分?
@@ -32,41 +33,41 @@ impl Simulator{
                         // type,        vartype             add_type()?
                         // value)       value               ?
                     let mut var_symbol = Symbol::new_from_symidx(&var_symidx);
-                    var_symbol.add_value(Value::from_string(&var_symidx.symbol_name, &vartype)?);
+                    var_symbol.add_value(Value::from_string(&value.symbol_name, &vartype)?);
                     self.symtab.add_symbol(var_symbol);
                 },
                 Arith { lhs, rhs } => match rhs {
-                    Add { a, b, vartype } => {
+                    Add { a, b, vartype: _ } => {
                         let a_val=self.symtab.get_symbol(a)?.get_value()?;
                         let b_val = self.symtab.get_symbol(b)?.get_value()?;
                         let result = a_val.clone() + b_val.clone();
                         self.symtab.get_mut_symbol(lhs)?.add_value(result);
                     },
-                    Mul { a, b, vartype } => {
+                    Mul { a, b, vartype: _ } => {
                         let a_val=self.symtab.get_symbol(a)?.get_value()?;
                         let b_val = self.symtab.get_symbol(b)?.get_value()?;
                         let result = a_val.clone() * b_val.clone();
                         self.symtab.get_mut_symbol(lhs)?.add_value(result);
                     },
-                    Div { a, b, vartype } => {
+                    Div { a, b, vartype: _ } => {
                         let a_val=self.symtab.get_symbol(a)?.get_value()?;
                         let b_val = self.symtab.get_symbol(b)?.get_value()?;
                         let result = a_val.clone() / b_val.clone();
                         self.symtab.get_mut_symbol(lhs)?.add_value(result);
                     },
-                    Sub { a, b, vartype } => {
+                    Sub { a, b, vartype: _ } => {
                         let a_val=self.symtab.get_symbol(a)?.get_value()?;
                         let b_val = self.symtab.get_symbol(b)?.get_value()?;
                         let result = a_val.clone() - b_val.clone();
                         self.symtab.get_mut_symbol(lhs)?.add_value(result);
                     },
-                    Mod { a, b, vartype } => {
+                    Mod { a, b, vartype: _ } => {
                         let a_val=self.symtab.get_symbol(a)?.get_value()?;
                         let b_val = self.symtab.get_symbol(b)?.get_value()?;
                         let result = a_val.clone() % b_val.clone();
                         self.symtab.get_mut_symbol(lhs)?.add_value(result);
                     },
-                    Icmp { plan, a, b, vartype } => {
+                    Icmp { plan, a, b, vartype: _ } => {
                         let a_val=self.symtab.get_symbol(a)?.get_value()?;
                         let b_val = self.symtab.get_symbol(b)?.get_value()?;
                         match plan {
@@ -112,7 +113,7 @@ impl Simulator{
                             },
                         }
                     },
-                    Ucmp { plan, a, b, vartype } => {
+                    Ucmp { plan, a, b, vartype: _ } => {
                         let a_val=self.symtab.get_symbol(a)?.get_value()?;
                         let b_val = self.symtab.get_symbol(b)?.get_value()?;
                         match plan {
@@ -142,19 +143,19 @@ impl Simulator{
                             },
                         }
                     }
-                    LogicAnd { a, b, vartype } => {
+                    LogicAnd { a, b, vartype: _ } => {
                         let a_val = self.symtab.get_symbol(a)?.get_value()?;
                         let b_val = self.symtab.get_symbol(b)?.get_value()?;
                         let result = a_val.clone() & b_val.clone();
                         self.symtab.get_mut_symbol(lhs)?.add_value(result);
                     },
-                    LogicOr { a, b, vartype } => {
+                    LogicOr { a, b, vartype: _ } => {
                         let a_val = self.symtab.get_symbol(a)?.get_value()?;
                         let b_val = self.symtab.get_symbol(b)?.get_value()?;
                         let result = a_val.clone() | b_val.clone();
                         self.symtab.get_mut_symbol(lhs)?.add_value(result);
                     },
-                    LogicNot { a, vartype } => {
+                    LogicNot { a, vartype: _ } => {
                         let a_val = self.symtab.get_symbol(a)?.get_value()?;
                         let result = !a_val.clone();
                         self.symtab.get_mut_symbol(lhs)?.add_value(result);
@@ -164,12 +165,12 @@ impl Simulator{
                     let rhs_val = self.symtab.get_symbol(rhs)?.get_value()?.clone();
                     self.symtab.get_mut_symbol(lhs)?.add_value(rhs_val);
                 },
-                Call { assigned, func_op } => panic!("函数调用不处理"),
-                Jump {  jump_op } => panic!("Jump不处理"),
-                Phi { lhs, rhs } => panic!("Phi不处理"),
+                Call { assigned: _, func_op: _ } => panic!("函数调用不处理"),
+                Jump {  jump_op: _ } => panic!("Jump不处理"),
+                Phi { lhs: _, rhs: _ } => panic!("Phi不处理"),
                 TranType { lhs, op } => {
-                    let lhs_val = self.symtab.get_symbol(lhs)?.get_value()?;
-                    let result = match op {
+                    let _lhs_val = self.symtab.get_symbol(lhs)?.get_value()?;
+                    let _result = match op {
                         super::nhwc_instr::Trans::Fptosi { float_symidx } => {
                             let float_val = self.symtab.get_symbol(float_symidx)?.get_value()?;
                             let result = float_val.clone().to_specific_type(&I32)?;
@@ -188,7 +189,7 @@ impl Simulator{
                             self.symtab.get_mut_symbol(lhs)?.add_value(result.clone());
                             result
                         },
-                        super::nhwc_instr::Trans::Bitcast { rptr_symidx, rptr_type, lptr_type } => {
+                        super::nhwc_instr::Trans::Bitcast { rptr_symidx: _, rptr_type: _, lptr_type: _ } => {
                             panic!("bitcast不处理")
                         },
                     };

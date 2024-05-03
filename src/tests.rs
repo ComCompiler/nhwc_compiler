@@ -115,8 +115,8 @@ mod tests {
     fn find_symbol() {
         let mut symtab = SymTab::new();
 
-        let x = symtab.add_symbol(Symbol::new(0, "x".to_string()));
-        let y = symtab.add_symbol(Symbol::new(0, "y".to_string()));
+        let _x = symtab.add_symbol(Symbol::new(0, "x".to_string()));
+        let _y = symtab.add_symbol(Symbol::new(0, "y".to_string()));
 
         match symtab.get_symbol_verbose("x".to_string(), 0) {
             Ok(_) => {
@@ -146,11 +146,11 @@ mod tests {
     }
     #[test]
     fn find_symbol_field() {
-        let field_name = "TYPE";
+        let _field_name = "TYPE";
         let mut symtab = SymTab::new();
 
         let x = symtab.add_symbol(Symbol::new(0, "x".to_string())).unwrap();
-        let y = symtab.add_symbol(Symbol::new(0, "y".to_string())).unwrap();
+        let _y = symtab.add_symbol(Symbol::new(0, "y".to_string())).unwrap();
 
         match symtab.get_symbol(&x) {
             Ok(_) => {

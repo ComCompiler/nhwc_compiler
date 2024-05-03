@@ -206,9 +206,9 @@ impl Instruction {
             }else{
                 vec![]
             },
-            InstrType::Jump { jump_op: op } => vec![],
+            InstrType::Jump { jump_op: _op } => vec![],
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
-            InstrType::TranType { lhs, op } => vec![lhs],
+            InstrType::TranType { lhs, op: _ } => vec![lhs],
         }
     }
     pub fn get_use_symidx_vec(&self)->Vec<&SymIdx>{
@@ -235,7 +235,7 @@ impl Instruction {
             InstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
-            InstrType::Call { assigned, func_op } => if let  symidx= assigned{
+            InstrType::Call { assigned, func_op } => if let  _symidx= assigned{
                 func_op.args.iter().collect_vec()
             }else{
                 vec![]
@@ -274,7 +274,7 @@ impl Instruction {
             }else{
                 vec![]
             },
-            InstrType::Jump { jump_op: op } => vec![],
+            InstrType::Jump { jump_op: _op } => vec![],
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op:_ } => vec![lhs],
         }
@@ -303,7 +303,7 @@ impl Instruction {
             InstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
-            InstrType::Call { assigned, func_op } => if let  symidx= assigned{
+            InstrType::Call { assigned, func_op } => if let  _symidx= assigned{
                 func_op.args.iter_mut().collect_vec()
             }else{
                 vec![]
@@ -441,9 +441,9 @@ impl InstrType {
 
     pub fn get_lhs(&self)->Option<SymIdx>{
         match self{
-            InstrType::Arith { lhs, rhs } => Some(lhs.clone()),
-            InstrType::SimpleAssign { lhs, rhs } => Some(lhs.clone()),
-            InstrType::Phi { lhs, rhs } => Some(lhs.clone()),
+            InstrType::Arith { lhs, rhs: _ } => Some(lhs.clone()),
+            InstrType::SimpleAssign { lhs, rhs: _ } => Some(lhs.clone()),
+            InstrType::Phi { lhs, rhs: _ } => Some(lhs.clone()),
             _=>None
         }
     }
@@ -485,9 +485,9 @@ impl Debug for JumpOp {
                 write!(f, "br i1 {:?}, label {:?}, label {:?}", cond, t1, t2)
             }
 
-            Self::Switch { cond: _, default, compared: _ } => write!(f, "还没见过"),
+            Self::Switch { cond: _, default: _, compared: _ } => write!(f, "还没见过"),
 
-            Self::DirectJump { cfg_dst_label } => write!(f, "还没见过"),
+            Self::DirectJump { cfg_dst_label: _ } => write!(f, "还没见过"),
         }
     }
 }

@@ -41,7 +41,7 @@ pub fn dfs<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32) -> Vec<u
 where
     Ty: EdgeType,
 {
-    dfs_with_predicate(graph, start_node, |e |true)
+    dfs_with_predicate(graph, start_node, |_e |true)
 }   
 /// dfs,但是添加了对边的判定
 pub fn dfs_with_predicate<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, mut predicate:impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->bool)-> Vec<u32>

@@ -10,7 +10,7 @@ impl Nhwc2RiscvDebugPass {
 
 impl Pass for Nhwc2RiscvDebugPass {
     // 运行这个pass
-    fn run(&mut self, ctx:&mut Context) -> Result<()> {
+    fn run(&mut self, _ctx:&mut Context) -> Result<()> {
         // 拿到一个nhwc的vec,转化成汇编语言
         Ok(())
     }

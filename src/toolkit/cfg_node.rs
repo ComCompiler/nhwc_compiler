@@ -73,7 +73,7 @@ pub struct CfgNode {
 }
 #[derive(Clone)]
 pub struct InstrList{
-    instr_vec:Vec<usize>,
+    pub instr_vec:Vec<usize>,
     pub outdated:bool
 }
 impl InstrList{

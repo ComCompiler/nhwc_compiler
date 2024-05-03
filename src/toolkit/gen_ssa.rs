@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use crate::{add_field, add_symbol, debug_info_green, debug_info_yellow, direct_child_nodes, direct_parent_nodes, instr,  reg_field_for_struct, node, node_mut, push_phi_instr};
+use crate::{add_field, add_symbol, direct_child_nodes, direct_parent_nodes, instr,  reg_field_for_struct, node, node_mut, push_phi_instr};
 use itertools::{Itertools};
 
 use crate::toolkit::symtab::{SymTabEdge,SymTabGraph};
@@ -17,7 +17,7 @@ reg_field_for_struct!(Symbol {
     INSTR:usize,
 } with_fields fields);
 
-pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab, ddu_grpah:&mut DduGraph, op_symtab_graph:&mut Option<&mut SymTabGraph>)->Result<()>{
+pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,_dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab, _ddu_grpah:&mut DduGraph, _op_symtab_graph:&mut Option<&mut SymTabGraph>)->Result<()>{
     refresh_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
     for (func_symidx,_cfg_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.iter(){
         for variable in symtab.get_symbol(func_symidx)?.get_declared_vars()?{
@@ -33,11 +33,11 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
             // defs of the variable 
             let def_cfg_nodes:Vec<u32> = cfg_node_instr_groups.iter().map(|x|x.0).collect();
             while !cfg_node_instr_groups.is_empty(){
-                let (cfg_node,instr) = cfg_node_instr_groups.pop().unwrap();
+                let (cfg_node,_instr) = cfg_node_instr_groups.pop().unwrap();
                 let domiance_frontiers = node!(at cfg_node in cfg_graph).get_domiance_frontier_cfg_nodes()?.clone();
                 for cfg_df_node in domiance_frontiers{
                     if let Some(vec_idx) = find_first_def_in_instr_vec(&node_mut!(at cfg_df_node in cfg_graph).phi_instrs, variable, instr_slab, Ordering::Less,None)?{
-                        let phi_instr = node!(at cfg_df_node in cfg_graph).phi_instrs[vec_idx];
+                        let _phi_instr = node!(at cfg_df_node in cfg_graph).phi_instrs[vec_idx];
                         // debug_info_yellow!("append {:?} {:?}",(cfg_df_node,phi_instr),instr_slab.get_mut_instr(phi_instr)?);
                         // if let InstrType::Phi { lhs, rhs }=&mut instr_slab.get_mut_instr(phi_instr)?.instr_type{
                         //     rhs.push_phi_pair(PhiPair::new(lhs.clone(),instr ))?;
@@ -70,7 +70,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
 
     Ok(())
 }
-pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab, ddu_grpah:&mut DduGraph, op_symtab_graph:&mut Option<&mut SymTabGraph>)->Result<()>{
+pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab, _ddu_grpah:&mut DduGraph, op_symtab_graph:&mut Option<&mut SymTabGraph>)->Result<()>{
     refresh_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
     // 添加 ssa_index 0 作为NULl ，一开始所有变量的 reaching_def 都是 NULl
     for (func_symidx,_cfg_func_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.clone().iter(){
@@ -323,7 +323,7 @@ pub fn cfg_is_dominated_by(cfg_node1:u32, cfg_node2:u32, cfg_graph:&CfgGraph,dj_
                 if cur_dj_node == dj_node2{
                     return Ok(true);
                 }
-                let dj_parent = dj_parent_nodes[0];
+                let _dj_parent = dj_parent_nodes[0];
                 last_dj_node = cur_dj_node
             },
             l if l==0 => {
@@ -335,8 +335,8 @@ pub fn cfg_is_dominated_by(cfg_node1:u32, cfg_node2:u32, cfg_graph:&CfgGraph,dj_
     Ok(false)
 }
 
-pub fn phi_node_deconstruction(instr:usize,src_symidx:&SymIdx,symtab:&mut SymTab,cfg_graph:&CfgGraph, dj_graph:&DjGraph,instr_slab:&InstrSlab)->Result<()>{
-    for (func_symidx,_cfg_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.iter(){
+pub fn phi_node_deconstruction(_instr:usize,_src_symidx:&SymIdx,symtab:&mut SymTab,_cfg_graph:&CfgGraph, _dj_graph:&DjGraph,_instr_slab:&InstrSlab)->Result<()>{
+    for (_func_symidx,_cfg_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.iter(){
         // for dj_node in etc::dfs_with_predicate(dj_graph, , |e| e.weight().is_dom()){
             
         // }
@@ -355,7 +355,7 @@ pub fn refresh_cfg_instr_idx_in_cfg_node(cfg_graph:&mut CfgGraph,cfg_node:u32,sy
     refresh_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph, cfg_node, symtab, instr_slab)?;
     Ok(())
 }
-pub fn refresh_cfg_instr_idx_in_cfg_node_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,symtab:&mut SymTab,instr_slab:&mut InstrSlab)->Result<()>{
+pub fn refresh_cfg_instr_idx_in_cfg_node_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,_symtab:&mut SymTab,instr_slab:&mut InstrSlab)->Result<()>{
     let outdated = &mut node_mut!(at cfg_node in cfg_graph).instrs.outdated ;
     // 只有当instrList 是outdated 状态才进行操作
     if !*outdated {
@@ -369,7 +369,7 @@ pub fn refresh_cfg_instr_idx_in_cfg_node_instrs(cfg_graph:&mut CfgGraph,cfg_node
     }
     Ok(())
 }
-pub fn refresh_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,symtab:&mut SymTab,instr_slab:&mut InstrSlab)->Result<()>{
+pub fn refresh_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,_symtab:&mut SymTab,instr_slab:&mut InstrSlab)->Result<()>{
     let outdated = &mut node_mut!(at cfg_node in cfg_graph).phi_instrs.outdated ;
     // 只有当instrList 是outdated 状态才进行操作
     if !*outdated {

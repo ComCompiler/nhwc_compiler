@@ -91,12 +91,12 @@ pub fn process_stmt(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymT
         (_, _) => panic!("不属于任何statement下等语句,ast树有错误 node:{}", which_statement),
     }
 }
-pub fn process_declartion(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, current_declare_node:u32) -> Result<Option<(u32, u32)>> {
+pub fn process_declartion(cfg_graph:&mut CfgGraph, _ast_tree:&AstTree, _symtab:&mut SymTab, current_declare_node:u32) -> Result<Option<(u32, u32)>> {
     let bb_struct = CfgNode::new_bb(vec![current_declare_node]);
     let cfg_basicblock_node = add_node!(bb_struct to cfg_graph);
     Ok(Some((cfg_basicblock_node, cfg_basicblock_node)))
 }
-pub fn process_expression(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, current_expression_node:u32) -> Result<Option<(u32, u32)>> {
+pub fn process_expression(cfg_graph:&mut CfgGraph, _ast_tree:&AstTree, _symtab:&mut SymTab, current_expression_node:u32) -> Result<Option<(u32, u32)>> {
     let bb_struct = CfgNode::new_bb(vec![current_expression_node]);
     let cfg_basicblock_node = add_node!(bb_struct to cfg_graph);
     Ok(Some((cfg_basicblock_node, cfg_basicblock_node)))
@@ -233,8 +233,8 @@ pub fn try_unite(opt_node1:Option<u32>, opt_node2:Option<u32>, cfg_graph:&mut Cf
                 }
             }
         }
-        (Some(node1), None) => Ok(opt_node1),
-        (None, Some(node2)) => Ok(opt_node2),
+        (Some(_node1), None) => Ok(opt_node1),
+        (None, Some(_node2)) => Ok(opt_node2),
         (None, None) => Ok(None),
     }
 }
@@ -291,7 +291,7 @@ pub fn process_compound(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut 
 }
 
 /// 这个函数依赖 ast
-pub fn parse_ast_to_cfg(ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab, scope_tree:&ScopeTree) -> Result<()> {
+pub fn parse_ast_to_cfg(ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab, _scope_tree:&ScopeTree) -> Result<()> {
     let ast_root_node = 0;
 
     let funcdef_nodes:Vec<u32> = find_nodes_by_dfs!(rule RULE_functionDefinition at ast_root_node in ast_tree);
