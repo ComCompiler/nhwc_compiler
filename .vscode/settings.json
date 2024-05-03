@@ -3,5 +3,6 @@
         "./Cargo.toml",
         "./Cargo.toml"
     ],
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    "git.ignoreLimitWarning": true
 }

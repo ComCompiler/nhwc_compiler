@@ -377,12 +377,16 @@ pub enum JumpOp {
 }
 #[derive(Clone)]
 pub enum Trans {
-    Fptosi { float_symidx:SymIdx }, //浮点转整数
-    Sitofp { int_symidx:SymIdx },   //整数转浮点数
-    Zext { bool_symidx:SymIdx },    //I1转整数
-    Bitcast { rptr_symidx:SymIdx, rptr_type:Type, lptr_type:Type }, //指针类型转指针类型，比如I32指针转F32指针
-                                    //其他类型转I1通过变量和0进行比较得到
-                                    //I1转f32分两步，先转I32，后转F32
+    /// 浮点转整数
+    Fptosi { float_symidx:SymIdx }, 
+    /// 整数转浮点数
+    Sitofp { int_symidx:SymIdx },   
+    /// I1转整数
+    Zext { bool_symidx:SymIdx },    
+    /// 指针类型转指针类型，比如I32指针转F32指针  
+    /// 其他类型转I1通过变量和0进行比较得到  
+    /// I1转f32分两步，先转I32，后转F32  
+    Bitcast { rptr_symidx:SymIdx, rptr_type:Type, lptr_type:Type }, 
 }
 impl Debug for Trans {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
