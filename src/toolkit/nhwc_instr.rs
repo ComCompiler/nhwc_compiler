@@ -372,7 +372,7 @@ pub enum JumpOp {
         compared:Vec<ComparedPair>,
     },
     DirectJump {
-        cfg_dst_label:u32, // 这是 cfg blcok 的 索引
+        label_symidx:SymIdx, // 这是 cfg blcok 的 索引
     },
 }
 #[derive(Clone)]
@@ -432,7 +432,7 @@ impl InstrType {
     pub fn new_ret(ret_sym:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::Ret { ret_sym } } }
     pub fn new_br(cond:SymIdx, t1:SymIdx, t2:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::Br { cond:cond, t1, t2 } } }
     pub fn new_switch(cond:SymIdx, default:SymIdx, compared:Vec<ComparedPair>) -> Self { Self::Jump { jump_op:JumpOp::Switch { cond, default, compared } } }
-    pub fn new_jump(cfg_dst_label:u32) -> Self { Self::Jump { jump_op:JumpOp::DirectJump { cfg_dst_label } } }
+    pub fn new_jump(label_symidx:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::DirectJump { label_symidx } } }
     //自动类型转换
     pub fn new_int2float(int_symidx:SymIdx, float_symidx:SymIdx) -> Self { Self::TranType { lhs:float_symidx, op:Trans::Sitofp { int_symidx } } }
     pub fn new_float2int(float_symidx:SymIdx, int_symidx:SymIdx) -> Self { Self::TranType { lhs:int_symidx, op:Trans::Fptosi { float_symidx } } }
@@ -487,7 +487,7 @@ impl Debug for JumpOp {
 
             Self::Switch { cond: _, default: _, compared: _ } => write!(f, "还没见过"),
 
-            Self::DirectJump { cfg_dst_label: _ } => write!(f, "还没见过"),
+            Self::DirectJump { label_symidx } => write!(f, "jump label: {:?}",label_symidx),
         }
     }
 }

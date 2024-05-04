@@ -2,7 +2,8 @@ use crate::{add_node, toolkit::{cfg_node::InstrList, context::Context, field::Ty
 use anyhow::{Ok, Result};
 use crate::toolkit::dot::Config;
 use crate::toolkit::etc::generate_png_by_graph;
-
+use crate::toolkit::nhwc_instr::IcmpPlan::*;
+use crate::toolkit::field::Type::*;
 /// 定义额外的信息，这样我们就可以把 add_field 宏加入到符号表或者任何实现了 Fields trait 的地方
 /// 任何一个Pass 都有一个pass_run函数 来进行这个pass 相关的工作，比如说对于 SSAPass 我们要对 一个BasicBlock 中的ExprTree做出转换。
 /// 因为实际上 一个 ExprTree 最终会对应一个BasicBlock。
@@ -34,12 +35,24 @@ impl Pass for SimulatorDebugPass {
         let a_val = SymIdx::new(1, "3".to_string());
         let b_val = SymIdx::new(1, "2".to_string());
         let c_val = SymIdx::new(1, "0".to_string());
+        let label1 = SymIdx::new(1, "label1".to_string());
+        let label2 = SymIdx::new(1, "label2".to_string());
+        let jump1 = SymIdx::new(1, "".to_string());
+
         // 定义一些指令
         let instrs = vec![ 
-            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, a.clone(), a_val).to_instr()),
-            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, b.clone(), b_val).to_instr()),
-            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, c.clone(), c_val).to_instr()),
-            instr_slab.insert_instr(InstrType::new_add(c,b,a,Type::I32).to_instr()),
+            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, a.clone(), a_val).to_instr()),    // a=3
+            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, b.clone(), b_val).to_instr()),    // b=2
+            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, c.clone(), c_val).to_instr()),    // c=0
+
+            instr_slab.insert_instr(InstrType::new_jump(label1.clone()).to_instr()),                    // jump label1
+            instr_slab.insert_instr(InstrType::new_label(label1.clone()).to_instr()),                   // label1
+            
+            instr_slab.insert_instr(InstrType::new_add(c.clone(),b.clone(),a.clone(),Type::I32).to_instr()),    //c=a+b
+            instr_slab.insert_instr(InstrType::new_icmp(a.clone(),Sgt,b.clone(),c.clone(),I32).to_instr()),     //a = b > c false
+            instr_slab.insert_instr(InstrType::new_br(a.clone(), label1.clone() , label2.clone()).to_instr()),  // if a {label1} else {label2}
+            instr_slab.insert_instr(InstrType::new_label(label2.clone()).to_instr()),                     // label2
+
         ];
         // 实例化simulator
         let mut simu = Simulator{
