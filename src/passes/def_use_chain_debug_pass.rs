@@ -76,7 +76,7 @@ impl Pass for DefUseChainDebugPass {
         
         if self.is_gen_png {
             // let symt = self.op_cfg_graph.unwrap();
-            generate_png_by_graph(&ctx.def_use_graph.clone(), "def_use_graph".to_string(), &[Config::Record, Config::Title("def_use_graph".to_string())],&mut ctx.io_task_list)?;
+            generate_png_by_graph(&ctx.def_use_graph.clone(), "def_use_graph".to_string(), &[Config::Record, Config::Title("def_use_graph".to_string()),Config::RankDirLR],&mut ctx.io_task_list)?;
         }
 
         Ok(()) 
