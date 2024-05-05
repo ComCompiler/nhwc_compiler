@@ -206,9 +206,9 @@ impl Instruction {
             }else{
                 vec![]
             },
-            InstrType::Jump { jump_op: op } => vec![],
+            InstrType::Jump { jump_op: _op } => vec![],
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
-            InstrType::TranType { lhs, op } => vec![lhs],
+            InstrType::TranType { lhs, op: _ } => vec![lhs],
         }
     }
     pub fn get_use_symidx_vec(&self)->Vec<&SymIdx>{
@@ -235,7 +235,7 @@ impl Instruction {
             InstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
-            InstrType::Call { assigned, func_op } => if let  symidx= assigned{
+            InstrType::Call { assigned, func_op } => if let  _symidx= assigned{
                 func_op.args.iter().collect_vec()
             }else{
                 vec![]
@@ -274,7 +274,7 @@ impl Instruction {
             }else{
                 vec![]
             },
-            InstrType::Jump { jump_op: op } => vec![],
+            InstrType::Jump { jump_op: _op } => vec![],
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op:_ } => vec![lhs],
         }
@@ -303,7 +303,7 @@ impl Instruction {
             InstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
-            InstrType::Call { assigned, func_op } => if let  symidx= assigned{
+            InstrType::Call { assigned, func_op } => if let  _symidx= assigned{
                 func_op.args.iter_mut().collect_vec()
             }else{
                 vec![]
@@ -372,17 +372,21 @@ pub enum JumpOp {
         compared:Vec<ComparedPair>,
     },
     DirectJump {
-        cfg_dst_label:u32, // 这是 cfg blcok 的 索引
+        label_symidx:SymIdx, // 这是 cfg blcok 的 索引
     },
 }
 #[derive(Clone)]
 pub enum Trans {
-    Fptosi { float_symidx:SymIdx }, //浮点转整数
-    Sitofp { int_symidx:SymIdx },   //整数转浮点数
-    Zext { bool_symidx:SymIdx },    //I1转整数
-    Bitcast { rptr_symidx:SymIdx, rptr_type:Type, lptr_type:Type }, //指针类型转指针类型，比如I32指针转F32指针
-                                    //其他类型转I1通过变量和0进行比较得到
-                                    //I1转f32分两步，先转I32，后转F32
+    /// 浮点转整数
+    Fptosi { float_symidx:SymIdx }, 
+    /// 整数转浮点数
+    Sitofp { int_symidx:SymIdx },   
+    /// I1转整数
+    Zext { bool_symidx:SymIdx },    
+    /// 指针类型转指针类型，比如I32指针转F32指针  
+    /// 其他类型转I1通过变量和0进行比较得到  
+    /// I1转f32分两步，先转I32，后转F32  
+    Bitcast { rptr_symidx:SymIdx, rptr_type:Type, lptr_type:Type }, 
 }
 impl Debug for Trans {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -428,7 +432,7 @@ impl InstrType {
     pub fn new_ret(ret_sym:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::Ret { ret_sym } } }
     pub fn new_br(cond:SymIdx, t1:SymIdx, t2:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::Br { cond:cond, t1, t2 } } }
     pub fn new_switch(cond:SymIdx, default:SymIdx, compared:Vec<ComparedPair>) -> Self { Self::Jump { jump_op:JumpOp::Switch { cond, default, compared } } }
-    pub fn new_jump(cfg_dst_label:u32) -> Self { Self::Jump { jump_op:JumpOp::DirectJump { cfg_dst_label } } }
+    pub fn new_jump(label_symidx:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::DirectJump { label_symidx } } }
     //自动类型转换
     pub fn new_int2float(int_symidx:SymIdx, float_symidx:SymIdx) -> Self { Self::TranType { lhs:float_symidx, op:Trans::Sitofp { int_symidx } } }
     pub fn new_float2int(float_symidx:SymIdx, int_symidx:SymIdx) -> Self { Self::TranType { lhs:int_symidx, op:Trans::Fptosi { float_symidx } } }
@@ -437,9 +441,9 @@ impl InstrType {
 
     pub fn get_lhs(&self)->Option<SymIdx>{
         match self{
-            InstrType::Arith { lhs, rhs } => Some(lhs.clone()),
-            InstrType::SimpleAssign { lhs, rhs } => Some(lhs.clone()),
-            InstrType::Phi { lhs, rhs } => Some(lhs.clone()),
+            InstrType::Arith { lhs, rhs: _ } => Some(lhs.clone()),
+            InstrType::SimpleAssign { lhs, rhs: _ } => Some(lhs.clone()),
+            InstrType::Phi { lhs, rhs: _ } => Some(lhs.clone()),
             _=>None
         }
     }
@@ -481,9 +485,9 @@ impl Debug for JumpOp {
                 write!(f, "br i1 {:?}, label {:?}, label {:?}", cond, t1, t2)
             }
 
-            Self::Switch { cond: _, default, compared: _ } => write!(f, "还没见过"),
+            Self::Switch { cond: _, default: _, compared: _ } => write!(f, "还没见过"),
 
-            Self::DirectJump { cfg_dst_label } => write!(f, "还没见过"),
+            Self::DirectJump { label_symidx } => write!(f, "jump label: {:?}",label_symidx),
         }
     }
 }

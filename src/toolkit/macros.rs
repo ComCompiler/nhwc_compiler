@@ -489,7 +489,7 @@ macro_rules! push_instr {
             let cfg_node_struct = node_mut!(at $node in $graph);
             let instr = $instrslab.insert_instr($instr);
             cfg_node_struct.instrs.push(instr);
-            $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.instrs.len()-1, false));
+            // $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.instrs.len()-1, false));
             instr
         }
     };
@@ -502,7 +502,7 @@ macro_rules! push_phi_instr {
             let cfg_node_struct = node_mut!(at $node in $graph);
             let instr = $instrslab.insert_instr($instr);
             cfg_node_struct.phi_instrs.push(instr);
-            $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.phi_instrs.len()-1, true));
+            // $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.phi_instrs.len()-1, true));
             instr
         }
     };
@@ -623,7 +623,7 @@ macro_rules! reg_field_for_struct {
                     $crate::downcast_op_any!(mut $field_type,op_field_mut).with_context(|| format!("{} downcast_op_any 失败 field_name:{} {} {}",stringify!($struct_name),stringify!($upper_field_name),file!(),line!()))
                 }
                 pub fn [<add_ $upper_field_name:lower _with_debug>](&mut self, field:$field_type,symtab:&SymTab,symtab_graph:&mut Option<&mut SymTabGraph>) {
-                    let op_field = self.$fields.insert($upper_field_name,Box::new(field));
+                    let _op_field = self.$fields.insert($upper_field_name,Box::new(field));
                     // let op_field_ref = op_field.as_ref();
                     // $crate::downcast_op_any!($field_type,op_field)
                     match symtab_graph{

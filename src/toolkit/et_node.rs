@@ -82,7 +82,7 @@ pub enum ExprOp {
 impl ExprOp {
     /// 传入的vec的内部是节点在et_tree里的节点序号
     /// 作用是
-    pub fn eval_sub_et_nodes(&self, et_tree:&mut EtTree, vec:&Vec<SymIdx>) -> SymIdx {
+    pub fn eval_sub_et_nodes(&self, _et_tree:&mut EtTree, vec:&Vec<SymIdx>) -> SymIdx {
         let sym_idx = match &self {
             ExprOp::Mul => eval(&format!("{}{}{}", &vec[0].symbol_name, "*", &vec[1].symbol_name)).unwrap(),
             ExprOp::Add => eval(&format!("{}{}{}", &vec[0].symbol_name, "+", &vec[1].symbol_name)).unwrap(),

@@ -36,7 +36,7 @@ impl Context {
             symtab:{let mut symtab = SymTab::new(); 
                     let mut symbol = Symbol::new_verbose(0, COMPILATION_UNIT.to_string(), None);
                     symbol.add_all_cfg_func_name_entry_tuples(vec![]);
-                    let compilation_symidx = symtab.add_symbol(symbol);
+                    let _compilation_symidx = symtab.add_symbol(symbol);
                     symtab},
             code:String::new(),
             scope_tree:ScopeTree::new(),

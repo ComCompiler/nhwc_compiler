@@ -20,7 +20,7 @@ pub enum CfgEdgeType {
     GatherFalse {},
 }
 impl CfgEdge {
-    pub fn load_ast_node_text(&mut self, ast_tree:&AstTree) -> Result<()> {
+    pub fn load_ast_node_text(&mut self, _ast_tree:&AstTree) -> Result<()> {
         match &self.cfg_edge_type {
             CfgEdgeType::IfTrue {} => self.text += "True",
             CfgEdgeType::IfFalse {} => self.text += "False",

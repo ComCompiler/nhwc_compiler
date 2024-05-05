@@ -25,4 +25,7 @@ reg_field_for_struct! {Symbol { USE_COUNTER:UseCounter,TYPE:Type, } with_fields 
 impl Symbol {
     pub fn new_verbose(scope_node:u32, symbol_name:String, index_ssa:Option<u32>) -> Symbol { Symbol { fields:HashMap::new(), symidx:SymIdx::new_verbose(scope_node, symbol_name, index_ssa) } }
     pub fn new(scope_node:u32, symbol_name:String) -> Symbol { Symbol { fields:HashMap::new(), symidx:SymIdx::new(scope_node, symbol_name) } }
+    pub fn new_from_symidx(symidx:&SymIdx)->Self{
+        Symbol::new_verbose(symidx.scope_node, symidx.symbol_name.clone(),symidx.index_ssa)
+    }
 }

@@ -1,6 +1,7 @@
-use std::{any::Any, collections::HashMap, fmt::Debug};
+use std::{any::Any, collections::HashMap, fmt::Debug, ops::{Add, BitAnd, BitOr, Div, Mul, Not, Rem, Sub}};
 
 use strum_macros::EnumIs;
+use anyhow::*;
 
 use super::ast_node::AstTree;
 use super::symtab::SymIdx;
@@ -31,7 +32,7 @@ pub trait Field: Any + Debug {
 //     }
 // }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum Value {
     I32(Option<i32>),
     F32(Option<f32>),
@@ -56,6 +57,53 @@ impl Value {
     pub fn new_f32(value:f32) -> Self { Value::F32(Some(value)) }
     pub fn new_i1(value:bool) -> Self { Value::I1(Some(value)) }
     pub fn new_void() -> Self { Value::Void }
+    pub fn to_specific_type(&self,ty:&Type) -> Result<Value>{
+        match (&self,&ty) {
+            (Value::I32(v), Type::I32) => Ok(Value::new_i32(v.context("没毛病")? as i32)),
+            (Value::I32(v), Type::F32) => Ok(Value::new_f32(v.context("I32 to F32 but not a i32")? as f32)),
+            (Value::I32(_v), Type::I1) => todo!(),
+            (Value::I32(_v), Type::Void) => todo!(),
+            (Value::I32(_v), Type::Label) => todo!(),
+            (Value::I32(_v), Type::Fn { arg_syms: _, ret_sym: _ }) => todo!(),
+            (Value::F32(_v), Type::I32) => todo!(),
+            (Value::F32(v), Type::F32) => Ok(Value::new_f32(v.context("没毛病")? as f32)),
+            (Value::F32(_v), Type::I1) => todo!(),
+            (Value::F32(_v), Type::Void) => todo!(),
+            (Value::F32(_v), Type::Label) => todo!(),
+            (Value::F32(_v), Type::Fn { arg_syms: _, ret_sym: _ }) => todo!(),
+            (Value::I1(v), Type::I32) => Ok(Value::new_i32(v.context("I32 to I1 but not a i1")?.into())),
+            (Value::I1(v), Type::F32) => Ok(Value::new_f32(v.context("F32 to I1 but not a f32")?.into())),
+            (Value::I1(v), Type::I1) => Ok(Value::new_i1(v.context("没毛病")?.into())),
+            (Value::I1(_v), Type::Void) => todo!(),
+            (Value::I1(_v), Type::Label) => todo!(),
+            (Value::I1(_v), Type::Fn { arg_syms: _, ret_sym: _ }) => todo!(),
+            (Value::Void, t) => Err(anyhow!("void 类型不能转化为 {:?} 类型",t)),
+        }
+    }
+    // pub fn as_specific_type(self) -> Self {
+
+    // }
+    pub fn from_string(s:&String,ty:&Type)->Result<Value>{
+        Ok(match &ty{
+            Type::I32 => Value::new_i32(s.parse()?),
+            Type::F32 => Value::new_f32(s.parse()?),
+            Type::I1 => Value::new_i1(s.parse()?),
+            Type::Void => Err(anyhow!("不能从string 转化为 Void 类型的value"))?,
+            Type::Label => Err(anyhow!("不能从string 转化为 Label 类型的value"))?,
+            Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("不能从string 转化为 Fn 类型的value"))?,
+        })
+    }
+    pub fn to_type(&self)->Type{
+        match self{
+            Value::I32(_) => Type::I32,
+            Value::F32(_) => Type::F32,
+            Value::I1(_) => Type::I1,
+            Value::Void => Type::Void,
+        }
+    }
+    pub fn adapt(&self, value2:&Value) -> Type {
+        Type::adapt(&self.to_type() ,&value2.to_type())  
+    }
 }
 impl Type {
     pub fn new(ast_node:u32, ast_tree:&AstTree) -> Self {
@@ -119,6 +167,130 @@ impl Type {
             _ => {
                 panic!("{:?}和{:?}不能进行兼容", ty1, ty2);
             }
+        }
+    }
+}
+impl Add for Value{
+    type Output=Value;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        let pub_ty=self.adapt(&rhs);
+        let l_val=self.to_specific_type(&pub_ty).unwrap();
+        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        match (l_val,r_val) {
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1+v2),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_f32(v1+v2),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => panic!("I1 类型进行相加"),
+            (Value::Void, Value::Void) => panic!("Void 类型进行相加"),
+            (_,_) => panic!("不同类型相加"),
+        }
+    }
+}
+impl Sub for Value{
+    type Output=Value;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        let pub_ty=self.adapt(&rhs);
+        let l_val=self.to_specific_type(&pub_ty).unwrap();
+        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        match (l_val,r_val) {
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 - v2),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_f32(v1 - v2),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => panic!("I1 类型进行相减"),
+            (Value::Void, Value::Void) => panic!("Void 类型进行相减"),
+            (_,_) => panic!("不同类型相减"),
+        }
+    }
+}
+impl Mul for Value{
+    type Output = Value;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        let pub_ty=self.adapt(&rhs);
+        let l_val=self.to_specific_type(&pub_ty).unwrap();
+        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        match (l_val,r_val) {
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 * v2),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_f32(v1 * v2),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => panic!("I1 类型进行相乘"),
+            (Value::Void, Value::Void) => panic!("Void 类型进行相乘"),
+            (_,_) => panic!("不同类型相乘"),
+        }
+    }
+}
+impl Div for Value{
+    type Output = Value;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        let pub_ty=self.adapt(&rhs);
+        let l_val=self.to_specific_type(&pub_ty).unwrap();
+        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        match (l_val,r_val) {
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 / v2),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_f32(v1 / v2),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => panic!("I1 类型进行相除"),
+            (Value::Void, Value::Void) => panic!("Void 类型进行相除"),
+            (_,_) => panic!("不同类型相除"),
+        }
+    }
+}
+impl Rem for Value{
+    type Output = Value;
+
+    fn rem(self, rhs: Self) -> Self::Output {
+        let pub_ty=self.adapt(&rhs);
+        let l_val=self.to_specific_type(&pub_ty).unwrap();
+        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        match (l_val,r_val) {
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 % v2),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_f32(v1 % v2),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => panic!("I1 类型进行取模运算"),
+            (Value::Void, Value::Void) => panic!("Void 类型进行取模运算"),
+            (_,_) => panic!("不同类型进行取模运算"),
+        }
+    }
+}
+impl BitAnd for Value{
+    type Output = Value;
+    fn bitand(self, rhs: Self) -> Self::Output {
+        let pub_ty=self.adapt(&rhs);
+        let l_val=self.to_specific_type(&pub_ty).unwrap();
+        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        match (l_val,r_val) {
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 & v2),
+            (Value::F32(Some(_v1)), Value::F32(Some(_v2))) => panic!("F32 类型无法进行按位与运算"),
+            (Value::I1(Some(v1)), Value::I1(Some(v2))) => Value::new_i1(v1 & v2),
+            (Value::Void, Value::Void) => panic!("Void 类型无法进行按位与运算"),
+            (_,_) => panic!("不同类型无法进行按位与运算"),
+        }
+    }
+}
+impl BitOr for Value{
+    type Output = Value;
+    fn bitor(self, rhs: Self) -> Self::Output {
+        let pub_ty=self.adapt(&rhs);
+        let l_val=self.to_specific_type(&pub_ty).unwrap();
+        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        match (l_val,r_val) {
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 | v2),
+            (Value::F32(Some(_v1)), Value::F32(Some(_v2))) => panic!("F32 类型无法进行按位或运算"),
+            (Value::I1(Some(v1)), Value::I1(Some(v2))) => Value::new_i1(v1 | v2),
+            (Value::Void, Value::Void) => panic!("Void 类型无法进行按位或运算"),
+            (_,_) => panic!("不同类型无法进行按位或运算"),
+        }
+    }
+}
+impl Not for Value{
+    type Output = Value;
+    fn not(self) -> Self::Output {
+        let pub_ty=self.adapt(&self);
+        let l_val=self.to_specific_type(&pub_ty).unwrap();
+        match l_val {
+            Value::I32(Some(v1)) => Value::new_i32(!v1),
+            Value::F32(Some(_v1)) => panic!("F32 类型无法进行按位非运算"),
+            Value::I1(Some(v1)) => Value::new_i1(!v1),
+            Value::Void => panic!("Void 类型无法进行按位非运算"),
+            _ => panic!("其他类型无法进行按位非运算"),
         }
     }
 }
