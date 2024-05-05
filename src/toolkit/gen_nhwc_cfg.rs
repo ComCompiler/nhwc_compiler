@@ -821,6 +821,7 @@ fn process_self_increment(
     push_instr!(assign_instr to cfg_bb in cfg_graph slab instr_slab);
     Ok((tmp_addvar_symidx, tmp_loadvar_symidx))
 }
+
 ///处理自减运算符，不分左右
 fn process_self_attennuation(
     ast_tree:&AstTree, cfg_graph:&mut CfgGraph, et_tree:&EtTree, scope_tree:&ScopeTree, symtab:&mut SymTab, op_et_node:u32, scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
@@ -1106,88 +1107,36 @@ fn process_et(
                 // super::et_node::ExprOp::RShift => todo!(),
                 //比较运算符
                 super::et_node::ExprOp::Eq => {
-                    if let Some(_) = direct_child_node!(at et_node in et_tree ret option) {
-                        let (tmp_var_symidx, l_symidx, r_symidx, var_type, _) =
-                            process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-
-                        let eq_instr = InstrType::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Eq, l_symidx, r_symidx, var_type).to_instr();
-                        push_instr!(eq_instr to cfg_bb in cfg_graph slab instr_slab);
-
-                        Ok(tmp_var_symidx)
-                    } else {
-                        return Err(anyhow!("操作符{}下缺少符号", et_node));
-                    }
+                    let (eq_instr,eq_tmp_symidx) = process_icmp_op(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node,scope_node, cfg_bb, counter, instr_slab, IcmpPlan::Eq,symtab_graph)?;
+                    push_instr!(eq_instr to cfg_bb in cfg_graph slab instr_slab);
+                    Ok(eq_tmp_symidx)
                 }
                 super::et_node::ExprOp::NEq => {
-                    if let Some(_) = direct_child_node!(at et_node in et_tree ret option) {
-                        let (tmp_var_symidx, l_symidx, r_symidx, var_type, _) =
-                            process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-
-                        let neq_instr = InstrType::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Ne, l_symidx, r_symidx, var_type).to_instr();
-                        push_instr!(neq_instr to cfg_bb in cfg_graph slab instr_slab);
-
-                        Ok(tmp_var_symidx)
-                    } else {
-                        return Err(anyhow!("操作符{}下缺少符号", et_node));
-                    }
+                    let (ne_instr,ne_tmp_symidx) = process_icmp_op(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb,counter, instr_slab, IcmpPlan::Ne,symtab_graph)?;
+                    push_instr!(ne_instr to cfg_bb in cfg_graph slab instr_slab);
+                    Ok(ne_tmp_symidx)
                 }
                 super::et_node::ExprOp::Less => {
-                    if let Some(_) = direct_child_node!(at et_node in et_tree ret option) {
-                        let (tmp_var_symidx, l_symidx, r_symidx, var_type, _) =
-                            process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-
-                        let less_instr = InstrType::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Slt, l_symidx, r_symidx, var_type).to_instr();
-                        push_instr!(less_instr to cfg_bb in cfg_graph slab instr_slab);
-
-                        Ok(tmp_var_symidx)
-                    } else {
-                        return Err(anyhow!("操作符{}下缺少符号", et_node));
-                    }
+                    let (slt_instr,slt_tmp_symidx) = process_icmp_op(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb,counter, instr_slab, IcmpPlan::Slt,symtab_graph)?;
+                    push_instr!(slt_instr to cfg_bb in cfg_graph slab instr_slab);
+                    Ok(slt_tmp_symidx)
                 }
                 super::et_node::ExprOp::Greater => {
-                    if let Some(_) = direct_child_node!(at et_node in et_tree ret option) {
-                        let (tmp_var_symidx, l_symidx, r_symidx, var_type, _) =
-                            process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-
-                        let greater_instr = InstrType::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Sgt, l_symidx, r_symidx, var_type).to_instr();
-                        push_instr!(greater_instr to cfg_bb in cfg_graph slab instr_slab);
-
-                        Ok(tmp_var_symidx)
-                    } else {
-                        return Err(anyhow!("操作符{}下缺少符号", et_node));
-                    }
+                    let (sgt_instr,sgt_tmp_symidx) = process_icmp_op(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb,counter, instr_slab, IcmpPlan::Sgt,symtab_graph)?;
+                    push_instr!(sgt_instr to cfg_bb in cfg_graph slab instr_slab);
+                    Ok(sgt_tmp_symidx)
                 }
                 super::et_node::ExprOp::LEq => {
-                    if let Some(_) = direct_child_node!(at et_node in et_tree ret option) {
-                        let (tmp_var_symidx, l_symidx, r_symidx, var_type, _) =
-                            process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-
-                        let lesseq_instr = InstrType::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Sle, l_symidx, r_symidx, var_type).to_instr();
-                        push_instr!(lesseq_instr to cfg_bb in cfg_graph slab instr_slab);
-
-                        Ok(tmp_var_symidx)
-                    } else {
-                        return Err(anyhow!("操作符{}下缺少符号", et_node));
-                    }
+                    let (sle_instr,sle_tmp_symidx) = process_icmp_op(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb,counter, instr_slab, IcmpPlan::Sle,symtab_graph)?;
+                    push_instr!(sle_instr to cfg_bb in cfg_graph slab instr_slab);
+                    Ok(sle_tmp_symidx)
                 }
                 super::et_node::ExprOp::GEq => {
-                    if let Some(_) = direct_child_node!(at et_node in et_tree ret option) {
-                        let (tmp_var_symidx, l_symidx, r_symidx, var_type, _) =
-                            process_arithop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-
-                        let greatereq_instr = InstrType::new_icmp(tmp_var_symidx.clone(), IcmpPlan::Sge, l_symidx, r_symidx, var_type).to_instr();
-                        push_instr!(greatereq_instr to cfg_bb in cfg_graph slab instr_slab);
-
-                        Ok(tmp_var_symidx)
-                    } else {
-                        return Err(anyhow!("操作符{}下缺少符号", et_node));
-                    }
+                    let (sge_instr,sge_tmp_symidx) = process_icmp_op(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb, counter, instr_slab, IcmpPlan::Sge,symtab_graph)?;
+                    push_instr!(sge_instr to cfg_bb in cfg_graph slab instr_slab);
+                    Ok(sge_tmp_symidx)
                 }
-
-                //类型转换
-                // super::et_node::ExprOp::Cast => todo!(),
                 //调用函数
-                //decl接收返回值，stmt不接受返回值（在stmt中处理），stmt接收返回值 
                 super::et_node::ExprOp::Call => {
                     if let (Some(tmp_symidx),_) = process_call(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?{
                         Ok(tmp_symidx)

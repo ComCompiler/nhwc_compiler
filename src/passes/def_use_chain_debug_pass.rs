@@ -66,7 +66,7 @@ impl Pass for DefUseChainDebugPass {
                         };
                         let &def_dug_node = instr_slab.get_instr(def_instr)?.get_dug_cor_def_use_node()?;
                         let dug_edge = add_edge!({DefUseEdge::new(use_symidx.clone())} from def_dug_node to cor_dug_node in def_use_graph);
-                        println!("add_edge about {:?} ",&use_symidx);
+                        // println!("add_edge about {:?} ",&use_symidx);
                     }
                 }
             }

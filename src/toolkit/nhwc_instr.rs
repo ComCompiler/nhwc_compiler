@@ -173,6 +173,8 @@ pub enum InstrType {
     // phi node
     Phi { lhs:SymIdx, rhs:PhiOp },
     TranType { lhs:SymIdx, op:Trans },
+    // 断点     只在simulator中使用
+    BreakPoint {},
 }
 #[derive(Clone)]
 pub struct Instruction {
@@ -209,6 +211,7 @@ impl Instruction {
             InstrType::Jump { jump_op: _op } => vec![],
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op: _ } => vec![lhs],
+            InstrType::BreakPoint {  } => vec![],
         }
     }
     pub fn get_use_symidx_vec(&self)->Vec<&SymIdx>{
@@ -249,6 +252,7 @@ impl Instruction {
                 Trans::Bitcast { rptr_symidx, rptr_type:_, lptr_type:_ } => vec![rptr_symidx],
             }
             ,
+            InstrType::BreakPoint {  } => vec![],
         }
     }
         pub fn get_mut_def_symidx_vec(&mut self)->Vec<&mut SymIdx>{
@@ -277,6 +281,7 @@ impl Instruction {
             InstrType::Jump { jump_op: _op } => vec![],
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op:_ } => vec![lhs],
+            InstrType::BreakPoint {  } => vec![],
         }
     }
     pub fn get_mut_use_symidx_vec(&mut self)->Vec<&mut SymIdx>{
@@ -317,6 +322,7 @@ impl Instruction {
                 Trans::Bitcast { rptr_symidx, rptr_type:_, lptr_type:_ } => vec![rptr_symidx],
             }
             ,
+            InstrType::BreakPoint {  } => vec![],
         }
     }
     pub fn is_phi(&self)->bool{
@@ -403,14 +409,12 @@ impl Debug for Trans {
 // 以下是构造函数:
 impl InstrType {
     pub fn to_instr(self) -> Instruction { Instruction { instr_type:self, info:Fields::new(), text: String::new() } }
-    pub fn new_def_func(func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx>) -> Self { Self::DefineFunc { func_symidx, ret_type, args } }
+
     pub fn new_label(label_symidx:SymIdx) -> Self { Self::Label { label_symidx } }
+    
+    pub fn new_def_func(func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx>) -> Self { Self::DefineFunc { func_symidx, ret_type, args } }
 
     pub fn new_def_var(vartype:Type, varname:SymIdx, value:SymIdx) -> Self { Self::DefineVar { var_symidx:varname, vartype, value } }
-    pub fn new_assign(lhs:SymIdx, rhs:SymIdx) -> Self { Self::SimpleAssign { lhs, rhs } }
-    pub fn new_phi_node(lhs:SymIdx, phi_pair_vec:Vec<PhiPair>) -> Self{
-        Self::Phi { lhs, rhs: PhiOp { phi_pairs:phi_pair_vec  } }
-    }
 
     // Instruction -> Arith -> ArithOp
     pub fn new_add(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::Add { a, b, vartype } } }
@@ -423,6 +427,10 @@ impl InstrType {
     pub fn new_logic_and(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::LogicAnd { a, b, vartype } } }
     pub fn new_logic_or(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::LogicOr { a, b, vartype } } }
     pub fn new_logic_not(lhs:SymIdx, a:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::LogicNot { a, vartype } } }
+    
+    pub fn new_assign(lhs:SymIdx, rhs:SymIdx) -> Self { Self::SimpleAssign { lhs, rhs } }
+
+
     // Instruction -> Call -> FuncOp
     pub fn new_func_call(assigned:Option<SymIdx>, func:SymIdx, args:Vec<SymIdx>,ret_type:Type) -> Self {
         //也许可以直接传入一个Func结构体
@@ -433,6 +441,13 @@ impl InstrType {
     pub fn new_br(cond:SymIdx, t1:SymIdx, t2:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::Br { cond:cond, t1, t2 } } }
     pub fn new_switch(cond:SymIdx, default:SymIdx, compared:Vec<ComparedPair>) -> Self { Self::Jump { jump_op:JumpOp::Switch { cond, default, compared } } }
     pub fn new_jump(label_symidx:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::DirectJump { label_symidx } } }
+    
+    pub fn new_phi_node(lhs:SymIdx, phi_pair_vec:Vec<PhiPair>) -> Self{
+        Self::Phi { lhs, rhs: PhiOp { phi_pairs:phi_pair_vec  } }
+    }
+
+    pub fn new_breakpoint() -> Self { Self::BreakPoint {} }
+
     //自动类型转换
     pub fn new_int2float(int_symidx:SymIdx, float_symidx:SymIdx) -> Self { Self::TranType { lhs:float_symidx, op:Trans::Sitofp { int_symidx } } }
     pub fn new_float2int(float_symidx:SymIdx, int_symidx:SymIdx) -> Self { Self::TranType { lhs:int_symidx, op:Trans::Fptosi { float_symidx } } }
@@ -506,32 +521,29 @@ impl Debug for InstrType {
     // 以类似llvm ir的格式打印输出
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
-
-            Self::Call { assigned, func_op } => match assigned {
-                Some(symidx) => write!(f, "{:?} = {:?}",symidx, func_op),
-
-                None => write!(f, "{:?}", func_op),
-            },
-
-            Self::Jump { jump_op: op } => write!(f, "{:?}", op),
-
-            Self::Phi { lhs, rhs } => write!(f, "{:?} = {:?}",lhs,rhs),
-            Self::SimpleAssign { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
-            Self::DefineFunc { func_symidx: funname, ret_type: rettype, args: paralst } => {
+            InstrType::Label { label_symidx } => {
+                write!(f, "     label {:?}:", label_symidx)
+            }
+            InstrType::DefineFunc { func_symidx: funname, ret_type: rettype, args: paralst } => {
                 write!(f, "Define {:?} {:?} {:?}", rettype, funname, paralst)
             }
-            Self::DefineVar { var_symidx: varname, vartype, value } => {
+            InstrType::DefineVar { var_symidx: varname, vartype, value } => {
                 if value.symbol_name.is_empty() {
                     Ok(write!(f, "Alloc {:?} %{:?}", vartype, varname)?)
                 } else {
                     Ok(write!(f, "Alloc {:?} %{:?} = {:?}", vartype, varname, value)?)
                 }
             }
-            Self::Label { label_symidx } => {
-                write!(f, "     label {:?}:", label_symidx)
-            }
-            Self::TranType { lhs, op } => write!(f, "{:?} = {:?}", lhs, op),
+            InstrType::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
+            InstrType::SimpleAssign { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
+            InstrType::Call { assigned, func_op } => match assigned {
+                Some(symidx) => write!(f, "{:?} = {:?}",symidx, func_op),
+                None => write!(f, "{:?}", func_op),
+            },
+            InstrType::Jump { jump_op: op } => write!(f, "{:?}", op),
+            InstrType::Phi { lhs, rhs } => write!(f, "{:?} = {:?}",lhs,rhs),
+            InstrType::TranType { lhs, op } => write!(f, "{:?} = {:?}", lhs, op),
+            InstrType::BreakPoint {  } => write!(f,"breakpoint !"),
         }
     }
 }
