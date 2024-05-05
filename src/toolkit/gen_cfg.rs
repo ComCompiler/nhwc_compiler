@@ -130,7 +130,7 @@ pub fn process_if(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab
         match p0 {
             Some((st_head_node, st_tail_node)) => {
                 add_edge!({CfgEdge::new_if_true()} from cfg_branch_node to st_head_node in cfg_graph);
-                add_edge!({CfgEdge::new_if2gather()} from st_tail_node to cfg_gather_node in cfg_graph);
+                add_edge!({CfgEdge::new_gather_true()} from st_tail_node to cfg_gather_node in cfg_graph);
             }
             None => {
                 add_edge!({CfgEdge::new_if_true()} from cfg_branch_node to cfg_gather_node in cfg_graph);
@@ -151,7 +151,7 @@ pub fn process_if(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab
         match p0 {
             Some((st_head_node, st_tail_node)) => {
                 add_edge!({CfgEdge::new_if_true()} from cfg_branch_node to st_head_node in cfg_graph);
-                add_edge!({CfgEdge::new_if2gather()} from st_tail_node to cfg_gather_node in cfg_graph);
+                add_edge!({CfgEdge::new_gather_true()} from st_tail_node to cfg_gather_node in cfg_graph);
             }
             None => {
                 add_edge!({CfgEdge::new_if_true()} from cfg_branch_node to cfg_gather_node in cfg_graph);
@@ -160,7 +160,7 @@ pub fn process_if(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab
         match p1 {
             Some((st_head_node, st_tail_node)) => {
                 add_edge!({CfgEdge::new_if_false()} from cfg_branch_node to st_head_node in cfg_graph);
-                add_edge!({CfgEdge::new_if2gather()} from st_tail_node to cfg_gather_node in cfg_graph);
+                add_edge!({CfgEdge::new_gather_false()} from st_tail_node to cfg_gather_node in cfg_graph);
             }
             None => {
                 add_edge!({CfgEdge::new_if_false()} from cfg_branch_node to cfg_gather_node in cfg_graph);
