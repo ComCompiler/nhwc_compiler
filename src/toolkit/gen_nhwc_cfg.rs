@@ -1285,13 +1285,14 @@ fn parse_func2nhwc(
         //获取返回类型
         let ast_retype = find!(rule RULE_declarationSpecifiers at ast_fun in ast_tree).unwrap();
         let func_rettype = &node!(at ast_retype in ast_tree).text;
-        let func_ret_symidx = SymIdx::new(func_scope, func_rettype.to_string());
 
         //获取参数列表
         let mut arg_syms:Vec<SymIdx> = vec![];
         //添加到符号表中，
         let func_symidx = process_func_symbol(symtab,  op_symtab_graph,func_name)?;
         let _:Vec<_> = etc::dfs(cfg_graph, cfg_entry).iter().map(|&cfg_node|{node_mut!(at cfg_node in cfg_graph).add_cor_func_symidx(func_symidx.clone())}).collect();
+        // 添加返回值到符号表
+        let func_ret_symidx = process_symbol(ast_tree, scope_tree, symtab, &DeclOrDefOrUse::DeclDef { type_ast_node: ast_retype }, &format!("{}_{}",func_name,"ret"), 0, op_symtab_graph, cfg_entry, cfg_graph)?;
         //函数有参数
         if let Some(para) = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_parameterTypeList at ast_fun in ast_tree) {
             let ast_func_args = find_nodes!(rule RULE_parameterList finally RULE_parameterDeclaration at para in ast_tree);
@@ -1303,14 +1304,12 @@ fn parse_func2nhwc(
                 let arg_symidx = process_symbol(ast_tree, scope_tree, symtab, &DeclOrDefOrUse::DeclDef { type_ast_node:ast_arg_type }, func_arg_str, func_scope, op_symtab_graph, cfg_entry, cfg_graph)?;
                 arg_syms.push(arg_symidx);
             }
-            let func_ret_symidx = process_symbol(ast_tree, scope_tree, symtab, &DeclOrDefOrUse::DeclDef { type_ast_node: ast_retype }, &format!("{}_{}",func_name,"ret"), 0, op_symtab_graph, cfg_entry, cfg_graph)?;
             let func_type = Type::Fn { arg_syms: arg_syms.clone(), ret_sym:func_ret_symidx.clone()};
             symtab.get_mut_symbol(&func_symidx)?.add_type(func_type);
             // label:function
         }
         //函数无参数，则不需要处理参数部分
         else {
-            let func_ret_symidx = process_symbol(ast_tree, scope_tree, symtab, &DeclOrDefOrUse::DeclDef { type_ast_node: ast_retype }, &format!("{}_{}",func_name,"ret"), 0, op_symtab_graph, cfg_entry, cfg_graph)?;
             let func_type = Type::Fn { arg_syms: vec![], ret_sym:func_ret_symidx.clone()};
             symtab.get_mut_symbol(&func_symidx)?.add_type(func_type);
         };

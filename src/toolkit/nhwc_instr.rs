@@ -160,7 +160,7 @@ pub enum MemOp {
 pub enum InstrType {
     Label { label_symidx:SymIdx },
     //定义函数
-    DefineFunc { func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx> },
+    DefineFunc { func_symidx:SymIdx, ret_symidx:SymIdx, args:Vec<SymIdx> },
     //定义变量
     DefineVar { var_symidx:SymIdx, vartype:Type, value:SymIdx },
     // 算数运算符 + - * / etc.
@@ -189,7 +189,7 @@ impl Instruction {
     pub fn get_def_symidx_vec(&self)->Vec<&SymIdx>{
         match &self.instr_type{
             InstrType::Label { label_symidx:_ } => vec![],
-            InstrType::DefineFunc { func_symidx, ret_type:_, args } => {
+            InstrType::DefineFunc { func_symidx, ret_symidx:_, args } => {
                 {
                     let mut symidx_vec= vec![func_symidx];
                     args.iter().map(|arg| symidx_vec.push(arg)).count();
@@ -217,7 +217,7 @@ impl Instruction {
     pub fn get_use_symidx_vec(&self)->Vec<&SymIdx>{
         match &self.instr_type{
             InstrType::Label { label_symidx:_ } => vec![],
-            InstrType::DefineFunc { func_symidx:_, ret_type:_, args:_ } => {
+            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args:_ } => {
                 vec![]
             },
             InstrType::DefineVar { var_symidx:_, vartype:_, value:_ } => {
@@ -258,7 +258,7 @@ impl Instruction {
         pub fn get_mut_def_symidx_vec(&mut self)->Vec<&mut SymIdx>{
         match &mut self.instr_type{
             InstrType::Label { label_symidx:_ } => vec![],
-            InstrType::DefineFunc { func_symidx, ret_type:_, args } => {
+            InstrType::DefineFunc { func_symidx, ret_symidx:_, args } => {
                 {
                     let mut symidx_vec= vec![func_symidx];
                     args.iter_mut().map(|arg| symidx_vec.push(arg)).count();
@@ -287,7 +287,7 @@ impl Instruction {
     pub fn get_mut_use_symidx_vec(&mut self)->Vec<&mut SymIdx>{
         match &mut self.instr_type{
             InstrType::Label { label_symidx:_ } => vec![],
-            InstrType::DefineFunc { func_symidx:_, ret_type:_, args:_ } => {
+            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args:_ } => {
                 vec![]
             },
             InstrType::DefineVar { var_symidx:_, vartype:_, value:_ } => {
@@ -412,7 +412,7 @@ impl InstrType {
 
     pub fn new_label(label_symidx:SymIdx) -> Self { Self::Label { label_symidx } }
     
-    pub fn new_def_func(func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx>) -> Self { Self::DefineFunc { func_symidx, ret_type, args } }
+    pub fn new_def_func(func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx>) -> Self { Self::DefineFunc { func_symidx, ret_symidx: ret_type, args } }
 
     pub fn new_def_var(vartype:Type, varname:SymIdx, value:SymIdx) -> Self { Self::DefineVar { var_symidx:varname, vartype, value } }
 
@@ -524,8 +524,8 @@ impl Debug for InstrType {
             InstrType::Label { label_symidx } => {
                 write!(f, "     label {:?}:", label_symidx)
             }
-            InstrType::DefineFunc { func_symidx: funname, ret_type: rettype, args: paralst } => {
-                write!(f, "Define {:?} {:?} {:?}", rettype, funname, paralst)
+            InstrType::DefineFunc { func_symidx, ret_symidx, args } => {
+                write!(f, "Define {:?} {:?} {:?}", ret_symidx, func_symidx, args)
             }
             InstrType::DefineVar { var_symidx: varname, vartype, value } => {
                 if value.symbol_name.is_empty() {

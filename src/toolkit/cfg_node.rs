@@ -123,7 +123,7 @@ impl CfgNode {
                 self.text += "\n";
             }
             CfgNodeType::Exit { ast_node } => {
-                self.text += node!(at ast_node in ast_tree).text.as_str();
+                // self.text += node!(at ast_node in ast_tree).text.as_str();
                 self.text += "\n";
             }
             CfgNodeType::Branch {

@@ -57,7 +57,7 @@ impl Simulator{
             println!("{:?}",instr_struct);
             match &instr_struct.instr_type{
                 Label { label_symidx: _ } => (),
-                DefineFunc { func_symidx: _, ret_type: _, args: _ } => todo!(),
+                DefineFunc { func_symidx: _, ret_symidx: _, args: _ } => todo!(),
                 DefineVar { var_symidx, vartype, value } => {
                     //add_symbol!({var_symidx.symbol_name} of scope {var_symidx.scope_node} with field )
                     // 我需要向symtab中加一个symbol的什么部分?

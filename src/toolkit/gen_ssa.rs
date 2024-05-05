@@ -172,16 +172,9 @@ pub fn update_reaching_def(instr:usize,src_symidx:&SymIdx,symtab:&mut SymTab,cfg
     // src_symidx 的 reaching_def 一开始被设置为None,
     let mut r = symtab.get_symbol(src_symidx)?.get_ssa_reaching_def()?.clone();
     while r != None && !{
-        // debug_info_yellow!("get_instr_of {:?}",r);
         let &instr2 = symtab.get_symbol(r.as_ref().unwrap())?.get_ssa_def_instr()?;
-        if instr_is_dominated_by(instr,instr2, cfg_graph, dj_graph, instr_slab)?{
-            // debug_info_yellow!("instr {} is_dominated_by instr {}",instr,instr2);
-            true
-        }else{
-            // debug_info_yellow!("instr {} is_not_dominated_by instr {}",instr,instr2);
-            false
-        }
-    }{
+        instr_is_dominated_by(instr,instr2, cfg_graph, dj_graph, instr_slab)?}
+    {
         r = symtab.get_symbol(r.as_ref().unwrap())?.get_ssa_reaching_def()?.clone();
         // debug_info_yellow!("while_executed_set {:?} to {:?}",r,symtab.get_symbol(r.as_ref().unwrap())?.get_ssa_reaching_def()?.clone());
     }
