@@ -89,6 +89,11 @@ impl InstrList{
         self.instr_vec.push(instr);
         self.outdated = true;
     }
+    /// 删除在 vec 中下标为 idx 的 instr 索引
+    pub fn remove(&mut self,idx:usize){
+        self.instr_vec.remove(idx);
+        self.outdated = true;
+    }
     pub fn new()->Self{
         Self{
             instr_vec: vec![],

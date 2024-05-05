@@ -1,4 +1,4 @@
-use crate::{add_node, toolkit::{cfg_node::InstrList, context::Context, field::Type, nhwc_instr::{InstrSlab, InstrType}, pass_manager::Pass, simulator::Simulator, symtab::{SymIdx, SymTab, SymTabGraph}}};
+use crate::{add_node, toolkit::{cfg_node::InstrList, context::NhwcContext, field::Type, nhwc_instr::{InstrSlab, InstrType}, pass_manager::Pass, simulator::Simulator, symtab::{SymIdx, SymTab, SymTabGraph}}};
 use anyhow::{Ok, Result};
 use crate::toolkit::dot::Config;
 use crate::toolkit::etc::generate_png_by_graph;
@@ -26,7 +26,7 @@ impl SimulatorDebugPass {
 
 impl Pass for SimulatorDebugPass {
     // 运行这个pass
-    fn run(&mut self, ctx:&mut Context)  -> Result<()>{ 
+    fn run(&mut self, ctx:&mut NhwcContext)  -> Result<()>{ 
         let mut instr_slab = InstrSlab::new();
         // 定义一些变量
         let a = SymIdx::new(1, "a".to_string());
