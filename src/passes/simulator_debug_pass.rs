@@ -1,4 +1,4 @@
-use crate::{add_node, toolkit::{cfg_node::InstrList, context::Context, field::Type, nhwc_instr::{InstrSlab, InstrType}, pass_manager::Pass, simulator::Simulator, symtab::{SymIdx, SymTab, SymTabGraph}}};
+use crate::{add_node, add_node_with_edge, toolkit::{cfg_node::InstrList, context::Context, field::Type, nhwc_instr::{InstrSlab, InstrType}, pass_manager::Pass, simulator::Simulator, symtab::{SymIdx, SymTab, SymTabEdge, SymTabGraph}}};
 use anyhow::{Ok, Result};
 use crate::toolkit::dot::Config;
 use crate::toolkit::etc::generate_png_by_graph;
@@ -37,7 +37,8 @@ impl Pass for SimulatorDebugPass {
         let c_val = SymIdx::new(1, "0".to_string());
         let label1 = SymIdx::new(1, "label1".to_string());
         let label2 = SymIdx::new(1, "label2".to_string());
-        let jump1 = SymIdx::new(1, "".to_string());
+        let jump1 = SymIdx::new(1, "1".to_string());
+
 
         // 定义一些指令
         let instrs = vec![ 
@@ -45,31 +46,38 @@ impl Pass for SimulatorDebugPass {
             instr_slab.insert_instr(InstrType::new_def_var(Type::I32, b.clone(), b_val).to_instr()),    // b=2
             instr_slab.insert_instr(InstrType::new_def_var(Type::I32, c.clone(), c_val).to_instr()),    // c=0
 
+            instr_slab.insert_instr(InstrType::new_breakpoint().to_instr()),     // breakpoint1
             instr_slab.insert_instr(InstrType::new_jump(label1.clone()).to_instr()),                    // jump label1
             instr_slab.insert_instr(InstrType::new_label(label1.clone()).to_instr()),                   // label1
             
             instr_slab.insert_instr(InstrType::new_add(c.clone(),b.clone(),a.clone(),Type::I32).to_instr()),    //c=a+b
             instr_slab.insert_instr(InstrType::new_icmp(a.clone(),Sgt,b.clone(),c.clone(),I32).to_instr()),     //a = b > c false
+
+            instr_slab.insert_instr(InstrType::new_breakpoint().to_instr()),     // breakpoint1
+
             instr_slab.insert_instr(InstrType::new_br(a.clone(), label1.clone() , label2.clone()).to_instr()),  // if a {label1} else {label2}
             instr_slab.insert_instr(InstrType::new_label(label2.clone()).to_instr()),                     // label2
 
         ];
-        // 实例化simulator
-        let mut simu = Simulator{
-            symtab: SymTab::new(),
-        };
+        
         let instrlist = InstrList{
             instr_vec:instrs,
             outdated:true,
         };
-        simu.execute(&instrlist, &instr_slab)?;
+        // 实例化simulator
+        let mut simu = Simulator::new(ctx.symtab.clone(),instrlist);
+        simu.start( &instr_slab)?;
+
         
         if self.is_gen_png{
             let mut simulator_g = SymTabGraph::new();
             // println!("ctx的symtab内容为{:#?}",ctx.symtab);
-            add_node!({simu.symtab.clone()} to simulator_g);
-            let _root = 0;
+            let root = 0;
             // add_node_with_edge!({simu.symtab.clone()} with edge {SymTabEdge::new("SimulatorDebugPass".to_owned())} from root in simulator_g);
+            simu.exec_till_breakpoint(&instr_slab)?;
+            add_node!({simu.simu_symtab.clone()} to simulator_g);
+            simu.exec_till_breakpoint(&instr_slab)?;
+            add_node_with_edge!({simu.simu_symtab.clone()} with edge {SymTabEdge::new("next breakpoint".to_string())} from root in simulator_g);
             generate_png_by_graph(&simulator_g.clone(), "simulator_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab, Config::Title("simulator_debug_graph".to_string())],&mut ctx.io_task_list)?;
         }
         Ok(())
