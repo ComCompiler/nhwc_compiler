@@ -1,5 +1,5 @@
 use crate::{
-    add_edge, antlr_parser::cparser::{RULE_declaration, RULE_expression, RULE_forDeclaration}, toolkit::{self, ast_node::find_dfs_rule_ast, context::Context, dot::Config, et_node::EtNodeType, etc::generate_png_by_graph, pass_manager::Pass}
+    add_edge, antlr_parser::cparser::{RULE_declaration, RULE_expression, RULE_forDeclaration}, toolkit::{self, ast_node::find_dfs_rule_ast, context::NhwcContext, dot::Config, et_node::EtNodeType, etc::generate_png_by_graph, pass_manager::Pass}
 };
 use anyhow::Result;
 #[derive(Debug)]
@@ -12,7 +12,7 @@ impl Ast2EtDebugPass {
 
 impl Pass for Ast2EtDebugPass {
     // 运行这个pass
-    fn run(&mut self, ctx:&mut Context) -> Result<()> {
+    fn run(&mut self, ctx:&mut NhwcContext) -> Result<()> {
         let et_tree = &mut ctx.et_tree;
 
         //dfs遍历ast找到第一个 expr stmt

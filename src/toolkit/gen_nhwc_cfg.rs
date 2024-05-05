@@ -25,17 +25,11 @@ use crate::{
 
 make_field_trait_for_struct!(
     SymIdx,
-    Vec<u32>,
-    Vec<usize>,
-    Vec<(SymIdx,u32)>,
-    Vec<(SymIdx,usize)>,
-    Vec<SymIdx>,
     usize,
     u32,
     UseCounter,
     bool,
     Type,
-    Option<SymIdx>,
     CfgInstrIdx
 );
 
@@ -502,9 +496,9 @@ fn process_func_symbol(
     symtab:&mut SymTab,op_symtab_graph:&mut Option<&mut SymTabGraph>, func_name:&String,
 )->Result<SymIdx>{
     let func_symidx = add_symbol!({Symbol::new(0, func_name.clone())} 
-        with_field DECLARED_VARS:{Vec::<SymIdx>::new()}
-        with_field REACHING_DEF:{Option::<SymIdx>::None}
-        with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
+        with_field DECLARED_VARS:{vec![]}
+        // with_field SSA_REACHING_DEF:{None}
+        with_field DEF_INSTRS_VEC:{vec![]}
         with_field IS_CONST:{true} 
         with_field IS_TEMP:{false} 
     to symtab debug op_symtab_graph);
@@ -528,7 +522,7 @@ fn process_symbol(
                 with_field IS_CONST:{false}
                 with_field IS_TEMP:{false} 
             to symtab debug op_symtab_graph);
-            let func_symidx = node_mut!(at cfg_node in cfg_graph).get_mut_cor_func_symidx_with_debug(&symtab,op_symtab_graph)?;
+            let func_symidx = node_mut!(at cfg_node in cfg_graph).get_cor_func_symidx_with_debug(&symtab,op_symtab_graph)?;
             symtab.get_mut_symbol(&func_symidx)?.get_mut_declared_vars()?.push(symidx.clone());
             Ok(symidx)
         }
@@ -557,7 +551,7 @@ fn process_symbol(
     }
 }
 fn process_temp_symbol(
-    cfg_graph:&mut CfgGraph, symtab:&mut SymTab, temp_type:Type,  scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
+    cfg_graph:&mut CfgGraph, symtab:&mut SymTab, temp_type:Type,  scope_node:u32, cfg_node:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
     symtab_graph:&mut Option<&mut SymTabGraph>)->Result<SymIdx>{
         let temp_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",counter))} 
             with_field TYPE:{temp_type.clone()} 
@@ -567,7 +561,9 @@ fn process_temp_symbol(
             to symtab debug symtab_graph);
         *counter+=1;       
         let temp_instr = InstrType::new_def_var(temp_type, temp_symidx.clone(), SymIdx::new(scope_node, format!(""))).to_instr();
-        push_instr!(temp_instr to cfg_bb in cfg_graph slab instr_slab);
+        let func_symidx = node_mut!(at cfg_node in cfg_graph).get_cor_func_symidx()?;
+        symtab.get_mut_symbol(&func_symidx)?.get_mut_declared_vars()?.push(temp_symidx.clone());
+        push_instr!(temp_instr to cfg_node in cfg_graph slab instr_slab);
         Ok(temp_symidx)
 }
 ///具有赋值性质的会将value的类型强制转换为var的类型，返回转换后的symidx

@@ -11,3 +11,4 @@ pub mod ssa_pass;
 pub mod ncfg2djg_pass;
 pub mod cfg_debug_pass;
 pub mod simulator_debug_pass;
+pub mod def_use_chain_debug_pass;

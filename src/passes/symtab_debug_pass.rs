@@ -4,7 +4,7 @@ use crate::toolkit::dot::Config;
 use crate::{add_node, add_node_with_edge};
 
 use crate::toolkit::symtab::{SymTabEdge, SymTabGraph};
-use crate::toolkit::{context::Context, etc::generate_png_by_graph, pass_manager::Pass};
+use crate::toolkit::{context::NhwcContext, etc::generate_png_by_graph, pass_manager::Pass};
 #[derive(Debug)]
 pub struct SymtabDebugPass {
     is_gen_png:bool,
@@ -15,7 +15,7 @@ impl SymtabDebugPass {
 
 impl Pass for SymtabDebugPass {
     // 运行这个pass
-    fn run(&mut self, ctx:&mut Context) -> Result<()> {
+    fn run(&mut self, ctx:&mut NhwcContext) -> Result<()> {
         //4.1可视化
         if self.is_gen_png {
             let mut symtab_g = SymTabGraph::new();

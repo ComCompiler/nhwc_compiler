@@ -8,7 +8,7 @@ use crate::antlr_parser::cparser::{
 use crate::{add_node, add_node_with_edge, direct_child_node, find_nodes_by_dfs, rule_id, RULE_compoundStatement, RULE_functionDefinition};
 use crate::{find, find_nodes, node};
 
-use super::context::Context;
+use super::context::NhwcContext;
 use super::scope_node::{ScopeNode, ScopeTree, ScopeType};
 
 ///将函数名添加进scopetree，返回下一部分衔接的u32
@@ -190,7 +190,7 @@ pub fn process_compound(scope_tree:&mut ScopeTree, ast_tree:&AstTree, scope_pare
     }
 }
 
-pub fn parse_ast_to_scope(context:&mut Context) {
+pub fn parse_ast_to_scope(context:&mut NhwcContext) {
     let scope_tree = &mut context.scope_tree;
     let ast_tree = &context.ast_tree;
     let ast2scope = &mut context.ast2scope;

@@ -1,4 +1,4 @@
-use crate::{toolkit::{context::Context, dot::Config, etc::generate_png_by_graph, pass_manager::Pass}};
+use crate::{toolkit::{context::NhwcContext, dot::Config, etc::generate_png_by_graph, pass_manager::Pass}};
 use anyhow::Result;
 #[derive(Debug)]
 pub struct CfgDebugPass {
@@ -10,7 +10,7 @@ impl CfgDebugPass {
 
 impl Pass for CfgDebugPass {
     // 运行这个pass
-    fn run(&mut self, ctx:&mut Context) -> Result<()> { 
+    fn run(&mut self, ctx:&mut NhwcContext) -> Result<()> { 
         for cfg_node in ctx.cfg_graph.node_weights_mut() {
             cfg_node.clear_text();
             cfg_node.load_instrs_text(&ctx.instr_slab)?;

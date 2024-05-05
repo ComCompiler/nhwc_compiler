@@ -4,20 +4,22 @@ use crate::{add_field, add_symbol, direct_child_nodes, direct_parent_nodes, inst
 use itertools::{Itertools};
 
 use crate::toolkit::symtab::{SymTabEdge,SymTabGraph};
-use super::{cfg_node::{CfgGraph, CfgInstrIdx, InstrList}, context::DjGraph, decl_def_use_node::DduGraph, etc, nhwc_instr::{InstrSlab, InstrType, PhiPair}, symbol::Symbol, symtab::{SymIdx, SymTab}};
+use super::{cfg_node::{CfgGraph, CfgInstrIdx, InstrList}, context::DjGraph, def_use_node::DefUseGraph, etc, nhwc_instr::{InstrSlab, InstrType, PhiPair}, symbol::Symbol, symtab::{SymIdx, SymTab}};
 use anyhow::{anyhow, Result, Context};
 
 reg_field_for_struct!(Symbol {
-    REACHING_DEF:Option<SymIdx>,
-    MAX_SSA_IDX:SymIdx,
-} with_fields fields);
+    SSA_REACHING_DEF:Option<SymIdx>,
+    SSA_MAX_SSA_IDX:SymIdx,
+    } 
+    with_fields fields
+);
 // 由于 每个 ssa symbol 都有唯一定义，因此我们可以把这个instr 存在里面
 // reg_field_name!(INSTR);
 reg_field_for_struct!(Symbol {
-    INSTR:usize,
+    SSA_DEF_INSTR:usize,
 } with_fields fields);
 
-pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,_dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab, _ddu_grpah:&mut DduGraph, _op_symtab_graph:&mut Option<&mut SymTabGraph>)->Result<()>{
+pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab )->Result<()>{
     refresh_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
     for (func_symidx,_cfg_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.iter(){
         for variable in symtab.get_symbol(func_symidx)?.get_declared_vars()?{
@@ -37,6 +39,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,_dj_graph:&mut DjGraph,symtab:&mut 
                 let domiance_frontiers = node!(at cfg_node in cfg_graph).get_domiance_frontier_cfg_nodes()?.clone();
                 for cfg_df_node in domiance_frontiers{
                     if let Some(vec_idx) = find_first_def_in_instr_vec(&node_mut!(at cfg_df_node in cfg_graph).phi_instrs, variable, instr_slab, Ordering::Less,None)?{
+                        // 这说明phi node 已经添加过了，不需要再添加了
                         let _phi_instr = node!(at cfg_df_node in cfg_graph).phi_instrs[vec_idx];
                         // debug_info_yellow!("append {:?} {:?}",(cfg_df_node,phi_instr),instr_slab.get_mut_instr(phi_instr)?);
                         // if let InstrType::Phi { lhs, rhs }=&mut instr_slab.get_mut_instr(phi_instr)?.instr_type{
@@ -44,7 +47,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,_dj_graph:&mut DjGraph,symtab:&mut 
                         // }else{
                         //     return Err(anyhow!("找到了非 phi node"));
                         // }
-                    }else {
+                    }else if let Some(recent_dom_def_instr) = find_recent_dom_instr_before(true, cfg_df_node, variable, 0, cfg_graph, dj_graph, instr_slab)? {
                         // 事实上我们在这个阶段并不需要添加 phi node 的几个 use 参数，这个在 variable_renaming 的时候可以很好的解决
                         // let mut phi_pairs = vec![];
                         // phi_pairs.push(PhiPair::new(variable.clone(),instr));
@@ -58,6 +61,8 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,_dj_graph:&mut DjGraph,symtab:&mut 
                             cfg_node_instr_groups.push((cfg_df_node,new_phi_instr));
                             // debug_info_yellow!("push {:?}",(cfg_df_node,new_phi_instr));
                         }
+                    }else{
+                        // 不符合插入 phi node 条件
                     }
                 }
             }
@@ -70,7 +75,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,_dj_graph:&mut DjGraph,symtab:&mut 
 
     Ok(())
 }
-pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab, _ddu_grpah:&mut DduGraph, op_symtab_graph:&mut Option<&mut SymTabGraph>)->Result<()>{
+pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab)->Result<()>{
     refresh_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
     // 添加 ssa_index 0 作为NULl ，一开始所有变量的 reaching_def 都是 NULl
     for (func_symidx,_cfg_func_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.clone().iter(){
@@ -78,8 +83,8 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
             // let symbol = symtab.get_mut_symbol(&src_symidx)?;
             // symbol.add_reaching_def_with_debug(None, symtab, op_symtab_graph)
             add_field!(
-                with_field REACHING_DEF:{None}
-                with_field MAX_SSA_IDX:{src_symidx.clone()}
+                with_field SSA_REACHING_DEF:{None}
+                with_field SSA_MAX_SSA_IDX:{src_symidx.clone()}
                 to src_symidx in symtab
             );
             // let src_type = symtab.get_symbol(&src_symidx)?.get_type()?.clone();
@@ -100,9 +105,9 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                     for use_symidx in instr_struct.get_mut_use_symidx_vec(){
                         let &is_const = symtab.get_symbol(&use_symidx)?.get_is_const()?;
                         let &is_temp = symtab.get_symbol(&use_symidx)?.get_is_temp()?;
-                        if !is_const && !is_temp{
+                        if !is_const {
                             update_reaching_def(instr, use_symidx, symtab, cfg_graph, dj_graph, instr_slab)?;
-                            *use_symidx = symtab.get_symbol(use_symidx)?.get_reaching_def()?.clone().context(anyhow!("ssa renaming 时发现变量在{:?}:instr[{}] 在 use 之前没有定义",use_symidx,instr))?;
+                            *use_symidx = symtab.get_symbol(use_symidx)?.get_ssa_reaching_def()?.clone().context(anyhow!("ssa renaming 时发现变量在{:?}:instr[{}] 在 use 之前没有定义",use_symidx,instr))?;
                         }else{
                             // 说明这是个常量或临时变量，不用renaming
                         }
@@ -113,30 +118,30 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                     // symtab.get_mut_symbol(def_symidx)?.get_instr()
                     let &is_const = symtab.get_symbol(&def_symidx)?.get_is_const()?;
                     let &is_temp = symtab.get_symbol(&def_symidx)?.get_is_temp()?;
-                    if !is_temp && !is_const{
-                        let new_ssa_symidx = symtab.get_symbol(def_symidx)?.get_max_ssa_idx()?.get_next_ssa_symidx();
-                        *symtab.get_mut_symbol(def_symidx)?.get_mut_max_ssa_idx()? = new_ssa_symidx.clone();
+                    if !is_const{
+                        let new_ssa_symidx = symtab.get_symbol(def_symidx)?.get_ssa_max_ssa_idx()?.get_next_ssa_symidx();
+                        *symtab.get_mut_symbol(def_symidx)?.get_mut_ssa_max_ssa_idx()? = new_ssa_symidx.clone();
 
                         // debug_info_yellow!("reach_def_symidx {:?} in instr {}",def_symidx,instr);
                         update_reaching_def(instr, def_symidx, symtab, cfg_graph, dj_graph, instr_slab)?;
 
                         let new_symidx = add_symbol!({new_ssa_symidx.into_symbol()}
                             // with field TYPE:{}
-                            with_field INSTR:{instr}
                             // with field DEF_INSTRS_VEC:{Vec::<usize>::new()}
                             // with field REACHING_DEF:{symtab.get_symbol(src_symidx)?.get_type()?.clone()}
-                            with_field REACHING_DEF:{None}
-                        to symtab debug op_symtab_graph);
+                            with_field SSA_DEF_INSTR:{instr}
+                            with_field SSA_REACHING_DEF:{None}
+                        to symtab);
 
                         let src_symidx  = def_symidx.clone();
                         // replace the definition of src_symidx by def_symidx
                         **def_symidx = new_symidx.clone();
                         // symtab.get_mut_symbol(&src_symidx).
                         // 以下构建def use 链
-                        let cloned_src_reaching_def = symtab.get_symbol(&src_symidx)?.get_reaching_def()?.clone();
-                        let new_sym_reaching_def = symtab.get_mut_symbol(&new_symidx)?.get_mut_reaching_def()?; 
+                        let cloned_src_reaching_def = symtab.get_symbol(&src_symidx)?.get_ssa_reaching_def()?.clone();
+                        let new_sym_reaching_def = symtab.get_mut_symbol(&new_symidx)?.get_mut_ssa_reaching_def()?; 
                         *new_sym_reaching_def = cloned_src_reaching_def;
-                        let src_sym_reaching_def = symtab.get_mut_symbol(&src_symidx)?.get_mut_reaching_def()?; 
+                        let src_sym_reaching_def = symtab.get_mut_symbol(&src_symidx)?.get_mut_ssa_reaching_def()?; 
                         *src_sym_reaching_def = Some(new_symidx);
                     }
                 }
@@ -149,8 +154,9 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                     if let InstrType::Phi { lhs, rhs } = &mut phi_instr_struct.instr_type{
                         let phi_def_symidx =  lhs.to_src_symidx();
                         // debug_info_yellow!("transform {:?} to {:?}",phi_def_symidx,symtab.get_symbol(&phi_def_symidx)?.get_reaching_def()?);
-                        let phi_use_symidx = symtab.get_symbol(&phi_def_symidx)?.get_reaching_def()?.clone().context("这个symbol 的reaching def = None")?;
-                        rhs.push_phi_pair(PhiPair::new(phi_use_symidx, 0))?;
+                        let phi_use_symidx = symtab.get_symbol(&phi_def_symidx)?.get_ssa_reaching_def()?.clone().context(anyhow!("这个symbol {:?} 的reaching def = None",symtab.get_symbol(&phi_def_symidx)?))?;
+                        let &phi_use_def_instr = symtab.get_symbol(&phi_use_symidx)?.get_ssa_def_instr()?;
+                        rhs.push_phi_pair(PhiPair::new(phi_use_symidx,phi_use_def_instr))?;
                         update_reaching_def(phi_instr, &phi_def_symidx, symtab, cfg_graph, dj_graph, instr_slab)?;
                     }
                     // }
@@ -164,10 +170,10 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
 
 pub fn update_reaching_def(instr:usize,src_symidx:&SymIdx,symtab:&mut SymTab,cfg_graph:&CfgGraph, dj_graph:&DjGraph,instr_slab:&InstrSlab)->Result<()>{
     // src_symidx 的 reaching_def 一开始被设置为None,
-    let mut r = symtab.get_symbol(src_symidx)?.get_reaching_def()?.clone();
+    let mut r = symtab.get_symbol(src_symidx)?.get_ssa_reaching_def()?.clone();
     while r != None && !{
         // debug_info_yellow!("get_instr_of {:?}",r);
-        let &instr2 = symtab.get_symbol(r.as_ref().unwrap())?.get_instr()?;
+        let &instr2 = symtab.get_symbol(r.as_ref().unwrap())?.get_ssa_def_instr()?;
         if instr_is_dominated_by(instr,instr2, cfg_graph, dj_graph, instr_slab)?{
             // debug_info_yellow!("instr {} is_dominated_by instr {}",instr,instr2);
             true
@@ -176,11 +182,11 @@ pub fn update_reaching_def(instr:usize,src_symidx:&SymIdx,symtab:&mut SymTab,cfg
             false
         }
     }{
-        r = symtab.get_symbol(r.as_ref().unwrap())?.get_reaching_def()?.clone();
-        // debug_info_yellow!("while_executed_set {:?} to {:?}",r,symtab.get_symbol(r.as_ref().unwrap())?.get_reaching_def()?.clone());
+        r = symtab.get_symbol(r.as_ref().unwrap())?.get_ssa_reaching_def()?.clone();
+        // debug_info_yellow!("while_executed_set {:?} to {:?}",r,symtab.get_symbol(r.as_ref().unwrap())?.get_ssa_reaching_def()?.clone());
     }
     // debug_info_yellow!("update {:?}'s reaching_def to {:?}",src_symidx,r);
-    *symtab.get_mut_symbol(src_symidx)?.get_mut_reaching_def()? = r;
+    *symtab.get_mut_symbol(src_symidx)?.get_mut_ssa_reaching_def()? = r;
     Ok(())
 }
 
@@ -190,7 +196,7 @@ pub fn update_reaching_def(instr:usize,src_symidx:&SymIdx,symtab:&mut SymTab,cfg
 /// 这里需要注意的是 你想要查找的符号究竟是 带 ssa_index 的还是不带的
 /// 如果 不带 ssa_index ，那么会尝试将所有遇到的 带ssa_index 符号看做一个 不带ssa_index 的符号
 /// 返回 (cfg_node,instr_idx,is_in_phi)
-pub fn find_recent_dom_instr_before(check_phi_instrs:bool,cfg_node:u32,symidx:SymIdx,cfg_instr_pos:usize,cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph, instr_slab:&mut InstrSlab)->Result<Option<CfgInstrIdx>>{
+pub fn find_recent_dom_instr_before(check_phi_instrs:bool,cfg_node:u32,symidx:&SymIdx,cfg_instr_pos:usize,cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph, instr_slab:&mut InstrSlab)->Result<Option<CfgInstrIdx>>{
     {
         let instrs = &node!(at cfg_node in cfg_graph).instrs;
         if let Some(idx) = find_first_def_in_instr_vec(instrs, &symidx, instr_slab, Ordering::Less,Some(cfg_instr_pos))?{
