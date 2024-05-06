@@ -11,6 +11,7 @@ use super::{
 };
 use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_instr::InstrSlab};
 use crate::antlr_parser::cparser::RULE_returnStatement;
+use crate::debug_info_yellow;
 use crate::{
     add_edge, add_node_with_edge, add_symbol, antlr_parser::cparser::{
         RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_jumpStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
@@ -257,9 +258,6 @@ fn  parse_stmt_or_expr2nhwc(
                             }
                         };
                         if let Some(assign_instr) = op_assign_instr{
-                            for def_symidx in instr!(at assign_instr in instr_slab)?.get_def_symidx_vec().iter(){
-                                symtab.get_mut_symbol(def_symidx)?.get_mut_def_instrs_vec()?.push(assign_instr);
-                            }
                         }
                         sep_symidx_vec.push(op_symidx)
                     } else {
@@ -1397,34 +1395,49 @@ pub fn parse_cfg_into_nhwc_cfg(
     // debug_info_yellow!("success end");
     Ok(())
 }
+// /// 这个函数会把入边转移到 新建的 较前的  basic block，并返回这个 cfg_node:u32
+// /// 然后把出边转移到较后的 cfg_node  
+// /// 并且可以通过添加一个Option<idx> 来选择分割instrs 到这个新增的 basic block  
+// /// 将下标为[0,idx)的 instr 转移到新的 basic block
+// /// 需要注意的是存在phi_instrs 和 instrs 两种 instr ，执行这个函数必须确保 phi_instrs 为空，并且instrs 有足够的语句
+// pub fn split_cfg_node(cfg_node:u32,cfg_graph:&mut CfgGraph) -> Result<u32>{
+
+// }
+
 /// 在两个cfg node 之间插入一个bb ，并保留 边的属性，函数会自动判断究竟把带属性的边放到哪里(因为插入一个bb会多生成一条Direct边，需要判断把这条边放在什么位置)
 /// 以下条件满足之一可以insert new bb 
-/// 1. cfg_node1 和 cfg_node2 之间是一条 Direct 普通边
+/// 1. cfg_node1 和 cfg_node2 之间是一条 Direct 普通边 或 BodyHead BodyTail
 /// 2. cfg_node1 和 cfg_node2 其中有一个是 BasicBlock
 pub fn insert_bb_between(cfg_node1:u32, cfg_node2:u32, cfg_graph:&mut CfgGraph) -> Result<u32>{
     let cfg_former_edge_idx = cfg_graph.find_edge(node_index(cfg_node1 as usize), node_index(cfg_node2 as usize)).ok_or(anyhow!("找不到连接 cfg_node[{}] 和 cfg_node[{}]的边",cfg_node1,cfg_node2))
         .with_context(|| format!("在插入 cfg_node[{}] 和 cfg_node[{}]之间bb 失败",cfg_node1,cfg_node2))?;
-    let cfg_former_edge_cloned = cfg_graph.edge_weight(cfg_former_edge_idx).unwrap().clone();
     // 删除旧的边
-    cfg_graph.remove_edge(cfg_former_edge_idx);
+    let cfg_former_edge_removed = cfg_graph.remove_edge(cfg_former_edge_idx).unwrap();
     let (cfg_node_type1, cfg_node_type2) = (&node!(at cfg_node1 in cfg_graph).cfg_node_type,&node!(at cfg_node2 in cfg_graph).cfg_node_type);
-    if let CfgEdgeType::Direct {  } = &cfg_former_edge_cloned.cfg_edge_type {
+    if  cfg_former_edge_removed.cfg_edge_type.is_direct() {
         // 如果这条边本身就是一条普通边，那么就允许insert
         let mut bb_struct = CfgNode::new_bb(vec![]);
         bb_struct.add_cor_func_symidx(node!(at cfg_node1 in cfg_graph).get_cor_func_symidx()?.clone());
-        let new_bb = add_node_with_edge!({bb_struct} with edge {cfg_former_edge_cloned} from cfg_node1 in cfg_graph);
+        let new_bb = add_node_with_edge!({bb_struct} with edge {cfg_former_edge_removed} from cfg_node1 in cfg_graph);
         add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node2 in cfg_graph);
         Ok(new_bb)
+    } else if cfg_former_edge_removed.cfg_edge_type.is_body_head() ||cfg_former_edge_removed.cfg_edge_type.is_body_tail()  {
+        let mut bb_struct = CfgNode::new_bb(vec![]);
+        bb_struct.add_cor_func_symidx(node!(at cfg_node1 in cfg_graph).get_cor_func_symidx()?.clone());
+        let new_bb = add_node_with_edge!({bb_struct} with edge {CfgEdge::new_direct()} from cfg_node1 in cfg_graph);
+        add_edge!({cfg_former_edge_removed} from new_bb to cfg_node2 in cfg_graph);
+        Ok(new_bb)
+
     }else{
         match (cfg_node_type1,cfg_node_type2){
             (_,CfgNodeType::BasicBlock { ast_nodes:_ })=>{
-                let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with edge {cfg_former_edge_cloned} from cfg_node1 in cfg_graph);
+                let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with edge {cfg_former_edge_removed} from cfg_node1 in cfg_graph);
                 add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node2 in cfg_graph);
                 Ok(new_bb)
             }
             (CfgNodeType::BasicBlock { ast_nodes:_ },_)=>{
                 let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with edge {CfgEdge::new_direct()} from cfg_node1 in cfg_graph);
-                add_edge!({cfg_former_edge_cloned} from new_bb to cfg_node2 in cfg_graph);
+                add_edge!({cfg_former_edge_removed} from new_bb to cfg_node2 in cfg_graph);
                 Ok(new_bb)
             }
             _ => {

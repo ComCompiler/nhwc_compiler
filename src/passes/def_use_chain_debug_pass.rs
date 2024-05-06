@@ -26,7 +26,7 @@ impl Pass for DefUseChainDebugPass {
         // 先加入所有节点
         for (func_symidx,cfg_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?{
             for &cfg_node in etc::dfs(cfg_graph, *cfg_entry).iter(){
-                for &instr in node!(at cfg_node in cfg_graph).get_all_instrs_iter(){
+                for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
                     let dug_node = add_node!({DefUseNode::new(instr)} to def_use_graph);
                     node_mut!(at dug_node in def_use_graph).load_instr_text(instr_slab);
                     instr_mut!(at instr in instr_slab)?.add_dug_cor_def_use_node(dug_node);
@@ -36,7 +36,7 @@ impl Pass for DefUseChainDebugPass {
         // 然后加入边
         for (func_symidx,cfg_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?{
             for &cfg_node in etc::dfs(cfg_graph, *cfg_entry).iter(){
-                for &instr in node!(at cfg_node in cfg_graph).get_all_instrs_iter(){
+                for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
                     let instr_struct = instr!(at instr in instr_slab)?;
                     for use_symidx in instr_struct.get_use_symidx_vec() {
                         let &cor_dug_node = instr_struct.get_dug_cor_def_use_node()?;

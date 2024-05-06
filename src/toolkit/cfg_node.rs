@@ -216,7 +216,7 @@ impl CfgNode {
         Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Entry { ast_node, calls_in_func:vec![] }, phi_instrs: InstrList::new() }
     }
     pub fn new_exit(ast_node:u32) -> Self { Self { text:String::new(), instrs:InstrList::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Exit { ast_node }, phi_instrs: InstrList::new() } }
-    pub fn get_all_instrs_iter(&self)->impl Iterator<Item=&usize>+'_{
+    pub fn iter_all_instrs(&self)->impl Iterator<Item=&usize>+'_{
         self.phi_instrs.iter().chain(self.instrs.iter())
     }
 }
