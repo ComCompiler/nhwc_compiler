@@ -126,6 +126,14 @@ macro_rules! direct_child_node {
             .expect(format!("no direct child node of {:?} in {:?}", $graph.node_weight(petgraph::matrix_graph::NodeIndex::from($node)), $graph).as_str())
             .index() as u32
     }};
+    (at $node:ident in $graph:ident with_predicate $f:block )=> {{
+        let v = $crate::direct_child_nodes!(at $node in $graph with_predicate $f);
+        if v.len() >1 {
+            return Err(anyhow::anyhow!("此节点 direct_child_node 不止一个,无法使用这个宏"));
+        } else {
+            v[0]
+        }
+    }};
     (at $node:ident in $graph:ident ret option) => {{
         let node_index_option = $graph.neighbors(petgraph::matrix_graph::NodeIndex::from($node)).next();
         node_index_option.map(|node_index| node_index.index() as u32)
@@ -481,7 +489,19 @@ macro_rules! term_id {
     };
 }
 
-/// after push_instr  你可以使用  instr 的 cfg_instr_idx  field 
+/// insert_instr($instr to $node at $idx in $graph slab $instrslab)  
+#[macro_export]
+macro_rules! insert_instr {
+    ($instr:ident to $node:ident at $idx:block in $graph:ident slab $instrslab:ident) =>{
+        {
+            let cfg_node_struct = node_mut!(at $node in $graph);
+            let instr = $instrslab.insert_instr($instr);
+            cfg_node_struct.instrs.insert($idx,instr);
+            // $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.instrs.len()-1, false));
+            instr
+        }
+    };
+}
 #[macro_export]
 macro_rules! push_instr {
     ($instr:ident to $node:ident in $graph:ident slab $instrslab:ident) =>{
@@ -567,7 +587,7 @@ macro_rules! downcast_op_any {
 ///     upper_field_name2:field_type2
 ///     with fields member_of_fields_type}
 macro_rules! reg_field_for_struct {
-    ($struct_name:ident {$($upper_field_name:ident:$field_type:ty,)+} with_fields $fields:ident with_prefix $prefix:ident) => {
+    ($struct_name:ident {$($upper_field_name:ident:$field_type:ty,)*} with_fields $fields:ident with_prefix $prefix:ident) => {
         paste::paste!{
         $(
             reg_field_for_struct!{$struct_name
@@ -579,8 +599,8 @@ macro_rules! reg_field_for_struct {
         )+
         }
     };
-    ($struct_name:ident {$($upper_field_name:ident:$field_type:ty,)+} with_fields $fields:ident) => {
-        $($crate::_reg_field_name!($upper_field_name);)+
+    ($struct_name:ident {$($upper_field_name:ident:$field_type:ty,)*} with_fields $fields:ident) => {
+        $($crate::_reg_field_name!($upper_field_name);)*
         impl $struct_name {
             paste::paste!{
             $(
@@ -673,7 +693,7 @@ macro_rules! reg_field_for_struct {
                     //.with_context(|| format!("downcast_op_any 失败 {} {} {}",stringify!($upper_field_name),file!(),line!()))
                 }
 
-            )+
+            )*
             }
         }
     };

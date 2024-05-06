@@ -1,5 +1,6 @@
 use itertools::Itertools;
 use slab::Slab;
+use strum_macros::EnumIs;
 use std::{fmt::{Debug, Formatter}, vec};
 use anyhow::{anyhow,Result};
 use delegate::delegate;
@@ -156,7 +157,7 @@ pub enum MemOp {
 //     Jump(JumpOp)
 // }
 
-#[derive(Clone)]
+#[derive(Clone,EnumIs)]
 pub enum InstrType {
     Label { label_symidx:SymIdx },
     //定义函数
@@ -174,7 +175,7 @@ pub enum InstrType {
     Phi { lhs:SymIdx, rhs:PhiOp },
     TranType { lhs:SymIdx, op:Trans },
     // 断点     只在simulator中使用
-    BreakPoint {},
+    BreakPoint { breakpoint_symidx:SymIdx},
 }
 #[derive(Clone)]
 pub struct Instruction {
@@ -211,7 +212,7 @@ impl Instruction {
             InstrType::Jump { jump_op: _op } => vec![],
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op: _ } => vec![lhs],
-            InstrType::BreakPoint {  } => vec![],
+            InstrType::BreakPoint { breakpoint_symidx } => vec![],
         }
     }
     pub fn get_use_symidx_vec(&self)->Vec<&SymIdx>{
@@ -243,7 +244,14 @@ impl Instruction {
             }else{
                 vec![]
             },
-            InstrType::Jump { jump_op:_ } => vec![],
+            InstrType::Jump { jump_op } => {
+                match jump_op{
+                    JumpOp::Ret { ret_sym } => vec![ret_sym],
+                    JumpOp::Br { cond, t1, t2 } => vec![cond],
+                    JumpOp::Switch { cond, default, compared } => vec![cond],
+                    JumpOp::DirectJump { label_symidx } => vec![],
+                }
+            },
             InstrType::Phi { lhs:_, rhs } => rhs.phi_pairs.iter().map(|p| &p.symidx).collect_vec(),
             InstrType::TranType { lhs:_, op } => match op{
                 Trans::Fptosi { float_symidx } => vec![float_symidx],
@@ -252,7 +260,7 @@ impl Instruction {
                 Trans::Bitcast { rptr_symidx, rptr_type:_, lptr_type:_ } => vec![rptr_symidx],
             }
             ,
-            InstrType::BreakPoint {  } => vec![],
+            InstrType::BreakPoint { breakpoint_symidx  } => vec![],
         }
     }
         pub fn get_mut_def_symidx_vec(&mut self)->Vec<&mut SymIdx>{
@@ -281,7 +289,7 @@ impl Instruction {
             InstrType::Jump { jump_op: _op } => vec![],
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op:_ } => vec![lhs],
-            InstrType::BreakPoint {  } => vec![],
+            InstrType::BreakPoint { breakpoint_symidx  } => vec![],
         }
     }
     pub fn get_mut_use_symidx_vec(&mut self)->Vec<&mut SymIdx>{
@@ -313,7 +321,14 @@ impl Instruction {
             }else{
                 vec![]
             },
-            InstrType::Jump { jump_op:_ } => vec![],
+            InstrType::Jump { jump_op } => {
+                match jump_op{
+                    JumpOp::Ret { ret_sym } => vec![ret_sym],
+                    JumpOp::Br { cond, t1, t2 } => vec![cond],
+                    JumpOp::Switch { cond, default, compared } => vec![cond],
+                    JumpOp::DirectJump { label_symidx } => vec![],
+                }
+            },
             InstrType::Phi { lhs:_, rhs } => rhs.phi_pairs.iter_mut().map(|p|&mut p.symidx).collect_vec(),
             InstrType::TranType { lhs:_, op } => match op{
                 Trans::Fptosi { float_symidx } => vec![float_symidx],
@@ -322,7 +337,7 @@ impl Instruction {
                 Trans::Bitcast { rptr_symidx, rptr_type:_, lptr_type:_ } => vec![rptr_symidx],
             }
             ,
-            InstrType::BreakPoint {  } => vec![],
+            InstrType::BreakPoint { breakpoint_symidx  } => vec![],
         }
     }
     pub fn is_phi(&self)->bool{
@@ -446,7 +461,7 @@ impl InstrType {
         Self::Phi { lhs, rhs: PhiOp { phi_pairs:phi_pair_vec  } }
     }
 
-    pub fn new_breakpoint() -> Self { Self::BreakPoint {} }
+    pub fn new_breakpoint(symidx:SymIdx) -> Self { Self::BreakPoint {breakpoint_symidx:symidx } }
 
     //自动类型转换
     pub fn new_int2float(int_symidx:SymIdx, float_symidx:SymIdx) -> Self { Self::TranType { lhs:float_symidx, op:Trans::Sitofp { int_symidx } } }
@@ -461,6 +476,14 @@ impl InstrType {
             InstrType::Phi { lhs, rhs: _ } => Some(lhs.clone()),
             _=>None
         }
+    }
+    pub fn is_br(&self) -> bool{
+        if let InstrType::Jump { jump_op } = &self{
+            if let JumpOp::Br { cond, t1, t2 } = jump_op{
+                return true
+            }
+        }
+        false
     }
 }
 impl Debug for ArithOp {
@@ -543,7 +566,7 @@ impl Debug for InstrType {
             InstrType::Jump { jump_op: op } => write!(f, "{:?}", op),
             InstrType::Phi { lhs, rhs } => write!(f, "{:?} = {:?}",lhs,rhs),
             InstrType::TranType { lhs, op } => write!(f, "{:?} = {:?}", lhs, op),
-            InstrType::BreakPoint {  } => write!(f,"breakpoint !"),
+            InstrType::BreakPoint { breakpoint_symidx  } => write!(f,"breakpoint {:?} !",breakpoint_symidx),
         }
     }
 }

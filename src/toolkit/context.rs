@@ -47,7 +47,7 @@ impl NhwcContext {
             instr_slab:InstrSlab::new(),
             dj_graph: DjGraph::new(),
             def_use_graph: DefUseGraph::new(),
-            io_task_list: vec![]
+            io_task_list: vec![],
         }
     }
 }

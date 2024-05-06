@@ -3,7 +3,7 @@ use crate::antlr_parser::cparser::{
 };
 use crate::toolkit::ast_node::AstTree;
 use crate::toolkit::cfg_edge::CfgEdge;
-use crate::{add_edge, add_node, direct_child_node, find_nodes_by_dfs, rule_id, RULE_compoundStatement, RULE_functionDefinition};
+use crate::{add_edge, add_node, direct_child_node, find_nodes_by_dfs, reg_field_for_struct, rule_id, RULE_compoundStatement, RULE_functionDefinition};
 use crate::{find, find_nodes, node};
 use anyhow::Result;
 use petgraph::stable_graph::{EdgeIndex, NodeIndex};
@@ -14,6 +14,10 @@ use super::cfg_node::{CfgGraph, CfgNode, CfgNodeType};
 use super::scope_node::ScopeTree;
 use super::symtab::SymTab;
 /// 这个文件中没有在命名中提到是哪一中图中的节点，那么统一是 scope_node
+
+reg_field_for_struct!(CfgNode{
+    // CFG_COR_GATHER:u32,
+} with_fields info);
 
 pub fn process_while(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, current_while_node:u32) -> Result<Option<(u32, u32)>> {
     //expression做成whileloop节点
@@ -154,7 +158,10 @@ pub fn process_if(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab
                 add_edge!({CfgEdge::new_gather_true()} from st_tail_node to cfg_gather_node in cfg_graph);
             }
             None => {
-                add_edge!({CfgEdge::new_if_true()} from cfg_branch_node to cfg_gather_node in cfg_graph);
+                // 加入一个空的bb
+                let cfg_new_bb = add_node!({CfgNode::new_bb(vec![])} to cfg_graph);
+                add_edge!({CfgEdge::new_if_true()} from cfg_branch_node to cfg_new_bb in cfg_graph);
+                add_edge!({CfgEdge::new_if_true()} from cfg_new_bb to cfg_gather_node in cfg_graph);
             }
         }
         match p1 {
@@ -163,7 +170,9 @@ pub fn process_if(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab
                 add_edge!({CfgEdge::new_gather_false()} from st_tail_node to cfg_gather_node in cfg_graph);
             }
             None => {
-                add_edge!({CfgEdge::new_if_false()} from cfg_branch_node to cfg_gather_node in cfg_graph);
+                let cfg_new_bb = add_node!({CfgNode::new_bb(vec![])} to cfg_graph);
+                add_edge!({CfgEdge::new_if_false()} from cfg_branch_node to cfg_new_bb in cfg_graph);
+                add_edge!({CfgEdge::new_if_false()} from cfg_new_bb to cfg_gather_node in cfg_graph);
             }
         }
         Ok(Some((cfg_branch_node, cfg_gather_node)))

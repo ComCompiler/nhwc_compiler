@@ -15,7 +15,7 @@ use crate::{instr, toolkit::ast_node::AstTree};
 use crate::{ reg_field_for_struct, node};
 
 use super::field::Fields;
-use super::nhwc_instr::{InstrSlab};
+use super::nhwc_instr::{InstrSlab, Instruction};
 
 //use crate::toolkit::ast_node::AstNode;
 
@@ -88,6 +88,9 @@ impl InstrList{
     pub fn push(&mut self,instr:usize){
         self.instr_vec.push(instr);
         self.outdated = true;
+    }
+    pub fn insert(&mut self,idx:usize,instr:usize){
+        self.instr_vec.insert(idx, instr);
     }
     /// 删除在 vec 中下标为 idx 的 instr 索引
     pub fn remove(&mut self,idx:usize){

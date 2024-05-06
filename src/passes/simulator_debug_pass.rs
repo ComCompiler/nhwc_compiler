@@ -34,14 +34,14 @@ impl Pass for SimulatorDebugPass {
             instr_slab.insert_instr(InstrType::new_def_var(Type::I32, b.clone(), b_val).to_instr()),    // b=2
             instr_slab.insert_instr(InstrType::new_def_var(Type::I32, c.clone(), c_val).to_instr()),    // c=0
 
-            instr_slab.insert_instr(InstrType::new_breakpoint().to_instr()),     // breakpoint1
+            instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "b1".to_string())).to_instr()),     // breakpoint1
             instr_slab.insert_instr(InstrType::new_jump(label1.clone()).to_instr()),                    // jump label1
             instr_slab.insert_instr(InstrType::new_label(label1.clone()).to_instr()),                   // label1
             
             instr_slab.insert_instr(InstrType::new_add(c.clone(),b.clone(),a.clone(),Type::I32).to_instr()),    //c=a+b
             instr_slab.insert_instr(InstrType::new_icmp(a.clone(),Sgt,b.clone(),c.clone(),I32).to_instr()),     //a = b > c false
 
-            instr_slab.insert_instr(InstrType::new_breakpoint().to_instr()),     // breakpoint1
+            instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "b2".to_string())).to_instr()),     // breakpoint1
 
             instr_slab.insert_instr(InstrType::new_br(a.clone(), label1.clone() , label2.clone()).to_instr()),  // if a {label1} else {label2}
             instr_slab.insert_instr(InstrType::new_label(label2.clone()).to_instr()),                     // label2
@@ -63,9 +63,9 @@ impl Pass for SimulatorDebugPass {
             let root = 0;
             // add_node_with_edge!({simu.symtab.clone()} with edge {SymTabEdge::new("SimulatorDebugPass".to_owned())} from root in simulator_g);
             add_node!({simu.simu_symtab.clone()} to simulator_g);
-            while simu.exec_till_breakpoint(&instr_slab)? {
+            while let Some(bp_symidx) = simu.exec_till_breakpoint(&instr_slab)? {
                 let node_count= simulator_g.node_count() as u32 -1;
-                add_node_with_edge!({simu.simu_symtab.clone()} with edge {SymTabEdge::new("next breakpoint".to_string())} from node_count in simulator_g);
+                add_node_with_edge!({simu.simu_symtab.clone()} with edge {SymTabEdge::new(format!("{:?}",bp_symidx))} from node_count in simulator_g);
             }
             
             

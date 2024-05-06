@@ -7,23 +7,27 @@ pub type DefUseGraph = StableDiGraph<DefUseNode, DefUseEdge, u32>;
 
 #[derive(Clone)]
 pub struct DefUseNode{
+    pub is_det:bool,
     pub instr:usize,
     pub text:String,
 }
 #[derive(Clone)]
-pub enum DefOrUse{
-    Def{ },
-    Use{ }
+pub enum DepType{
+    PhiDep{ },
+    Dep{ }
 }
 
 #[derive(Clone)]
 pub struct DefUseEdge{
-    pub def_or_use:DefOrUse,
+    pub dep_type:DepType,
     pub symidx:SymIdx,
 }
 impl DefUseEdge{
     pub fn new(symidx:SymIdx)->Self{
-        Self { def_or_use: DefOrUse::Use {  }, symidx: symidx }
+        Self { dep_type: DepType::Dep {  }, symidx }
+    }
+    pub fn new_phi_dep(symidx:SymIdx)->Self{
+        Self { dep_type: DepType::PhiDep {  }, symidx }
     }
 }
 impl DefUseNode{
@@ -34,34 +38,26 @@ impl DefUseNode{
         Self{
             instr,
             text: String::new(),
+            is_det: false,
         }
     }
 }
 
-impl Debug for DefOrUse{
+impl Debug for DepType{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f,"{}",match &self{
-            DefOrUse::Def { } => "Def",
-            DefOrUse::Use { } => "Use",
+            DepType::PhiDep { } => "PhiDep",
+            DepType::Dep { } => "",
         })
     }
 }
 impl Debug for DefUseNode{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"{}",self.text)
+        write!(f,"{}{}",if self.is_det{ "DET-"} else {""},self.text)
     }
-}
-impl DefUseEdge{
-    pub fn new_def( symidx:SymIdx)->Self{
-        Self{def_or_use:DefOrUse::Def {  },symidx}
-    }
-    pub fn new_use( symidx:SymIdx)->Self{
-        Self{def_or_use:DefOrUse::Use {  },symidx}
-    }
-
 }
 impl Debug for DefUseEdge{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"{:?}",self.symidx)
+        write!(f,"{:?} {:?}",self.dep_type,self.symidx)
     }
 }

@@ -7,6 +7,7 @@ use crate::{make_field_trait_for_struct, reg_field_for_struct};
 use super::cfg_node::InstrList;
 use super::field::Type::{I32, F32};
 
+use super::symtab::SymIdx;
 use super::{field::{Field, Value}, nhwc_instr::{ArithOp::*, InstrSlab, InstrType::*}, symbol::Symbol, symtab::{SymTab, SymTabEdge, SymTabGraph}};
 make_field_trait_for_struct!(Value);
 reg_field_for_struct!(Symbol{
@@ -46,11 +47,11 @@ impl Simulator{
         }
         Ok(())
     }
-    pub fn exec_till_breakpoint(&mut self,instr_slab:&InstrSlab) -> Result<bool>{
+    pub fn exec_till_breakpoint(&mut self,instr_slab:&InstrSlab) -> Result<Option<SymIdx>>{
         let instr = &self.instr_list;
         // 运行完毕
         if self.current_pos >= instr.len() {
-            return Ok(false);
+            return Ok(None);
         }
         while self.current_pos < instr.len() {
 
@@ -248,18 +249,16 @@ impl Simulator{
                         },
                     };
                 },
-                BreakPoint {  } => {
+                BreakPoint { breakpoint_symidx  } => {
                     // 由于breakpoint会直接return,需要提前改变current_pos
                     self.current_pos+=1;
-                    return Ok(true)
+                    return Ok(Some(breakpoint_symidx.clone()))
                 }
             }
         self.current_pos += 1;
         }
         println!("current_pos: {:?}",self.current_pos);
         // 运行完毕
-        Ok(false)
+        Ok(None)
     }
-
-        
 }   

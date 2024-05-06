@@ -11,7 +11,7 @@ use super::{
 };
 use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_instr::InstrSlab};
 use crate::antlr_parser::cparser::RULE_returnStatement;
-use crate::debug_info_yellow;
+use crate::{debug_info_yellow, direct_parent_node, insert_instr};
 use crate::{
     add_edge, add_node_with_edge, add_symbol, antlr_parser::cparser::{
         RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_jumpStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
@@ -342,12 +342,28 @@ fn parse_whileloop2nhwc(
 ) -> Result<()> {
     match (rule_id!(at ast_expr_node in ast_tree), ast_expr_node) {
         (RULE_expression, expr_ast) => {
-            let label_instr = InstrType::new_label(SymIdx::new(0, "while.head".to_string())).to_instr();
-            push_instr!(label_instr to cfg_whileloop in cfg_graph slab instr_slab);
+            let while_head_symidx = SymIdx::new(*ast2scope.get(&ast_expr_node).unwrap(), "while.head".to_string());
+            let while_body_symidx = SymIdx::new(*ast2scope.get(&ast_expr_node).unwrap(), "while.body".to_string());
+            let while_exit_symidx = SymIdx::new(*ast2scope.get(&ast_expr_node).unwrap(), "while.exit".to_string());
+
+            let cfg_body_head_node = direct_child_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_head() });
+            let cfg_body_tail_node = direct_parent_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_tail() });
+            let cfg_exit_node = direct_child_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_direct() });
+
+            let label_body_instr_struct = InstrType::new_label(while_body_symidx.clone()).to_instr();
+            insert_instr!(label_body_instr_struct to cfg_body_head_node at {0} in cfg_graph slab instr_slab);
+
+            let label_head_instr_struct = InstrType::new_label(while_head_symidx.clone()).to_instr();
+            insert_instr!(label_head_instr_struct to cfg_whileloop at {0} in cfg_graph slab instr_slab);
+
+            let label_exit_instr_struct = InstrType::new_label(while_exit_symidx.clone()).to_instr();
+            insert_instr!(label_exit_instr_struct to cfg_exit_node at {0} in cfg_graph slab instr_slab);
+
+
             if let Some(expr_scope) = ast2scope.get(&expr_ast) {
                 let ret_vec = parse_stmt_or_expr2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, *expr_scope, ast_expr_node, cfg_whileloop, counter, instr_slab, symtab_graph)?;
                 if ret_vec.len()>1{
-                    return Err(anyhow!("条件表达式错误，返回类型不能转为bool"))
+                    return Err(anyhow!("条件表达式错误，返回参数不能大于一个"))
                 }
                 let r2bool_symidx;
                 if let Some(result_symidx) = &ret_vec[0]{
@@ -356,6 +372,14 @@ fn parse_whileloop2nhwc(
                 }else{
                     return Err(anyhow!("条件表达式错误，返回类型不能转为bool"))
                 }
+                // 添加 br 语句
+                let br_whileloop_instr_struct = InstrType::new_br(r2bool_symidx.clone(),while_body_symidx,while_exit_symidx).to_instr();
+                push_instr!(br_whileloop_instr_struct to cfg_whileloop in cfg_graph slab instr_slab);
+
+
+                let jump_body_tail_instr_struct = InstrType::new_jump(while_head_symidx.clone()).to_instr();
+                push_instr!(jump_body_tail_instr_struct to cfg_body_tail_node in cfg_graph slab instr_slab);
+
                 node_mut!(at cfg_whileloop in cfg_graph).add_jump_det(r2bool_symidx);
             } else {
                 return Err(anyhow!("找不到astnode的scope"));
@@ -445,6 +469,18 @@ fn parse_branch2nhwc(
     ast_tree:&AstTree, cfg_graph:&mut CfgGraph, scope_tree:&ScopeTree, et_tree:&mut EtTree, symtab:&mut SymTab, ast2scope:&HashMap<u32, u32>, ast_expr_node:u32, cfg_branch_node:u32, counter:&mut u32,
     instr_slab:&mut InstrSlab, symtab_g:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
+    let label_true_symidx = process_label_symbol(*ast2scope.get(&ast_expr_node).unwrap(), "branch.true:".to_string(), symtab)?;
+    let label_false_symidx = process_label_symbol(*ast2scope.get(&ast_expr_node).unwrap(), "branch.false:".to_string(), symtab)?;
+
+    let label_true_instr = InstrType::new_label(label_true_symidx.clone()).to_instr();
+    let label_false_instr = InstrType::new_label(label_false_symidx.clone()).to_instr();
+
+    let cfg_true_node = direct_child_node!(at cfg_branch_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_true()});
+    let cfg_false_node = direct_child_node!(at cfg_branch_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_false()});
+
+    insert_instr!(label_true_instr to cfg_true_node at {0} in cfg_graph slab instr_slab);
+    insert_instr!(label_false_instr to cfg_false_node at {0} in cfg_graph slab instr_slab);
+
     match (rule_id!(at ast_expr_node in ast_tree), ast_expr_node) {
         (RULE_expression, expr_node) => {
             if let Some(expr_scope) = ast2scope.get(&expr_node) {
@@ -459,6 +495,10 @@ fn parse_branch2nhwc(
                 }else{
                     return Err(anyhow!("条件表达式错误，返回类型不能转为bool"))
                 }
+
+                let br_branch_instr_struct = InstrType::new_br(r2bool_symidx.clone(),label_true_symidx,label_false_symidx).to_instr();
+                push_instr!(br_branch_instr_struct to cfg_branch_node in cfg_graph slab instr_slab);
+
                 node_mut!(at cfg_branch_node in cfg_graph).add_jump_det(r2bool_symidx);
             } else {
                 return Err(anyhow!("找不到astnode的scope"));
@@ -466,6 +506,10 @@ fn parse_branch2nhwc(
         }
         (_, _) => return Err(anyhow!("不正确的astnode")),
     }
+
+
+    
+
     Ok(())
 }
 fn process_constant(symtab:&mut SymTab, const_literal:&String, symtab_graph:&mut Option<&mut SymTabGraph>) -> Result<SymIdx> {
@@ -1355,7 +1399,15 @@ pub fn parse_cfg_into_nhwc_cfg(
         let dfs_vec = etc::dfs(cfg_graph, cfg_entry);
         // dfs_vec.sort_by(|node| )
         // dfs_vec.reverse();
-        for cfg_node in dfs_vec {
+        for &cfg_node in dfs_vec.iter() {
+            match &node!(at cfg_node in cfg_graph).cfg_node_type{
+                CfgNodeType::BasicBlock { ast_nodes } => {
+                    parse_bb2nhwc(ast_tree, cfg_graph, scope_tree, et_tree, symtab, ast2scope, ast_nodes.clone(), cfg_node, &mut counter, instr_slab, symtab_graph)?;
+                },
+                _ => {},
+            }
+        }
+        for &cfg_node in dfs_vec.iter() {
             // debug_info_yellow!("dfs current is {:?}", cfg_node);
             let cfgnode = node!(at cfg_node in cfg_graph);
             match &cfgnode.cfg_node_type {
@@ -1384,9 +1436,6 @@ pub fn parse_cfg_into_nhwc_cfg(
                 }
                 CfgNodeType::WhileLoop { ast_expr_node } => {
                     parse_whileloop2nhwc(ast_tree, cfg_graph, scope_tree, et_tree, symtab, ast2scope, *ast_expr_node, cfg_node, &mut counter, instr_slab, symtab_graph)?
-                }
-                CfgNodeType::BasicBlock { ast_nodes } => {
-                    parse_bb2nhwc(ast_tree, cfg_graph, scope_tree, et_tree, symtab, ast2scope, ast_nodes.clone(), cfg_node, &mut counter, instr_slab, symtab_graph)?;
                 }
                 _ => {}
             }
@@ -1474,3 +1523,46 @@ pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph)
     head.zip(tail).ok_or(anyhow!("while 或 loop {} 里面在cfg中没有对应的head 或tail", cfg_node))
 }
 
+
+pub fn find_gather_of_branch_downward(cfg_branch_node:u32,cfg_graph:&CfgGraph)-> Result<u32>{
+    let cur_branch_layer_count = 0;
+    _recursive_find_gather(cfg_branch_node, cfg_graph, cur_branch_layer_count)
+}
+pub fn _recursive_find_gather(cfg_node:u32,cfg_graph:&CfgGraph, mut cur_branch_layer_count: u32) -> Result<u32>{
+    if node!(at cfg_node in cfg_graph).cfg_node_type.is_gather(){
+        cur_branch_layer_count -= 1;
+    }else if node!(at cfg_node in cfg_graph).cfg_node_type.is_branch(){
+        cur_branch_layer_count += 1;
+    }
+    // 如果 层数 =0 ，那么说明找到了
+    if cur_branch_layer_count == 0{
+        Ok(cfg_node)
+    }else{
+        let mut rst = Err(anyhow!("找不到此 if 对应的gather"));
+        for neighbor in direct_child_nodes!(at cfg_node in cfg_graph){
+            rst = rst.or(_recursive_find_gather(neighbor, cfg_graph, cur_branch_layer_count));
+        }
+        rst
+    }
+}
+pub fn find_branch_of_gather_upwnward(cfg_branch_node:u32,cfg_graph:&CfgGraph)-> Result<u32>{
+    let cur_branch_layer_count = 0;
+    _recursive_find_branch(cfg_branch_node, cfg_graph, cur_branch_layer_count)
+}
+pub fn _recursive_find_branch(cfg_node:u32,cfg_graph:&CfgGraph, mut cur_branch_layer_count: u32) -> Result<u32>{
+    if node!(at cfg_node in cfg_graph).cfg_node_type.is_gather(){
+        cur_branch_layer_count += 1;
+    }else if node!(at cfg_node in cfg_graph).cfg_node_type.is_branch(){
+        cur_branch_layer_count -= 1;
+    }
+    // 如果 层数 =0 ，那么说明找到了
+    if cur_branch_layer_count == 0{
+        Ok(cfg_node)
+    }else{
+        let mut rst = Err(anyhow!("找不到此 if 对应的gather"));
+        for neighbor in direct_parent_nodes!(at cfg_node in cfg_graph){
+            rst = rst.or(_recursive_find_branch(neighbor, cfg_graph, cur_branch_layer_count));
+        }
+        rst
+    }
+}
