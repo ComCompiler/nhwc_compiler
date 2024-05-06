@@ -9,9 +9,9 @@ impl SsaPass {
 
 impl Pass for SsaPass {
     // 运行这个pass
-    fn run(&mut self, ctx:&mut crate::toolkit::context::Context) -> Result<()> { 
-        let add_phi_rst = add_phi_nodes(&mut ctx.cfg_graph, &mut ctx.dj_graph, &mut ctx.symtab, &mut ctx.instr_slab, &mut ctx.ddu_graph,&mut self.is_gen_symtab_graph_png.then(||&mut ctx.symtab_graph));
-        let variable_renaming_rst = variable_renaming(&mut ctx.cfg_graph, &mut ctx.dj_graph, &mut ctx.symtab, &mut ctx.instr_slab, &mut ctx.ddu_graph, &mut self.is_gen_symtab_graph_png.then(||&mut ctx.symtab_graph));
+    fn run(&mut self, ctx:&mut crate::toolkit::context::NhwcContext) -> Result<()> { 
+        let add_phi_rst = add_phi_nodes(&mut ctx.cfg_graph, &mut ctx.dj_graph, &mut ctx.symtab, &mut ctx.instr_slab);
+        let variable_renaming_rst = variable_renaming(&mut ctx.cfg_graph, &mut ctx.dj_graph, &mut ctx.symtab, &mut ctx.instr_slab);
         if self.is_gen_ssa_cfg_png{
             for (idx,instr_struct) in ctx.instr_slab.iter_mut(){
                 instr_struct.load_idx_text(idx);

@@ -17,20 +17,34 @@ pub trait Field: Any + Debug {
     fn clone_box(&self) -> Box<dyn Field>;
 }
 // if you implement this 会栈溢出，很神奇
-// impl<T:Clone+Any+Debug> Field for T{
-//     fn as_any(&self) -> &dyn std::any::Any {
-//         self
-//     }
-//     fn as_any_move(self) -> Box<dyn std::any::Any>{
-//         Box::new(self)
-//     }
-//     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
-//         self
-//     }
-//     fn clone_box(&self)->Box<dyn crate::toolkit::field::Field> {
-//         Box::new(self.clone())
-//     }
-// }
+impl<T:Clone+Any+Debug> Field for Vec<T>{
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+    fn as_any_move(self) -> Box<dyn std::any::Any>{
+        Box::new(self)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
+    fn clone_box(&self)->Box<dyn crate::toolkit::field::Field> {
+        Box::new(self.clone())
+    }
+}
+impl<T:Clone+Any+Debug> Field for Option<T>{
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+    fn as_any_move(self) -> Box<dyn std::any::Any>{
+        Box::new(self)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
+    fn clone_box(&self)->Box<dyn crate::toolkit::field::Field> {
+        Box::new(self.clone())
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum Value {

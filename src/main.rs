@@ -11,7 +11,7 @@ use antlr_parser::cparser::{RULE_compoundStatement, RULE_functionDefinition};
 use clap::Parser;
 use passes::{ast2cfg_pass::Ast2CfgPass, ast2et_debug_pass::Ast2EtDebugPass, ast2st_pass::Ast2StPass, cfg2ncfg_pass::Cfg2NcfgPass, code2ast_pass::Code2AstPass};
 
-use crate::{passes::{cfg_debug_pass::CfgDebugPass, ncfg2djg_pass::Ncfg2DjgPass, simulator_debug_pass, ssa_pass::SsaPass}, toolkit::pass_manager::PassManager};
+use crate::{passes::{cfg_debug_pass::CfgDebugPass, def_use_chain_debug_pass::DefUseChainDebugPass, ncfg2djg_pass::Ncfg2DjgPass, simulator_debug_pass, ssa_pass::SsaPass}, toolkit::pass_manager::PassManager};
 #[derive(Parser, Clone, Default)]
 #[command(author, version, about)]
 pub struct Args {
@@ -48,6 +48,7 @@ fn main() {
     let ncfg2djg_pass = Ncfg2DjgPass::new(true && is_gen_png_global);
     let ssa_pass = SsaPass::new(true && is_gen_png_global, true && is_gen_png_global);
     let cfg_debug_pass = CfgDebugPass::new(true && is_gen_png_global);
+    let def_use_chain_debug_pass = DefUseChainDebugPass::new(true && is_gen_png_global);
     // let symtab_debug_pass = SymtabDebugPass::new(true && is_gen_png_global);
     let simulator_debug_pass = simulator_debug_pass::SimulatorDebugPass::new(true && is_gen_png_global);
     add_passes!(
@@ -59,6 +60,7 @@ fn main() {
         then ncfg2djg_pass
         then ssa_pass
         then cfg_debug_pass
+        then def_use_chain_debug_pass
         // then symtab_debug_pass
         then simulator_debug_pass
         to pass_manager

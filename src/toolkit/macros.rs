@@ -567,6 +567,18 @@ macro_rules! downcast_op_any {
 ///     upper_field_name2:field_type2
 ///     with fields member_of_fields_type}
 macro_rules! reg_field_for_struct {
+    ($struct_name:ident {$($upper_field_name:ident:$field_type:ty,)+} with_fields $fields:ident with_prefix $prefix:ident) => {
+        paste::paste!{
+        $(
+            reg_field_for_struct!{$struct_name
+                {
+                    [<$prefix _ $upper_field_name>]:$field_type,
+                }
+                with_fields $fields
+            }
+        )+
+        }
+    };
     ($struct_name:ident {$($upper_field_name:ident:$field_type:ty,)+} with_fields $fields:ident) => {
         $($crate::_reg_field_name!($upper_field_name);)+
         impl $struct_name {
@@ -584,6 +596,9 @@ macro_rules! reg_field_for_struct {
                     let _op_field = self.$fields.insert($upper_field_name,Box::new(field));
                     // let op_field_ref = op_field.as_ref();
                     // $crate::downcast_op_any!($field_type,op_field)
+                }
+                pub fn [<has_ $upper_field_name:lower>](&self)->bool{
+                    self.$fields.get($upper_field_name).is_some()
                 }
                 pub fn [<remove_ $upper_field_name:lower >](&mut self) {
                     self.$fields.remove($upper_field_name);

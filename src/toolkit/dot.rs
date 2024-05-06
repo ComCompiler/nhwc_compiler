@@ -109,7 +109,7 @@ pub enum Config {
     SymTab,
     /// Cfg graph with subblocks
     CfgBlock,
-
+    RankDirLR,
     #[doc(hidden)]
     _Incomplete(()),
 }
@@ -153,6 +153,7 @@ make_config_struct!(
     Rounded,
     SymTab,
     CfgBlock,
+    RankDirLR,
 );
 #[derive(Clone)]
 pub enum Title {
@@ -186,6 +187,10 @@ where
         // 给图添加标题
         if !self.config.Title.is_empty() {
             writeln!(f, "{}label=\"{}\";\n{}fontsize=\"40\";", INDENT, self.config.Title.clone(), INDENT)?;
+        }
+        writeln!(f, "graph [overlap=false];")?;
+        if self.config.RankDirLR{
+            writeln!(f, "rankdir=LR;")?;
         }
 
         // output all labels

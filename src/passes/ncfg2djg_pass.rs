@@ -1,4 +1,4 @@
-use crate::toolkit::{context::Context, dot::Config, etc::generate_png_by_graph, gen_djg::parse_ncfg2dj_graph, pass_manager::Pass};
+use crate::toolkit::{context::NhwcContext, dot::Config, etc::generate_png_by_graph, gen_djg::parse_ncfg2dj_graph, pass_manager::Pass};
 use anyhow::Result;
 ///计算 dominnace frontier 
 #[derive(Debug)]
@@ -9,7 +9,7 @@ impl Ncfg2DjgPass {
 
 impl Pass for Ncfg2DjgPass {
     // 运行这个pass
-    fn run(&mut self, ctx:&mut Context) -> Result<()> { 
+    fn run(&mut self, ctx:&mut NhwcContext) -> Result<()> { 
         parse_ncfg2dj_graph(&mut ctx.cfg_graph, &mut ctx.dj_graph)?;
         if self.is_ncfg_png{
             generate_png_by_graph(&ctx.dj_graph.clone(), "dj_graph".to_string(),&[Config::Record, Config::Rounded, Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel],&mut ctx.io_task_list)?

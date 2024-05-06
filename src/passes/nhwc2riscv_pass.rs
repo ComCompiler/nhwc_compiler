@@ -1,4 +1,4 @@
-use crate::toolkit::{context::Context, pass_manager::Pass};
+use crate::toolkit::{context::NhwcContext, pass_manager::Pass};
 use anyhow::Result;
 #[derive(Debug)]
 pub struct Nhwc2RiscvDebugPass {
@@ -10,7 +10,7 @@ impl Nhwc2RiscvDebugPass {
 
 impl Pass for Nhwc2RiscvDebugPass {
     // 运行这个pass
-    fn run(&mut self, _ctx:&mut Context) -> Result<()> {
+    fn run(&mut self, _ctx:&mut NhwcContext) -> Result<()> {
         // 拿到一个nhwc的vec,转化成汇编语言
         Ok(())
     }

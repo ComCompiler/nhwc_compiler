@@ -1,4 +1,4 @@
-use crate::toolkit::{context::Context, dot::Config, etc::generate_png_by_graph, gen_cfg::parse_ast_to_cfg, pass_manager::Pass};
+use crate::toolkit::{context::NhwcContext, dot::Config, etc::generate_png_by_graph, gen_cfg::parse_ast_to_cfg, pass_manager::Pass};
 use anyhow::Result;
 #[derive(Debug)]
 pub struct Ast2CfgPass {
@@ -10,7 +10,7 @@ impl Ast2CfgPass {
 
 impl Pass for Ast2CfgPass {
     // 运行这个pass
-    fn run(&mut self, ctx:&mut Context) -> Result<()> {
+    fn run(&mut self, ctx:&mut NhwcContext) -> Result<()> {
         parse_ast_to_cfg(&ctx.ast_tree, &mut ctx.cfg_graph, &mut ctx.symtab, &ctx.scope_tree)?;
         // 1.1 生成对应的png
         for cfg_node in ctx.cfg_graph.node_weights_mut() {

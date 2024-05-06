@@ -2,8 +2,9 @@ use super::{context::COMPILATION_UNIT, symbol::Symbol};
 use crate::{add_node, add_node_with_edge };
 use core::fmt::Debug;
 use anyhow::{anyhow,Result};
+use delegate::delegate;
 use petgraph::stable_graph::StableDiGraph;
-use std::{collections::BTreeMap, fmt::{Display, Formatter}};
+use std::{collections::{btree_map, BTreeMap}, fmt::{Display, Formatter}, iter, slice::Iter};
 
 pub type SymTabGraph = StableDiGraph<SymTab, SymTabEdge, u32>;
 
@@ -70,7 +71,7 @@ impl SymIdx {
 impl SymTab {
     // 创建一个新的符号表
     pub fn new() -> SymTab { SymTab { map:BTreeMap::new() } }
-
+    
     // 添加或更新符号，如果是更新，那么返回旧的符号
     pub fn add_symbol(&mut self, sym:Symbol) -> Result<SymIdx> {
         let symidx = sym.symidx.clone();
@@ -87,6 +88,12 @@ impl SymTab {
     pub fn get_mut_symbol_verbose(&mut self, symbol_name:String, scope_node:u32) -> Result<&mut Symbol> { let symidx = SymIdx { scope_node, symbol_name, index_ssa:None }; self.map.get_mut(&symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx )) }
     pub fn get_mut_symbol(&mut self, symbol_index:&SymIdx) -> Result<&mut Symbol> { self.map.get_mut(symbol_index).ok_or(anyhow!("找不到{:?}对应的symbol",symbol_index)) }
 
+    delegate!{
+        to self.map {
+            pub fn iter(&self)->btree_map::Iter<SymIdx,Symbol>;
+            pub fn iter_mut(&mut self)->btree_map::IterMut<SymIdx,Symbol>;
+        }
+    }
 
     // 删除符号
     pub fn remove_symbol(&mut self, symbol_index:&SymIdx) { self.map.remove(symbol_index); }
@@ -109,6 +116,8 @@ impl SymTab {
         }
 
     }
+
+    
 }
 impl Default for SymTab {
     fn default() -> Self { Self { map:Default::default() } }
