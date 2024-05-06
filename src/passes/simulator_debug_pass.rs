@@ -66,7 +66,7 @@ impl Pass for SimulatorDebugPass {
         };
         // 实例化simulator
         let mut simu = Simulator::new(ctx.symtab.clone(),instrlist);
-        simu.start( &instr_slab)?;
+        simu.load( &instr_slab)?;
 
         
         if self.is_gen_png{
@@ -74,10 +74,13 @@ impl Pass for SimulatorDebugPass {
             // println!("ctx的symtab内容为{:#?}",ctx.symtab);
             let root = 0;
             // add_node_with_edge!({simu.symtab.clone()} with edge {SymTabEdge::new("SimulatorDebugPass".to_owned())} from root in simulator_g);
-            simu.exec_till_breakpoint(&instr_slab)?;
             add_node!({simu.simu_symtab.clone()} to simulator_g);
-            simu.exec_till_breakpoint(&instr_slab)?;
-            add_node_with_edge!({simu.simu_symtab.clone()} with edge {SymTabEdge::new("next breakpoint".to_string())} from root in simulator_g);
+            while simu.exec_till_breakpoint(&instr_slab)? {
+                let node_count= simulator_g.node_count() as u32 -1;
+                add_node_with_edge!({simu.simu_symtab.clone()} with edge {SymTabEdge::new("next breakpoint".to_string())} from node_count in simulator_g);
+            }
+            
+            
             generate_png_by_graph(&simulator_g.clone(), "simulator_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab, Config::Title("simulator_debug_graph".to_string())],&mut ctx.io_task_list)?;
         }
         Ok(())

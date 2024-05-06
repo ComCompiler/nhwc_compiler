@@ -23,14 +23,14 @@ pub struct Simulator{
 }
 impl Simulator{
     // 输入从别处获得到的symtab , instr_list里是指令的序列
-    pub fn new(src_symtab:SymTab,instr_list:InstrList) -> Self{
+    pub fn new(src_s:SymTab,instr_l:InstrList) -> Self{
         Simulator{
             simu_symtab:SymTab::new(),
-            src_symtab:src_symtab,
+            src_symtab:src_s,
             current_pos:0,
-            instr_list:instr_list,}
+            instr_list:instr_l,}
     }
-    pub fn start(&mut self,instr_slab:&InstrSlab) -> Result<()>{
+    pub fn load(&mut self,instr_slab:&InstrSlab) -> Result<()>{
         let instr = &self.instr_list;
         // 先扫一遍,找到所有的lebel并存入symtab
         for (idx,&l) in instr.iter().enumerate(){
@@ -46,15 +46,16 @@ impl Simulator{
         }
         Ok(())
     }
-    pub fn exec_till_breakpoint(&mut self,instr_slab:&InstrSlab) -> Result<()>{
+    pub fn exec_till_breakpoint(&mut self,instr_slab:&InstrSlab) -> Result<bool>{
         let instr = &self.instr_list;
+        // 运行完毕
         if self.current_pos >= instr.len() {
-            return Err(anyhow!("当前的指令位置已经超出指令列表范围"));
+            return Ok(false);
         }
         while self.current_pos < instr.len() {
 
             let instr_struct = instr_slab.get_instr(self.current_pos)?.clone();
-            println!("{:?}",instr_struct);
+            println!("当前指令为: {:?}",instr_struct);
             match &instr_struct.instr_type{
                 Label { label_symidx: _ } => (),
                 DefineFunc { func_symidx: _, ret_type: _, args: _ } => todo!(),
@@ -247,11 +248,18 @@ impl Simulator{
                         },
                     };
                 },
-                BreakPoint {  } => return Ok(()),
+                BreakPoint {  } => {
+                    // 由于breakpoint会直接return,需要提前改变current_pos
+                    self.current_pos+=1;
+                    return Ok(true)
+                }
             }
         self.current_pos += 1;
         }
-        Ok(())
+        println!("current_pos: {:?}",self.current_pos);
+        // 运行完毕
+        Ok(false)
     }
+
         
 }   
