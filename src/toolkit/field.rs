@@ -5,7 +5,7 @@ use anyhow::*;
 
 use super::ast_node::AstTree;
 use super::symtab::SymIdx;
-use crate::{node};
+use crate::node;
 
 pub type Fields = HashMap<&'static str, Box<dyn Field>>;
 
@@ -52,6 +52,10 @@ pub enum Value {
     F32(Option<f32>),
     I1(Option<bool>),
     Void,
+    Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
+    /// 这个类型用来表示不确定的值或其代数表达式
+    /// 例如 int a = getint() 由于 a取决于用户输入，那么我们不能直接使用 a的值，只能用一个代数符号表示
+    Unsure {},
 }
 #[derive(Clone,EnumIs,PartialEq)]
 pub enum Type {
@@ -61,6 +65,7 @@ pub enum Type {
     Void,
     Label,
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
+    Unsure {},
 }
 impl Clone for Box<dyn Field> {
     fn clone(&self) -> Box<dyn Field> { self.clone_box() }
@@ -69,6 +74,7 @@ impl Clone for Box<dyn Field> {
 impl Value {
     pub fn new_i32(value:i32) -> Self { Value::I32(Some(value)) }
     pub fn new_f32(value:f32) -> Self { Value::F32(Some(value)) }
+    pub fn new_unsure() -> Self {Value::Unsure {  }}
     pub fn new_i1(value:bool) -> Self { Value::I1(Some(value)) }
     pub fn new_void() -> Self { Value::Void }
     pub fn to_specific_type(&self,ty:&Type) -> Result<Value>{
@@ -78,20 +84,17 @@ impl Value {
             (Value::I32(_v), Type::I1) => todo!(),
             (Value::I32(_v), Type::Void) => todo!(),
             (Value::I32(_v), Type::Label) => todo!(),
-            (Value::I32(_v), Type::Fn { arg_syms: _, ret_sym: _ }) => todo!(),
             (Value::F32(_v), Type::I32) => todo!(),
             (Value::F32(v), Type::F32) => Ok(Value::new_f32(v.context("没毛病")? as f32)),
             (Value::F32(_v), Type::I1) => todo!(),
             (Value::F32(_v), Type::Void) => todo!(),
             (Value::F32(_v), Type::Label) => todo!(),
-            (Value::F32(_v), Type::Fn { arg_syms: _, ret_sym: _ }) => todo!(),
             (Value::I1(v), Type::I32) => Ok(Value::new_i32(v.context("I32 to I1 but not a i1")?.into())),
             (Value::I1(v), Type::F32) => Ok(Value::new_f32(v.context("F32 to I1 but not a f32")?.into())),
             (Value::I1(v), Type::I1) => Ok(Value::new_i1(v.context("没毛病")?.into())),
-            (Value::I1(_v), Type::Void) => todo!(),
-            (Value::I1(_v), Type::Label) => todo!(),
-            (Value::I1(_v), Type::Fn { arg_syms: _, ret_sym: _ }) => todo!(),
             (Value::Void, t) => Err(anyhow!("void 类型不能转化为 {:?} 类型",t)),
+            (Value::Fn { arg_syms, ret_sym }, t) => todo!(),
+            _ => Err(anyhow!("不能将 {:?} 转化为 {:?}",self,ty )),
         }
     }
     // pub fn as_specific_type(self) -> Self {
@@ -105,6 +108,7 @@ impl Value {
             Type::Void => Err(anyhow!("不能从string 转化为 Void 类型的value"))?,
             Type::Label => Err(anyhow!("不能从string 转化为 Label 类型的value"))?,
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("不能从string 转化为 Fn 类型的value"))?,
+            Type::Unsure {  } => Err(anyhow!("不能从string 转化为 Unsure 类型的value"))?,
         })
     }
     pub fn to_type(&self)->Type{
@@ -113,6 +117,8 @@ impl Value {
             Value::F32(_) => Type::F32,
             Value::I1(_) => Type::I1,
             Value::Void => Type::Void,
+            Value::Fn { arg_syms, ret_sym } => Type::Fn { arg_syms: arg_syms.clone(), ret_sym: ret_sym.clone() },
+            Value::Unsure {  } => todo!(),
         }
     }
     pub fn adapt(&self, value2:&Value) -> Type {
@@ -148,6 +154,7 @@ impl Type {
             Type::Void => todo!(),
             Type::Label => todo!(),
             Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
+            Type::Unsure {  } => todo!(),
         }
     }
 }
@@ -163,6 +170,7 @@ impl Debug for Type {
             }
             Type::Void => write!(f, "void"),
             Type::Label => write!(f, "label"),
+            Type::Unsure {  } => write!(f, "unsure"),
         }
     }
 }

@@ -99,6 +99,10 @@ impl SymTab {
     pub fn remove_symbol(&mut self, symbol_index:&SymIdx) { self.map.remove(symbol_index); }
     pub fn remove_symbol_verbose(&mut self, symbol_name:String, scope_node:u32) { self.map.remove(&SymIdx { scope_node, symbol_name, index_ssa:None }); }
 
+    pub fn has_symbol(&self, symidx:&SymIdx)->bool{
+        self.map.contains_key(symidx)
+    }
+
     pub fn get_mut_global_info(&mut self) -> &mut Symbol{
         self.get_mut_symbol_verbose(COMPILATION_UNIT.to_string(),0).unwrap()
     }
@@ -126,7 +130,7 @@ impl Debug for SymIdx {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
         match self.index_ssa {
             // Some(index_ssa) => write!(f, "{} _s{} _i{}", self.symbol_name, self.scope_node, index_ssa),
-            Some(index_ssa) => write!(f, "{}_i{}", self.symbol_name, index_ssa),
+            Some(index_ssa) => write!(f, "{}_s{} _i{}", self.symbol_name, self.scope_node, index_ssa),
             // None => write!(f, "{} _s{}", self.symbol_name, self.scope_node),
             None => write!(f, "{} _s{}", self.symbol_name, self.scope_node),
         }

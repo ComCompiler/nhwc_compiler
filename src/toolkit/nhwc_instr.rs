@@ -97,8 +97,8 @@ pub enum ArithOp {
 }
 #[derive(Clone)]
 pub struct FuncOp {
-    pub func:SymIdx,
-    pub args:Vec<SymIdx>, //存储所有的实参
+    pub func_symidx:SymIdx,
+    pub actual_arg_symidx_vec:Vec<SymIdx>, //存储所有的实参
     pub ret_type:Type
 }
 #[derive(Clone,PartialEq,Eq)]
@@ -168,7 +168,7 @@ pub enum InstrType {
     Arith { lhs:SymIdx, rhs:ArithOp },
     SimpleAssign { lhs:SymIdx, rhs:SymIdx },
     // 调用函数
-    Call { assigned:Option<SymIdx>, func_op:FuncOp },
+    Call { op_assigned_symidx:Option<SymIdx>, func_op:FuncOp },
     // 跳转  break continue  return  etc.
     Jump { jump_op:JumpOp },
     // phi node
@@ -204,7 +204,7 @@ impl Instruction {
             InstrType::SimpleAssign { lhs, rhs:_ } => {
                  vec![lhs] 
             },
-            InstrType::Call { assigned, func_op:_} => if let  Some(symidx)= assigned{
+            InstrType::Call { op_assigned_symidx: assigned, func_op:_} => if let  Some(symidx)= assigned{
                 vec![symidx]
             }else{
                 vec![]
@@ -239,8 +239,8 @@ impl Instruction {
             InstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
-            InstrType::Call { assigned, func_op } => if let  _symidx= assigned{
-                func_op.args.iter().collect_vec()
+            InstrType::Call { op_assigned_symidx: assigned, func_op } => if let  _symidx= assigned{
+                func_op.actual_arg_symidx_vec.iter().collect_vec()
             }else{
                 vec![]
             },
@@ -281,7 +281,7 @@ impl Instruction {
             InstrType::SimpleAssign { lhs, rhs:_ } => {
                  vec![lhs] 
             },
-            InstrType::Call { assigned, func_op:_ } => if let  Some(symidx)= assigned{
+            InstrType::Call { op_assigned_symidx: assigned, func_op:_ } => if let  Some(symidx)= assigned{
                 vec![symidx]
             }else{
                 vec![]
@@ -316,8 +316,8 @@ impl Instruction {
             InstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
-            InstrType::Call { assigned, func_op } => if let  _symidx= assigned{
-                func_op.args.iter_mut().collect_vec()
+            InstrType::Call { op_assigned_symidx: assigned, func_op } => if let  _symidx= assigned{
+                func_op.actual_arg_symidx_vec.iter_mut().collect_vec()
             }else{
                 vec![]
             },
@@ -449,7 +449,7 @@ impl InstrType {
     // Instruction -> Call -> FuncOp
     pub fn new_func_call(assigned:Option<SymIdx>, func:SymIdx, args:Vec<SymIdx>,ret_type:Type) -> Self {
         //也许可以直接传入一个Func结构体
-        Self::Call { assigned, func_op:FuncOp { func, args,ret_type } }
+        Self::Call { op_assigned_symidx: assigned, func_op:FuncOp { func_symidx: func, actual_arg_symidx_vec: args,ret_type } }
     }
     // Instruction -> Jump ->JumpOp
     pub fn new_ret(ret_sym:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::Ret { ret_sym } } }
@@ -508,10 +508,10 @@ impl Debug for ArithOp {
 }
 impl Debug for FuncOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let new_str:Vec<&str> = self.args.iter().map(|x| x.symbol_name.as_str()).collect();
+        let new_str:Vec<&str> = self.actual_arg_symidx_vec.iter().map(|x| x.symbol_name.as_str()).collect();
         let arg = new_str.join(", ");
 
-        write!(f, " Call {:?} {:?}({})", self.ret_type,self.func, arg)
+        write!(f, " Call {:?} {:?}({})", self.ret_type,self.func_symidx, arg)
     }
 }
 impl Debug for JumpOp {
@@ -559,7 +559,7 @@ impl Debug for InstrType {
             }
             InstrType::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
             InstrType::SimpleAssign { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
-            InstrType::Call { assigned, func_op } => match assigned {
+            InstrType::Call { op_assigned_symidx: assigned, func_op } => match assigned {
                 Some(symidx) => write!(f, "{:?} = {:?}",symidx, func_op),
                 None => write!(f, "{:?}", func_op),
             },

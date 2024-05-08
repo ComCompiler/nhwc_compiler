@@ -346,7 +346,9 @@ macro_rules! add_symbol {
             })?
             $(
                 let sym =  $symtab.get_mut_symbol(&symidx).unwrap();
-                sym.add_field($field_name,Box::new($field_value));
+                paste::paste!{
+                    sym.[<add_ $field_name:lower>]($field_value);
+                };
             )*
             symidx
         }

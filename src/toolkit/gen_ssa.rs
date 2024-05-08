@@ -85,7 +85,9 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
     refresh_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
     // 添加 ssa_index 0 作为NULl ，一开始所有变量的 reaching_def 都是 NULl
     for (func_symidx,_cfg_func_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.clone().iter(){
-        for src_symidx in symtab.get_symbol(func_symidx)?.get_declared_vars()?.clone(){
+        let src_symidx_vec = symtab.get_mut_symbol(func_symidx)?.get_mut_declared_vars()?.clone();
+        symtab.get_mut_symbol(func_symidx)?.get_mut_declared_vars()?.clear();
+        for src_symidx in src_symidx_vec{
             // let symbol = symtab.get_mut_symbol(&src_symidx)?;
             // symbol.add_reaching_def_with_debug(None, symtab, op_symtab_graph)
             add_field!(
@@ -95,6 +97,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
             );
             // let src_type = symtab.get_symbol(&src_symidx)?.get_type()?.clone();
         }
+        // 清空弹夹，因为后面ssa后全都重命名了，那么之前的值就没啥用了 
     }
 
     for (_func_symidx,cfg_func_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.clone().iter(){
@@ -121,17 +124,21 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                     }
                 }
                 // for any instr i
-                for def_symidx in instr_struct.get_mut_def_symidx_vec().iter_mut(){
+                for def_symidx in instr_struct.get_mut_def_symidx_vec(){
                     // symtab.get_mut_symbol(def_symidx)?.get_instr()
                     let &is_const = symtab.get_symbol(&def_symidx)?.get_is_const()?;
                     let &is_temp = symtab.get_symbol(&def_symidx)?.get_is_temp()?;
                     if !is_const{
                         let new_ssa_symidx = symtab.get_symbol(def_symidx)?.get_ssa_max_ssa_idx()?.get_next_ssa_symidx();
+                        let func_cor_symbol = node!(at cfg_node in cfg_graph).get_func_cor_symidx()?;
+
+                        // 更新 func symidx 对 此函数所定义变量的记录
+                        symtab.get_mut_symbol(func_cor_symbol)?.get_mut_declared_vars()?.push(new_ssa_symidx.clone());
+
                         *symtab.get_mut_symbol(def_symidx)?.get_mut_ssa_max_ssa_idx()? = new_ssa_symidx.clone();
 
                         debug_info_yellow!("reach_def_symidx {:?} in instr {}",def_symidx,instr);
                         update_reaching_def(instr, def_symidx, symtab, cfg_graph, dj_graph, instr_slab)?;
-
                         let new_symidx = add_symbol!({new_ssa_symidx.into_symbol()}
                             // with field TYPE:{}
                             // with field DEF_INSTRS_VEC:{Vec::<usize>::new()}
@@ -142,7 +149,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
 
                         let src_symidx  = def_symidx.clone();
                         // replace the definition of src_symidx by def_symidx
-                        **def_symidx = new_symidx.clone();
+                        *def_symidx = new_symidx.clone();
                         // symtab.get_mut_symbol(&src_symidx).
                         // 以下构建def use 链
                         let cloned_src_reaching_def = symtab.get_symbol(&src_symidx)?.get_ssa_reaching_def()?.clone();

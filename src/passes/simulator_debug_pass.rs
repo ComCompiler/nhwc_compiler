@@ -1,3 +1,5 @@
+use std::vec;
+
 use crate::{add_node, add_node_with_edge, toolkit::{cfg_node::InstrList, context::NhwcContext, field::Type, nhwc_instr::{InstrSlab, InstrType}, pass_manager::Pass, simulator::Simulator, symtab::{SymIdx, SymTab, SymTabEdge, SymTabGraph}}};
 use anyhow::{Ok, Result};
 use crate::toolkit::dot::Config;
@@ -15,7 +17,7 @@ impl SimulatorDebugPass {
 impl Pass for SimulatorDebugPass {
     // 运行这个pass
     fn run(&mut self, ctx:&mut NhwcContext)  -> Result<()>{ 
-        let mut instr_slab = InstrSlab::new();
+        let instr_slab = &mut ctx.instr_slab;
         // 定义一些变量
         let a = SymIdx::new(1, "a".to_string());
         let b = SymIdx::new(1, "b".to_string());
@@ -27,25 +29,40 @@ impl Pass for SimulatorDebugPass {
         let label2 = SymIdx::new(1, "label2".to_string());
         let jump1 = SymIdx::new(1, "1".to_string());
 
+        let func1_sum = SymIdx::new(0, "sum".to_string());
+        let func_ret_type = SymIdx::new(1, "I32".to_string());
+        let d:SymIdx = SymIdx::new(1, "d".to_string());
+        let e:SymIdx = SymIdx::new(1, "e".to_string());
+
+        let temp_0:SymIdx = SymIdx::new_verbose(14, "temp_5".to_string(),Some(0));
+        let temp_1:SymIdx = SymIdx::new_verbose(14, "temp_5".to_string(),Some(1));
 
         // 定义一些指令
         let instrs = vec![ 
-            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, a.clone(), a_val).to_instr()),    // a=3
+            1,23,24,25,
+            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, a.clone(), a_val.clone()).to_instr()),    // a=3
+            // instr_slab.insert_instr(InstrType::new_def_var(Type::I32, temp_0, a_val.clone()).to_instr()),    // a=3
+            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, temp_1, a_val).to_instr()),    // a=3
             instr_slab.insert_instr(InstrType::new_def_var(Type::I32, b.clone(), b_val).to_instr()),    // b=2
-            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, c.clone(), c_val).to_instr()),    // c=0
-
-            instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "b1".to_string())).to_instr()),     // breakpoint1
-            instr_slab.insert_instr(InstrType::new_jump(label1.clone()).to_instr()),                    // jump label1
-            instr_slab.insert_instr(InstrType::new_label(label1.clone()).to_instr()),                   // label1
-            
-            instr_slab.insert_instr(InstrType::new_add(c.clone(),b.clone(),a.clone(),Type::I32).to_instr()),    //c=a+b
-            instr_slab.insert_instr(InstrType::new_icmp(a.clone(),Sgt,b.clone(),c.clone(),I32).to_instr()),     //a = b > c false
+            // instr_slab.insert_instr(InstrType::new_def_var(Type::I32, c.clone(), c_val).to_instr()),    // c=0
+            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, d.clone(), c_val).to_instr()),    // c=0
 
             instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "b2".to_string())).to_instr()),     // breakpoint1
 
-            instr_slab.insert_instr(InstrType::new_br(a.clone(), label1.clone() , label2.clone()).to_instr()),  // if a {label1} else {label2}
-            instr_slab.insert_instr(InstrType::new_label(label2.clone()).to_instr()),                     // label2
+            instr_slab.insert_instr(InstrType::new_func_call(Option::Some(d),func1_sum,vec![a.clone(),b.clone()],Type::I32).to_instr()),
+            instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "func1_sum done".to_string())).to_instr()),     // breakpoint1
+            // instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "b1".to_string())).to_instr()),     // breakpoint1
+            // instr_slab.insert_instr(InstrType::new_jump(label1.clone()).to_instr()),                    // jump label1
+            // instr_slab.insert_instr(InstrType::new_label(label1.clone()).to_instr()),                   // label1
+            
+            // instr_slab.insert_instr(InstrType::new_add(c.clone(),b.clone(),a.clone(),Type::I32).to_instr()),    //c=a+b
+            // instr_slab.insert_instr(InstrType::new_icmp(a.clone(),Sgt,b.clone(),c.clone(),I32).to_instr()),     //a = b > c false
 
+
+            // instr_slab.insert_instr(InstrType::new_br(a.clone(), label1.clone() , label2.clone()).to_instr()),  // if a {label1} else {label2}
+            // instr_slab.insert_instr(InstrType::new_label(label2.clone()).to_instr()),                     // label2
+
+            
         ];
         
         let instrlist = InstrList{
@@ -53,8 +70,9 @@ impl Pass for SimulatorDebugPass {
             outdated:true,
         };
         // 实例化simulator
-        let mut simu = Simulator::new(ctx.symtab.clone(),instrlist);
+        let mut simu = Simulator::new(instrlist);
         simu.load( &instr_slab)?;
+        simu.cur_instr_pos = 4;
 
         
         if self.is_gen_png{
@@ -63,7 +81,7 @@ impl Pass for SimulatorDebugPass {
             let root = 0;
             // add_node_with_edge!({simu.symtab.clone()} with edge {SymTabEdge::new("SimulatorDebugPass".to_owned())} from root in simulator_g);
             add_node!({simu.simu_symtab.clone()} to simulator_g);
-            while let Some(bp_symidx) = simu.exec_till_breakpoint(&instr_slab)? {
+            while let Some(bp_symidx) = simu.exec_till_breakpoint(&instr_slab,&ctx.symtab)? {
                 let node_count= simulator_g.node_count() as u32 -1;
                 add_node_with_edge!({simu.simu_symtab.clone()} with edge {SymTabEdge::new(format!("{:?}",bp_symidx))} from node_count in simulator_g);
             }

@@ -50,7 +50,7 @@ reg_field_for_struct!(Symbol {
         FUNC_CALL_VEC:Vec<SymIdx>,
     } with_fields fields);
 reg_field_for_struct!(CfgNode {
-    COR_FUNC_SYMIDX:SymIdx,
+    FUNC_COR_SYMIDX:SymIdx,
     DEF_SYMIDX_INSTR_TUPLE_VEC:Vec<(SymIdx,usize)>,
 } with_fields info);
 // for Instruction
@@ -564,7 +564,7 @@ fn process_symbol(
                 with_field IS_CONST:{false}
                 with_field IS_TEMP:{false} 
             to symtab debug op_symtab_graph);
-            let func_symidx = node_mut!(at cfg_node in cfg_graph).get_cor_func_symidx_with_debug(&symtab,op_symtab_graph)?;
+            let func_symidx = node_mut!(at cfg_node in cfg_graph).get_func_cor_symidx_with_debug(&symtab,op_symtab_graph)?;
             symtab.get_mut_symbol(&func_symidx)?.get_mut_declared_vars()?.push(symidx.clone());
             Ok(symidx)
         }
@@ -603,7 +603,7 @@ fn process_temp_symbol(
             to symtab debug symtab_graph);
         *counter+=1;       
         let temp_instr = InstrType::new_def_var(temp_type, temp_symidx.clone(), SymIdx::new(scope_node, format!(""))).to_instr();
-        let func_symidx = node_mut!(at cfg_node in cfg_graph).get_cor_func_symidx()?;
+        let func_symidx = node_mut!(at cfg_node in cfg_graph).get_func_cor_symidx()?;
         symtab.get_mut_symbol(&func_symidx)?.get_mut_declared_vars()?.push(temp_symidx.clone());
         push_instr!(temp_instr to cfg_node in cfg_graph slab instr_slab);
         Ok(temp_symidx)
@@ -1332,7 +1332,7 @@ fn parse_func2nhwc(
         let mut arg_syms:Vec<SymIdx> = vec![];
         //添加到符号表中，
         let func_symidx = process_func_symbol(symtab,  op_symtab_graph,func_name)?;
-        let _:Vec<_> = etc::dfs(cfg_graph, cfg_entry).iter().map(|&cfg_node|{node_mut!(at cfg_node in cfg_graph).add_cor_func_symidx(func_symidx.clone())}).collect();
+        let _:Vec<_> = etc::dfs(cfg_graph, cfg_entry).iter().map(|&cfg_node|{node_mut!(at cfg_node in cfg_graph).add_func_cor_symidx(func_symidx.clone())}).collect();
         // 添加返回值到符号表
         let func_ret_symidx = process_symbol(ast_tree, scope_tree, symtab, &DeclOrDefOrUse::DeclDef { type_ast_node: ast_retype }, &format!("{}_{}",func_name,"ret"), 0, op_symtab_graph, cfg_entry, cfg_graph)?;
         //函数有参数
@@ -1466,13 +1466,13 @@ pub fn insert_bb_between(cfg_node1:u32, cfg_node2:u32, cfg_graph:&mut CfgGraph) 
     if  cfg_former_edge_removed.cfg_edge_type.is_direct() {
         // 如果这条边本身就是一条普通边，那么就允许insert
         let mut bb_struct = CfgNode::new_bb(vec![]);
-        bb_struct.add_cor_func_symidx(node!(at cfg_node1 in cfg_graph).get_cor_func_symidx()?.clone());
+        bb_struct.add_func_cor_symidx(node!(at cfg_node1 in cfg_graph).get_func_cor_symidx()?.clone());
         let new_bb = add_node_with_edge!({bb_struct} with edge {cfg_former_edge_removed} from cfg_node1 in cfg_graph);
         add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node2 in cfg_graph);
         Ok(new_bb)
     } else if cfg_former_edge_removed.cfg_edge_type.is_body_head() ||cfg_former_edge_removed.cfg_edge_type.is_body_tail()  {
         let mut bb_struct = CfgNode::new_bb(vec![]);
-        bb_struct.add_cor_func_symidx(node!(at cfg_node1 in cfg_graph).get_cor_func_symidx()?.clone());
+        bb_struct.add_func_cor_symidx(node!(at cfg_node1 in cfg_graph).get_func_cor_symidx()?.clone());
         let new_bb = add_node_with_edge!({bb_struct} with edge {CfgEdge::new_direct()} from cfg_node1 in cfg_graph);
         add_edge!({cfg_former_edge_removed} from new_bb to cfg_node2 in cfg_graph);
         Ok(new_bb)
