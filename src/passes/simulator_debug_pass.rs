@@ -39,18 +39,30 @@ impl Pass for SimulatorDebugPass {
 
         // 定义一些指令
         let instrs = vec![ 
-            1,23,24,25,
-            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, a.clone(), Some(a_val.clone())).to_instr()),    // a=3
-            // instr_slab.insert_instr(InstrType::new_def_var(Type::I32, temp_0, a_val.clone()).to_instr()),    // a=3
-            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, temp_1, Some(a_val)).to_instr()),    // a=3
-            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, b.clone(), Some(b_val)).to_instr()),    // b=2
-            // instr_slab.insert_instr(InstrType::new_def_var(Type::I32, c.clone(), c_val).to_instr()),    // c=0
-            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, d.clone(),Some(c_val)).to_instr()),    // c=0
+            // Fibo函数声明
+            1, 25,26,27,
+            instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "1".to_string())).to_instr()),     // breakpoint1
+            0,
+            // instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "2".to_string())).to_instr()),     // breakpoint1
+            17,18,
+            // instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "3".to_string())).to_instr()),     // breakpoint1
+            19, 
+            15,14, 
+            instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "4".to_string())).to_instr()),     // breakpoint1
+            16,22,23,24, 
+            instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "5".to_string())).to_instr()),     // breakpoint1
+            20,13,
+            instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "6".to_string())).to_instr()),     // breakpoint1
+            21,2,3,4,
+            instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "4 -> 5".to_string())).to_instr()),     // breakpoint1
+            5,6,7,8,9,10,11,12,
+            instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "7".to_string())).to_instr()),     // breakpoint1
 
-            instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "b2".to_string())).to_instr()),     // breakpoint1
-
-            instr_slab.insert_instr(InstrType::new_func_call(Option::Some(d),func1_sum,vec![a.clone(),b.clone()],Type::I32).to_instr()),
-            instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "func1_sum done".to_string())).to_instr()),     // breakpoint1
+            // 0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
+            // instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "fibonacci declared".to_string())).to_instr()),     // breakpoint1
+            // main
+            
+            instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "func Fibonacci done".to_string())).to_instr()),     // breakpoint1
             // instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "b1".to_string())).to_instr()),     // breakpoint1
             // instr_slab.insert_instr(InstrType::new_jump(label1.clone()).to_instr()),                    // jump label1
             // instr_slab.insert_instr(InstrType::new_label(label1.clone()).to_instr()),                   // label1
@@ -72,7 +84,7 @@ impl Pass for SimulatorDebugPass {
         // 实例化simulator
         let mut simu = Simulator::new(instrlist);
         simu.load( &instr_slab)?;
-        simu.cur_instr_pos = 4;
+        simu.cur_instr_pos = 0;
 
         
         if self.is_gen_png{
@@ -81,12 +93,19 @@ impl Pass for SimulatorDebugPass {
             let root = 0;
             // add_node_with_edge!({simu.symtab.clone()} with edge {SymTabEdge::new("SimulatorDebugPass".to_owned())} from root in simulator_g);
             add_node!({simu.simu_symtab.clone()} to simulator_g);
+            let mut idx:i32=0;
             while let Some(bp_symidx) = simu.exec_till_breakpoint(&instr_slab,&ctx.symtab)? {
+                println!("断电: {:?}", bp_symidx);
                 let node_count= simulator_g.node_count() as u32 -1;
                 add_node_with_edge!({simu.simu_symtab.clone()} with edge {SymTabEdge::new(format!("{:?}",bp_symidx))} from node_count in simulator_g);
                 simu.clear_text();
-                simu.load_instr_text(Some(3),instr_slab,)?;
+                simu.load_instr_text(Some(6),instr_slab,)?;
+                simu.load_stack_text()?;
                 println!("{:?}",simu);
+                idx+=1;
+                if idx>5{
+                    break
+                }
             }
             
             

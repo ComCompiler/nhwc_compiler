@@ -27,6 +27,7 @@ pub struct Simulator{
 }
 pub struct FuncCallCtx{
     func_symidx:SymIdx,   
+    args:Vec<Value>,
     ctx_symidx_value_tuple_vec:Vec<(SymIdx,Value)>,
     formal_ret_symidx:SymIdx,
     instr_pos_before_call:usize,
@@ -34,13 +35,14 @@ pub struct FuncCallCtx{
 }
 impl FuncCallCtx{
     // new 函数
-    pub fn new(func_symidx:SymIdx, ret_symidx:SymIdx,ctx_symidx_value_tuple_vec:Vec<(SymIdx,Value)>, instr_pos_before_call:usize, op_assigned_symidx:Option<SymIdx>) -> Self{
+    pub fn new(func_symidx:SymIdx, ret_symidx:SymIdx,args:Vec<Value>,ctx_symidx_value_tuple_vec:Vec<(SymIdx,Value)>, instr_pos_before_call:usize, op_assigned_symidx:Option<SymIdx>) -> Self{
         FuncCallCtx{
             func_symidx,
             ctx_symidx_value_tuple_vec,
             instr_pos_before_call,
             formal_ret_symidx: ret_symidx,
             op_assigned_symidx,
+            args,
         }
     }
     // pub fn new(func_symidx:SymIdx, ){
@@ -137,21 +139,25 @@ impl Simulator{
         // 由于可能存在递归导致把 值覆盖，我们先保存一下后面再恢复上下文
 
         // 获取形参以及返回值
+        let mut args_vec = vec![];
         let func_type = self.simu_symtab.get_symbol(func_symidx)?.get_type()?.clone();
         let ret_symidx = if let Type::Fn { arg_syms: formal_arg_symidx_vec, ret_sym: ret_symidx } = func_type {
             // 实参赋值给形参
             if formal_arg_symidx_vec.len()!= actual_args_vec.len() {
                 return Err(anyhow!("实参和形参数量不一致"));
             }
+            
             for (formal_arg_symidx,actual_arg_symidx) in formal_arg_symidx_vec.iter().zip(actual_args_vec.iter()) {
                 *self.simu_symtab.get_mut_symbol(formal_arg_symidx)?.get_mut_simu_val()? = self.simu_symtab.get_symbol(actual_arg_symidx)?.get_simu_val()?.clone();
+                args_vec.push(self.simu_symtab.get_symbol(actual_arg_symidx)?.get_simu_val()?.clone());
             }
+            
             ret_symidx.clone()
         }else{
             return Err(anyhow!("在 simulator 中运行的call语句对象不是函数类型"));
         };
         // 先保留调用此函数之前的 cur_instr_pos
-        self.func_call_ctx_stack.push(FuncCallCtx::new(func_symidx.clone(), ret_symidx,ctx_symidx_value_tuple_vec, self.cur_instr_pos,op_assinged_symidx.cloned()));
+        self.func_call_ctx_stack.push(FuncCallCtx::new(func_symidx.clone(), ret_symidx,args_vec, ctx_symidx_value_tuple_vec, self.cur_instr_pos,op_assinged_symidx.cloned()));
         // 跳转
         self.cur_instr_pos = *self.simu_symtab.get_symbol(func_symidx)?.get_simu_label_pos()?;
         Ok(())
@@ -177,7 +183,7 @@ impl Simulator{
     /// 执行单条命令，返回 执行的Instruction的引用，并且，不会对cur_instr_pos 进行增加 返回 执行的Instruction 
     pub fn exec_single_instr(&mut self, instr_slab:&InstrSlab, src_symtab:&SymTab) -> Result<Instruction>{
         let instr_struct = instr_slab.get_instr(self.instr_list[self.cur_instr_pos])?;
-
+        println!("exec_single_instr : {:?}",instr_struct);
         for def_symidx in instr_struct.get_def_symidx_vec(){
             let simu_symtab = &mut self.simu_symtab;
             if !simu_symtab.has_symbol(def_symidx){
@@ -186,6 +192,15 @@ impl Simulator{
                 to simu_symtab);
             }
         }
+        for use_symidx in instr_struct.get_use_symidx_vec(){
+            let simu_symtab = &mut self.simu_symtab;
+            if !simu_symtab.has_symbol(use_symidx) && *src_symtab.get_symbol(use_symidx)?.get_is_const()?{
+                add_symbol!({Symbol::new_from_symidx(use_symidx)}
+                    with_field SIMU_VAL:{Value::from_string_with_specific_type(&src_symtab.get_symbol(use_symidx)?.symidx.symbol_name, src_symtab.get_symbol(use_symidx)?.get_type()?)?}
+                to simu_symtab);
+            }
+        }
+
         match &instr_struct.instr_type{
             Label { label_symidx: _ } => (),
             DefineFunc { func_symidx: _, ret_symidx: _, args: _ } => {},
@@ -422,6 +437,14 @@ impl Simulator{
         }
         Ok(())
     }
+    /// 往 text 中添加 栈 的信息
+    pub fn load_stack_text(&mut self) -> Result<()>{
+        for i in 0..self.func_call_ctx_stack.len() {
+            let stack_ctx = &self.func_call_ctx_stack[i];
+            self.text += format!("layer{}: {:?}\n", i, stack_ctx).as_str();
+        }
+        Ok(())
+    }
     pub fn clear_text(&mut self){
         self.text.clear()
     }
@@ -431,5 +454,10 @@ impl Simulator{
 impl Debug for Simulator{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f,"{}",self.text)
+    }
+}
+impl Debug for FuncCallCtx{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f,"func_symidx : {:?} \n args : {:?}",self.func_symidx,self.args)
     }
 }

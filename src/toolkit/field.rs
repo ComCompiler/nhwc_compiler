@@ -118,7 +118,7 @@ impl Value {
             Value::I1(_) => Type::I1,
             Value::Void => Type::Void,
             Value::Fn { arg_syms, ret_sym } => Type::Fn { arg_syms: arg_syms.clone(), ret_sym: ret_sym.clone() },
-            Value::Unsure {  } => todo!(),
+            Value::Unsure {  } => Type::Unsure {  },
         }
     }
     pub fn adapt(&self, value2:&Value) -> Type {
