@@ -40,12 +40,12 @@ impl Pass for SimulatorDebugPass {
         // 定义一些指令
         let instrs = vec![ 
             1,23,24,25,
-            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, a.clone(), a_val.clone()).to_instr()),    // a=3
+            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, a.clone(), Some(a_val.clone())).to_instr()),    // a=3
             // instr_slab.insert_instr(InstrType::new_def_var(Type::I32, temp_0, a_val.clone()).to_instr()),    // a=3
-            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, temp_1, a_val).to_instr()),    // a=3
-            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, b.clone(), b_val).to_instr()),    // b=2
+            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, temp_1, Some(a_val)).to_instr()),    // a=3
+            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, b.clone(), Some(b_val)).to_instr()),    // b=2
             // instr_slab.insert_instr(InstrType::new_def_var(Type::I32, c.clone(), c_val).to_instr()),    // c=0
-            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, d.clone(), c_val).to_instr()),    // c=0
+            instr_slab.insert_instr(InstrType::new_def_var(Type::I32, d.clone(),Some(c_val)).to_instr()),    // c=0
 
             instr_slab.insert_instr(InstrType::new_breakpoint(SymIdx::new(0, "b2".to_string())).to_instr()),     // breakpoint1
 
@@ -84,6 +84,9 @@ impl Pass for SimulatorDebugPass {
             while let Some(bp_symidx) = simu.exec_till_breakpoint(&instr_slab,&ctx.symtab)? {
                 let node_count= simulator_g.node_count() as u32 -1;
                 add_node_with_edge!({simu.simu_symtab.clone()} with edge {SymTabEdge::new(format!("{:?}",bp_symidx))} from node_count in simulator_g);
+                simu.clear_text();
+                simu.load_instr_text(Some(3),instr_slab,)?;
+                println!("{:?}",simu);
             }
             
             

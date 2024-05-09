@@ -163,7 +163,7 @@ pub enum InstrType {
     //定义函数
     DefineFunc { func_symidx:SymIdx, ret_symidx:SymIdx, args:Vec<SymIdx> },
     //定义变量
-    DefineVar { var_symidx:SymIdx, vartype:Type, value:SymIdx },
+    DefineVar { var_symidx:SymIdx, vartype:Type, op_value:Option<SymIdx> },
     // 算数运算符 + - * / etc.
     Arith { lhs:SymIdx, rhs:ArithOp },
     SimpleAssign { lhs:SymIdx, rhs:SymIdx },
@@ -197,7 +197,7 @@ impl Instruction {
                     symidx_vec
                 }
             },
-            InstrType::DefineVar { var_symidx, vartype:_, value:_ } => {
+            InstrType::DefineVar { var_symidx, vartype:_, op_value:_ } => {
                 vec![var_symidx]
             },
             InstrType::Arith { lhs, rhs:_ } => { vec![lhs] },
@@ -221,7 +221,7 @@ impl Instruction {
             InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args:_ } => {
                 vec![]
             },
-            InstrType::DefineVar { var_symidx:_, vartype:_, value:_ } => {
+            InstrType::DefineVar { var_symidx:_, vartype:_, op_value:_ } => {
                 vec![]
             },
             InstrType::Arith { lhs:_, rhs } => { match rhs{
@@ -274,7 +274,7 @@ impl Instruction {
 
                 }
             },
-            InstrType::DefineVar { var_symidx, vartype:_, value:_ } => {
+            InstrType::DefineVar { var_symidx, vartype:_, op_value:_ } => {
                 vec![var_symidx]
             },
             InstrType::Arith { lhs, rhs:_ } => { vec![lhs] },
@@ -298,7 +298,7 @@ impl Instruction {
             InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args:_ } => {
                 vec![]
             },
-            InstrType::DefineVar { var_symidx:_, vartype:_, value:_ } => {
+            InstrType::DefineVar { var_symidx:_, vartype:_, op_value:_ } => {
                 vec![]
             },
             InstrType::Arith { lhs:_, rhs } => { match rhs{
@@ -429,7 +429,7 @@ impl InstrType {
     
     pub fn new_def_func(func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx>) -> Self { Self::DefineFunc { func_symidx, ret_symidx: ret_type, args } }
 
-    pub fn new_def_var(vartype:Type, varname:SymIdx, value:SymIdx) -> Self { Self::DefineVar { var_symidx:varname, vartype, value } }
+    pub fn new_def_var(vartype:Type, varname:SymIdx, value:Option<SymIdx>) -> Self { Self::DefineVar { var_symidx:varname, vartype, op_value: value } }
 
     // Instruction -> Arith -> ArithOp
     pub fn new_add(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::Add { a, b, vartype } } }
@@ -550,11 +550,10 @@ impl Debug for InstrType {
             InstrType::DefineFunc { func_symidx, ret_symidx, args } => {
                 write!(f, "Define {:?} {:?} {:?}", ret_symidx, func_symidx, args)
             }
-            InstrType::DefineVar { var_symidx: varname, vartype, value } => {
-                if value.symbol_name.is_empty() {
-                    Ok(write!(f, "Alloc {:?} %{:?}", vartype, varname)?)
-                } else {
-                    Ok(write!(f, "Alloc {:?} %{:?} = {:?}", vartype, varname, value)?)
+            InstrType::DefineVar { var_symidx: varname, vartype, op_value: value } => {
+                match value{
+                    Some(value) => write!(f, "Alloc {:?} %{:?} = {:?}", vartype, varname, value),
+                    None => write!(f, "Alloc {:?} %{:?}", vartype, varname),
                 }
             }
             InstrType::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),

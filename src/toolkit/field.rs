@@ -100,7 +100,7 @@ impl Value {
     // pub fn as_specific_type(self) -> Self {
 
     // }
-    pub fn from_string(s:&String,ty:&Type)->Result<Value>{
+    pub fn from_string_with_specific_type(s:&String,ty:&Type)->Result<Value>{
         Ok(match &ty{
             Type::I32 => Value::new_i32(s.parse()?),
             Type::F32 => Value::new_f32(s.parse()?),

@@ -602,7 +602,7 @@ fn process_temp_symbol(
             with_field IS_CONST:{false}
             to symtab debug symtab_graph);
         *counter+=1;       
-        let temp_instr = InstrType::new_def_var(temp_type, temp_symidx.clone(), SymIdx::new(scope_node, format!(""))).to_instr();
+        let temp_instr = InstrType::new_def_var(temp_type, temp_symidx.clone(), None).to_instr();
         let func_symidx = node_mut!(at cfg_node in cfg_graph).get_func_cor_symidx()?;
         symtab.get_mut_symbol(&func_symidx)?.get_mut_declared_vars()?.push(temp_symidx.clone());
         push_instr!(temp_instr to cfg_node in cfg_graph slab instr_slab);
@@ -1283,7 +1283,7 @@ fn parse_declaration2nhwc(
                         }
                         // let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
                         let transed_value_symidx = force_trans_type(cfg_graph, symtab, &var_type, &value_type, &value_symidx, decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
-                        let defvar_instr = InstrType::new_def_var(var_type, var_symidx, transed_value_symidx).to_instr();
+                        let defvar_instr = InstrType::new_def_var(var_type, var_symidx, Some(transed_value_symidx)).to_instr();
 
                         push_instr!(defvar_instr to cfg_node in cfg_graph slab instr_slab);
                     } else {
@@ -1300,7 +1300,7 @@ fn parse_declaration2nhwc(
                     let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab, &def_or_use, var_str, decl_parent_scope, symtab_g,cfg_node,cfg_graph)?;
                     //创建空值
                     let value_symidx = SymIdx::new(decl_parent_scope, "".to_string());
-                    let def_instr = InstrType::new_def_var(var_type, symbol_symidx.clone(), value_symidx).to_instr();
+                    let def_instr = InstrType::new_def_var(var_type, symbol_symidx.clone(), Some(value_symidx)).to_instr();
                     let instr = push_instr!(def_instr to cfg_node in cfg_graph slab instr_slab);
                     node_mut!(at cfg_node in cfg_graph).get_mut_def_symidx_instr_tuple_vec()?.push((symbol_symidx.clone(),instr));
                 }

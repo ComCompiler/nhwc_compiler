@@ -1,6 +1,8 @@
 use core::panic;
 
 use crate::toolkit::nhwc_instr::ArithOp::{Add , Sub, Mul, Div};
+use crate::toolkit::symtab;
+use std::fmt::Debug;
 use anyhow::*;
 
 use crate::{add_symbol, make_field_trait_for_struct, reg_field_for_struct};
@@ -21,6 +23,7 @@ pub struct Simulator{
     pub cur_instr_pos: usize,
     pub instr_list:InstrList,
     pub func_call_ctx_stack:Vec<FuncCallCtx>,
+    pub text:String,
 }
 pub struct FuncCallCtx{
     func_symidx:SymIdx,   
@@ -52,12 +55,16 @@ impl Simulator{
             cur_instr_pos:0,
             instr_list:instr_l,
             func_call_ctx_stack: vec![],
+            text: String::new(),
         }
     }
+    /// load函数负责在运行前将所有包含的函数符号及其参数和形式返回值以及label和Deffunc行号记录在案  
+    /// 以确定跳转位置(ret or br)
     pub fn load(&mut self,instr_slab:&InstrSlab) -> Result<()>{
         let instr = &self.instr_list;
         let simu_symtab = &mut self.simu_symtab;
-        // 先扫一遍,找到所有的lebel并存入symtab
+
+        // 先扫一遍,找到所有的label 并存入symtab
         for (idx,&l) in instr.iter().enumerate(){
             let instr_struct = instr_slab.get_instr(l)?.clone();
             match &instr_struct.instr_type {
@@ -110,7 +117,6 @@ impl Simulator{
                 return Ok(op_breakpoint_symidx);
             }
         }
-        println!("current_pos: {:?}",self.cur_instr_pos);
         // 运行完毕
         Ok(None)
     }
@@ -152,12 +158,18 @@ impl Simulator{
     }
 
     pub fn pop_func_call(&mut self,actual_ret_symidx:&SymIdx)->Result<()>{
-        // 恢复上下文还没做 
         let func_call_ctx = self.func_call_ctx_stack.pop().ok_or(anyhow!("simulator pop_func_call 出栈失败，因为栈为空"))?;
         self.cur_instr_pos = func_call_ctx.instr_pos_before_call;
+
+        // 将实际返回值 赋值给 形式返回值
         *self.simu_symtab.get_mut_symbol(&func_call_ctx.formal_ret_symidx)?.get_mut_simu_val()? = self.simu_symtab.get_symbol(actual_ret_symidx)?.get_simu_val()?.clone();
         if let Some(assigned_symidx) = func_call_ctx.op_assigned_symidx{
             *self.simu_symtab.get_mut_symbol(&assigned_symidx)?.get_mut_simu_val()? = self.simu_symtab.get_symbol(&func_call_ctx.formal_ret_symidx)?.get_simu_val()?.clone();
+        }
+
+        // 恢复上下文
+        for (symidx,value) in &func_call_ctx.ctx_symidx_value_tuple_vec{
+            *self.simu_symtab.get_mut_symbol(symidx)?.get_mut_simu_val()? = value.clone();
         }
         Ok(())
     }
@@ -165,11 +177,19 @@ impl Simulator{
     /// 执行单条命令，返回 执行的Instruction的引用，并且，不会对cur_instr_pos 进行增加 返回 执行的Instruction 
     pub fn exec_single_instr(&mut self, instr_slab:&InstrSlab, src_symtab:&SymTab) -> Result<Instruction>{
         let instr_struct = instr_slab.get_instr(self.instr_list[self.cur_instr_pos])?;
-        println!("当前指令为: {:?}",instr_struct);
+
+        for def_symidx in instr_struct.get_def_symidx_vec(){
+            let simu_symtab = &mut self.simu_symtab;
+            if !simu_symtab.has_symbol(def_symidx){
+                add_symbol!({Symbol::new_from_symidx(def_symidx)}
+                    with_field SIMU_VAL:{Value::new_unsure()}
+                to simu_symtab);
+            }
+        }
         match &instr_struct.instr_type{
             Label { label_symidx: _ } => (),
             DefineFunc { func_symidx: _, ret_symidx: _, args: _ } => {},
-            DefineVar { var_symidx, vartype, value } => {
+            DefineVar { var_symidx, vartype, op_value } => {
                 //add_symbol!({var_symidx.symbol_name} of scope {var_symidx.scope_node} with field )
                 // 我需要向symtab中加一个symbol的什么部分?
 
@@ -178,13 +198,15 @@ impl Simulator{
                     // field,       ?怎么获取?          add_field()?
                     // type,        vartype             add_type()?
                     // value)       value               ?
-                let mut var_symbol = Symbol::new_from_symidx(&var_symidx);
-                if value.symbol_name.is_empty(){
-                    var_symbol.add_simu_val(Value::new_i32(0));
-                }else{
-                    var_symbol.add_simu_val(Value::from_string(&value.symbol_name, &vartype)?);
+                if !self.simu_symtab.has_symbol(var_symidx){
+                    self.simu_symtab.add_symbol(var_symidx.clone().into_symbol())?;
                 }
-                self.simu_symtab.add_symbol(var_symbol)?;
+                match op_value{
+                    Some(value) => {
+                        self.simu_symtab.get_mut_symbol(var_symidx)?.add_simu_val(Value::from_string_with_specific_type(&value.symbol_name,vartype)?);
+                    },
+                    None => (),
+                }
             },
             Arith { lhs, rhs } => match rhs {
                 Add { a, b, vartype: _ } => {
@@ -370,4 +392,44 @@ impl Simulator{
         }
         Ok(instr_struct.clone())
     }
+    pub fn load_instr_text(&mut self,op_max_display_instr_num:Option<usize>,instr_slab:&InstrSlab) -> Result<()>{
+        let instr_pos_num_radius= (op_max_display_instr_num.or(Some(self.instr_list.len())).unwrap().min(self.instr_list.len())+1)/2-1;
+        let center_pos = self.cur_instr_pos.clamp(instr_pos_num_radius, self.instr_list.len() - instr_pos_num_radius-1);
+        for instr_idx in center_pos - instr_pos_num_radius .. center_pos {
+            if instr_idx == self.cur_instr_pos{
+                let instr = self.instr_list[instr_idx];
+                self.text += format!("{:3}{:?}\n","-->",instr_slab.get_instr(instr)?).as_str();
+            }else{
+                let instr = self.instr_list[instr_idx];
+                self.text += format!("{:3}{:?}\n","",instr_slab.get_instr(instr)?).as_str();
+            }
+        }
+        if center_pos == self.cur_instr_pos{
+            let instr = self.instr_list[center_pos];
+            self.text += format!("{:3}{:?}\n","-->",instr_slab.get_instr(instr)?).as_str();
+        }else{
+            let instr = self.instr_list[center_pos];
+            self.text += format!("{:3}{:?}\n","",instr_slab.get_instr(instr)?).as_str();
+        }
+        for instr_idx in center_pos+1 .. center_pos+instr_pos_num_radius+1 {
+            if instr_idx == self.cur_instr_pos{
+                let instr = self.instr_list[instr_idx];
+                self.text += format!("{:3}{:?}\n","-->",instr_slab.get_instr(instr)?).as_str();
+            }else{
+                let instr = self.instr_list[instr_idx];
+                self.text += format!("{:3}{:?}\n","",instr_slab.get_instr(instr)?).as_str();
+            }
+        }
+        Ok(())
+    }
+    pub fn clear_text(&mut self){
+        self.text.clear()
+    }
 }   
+
+
+impl Debug for Simulator{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f,"{}",self.text)
+    }
+}
