@@ -257,6 +257,16 @@ macro_rules! direct_child_nodes {
             .map(|e|e.target().index() as u32).collect();
         edges_vec
     }};
+    (at $node:ident in $graph:ident with_priority $f:block )=> {{
+        use petgraph::visit::EdgeRef;
+        let mut edges_vec:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing)
+            .filter(|e|$f(e)>0).collect();
+        edges_vec.sort_by_key(|e|$f(e));
+        let edges_vec:Vec<_> = edges_vec
+            .iter()
+            .map(|e|e.target().index() as u32).collect();
+        edges_vec
+    }};
 }
 /// 这个宏返回指定节点的outgoing 边，你必须保证这个节点的出边只有一条
 #[macro_export]

@@ -218,11 +218,14 @@ impl Instruction {
     pub fn get_use_symidx_vec(&self)->Vec<&SymIdx>{
         match &self.instr_type{
             InstrType::Label { label_symidx:_ } => vec![],
-            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args:_ } => {
+            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args } => {
                 vec![]
             },
-            InstrType::DefineVar { var_symidx:_, vartype:_, op_value:_ } => {
-                vec![]
+            InstrType::DefineVar { var_symidx:_, vartype:_, op_value } => {
+                match op_value{
+                    Some(value) => vec![value],
+                    None => vec![],
+                }
             },
             InstrType::Arith { lhs:_, rhs } => { match rhs{
                 ArithOp::Add { a, b, vartype:_ } => vec![a,b],
@@ -239,10 +242,8 @@ impl Instruction {
             InstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
-            InstrType::Call { op_assigned_symidx: assigned, func_op } => if let  _symidx= assigned{
+            InstrType::Call { op_assigned_symidx: assigned, func_op } => {
                 func_op.actual_arg_symidx_vec.iter().collect_vec()
-            }else{
-                vec![]
             },
             InstrType::Jump { jump_op } => {
                 match jump_op{
@@ -295,11 +296,14 @@ impl Instruction {
     pub fn get_mut_use_symidx_vec(&mut self)->Vec<&mut SymIdx>{
         match &mut self.instr_type{
             InstrType::Label { label_symidx:_ } => vec![],
-            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args:_ } => {
+            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args } => {
                 vec![]
             },
-            InstrType::DefineVar { var_symidx:_, vartype:_, op_value:_ } => {
-                vec![]
+            InstrType::DefineVar { var_symidx:_, vartype:_, op_value } => {
+                match op_value{
+                    Some(value) => vec![value],
+                    None => vec![],
+                }
             },
             InstrType::Arith { lhs:_, rhs } => { match rhs{
                 ArithOp::Add { a, b, vartype:_ } => vec![a,b],
@@ -316,10 +320,8 @@ impl Instruction {
             InstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
-            InstrType::Call { op_assigned_symidx: assigned, func_op } => if let  _symidx= assigned{
+            InstrType::Call { op_assigned_symidx: assigned, func_op } => {
                 func_op.actual_arg_symidx_vec.iter_mut().collect_vec()
-            }else{
-                vec![]
             },
             InstrType::Jump { jump_op } => {
                 match jump_op{
@@ -508,8 +510,8 @@ impl Debug for ArithOp {
 }
 impl Debug for FuncOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let new_str:Vec<&str> = self.actual_arg_symidx_vec.iter().map(|x| x.symbol_name.as_str()).collect();
-        let arg = new_str.join(", ");
+        let new_str_vec = self.actual_arg_symidx_vec.iter().map(|x| format!("{:?}",x)).collect_vec();
+        let arg = new_str_vec.join(", ");
 
         write!(f, " Call {:?} {:?}({})", self.ret_type,self.func_symidx, arg)
     }

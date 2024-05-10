@@ -73,6 +73,31 @@ where
         }
     }
 }
+pub fn dfs_with_priority<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, mut predicate:impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->isize)-> Vec<u32>
+where
+    Ty: EdgeType,
+{
+    let mut visited:Vec<bool> = vec![false; graph.node_count()];
+    let mut dfs_vec:Vec<u32> = vec![];
+    visited[start_node as usize] = true;
+    // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
+    _dfs_with_priority(graph, start_node, &mut visited, &mut dfs_vec, &mut predicate);
+    dfs_vec
+}
+fn _dfs_with_priority<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, dfs_vec:&mut Vec<u32>, priority:&mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->isize)
+where
+    Ty: EdgeType,
+{
+    dfs_vec.push(start_node);
+    visited[start_node as usize] = true;
+    let nodes = direct_child_nodes!(at start_node in graph with_priority {|e|priority(e)});
+    // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
+    for node in nodes {
+        if !visited[node as usize] {
+            _dfs_with_priority(graph, node, visited, dfs_vec, priority);
+        }
+    }
+}
 
 pub fn element_remained_after_exclusion_in_vec<T:PartialEq+Clone>(v:Vec<T>,element1:T) -> Result<T>{
     if v.len()!=2 { return Err(anyhow!("待排除的Vec元素数目不为2")) }

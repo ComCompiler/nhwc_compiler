@@ -5,7 +5,7 @@ use crate::toolkit::symtab;
 use std::fmt::Debug;
 use anyhow::*;
 
-use crate::{add_symbol, make_field_trait_for_struct, reg_field_for_struct};
+use crate::{add_symbol, debug_info_yellow, make_field_trait_for_struct, reg_field_for_struct};
 use super::cfg_node::InstrList;
 use super::field::Type::{self, F32, I32};
 
@@ -133,6 +133,7 @@ impl Simulator{
             if self.simu_symtab.has_symbol(ctx_symidx){
                 let ctx_value = self.simu_symtab.get_symbol(ctx_symidx)?.get_simu_val()?;
                 ctx_symidx_value_tuple_vec.push((ctx_symidx.clone(),ctx_value.clone()));
+                debug_info_yellow!("保存上下文 {:?} {:?}",ctx_symidx,ctx_value)
             }
         }
 
@@ -142,11 +143,11 @@ impl Simulator{
         let mut args_vec = vec![];
         let func_type = self.simu_symtab.get_symbol(func_symidx)?.get_type()?.clone();
         let ret_symidx = if let Type::Fn { arg_syms: formal_arg_symidx_vec, ret_sym: ret_symidx } = func_type {
-            // 实参赋值给形参
             if formal_arg_symidx_vec.len()!= actual_args_vec.len() {
                 return Err(anyhow!("实参和形参数量不一致"));
             }
             
+            // 实参赋值给形参
             for (formal_arg_symidx,actual_arg_symidx) in formal_arg_symidx_vec.iter().zip(actual_args_vec.iter()) {
                 *self.simu_symtab.get_mut_symbol(formal_arg_symidx)?.get_mut_simu_val()? = self.simu_symtab.get_symbol(actual_arg_symidx)?.get_simu_val()?.clone();
                 args_vec.push(self.simu_symtab.get_symbol(actual_arg_symidx)?.get_simu_val()?.clone());
@@ -169,13 +170,18 @@ impl Simulator{
 
         // 将实际返回值 赋值给 形式返回值
         *self.simu_symtab.get_mut_symbol(&func_call_ctx.formal_ret_symidx)?.get_mut_simu_val()? = self.simu_symtab.get_symbol(actual_ret_symidx)?.get_simu_val()?.clone();
-        if let Some(assigned_symidx) = func_call_ctx.op_assigned_symidx{
-            *self.simu_symtab.get_mut_symbol(&assigned_symidx)?.get_mut_simu_val()? = self.simu_symtab.get_symbol(&func_call_ctx.formal_ret_symidx)?.get_simu_val()?.clone();
-        }
 
+        let ret_value = self.simu_symtab.get_symbol(&func_call_ctx.formal_ret_symidx)?.get_simu_val()?.clone();
         // 恢复上下文
         for (symidx,value) in &func_call_ctx.ctx_symidx_value_tuple_vec{
             *self.simu_symtab.get_mut_symbol(symidx)?.get_mut_simu_val()? = value.clone();
+            debug_info_yellow!("恢复上下文 {:?} {:?}",symidx,value)
+        }
+
+        // 将形式返回值赋值给 op_assigned
+        // 这一步一定要在恢复上下文之后做
+        if let Some(assigned_symidx) = func_call_ctx.op_assigned_symidx{
+            *self.simu_symtab.get_mut_symbol(&assigned_symidx)?.get_mut_simu_val()? = ret_value;
         }
         Ok(())
     }
@@ -217,41 +223,49 @@ impl Simulator{
                     self.simu_symtab.add_symbol(var_symidx.clone().into_symbol())?;
                 }
                 match op_value{
-                    Some(value) => {
-                        self.simu_symtab.get_mut_symbol(var_symidx)?.add_simu_val(Value::from_string_with_specific_type(&value.symbol_name,vartype)?);
+                    Some(value_symidx) => {
+                        if self.simu_symtab.get_symbol(value_symidx)?.has_simu_val(){
+                            // 说明这应该是一个普通变量
+                            let value = self.simu_symtab.get_symbol(value_symidx)?.get_simu_val()?.clone();
+                            self.simu_symtab.get_mut_symbol(var_symidx)?.add_simu_val(value);
+                        }else{
+                            // 说明这应该是一个常量
+                            self.simu_symtab.get_mut_symbol(var_symidx)?.add_simu_val(Value::from_string_with_specific_type(&value_symidx.symbol_name,vartype)?);
+                        }
                     },
                     None => (),
                 }
             },
             Arith { lhs, rhs } => match rhs {
                 Add { a, b, vartype: _ } => {
+                    debug_info_yellow!("compare {:?} and {:?}",a,b);
                     let a_val=self.simu_symtab.get_symbol(a)?.get_simu_val()?;
                     let b_val = self.simu_symtab.get_symbol(b)?.get_simu_val()?;
-                    let result = a_val.clone() + b_val.clone();
+                    let result = (a_val.clone() + b_val.clone())?;
                     self.simu_symtab.get_mut_symbol(lhs)?.add_simu_val(result);
                 },
                 Mul { a, b, vartype: _ } => {
                     let a_val=self.simu_symtab.get_symbol(a)?.get_simu_val()?;
                     let b_val = self.simu_symtab.get_symbol(b)?.get_simu_val()?;
-                    let result = a_val.clone() * b_val.clone();
+                    let result = (a_val.clone() * b_val.clone())?;
                     self.simu_symtab.get_mut_symbol(lhs)?.add_simu_val(result);
                 },
                 Div { a, b, vartype: _ } => {
                     let a_val=self.simu_symtab.get_symbol(a)?.get_simu_val()?;
                     let b_val = self.simu_symtab.get_symbol(b)?.get_simu_val()?;
-                    let result = a_val.clone() / b_val.clone();
+                    let result = (a_val.clone() / b_val.clone())?;
                     self.simu_symtab.get_mut_symbol(lhs)?.add_simu_val(result);
                 },
                 Sub { a, b, vartype: _ } => {
                     let a_val=self.simu_symtab.get_symbol(a)?.get_simu_val()?;
                     let b_val = self.simu_symtab.get_symbol(b)?.get_simu_val()?;
-                    let result = a_val.clone() - b_val.clone();
+                    let result = (a_val.clone() - b_val.clone())?;
                     self.simu_symtab.get_mut_symbol(lhs)?.add_simu_val(result);
                 },
                 Mod { a, b, vartype: _ } => {
                     let a_val=self.simu_symtab.get_symbol(a)?.get_simu_val()?;
                     let b_val = self.simu_symtab.get_symbol(b)?.get_simu_val()?;
-                    let result = a_val.clone() % b_val.clone();
+                    let result = (a_val.clone() % b_val.clone())?;
                     self.simu_symtab.get_mut_symbol(lhs)?.add_simu_val(result);
                 },
                 Icmp { plan, a, b, vartype: _ } => {
@@ -333,18 +347,18 @@ impl Simulator{
                 LogicAnd { a, b, vartype: _ } => {
                     let a_val = self.simu_symtab.get_symbol(a)?.get_simu_val()?;
                     let b_val = self.simu_symtab.get_symbol(b)?.get_simu_val()?;
-                    let result = a_val.clone() & b_val.clone();
+                    let result = (a_val.clone() & b_val.clone())?;
                     self.simu_symtab.get_mut_symbol(lhs)?.add_simu_val(result);
                 },
                 LogicOr { a, b, vartype: _ } => {
                     let a_val = self.simu_symtab.get_symbol(a)?.get_simu_val()?;
                     let b_val = self.simu_symtab.get_symbol(b)?.get_simu_val()?;
-                    let result = a_val.clone() | b_val.clone();
+                    let result = (a_val.clone() | b_val.clone())?;
                     self.simu_symtab.get_mut_symbol(lhs)?.add_simu_val(result);
                 },
                 LogicNot { a, vartype: _ } => {
                     let a_val = self.simu_symtab.get_symbol(a)?.get_simu_val()?;
-                    let result = !a_val.clone();
+                    let result = (!a_val.clone())?;
                     self.simu_symtab.get_mut_symbol(lhs)?.add_simu_val(result);
                 },
             }
@@ -363,9 +377,10 @@ impl Simulator{
 
                     super::nhwc_instr::JumpOp::Br { cond, t1, t2 } => {
                         let cond_val = self.simu_symtab.get_symbol(cond)?.get_simu_val()?;
-                        if cond_val.clone().to_specific_type(&I32)? == Value::new_i1(true){
+                        if cond_val.clone().to_specific_type(&Type::I1)? == Value::new_i1(true){
                             self.cur_instr_pos = *self.simu_symtab.get_mut_symbol(t1)?.get_simu_label_pos()?;
                         } else {
+                            debug_info_yellow!("{:?} is not equal to {:?}",cond_val,Value::new_i1(true));
                             self.cur_instr_pos = *self.simu_symtab.get_mut_symbol(t2)?.get_simu_label_pos()?;
                         }
                     },

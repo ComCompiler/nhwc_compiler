@@ -4,7 +4,7 @@ use petgraph::{adj::NodeIndex, algo::dominators::simple_fast, visit::EdgeRef};
 
 use crate::{add_edge, add_node, direct_child_nodes, direct_parent_nodes, reg_field_for_struct, node, node_mut, toolkit::{dj_edge::DjEdge, dj_node::DjNode}};
 
-use super::{cfg_node::{CfgGraph, CfgNode}, context::DjGraph, etc::{dfs_with_predicate}};
+use super::{cfg_node::{CfgGraph, CfgNode}, context::DjGraph, etc::{dfs_with_predicate, dfs_with_priority}};
 use super::symtab::{SymTab,SymTabEdge,SymTabGraph};
 use super::field::Field;
 use anyhow::{Result,Context};
@@ -88,7 +88,15 @@ pub fn parse_ncfg2dj_graph(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph)->Resul
 pub fn get_dj_graph_subtree_nodes(dj_node:u32,dj_graph:&mut DjGraph)->Vec<u32>{
     // dfs_with_predicate(dj_graph, dj_node, &mut visited, &mut dfs_vec, Box::new(|e|e.weight().is_dom()));
     // if dj_node == 4 {dfs_with_predicate(dj_graph, dj_node, &mut visited, &mut dfs_vec, Box::new(|e|{debug_info_yellow!("{:?}",(e.source(),e.target(),e.weight()));e.weight().is_dom()}));}
-    dfs_with_predicate(dj_graph, dj_node,  |e|e.weight().is_dom())
+    // dfs_with_predicate(dj_graph, dj_node,  |e|e.weight().is_dom())
+    dfs_with_priority(dj_graph, dj_node,  |e|{
+        match e.weight(){
+            DjEdge::Join{} =>{
+                -1
+            }
+            DjEdge::Dom {  } => -1,
+        }
+    })
 }
 
 /// 标记 dominator tree 的深度，由于这是树形结构， 因此不需要visited 数组

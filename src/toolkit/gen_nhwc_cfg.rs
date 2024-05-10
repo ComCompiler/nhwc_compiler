@@ -37,7 +37,7 @@ make_field_trait_for_struct!(
 // for variables symbol
 reg_field_for_struct!(Symbol {
         DEF_INSTRS_VEC:Vec<usize>,
-        DEF_CFG_NODE_VEC:Vec<u32>,
+         DEF_CFG_NODE_VEC:Vec<u32>,
         IS_CONST:bool,
         IS_TEMP:bool,
     } with_fields fields);
@@ -915,7 +915,7 @@ fn process_arithop(
 
     //将左右操作数进行类型自动转换
     let (l_symidx, r_symidx) = autotrans_arith_type(cfg_graph, symtab, &l_type, &l_symidx, &r_type, &r_symidx, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-    let var_type = Type::adapt(&l_type, &r_type);
+    let var_type = Type::adapt(&l_type, &r_type)?;
     let tmp_var_symidx = process_temp_symbol(cfg_graph, symtab, var_type.clone(), scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
     //在复合操作符如+=这类操作符在类型转换后需要返回左操作数（即变量）的类型
     Ok((tmp_var_symidx, l_symidx, r_symidx, var_type, l_type))

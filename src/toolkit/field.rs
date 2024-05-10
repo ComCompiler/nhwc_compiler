@@ -102,9 +102,9 @@ impl Value {
     // }
     pub fn from_string_with_specific_type(s:&String,ty:&Type)->Result<Value>{
         Ok(match &ty{
-            Type::I32 => Value::new_i32(s.parse()?),
-            Type::F32 => Value::new_f32(s.parse()?),
-            Type::I1 => Value::new_i1(s.parse()?),
+            Type::I32 => Value::new_i32(s.parse().with_context(||format!("when parsing {}",s))?),
+            Type::F32 => Value::new_f32(s.parse().with_context(||format!("when parsing {}",s))?),
+            Type::I1 => Value::new_i1(s.parse().with_context(||format!("when parsing {}",s))?),
             Type::Void => Err(anyhow!("不能从string 转化为 Void 类型的value"))?,
             Type::Label => Err(anyhow!("不能从string 转化为 Label 类型的value"))?,
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("不能从string 转化为 Fn 类型的value"))?,
@@ -121,8 +121,8 @@ impl Value {
             Value::Unsure {  } => Type::Unsure {  },
         }
     }
-    pub fn adapt(&self, value2:&Value) -> Type {
-        Type::adapt(&self.to_type() ,&value2.to_type())  
+    pub fn adapt(&self, value2:&Value) -> Result<Type> {
+        Type::adapt(&self.to_type() ,&value2.to_type())
     }
 }
 impl Type {
@@ -175,144 +175,144 @@ impl Debug for Type {
     }
 }
 impl Type {
-    pub fn adapt(ty1:&Type, ty2:&Type) -> Self {
+    pub fn adapt(ty1:&Type, ty2:&Type) -> Result<Self> {
         match (ty1, ty2) {
-            (Type::I32, Type::I32) => Type::I32,
-            (Type::I32, Type::F32) => Type::F32,
-            (Type::F32, Type::I32) => Type::F32,
-            (Type::F32, Type::F32) => Type::F32,
-            (Type::I32, Type::I1) => Type::I32,
-            (Type::F32, Type::I1) => Type::F32,
-            (Type::I1, Type::I32) => Type::I32,
-            (Type::I1, Type::F32) => Type::F32,
-            (Type::I1, Type::I1) => Type::I1,
+            (Type::I32, Type::I32) => Ok(Type::I32),
+            (Type::I32, Type::F32) => Ok(Type::F32),
+            (Type::F32, Type::I32) => Ok(Type::F32),
+            (Type::F32, Type::F32) => Ok(Type::F32),
+            (Type::I32, Type::I1) => Ok(Type::I32),
+            (Type::F32, Type::I1) => Ok(Type::F32),
+            (Type::I1, Type::I32) => Ok(Type::I32),
+            (Type::I1, Type::F32) => Ok(Type::F32),
+            (Type::I1, Type::I1) => Ok(Type::I1),
             _ => {
-                panic!("{:?}和{:?}不能进行兼容", ty1, ty2);
+                Err(anyhow!("{:?}和{:?}不能进行兼容", ty1, ty2))
             }
         }
     }
 }
 impl Add for Value{
-    type Output=Value;
+    type Output=Result<Value>;
 
     fn add(self, rhs: Self) -> Self::Output {
-        let pub_ty=self.adapt(&rhs);
-        let l_val=self.to_specific_type(&pub_ty).unwrap();
-        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        let pub_ty=self.adapt(&rhs).with_context(||format!("无法得出{:?} 和 {:?}的兼容类型",self,rhs))?;
+        let l_val=self.to_specific_type(&pub_ty)?;
+        let r_val=rhs.to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
-            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1+v2),
-            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_f32(v1+v2),
-            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => panic!("I1 类型进行相加"),
-            (Value::Void, Value::Void) => panic!("Void 类型进行相加"),
-            (_,_) => panic!("不同类型相加"),
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1+v2)),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1+v2)),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 类型进行相加")),
+            (Value::Void, Value::Void) => Err(anyhow!("Void 类型进行相加")),
+            (_,_) => Err(anyhow!("不同类型相加")),
         }
     }
 }
 impl Sub for Value{
-    type Output=Value;
+    type Output=Result<Value>;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        let pub_ty=self.adapt(&rhs);
-        let l_val=self.to_specific_type(&pub_ty).unwrap();
-        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        let pub_ty=self.adapt(&rhs).with_context(||format!("无法得出{:?} 和 {:?}的兼容类型",self,rhs))?;
+        let l_val=self.to_specific_type(&pub_ty)?;
+        let r_val=rhs.to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
-            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 - v2),
-            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_f32(v1 - v2),
-            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => panic!("I1 类型进行相减"),
-            (Value::Void, Value::Void) => panic!("Void 类型进行相减"),
-            (_,_) => panic!("不同类型相减"),
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 - v2)),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1 - v2)),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 类型进行相减")),
+            (Value::Void, Value::Void) => Err(anyhow!("Void 类型进行相减")),
+            (_,_) => Err(anyhow!("不同类型相减")),
         }
     }
 }
 impl Mul for Value{
-    type Output = Value;
+    type Output = Result<Value>;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        let pub_ty=self.adapt(&rhs);
-        let l_val=self.to_specific_type(&pub_ty).unwrap();
-        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        let pub_ty=self.adapt(&rhs).with_context(||format!("无法得出{:?} 和 {:?}的兼容类型",self,rhs))?;
+        let l_val=self.to_specific_type(&pub_ty)?;
+        let r_val=rhs.to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
-            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 * v2),
-            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_f32(v1 * v2),
-            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => panic!("I1 类型进行相乘"),
-            (Value::Void, Value::Void) => panic!("Void 类型进行相乘"),
-            (_,_) => panic!("不同类型相乘"),
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 * v2)),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1 * v2)),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 类型进行相乘")),
+            (Value::Void, Value::Void) => Err(anyhow!("Void 类型进行相乘")),
+            (_,_) => Err(anyhow!("不同类型相乘")),
         }
     }
 }
 impl Div for Value{
-    type Output = Value;
+    type Output = Result<Value>;
 
     fn div(self, rhs: Self) -> Self::Output {
-        let pub_ty=self.adapt(&rhs);
-        let l_val=self.to_specific_type(&pub_ty).unwrap();
-        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        let pub_ty=self.adapt(&rhs).with_context(||format!("无法得出{:?} 和 {:?}的兼容类型",self,rhs))?;
+        let l_val=self.to_specific_type(&pub_ty)?;
+        let r_val=rhs.to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
-            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 / v2),
-            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_f32(v1 / v2),
-            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => panic!("I1 类型进行相除"),
-            (Value::Void, Value::Void) => panic!("Void 类型进行相除"),
-            (_,_) => panic!("不同类型相除"),
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 / v2)),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1 / v2)),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 类型进行相除")),
+            (Value::Void, Value::Void) => Err(anyhow!("Void 类型进行相除")),
+            (_,_) => Err(anyhow!("不同类型相除")),
         }
     }
 }
 impl Rem for Value{
-    type Output = Value;
+    type Output = Result<Value>;
 
     fn rem(self, rhs: Self) -> Self::Output {
-        let pub_ty=self.adapt(&rhs);
-        let l_val=self.to_specific_type(&pub_ty).unwrap();
-        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        let pub_ty=self.adapt(&rhs).with_context(||format!("无法得出{:?} 和 {:?}的兼容类型",self,rhs))?;
+        let l_val=self.to_specific_type(&pub_ty)?;
+        let r_val=rhs.to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
-            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 % v2),
-            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_f32(v1 % v2),
-            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => panic!("I1 类型进行取模运算"),
-            (Value::Void, Value::Void) => panic!("Void 类型进行取模运算"),
-            (_,_) => panic!("不同类型进行取模运算"),
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 % v2)),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1 % v2)),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 类型进行取模运算")),
+            (Value::Void, Value::Void) => Err(anyhow!("Void 类型进行取模运算")),
+            (_,_) => Err(anyhow!("不同类型进行取模运算")),
         }
     }
 }
 impl BitAnd for Value{
-    type Output = Value;
+    type Output = Result<Value>;
     fn bitand(self, rhs: Self) -> Self::Output {
-        let pub_ty=self.adapt(&rhs);
-        let l_val=self.to_specific_type(&pub_ty).unwrap();
-        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        let pub_ty=self.adapt(&rhs).with_context(||format!("无法得出{:?} 和 {:?}的兼容类型",self,rhs))?;
+        let l_val=self.to_specific_type(&pub_ty)?;
+        let r_val=rhs.to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
-            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 & v2),
-            (Value::F32(Some(_v1)), Value::F32(Some(_v2))) => panic!("F32 类型无法进行按位与运算"),
-            (Value::I1(Some(v1)), Value::I1(Some(v2))) => Value::new_i1(v1 & v2),
-            (Value::Void, Value::Void) => panic!("Void 类型无法进行按位与运算"),
-            (_,_) => panic!("不同类型无法进行按位与运算"),
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 & v2)),
+            (Value::F32(Some(_v1)), Value::F32(Some(_v2))) => Err(anyhow!("F32 类型无法进行按位与运算")),
+            (Value::I1(Some(v1)), Value::I1(Some(v2))) => Ok(Value::new_i1(v1 & v2)),
+            (Value::Void, Value::Void) => Err(anyhow!("Void 类型无法进行按位与运算")),
+            (_,_) => Err(anyhow!("不同类型无法进行按位与运算")),
         }
     }
 }
 impl BitOr for Value{
-    type Output = Value;
+    type Output = Result<Value>;
     fn bitor(self, rhs: Self) -> Self::Output {
-        let pub_ty=self.adapt(&rhs);
-        let l_val=self.to_specific_type(&pub_ty).unwrap();
-        let r_val=rhs.to_specific_type(&pub_ty).unwrap();
+        let pub_ty=self.adapt(&rhs).with_context(||format!("无法得出{:?} 和 {:?}的兼容类型",self,rhs))?;
+        let l_val=self.to_specific_type(&pub_ty)?;
+        let r_val=rhs.to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
-            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i32(v1 | v2),
-            (Value::F32(Some(_v1)), Value::F32(Some(_v2))) => panic!("F32 类型无法进行按位或运算"),
-            (Value::I1(Some(v1)), Value::I1(Some(v2))) => Value::new_i1(v1 | v2),
-            (Value::Void, Value::Void) => panic!("Void 类型无法进行按位或运算"),
-            (_,_) => panic!("不同类型无法进行按位或运算"),
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 | v2)),
+            (Value::F32(Some(_v1)), Value::F32(Some(_v2))) => Err(anyhow!("F32 类型无法进行按位或运算")),
+            (Value::I1(Some(v1)), Value::I1(Some(v2))) => Ok(Value::new_i1(v1 | v2)),
+            (Value::Void, Value::Void) => Err(anyhow!("Void 类型无法进行按位或运算")),
+            (_,_) => Err(anyhow!("不同类型无法进行按位或运算")),
         }
     }
 }
 impl Not for Value{
-    type Output = Value;
+    type Output = Result<Value>;
     fn not(self) -> Self::Output {
-        let pub_ty=self.adapt(&self);
-        let l_val=self.to_specific_type(&pub_ty).unwrap();
-        match l_val {
-            Value::I32(Some(v1)) => Value::new_i32(!v1),
-            Value::F32(Some(_v1)) => panic!("F32 类型无法进行按位非运算"),
-            Value::I1(Some(v1)) => Value::new_i1(!v1),
-            Value::Void => panic!("Void 类型无法进行按位非运算"),
-            _ => panic!("其他类型无法进行按位非运算"),
+        // let pub_ty=self.adapt(&self)?;
+        // let l_val=self.to_specific_type(&pub_ty)?;
+        match &self {
+            Value::I32(Some(v1)) => Ok(Value::new_i32(!v1)),
+            Value::F32(Some(_v1)) => Err(anyhow!("F32 类型无法进行按位非运算")),
+            Value::I1(Some(v1)) => Ok(Value::new_i1(!v1)),
+            Value::Void => Err(anyhow!("Void 类型无法进行按位非运算")),
+            _ => Err(anyhow!("其他类型无法进行按位非运算")),
         }
     }
 }

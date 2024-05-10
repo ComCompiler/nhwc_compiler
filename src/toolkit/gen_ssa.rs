@@ -117,6 +117,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                         let &is_temp = symtab.get_symbol(&use_symidx)?.get_is_temp()?;
                         if !is_const {
                             update_reaching_def(instr, use_symidx, symtab, cfg_graph, dj_graph, instr_slab)?;
+                            debug_info_yellow!("set {:?} to {:?} in instr {}",use_symidx,symtab.get_symbol(use_symidx)?.get_ssa_reaching_def()?.clone().context(anyhow!("ssa renaming 时发现变量在{:?}:instr[{}] 在 use 之前没有定义",use_symidx,instr)),instr);
                             *use_symidx = symtab.get_symbol(use_symidx)?.get_ssa_reaching_def()?.clone().context(anyhow!("ssa renaming 时发现变量在{:?}:instr[{}] 在 use 之前没有定义",use_symidx,instr))?;
                         }else{
                             // 说明这是个常量，不用renaming
@@ -145,6 +146,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                             // with field REACHING_DEF:{symtab.get_symbol(src_symidx)?.get_type()?.clone()}
                             with_field SSA_DEF_INSTR:{instr}
                             with_field SSA_REACHING_DEF:{None}
+                            with_field IS_CONST:{false}
                         to symtab);
 
                         let src_symidx  = def_symidx.clone();
