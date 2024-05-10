@@ -379,7 +379,7 @@ pub struct ComparedPair {
     compared:SymIdx,
     label:SymIdx,
 }
-#[derive(Clone)]
+#[derive(Clone,EnumIs)]
 pub enum JumpOp {
     Ret {
         ret_sym:SymIdx, // 这是返回的类型
@@ -519,7 +519,7 @@ impl Debug for FuncOp {
 impl Debug for JumpOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Ret { ret_sym } => write!(f, "ret type {:?}", ret_sym),
+            Self::Ret { ret_sym } => write!(f, "ret {:?}", ret_sym),
 
             Self::Br { cond, t1, t2 } => {
                 write!(f, "br i1 {:?}, label {:?}, label {:?}", cond, t1, t2)
@@ -547,10 +547,10 @@ impl Debug for InstrType {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             InstrType::Label { label_symidx } => {
-                write!(f, "     label {:?}:", label_symidx)
+                write!(f, "label {:?}:", label_symidx)
             }
             InstrType::DefineFunc { func_symidx, ret_symidx, args } => {
-                write!(f, "Define {:?} {:?} {:?}", ret_symidx, func_symidx, args)
+                write!(f, "Define {:?} {:?} -> {:?}", func_symidx, args, ret_symidx)
             }
             InstrType::DefineVar { var_symidx: varname, vartype, op_value: value } => {
                 match value{

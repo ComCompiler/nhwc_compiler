@@ -9,10 +9,10 @@ use crate::{
     }, toolkit::ast_node::AstNode
 };
 
-use super::context::NhwcContext;
+use super::context::NhwcCtx;
 
 /// 把代码生成为AST树 code 为代码文本的字符串
-pub fn parse_as_ast_tree(context:&mut NhwcContext) {
+pub fn parse_as_ast_tree(context:&mut NhwcCtx) {
     let code = &context.code;
     let ast_tree = &mut context.ast_tree;
 

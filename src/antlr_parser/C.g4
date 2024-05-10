@@ -417,6 +417,7 @@ statement
     |   selectionStatement
     |   iterationStatement
     |   jumpStatement
+    |   breakpointStatement
     |   ('__asm' | '__asm__') ('volatile' | '__volatile__') '(' (logicalOrExpression (',' logicalOrExpression)*)? (':' (logicalOrExpression (',' logicalOrExpression)*)?)* ')' ';'
     ;
 
@@ -467,6 +468,7 @@ whileIterationStatement
 doWhileIterationStatement
     :   Do statement While '(' expression ')' ';'
     ;
+
 //    |   'for' '(' expression? ';' expression?  ';' forUpdate? ')' statement
 //    |   For '(' declaration  expression? ';' expression? ')' statement
 
@@ -495,6 +497,10 @@ jumpStatement
     |   returnStatement
     // |   'goto' unaryExpression // GCC extension
     // )
+    ;
+
+breakpointStatement
+    :   'breakpoint' Identifier ';'
     ;
 
 continueStatement
@@ -547,6 +553,7 @@ Float : 'float';
 For : 'for';
 Goto : 'goto';
 If : 'if';
+Breakpoint : 'breakpoint';
 Inline : 'inline';
 Int : 'int';
 Long : 'long';

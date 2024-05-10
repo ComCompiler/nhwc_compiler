@@ -1,5 +1,5 @@
 use crate::antlr_parser::cparser::{
-    RULE_blockItem, RULE_blockItemList, RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
+    RULE_blockItem, RULE_blockItemList, RULE_breakpointStatement, RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
 };
 use crate::toolkit::ast_node::AstTree;
 use crate::toolkit::cfg_edge::CfgEdge;
@@ -83,6 +83,11 @@ pub fn process_stmt(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymT
         (RULE_selectionStatement, select_node) => Ok(process_selection(cfg_graph, ast_tree, symtab, select_node)?),
         (RULE_jumpStatement, jump_node) => {
             let bb_struct = CfgNode::new_bb(vec![jump_node]);
+            let cfg_basicblock_node = add_node!(bb_struct to cfg_graph);
+            Ok(Some((cfg_basicblock_node, cfg_basicblock_node)))
+        }
+        (RULE_breakpointStatement, breakpoint_node) => {
+            let bb_struct = CfgNode::new_bb(vec![breakpoint_node]);
             let cfg_basicblock_node = add_node!(bb_struct to cfg_graph);
             Ok(Some((cfg_basicblock_node, cfg_basicblock_node)))
         }

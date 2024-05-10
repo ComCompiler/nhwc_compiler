@@ -504,11 +504,11 @@ macro_rules! term_id {
 /// insert_instr($instr to $node at $idx in $graph slab $instrslab)  
 #[macro_export]
 macro_rules! insert_instr {
-    ($instr:ident to $node:ident at $idx:block in $graph:ident slab $instrslab:ident) =>{
+    ($instr:ident to $node:ident instr_list $instr_list:ident at $idx:block in $graph:ident slab $instrslab:ident) =>{
         {
             let cfg_node_struct = node_mut!(at $node in $graph);
             let instr = $instrslab.insert_instr($instr);
-            cfg_node_struct.instrs.insert($idx,instr);
+            cfg_node_struct.$instr_list.insert($idx,instr);
             // $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.instrs.len()-1, false));
             instr
         }
@@ -516,25 +516,12 @@ macro_rules! insert_instr {
 }
 #[macro_export]
 macro_rules! push_instr {
-    ($instr:ident to $node:ident in $graph:ident slab $instrslab:ident) =>{
+    ($instr:ident to $node:ident instr_list $instr_list:ident in $graph:ident slab $instrslab:ident) =>{
         {
             let cfg_node_struct = node_mut!(at $node in $graph);
             let instr = $instrslab.insert_instr($instr);
-            cfg_node_struct.instrs.push(instr);
+            cfg_node_struct.$instr_list.push(instr);
             // $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.instrs.len()-1, false));
-            instr
-        }
-    };
-}
-#[macro_export]
-/// push_phi_instr!(instr to node in grpah slab instr_slab);
-macro_rules! push_phi_instr {
-    ($instr:ident to $node:ident in $graph:ident slab $instrslab:ident) =>{
-        {
-            let cfg_node_struct = node_mut!(at $node in $graph);
-            let instr = $instrslab.insert_instr($instr);
-            cfg_node_struct.phi_instrs.push(instr);
-            // $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.phi_instrs.len()-1, true));
             instr
         }
     };

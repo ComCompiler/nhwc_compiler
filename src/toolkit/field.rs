@@ -46,7 +46,7 @@ impl<T:Clone+Any+Debug> Field for Option<T>{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, EnumIs)]
 pub enum Value {
     I32(Option<i32>),
     F32(Option<f32>),

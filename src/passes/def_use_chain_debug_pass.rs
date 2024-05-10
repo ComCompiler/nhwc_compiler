@@ -1,4 +1,4 @@
-use crate::{add_edge, add_node, add_node_with_edge, debug_info_yellow, instr, instr_mut, node, node_mut, reg_field_for_struct, toolkit::{context::NhwcContext, def_use_node::{DefUseEdge, DefUseNode}, dot::Config, etc::{self, generate_png_by_graph}, gen_dug, gen_nhwc_cfg::find_branch_of_gather_upwnward, gen_ssa::refresh_cfg_instr_idx_in_cfg_graph, nhwc_instr::Instruction, pass_manager::Pass, symbol::Symbol, symtab::{SymTab, SymTabEdge, SymTabGraph}}};
+use crate::{add_edge, add_node, add_node_with_edge, debug_info_yellow, instr, instr_mut, node, node_mut, reg_field_for_struct, toolkit::{context::NhwcCtx, def_use_node::{DefUseEdge, DefUseNode}, dot::Config, etc::{self, generate_png_by_graph}, gen_dug, gen_nhwc_cfg::find_branch_of_gather_upwnward, gen_ssa::refresh_cfg_instr_idx_in_cfg_graph, nhwc_instr::Instruction, pass_manager::Pass, symbol::Symbol, symtab::{SymTab, SymTabEdge, SymTabGraph}}};
 use anyhow::*;
 #[derive(Debug)]
 pub struct DefUseChainDebugPass {
@@ -18,7 +18,7 @@ reg_field_for_struct!(Instruction
 
 impl Pass for DefUseChainDebugPass {
     // 运行这个pass
-    fn run(&mut self, ctx:&mut NhwcContext) -> Result<()> { 
+    fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> { 
         // 先建立一个图 
         let (instr_slab,cfg_graph,def_use_graph,symtab )= (&mut ctx.instr_slab,&mut ctx.cfg_graph,&mut ctx.def_use_graph,&ctx.symtab,);
         

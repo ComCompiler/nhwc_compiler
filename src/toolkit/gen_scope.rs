@@ -3,12 +3,12 @@ use std::collections::HashMap;
 use crate::toolkit::ast_node::AstTree;
 
 use crate::antlr_parser::cparser::{
-    RULE_blockItem, RULE_blockItemList, RULE_constantExpression, RULE_declaration, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_parameterTypeList, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
+    RULE_blockItem, RULE_blockItemList, RULE_breakStatement, RULE_breakpointStatement, RULE_constantExpression, RULE_declaration, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_parameterTypeList, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
 };
 use crate::{add_node, add_node_with_edge, direct_child_node, find_nodes_by_dfs, rule_id, RULE_compoundStatement, RULE_functionDefinition};
 use crate::{find, find_nodes, node};
 
-use super::context::NhwcContext;
+use super::context::NhwcCtx;
 use super::scope_node::{ScopeNode, ScopeTree, ScopeType};
 
 ///将函数名添加进scopetree，返回下一部分衔接的u32
@@ -64,6 +64,10 @@ pub fn process_statement(scope_tree:&mut ScopeTree, ast_tree:&AstTree, scope_par
         (RULE_jumpStatement, jump_node) => {
             let scope_jump = add_node_with_edge!({ScopeNode{ast_node:jump_node,text:String::new(),parent:scope_parent,scope_type:ScopeType::Terminal}} from scope_parent in scope_tree);
             ast2scope.insert(jump_node, scope_jump);
+        }
+        (RULE_breakpointStatement, breakpoint_node) => {
+            let scope_breakpoint = add_node_with_edge!({ScopeNode{ast_node:breakpoint_node,text:String::new(),parent:scope_parent,scope_type:ScopeType::Terminal}} from scope_parent in scope_tree);
+            ast2scope.insert(breakpoint_node, scope_breakpoint);
         }
         (_, _) => {
             panic!("statment下未知节点，ast出错")
@@ -190,7 +194,7 @@ pub fn process_compound(scope_tree:&mut ScopeTree, ast_tree:&AstTree, scope_pare
     }
 }
 
-pub fn parse_ast_to_scope(context:&mut NhwcContext) {
+pub fn parse_ast_to_scope(context:&mut NhwcCtx) {
     let scope_tree = &mut context.scope_tree;
     let ast_tree = &context.ast_tree;
     let ast2scope = &mut context.ast2scope;

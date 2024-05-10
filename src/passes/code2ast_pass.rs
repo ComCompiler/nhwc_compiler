@@ -1,5 +1,5 @@
 use crate::toolkit::{
-    context::NhwcContext, dot::Config, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, pass_manager::Pass
+    context::NhwcCtx, dot::Config, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, pass_manager::Pass
 };
 use anyhow::Result;
 #[derive(Debug)]
@@ -12,7 +12,7 @@ impl Code2AstPass {
 
 impl Pass for Code2AstPass {
     // 运行这个pass
-    fn run(&mut self, ctx:&mut NhwcContext) -> Result<()> {
+    fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> {
         ctx.code = read_file_content(ctx.args.c_file_path.to_string_lossy().into_owned());
         parse_as_ast_tree(ctx);
         // 生成对应的png

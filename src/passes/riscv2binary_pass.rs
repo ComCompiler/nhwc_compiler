@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::toolkit::{context::NhwcContext, pass_manager::Pass};
+use crate::toolkit::{context::NhwcCtx, pass_manager::Pass};
 #[derive(Debug)]
 pub struct Riscv2BinaryPass {}
 impl Riscv2BinaryPass {
@@ -9,7 +9,7 @@ impl Riscv2BinaryPass {
 
 impl Pass for Riscv2BinaryPass {
     // 运行这个pass
-    fn run(&mut self, ctx:&mut NhwcContext) -> Result<()> {
+    fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> {
         todo!();
     }
     // 返回pass的描述，具体作用

@@ -1,0 +1,38 @@
+ 2    Define main _s0 [] -> main_ret _s0 
+         20   Alloc i32 %x_s15 _i0 = 4 _s0 
+     30   label while.head _s18: 
+         37   x_s15 _i1 = phi [x_s15 _i0,instr:20],[x_s15 _i2,instr:28], 
+         32   Alloc i1 %temp_6_s17 _i0 
+         33   temp_6_s17 _i1 = icmp i1 Slt x_s15 _i1, 17 _s0 
+         34   br i1 temp_6_s17 _i1, label while.body _s18, label while.exit _s18 
+     29   label while.body _s18: 
+         23   Alloc i32 %temp_4_s20 _i0 
+         24   temp_4_s20 _i1 =  Call i32 m _s0(3 _s0) 
+         25   breakpoint a _s21 ! 
+         26   Alloc i32 %temp_5_s19 _i0 
+         27   temp_5_s19 _i1 = Add i32 x_s15 _i1, 1 _s0 
+         28   x_s15 _i2 = temp_5_s19 _i1 
+         35   jump label: while.head _s18 
+     31   label while.exit _s18: 
+         21   breakpoint exit _s23 ! 
+         22   ret 0 _s0 
+ 1    Define m _s0 [x_s10 _i0] -> m_ret _s0 
+         17   Alloc i32 %temp_3_s12 _i0 
+         18   temp_3_s12 _i1 =  Call i32 square _s0(3 _s0) 
+         19   ret temp_3_s12 _i1 
+ 0    Define square _s0 [num_s1 _i0] -> square_ret _s0 
+     11   label while.head _s5: 
+         36   num_s1 _i1 = phi [num_s1 _i0,instr:0],[num_s1 _i2,instr:9], 
+         13   Alloc i1 %temp_2_s4 _i0 
+         14   temp_2_s4 _i1 = icmp i1 Slt num_s1 _i1, 20 _s0 
+         15   br i1 temp_2_s4 _i1, label while.body _s5, label while.exit _s5 
+     10   label while.body _s5: 
+         7    Alloc i32 %temp_1_s6 _i0 
+         8    temp_1_s6 _i1 = Add i32 num_s1 _i1, 1 _s0 
+         9    num_s1 _i2 = temp_1_s6 _i1 
+         16   jump label: while.head _s5 
+     12   label while.exit _s5: 
+         3    Alloc i32 %temp_0_s3 _i0 
+         4    temp_0_s3 _i1 = Mul i32 num_s1 _i1, num_s1 _i1 
+         5    Alloc i32 %a_s3 _i0 = temp_0_s3 _i1 
+         6    ret a_s3 _i0 

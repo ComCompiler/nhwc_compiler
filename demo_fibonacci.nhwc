@@ -1,0 +1,29 @@
+ 1    Define main_ret _s0 main _s0 [] 
+         25   Alloc i32 %temp_7_s12 _i0 
+         26   temp_7_s12 _i1 =  Call i32 Fibo _s0(6 _s0) 
+         27   Alloc i32 %a_s12 _i0 = temp_7_s12 _i1 
+         28   ret type 0 _s0 
+ 0    Define Fibo_ret _s0 Fibo _s0 [n_s1 _i0] 
+         17   Alloc i1 %temp_5_s4 _i0 
+         18   temp_5_s4 _i1 = icmp i1 Eq n_s1 _i0, 0 _s0 
+         19   br i1 temp_5_s4 _i1, label branch.true: _s5, label branch.false: _s5 
+     15   label branch.true: _s5: 
+         14   ret type 0 _s0 
+     16   label branch.false: _s5: 
+         22   Alloc i1 %temp_6_s7 _i0 
+         23   temp_6_s7 _i1 = icmp i1 Eq n_s1 _i0, 1 _s0 
+         24   br i1 temp_6_s7 _i1, label branch.true: _s8, label branch.false: _s8 
+     20   label branch.true: _s8: 
+         13   ret type 1 _s0 
+     21   label branch.false: _s8: 
+         2    Alloc i32 %temp_0_s7 _i0 
+         3    temp_0_s7 _i1 = Sub i32 n_s1 _i0, 2 _s0 
+         4    Alloc i32 %temp_1_s7 _i0 
+         5    temp_1_s7 _i1 =  Call i32 Fibo _s0(temp_0_s7 _i1) 
+         6    Alloc i32 %temp_2_s7 _i0 
+         7    temp_2_s7 _i1 = Sub i32 n_s1 _i0, 1 _s0 
+         8    Alloc i32 %temp_3_s7 _i0 
+         9    temp_3_s7 _i1 =  Call i32 Fibo _s0(temp_2_s7 _i1) 
+         10   Alloc i32 %temp_4_s7 _i0 
+         11   temp_4_s7 _i1 = Add i32 temp_3_s7 _i1, temp_1_s7 _i1 
+         12   ret type temp_4_s7 _i1 
