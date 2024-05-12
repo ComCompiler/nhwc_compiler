@@ -65,7 +65,9 @@ pub enum CfgNodeType {
     BasicBlock {
         ast_nodes:Vec<u32>,
     },
-    Root {},
+    Root {
+        static_ast_nodes:Vec<u32>,
+    },
 }
 
 #[derive(Clone)]
@@ -147,7 +149,13 @@ impl CfgNode {
                 }
                 self.text += "\n";
             }
-            CfgNodeType::Root {} => {}
+            CfgNodeType::Root {static_ast_nodes} => {
+                for static_node in static_ast_nodes {
+                    let node_text = node!(at static_node in ast_tree).text.clone();
+                    self.text += node_text.as_str();
+                    self.text += "\n";
+                }
+            }
             CfgNodeType::ForLoop {
                 ast_before_node,
                 ast_mid_node,
@@ -203,7 +211,7 @@ impl CfgNode {
         cfg_node_struct
     }
     pub fn new_gather() -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type: CfgNodeType::Gather {},label_instrs:InstrList::new(), phi_instrs: InstrList::new() } }
-    pub fn new_root() -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Root {},label_instrs:InstrList::new(), phi_instrs: InstrList::new() } }
+    pub fn new_root(ast_nodes:Vec<u32>) -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Root {static_ast_nodes:ast_nodes},label_instrs:InstrList::new(), phi_instrs: InstrList::new() } }
     pub fn new_branch(ast_node:u32) -> Self {
         Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Branch { ast_expr_node:ast_node, },label_instrs:InstrList::new(), phi_instrs: InstrList::new(), }
     }
@@ -223,7 +231,7 @@ impl CfgNode {
     }
     pub fn new_switch(ast_expr_node:u32) -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Switch { ast_expr_node ,},label_instrs:InstrList::new(), phi_instrs: InstrList::new() } }
     pub fn new_entry(ast_node:u32, _instr:usize) -> Self {
-        Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Entry { ast_node, calls_in_func:vec![] ,},label_instrs:InstrList::new(), phi_instrs: InstrList::new() }
+        Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Entry { ast_node, calls_in_func:vec![]},label_instrs:InstrList::new(), phi_instrs: InstrList::new() }
     }
     pub fn new_exit(ast_node:u32) -> Self { Self { text:String::new(), instrs:InstrList::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Exit { ast_node }, phi_instrs: InstrList::new(), label_instrs: InstrList::new() } }
     pub fn iter_all_instrs(&self)->impl Iterator<Item=&usize>+'_{
@@ -276,7 +284,7 @@ impl Debug for CfgNode {
                 write!(f, " # {} \n {} $ @ # {} \n{:#?} $", "BasicBlock\n", self.text, "Fields", self.info)
             }
             // 3元  输出为3格 {1 | 1 | 1}
-            CfgNodeType::Root {} => write!(f, " {} @ {}\n {:#?} ", "root\n", "Fields", self.info),
+            CfgNodeType::Root {static_ast_nodes} => write!(f, " {} {} @ {}\n {:#?} ", "root\n", self.text,"Fields", self.info),
             // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::ForLoop { ast_before_node, ast_mid_node: _, ast_after_node: _ } => {
                 write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} $ ", "For\n", ast_before_node, self.text, "Fields", self.info)

@@ -28,7 +28,9 @@ impl NhwcCollectPass {
 impl Pass for NhwcCollectPass {
     // 运行这个pass
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> { 
-        let (args,instr_slab,cfg_graph,collected_nhwc_ir) = (&ctx.args,&mut ctx.instr_slab,&mut ctx.cfg_graph,&mut ctx.collected_nhwc_ir);
+        let mut nhwc_ir_vec = vec![];
+        
+        let (args,instr_slab,cfg_graph,nhwc_ir_list) = (&ctx.args,&mut ctx.instr_slab,&mut ctx.cfg_graph, &mut ctx.collected_nhwc_ir);
         let dfs_node_vec = dfs_with_priority(cfg_graph,0,|e| match &e.weight().cfg_edge_type{
             CfgEdgeType::BodyHead {  } => 1,
             CfgEdgeType::IfFalse {  } => 2,
@@ -40,15 +42,7 @@ impl Pass for NhwcCollectPass {
         });
         for cfg_node in dfs_node_vec{
             for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
-                collected_nhwc_ir.push(instr)
-            }
-        }
-        if self.is_gen_nhwc_ir_file{
-            let mut cur_tab = 0;
-            let mut f =fs::File::create(args.c_file_path.file_stem().unwrap().to_string_lossy().to_string() + ".nhwc")?;
-            for &instr in collected_nhwc_ir.iter(){
-                // instr_mut!(at instr in instr_slab)?.text.clear();
-                
+                let mut cur_tab = 0;
                 if instr!(at instr in instr_slab)?.instr_type.is_define_func(){
                     cur_tab = 0;
                 }else if instr!(at instr in instr_slab)?.instr_type.is_label(){
@@ -57,6 +51,19 @@ impl Pass for NhwcCollectPass {
                 else{
                     cur_tab = 2;
                 }
+                if matches!(&node!(at cfg_node in cfg_graph).cfg_node_type,crate::toolkit::cfg_node::CfgNodeType::Root { static_ast_nodes }){
+                    cur_tab = 0;
+                }
+                nhwc_ir_vec.push((instr,cur_tab));
+                nhwc_ir_list.push(instr)
+            }
+        }
+        if self.is_gen_nhwc_ir_file{
+            
+            let mut f =fs::File::create(args.c_file_path.file_stem().unwrap().to_string_lossy().to_string() + ".nhwc")?;
+            for &(instr,cur_tab) in nhwc_ir_vec.iter(){
+                // instr_mut!(at instr in instr_slab)?.text.clear();
+                
                 writeln!(f,"{}{:?}","    ".repeat(cur_tab),instr!(at instr in instr_slab)?)?;
                 // if let InstrType::Jump{ jump_op } = &instr!(at instr in instr_slab)?.instr_type {
                 //     if jump_op.is_ret(){

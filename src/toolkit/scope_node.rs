@@ -13,7 +13,7 @@ pub type ScopeTree = StableDiGraph<ScopeNode, (), u32>;
 pub struct ScopeNode {
     pub ast_node:u32,
     pub text:String,
-    pub parent:u32,
+    pub parent:Option<u32>,
     pub scope_type:ScopeType,
 }
 impl ScopeNode {
