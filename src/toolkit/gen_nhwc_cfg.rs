@@ -542,7 +542,8 @@ fn process_func_symbol(
         // with_field SSA_REACHING_DEF:{None}
         with_field DEF_INSTRS_VEC:{vec![]}
         with_field IS_CONST:{true} 
-        with_field IS_TEMP:{false} 
+        with_field IS_TEMP:{false}
+        with_field FUNC_CALL_VEC: {vec![]}
     to symtab debug op_symtab_graph);
     Ok(func_symidx)
 }
@@ -964,8 +965,9 @@ fn process_icmp_op(
 }
 ///处理调用函数，返回一个是option，some表示返回tmp_symidx（非void返回）为了et处理返回symidx,none（void返回），第二个是push的调用函数的instr，stmt要用到。（好tm臃肿）
 fn process_call(
-    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, et_tree:&EtTree, scope_tree:&ScopeTree, symtab:&mut SymTab, et_node:u32, scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
-    symtab_graph:&mut Option<&mut SymTabGraph>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, et_tree:&EtTree, scope_tree:&ScopeTree, symtab:&mut SymTab, et_node:u32, 
+    scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
+    symtab_graph:&mut Option<&mut SymTabGraph>
 ) -> Result<(Option<SymIdx>,usize)> {
     //取函数名和实参
     let func_name_and_args = direct_child_nodes!(at et_node in et_tree);
@@ -983,6 +985,10 @@ fn process_call(
         }
     }
     let func_name_symidx = SymIdx::new(0, func_name_str);
+    // 给func call节点的field中添加cor symidx信息
+    let func_symidx = node_mut!(at cfg_bb in cfg_graph).get_func_cor_symidx()?.clone();
+    symtab.get_mut_symbol(&func_name_symidx)?.add_func_call_vec(vec![func_symidx]);
+
     let mut para_symidxs = vec![];
     for &para_et_node in func_name_and_args[1..].iter() {
         para_symidxs.push(process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, para_et_node, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?)
