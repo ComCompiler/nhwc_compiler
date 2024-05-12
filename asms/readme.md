@@ -27,6 +27,9 @@ vim ~/.bashrc
 加载bashrc
 source ~/.bashrc
 
+接着是 qemu-riscv32-static 命令的依赖
+sudo apt install qemu-user-static 
+
 ## 转化命令
 
 已有<文件名>.s  

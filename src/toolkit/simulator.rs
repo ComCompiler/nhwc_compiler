@@ -211,22 +211,31 @@ impl Simulator{
     pub fn exec_single_instr(&mut self, instr_slab:&InstrSlab, src_symtab:&SymTab) -> Result<Instruction>{
         let instr = self.instr_list[self.cur_instr_pos];
         let instr_struct = instr_slab.get_instr(self.instr_list[self.cur_instr_pos])?;
-        println!("exec_single_instr : {:?}",instr_struct);
-        for def_symidx in instr_struct.get_def_symidx_vec(){
-            let simu_symtab = &mut self.simu_symtab;
-            if !simu_symtab.has_symbol(def_symidx){
-                add_symbol!({Symbol::new_from_symidx(def_symidx)}
-                    with_field SIMU_VAL:{Value::new_unsure()}
-                    with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
-                to simu_symtab);
-            }
-        }
+        // println!("exec_single_instr : {:?}",instr_struct);
+        // 对于 use 到常量时的处理
         for use_symidx in instr_struct.get_use_symidx_vec(){
             let simu_symtab = &mut self.simu_symtab;
             if !simu_symtab.has_symbol(use_symidx) && *src_symtab.get_symbol(use_symidx)?.get_is_const()?{
+                // 将常量加入
                 add_symbol!({Symbol::new_from_symidx(use_symidx)}
                     with_field SIMU_VAL:{Value::from_string_with_specific_type(&src_symtab.get_symbol(use_symidx)?.symidx.symbol_name, src_symtab.get_symbol(use_symidx)?.get_type()?)?}
                 to simu_symtab);
+            }
+        }
+        for def_symidx in instr_struct.get_def_symidx_vec(){
+            let simu_symtab = &mut self.simu_symtab;
+            let src_var_symidx= def_symidx.to_src_symidx();
+            if self.simu_symtab.has_symbol(&src_var_symidx){
+                let simu_symtab = &mut self.simu_symtab;
+                if !simu_symtab.has_symbol(&def_symidx){
+                    // 如果没有这个 var_symidx说名这是个 ssa变量，只是src_symidx 的一个版本，因此不妨定义一下这个版本
+                    add_symbol!({def_symidx.clone().into_symbol()}
+                        with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
+                        to simu_symtab
+                    );
+                }
+            }else{
+                return Err(anyhow!("变量 {:?} 的内存还没有被分配过",src_var_symidx))
             }
         }
 
@@ -252,13 +261,6 @@ impl Simulator{
                 //     );
                 // }
 
-                if !self.simu_symtab.has_symbol(var_symidx){
-                    let simu_symtab = &mut self.simu_symtab;
-                    add_symbol!({var_symidx.clone().into_symbol()}
-                        with_field SIMU_OP_LAST_DEF_INSTR:{None}
-                        to simu_symtab
-                    );
-                }
                 match op_value{
                     Some(value_symidx) => {
                         if self.simu_symtab.get_symbol(value_symidx)?.has_simu_val(){
@@ -275,7 +277,7 @@ impl Simulator{
             },
             Arith { lhs, rhs } => match rhs {
                 Add { a, b, vartype: _ } => {
-                    debug_info_yellow!("compare {:?} and {:?}",a,b);
+                    // debug_info_yellow!("compare {:?} and {:?}",a,b);
                     let a_val=self.simu_symtab.get_symbol(a)?.get_simu_val()?;
                     let b_val = self.simu_symtab.get_symbol(b)?.get_simu_val()?;
                     let result = (a_val.clone() + b_val.clone())?;
@@ -308,7 +310,7 @@ impl Simulator{
                 Icmp { plan, a, b, vartype: _ } => {
                     let a_val=self.simu_symtab.get_symbol(a)?.get_simu_val()?;
                     let b_val = self.simu_symtab.get_symbol(b)?.get_simu_val()?;
-                    debug_info_yellow!("{:?}:{:?} compare with {:?}:{:?}",a,a_val,b,b_val);
+                    // debug_info_yellow!("{:?}:{:?} compare with {:?}:{:?}",a,a_val,b,b_val);
                     // if !(a_val.is_i_1()&& b_val.is_i_1()){
                     //     return Err(anyhow!("{:?} can't compare with {:?} :icmp only support i1 比较",a,b));
                     // }
@@ -442,7 +444,7 @@ impl Simulator{
                     if phi_pair.def_instr ==  def_instr {
                         let phi_val = self.simu_symtab.get_symbol(&phi_pair.symidx)?.get_simu_val()?;
                         self.simu_add_value(lhs,phi_val.clone())?;
-                        debug_info_red!("assinged !!!!!!!!");
+                        // debug_info_red!("assinged !!!!!!!!");
                         flag =true;
                     }
                 }
@@ -477,6 +479,15 @@ impl Simulator{
                 };
             },
             BreakPoint { breakpoint_symidx:_ } => {},
+            Alloc { var_symidx, vartype} => {
+                // 这是内存分配指令， 我们在内存分配的时候加入 src 变量
+                let simu_symtab = &mut self.simu_symtab;
+                let src_var_symidx = var_symidx.to_src_symidx();
+                add_symbol!({src_var_symidx.into_symbol()}
+                    with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
+                    to simu_symtab
+                );
+            },
         }
         Ok(instr_struct.clone())
     }
@@ -522,14 +533,15 @@ impl Simulator{
         self.text.clear()
     }
     pub fn simu_add_value(&mut self,symidx:&SymIdx,value:Value)->Result<()>{
-        debug_info_yellow!("simu_add_value {:?} ",symidx);
+        // debug_info_yellow!("simu_add_value {:?} ",symidx);
         let simu_symtab = &mut self.simu_symtab;
         if !simu_symtab.has_symbol(&symidx.to_src_symidx()){
-            let lhs_src_symidx = symidx.to_src_symidx();
-            add_symbol!({Symbol::new_from_symidx(&lhs_src_symidx)}
-                with_field SIMU_OP_LAST_DEF_INSTR:{None}
-                to simu_symtab
-            );
+            // let lhs_src_symidx = symidx.to_src_symidx();
+            // add_symbol!({Symbol::new_from_symidx(&lhs_src_symidx)}
+            //     with_field SIMU_OP_LAST_DEF_INSTR:{None}
+            //     to simu_symtab
+            // );
+            return Err(anyhow!("变量{:?}还没有被声明",symidx))
         }
         self.simu_symtab.get_mut_symbol(symidx)?.add_simu_val(value);
         self.simu_symtab.get_mut_symbol(symidx)?.add_simu_op_last_def_instr(Some(self.instr_list[self.cur_instr_pos]));

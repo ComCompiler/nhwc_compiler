@@ -164,6 +164,7 @@ pub enum InstrType {
     DefineFunc { func_symidx:SymIdx, ret_symidx:SymIdx, args:Vec<SymIdx> },
     //定义变量
     DefineVar { var_symidx:SymIdx, vartype:Type, op_value:Option<SymIdx> },
+    Alloc { var_symidx:SymIdx, vartype:Type },
     // 算数运算符 + - * / etc.
     Arith { lhs:SymIdx, rhs:ArithOp },
     SimpleAssign { lhs:SymIdx, rhs:SymIdx },
@@ -213,6 +214,7 @@ impl Instruction {
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op: _ } => vec![lhs],
             InstrType::BreakPoint { breakpoint_symidx } => vec![],
+            InstrType::Alloc { var_symidx, vartype, } => vec![],
         }
     }
     pub fn get_use_symidx_vec(&self)->Vec<&SymIdx>{
@@ -262,6 +264,7 @@ impl Instruction {
             }
             ,
             InstrType::BreakPoint { breakpoint_symidx  } => vec![],
+            InstrType::Alloc { var_symidx, vartype, } => vec![],
         }
     }
         pub fn get_mut_def_symidx_vec(&mut self)->Vec<&mut SymIdx>{
@@ -291,6 +294,7 @@ impl Instruction {
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op:_ } => vec![lhs],
             InstrType::BreakPoint { breakpoint_symidx  } => vec![],
+            InstrType::Alloc { var_symidx, vartype, } => vec![],
         }
     }
     pub fn get_mut_use_symidx_vec(&mut self)->Vec<&mut SymIdx>{
@@ -340,6 +344,7 @@ impl Instruction {
             }
             ,
             InstrType::BreakPoint { breakpoint_symidx  } => vec![],
+            InstrType::Alloc { var_symidx, vartype, } => vec![],
         }
     }
     pub fn is_phi(&self)->bool{
@@ -431,7 +436,9 @@ impl InstrType {
     
     pub fn new_def_func(func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx>) -> Self { Self::DefineFunc { func_symidx, ret_symidx: ret_type, args } }
 
-    pub fn new_def_var(vartype:Type, varname:SymIdx, value:Option<SymIdx>) -> Self { Self::DefineVar { var_symidx:varname, vartype, op_value: value } }
+    pub fn new_def_var(vartype:Type, var_symidx:SymIdx, value:Option<SymIdx>) -> Self { Self::DefineVar { var_symidx, vartype, op_value: value } }
+
+    pub fn new_alloc(vartype:Type, var_symidx:SymIdx) -> Self { Self::Alloc { var_symidx, vartype, }  }
 
     // Instruction -> Arith -> ArithOp
     pub fn new_add(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::Add { a, b, vartype } } }
@@ -554,8 +561,8 @@ impl Debug for InstrType {
             }
             InstrType::DefineVar { var_symidx: varname, vartype, op_value: value } => {
                 match value{
-                    Some(value) => write!(f, "Alloc {:?} %{:?} = {:?}", vartype, varname, value),
-                    None => write!(f, "Alloc {:?} %{:?}", vartype, varname),
+                    Some(value) => write!(f, "new_var {:?} %{:?} = {:?}", vartype, varname, value),
+                    None => write!(f, "new_var {:?} %{:?}", vartype, varname),
                 }
             }
             InstrType::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
@@ -568,6 +575,7 @@ impl Debug for InstrType {
             InstrType::Phi { lhs, rhs } => write!(f, "{:?} = {:?}",lhs,rhs),
             InstrType::TranType { lhs, op } => write!(f, "{:?} = {:?}", lhs, op),
             InstrType::BreakPoint { breakpoint_symidx  } => write!(f,"breakpoint {:?} !",breakpoint_symidx),
+            InstrType::Alloc { var_symidx, vartype, } => write!(f,"alloc {:?} {:?}",vartype,var_symidx),
         }
     }
 }

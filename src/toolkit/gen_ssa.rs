@@ -26,6 +26,10 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
 
     for (func_symidx,_cfg_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?.iter(){
         for variable in symtab.get_symbol(func_symidx)?.get_declared_vars()?{
+            // if *symtab.get_symbol(variable)?.get_is_temp()?{
+            //     // 我们不处理 临时变量的 ssa
+            //     continue;
+            // }
             let mut cfg_instr_idx_vec:Vec<_> = symtab.get_symbol(variable)?.get_def_instrs_vec()?.iter().map(|&instr|instr!(at instr in instr_slab).unwrap().get_cfg_instr_idx().unwrap()).collect();
             cfg_instr_idx_vec.sort();
             // get the cfg work list 
@@ -114,7 +118,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                 if !instr_struct.is_phi(){
                     for use_symidx in instr_struct.get_mut_use_symidx_vec(){
                         let &is_const = symtab.get_symbol(&use_symidx)?.get_is_const()?;
-                        let &is_temp = symtab.get_symbol(&use_symidx)?.get_is_temp()?;
+                        // let &is_temp = symtab.get_symbol(&use_symidx)?.get_is_temp()?;
                         if !is_const {
                             update_reaching_def(instr, use_symidx, symtab, cfg_graph, dj_graph, instr_slab)?;
                             debug_info_yellow!("set {:?} to {:?} in instr {}",use_symidx,symtab.get_symbol(use_symidx)?.get_ssa_reaching_def()?.clone().context(anyhow!("ssa renaming 时发现变量在{:?}:instr[{}] 在 use 之前没有定义",use_symidx,instr)),instr);
@@ -128,8 +132,8 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                 for def_symidx in instr_struct.get_mut_def_symidx_vec(){
                     // symtab.get_mut_symbol(def_symidx)?.get_instr()
                     let &is_const = symtab.get_symbol(&def_symidx)?.get_is_const()?;
-                    let &is_temp = symtab.get_symbol(&def_symidx)?.get_is_temp()?;
-                    if !is_const{
+                    // let &is_temp = symtab.get_symbol(&def_symidx)?.get_is_temp()?;
+                    if !is_const {
                         let new_ssa_symidx = symtab.get_symbol(def_symidx)?.get_ssa_max_ssa_idx()?.get_next_ssa_symidx();
                         let func_cor_symbol = node!(at cfg_node in cfg_graph).get_func_cor_symidx()?;
 

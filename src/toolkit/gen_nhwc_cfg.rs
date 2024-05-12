@@ -46,9 +46,11 @@ reg_field_for_struct!(Symbol {
 reg_field_for_struct!(Symbol {
         ALL_CFG_FUNC_NAME_ENTRY_TUPLES:Vec<(SymIdx,u32)>,
     } with_fields fields);
+// for func symbol
 reg_field_for_struct!(Symbol {
         DECLARED_VARS:Vec<SymIdx>,
         FUNC_CALL_VEC:Vec<SymIdx>,
+        CFG_ENTRY_NODE:u32,
     } with_fields fields);
 reg_field_for_struct!(CfgNode {
     FUNC_COR_SYMIDX:SymIdx,
@@ -612,10 +614,14 @@ fn process_temp_symbol(
             with_field IS_CONST:{false}
             to symtab debug symtab_graph);
         *counter+=1;       
-        let temp_instr = InstrType::new_def_var(temp_type, temp_symidx.clone(), None).to_instr();
+        let temp_def_instr = InstrType::new_def_var(temp_type.clone(), temp_symidx.clone(), None).to_instr();
         let func_symidx = node_mut!(at cfg_node in cfg_graph).get_func_cor_symidx()?;
         symtab.get_mut_symbol(&func_symidx)?.get_mut_declared_vars()?.push(temp_symidx.clone());
-        push_instr!(temp_instr to cfg_node instr_list instrs in cfg_graph slab instr_slab);
+        push_instr!(temp_def_instr to cfg_node instr_list instrs in cfg_graph slab instr_slab);
+        let alloc_instr = InstrType::new_alloc(temp_type, temp_symidx.clone()).to_instr();
+        let cfg_entry = get_cfg_entry_by_cfg_node(cfg_graph, symtab, cfg_node)?;
+        push_instr!(alloc_instr to cfg_entry instr_list instrs in cfg_graph slab instr_slab);
+
         Ok(temp_symidx)
 }
 ///具有赋值性质的会将value的类型强制转换为var的类型，返回转换后的symidx
@@ -1293,9 +1299,13 @@ fn parse_declaration2nhwc(
                         }
                         // let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
                         let transed_value_symidx = force_trans_type(cfg_graph, symtab, &var_type, &value_type, &value_symidx, decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
-                        let defvar_instr = InstrType::new_def_var(var_type, var_symidx, Some(transed_value_symidx)).to_instr();
 
+                        let defvar_instr = InstrType::new_def_var(var_type.clone(), var_symidx.clone(), Some(transed_value_symidx.clone())).to_instr();
                         push_instr!(defvar_instr to cfg_node instr_list instrs in cfg_graph slab instr_slab);
+
+                        let alloc_instr = InstrType::new_alloc(var_type, var_symidx).to_instr();
+                        let cfg_entry = get_cfg_entry_by_cfg_node(cfg_graph, symtab, cfg_node)?;
+                        push_instr!(alloc_instr to cfg_entry instr_list instrs in cfg_graph slab instr_slab);
                     } else {
                         return Err(anyhow!("操作符下缺少具体变量或常量"));
                     }
@@ -1310,9 +1320,13 @@ fn parse_declaration2nhwc(
                     let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab, &def_or_use, var_str, decl_parent_scope, symtab_g,cfg_node,cfg_graph)?;
                     //创建空值
                     let value_symidx = SymIdx::new(decl_parent_scope, "".to_string());
-                    let def_instr = InstrType::new_def_var(var_type, symbol_symidx.clone(), Some(value_symidx)).to_instr();
+                    let def_instr = InstrType::new_def_var(var_type.clone(), symbol_symidx.clone(), Some(value_symidx)).to_instr();
+                    let alloc_instr = InstrType::new_alloc(var_type.clone(), symbol_symidx.clone().clone()).to_instr();
+                    let cfg_entry =get_cfg_entry_by_cfg_node(cfg_graph, symtab, cfg_node)?;
+                    // 注意，这里def_instr 需要放到 cfg_entry 中，不能放到这个basic block，它可能是在一个循环中
                     let instr = push_instr!(def_instr to cfg_node instr_list instrs in cfg_graph slab instr_slab);
                     node_mut!(at cfg_node in cfg_graph).get_mut_def_symidx_instr_tuple_vec()?.push((symbol_symidx.clone(),instr));
+                    push_instr!(alloc_instr to cfg_entry instr_list instrs in cfg_graph slab instr_slab);
                 }
                 _ => return Err(anyhow!("{}这里不应该为sep类型", detail_et)),
             }
@@ -1369,8 +1383,9 @@ fn parse_func2nhwc(
         //做成instr放在cfg的entry里面
         let func_instr = InstrType::new_def_func(func_symidx.clone(), func_ret_symidx, arg_syms).to_instr();
         // 把信息加入到 ！compilation_unit 中
-        symtab.get_mut_global_info().get_mut_all_cfg_func_name_entry_tuples()?.push((func_symidx,cfg_entry));
-
+        symtab.get_mut_global_info().get_mut_all_cfg_func_name_entry_tuples()?.push((func_symidx.clone(),cfg_entry));
+        // 把cfg entry 信息加入到 func symbol 中
+        symtab.get_mut_symbol(&func_symidx)?.add_cfg_entry_node(cfg_entry);
 
 
         push_instr!(func_instr to cfg_entry instr_list instrs in cfg_graph slab instr_slab);
@@ -1575,4 +1590,10 @@ pub fn _recursive_find_branch(cfg_node:u32,cfg_graph:&CfgGraph, mut cur_branch_l
         }
         rst
     }
+}
+
+pub fn get_cfg_entry_by_cfg_node(cfg_graph:&CfgGraph,symtab:&SymTab,cfg_node:u32)-> Result<u32>{
+    let func_symidx = node!(at cfg_node in cfg_graph).get_func_cor_symidx()?;
+    let &cfg_entry = symtab.get_symbol(func_symidx)?.get_cfg_entry_node()?;
+    Ok(cfg_entry)
 }

@@ -1,6 +1,6 @@
 use std::vec;
 
-use crate::{add_node, add_node_with_edge, debug_info_red, toolkit::{cfg_node::InstrList, context::NhwcCtx, field::Type, nhwc_instr::{InstrSlab, InstrType}, pass_manager::Pass, simulator::Simulator, symtab::{SymIdx, SymTab, SymTabEdge, SymTabGraph}}};
+use crate::{add_node, add_node_with_edge, debug_info_red, debug_info_yellow, toolkit::{cfg_node::InstrList, context::NhwcCtx, field::Type, nhwc_instr::{InstrSlab, InstrType}, pass_manager::Pass, simulator::Simulator, symtab::{SymIdx, SymTab, SymTabEdge, SymTabGraph}}};
 use anyhow::{ Result};
 use crate::toolkit::dot::Config;
 use crate::toolkit::etc::generate_png_by_graph;
@@ -110,6 +110,11 @@ impl Pass for SimulatorDebugPass {
                         break;
                     }
                 }else if let Err(e) = rst {
+                    debug_info_red!("Err when running this instr");
+                    simu.clear_text();
+                    simu.load_instr_text(Some(6),instr_slab,)?;
+                    simu.load_stack_text()?;
+                    debug_info_yellow!("{:?}",simu);
                     debug_info_red!("{:?}",e);
                     break;
                 }
