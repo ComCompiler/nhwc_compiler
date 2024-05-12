@@ -90,25 +90,11 @@ pub fn get_cor_br_instr_of_phi_instr(cfg_graph:&CfgGraph,instr_slab:&InstrSlab, 
     let phi_cfg_node  = phi_instr_struct.get_cfg_instr_idx()?.cfg_node;
     if node!(at phi_cfg_node in cfg_graph).cfg_node_type.is_gather(){
         let cfg_branch_node = find_branch_of_gather_upwnward(phi_cfg_node, cfg_graph)?;
-        Ok(get_br_instr_of_cfg_node(cfg_graph, instr_slab, cfg_branch_node, symtab)?)
+        Ok(node!(at cfg_branch_node in cfg_graph).op_jump_instr.ok_or(anyhow!("这个 cfg_node:{} 没有 jump_instr ",cfg_branch_node))?)
     }else if node!(at phi_cfg_node in cfg_graph).cfg_node_type.is_while_loop(){
-        Ok(get_br_instr_of_cfg_node(cfg_graph, instr_slab, phi_cfg_node, symtab)?)
+        Ok(node!(at phi_cfg_node in cfg_graph).op_jump_instr.ok_or(anyhow!("这个 cfg_node:{} 没有 jump_instr ",phi_cfg_node))?)
     }else{
         Err(anyhow!("这个 phi instr {:?} 没有对应的 jump_det ",phi_instr_struct))
     }
 
-}
-
-pub fn get_br_instr_of_cfg_node(cfg_graph:&CfgGraph,instr_slab:&InstrSlab, cfg_node:u32, symtab:&SymTab)-> Result<usize>{
-    let instrs = &node!(at cfg_node in cfg_graph).instrs;
-    // 这个instr 可能是 br 也有可能是直接 jump ,更有可能是空
-    if instrs.len()==0{
-        Err(anyhow!("无法获取此cfg_node:{} 的 br_instr 因为它其中没有任何instr",cfg_node))?
-    }
-    let br_instr = instrs[instrs.len()-1];
-    if instr!(at br_instr in instr_slab)?.instr_type.is_br(){
-        Ok(br_instr)
-    }else{
-        Err(anyhow!("这个 cfg_node:{} 的instr:{} 不是 jump_instr ",cfg_node,br_instr))
-    }
 }

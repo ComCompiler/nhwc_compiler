@@ -496,10 +496,12 @@ impl Simulator{
                 // 这是内存分配指令， 我们在内存分配的时候加入 src 变量
                 let simu_symtab = &mut self.simu_symtab;
                 let src_var_symidx = var_symidx.to_src_symidx();
-                add_symbol!({src_var_symidx.into_symbol()}
-                    with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
-                    to simu_symtab
-                );
+                if !simu_symtab.has_symbol(&src_var_symidx){
+                    add_symbol!({src_var_symidx.into_symbol()}
+                        with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
+                        to simu_symtab
+                    );
+                }
             },
         }
         Ok(instr_struct.clone())

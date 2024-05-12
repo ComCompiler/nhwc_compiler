@@ -4,7 +4,7 @@ use crate::{add_field, add_symbol, debug_info_green, debug_info_yellow, direct_c
 use itertools::{Itertools};
 
 use crate::toolkit::symtab::{SymTabEdge,SymTabGraph};
-use super::{cfg_node::{CfgGraph, CfgInstrIdx, InstrList}, context::DjGraph, def_use_node::DefUseGraph, etc, nhwc_instr::{InstrSlab, InstrType, PhiPair}, symbol::Symbol, symtab::{SymIdx, SymTab}};
+use super::{cfg_node::{CfgGraph, CfgInstrIdx, InCfgNodeInstrPos, InstrList}, context::DjGraph, def_use_node::DefUseGraph, etc, nhwc_instr::{InstrSlab, InstrType, PhiPair}, symbol::Symbol, symtab::{SymIdx, SymTab}};
 use anyhow::{anyhow, Result, Context};
 
 
@@ -222,7 +222,7 @@ pub fn find_recent_dom_instr_before(check_phi_instrs:bool,cfg_node:u32,symidx:&S
     {
         let instrs = &node!(at cfg_node in cfg_graph).instrs;
         if let Some(idx) = find_first_def_in_instr_vec(instrs, &symidx, instr_slab, Ordering::Less,Some(cfg_instr_pos))?{
-            return Ok(Some(CfgInstrIdx::new(cfg_node,idx, false)))
+            return Ok(Some(CfgInstrIdx::new(cfg_node,InCfgNodeInstrPos::InInstrs { instr_pos: idx })))
         }
     }
     // 如果在 这个instruction 的 def_vec 找到了想要找的符号，那么就直接 return 
@@ -230,7 +230,7 @@ pub fn find_recent_dom_instr_before(check_phi_instrs:bool,cfg_node:u32,symidx:&S
     if check_phi_instrs{
         let phi_instrs = &node!(at cfg_node in cfg_graph).phi_instrs;
         if let Some(idx) = find_first_def_in_instr_vec(phi_instrs, &symidx, instr_slab, Ordering::Less,None)?{
-            return Ok(Some(CfgInstrIdx::new(cfg_node,idx, true)))
+            return Ok(Some(CfgInstrIdx::new(cfg_node,InCfgNodeInstrPos::InPhi { phi_instr_pos: idx } )))
         }
     }
     // 检查所有 domiance node 
@@ -249,13 +249,13 @@ pub fn find_recent_dom_instr_before(check_phi_instrs:bool,cfg_node:u32,symidx:&S
                 {
                     let instrs = &node!(at domiance_cfg_node in cfg_graph).instrs;
                     if let Some(idx) = find_first_def_in_instr_vec(instrs, &symidx, instr_slab, Ordering::Less,None)?{
-                        return Ok(Some(CfgInstrIdx::new(domiance_cfg_node,idx, false)))
+                        return Ok(Some(CfgInstrIdx::new(domiance_cfg_node,InCfgNodeInstrPos::InInstrs { instr_pos: idx })))
                     }
                 }
                 if check_phi_instrs{
                     let phi_instrs = &node!(at cfg_node in cfg_graph).phi_instrs;
                     if let Some(idx) = find_first_def_in_instr_vec(phi_instrs, &symidx, instr_slab, Ordering::Less,None)?{
-                        return Ok(Some(CfgInstrIdx::new(domiance_cfg_node,idx, true)))
+                        return Ok(Some(CfgInstrIdx::new(domiance_cfg_node,InCfgNodeInstrPos::InPhi { phi_instr_pos: idx })))
                     }
                 }
             },
@@ -323,11 +323,24 @@ pub fn instr_is_dominated_by(instr1:usize, instr2:usize, cfg_graph:&CfgGraph, dj
     let cfg_instr_idx2 = instr_slab.get_instr(instr2)?.get_cfg_instr_idx()?;
     if cfg_instr_idx1.cfg_node == cfg_instr_idx2.cfg_node {
         // 如果处于同一个cfg_node ，那么考虑 是否是 phi instr
-        match (cfg_instr_idx1.is_in_phi,cfg_instr_idx2.is_in_phi){
-            (true, true) => Ok(cfg_instr_idx1.instr_pos > cfg_instr_idx2.instr_pos),
-            (true, false) => Ok(false),
-            (false, true) => Ok(true),
-            (false, false) =>Ok(cfg_instr_idx1.instr_pos > cfg_instr_idx2.instr_pos),
+        match (&cfg_instr_idx1.in_cfg_instr_pos,&cfg_instr_idx2.in_cfg_instr_pos){
+            (InCfgNodeInstrPos::InPhi { phi_instr_pos:phi_instr_pos1 }, InCfgNodeInstrPos::InPhi { phi_instr_pos:phi_instr_pos2 }) => Ok(phi_instr_pos1> phi_instr_pos2),
+            (InCfgNodeInstrPos::InPhi { phi_instr_pos }, InCfgNodeInstrPos::InInstrs { instr_pos}) => Ok(false),
+            (InCfgNodeInstrPos::InInstrs { instr_pos}, InCfgNodeInstrPos::InPhi { phi_instr_pos }) => Ok(true),
+            (InCfgNodeInstrPos::InInstrs { instr_pos:instr_pos1 }, InCfgNodeInstrPos::InInstrs { instr_pos:instr_pos2 }) =>Ok(instr_pos1 > instr_pos2),
+            (InCfgNodeInstrPos::InPhi { phi_instr_pos }, InCfgNodeInstrPos::InLabel {  }) => Ok(true),
+            (InCfgNodeInstrPos::InInstrs { instr_pos }, InCfgNodeInstrPos::InLabel {  }) => Ok(true),
+            (InCfgNodeInstrPos::InPhi { phi_instr_pos }, InCfgNodeInstrPos::InJump {  }) => Ok(false),
+            (InCfgNodeInstrPos::InInstrs { instr_pos }, InCfgNodeInstrPos::InJump {  }) => Ok(false),
+            (InCfgNodeInstrPos::InLabel {  }, InCfgNodeInstrPos::InPhi { phi_instr_pos }) => Ok(false),
+            (InCfgNodeInstrPos::InLabel {  }, InCfgNodeInstrPos::InInstrs { instr_pos }) => Ok(false),
+            (InCfgNodeInstrPos::InLabel {  }, InCfgNodeInstrPos::InLabel {  }) => Ok(false),
+            (InCfgNodeInstrPos::InLabel {  }, InCfgNodeInstrPos::InJump {  }) => Ok(false),
+            (InCfgNodeInstrPos::InJump {  }, InCfgNodeInstrPos::InPhi { phi_instr_pos }) => Ok(true),
+            (InCfgNodeInstrPos::InJump {  }, InCfgNodeInstrPos::InInstrs { instr_pos }) => Ok(true),
+            (InCfgNodeInstrPos::InJump {  }, InCfgNodeInstrPos::InLabel {  }) => Ok(true),
+            (InCfgNodeInstrPos::InJump {  }, InCfgNodeInstrPos::InJump {  }) => Ok(true),
+            // _ => Err(anyhow!("instr_is_dominated_by 只讨论 普通Instr 和 Phi_instr 之间的支配关系，无法识别 instr1:{} instr2:{}",instr1,instr2))
         }
     }else{
         // 如果不是同一个cfg_node ，只需要判断 whether cfg_node1 is dominated by cfg_node2
@@ -381,9 +394,15 @@ pub fn refresh_cfg_instr_idx_in_cfg_graph(cfg_graph:&mut CfgGraph,symtab:&SymTab
 pub fn refresh_cfg_instr_idx_in_cfg_node(cfg_graph:&mut CfgGraph,cfg_node:u32,symtab:&SymTab,instr_slab:&mut InstrSlab)->Result<()>{
     refresh_cfg_instr_idx_in_cfg_node_instrs(cfg_graph, cfg_node, symtab, instr_slab)?;
     refresh_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph, cfg_node, symtab, instr_slab)?;
+    for &instr in node_mut!(at cfg_node in cfg_graph).op_label_instr.iter() {
+        instr_slab.get_mut_instr(instr).unwrap().add_cfg_instr_idx(CfgInstrIdx::new(cfg_node, InCfgNodeInstrPos::InLabel {  } ));   
+    }
+    for &instr in node_mut!(at cfg_node in cfg_graph).op_jump_instr.iter() {
+        instr_slab.get_mut_instr(instr).unwrap().add_cfg_instr_idx(CfgInstrIdx::new(cfg_node, InCfgNodeInstrPos::InJump {  } ));   
+    }
     Ok(())
 }
-pub fn refresh_cfg_instr_idx_in_cfg_node_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,_symtab:&SymTab,instr_slab:&mut InstrSlab)->Result<()>{
+fn refresh_cfg_instr_idx_in_cfg_node_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,_symtab:&SymTab,instr_slab:&mut InstrSlab)->Result<()>{
     let outdated = &mut node_mut!(at cfg_node in cfg_graph).instrs.outdated ;
     // 只有当instrList 是outdated 状态才进行操作
     if !*outdated {
@@ -393,11 +412,11 @@ pub fn refresh_cfg_instr_idx_in_cfg_node_instrs(cfg_graph:&mut CfgGraph,cfg_node
     // debug_info_yellow!("refresh node {}",cfg_node);
 
     for (instr_pos,&instr) in node_mut!(at cfg_node in cfg_graph).instrs.iter().enumerate() {
-        instr_slab.get_mut_instr(instr).unwrap().add_cfg_instr_idx(CfgInstrIdx::new(cfg_node, instr_pos, false));   
+        instr_slab.get_mut_instr(instr).unwrap().add_cfg_instr_idx(CfgInstrIdx::new(cfg_node, InCfgNodeInstrPos::InInstrs { instr_pos }));   
     }
     Ok(())
 }
-pub fn refresh_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,_symtab:&SymTab,instr_slab:&mut InstrSlab)->Result<()>{
+fn refresh_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,_symtab:&SymTab,instr_slab:&mut InstrSlab)->Result<()>{
     let outdated = &mut node_mut!(at cfg_node in cfg_graph).phi_instrs.outdated ;
     // 只有当instrList 是outdated 状态才进行操作
     if !*outdated {
@@ -407,12 +426,12 @@ pub fn refresh_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph:&mut CfgGraph,cfg_
     // debug_info_yellow!("refresh phi node {}",cfg_node);
 
     for (instr_pos,&phi_instr) in node_mut!(at cfg_node in cfg_graph).phi_instrs.iter().enumerate() {
-        instr_slab.get_mut_instr(phi_instr).unwrap().add_cfg_instr_idx(CfgInstrIdx::new(cfg_node, instr_pos, true));   
+        instr_slab.get_mut_instr(phi_instr).unwrap().add_cfg_instr_idx(CfgInstrIdx::new(cfg_node, InCfgNodeInstrPos::InPhi { phi_instr_pos: instr_pos }));   
     }
     Ok(())
 }
 
-pub fn refresh_def_instr_vec_of_defined_symbol(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab )->Result<()>{
+fn refresh_def_instr_vec_of_defined_symbol(cfg_graph:&mut CfgGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab )->Result<()>{
     let cfg_dfs_vec = etc::dfs(cfg_graph, 0);
     for cfg_node in cfg_dfs_vec{
         for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){

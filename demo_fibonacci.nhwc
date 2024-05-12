@@ -1,9 +1,9 @@
  1    Define main _s0 [] -> main_ret _s0 
          33   alloc i32 temp_7 _s12 
          36   alloc i32 a _s12 
-         32   new_var i32 %temp_7 _s12 
-         34   temp_7 _s12 =  Call i32 Fibo _s0(6 _s0) 
-         35   new_var i32 %a _s12 = temp_7 _s12 
+         32   new_var i32 %temp_70 
+         34   temp_71 =  Call i32 Fibo _s0(6 _s0) 
+         35   new_var i32 %a0 = temp_71 
          37   ret 0 _s0 
  0    Define Fibo _s0 [n0] -> Fibo_ret _s0 
          3    alloc i32 temp_0 _s7 
@@ -15,24 +15,24 @@
          29   alloc i1 temp_6 _s7 
          22   new_var i1 %temp_50 
          24   temp_51 = icmp i1 Eq n0, 0 _s0 
-         25   br i1 temp_5 _s4, label branch.true: _s5, label branch.false: _s5 
+         25   br i1 temp_51, label branch.true: _s5, label branch.false: _s5 
      20   label branch.true: _s5: 
          19   ret 0 _s0 
      21   label branch.false: _s5: 
-         28   new_var i1 %temp_6 _s7 
-         30   temp_6 _s7 = icmp i1 Eq n _s1, 1 _s0 
-         31   br i1 temp_6 _s7, label branch.true: _s8, label branch.false: _s8 
+         28   new_var i1 %temp_60 
+         30   temp_61 = icmp i1 Eq n0, 1 _s0 
+         31   br i1 temp_61, label branch.true: _s8, label branch.false: _s8 
      26   label branch.true: _s8: 
          18   ret 1 _s0 
      27   label branch.false: _s8: 
-         2    new_var i32 %temp_0 _s7 
-         4    temp_0 _s7 = Sub i32 n _s1, 2 _s0 
-         5    new_var i32 %temp_1 _s7 
-         7    temp_1 _s7 =  Call i32 Fibo _s0(temp_0 _s7) 
-         8    new_var i32 %temp_2 _s7 
-         10   temp_2 _s7 = Sub i32 n _s1, 1 _s0 
-         11   new_var i32 %temp_3 _s7 
-         13   temp_3 _s7 =  Call i32 Fibo _s0(temp_2 _s7) 
-         14   new_var i32 %temp_4 _s7 
-         16   temp_4 _s7 = Add i32 temp_3 _s7, temp_1 _s7 
-         17   ret temp_4 _s7 
+         2    new_var i32 %temp_00 
+         4    temp_01 = Sub i32 n0, 2 _s0 
+         5    new_var i32 %temp_10 
+         7    temp_11 =  Call i32 Fibo _s0(temp_01) 
+         8    new_var i32 %temp_20 
+         10   temp_21 = Sub i32 n0, 1 _s0 
+         11   new_var i32 %temp_30 
+         13   temp_31 =  Call i32 Fibo _s0(temp_21) 
+         14   new_var i32 %temp_40 
+         16   temp_41 = Add i32 temp_31, temp_11 
+         17   ret temp_41 
