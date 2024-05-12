@@ -1,6 +1,7 @@
 use core::panic;
 
 use crate::toolkit::nhwc_instr::ArithOp::{Add , Sub, Mul, Div};
+use crate::toolkit::symtab;
 use std::fmt::Debug;
 use anyhow::*;
 
@@ -101,11 +102,20 @@ impl Simulator{
                         to simu_symtab
                     );
                     for arg in args{
-                        add_symbol!({Symbol::new_from_symidx(arg)}
+                        add_symbol!({Symbol::new_from_symidx(&arg.to_src_symidx())}
                             with_field SIMU_VAL:{Value::new_unsure()}
                             with_field SIMU_OP_LAST_DEF_INSTR:{Some(self.instr_list[idx])}
                             to simu_symtab
                         );
+                    }
+                    for arg in args{
+                        if !simu_symtab.has_symbol(arg){
+                            add_symbol!({Symbol::new_from_symidx(&arg)}
+                                with_field SIMU_VAL:{Value::new_unsure()}
+                                with_field SIMU_OP_LAST_DEF_INSTR:{Some(self.instr_list[idx])}
+                                to simu_symtab
+                            );
+                        }   
                     }
                 }
                 _ => (),
@@ -221,7 +231,9 @@ impl Simulator{
                     with_field SIMU_VAL:{Value::from_string_with_specific_type(&src_symtab.get_symbol(use_symidx)?.symidx.symbol_name, src_symtab.get_symbol(use_symidx)?.get_type()?)?}
                 to simu_symtab);
             }
+            
         }
+        
         for def_symidx in instr_struct.get_def_symidx_vec(){
             let simu_symtab = &mut self.simu_symtab;
             let src_var_symidx= def_symidx.to_src_symidx();
@@ -231,6 +243,7 @@ impl Simulator{
                     // 如果没有这个 var_symidx说名这是个 ssa变量，只是src_symidx 的一个版本，因此不妨定义一下这个版本
                     add_symbol!({def_symidx.clone().into_symbol()}
                         with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
+                        with_field SIMU_VAL:{Value::new_unsure()}
                         to simu_symtab
                     );
                 }

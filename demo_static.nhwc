@@ -1,0 +1,2 @@
+ 0    Define main _s0 [] -> main_ret _s0 
+         1    ret 0 _s0 

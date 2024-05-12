@@ -11,7 +11,7 @@ impl Ast2StPass {
 impl Pass for Ast2StPass {
     // 运行这个pass
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> {
-        parse_ast_to_scope(ctx);
+        parse_ast_to_scope(&ctx.ast_tree,&ctx.cfg_graph,&mut ctx.scope_tree,&mut ctx.ast2scope);
         // 3.1 生成对应的pn
         if self.is_gen_png {
             // let symt = self.op_cfg_graph.unwrap();
