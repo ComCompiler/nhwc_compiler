@@ -72,7 +72,7 @@ impl Simulator{
     }
     /// load函数负责在运行前将所有包含的函数符号及其参数和形式返回值以及label和Deffunc行号记录在案  
     /// 以确定跳转位置(ret or br)
-    pub fn load(&mut self,instr_slab:&InstrSlab) -> Result<()>{
+    pub fn load_instrs(&mut self,instr_slab:&InstrSlab) -> Result<()>{
         let instr = &self.instr_list;
         let simu_symtab = &mut self.simu_symtab;
 

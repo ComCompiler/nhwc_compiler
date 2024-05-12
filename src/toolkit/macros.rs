@@ -516,11 +516,17 @@ macro_rules! insert_instr {
 }
 #[macro_export]
 macro_rules! push_instr {
-    ($instr:ident to $node:ident instr_list $instr_list:ident in $graph:ident slab $instrslab:ident) =>{
+    ($instr:ident to $node:ident in $graph:ident slab $instrslab:ident) =>{
         {
             let cfg_node_struct = node_mut!(at $node in $graph);
             let instr = $instrslab.insert_instr($instr);
-            cfg_node_struct.$instr_list.push(instr);
+            match &instr!(at instr in $instrslab)?.instr_type{
+                InstrType::Label { label_symidx } => cfg_node_struct.op_label_instr = Some(instr),
+                InstrType::Phi { lhs, rhs } => cfg_node_struct.phi_instrs.push(instr),
+                InstrType::Jump { jump_op } => cfg_node_struct.op_jump_instr = Some(instr),
+                _ => cfg_node_struct.instrs.push(instr),
+            }
+
             // $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.instrs.len()-1, false));
             instr
         }

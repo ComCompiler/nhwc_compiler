@@ -62,7 +62,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
                         // 由于 c语言要求在 dominator 中 必须已经先声明 变量，因此我们可以直接假定存在这个 dom_instr 故直接 unwrap 是可行的
                         // let phi_instr_struct = InstrType::new_phi_node(variable.clone(), phi_pairs ).to_instr();
                         let phi_instr_struct = InstrType::new_phi_node(variable.clone(), vec![]).to_instr();
-                        let new_phi_instr = push_instr!(phi_instr_struct to cfg_df_node instr_list phi_instrs in cfg_graph slab instr_slab);
+                        let new_phi_instr = push_instr!(phi_instr_struct to cfg_df_node in cfg_graph slab instr_slab);
 
                         // 如果 def_cfg_nodes 不包含 这个 cfg_node ，那么需要把这个cfg_node 添加到 work_list 中，进行phi_node的再生产 reproduction
                         if !def_cfg_nodes.contains(&cfg_df_node) {
