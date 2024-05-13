@@ -12,11 +12,13 @@ use super::field::Type::{self, F32, I32};
 use super::nhwc_instr::Instruction;
 use super::symtab::SymIdx;
 use super::{field::{Field, Value}, nhwc_instr::{ArithOp::*, InstrSlab, InstrType::*}, symbol::Symbol, symtab::{SymTab, SymTabEdge, SymTabGraph}};
-make_field_trait_for_struct!(Value);
+make_field_trait_for_struct!(Value,(usize,usize));
+// simu_func_pos_range 是一个左闭右开区间
 reg_field_for_struct!(Symbol{
     SIMU_VAL:Value,
     SIMU_OP_LAST_DEF_INSTR:Option<usize>,
     SIMU_LABEL_POS:usize,
+    SIMU_FUNC_POS_RANGE:(usize,usize),
 }with_fields fields);
 pub struct Simulator{
     // 自己创建的symtab
@@ -66,9 +68,18 @@ impl Simulator{
             text: String::new(),
         }
     }
-    pub fn set_instr_pos_to_main(&mut self)->Result<()>{
-        let &main_pos = self.simu_symtab.get_symbol(&SymIdx::new(0, "main".to_string()))?.get_simu_label_pos()?;
+    pub fn set_instr_pos_to_main(&mut self,instr_slab:&mut InstrSlab)->Result<()>{
+        let main_func_symidx = SymIdx::new(0, "main".to_string());
+        let func_type = self.simu_symtab.get_symbol(&main_func_symidx).with_context(||format!("在设置main函数为开始运行点时找不到main符号"))?.get_type()?.clone();
+        let ret_symidx = if let Type::Fn { arg_syms: formal_arg_symidx_vec, ret_sym: ret_symidx } = &func_type {
+            ret_symidx.clone()
+        }else{
+            return Err(anyhow!("main不是一个函数符号"))
+        };
+        let &main_pos = self.simu_symtab.get_symbol(&main_func_symidx)?.get_simu_label_pos()?;
         self.cur_instr_pos = main_pos;
+        self.instr_list.push(instr_slab.insert_instr(BreakPoint { breakpoint_symidx: SymIdx::new(0, "exit".to_string()) }.to_instr()));
+        self.func_call_ctx_stack.push(FuncCallCtx::new(main_func_symidx, ret_symidx, vec![], vec![], self.instr_list.len()-2, None));
         Ok(())
     }
     /// load函数负责在运行前将所有包含的函数符号及其参数和形式返回值以及label和Deffunc行号记录在案  
@@ -78,13 +89,14 @@ impl Simulator{
         let simu_symtab = &mut self.simu_symtab;
 
         // 先扫一遍,找到所有的label 并存入symtab
-        for (idx,&l) in instr.iter().enumerate(){
+        let mut op_cur_define_func = None;
+        for (pos,&l) in instr.iter().enumerate(){
             let instr_struct = instr_slab.get_instr(l)?.clone();
             match &instr_struct.instr_type {
                 Label { label_symidx } => {
                     add_symbol!({Symbol::new_from_symidx(label_symidx)}
                         with_field SIMU_VAL:{Value::new_unsure()}
-                        with_field SIMU_LABEL_POS:{idx}
+                        with_field SIMU_LABEL_POS:{pos}
                         to simu_symtab
                     );
                 }
@@ -93,7 +105,7 @@ impl Simulator{
                     add_symbol!({Symbol::new_from_symidx(func_symidx)}
                         with_field SIMU_VAL:{Value::new_unsure()}
                         with_field TYPE:{Type::Fn { arg_syms: args.clone(), ret_sym: ret_symidx.clone()}}
-                        with_field SIMU_LABEL_POS:{idx}
+                        with_field SIMU_LABEL_POS:{pos}
                         to simu_symtab
                     );
                     add_symbol!({Symbol::new_from_symidx(ret_symidx)}
@@ -104,7 +116,7 @@ impl Simulator{
                     for arg in args{
                         add_symbol!({Symbol::new_from_symidx(&arg.to_src_symidx())}
                             with_field SIMU_VAL:{Value::new_unsure()}
-                            with_field SIMU_OP_LAST_DEF_INSTR:{Some(self.instr_list[idx])}
+                            with_field SIMU_OP_LAST_DEF_INSTR:{Some(self.instr_list[pos])}
                             to simu_symtab
                         );
                     }
@@ -112,26 +124,31 @@ impl Simulator{
                         if !simu_symtab.has_symbol(arg){
                             add_symbol!({Symbol::new_from_symidx(&arg)}
                                 with_field SIMU_VAL:{Value::new_unsure()}
-                                with_field SIMU_OP_LAST_DEF_INSTR:{Some(self.instr_list[idx])}
+                                with_field SIMU_OP_LAST_DEF_INSTR:{Some(self.instr_list[pos])}
                                 to simu_symtab
                             );
                         }   
                     }
+                    // 这代表着上一个函数的结束(如果有的话)
+                    if let Some((last_func_symidx,last_func_start_pos)) = &op_cur_define_func{
+                        simu_symtab.get_mut_symbol(last_func_symidx)?.add_simu_func_pos_range((*last_func_start_pos,pos));
+                    }
+                    op_cur_define_func = Some((func_symidx.clone(),pos));
                 }
                 _ => (),
             }
         }
         Ok(())
     }
-    /// 这个函数会从cur_instr_pos 一直运行，一直到跑到断电为止
+    /// 这个函数会从cur_instr_pos 一直运行，一直到跑到断点或栈为空为止
     pub fn exec_till_breakpoint(&mut self,instr_slab:&InstrSlab,src_symtab:&SymTab) -> Result<Option<SymIdx>>{
         // 运行完毕
         if self.cur_instr_pos >= self.instr_list.len() {
-            return Ok(None);
+            return Err(anyhow!("simulator 运行到instr_list末尾了"));
         }
         while self.cur_instr_pos < self.instr_list.len() {
             let instr = self.instr_list[self.cur_instr_pos];
-            let op_breakpoint_symidx = match &self.exec_single_instr( instr_slab,src_symtab).with_context(||format!("运行instr {:?} 失败",instr_slab.get_instr(instr).unwrap()))?.instr_type{
+            let op_breakpoint_symidx = match &self.exec_cur_instr( instr_slab,src_symtab).with_context(||format!("运行instr {:?} 失败",instr_slab.get_instr(instr).unwrap()))?.instr_type{
                 BreakPoint { breakpoint_symidx  } => {
                     Some(breakpoint_symidx.clone())
                 },
@@ -218,7 +235,7 @@ impl Simulator{
     }
 
     /// 执行单条命令，返回 执行的Instruction的引用，并且，不会对cur_instr_pos 进行增加 返回 执行的Instruction 
-    pub fn exec_single_instr(&mut self, instr_slab:&InstrSlab, src_symtab:&SymTab) -> Result<Instruction>{
+    pub fn exec_cur_instr(&mut self, instr_slab:&InstrSlab, src_symtab:&SymTab) -> Result<Instruction>{
         let instr = self.instr_list[self.cur_instr_pos];
         let instr_struct = instr_slab.get_instr(self.instr_list[self.cur_instr_pos])?;
         // println!("exec_single_instr : {:?}",instr_struct);

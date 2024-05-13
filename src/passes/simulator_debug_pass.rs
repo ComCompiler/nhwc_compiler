@@ -85,7 +85,7 @@ impl Pass for SimulatorDebugPass {
         // // 实例化simulator
         let mut simu = Simulator::new(ctx.collected_nhwc_ir.clone());
         simu.load_instrs( &instr_slab)?;
-        simu.set_instr_pos_to_main()?;
+        simu.set_instr_pos_to_main(instr_slab)?;
 
         
         if self.is_gen_png{
