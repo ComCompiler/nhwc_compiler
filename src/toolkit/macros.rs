@@ -720,6 +720,9 @@ macro_rules! make_field_trait_for_struct {
             fn clone_box(&self)->Box<dyn Field> {
                 Box::new(self.clone())
             }
+            fn as_field_move(self) -> Box<dyn Field> {
+                Box::new(self)
+            }
         }
         )*
     };

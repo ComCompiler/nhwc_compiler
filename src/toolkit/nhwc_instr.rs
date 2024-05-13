@@ -495,10 +495,18 @@ impl InstrType {
         false
     }
 }
-#[derive(Clone,Debug)]
+#[derive(Clone)]
 pub struct BreakpointArg{
     pub symidx:SymIdx,
     pub op_field_name:Option<String>,
+}
+impl Debug for BreakpointArg{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match &self.op_field_name{
+            Some(field_name) => write!(f,"{:?}.{}",self.symidx,field_name),
+            None => write!(f,"{:?}",self.symidx),
+        }
+    }
 }
 impl Debug for ArithOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {

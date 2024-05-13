@@ -24,5 +24,5 @@
          4    new_var i32 %temp_00 
          6    temp_01 =  Call i32 square _s0(5 _s0) 
          7    new_var i32 %b0 = temp_01 
-         9    breakpoint bp1 _s9([BreakpointArg { symidx: main _s9, op_field_name: Some("simu_func_pos_range") }]) ! 
+         9    breakpoint bp1 _s9([b _s9.simu_val]) ! 
          10   ret 0 _s0 

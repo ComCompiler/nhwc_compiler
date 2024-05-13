@@ -5,7 +5,7 @@ int main(){
         x = x+1;
     }
     int b = square(5);
-    breakpoint bp1(main.simu_func_pos_range);
+    breakpoint bp1(b.simu_val);
     return 0;
 }
 

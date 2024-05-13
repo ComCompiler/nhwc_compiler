@@ -15,6 +15,7 @@ pub trait Field: Any + Debug {
     fn as_any_move(self) -> Box<dyn Any>;
     fn as_any_mut(&mut self) -> &mut dyn Any;
     fn clone_box(&self) -> Box<dyn Field>;
+    fn as_field_move(self) -> Box<dyn Field>;
 }
 // if you implement this 会栈溢出，很神奇
 impl<T:Clone+Any+Debug> Field for Vec<T>{
@@ -26,6 +27,9 @@ impl<T:Clone+Any+Debug> Field for Vec<T>{
     }
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
         self
+    }
+    fn as_field_move(self) -> Box<dyn Field>{
+        Box::new(self)
     }
     fn clone_box(&self)->Box<dyn crate::toolkit::field::Field> {
         Box::new(self.clone())
@@ -43,6 +47,10 @@ impl<T:Clone+Any+Debug> Field for Option<T>{
     }
     fn clone_box(&self)->Box<dyn crate::toolkit::field::Field> {
         Box::new(self.clone())
+    }
+    
+    fn as_field_move(self) -> Box<dyn Field>{
+        Box::new(self)
     }
 }
 

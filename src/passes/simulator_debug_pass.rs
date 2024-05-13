@@ -4,8 +4,6 @@ use crate::{add_node, add_node_with_edge, debug_info_red, debug_info_yellow, too
 use anyhow::{ Result};
 use crate::toolkit::dot::Config;
 use crate::toolkit::etc::generate_png_by_graph;
-use crate::toolkit::nhwc_instr::IcmpPlan::*;
-use crate::toolkit::field::Type::*;
 #[derive(Debug)]
 pub struct SimulatorDebugPass {
     is_gen_png:bool,
@@ -98,10 +96,10 @@ impl Pass for SimulatorDebugPass {
             
             loop{
                 let rst = simu.exec_till_breakpoint(&instr_slab,&ctx.symtab);
-                if let Ok(Some(bp_symidx)) =  rst{
+                if let Ok(Some((bp_symidx,field_vec))) =  rst{
                     println!("breakpoint: {:?}", bp_symidx);
                     let node_count= simulator_g.node_count() as u32 -1;
-                    add_node_with_edge!({simu.simu_symtab.clone()} with edge {SymTabEdge::new(format!("{:?}",bp_symidx))} from node_count in simulator_g);
+                    add_node_with_edge!({simu.simu_symtab.clone()} with edge {SymTabEdge::new(format!("{:?} fields:{:?}",bp_symidx,field_vec))} from node_count in simulator_g);
                     simu.clear_text();
                     simu.load_instr_text(Some(6),instr_slab,)?;
                     simu.load_stack_text()?;
