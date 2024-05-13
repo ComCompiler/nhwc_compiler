@@ -7,6 +7,7 @@ use anyhow::*;
 
 use crate::{add_symbol, debug_info_red, debug_info_yellow, make_field_trait_for_struct, reg_field_for_struct};
 use super::cfg_node::InstrList;
+use super::field;
 use super::field::Type::{self, F32, I32};
 
 use super::nhwc_instr::Instruction;
@@ -78,7 +79,7 @@ impl Simulator{
         };
         let &main_pos = self.simu_symtab.get_symbol(&main_func_symidx)?.get_simu_label_pos()?;
         self.cur_instr_pos = main_pos;
-        self.instr_list.push(instr_slab.insert_instr(BreakPoint { breakpoint_symidx: SymIdx::new(0, "exit".to_string()) }.to_instr()));
+        self.instr_list.push(instr_slab.insert_instr(BreakPoint { symidx: SymIdx::new(0, "exit".to_string()), breakpoint_args: vec![] }.to_instr()));
         self.func_call_ctx_stack.push(FuncCallCtx::new(main_func_symidx, ret_symidx, vec![], vec![], self.instr_list.len()-2, None));
         Ok(())
     }
@@ -138,6 +139,10 @@ impl Simulator{
                 _ => (),
             }
         }
+        // 继续记录最后一个函数位置信息
+        if let Some((last_func_symidx,last_func_start_pos)) = &op_cur_define_func{
+            simu_symtab.get_mut_symbol(last_func_symidx)?.add_simu_func_pos_range((*last_func_start_pos,self.instr_list.len()));
+        }
         Ok(())
     }
     /// 这个函数会从cur_instr_pos 一直运行，一直到跑到断点或栈为空为止
@@ -149,8 +154,29 @@ impl Simulator{
         while self.cur_instr_pos < self.instr_list.len() {
             let instr = self.instr_list[self.cur_instr_pos];
             let op_breakpoint_symidx = match &self.exec_cur_instr( instr_slab,src_symtab).with_context(||format!("运行instr {:?} 失败",instr_slab.get_instr(instr).unwrap()))?.instr_type{
-                BreakPoint { breakpoint_symidx  } => {
-                    Some(breakpoint_symidx.clone())
+                BreakPoint { symidx, breakpoint_args  } => {
+                    for (itered_symidx, itered_symbol ) in self.simu_symtab.iter(){
+                        for breakpoint_arg in breakpoint_args{
+                            if itered_symidx.symbol_name == breakpoint_arg.symidx.symbol_name {
+                                if let Some(field_name) = &breakpoint_arg.op_field_name{
+                                    match field_name.as_str(){
+                                        "simu_val"=>{
+                                            debug_info_yellow!("进入断点 {:?} 此时{:?}.{}={:?}",symidx,itered_symidx,field_name,itered_symbol.get_simu_val().or(Err(())))
+                                        },
+                                        "simu_func_pos_range"=>{
+                                            debug_info_yellow!("进入断点 {:?} 此时{:?}.{}={:?}",symidx,itered_symidx,field_name,itered_symbol.get_simu_func_pos_range().or(Err(())))
+                                        }
+                                        _ => {
+                                            debug_info_red!("未识别的 breakpoint field_name:{}",field_name)
+                                        }
+                                    }
+                                }else {
+                                    debug_info_yellow!("进入断点 {:?} 此时{:?}:{:?}",symidx,itered_symidx,itered_symbol)
+                                }
+                            }
+                        }
+                    }
+                    Some(symidx.clone())
                 },
                 _=>{None}
             };
@@ -508,7 +534,7 @@ impl Simulator{
                     },
                 };
             },
-            BreakPoint { breakpoint_symidx:_ } => {},
+            BreakPoint { symidx:_, breakpoint_args: symidx_vec_to_observe } => {},
             Alloc { var_symidx, vartype} => {
                 // 这是内存分配指令， 我们在内存分配的时候加入 src 变量
                 let simu_symtab = &mut self.simu_symtab;

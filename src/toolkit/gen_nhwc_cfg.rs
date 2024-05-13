@@ -1,4 +1,5 @@
 use anyhow::{anyhow, Context, Ok, Result};
+use itertools::Itertools;
 use petgraph::{
     graph::node_index, stable_graph::NodeIndex, visit::EdgeRef
 };
@@ -12,7 +13,8 @@ use super::{
 };
 use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_instr::InstrSlab};
 use crate::antlr_parser::clexer::Identifier;
-use crate::antlr_parser::cparser::{RULE_breakpointStatement, RULE_returnStatement};
+use crate::antlr_parser::cparser::{RULE_breakpointArg, RULE_breakpointStatement, RULE_returnStatement};
+use crate::toolkit::nhwc_instr::BreakpointArg;
 use crate::{debug_info_yellow, direct_parent_node, insert_instr};
 use crate::{
     add_edge, add_node_with_edge, add_symbol, antlr_parser::cparser::{
@@ -319,8 +321,29 @@ fn parse_bb2nhwc(
             }
             (RULE_breakpointStatement, breakpoint_node) => {
                 if let Some(&breakpoint_scope) = ast2scope.get(&breakpoint_node) {
-                    let ident_node = find!(term Identifier at breakpoint_node in ast_tree).unwrap();
-                    let ret_instr = InstrType::new_breakpoint(SymIdx::new(breakpoint_scope, node!(at ident_node in ast_tree).text.clone())).to_instr();
+                    let breakpoint_arg_nodes = find_nodes!(rule RULE_breakpointArg at breakpoint_node in ast_tree);
+                    let breakpoint_head_node = find!(term Identifier at breakpoint_node in ast_tree).unwrap();
+                    let breakpoint_args = breakpoint_arg_nodes.iter()
+                        .map(|&breakpoint_arg_node| {
+                            // idents 的长度可能是1或2  例如 breakpoint bp(a) 中 a 例如 breakpoint bp(a.simu_val) 中 a.simu_val就是2
+                            let idents = find_nodes!(term Identifier at breakpoint_arg_node in ast_tree);
+                            BreakpointArg{
+                            symidx: {
+                                let head =  idents[0];
+                                let head_name = node!(at head in ast_tree).text.clone();
+                                SymIdx::new(breakpoint_scope, head_name)
+                            },
+                            op_field_name: {
+                                match idents.get(1) {
+                                    Some(&tail_name) => Some(node!(at tail_name in ast_tree).text.clone()),
+                                    None => None,
+                                } 
+                            },
+                        } }).collect_vec();
+                    let ret_instr = InstrType::new_breakpoint(
+                        SymIdx::new(breakpoint_scope, node!(at  breakpoint_head_node in ast_tree).text.clone()),
+                        breakpoint_args,
+                    ).to_instr();
                     push_instr!(ret_instr to cfg_bb in cfg_graph slab instr_slab);
                 } else {
                     return Err(anyhow!("找不到astnode的scope"));

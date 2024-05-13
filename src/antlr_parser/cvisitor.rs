@@ -555,6 +555,12 @@ pub trait CVisitor<'input>: ParseTreeVisitor<'input,CParserContextType>{
 	fn visit_breakpointStatement(&mut self, ctx: &BreakpointStatementContext<'input>) { self.visit_children(ctx) }
 
 	/**
+	 * Visit a parse tree produced by {@link CParser#breakpointArg}.
+	 * @param ctx the parse tree
+	 */
+	fn visit_breakpointArg(&mut self, ctx: &BreakpointArgContext<'input>) { self.visit_children(ctx) }
+
+	/**
 	 * Visit a parse tree produced by {@link CParser#continueStatement}.
 	 * @param ctx the parse tree
 	 */
@@ -1334,6 +1340,14 @@ pub trait CVisitorCompat<'input>:ParseTreeVisitorCompat<'input, Node= CParserCon
 		}
 
 	/**
+	 * Visit a parse tree produced by {@link CParser#breakpointArg}.
+	 * @param ctx the parse tree
+	 */
+		fn visit_breakpointArg(&mut self, ctx: &BreakpointArgContext<'input>) -> Self::Return {
+			self.visit_children(ctx)
+		}
+
+	/**
 	 * Visit a parse tree produced by {@link CParser#continueStatement}.
 	 * @param ctx the parse tree
 	 */
@@ -1855,6 +1869,11 @@ where
 
 	fn visit_breakpointStatement(&mut self, ctx: &BreakpointStatementContext<'input>){
 		let result = <Self as CVisitorCompat>::visit_breakpointStatement(self, ctx);
+        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
+	}
+
+	fn visit_breakpointArg(&mut self, ctx: &BreakpointArgContext<'input>){
+		let result = <Self as CVisitorCompat>::visit_breakpointArg(self, ctx);
         *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
 	}
 

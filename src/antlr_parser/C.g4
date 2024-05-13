@@ -500,7 +500,11 @@ jumpStatement
     ;
 
 breakpointStatement
-    :   'breakpoint' Identifier ';'
+    :   'breakpoint' Identifier ('(' ')')? ';'
+    |   'breakpoint' Identifier '(' breakpointArg (',' breakpointArg)* ')' ';'
+    ;
+breakpointArg
+    : Identifier('.' Identifier)?
     ;
 
 continueStatement

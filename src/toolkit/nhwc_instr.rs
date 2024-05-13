@@ -1,7 +1,7 @@
 use itertools::Itertools;
 use slab::Slab;
 use strum_macros::EnumIs;
-use std::{fmt::{Debug, Formatter}, vec};
+use std::{fmt::{Debug, Formatter}, option::Iter, vec};
 use anyhow::{anyhow,Result};
 use delegate::delegate;
 
@@ -176,7 +176,7 @@ pub enum InstrType {
     Phi { lhs:SymIdx, rhs:PhiOp },
     TranType { lhs:SymIdx, op:Trans },
     // 断点     只在simulator中使用
-    BreakPoint { breakpoint_symidx:SymIdx},
+    BreakPoint { symidx:SymIdx, breakpoint_args:Vec<BreakpointArg>},
 }
 #[derive(Clone)]
 pub struct Instruction {
@@ -213,7 +213,7 @@ impl Instruction {
             InstrType::Jump { jump_op: _op } => vec![],
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op: _ } => vec![lhs],
-            InstrType::BreakPoint { breakpoint_symidx } => vec![],
+            InstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args: symidx_vec_to_observe } => vec![],
             InstrType::Alloc { var_symidx, vartype, } => vec![],
         }
     }
@@ -263,7 +263,7 @@ impl Instruction {
                 Trans::Bitcast { rptr_symidx, rptr_type:_, lptr_type:_ } => vec![rptr_symidx],
             }
             ,
-            InstrType::BreakPoint { breakpoint_symidx  } => vec![],
+            InstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args: symidx_vec_to_observe  } => vec![],
             InstrType::Alloc { var_symidx, vartype, } => vec![],
         }
     }
@@ -293,7 +293,7 @@ impl Instruction {
             InstrType::Jump { jump_op: _op } => vec![],
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op:_ } => vec![lhs],
-            InstrType::BreakPoint { breakpoint_symidx  } => vec![],
+            InstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args: symidx_vec_to_observe  } => vec![],
             InstrType::Alloc { var_symidx, vartype, } => vec![],
         }
     }
@@ -343,7 +343,7 @@ impl Instruction {
                 Trans::Bitcast { rptr_symidx, rptr_type:_, lptr_type:_ } => vec![rptr_symidx],
             }
             ,
-            InstrType::BreakPoint { breakpoint_symidx  } => vec![],
+            InstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args: symidx_vec_to_observe  } => vec![],
             InstrType::Alloc { var_symidx, vartype, } => vec![],
         }
     }
@@ -470,7 +470,7 @@ impl InstrType {
         Self::Phi { lhs, rhs: PhiOp { phi_pairs:phi_pair_vec  } }
     }
 
-    pub fn new_breakpoint(symidx:SymIdx) -> Self { Self::BreakPoint {breakpoint_symidx:symidx } }
+    pub fn new_breakpoint(symidx:SymIdx,breakpoint_args:Vec<BreakpointArg>) -> Self { Self::BreakPoint {symidx ,breakpoint_args } }
 
     //自动类型转换
     pub fn new_int2float(int_symidx:SymIdx, float_symidx:SymIdx) -> Self { Self::TranType { lhs:float_symidx, op:Trans::Sitofp { int_symidx } } }
@@ -494,6 +494,11 @@ impl InstrType {
         }
         false
     }
+}
+#[derive(Clone,Debug)]
+pub struct BreakpointArg{
+    pub symidx:SymIdx,
+    pub op_field_name:Option<String>,
 }
 impl Debug for ArithOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -574,7 +579,7 @@ impl Debug for InstrType {
             InstrType::Jump { jump_op: op } => write!(f, "{:?}", op),
             InstrType::Phi { lhs, rhs } => write!(f, "{:?} = {:?}",lhs,rhs),
             InstrType::TranType { lhs, op } => write!(f, "{:?} = {:?}", lhs, op),
-            InstrType::BreakPoint { breakpoint_symidx  } => write!(f,"breakpoint {:?} !",breakpoint_symidx),
+            InstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args  } => write!(f,"breakpoint {:?}({:?}) !",breakpoint_symidx,breakpoint_args),
             InstrType::Alloc { var_symidx, vartype, } => write!(f,"alloc {:?} {:?}",vartype,var_symidx),
         }
     }

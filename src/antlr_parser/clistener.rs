@@ -915,6 +915,16 @@ fn enter_breakpointStatement(&mut self, _ctx: &BreakpointStatementContext<'input
  */
 fn exit_breakpointStatement(&mut self, _ctx: &BreakpointStatementContext<'input>) { }
 /**
+ * Enter a parse tree produced by {@link CParser#breakpointArg}.
+ * @param ctx the parse tree
+ */
+fn enter_breakpointArg(&mut self, _ctx: &BreakpointArgContext<'input>) { }
+/**
+ * Exit a parse tree produced by {@link CParser#breakpointArg}.
+ * @param ctx the parse tree
+ */
+fn exit_breakpointArg(&mut self, _ctx: &BreakpointArgContext<'input>) { }
+/**
  * Enter a parse tree produced by {@link CParser#continueStatement}.
  * @param ctx the parse tree
  */
