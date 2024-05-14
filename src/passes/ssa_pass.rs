@@ -25,7 +25,7 @@ impl Pass for SsaPass {
         }
         if self.is_gen_symtab_graph_png {
             ctx.symtab_graph.clear();
-            ctx.symtab.debug_symtab_graph(format!("after ssa pass"), &mut ctx.symtab_graph);
+            ctx.symtab.debug_symtab_graph(format!("after ssa pass"), &mut ctx.symtab_graph,vec![]);
             generate_png_by_graph(&ctx.symtab_graph.clone(), "ssa_symtab".to_string(), &[Config::Record, Config::Rounded, Config::Title("ssa_cfg".to_string()), Config::NodeIndexLabel, Config::CfgBlock],&mut ctx.io_task_list)?
         }
         add_phi_rst.and(variable_renaming_rst)

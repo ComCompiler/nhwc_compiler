@@ -2139,7 +2139,7 @@ where
 			recog.base.set_state(296);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			while ((((_la - 79)) & !0x3f) == 0 && ((1usize << (_la - 79)) & ((1usize << (Star - 79)) | (1usize << (Div - 79)) | (1usize << (Mod - 79)))) != 0) {
+			while (((_la - 79)) & !0x3f) == 0 && ((1usize << (_la - 79)) & ((1usize << (Star - 79)) | (1usize << (Div - 79)) | (1usize << (Mod - 79)))) != 0 {
 				{
 				{
 				recog.base.set_state(292);
@@ -2592,7 +2592,7 @@ where
 			recog.base.set_state(320);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			while ((((_la - 69)) & !0x3f) == 0 && ((1usize << (_la - 69)) & ((1usize << (Less - 69)) | (1usize << (LessEqual - 69)) | (1usize << (Greater - 69)) | (1usize << (GreaterEqual - 69)))) != 0) {
+			while (((_la - 69)) & !0x3f) == 0 && ((1usize << (_la - 69)) & ((1usize << (Less - 69)) | (1usize << (LessEqual - 69)) | (1usize << (Greater - 69)) | (1usize << (GreaterEqual - 69)))) != 0 {
 				{
 				{
 				recog.base.set_state(316);
@@ -9445,7 +9445,7 @@ where
 					recog.base.set_state(718);
 					recog.err_handler.sync(&mut recog.base)?;
 					_la = recog.base.input.la(1);
-					if ((((_la - 63)) & !0x3f) == 0 && ((1usize << (_la - 63)) & ((1usize << (LeftParen - 63)) | (1usize << (LeftBracket - 63)) | (1usize << (Star - 63)) | (1usize << (Caret - 63)))) != 0) {
+					if (((_la - 63)) & !0x3f) == 0 && ((1usize << (_la - 63)) & ((1usize << (LeftParen - 63)) | (1usize << (LeftBracket - 63)) | (1usize << (Star - 63)) | (1usize << (Caret - 63)))) != 0 {
 						{
 						/*InvokeRule abstractDeclarator*/
 						recog.base.set_state(717);
@@ -9690,7 +9690,7 @@ where
 			recog.base.set_state(732);
 			recog.err_handler.sync(&mut recog.base)?;
 			_la = recog.base.input.la(1);
-			if ((((_la - 63)) & !0x3f) == 0 && ((1usize << (_la - 63)) & ((1usize << (LeftParen - 63)) | (1usize << (LeftBracket - 63)) | (1usize << (Star - 63)) | (1usize << (Caret - 63)))) != 0) {
+			if (((_la - 63)) & !0x3f) == 0 && ((1usize << (_la - 63)) & ((1usize << (LeftParen - 63)) | (1usize << (LeftBracket - 63)) | (1usize << (Star - 63)) | (1usize << (Caret - 63)))) != 0 {
 				{
 				/*InvokeRule abstractDeclarator*/
 				recog.base.set_state(731);

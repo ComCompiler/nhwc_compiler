@@ -521,9 +521,9 @@ macro_rules! push_instr {
             let cfg_node_struct = node_mut!(at $node in $graph);
             let instr = $instrslab.insert_instr($instr);
             match &instr!(at instr in $instrslab)?.instr_type{
-                InstrType::Label { label_symidx } => cfg_node_struct.op_label_instr = Some(instr),
-                InstrType::Phi { lhs, rhs } => cfg_node_struct.phi_instrs.push(instr),
-                InstrType::Jump { jump_op } => cfg_node_struct.op_jump_instr = Some(instr),
+                InstrType::Label { label_symidx: _ } => cfg_node_struct.op_label_instr = Some(instr),
+                InstrType::Phi { lhs: _, rhs: _ } => cfg_node_struct.phi_instrs.push(instr),
+                InstrType::Jump { jump_op: _ } => cfg_node_struct.op_jump_instr = Some(instr),
                 _ => cfg_node_struct.instrs.push(instr),
             }
 

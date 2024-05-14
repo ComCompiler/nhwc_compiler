@@ -4,7 +4,7 @@ use crate::{add_field, add_symbol, debug_info_green, debug_info_yellow, direct_c
 use itertools::{Itertools};
 
 use crate::toolkit::symtab::{SymTabEdge,SymTabGraph};
-use super::{cfg_node::{CfgGraph, CfgInstrIdx, InCfgNodeInstrPos, InstrList}, context::DjGraph, def_use_node::DefUseGraph, etc, nhwc_instr::{InstrSlab, InstrType, PhiPair}, symbol::Symbol, symtab::{SymIdx, SymTab}};
+use super::{cfg_node::{CfgGraph, CfgInstrIdx, InCfgNodeInstrPos, InstrList}, context::DjGraph, etc, nhwc_instr::{InstrSlab, InstrType, PhiPair}, symbol::Symbol, symtab::{SymIdx, SymTab}};
 use anyhow::{anyhow, Result, Context};
 
 
@@ -55,7 +55,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
                         // }else{
                         //     return Err(anyhow!("找到了非 phi node"));
                         // }
-                    }else if let Some(recent_dom_def_instr) = find_recent_dom_instr_before(true, cfg_df_node, variable, 0, cfg_graph, dj_graph, instr_slab)? {
+                    }else if let Some(_recent_dom_def_instr) = find_recent_dom_instr_before(true, cfg_df_node, variable, 0, cfg_graph, dj_graph, instr_slab)? {
                         // 事实上我们在这个阶段并不需要添加 phi node 的几个 use 参数，这个在 variable_renaming 的时候可以很好的解决
                         // let mut phi_pairs = vec![];
                         // phi_pairs.push(PhiPair::new(variable.clone(),instr));
@@ -325,19 +325,19 @@ pub fn instr_is_dominated_by(instr1:usize, instr2:usize, cfg_graph:&CfgGraph, dj
         // 如果处于同一个cfg_node ，那么考虑 是否是 phi instr
         match (&cfg_instr_idx1.in_cfg_instr_pos,&cfg_instr_idx2.in_cfg_instr_pos){
             (InCfgNodeInstrPos::InPhi { phi_instr_pos:phi_instr_pos1 }, InCfgNodeInstrPos::InPhi { phi_instr_pos:phi_instr_pos2 }) => Ok(phi_instr_pos1> phi_instr_pos2),
-            (InCfgNodeInstrPos::InPhi { phi_instr_pos }, InCfgNodeInstrPos::InInstrs { instr_pos}) => Ok(false),
-            (InCfgNodeInstrPos::InInstrs { instr_pos}, InCfgNodeInstrPos::InPhi { phi_instr_pos }) => Ok(true),
+            (InCfgNodeInstrPos::InPhi { phi_instr_pos: _ }, InCfgNodeInstrPos::InInstrs { instr_pos: _}) => Ok(false),
+            (InCfgNodeInstrPos::InInstrs { instr_pos: _}, InCfgNodeInstrPos::InPhi { phi_instr_pos: _ }) => Ok(true),
             (InCfgNodeInstrPos::InInstrs { instr_pos:instr_pos1 }, InCfgNodeInstrPos::InInstrs { instr_pos:instr_pos2 }) =>Ok(instr_pos1 > instr_pos2),
-            (InCfgNodeInstrPos::InPhi { phi_instr_pos }, InCfgNodeInstrPos::InLabel {  }) => Ok(true),
-            (InCfgNodeInstrPos::InInstrs { instr_pos }, InCfgNodeInstrPos::InLabel {  }) => Ok(true),
-            (InCfgNodeInstrPos::InPhi { phi_instr_pos }, InCfgNodeInstrPos::InJump {  }) => Ok(false),
-            (InCfgNodeInstrPos::InInstrs { instr_pos }, InCfgNodeInstrPos::InJump {  }) => Ok(false),
-            (InCfgNodeInstrPos::InLabel {  }, InCfgNodeInstrPos::InPhi { phi_instr_pos }) => Ok(false),
-            (InCfgNodeInstrPos::InLabel {  }, InCfgNodeInstrPos::InInstrs { instr_pos }) => Ok(false),
+            (InCfgNodeInstrPos::InPhi { phi_instr_pos: _ }, InCfgNodeInstrPos::InLabel {  }) => Ok(true),
+            (InCfgNodeInstrPos::InInstrs { instr_pos: _ }, InCfgNodeInstrPos::InLabel {  }) => Ok(true),
+            (InCfgNodeInstrPos::InPhi { phi_instr_pos: _ }, InCfgNodeInstrPos::InJump {  }) => Ok(false),
+            (InCfgNodeInstrPos::InInstrs { instr_pos: _ }, InCfgNodeInstrPos::InJump {  }) => Ok(false),
+            (InCfgNodeInstrPos::InLabel {  }, InCfgNodeInstrPos::InPhi { phi_instr_pos: _ }) => Ok(false),
+            (InCfgNodeInstrPos::InLabel {  }, InCfgNodeInstrPos::InInstrs { instr_pos: _ }) => Ok(false),
             (InCfgNodeInstrPos::InLabel {  }, InCfgNodeInstrPos::InLabel {  }) => Ok(false),
             (InCfgNodeInstrPos::InLabel {  }, InCfgNodeInstrPos::InJump {  }) => Ok(false),
-            (InCfgNodeInstrPos::InJump {  }, InCfgNodeInstrPos::InPhi { phi_instr_pos }) => Ok(true),
-            (InCfgNodeInstrPos::InJump {  }, InCfgNodeInstrPos::InInstrs { instr_pos }) => Ok(true),
+            (InCfgNodeInstrPos::InJump {  }, InCfgNodeInstrPos::InPhi { phi_instr_pos: _ }) => Ok(true),
+            (InCfgNodeInstrPos::InJump {  }, InCfgNodeInstrPos::InInstrs { instr_pos: _ }) => Ok(true),
             (InCfgNodeInstrPos::InJump {  }, InCfgNodeInstrPos::InLabel {  }) => Ok(true),
             (InCfgNodeInstrPos::InJump {  }, InCfgNodeInstrPos::InJump {  }) => Ok(true),
             // _ => Err(anyhow!("instr_is_dominated_by 只讨论 普通Instr 和 Phi_instr 之间的支配关系，无法识别 instr1:{} instr2:{}",instr1,instr2))

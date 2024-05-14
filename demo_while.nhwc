@@ -1,28 +1,29 @@
  1    Define square _s0 [num0] -> square_ret _s0 
-         24   alloc i32 temp_3 _s13 
-         23   new_var i32 %temp_30 
-         25   temp_31 = Mul i32 num0, num0 
-         26   ret temp_31 
+         25   alloc i32 temp_3 _s14 
+         24   new_var i32 %temp_30 
+         26   temp_31 = Mul i32 num0, num0 
+         27   ret temp_31 
  0    Define main _s0 [] -> main_ret _s0 
          3    alloc i32 x _s2 
          5    alloc i32 temp_0 _s2 
          8    alloc i32 b _s2 
          12   alloc i32 temp_1 _s6 
-         19   alloc i1 temp_2 _s4 
+         20   alloc i1 temp_2 _s4 
          2    new_var i32 %x0 = 4 _s0 
-     16   label while.head _s5: 
-         27   x1 = phi [x0,instr:2],[x2,instr:14], 
-         18   new_var i1 %temp_20 
-         20   temp_21 = icmp i1 Slt x1, 17 _s0 
-         21   br i1 temp_21, label while.body _s5, label while.exit _s5 
-     15   label while.body _s5: 
+     17   label while.head _s5: 
+         28   x1 = phi [x0,instr:2],[x2,instr:14], 
+         19   new_var i1 %temp_20 
+         21   temp_21 = icmp i1 Slt x1, 7 _s0 
+         22   br i1 temp_21, label while.body _s5, label while.exit _s5 
+     16   label while.body _s5: 
          11   new_var i32 %temp_10 
          13   temp_11 = Add i32 x1, 1 _s0 
          14   x2 = temp_11 
-         22   jump label: while.head _s5 
-     17   label while.exit _s5: 
+         15   breakpoint bp0 _s8([x _s8.simu_val]) ! 
+         23   jump label: while.head _s5 
+     18   label while.exit _s5: 
          4    new_var i32 %temp_00 
-         6    temp_01 =  Call i32 square _s0(5 _s0) 
+         6    temp_01 =  Call i32 square _s0(x1) 
          7    new_var i32 %b0 = temp_01 
-         9    breakpoint bp1 _s9([b _s9.simu_val]) ! 
+         9    breakpoint bp1 _s10([b _s10.simu_val, x _s10.simu_val]) ! 
          10   ret 0 _s0 

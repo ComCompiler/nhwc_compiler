@@ -1,6 +1,6 @@
 use petgraph::stable_graph::StableDiGraph;
 
-use super::{cfg_node::CfgInstrIdx, nhwc_instr::InstrSlab, symtab::SymIdx};
+use super::{nhwc_instr::InstrSlab, symtab::SymIdx};
 use std::fmt::Debug;
 
 pub type DefUseGraph = StableDiGraph<DefUseNode, DefUseEdge, u32>;
@@ -14,7 +14,8 @@ pub struct DefUseNode{
 #[derive(Clone)]
 pub enum DepType{
     PhiDep{ },
-    Dep{ }
+    Dep{ },
+    FinalDep{}
 }
 
 #[derive(Clone)]
@@ -28,6 +29,9 @@ impl DefUseEdge{
     }
     pub fn new_phi_dep(symidx:SymIdx)->Self{
         Self { dep_type: DepType::PhiDep {  }, symidx }
+    }
+    pub fn new_final_dep(symidx:SymIdx)->Self{
+        Self { dep_type: DepType::FinalDep {  } , symidx }
     }
 }
 impl DefUseNode{
@@ -48,6 +52,7 @@ impl Debug for DepType{
         write!(f,"{}",match &self{
             DepType::PhiDep { } => "PhiDep",
             DepType::Dep { } => "",
+            DepType::FinalDep {  } => "FinalDep",
         })
     }
 }

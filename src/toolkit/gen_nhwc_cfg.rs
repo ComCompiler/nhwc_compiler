@@ -1,12 +1,12 @@
 use anyhow::{anyhow, Context, Ok, Result};
 use itertools::Itertools;
 use petgraph::{
-    graph::node_index, stable_graph::NodeIndex, visit::EdgeRef
+    graph::node_index, visit::EdgeRef
 };
 use std::collections::HashMap;
 
 
-use super::nhwc_instr::JumpOp;
+
 use super::{cfg_edge::CfgEdge, nhwc_instr::Instruction};
 use super::{
     ast_node::AstTree, cfg_node::CfgGraph, et_node::{DeclOrDefOrUse, EtNodeType, EtTree}, gen_et::process_any_stmt, nhwc_instr::InstrType, scope_node::ScopeTree, symtab::{SymIdx, SymTab, SymTabGraph}
@@ -15,7 +15,7 @@ use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_ins
 use crate::antlr_parser::clexer::Identifier;
 use crate::antlr_parser::cparser::{RULE_breakpointArg, RULE_breakpointStatement, RULE_returnStatement};
 use crate::toolkit::nhwc_instr::BreakpointArg;
-use crate::{debug_info_yellow, direct_parent_node, insert_instr};
+use crate::{direct_parent_node};
 use crate::{
     add_edge, add_node_with_edge, add_symbol, antlr_parser::cparser::{
         RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_jumpStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
@@ -103,11 +103,9 @@ fn  parse_stmt_or_expr2nhwc(
                                 check_child_nodes(op_values.clone(), Some(2))?;
                                 // 后序遍历 右边
                                 let value_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[1], stmt_parent_scope, cfg_node, counter, instr_slab, symtab_graph)?;
-                                // let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
                                 let value_type = symtab.get_symbol(&value_symidx).unwrap().get_type_with_debug(symtab, symtab_graph)?.clone();
                                 // 后序遍历 左边
                                 let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[0], stmt_parent_scope, cfg_node, counter, instr_slab, symtab_graph)?;
-                                // let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
                                 let var_type = symtab.get_symbol(&var_symidx).unwrap().get_type_with_debug(symtab, symtab_graph)?.clone();
                                 //如果结果和变量类型不同，添加自动转化instr
                                 let new_value_symidx = force_trans_type(cfg_graph, symtab, &var_type, &value_type, &value_symidx, stmt_parent_scope, cfg_node, counter, instr_slab, symtab_graph)?;
@@ -261,7 +259,7 @@ fn  parse_stmt_or_expr2nhwc(
                                 return Err(anyhow!("statment初始运算符应有赋值性质,ast_node {} 符号出现错误", *ast_node));
                             }
                         };
-                        if let Some(assign_instr) = op_assign_instr{
+                        if let Some(_assign_instr) = op_assign_instr{
                         }
                         sep_symidx_vec.push(op_symidx)
                     } else {
@@ -1332,7 +1330,7 @@ fn parse_declaration2nhwc(
                 push_instr!(defvar_instr to cfg_node in cfg_graph slab instr_slab);
 
                 let alloc_instr = InstrType::new_alloc(var_type, var_symidx).to_instr();
-                if !matches!(&node!(at cfg_node in cfg_graph).cfg_node_type,CfgNodeType::Root { static_ast_nodes }){
+                if !matches!(&node!(at cfg_node in cfg_graph).cfg_node_type,CfgNodeType::Root { static_ast_nodes: _ }){
                 let cfg_entry = get_cfg_entry_by_cfg_node(cfg_graph, symtab, cfg_node)?.with_context(||format!("这个cfg node:{} 没有对应的entry节点",cfg_node))?;
                 push_instr!(alloc_instr to cfg_entry in cfg_graph slab instr_slab);
                 }
@@ -1373,7 +1371,7 @@ fn parse_func2nhwc(
         // let name_symidx = SymIdx::new(0, func_name.to_string());
         //获取返回类型
         let ast_retype = find!(rule RULE_declarationSpecifiers at ast_fun in ast_tree).unwrap();
-        let func_rettype = &node!(at ast_retype in ast_tree).text;
+        let _func_rettype = &node!(at ast_retype in ast_tree).text;
         //获取参数列表
         let mut arg_syms:Vec<SymIdx> = vec![];
         //添加到符号表中，

@@ -1,7 +1,7 @@
 use itertools::Itertools;
 use slab::Slab;
 use strum_macros::EnumIs;
-use std::{fmt::{Debug, Formatter}, option::Iter, vec};
+use std::{fmt::{Debug, Formatter}, vec};
 use anyhow::{anyhow,Result};
 use delegate::delegate;
 
@@ -213,14 +213,14 @@ impl Instruction {
             InstrType::Jump { jump_op: _op } => vec![],
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op: _ } => vec![lhs],
-            InstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args: symidx_vec_to_observe } => vec![],
-            InstrType::Alloc { var_symidx, vartype, } => vec![],
+            InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe } => vec![],
+            InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
         }
     }
     pub fn get_use_symidx_vec(&self)->Vec<&SymIdx>{
         match &self.instr_type{
             InstrType::Label { label_symidx:_ } => vec![],
-            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args } => {
+            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args: _ } => {
                 vec![]
             },
             InstrType::DefineVar { var_symidx:_, vartype:_, op_value } => {
@@ -244,15 +244,15 @@ impl Instruction {
             InstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
-            InstrType::Call { op_assigned_symidx: assigned, func_op } => {
+            InstrType::Call { op_assigned_symidx: _assigned, func_op } => {
                 func_op.actual_arg_symidx_vec.iter().collect_vec()
             },
             InstrType::Jump { jump_op } => {
                 match jump_op{
                     JumpOp::Ret { ret_sym } => vec![ret_sym],
-                    JumpOp::Br { cond, t1, t2 } => vec![cond],
-                    JumpOp::Switch { cond, default, compared } => vec![cond],
-                    JumpOp::DirectJump { label_symidx } => vec![],
+                    JumpOp::Br { cond, t1: _, t2: _ } => vec![cond],
+                    JumpOp::Switch { cond, default: _, compared: _ } => vec![cond],
+                    JumpOp::DirectJump { label_symidx: _ } => vec![],
                 }
             },
             InstrType::Phi { lhs:_, rhs } => rhs.phi_pairs.iter().map(|p| &p.symidx).collect_vec(),
@@ -263,8 +263,8 @@ impl Instruction {
                 Trans::Bitcast { rptr_symidx, rptr_type:_, lptr_type:_ } => vec![rptr_symidx],
             }
             ,
-            InstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args: symidx_vec_to_observe  } => vec![],
-            InstrType::Alloc { var_symidx, vartype, } => vec![],
+            InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
+            InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
         }
     }
         pub fn get_mut_def_symidx_vec(&mut self)->Vec<&mut SymIdx>{
@@ -293,14 +293,14 @@ impl Instruction {
             InstrType::Jump { jump_op: _op } => vec![],
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op:_ } => vec![lhs],
-            InstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args: symidx_vec_to_observe  } => vec![],
-            InstrType::Alloc { var_symidx, vartype, } => vec![],
+            InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
+            InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
         }
     }
     pub fn get_mut_use_symidx_vec(&mut self)->Vec<&mut SymIdx>{
         match &mut self.instr_type{
             InstrType::Label { label_symidx:_ } => vec![],
-            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args } => {
+            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args: _ } => {
                 vec![]
             },
             InstrType::DefineVar { var_symidx:_, vartype:_, op_value } => {
@@ -324,15 +324,15 @@ impl Instruction {
             InstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
-            InstrType::Call { op_assigned_symidx: assigned, func_op } => {
+            InstrType::Call { op_assigned_symidx: _assigned, func_op } => {
                 func_op.actual_arg_symidx_vec.iter_mut().collect_vec()
             },
             InstrType::Jump { jump_op } => {
                 match jump_op{
                     JumpOp::Ret { ret_sym } => vec![ret_sym],
-                    JumpOp::Br { cond, t1, t2 } => vec![cond],
-                    JumpOp::Switch { cond, default, compared } => vec![cond],
-                    JumpOp::DirectJump { label_symidx } => vec![],
+                    JumpOp::Br { cond, t1: _, t2: _ } => vec![cond],
+                    JumpOp::Switch { cond, default: _, compared: _ } => vec![cond],
+                    JumpOp::DirectJump { label_symidx: _ } => vec![],
                 }
             },
             InstrType::Phi { lhs:_, rhs } => rhs.phi_pairs.iter_mut().map(|p|&mut p.symidx).collect_vec(),
@@ -343,8 +343,8 @@ impl Instruction {
                 Trans::Bitcast { rptr_symidx, rptr_type:_, lptr_type:_ } => vec![rptr_symidx],
             }
             ,
-            InstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args: symidx_vec_to_observe  } => vec![],
-            InstrType::Alloc { var_symidx, vartype, } => vec![],
+            InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
+            InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
         }
     }
     pub fn is_phi(&self)->bool{
@@ -488,7 +488,7 @@ impl InstrType {
     }
     pub fn is_br(&self) -> bool{
         if let InstrType::Jump { jump_op } = &self{
-            if let JumpOp::Br { cond, t1, t2 } = jump_op{
+            if let JumpOp::Br { cond: _, t1: _, t2: _ } = jump_op{
                 return true
             }
         }

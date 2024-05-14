@@ -1,5 +1,6 @@
 use std::{any::Any, collections::HashMap, fmt::Debug, ops::{Add, BitAnd, BitOr, Div, Mul, Not, Rem, Sub}};
 
+use ahash::AHashMap;
 use strum_macros::EnumIs;
 use anyhow::*;
 
@@ -61,19 +62,58 @@ pub enum Value {
     I1(Option<bool>),
     Void,
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
-    /// 这个类型用来表示不确定的值或其代数表达式
-    /// 例如 int a = getint() 由于 a取决于用户输入，那么我们不能直接使用 a的值，只能用一个代数符号表示
-    Unsure {},
+    Array {
+        value_map:ArrayMap,
+        dims:Vec<u32>,
+        ele_type:Type,
+    }
+    // // 这个类型用来表示不确定的值或其代数表达式
+    // // 例如 int a = getint() 由于 a取决于用户输入，那么我们不能直接使用 a的值，只能用一个代数符号表示
+    // // Unsure {},
 }
-#[derive(Clone,EnumIs,PartialEq)]
+#[derive(Clone)]
+pub struct ArrayMap{
+    map:AHashMap<Vec<u32>,Value>
+    
+}
+impl ArrayMap{
+    pub fn new()->Self{
+        Self { map: AHashMap::new() }
+    }
+}
+impl Debug for ArrayMap{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut text = String::new();
+        for (k,v) in self.map.iter(){
+            let s:String  = k.iter().map(|&dim_index| format!("[{}]",dim_index)).collect();
+            text += format!("{} ={:?}",s,v).as_str();
+        }
+        write!(f,"{}",text)
+    }
+}
+impl PartialEq for ArrayMap{
+    fn eq(&self, other: &Self) -> bool {
+        self.map == other.map
+    }
+} 
+impl PartialOrd for ArrayMap{
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        panic!("不能比较 array {:?} 和 array {:?} 类型",self, other);
+    }
+}
+
+#[derive(Clone,EnumIs,PartialOrd,PartialEq)]
 pub enum Type {
     I32,
     F32,
     I1,
     Void,
     Label,
+    Array{
+        dims:Vec<u32>,
+        ty:Box<Type>,
+    },
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
-    Unsure {},
 }
 impl Clone for Box<dyn Field> {
     fn clone(&self) -> Box<dyn Field> { self.clone_box() }
@@ -82,7 +122,20 @@ impl Clone for Box<dyn Field> {
 impl Value {
     pub fn new_i32(value:i32) -> Self { Value::I32(Some(value)) }
     pub fn new_f32(value:f32) -> Self { Value::F32(Some(value)) }
-    pub fn new_unsure() -> Self {Value::Unsure {  }}
+    pub fn new_unsure_from_specific_type(specified_ty:&Type) -> Self {
+        match specified_ty{
+            Type::I32 => Value::I32(None),
+            Type::F32 => Value::F32(None),
+            Type::I1 => Value::I1(None),
+            Type::Void => Value::Void,
+            Type::Label => todo!(),
+            Type::Array { dims: _, ty } => Value::Array { value_map: ArrayMap::new(), dims: vec![], ele_type: *ty.clone()},
+            Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
+        }
+    }
+    pub fn is_unsure(){
+
+    }
     pub fn new_i1(value:bool) -> Self { Value::I1(Some(value)) }
     pub fn new_void() -> Self { Value::Void }
     pub fn to_specific_type(&self,ty:&Type) -> Result<Value>{
@@ -101,7 +154,7 @@ impl Value {
             (Value::I1(v), Type::F32) => Ok(Value::new_f32(v.context("F32 to I1 but not a f32")?.into())),
             (Value::I1(v), Type::I1) => Ok(Value::new_i1(v.context("没毛病")?.into())),
             (Value::Void, t) => Err(anyhow!("void 类型不能转化为 {:?} 类型",t)),
-            (Value::Fn { arg_syms, ret_sym }, t) => todo!(),
+            (Value::Fn { arg_syms: _, ret_sym: _ }, _t) => todo!(),
             _ => Err(anyhow!("不能将 {:?} 转化为 {:?}",self,ty )),
         }
     }
@@ -116,7 +169,8 @@ impl Value {
             Type::Void => Err(anyhow!("不能从string 转化为 Void 类型的value"))?,
             Type::Label => Err(anyhow!("不能从string 转化为 Label 类型的value"))?,
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("不能从string 转化为 Fn 类型的value"))?,
-            Type::Unsure {  } => Err(anyhow!("不能从string 转化为 Unsure 类型的value"))?,
+            // Type::Unsure {  } => Err(anyhow!("不能从string 转化为 Unsure 类型的value"))?,
+            Type::Array { dims: _, ty: _ } => todo!(),
         })
     }
     pub fn to_type(&self)->Type{
@@ -126,7 +180,8 @@ impl Value {
             Value::I1(_) => Type::I1,
             Value::Void => Type::Void,
             Value::Fn { arg_syms, ret_sym } => Type::Fn { arg_syms: arg_syms.clone(), ret_sym: ret_sym.clone() },
-            Value::Unsure {  } => Type::Unsure {  },
+            Value::Array { value_map: _, dims , ele_type } => Type::Array { dims: dims.clone(), ty:Box::new(ele_type.clone())  },
+            // Value::Unsure {  } => Type::Unsure {  },
         }
     }
     pub fn adapt(&self, value2:&Value) -> Result<Type> {
@@ -134,6 +189,8 @@ impl Value {
     }
 }
 impl Type {
+    /// 这个函数接受一个ast_node 和 ast_tree 通过识别 ast_node 来完成基本类型的识别  
+    /// 但是无法识别数组类型(只能识别数组的元素类型)
     pub fn new(ast_node:u32, ast_tree:&AstTree) -> Self {
         // 在asttree中找到node的u32所在节点的类型,返回I32或F32
         let text = node!(at ast_node in ast_tree).text.as_str();
@@ -145,6 +202,15 @@ impl Type {
             "void" => Type::Void,
             _ => panic!("text中类型错误 找到不支持的类型 {}", text),
         }
+    }
+    /// 这个函数接受一个元素类型和各个维度的大小来构建一个数组类型
+    /// 但是禁止创建数组的数组
+    pub fn new_array(ele_ty:Type,dims:Vec<u32>)->Result<Self>{
+        match &ele_ty{
+            Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
+            _=>{}
+        }
+        Ok(Type::Array { dims: dims, ty: Box::new(ele_ty) })
     }
 
     pub fn new_from_const(const_str:&String) -> Self {
@@ -162,7 +228,7 @@ impl Type {
             Type::Void => todo!(),
             Type::Label => todo!(),
             Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
-            Type::Unsure {  } => todo!(),
+            Type::Array { dims: _, ty: _ } => todo!(),
         }
     }
 }
@@ -178,7 +244,8 @@ impl Debug for Type {
             }
             Type::Void => write!(f, "void"),
             Type::Label => write!(f, "label"),
-            Type::Unsure {  } => write!(f, "unsure"),
+            // Type::Unsure {  } => write!(f, "unsure"),
+            Type::Array { dims, ty } => write!(f,"{:?}{:?}",ty,dims),
         }
     }
 }

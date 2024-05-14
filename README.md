@@ -34,13 +34,17 @@ nhwc 的意思是 Never Happy When Coding ，出自动画「BanG Dream! It's Myg
         - [x] 支持解析单个 statement 
         - [ ] 支持直接解析整一个basic block 
     - [x] ast2cfg_pass 用于将 ast 树转化为 cfg (不带nhwc ir)
-    - [ ] cfg2ncfg_pass 用于从 cfg(不带nhwc ir) 构造 ncfg(带nhwc ir 的cfg)
+    - [x] cfg2ncfg_pass 用于从 cfg(不带nhwc ir) 构造 ncfg(带nhwc ir 的cfg)
         - [x] 符号作用域检查
         - [x] 支持遍历作为 树的 et 
         - [ ] 支持遍历作为 DAG的 et 
-    - [ ] ncfg2ssa_ncfg 将 ncfg(non-ssa) 转化为 ssa形式的ncfg
-        - [ ] 插入 phi-node 
-        - [ ] 变量重命名
+    - [x] ncfg2ssa_ncfg 将 ncfg(non-ssa) 转化为 ssa形式的ncfg
+        - [x] 插入 phi-node 
+        - [x] 变量重命名
+    - [x] nhwc_collect_pass 将图中的 nhwc ir 收集为一个文本文件
+    - [x] simulator_debug_pass 用于执行ir，是一个ir解释器，
+        - [x] 支持运行main 函数
+        - [x] 支持插入断点并运行在.c 文件中以代码的形式添加
     - [ ] nhwc2riscv_pass 由nhwc ir 转化为 riscv
         - [ ] 完成nhwc ir 到riscv assembly 的简单对应
     - [ ] riscv2binary_pass 将riscv 汇编文件编译为二进制文件
@@ -131,6 +135,14 @@ impl Pass for Code2AstPass{
 # ncfg 
 
 <p align="center"><img src="./report/nhwc_cfg_graph.png"></p>
+
+# def use chain graph
+
+<p align="center"><img src="./report/def_use_graph.png"></p>
+
+# simulator_graph
+
+<p align="center"><img src="./report/simulator_graph.png"></p>
 
 <!-- #  -->
 

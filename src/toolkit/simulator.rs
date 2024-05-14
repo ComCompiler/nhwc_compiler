@@ -1,13 +1,11 @@
 use core::panic;
 
 use crate::toolkit::nhwc_instr::ArithOp::{Add , Sub, Mul, Div};
-use crate::toolkit::symtab;
 use std::fmt::Debug;
 use anyhow::*;
 
 use crate::{add_symbol, debug_info_red, debug_info_yellow, make_field_trait_for_struct, reg_field_for_struct};
 use super::cfg_node::InstrList;
-use super::field;
 use super::field::Type::{self, F32, I32};
 
 use super::nhwc_instr::{BreakpointArg, Instruction};
@@ -55,8 +53,8 @@ impl FuncCallCtx{
 }
 pub struct SimuSymCtx{
     symidx:SymIdx,
-    value:Value,
-    def_pos:Option<usize>,
+    value:Option<Value>,
+    def_pos:Option<Option<usize>>,
 }
 impl Simulator{
     // 输入从别处获得到的symtab , instr_list里是指令的序列
@@ -72,7 +70,7 @@ impl Simulator{
     pub fn set_instr_pos_to_main(&mut self,instr_slab:&mut InstrSlab)->Result<()>{
         let main_func_symidx = SymIdx::new(0, "main".to_string());
         let func_type = self.simu_symtab.get_symbol(&main_func_symidx).with_context(||format!("在设置main函数为开始运行点时找不到main符号"))?.get_type()?.clone();
-        let ret_symidx = if let Type::Fn { arg_syms: formal_arg_symidx_vec, ret_sym: ret_symidx } = &func_type {
+        let ret_symidx = if let Type::Fn { arg_syms: _formal_arg_symidx_vec, ret_sym: ret_symidx } = &func_type {
             ret_symidx.clone()
         }else{
             return Err(anyhow!("main不是一个函数符号"))
@@ -96,7 +94,7 @@ impl Simulator{
             match &instr_struct.instr_type {
                 Label { label_symidx } => {
                     add_symbol!({Symbol::new_from_symidx(label_symidx)}
-                        with_field SIMU_VAL:{Value::new_unsure()}
+                        // with_field SIMU_VAL:{Value::}
                         with_field SIMU_LABEL_POS:{pos}
                         to simu_symtab
                     );
@@ -104,19 +102,16 @@ impl Simulator{
                 DefineFunc { func_symidx, ret_symidx, args } => {
                     // 将 函数符号 和 参数符号 以及 返回值符号 加入到符号表
                     add_symbol!({Symbol::new_from_symidx(func_symidx)}
-                        with_field SIMU_VAL:{Value::new_unsure()}
                         with_field TYPE:{Type::Fn { arg_syms: args.clone(), ret_sym: ret_symidx.clone()}}
                         with_field SIMU_LABEL_POS:{pos}
                         to simu_symtab
                     );
                     add_symbol!({Symbol::new_from_symidx(ret_symidx)}
-                        with_field SIMU_VAL:{Value::new_unsure()}
                         with_field SIMU_OP_LAST_DEF_INSTR:{None}
                         to simu_symtab
                     );
                     for arg in args{
                         add_symbol!({Symbol::new_from_symidx(&arg.to_src_symidx())}
-                            with_field SIMU_VAL:{Value::new_unsure()}
                             with_field SIMU_OP_LAST_DEF_INSTR:{Some(self.instr_list[pos])}
                             to simu_symtab
                         );
@@ -124,7 +119,6 @@ impl Simulator{
                     for arg in args{
                         if !simu_symtab.has_symbol(arg){
                             add_symbol!({Symbol::new_from_symidx(&arg)}
-                                with_field SIMU_VAL:{Value::new_unsure()}
                                 with_field SIMU_OP_LAST_DEF_INSTR:{Some(self.instr_list[pos])}
                                 to simu_symtab
                             );
@@ -146,7 +140,7 @@ impl Simulator{
         Ok(())
     }
     /// 这个函数会从cur_instr_pos 一直运行，一直到跑到断点或栈为空为止
-    pub fn exec_till_breakpoint(&mut self,instr_slab:&InstrSlab,src_symtab:&SymTab) -> Result<Option<(SymIdx,Vec<(BreakpointArg,Result<Box<dyn Field>>)>)>>{
+    pub fn exec_till_breakpoint(&mut self,instr_slab:&InstrSlab,src_symtab:&SymTab) -> Result<Option<(SymIdx,Vec<(BreakpointArg,SymIdx,Result<Box<dyn Field>>)>)>>{
         // 运行完毕
         if self.cur_instr_pos >= self.instr_list.len() {
             return Err(anyhow!("simulator 运行到instr_list末尾了"));
@@ -163,12 +157,12 @@ impl Simulator{
                                     match field_name.as_str(){
                                         "simu_val"=>{
                                             debug_info_yellow!("进入断点 {:?} 此时{:?}.{}={:?}",symidx,itered_symidx,field_name,itered_symbol.get_simu_val().or(Err(())));
-                                            field_vec.push((breakpoint_arg.clone(),
+                                            field_vec.push((breakpoint_arg.clone(),itered_symidx.clone(),
                                                 itered_symbol.get_simu_val().cloned().map(|field|field.as_field_move())));
                                         },
                                         "simu_func_pos_range"=>{
                                             debug_info_yellow!("进入断点 {:?} 此时{:?}.{}={:?}",symidx,itered_symidx,field_name,itered_symbol.get_simu_func_pos_range().or(Err(())));
-                                            field_vec.push((breakpoint_arg.clone(),
+                                            field_vec.push((breakpoint_arg.clone(),itered_symidx.clone(),
                                                 itered_symbol.get_simu_func_pos_range().cloned().map(|field|field.as_field_move())));
                                         }
                                         _ => {
@@ -233,7 +227,7 @@ impl Simulator{
         // 跳转
         self.cur_instr_pos = *self.simu_symtab.get_symbol(func_symidx)?.get_simu_label_pos()?;
         // 跳转后再赋值
-        if let Type::Fn { arg_syms: formal_arg_symidx_vec, ret_sym: ret_symidx } = func_type {
+        if let Type::Fn { arg_syms: formal_arg_symidx_vec, ret_sym: _ret_symidx } = func_type {
             // 实参赋值给形参
             for (formal_arg_symidx,actual_arg_symidx) in formal_arg_symidx_vec.iter().zip(actual_args_vec.iter()) {
                 let value = self.simu_symtab.get_symbol(actual_arg_symidx)?.get_simu_val()?.clone();
@@ -248,7 +242,8 @@ impl Simulator{
         self.cur_instr_pos = func_call_ctx.instr_pos_before_call;
 
         // 将实际返回值 赋值给 形式返回值
-        *self.simu_symtab.get_mut_symbol(&func_call_ctx.formal_ret_symidx)?.get_mut_simu_val()? = self.simu_symtab.get_symbol(actual_ret_symidx)?.get_simu_val()?.clone();
+        let actual_ret_val = self.simu_symtab.get_symbol(actual_ret_symidx)?.get_simu_val()?.clone();
+        self.simu_symtab.get_mut_symbol(&func_call_ctx.formal_ret_symidx)?.add_simu_val(actual_ret_val);
 
         let ret_value = self.simu_symtab.get_symbol(&func_call_ctx.formal_ret_symidx)?.get_simu_val()?.clone();
         // 恢复上下文
@@ -260,7 +255,7 @@ impl Simulator{
         // 将形式返回值赋值给 op_assigned
         // 这一步一定要在恢复上下文之后做
         if let Some(assigned_symidx) = func_call_ctx.op_assigned_symidx{
-            *self.simu_symtab.get_mut_symbol(&assigned_symidx)?.get_mut_simu_val()? = ret_value;
+            self.simu_symtab.get_mut_symbol(&assigned_symidx)?.add_simu_val(ret_value);
         }
         Ok(())
     }
@@ -283,7 +278,7 @@ impl Simulator{
         }
         
         for def_symidx in instr_struct.get_def_symidx_vec(){
-            let simu_symtab = &mut self.simu_symtab;
+            let _simu_symtab = &mut self.simu_symtab;
             let src_var_symidx= def_symidx.to_src_symidx();
             if self.simu_symtab.has_symbol(&src_var_symidx){
                 let simu_symtab = &mut self.simu_symtab;
@@ -291,7 +286,6 @@ impl Simulator{
                     // 如果没有这个 var_symidx说名这是个 ssa变量，只是src_symidx 的一个版本，因此不妨定义一下这个版本
                     add_symbol!({def_symidx.clone().into_symbol()}
                         with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
-                        with_field SIMU_VAL:{Value::new_unsure()}
                         to simu_symtab
                     );
                 }
@@ -488,8 +482,7 @@ impl Simulator{
                             self.cur_instr_pos = *self.simu_symtab.get_mut_symbol(t2)?.get_simu_label_pos()?;
                         }
                     },
-                    super::nhwc_instr::JumpOp::Switch { cond, default, compared } => todo!(),
-                    
+                    super::nhwc_instr::JumpOp::Switch { cond: _, default: _, compared: _ } => todo!(),
                     super::nhwc_instr::JumpOp::DirectJump { label_symidx } => {
                         self.cur_instr_pos = *self.simu_symtab.get_mut_symbol(label_symidx)?.get_simu_label_pos()?;
                     },
@@ -539,14 +532,14 @@ impl Simulator{
                     },
                 };
             },
-            BreakPoint { symidx:_, breakpoint_args } => {},
+            BreakPoint { symidx:_, breakpoint_args: _ } => {},
             Alloc { var_symidx, vartype} => {
                 // 这是内存分配指令， 我们在内存分配的时候加入 src 变量
                 let simu_symtab = &mut self.simu_symtab;
                 let src_var_symidx = var_symidx.to_src_symidx();
                 if !simu_symtab.has_symbol(&src_var_symidx){
                     add_symbol!({src_var_symidx.into_symbol()}
-                        with_field SIMU_VAL:{Value::new_unsure()}
+                        with_field SIMU_VAL:{Value::new_unsure_from_specific_type(&vartype)}
                         with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
                         to simu_symtab
                     );
@@ -615,15 +608,21 @@ impl Simulator{
     pub fn simu_store_sym_ctx(&mut self,symdix:SymIdx)->Result<SimuSymCtx>{
         Ok(
             SimuSymCtx{
-                value:self.simu_symtab.get_mut_symbol(&symdix)?.get_simu_val()?.clone(),
-                def_pos: self.simu_symtab.get_mut_symbol(&symdix)?.get_simu_op_last_def_instr()?.clone(),
+                value:if self.simu_symtab.get_mut_symbol(&symdix)?.has_simu_val() {
+                    Some(self.simu_symtab.get_mut_symbol(&symdix)?.get_simu_val()?.clone())} else { None},
+                def_pos: if self.simu_symtab.get_mut_symbol(&symdix)?.has_simu_op_last_def_instr() {
+                    Some(self.simu_symtab.get_mut_symbol(&symdix)?.get_simu_op_last_def_instr()?.clone())} else { None},
                 symidx: symdix,
             }
         )
     }
     pub fn simu_restore_sym_ctx(&mut self,sym_ctx:&SimuSymCtx)->Result<()>{
-        self.simu_symtab.get_mut_symbol(&sym_ctx.symidx)?.add_simu_val(sym_ctx.value.clone());
-        self.simu_symtab.get_mut_symbol(&sym_ctx.symidx)?.add_simu_op_last_def_instr(sym_ctx.def_pos.clone());
+        if let Some(value) = &sym_ctx.value{
+            self.simu_symtab.get_mut_symbol(&sym_ctx.symidx)?.add_simu_val(value.clone());
+        }
+        if let Some(op_last_def_instr) = &sym_ctx.def_pos{
+            self.simu_symtab.get_mut_symbol(&sym_ctx.symidx)?.add_simu_op_last_def_instr(op_last_def_instr.clone());
+        }
         Ok(())
     }
 }   

@@ -1,8 +1,8 @@
 use std::fs;
-use std::io::{Write,Read};
+use std::io::{Write};
 
-use crate::{instr, instr_mut};
-use crate::toolkit::nhwc_instr::InstrType;
+use crate::{instr};
+
 use crate::{node, toolkit::{cfg_edge::CfgEdgeType, context::NhwcCtx, etc::dfs_with_priority, pass_manager::Pass}};
 use anyhow::*;
 /// 定义额外的信息，这样我们就可以把 add_field 宏加入到符号表或者任何实现了 Fields trait 的地方
@@ -51,7 +51,7 @@ impl Pass for NhwcCollectPass {
                 else{
                     cur_tab = 2;
                 }
-                if matches!(&node!(at cfg_node in cfg_graph).cfg_node_type,crate::toolkit::cfg_node::CfgNodeType::Root { static_ast_nodes }){
+                if matches!(&node!(at cfg_node in cfg_graph).cfg_node_type,crate::toolkit::cfg_node::CfgNodeType::Root { static_ast_nodes: _ }){
                     cur_tab = 0;
                 }
                 nhwc_ir_vec.push((instr,cur_tab));

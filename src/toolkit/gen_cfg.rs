@@ -1,9 +1,9 @@
 use crate::antlr_parser::cparser::{
-    RULE_blockItem, RULE_blockItemList, RULE_breakpointStatement, RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_externalDeclaration, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
+    RULE_blockItem, RULE_blockItemList, RULE_breakpointStatement, RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
 };
 use crate::toolkit::ast_node::AstTree;
 use crate::toolkit::cfg_edge::CfgEdge;
-use crate::{add_edge, add_node, direct_child_node, direct_child_nodes, find_nodes_by_dfs, reg_field_for_struct, rule_id, RULE_compoundStatement, RULE_functionDefinition};
+use crate::{add_edge, add_node, direct_child_node, direct_child_nodes, reg_field_for_struct, rule_id, RULE_compoundStatement, RULE_functionDefinition};
 use crate::{find, find_nodes, node};
 use anyhow::Result;
 use petgraph::stable_graph::{EdgeIndex, NodeIndex};
@@ -11,7 +11,7 @@ use petgraph::visit::EdgeRef;
 
 use super::cfg_node::{CfgGraph, CfgNode, CfgNodeType};
 
-use super::scope_node::ScopeTree;
+
 use super::symtab::SymTab;
 /// 这个文件中没有在命名中提到是哪一中图中的节点，那么统一是 scope_node
 

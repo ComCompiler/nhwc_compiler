@@ -1,15 +1,16 @@
 use std::vec;
 
-use crate::{add_node, add_node_with_edge, debug_info_red, debug_info_yellow, toolkit::{cfg_node::InstrList, context::NhwcCtx, field::Type, nhwc_instr::{InstrSlab, InstrType}, pass_manager::Pass, simulator::Simulator, symtab::{SymIdx, SymTab, SymTabEdge, SymTabGraph}}};
-use anyhow::{ Result};
+use crate::{ debug_info_red, debug_info_yellow, toolkit::{ context::NhwcCtx, pass_manager::Pass, simulator::Simulator, symtab::{SymTabGraph}}};
+use itertools::Itertools;
 use crate::toolkit::dot::Config;
 use crate::toolkit::etc::generate_png_by_graph;
+use anyhow::Result;
 #[derive(Debug)]
 pub struct SimulatorDebugPass {
-    is_gen_png:bool,
+    is_gen_png:bool,detailed:bool,
 }
 impl SimulatorDebugPass {
-    pub fn new(is_gen_png:bool) -> Self { SimulatorDebugPass {is_gen_png} }
+    pub fn new(is_gen_png:bool,detailed:bool) -> Self { SimulatorDebugPass {is_gen_png, detailed } }
 }
 
 impl Pass for SimulatorDebugPass {
@@ -89,17 +90,21 @@ impl Pass for SimulatorDebugPass {
         if self.is_gen_png{
             let mut simulator_g = SymTabGraph::new();
             // println!("ctx的symtab内容为{:#?}",ctx.symtab);
-            let root = 0;
+            let _root = 0;
             // add_node_with_edge!({simu.symtab.clone()} with edge {SymTabEdge::new("SimulatorDebugPass".to_owned())} from root in simulator_g);
-            add_node!({simu.simu_symtab.clone()} to simulator_g);
-            let mut idx:i32=0;
+            simu.simu_symtab.debug_symtab_graph(String::new(), &mut simulator_g, vec![]);
+            let _idx:i32=0;
             
             loop{
                 let rst = simu.exec_till_breakpoint(&instr_slab,&ctx.symtab);
                 if let Ok(Some((bp_symidx,field_vec))) =  rst{
                     println!("breakpoint: {:?}", bp_symidx);
-                    let node_count= simulator_g.node_count() as u32 -1;
-                    add_node_with_edge!({simu.simu_symtab.clone()} with edge {SymTabEdge::new(format!("{:?} fields:{:?}",bp_symidx,field_vec))} from node_count in simulator_g);
+                    simu.simu_symtab.debug_symtab_graph(format!("{:?} fields:{:?}",bp_symidx,field_vec), &mut simulator_g,
+                        if self.detailed{
+                            vec![]
+                        }else{
+                            field_vec.into_iter().map(|tuple|tuple.1).collect_vec()
+                        });
                     simu.clear_text();
                     simu.load_instr_text(Some(6),instr_slab,)?;
                     simu.load_stack_text()?;

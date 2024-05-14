@@ -15,7 +15,7 @@ use crate::{instr, toolkit::ast_node::AstTree};
 use crate::{ reg_field_for_struct, node};
 
 use super::field::Fields;
-use super::nhwc_instr::{InstrSlab, Instruction};
+use super::nhwc_instr::{InstrSlab};
 
 //use crate::toolkit::ast_node::AstNode;
 
@@ -129,7 +129,7 @@ impl CfgNode {
                 self.text += node_text;
                 self.text += "\n";
             }
-            CfgNodeType::Exit { ast_node } => {
+            CfgNodeType::Exit { ast_node: _ } => {
                 // self.text += node!(at ast_node in ast_tree).text.as_str();
                 self.text += "\n";
             }
@@ -291,7 +291,7 @@ impl Debug for CfgNode {
                 write!(f, " # {} \n {} $ @ # {} \n{:#?} $", "BasicBlock\n", self.text, "Fields", self.info)
             }
             // 3元  输出为3格 {1 | 1 | 1}
-            CfgNodeType::Root {static_ast_nodes} => write!(f, " {} {} @ {}\n {:#?} ", "root\n", self.text,"Fields", self.info),
+            CfgNodeType::Root {static_ast_nodes: _} => write!(f, " {} {} @ {}\n {:#?} ", "root\n", self.text,"Fields", self.info),
             // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::ForLoop { ast_before_node, ast_mid_node: _, ast_after_node: _ } => {
                 write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} $ ", "For\n", ast_before_node, self.text, "Fields", self.info)

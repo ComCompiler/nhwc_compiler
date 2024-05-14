@@ -3,13 +3,13 @@ use std::collections::HashMap;
 use crate::toolkit::ast_node::AstTree;
 
 use crate::antlr_parser::cparser::{
-    RULE_blockItem, RULE_blockItemList, RULE_breakStatement, RULE_breakpointStatement, RULE_constantExpression, RULE_declaration, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_parameterTypeList, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
+    RULE_blockItem, RULE_blockItemList, RULE_breakpointStatement, RULE_constantExpression, RULE_declaration, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_parameterTypeList, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
 };
-use crate::{add_node, add_node_with_edge, direct_child_node, direct_child_nodes, find_nodes_by_dfs, rule_id, RULE_compoundStatement, RULE_functionDefinition};
+use crate::{add_node, add_node_with_edge, direct_child_node, direct_child_nodes, rule_id, RULE_compoundStatement, RULE_functionDefinition};
 use crate::{find, find_nodes, node};
 
-use super::cfg_node::{CfgGraph, CfgNodeType};
-use super::context::NhwcCtx;
+use super::cfg_node::{CfgGraph};
+
 use super::scope_node::{ScopeNode, ScopeTree, ScopeType};
 
 ///将函数名添加进scopetree，返回下一部分衔接的u32
@@ -196,7 +196,7 @@ pub fn process_compound(scope_tree:&mut ScopeTree, ast_tree:&AstTree, scope_pare
     }
 }
 
-pub fn parse_ast_to_scope(ast_tree:&AstTree,cfg_graph:&CfgGraph,scope_tree:&mut ScopeTree,ast2scope:&mut HashMap<u32, u32>,) {
+pub fn parse_ast_to_scope(ast_tree:&AstTree,_cfg_graph:&CfgGraph,scope_tree:&mut ScopeTree,ast2scope:&mut HashMap<u32, u32>,) {
     let ast_root_node = 1;
     let static_nodes:Vec<u32> = direct_child_nodes!(at ast_root_node in ast_tree);
     let mut static_decl_nodes = vec![];

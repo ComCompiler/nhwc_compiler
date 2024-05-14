@@ -4,13 +4,14 @@ use core::fmt::Debug;
 use anyhow::{anyhow,Result};
 use delegate::delegate;
 use petgraph::stable_graph::StableDiGraph;
-use std::{collections::{btree_map, BTreeMap}, fmt::{Display, Formatter}, iter, slice::Iter};
+use std::{collections::{btree_map, BTreeMap}, fmt::{Display, Formatter}};
 
 pub type SymTabGraph = StableDiGraph<SymTab, SymTabEdge, u32>;
 
 #[derive(Clone)]
 pub struct SymTab {
     map:BTreeMap<SymIdx, Symbol>,
+    text:String,
 }
 #[derive(Clone)]
 pub struct SymTabEdge {
@@ -70,7 +71,7 @@ impl SymIdx {
 
 impl SymTab {
     // 创建一个新的符号表
-    pub fn new() -> SymTab { SymTab { map:BTreeMap::new() } }
+    pub fn new() -> SymTab { SymTab { map:BTreeMap::new(), text: String::new() } }
     
     // 添加或更新符号，如果是更新，那么返回旧的符号
     pub fn add_symbol(&mut self, sym:Symbol) -> Result<SymIdx> {
@@ -110,21 +111,38 @@ impl SymTab {
         self.get_symbol_verbose(COMPILATION_UNIT.to_string(),0).unwrap()
     }
 
-    pub fn debug_symtab_graph(&self,desc:String, symtab_graph:&mut SymTabGraph){
+    pub fn debug_symtab_graph(&mut self,desc:String, symtab_graph:&mut SymTabGraph,symidx_vec:Vec<SymIdx>){
         let mut idx = symtab_graph.node_count() as u32;
         if idx==0{
-            add_node!({self.clone()} to symtab_graph);
+            add_node!({let mut s = self.clone(); s.load_symtab_text(symidx_vec);s } to symtab_graph);
         }else {//如果已经有节点了,在最后一个节点上加点加边
             idx-=1;
-            add_node_with_edge!({self.clone()} with edge {SymTabEdge::new(desc)} from idx in symtab_graph);
+            add_node_with_edge!({let mut s = self.clone(); s.load_symtab_text(symidx_vec);s } with edge {SymTabEdge::new(desc)} from idx in symtab_graph);
         }
 
+    }
+
+    pub fn load_symtab_text(&mut self,symidx_vec:Vec<SymIdx>)->Result<()>{
+        if symidx_vec.len()!=0{
+            self.text+= "#sym_name@fields$";
+            for symidx in &symidx_vec{
+                let sym = self.get_symbol(symidx)?;
+                self.text += format!("@ # {:?} @ {:#?} $", symidx, sym.fields).as_str();
+            }
+        }else{
+            let mut s = "#sym_name@fields$".to_string();
+            for (symidx,sym) in self.iter(){
+                s += format!("@ # {:?} @ {:#?} $", symidx, sym.fields).as_str();
+            }
+            self.text += s.as_str();
+        }
+        Ok(())
     }
 
     
 }
 impl Default for SymTab {
-    fn default() -> Self { Self { map:Default::default() } }
+    fn default() -> Self { Self { map:Default::default(), text: String::new() } }
 }
 impl Debug for SymIdx {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
@@ -148,10 +166,6 @@ impl Display for SymIdx{
 }
 impl Debug for SymTab {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
-        let mut s = String::from("#sym_name@fields$");
-        for (symidx, sym) in self.map.iter() {
-            s.push_str(format!("@ # {:?} @ {:#?} $", symidx, sym.fields).as_str());
-        }
-        write!(f, "{}", s)
+        write!(f,"{}",self.text)
     }
 }
