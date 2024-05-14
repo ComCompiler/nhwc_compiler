@@ -1,13 +1,13 @@
-use std::ops::Index;
 
 use crate::toolkit::cfg_edge::CfgEdgeType;
-use crate::toolkit::gen_ssa::instr_is_dominated_by;
+use crate::toolkit::etc::dfs_with_predicate;
 use crate::{add_edge, add_node, direct_child_node, instr, instr_mut, node, node_mut};
 
 use crate::toolkit::cfg_node::CfgNodeType::{Gather,WhileLoop};
 use super::context::DjGraph;
 use super::{cfg_node::CfgGraph, def_use_node::{DefUseEdge, DefUseGraph, DefUseNode}, etc, gen_nhwc_cfg::find_branch_of_gather_upwnward, gen_ssa::{refresh_cfg_instr_idx_in_cfg_graph}, nhwc_instr::{InstrSlab, InstrType, JumpOp}, symtab::{SymTab}};
 use anyhow::*;
+use petgraph::visit::EdgeRef;
 
 pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab,symtab:&SymTab,def_use_graph:&mut DefUseGraph,dj_graph:&DjGraph) -> Result<()>{
     for (_func_symidx,cfg_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?{
@@ -110,13 +110,13 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab,symtab:&SymTa
                             // 这里有两种情况，一种是这个phi 在 循环头中，另一种则是在 if 的 Exit node 中，我们要分别讨论
                             match &node!(at def_cfg_node in cfg_graph).cfg_node_type{
                                 WhileLoop { ast_expr_node: _ } => {
-                                    let while_exit_cfg_node = direct_child_node!(at def_cfg_node in cfg_graph with_predicate {|e|matches!(e.weight().cfg_edge_type,CfgEdgeType::Direct {  })} );
+                                    // let while_exit_cfg_node = direct_child_node!(at def_cfg_node in cfg_graph with_predicate {|e|matches!(e.weight().cfg_edge_type,CfgEdgeType::Direct {  })} );
                                     // while_exit_cfg_node 一定有 label_instr 
-                                    let exit_label_instr = node!(at while_exit_cfg_node in cfg_graph).op_label_instr.unwrap();
-                                    if instr_is_dominated_by(instr, exit_label_instr, cfg_graph, dj_graph, instr_slab)?{
-                                        let _dug_edge = add_edge!({DefUseEdge::new_final_dep(use_symidx.clone())} from def_dug_node to dug_cor_node in def_use_graph);
-                                    }else{
+                                    // let while_head_label_instr = node!(at def_cfg_node in cfg_graph).op_label_instr.unwrap();
+                                    if get_cfg_while_loop_body_nodes(def_cfg_node, cfg_graph)?.contains(&cfg_node){
                                         let _dug_edge = add_edge!({DefUseEdge::new(use_symidx.clone())} from def_dug_node to dug_cor_node in def_use_graph);
+                                    }else{
+                                        let _dug_edge = add_edge!({DefUseEdge::new_final_dep(use_symidx.clone())} from def_dug_node to dug_cor_node in def_use_graph);
                                     }
                                 },
                                 Gather {  } => {
@@ -148,5 +148,11 @@ pub fn get_cor_br_instr_of_phi_instr(cfg_graph:&CfgGraph,instr_slab:&InstrSlab, 
     }else{
         Err(anyhow!("这个 phi instr {:?} 没有对应的 jump_det ",phi_instr_struct))
     }
+}
 
+pub fn get_cfg_while_loop_body_nodes(cfg_while_loop_node:u32,cfg_graph:&CfgGraph) -> Result<Vec<u32>>{
+    let start_node = direct_child_node!(at cfg_while_loop_node in cfg_graph with_predicate {|e|matches!(e.weight().cfg_edge_type,CfgEdgeType::BodyHead {  })});
+    let mut body_nodes = dfs_with_predicate(cfg_graph, start_node, |e|e.target().index() as u32!=cfg_while_loop_node);
+    body_nodes.push(cfg_while_loop_node);
+    Ok(body_nodes)
 }
