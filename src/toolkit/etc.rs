@@ -7,7 +7,19 @@ use crate::{
     direct_child_nodes, toolkit::dot::{Config, Dot}
 };
 use petgraph::{stable_graph::StableGraph, EdgeType};
-use anyhow::{anyhow, Context, Result};
+use anyhow::{anyhow, Context, Ok, Result};
+/// 传入C文件(带有.c后缀),生成.s汇编文件,  
+/// 生成在./assembly_repo/目录下
+pub fn generate_s_by_c(cfile_path:String) -> Result<()>{
+    // let c_name = cfile_path.split("/").last().unwrap().split(".").next().unwrap();
+    let output = Command::new("./llvm/c2s.sh").args([cfile_path]).output().with_context(||".c文件转.s文件失败")?;
+    Ok(())
+}
+pub fn run_s(sfile_path:String) -> Result<()>{
+    // let c_name = cfile_path.split("/").last().unwrap().split(".").next().unwrap();
+    let output = Command::new("./assembly_repo/").args(["a.out"]).output().with_context(||".s文件执行失败")?;
+    Ok(())
+}
 
 /// 生成树(可以是任何树)对应的png ，将此png 放在命令行*当前*目录下
 pub fn generate_png_by_graph<N:Debug, E:Debug, Ty:EdgeType>(g:&StableGraph<N, E, Ty>, name:String, graph_config:&[Config],io_task_list:&mut Vec<JoinHandle<Result<()>>>) -> Result<()>{

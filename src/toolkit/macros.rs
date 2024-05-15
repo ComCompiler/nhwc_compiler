@@ -504,11 +504,11 @@ macro_rules! term_id {
 /// insert_instr($instr to $node at $idx in $graph slab $instrslab)  
 #[macro_export]
 macro_rules! insert_instr {
-    ($instr:ident to $node:ident at $idx:block in $graph:ident slab $instrslab:ident) =>{
+    ($instr:ident to $node:ident instr_list $instr_list:ident at $idx:block in $graph:ident slab $instrslab:ident) =>{
         {
             let cfg_node_struct = node_mut!(at $node in $graph);
             let instr = $instrslab.insert_instr($instr);
-            cfg_node_struct.instrs.insert($idx,instr);
+            cfg_node_struct.$instr_list.insert($idx,instr);
             // $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.instrs.len()-1, false));
             instr
         }
@@ -520,21 +520,14 @@ macro_rules! push_instr {
         {
             let cfg_node_struct = node_mut!(at $node in $graph);
             let instr = $instrslab.insert_instr($instr);
-            cfg_node_struct.instrs.push(instr);
+            match &instr!(at instr in $instrslab)?.instr_type{
+                InstrType::Label { label_symidx: _ } => cfg_node_struct.op_label_instr = Some(instr),
+                InstrType::Phi { lhs: _, rhs: _ } => cfg_node_struct.phi_instrs.push(instr),
+                InstrType::Jump { jump_op: _ } => cfg_node_struct.op_jump_instr = Some(instr),
+                _ => cfg_node_struct.instrs.push(instr),
+            }
+
             // $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.instrs.len()-1, false));
-            instr
-        }
-    };
-}
-#[macro_export]
-/// push_phi_instr!(instr to node in grpah slab instr_slab);
-macro_rules! push_phi_instr {
-    ($instr:ident to $node:ident in $graph:ident slab $instrslab:ident) =>{
-        {
-            let cfg_node_struct = node_mut!(at $node in $graph);
-            let instr = $instrslab.insert_instr($instr);
-            cfg_node_struct.phi_instrs.push(instr);
-            // $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.phi_instrs.len()-1, true));
             instr
         }
     };
@@ -726,6 +719,9 @@ macro_rules! make_field_trait_for_struct {
             }
             fn clone_box(&self)->Box<dyn Field> {
                 Box::new(self.clone())
+            }
+            fn as_field_move(self) -> Box<dyn Field> {
+                Box::new(self)
             }
         }
         )*

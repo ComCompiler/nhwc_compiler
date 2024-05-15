@@ -1,4 +1,4 @@
-use crate::toolkit::{context::NhwcContext, pass_manager::Pass};
+use crate::toolkit::{context::NhwcCtx, pass_manager::Pass};
 use anyhow::*;
 /// 定义额外的信息，这样我们就可以把 add_field 宏加入到符号表或者任何实现了 Fields trait 的地方
 /// 任何一个Pass 都有一个pass_run函数 来进行这个pass 相关的工作，比如说对于 SSAPass 我们要对 一个BasicBlock 中的ExprTree做出转换。
@@ -20,7 +20,7 @@ impl PassDemo {
 
 impl Pass for PassDemo {
     // 运行这个pass
-    fn run(&mut self, _ctx:&mut NhwcContext) -> Result<()> { Ok(()) }
+    fn run(&mut self, _ctx:&mut NhwcCtx) -> Result<()> { Ok(()) }
     // 返回pass的描述，具体作用
     fn get_desc(&self) -> String { return "pass demo description".to_string(); }
 

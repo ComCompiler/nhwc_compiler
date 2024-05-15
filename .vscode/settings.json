@@ -1,8 +1,0 @@
-{
-    "rust-analyzer.linkedProjects": [
-        "./Cargo.toml",
-        "./Cargo.toml"
-    ],
-    "C_Cpp.errorSquiggles": "disabled",
-    "git.ignoreLimitWarning": true
-}

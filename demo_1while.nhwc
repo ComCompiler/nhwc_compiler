@@ -1,0 +1,25 @@
+ 0    Define main _s0 [] -> main_ret _s0 
+         2    alloc i32 i _s2 
+         4    alloc i32 a _s2 
+         8    alloc i32 temp_0 _s7 
+         12   alloc i32 temp_1 _s7 
+         19   alloc i1 temp_2 _s5 
+         1    new_var i32 %i0 = 0 _s0 
+         3    new_var i32 %a0 = 0 _s0 
+     16   label while.head _s6: 
+         23   i1 = phi [i0,instr:1],[i2,instr:14], 
+         24   a1 = phi [a0,instr:3],[a2,instr:10], 
+         18   new_var i1 %temp_20 
+         20   temp_21 = icmp i1 Slt i1, 5 _s0 
+         21   br i1 temp_21, label while.body _s6, label while.exit _s6 
+     15   label while.body _s6: 
+         7    new_var i32 %temp_00 
+         9    temp_01 = Add i32 a1, i1 
+         10   a2 = temp_01 
+         11   new_var i32 %temp_10 
+         13   temp_11 = Add i32 i1, 1 _s0 
+         14   i2 = temp_11 
+         22   jump label: while.head _s6 
+     17   label while.exit _s6: 
+         5    breakpoint m _s10 ! 
+         6    ret a1 

@@ -1,9 +1,9 @@
 use crate::antlr_parser::cparser::{
-    RULE_blockItem, RULE_blockItemList, RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
+    RULE_blockItem, RULE_blockItemList, RULE_breakpointStatement, RULE_declaration, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
 };
 use crate::toolkit::ast_node::AstTree;
 use crate::toolkit::cfg_edge::CfgEdge;
-use crate::{add_edge, add_node, direct_child_node, find_nodes_by_dfs, reg_field_for_struct, rule_id, RULE_compoundStatement, RULE_functionDefinition};
+use crate::{add_edge, add_node, direct_child_node, direct_child_nodes, reg_field_for_struct, rule_id, RULE_compoundStatement, RULE_functionDefinition};
 use crate::{find, find_nodes, node};
 use anyhow::Result;
 use petgraph::stable_graph::{EdgeIndex, NodeIndex};
@@ -11,7 +11,7 @@ use petgraph::visit::EdgeRef;
 
 use super::cfg_node::{CfgGraph, CfgNode, CfgNodeType};
 
-use super::scope_node::ScopeTree;
+
 use super::symtab::SymTab;
 /// 这个文件中没有在命名中提到是哪一中图中的节点，那么统一是 scope_node
 
@@ -83,6 +83,11 @@ pub fn process_stmt(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymT
         (RULE_selectionStatement, select_node) => Ok(process_selection(cfg_graph, ast_tree, symtab, select_node)?),
         (RULE_jumpStatement, jump_node) => {
             let bb_struct = CfgNode::new_bb(vec![jump_node]);
+            let cfg_basicblock_node = add_node!(bb_struct to cfg_graph);
+            Ok(Some((cfg_basicblock_node, cfg_basicblock_node)))
+        }
+        (RULE_breakpointStatement, breakpoint_node) => {
+            let bb_struct = CfgNode::new_bb(vec![breakpoint_node]);
             let cfg_basicblock_node = add_node!(bb_struct to cfg_graph);
             Ok(Some((cfg_basicblock_node, cfg_basicblock_node)))
         }
@@ -300,11 +305,24 @@ pub fn process_compound(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut 
 }
 
 /// 这个函数依赖 ast
-pub fn parse_ast_to_cfg(ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab, _scope_tree:&ScopeTree) -> Result<()> {
-    let ast_root_node = 0;
-
-    let funcdef_nodes:Vec<u32> = find_nodes_by_dfs!(rule RULE_functionDefinition at ast_root_node in ast_tree);
-    let cfg_func_parent = CfgNode::new_root();
+pub fn parse_ast_to_cfg(ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab) -> Result<()> {
+    let ast_root_node = 1;
+    let static_nodes:Vec<u32> = direct_child_nodes!(at ast_root_node in ast_tree);
+    let mut static_decl_nodes = vec![];
+    let mut funcdef_nodes = vec![];
+    for static_node in static_nodes{
+        let gloabl_ast_node = direct_child_node!(at static_node in ast_tree);
+        match (rule_id!(at gloabl_ast_node in ast_tree),gloabl_ast_node){
+            (RULE_declaration,static_decl_node) => {
+                static_decl_nodes.push(static_decl_node);
+            },
+            (RULE_functionDefinition,funcdef_node) => {
+                funcdef_nodes.push(funcdef_node)
+            },
+            (_,_) => {},
+        }
+    }
+    let cfg_func_parent = CfgNode::new_root(static_decl_nodes);
     // 为每一个function 创建一个共享的根节点
     let cfg_func_parent_node = cfg_graph.add_node(cfg_func_parent);
     for func_def_node in funcdef_nodes {

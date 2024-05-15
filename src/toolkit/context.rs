@@ -1,10 +1,11 @@
 use std::{collections::HashMap, thread::JoinHandle};
 
 use anyhow::Result;
-use anyhow::Context;
+
 
 use crate::Args;
 
+use super::cfg_node::InstrList;
 use super::{
     ast_node::AstTree, cfg_node::CfgGraph, def_use_node::DefUseGraph, dj_node::DjNode, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symbol::Symbol, symtab::{SymTab, SymTabGraph}
 };
@@ -12,7 +13,7 @@ use super::dj_edge::DjEdge;
 
 pub type DjGraph = petgraph::stable_graph::StableDiGraph<DjNode, DjEdge, u32>;
 
-pub struct NhwcContext {
+pub struct NhwcCtx {
     pub args:Args,
     pub code:String,
     pub ast_tree:AstTree,
@@ -25,12 +26,13 @@ pub struct NhwcContext {
     pub symtab_graph:SymTabGraph,
     pub instr_slab:InstrSlab,
     pub def_use_graph:DefUseGraph,
+    pub collected_nhwc_ir: InstrList,
     pub io_task_list: Vec<JoinHandle<Result<()>>>,
 }
 pub(crate) static COMPILATION_UNIT:&str = "!compilation_unit";
-impl NhwcContext {
+impl NhwcCtx {
     pub fn new(args:Args) -> Self {
-        NhwcContext {
+        NhwcCtx {
             args,
             cfg_graph:CfgGraph::new(),
             ast_tree:AstTree::new(),
@@ -48,6 +50,7 @@ impl NhwcContext {
             dj_graph: DjGraph::new(),
             def_use_graph: DefUseGraph::new(),
             io_task_list: vec![],
+            collected_nhwc_ir: InstrList::new(),
         }
     }
 }

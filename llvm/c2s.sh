@@ -12,7 +12,7 @@ filename=$(basename -- "$input_file")
 filename_noext="${filename%.*}"
 
 # 编译生成 LLVM IR 文件
-clang -S -emit-llvm -o "$filename_noext.ll" "$input_file"
+clang -S -emit-llvm -o "./llvm_repo/$filename_noext.ll" "$input_file"
 
 # 使用 llc 将 LLVM IR 文件编译成 RISC-V 汇编文件
-llc -march=riscv32 -o "$filename_noext.s" "$filename_noext.ll"
+llc -march=riscv32 -o "./assembly_repo/$filename_noext.s" "./llvm_repo/$filename_noext.ll"

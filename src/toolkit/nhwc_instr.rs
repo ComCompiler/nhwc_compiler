@@ -164,6 +164,7 @@ pub enum InstrType {
     DefineFunc { func_symidx:SymIdx, ret_symidx:SymIdx, args:Vec<SymIdx> },
     //定义变量
     DefineVar { var_symidx:SymIdx, vartype:Type, op_value:Option<SymIdx> },
+    Alloc { var_symidx:SymIdx, vartype:Type },
     // 算数运算符 + - * / etc.
     Arith { lhs:SymIdx, rhs:ArithOp },
     SimpleAssign { lhs:SymIdx, rhs:SymIdx },
@@ -175,7 +176,7 @@ pub enum InstrType {
     Phi { lhs:SymIdx, rhs:PhiOp },
     TranType { lhs:SymIdx, op:Trans },
     // 断点     只在simulator中使用
-    BreakPoint { breakpoint_symidx:SymIdx},
+    BreakPoint { symidx:SymIdx, breakpoint_args:Vec<BreakpointArg>},
 }
 #[derive(Clone)]
 pub struct Instruction {
@@ -212,13 +213,14 @@ impl Instruction {
             InstrType::Jump { jump_op: _op } => vec![],
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op: _ } => vec![lhs],
-            InstrType::BreakPoint { breakpoint_symidx } => vec![],
+            InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe } => vec![],
+            InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
         }
     }
     pub fn get_use_symidx_vec(&self)->Vec<&SymIdx>{
         match &self.instr_type{
             InstrType::Label { label_symidx:_ } => vec![],
-            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args } => {
+            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args: _ } => {
                 vec![]
             },
             InstrType::DefineVar { var_symidx:_, vartype:_, op_value } => {
@@ -242,15 +244,15 @@ impl Instruction {
             InstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
-            InstrType::Call { op_assigned_symidx: assigned, func_op } => {
+            InstrType::Call { op_assigned_symidx: _assigned, func_op } => {
                 func_op.actual_arg_symidx_vec.iter().collect_vec()
             },
             InstrType::Jump { jump_op } => {
                 match jump_op{
                     JumpOp::Ret { ret_sym } => vec![ret_sym],
-                    JumpOp::Br { cond, t1, t2 } => vec![cond],
-                    JumpOp::Switch { cond, default, compared } => vec![cond],
-                    JumpOp::DirectJump { label_symidx } => vec![],
+                    JumpOp::Br { cond, t1: _, t2: _ } => vec![cond],
+                    JumpOp::Switch { cond, default: _, compared: _ } => vec![cond],
+                    JumpOp::DirectJump { label_symidx: _ } => vec![],
                 }
             },
             InstrType::Phi { lhs:_, rhs } => rhs.phi_pairs.iter().map(|p| &p.symidx).collect_vec(),
@@ -261,7 +263,8 @@ impl Instruction {
                 Trans::Bitcast { rptr_symidx, rptr_type:_, lptr_type:_ } => vec![rptr_symidx],
             }
             ,
-            InstrType::BreakPoint { breakpoint_symidx  } => vec![],
+            InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
+            InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
         }
     }
         pub fn get_mut_def_symidx_vec(&mut self)->Vec<&mut SymIdx>{
@@ -290,13 +293,14 @@ impl Instruction {
             InstrType::Jump { jump_op: _op } => vec![],
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op:_ } => vec![lhs],
-            InstrType::BreakPoint { breakpoint_symidx  } => vec![],
+            InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
+            InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
         }
     }
     pub fn get_mut_use_symidx_vec(&mut self)->Vec<&mut SymIdx>{
         match &mut self.instr_type{
             InstrType::Label { label_symidx:_ } => vec![],
-            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args } => {
+            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args: _ } => {
                 vec![]
             },
             InstrType::DefineVar { var_symidx:_, vartype:_, op_value } => {
@@ -320,15 +324,15 @@ impl Instruction {
             InstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
-            InstrType::Call { op_assigned_symidx: assigned, func_op } => {
+            InstrType::Call { op_assigned_symidx: _assigned, func_op } => {
                 func_op.actual_arg_symidx_vec.iter_mut().collect_vec()
             },
             InstrType::Jump { jump_op } => {
                 match jump_op{
                     JumpOp::Ret { ret_sym } => vec![ret_sym],
-                    JumpOp::Br { cond, t1, t2 } => vec![cond],
-                    JumpOp::Switch { cond, default, compared } => vec![cond],
-                    JumpOp::DirectJump { label_symidx } => vec![],
+                    JumpOp::Br { cond, t1: _, t2: _ } => vec![cond],
+                    JumpOp::Switch { cond, default: _, compared: _ } => vec![cond],
+                    JumpOp::DirectJump { label_symidx: _ } => vec![],
                 }
             },
             InstrType::Phi { lhs:_, rhs } => rhs.phi_pairs.iter_mut().map(|p|&mut p.symidx).collect_vec(),
@@ -339,7 +343,8 @@ impl Instruction {
                 Trans::Bitcast { rptr_symidx, rptr_type:_, lptr_type:_ } => vec![rptr_symidx],
             }
             ,
-            InstrType::BreakPoint { breakpoint_symidx  } => vec![],
+            InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
+            InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
         }
     }
     pub fn is_phi(&self)->bool{
@@ -379,7 +384,7 @@ pub struct ComparedPair {
     compared:SymIdx,
     label:SymIdx,
 }
-#[derive(Clone)]
+#[derive(Clone,EnumIs)]
 pub enum JumpOp {
     Ret {
         ret_sym:SymIdx, // 这是返回的类型
@@ -431,7 +436,9 @@ impl InstrType {
     
     pub fn new_def_func(func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx>) -> Self { Self::DefineFunc { func_symidx, ret_symidx: ret_type, args } }
 
-    pub fn new_def_var(vartype:Type, varname:SymIdx, value:Option<SymIdx>) -> Self { Self::DefineVar { var_symidx:varname, vartype, op_value: value } }
+    pub fn new_def_var(vartype:Type, var_symidx:SymIdx, value:Option<SymIdx>) -> Self { Self::DefineVar { var_symidx, vartype, op_value: value } }
+
+    pub fn new_alloc(vartype:Type, var_symidx:SymIdx) -> Self { Self::Alloc { var_symidx, vartype, }  }
 
     // Instruction -> Arith -> ArithOp
     pub fn new_add(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::Add { a, b, vartype } } }
@@ -463,7 +470,7 @@ impl InstrType {
         Self::Phi { lhs, rhs: PhiOp { phi_pairs:phi_pair_vec  } }
     }
 
-    pub fn new_breakpoint(symidx:SymIdx) -> Self { Self::BreakPoint {breakpoint_symidx:symidx } }
+    pub fn new_breakpoint(symidx:SymIdx,breakpoint_args:Vec<BreakpointArg>) -> Self { Self::BreakPoint {symidx ,breakpoint_args } }
 
     //自动类型转换
     pub fn new_int2float(int_symidx:SymIdx, float_symidx:SymIdx) -> Self { Self::TranType { lhs:float_symidx, op:Trans::Sitofp { int_symidx } } }
@@ -481,11 +488,24 @@ impl InstrType {
     }
     pub fn is_br(&self) -> bool{
         if let InstrType::Jump { jump_op } = &self{
-            if let JumpOp::Br { cond, t1, t2 } = jump_op{
+            if let JumpOp::Br { cond: _, t1: _, t2: _ } = jump_op{
                 return true
             }
         }
         false
+    }
+}
+#[derive(Clone)]
+pub struct BreakpointArg{
+    pub symidx:SymIdx,
+    pub op_field_name:Option<String>,
+}
+impl Debug for BreakpointArg{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match &self.op_field_name{
+            Some(field_name) => write!(f,"{:?}.{}",self.symidx,field_name),
+            None => write!(f,"{:?}",self.symidx),
+        }
     }
 }
 impl Debug for ArithOp {
@@ -519,7 +539,7 @@ impl Debug for FuncOp {
 impl Debug for JumpOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Ret { ret_sym } => write!(f, "ret type {:?}", ret_sym),
+            Self::Ret { ret_sym } => write!(f, "ret {:?}", ret_sym),
 
             Self::Br { cond, t1, t2 } => {
                 write!(f, "br i1 {:?}, label {:?}, label {:?}", cond, t1, t2)
@@ -547,15 +567,15 @@ impl Debug for InstrType {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             InstrType::Label { label_symidx } => {
-                write!(f, "     label {:?}:", label_symidx)
+                write!(f, "label {:?}:", label_symidx)
             }
             InstrType::DefineFunc { func_symidx, ret_symidx, args } => {
-                write!(f, "Define {:?} {:?} {:?}", ret_symidx, func_symidx, args)
+                write!(f, "Define {:?} {:?} -> {:?}", func_symidx, args, ret_symidx)
             }
             InstrType::DefineVar { var_symidx: varname, vartype, op_value: value } => {
                 match value{
-                    Some(value) => write!(f, "Alloc {:?} %{:?} = {:?}", vartype, varname, value),
-                    None => write!(f, "Alloc {:?} %{:?}", vartype, varname),
+                    Some(value) => write!(f, "new_var {:?} %{:?} = {:?}", vartype, varname, value),
+                    None => write!(f, "new_var {:?} %{:?}", vartype, varname),
                 }
             }
             InstrType::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
@@ -567,7 +587,8 @@ impl Debug for InstrType {
             InstrType::Jump { jump_op: op } => write!(f, "{:?}", op),
             InstrType::Phi { lhs, rhs } => write!(f, "{:?} = {:?}",lhs,rhs),
             InstrType::TranType { lhs, op } => write!(f, "{:?} = {:?}", lhs, op),
-            InstrType::BreakPoint { breakpoint_symidx  } => write!(f,"breakpoint {:?} !",breakpoint_symidx),
+            InstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args  } => write!(f,"breakpoint {:?}({:?}) !",breakpoint_symidx,breakpoint_args),
+            InstrType::Alloc { var_symidx, vartype, } => write!(f,"alloc {:?} {:?}",vartype,var_symidx),
         }
     }
 }
