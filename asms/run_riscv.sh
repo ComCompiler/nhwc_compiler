@@ -29,8 +29,8 @@ executable="./asms"
 
 # 汇编 .s 文件
 echo "----汇编.s文件----" 
-riscv32-unknown-elf-gcc -o -S -O2 "$ofile_folder/$filename.o" "$input_file"
-# riscv32-unknown-elf-as "$input_file" -o "$ofile_folder/$filename.o"
+# riscv32-unknown-elf-gcc -o  "$ofile_folder/$filename.o" "$input_file"
+riscv32-unknown-elf-as -o "$ofile_folder/$filename.o" "$input_file" 
 
 # 检查是否生成了中间文件
 if [ ! -f "$ofile_folder/$filename.o" ]; then
@@ -50,11 +50,11 @@ fi
 
 # 显示可执行文件的机器码
 echo "----可执行文件的机器码----"
-riscv32-unknown-elf-objdump -d "$filename.o"
+riscv32-unknown-elf-objdump -d "$ofile_folder/$filename.o"
 
 # 运行可执行文件
 echo "----执行可执行文件----"
-qemu-riscv32-static "$filename"
+qemu-riscv32-static "$ofile_folder/$filename"
 
 # 输出成功信息
 echo "可执行文件 $filename 已生成并移动到 $executable 文件夹中"
