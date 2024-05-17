@@ -64,7 +64,7 @@ pub enum Value {
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
     Array {
         value_map:ArrayMap,
-        dims:Vec<u32>,
+        dims:Vec<SymIdx>,
         ele_type:Type,
     }
     // // 这个类型用来表示不确定的值或其代数表达式
@@ -110,7 +110,7 @@ pub enum Type {
     Void,
     Label,
     Array{
-        dims:Vec<u32>,
+        dims:Vec<SymIdx>,
         ty:Box<Type>,
     },
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
@@ -205,12 +205,12 @@ impl Type {
     }
     /// 这个函数接受一个元素类型和各个维度的大小来构建一个数组类型
     /// 但是禁止创建数组的数组
-    pub fn new_array(ele_ty:Type,dims:Vec<u32>)->Result<Self>{
+    pub fn new_array(ele_ty:Type,dims:Vec<SymIdx>)->Result<Self>{
         match &ele_ty{
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
             _=>{}
         }
-        Ok(Type::Array { dims: dims, ty: Box::new(ele_ty) })
+        Ok(Type::Array { dims, ty: Box::new(ele_ty) })
     }
 
     pub fn new_from_const(const_str:&String) -> Self {
