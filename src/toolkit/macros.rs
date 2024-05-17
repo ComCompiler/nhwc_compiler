@@ -293,11 +293,11 @@ macro_rules! add_edge {
     };
 }
 #[macro_export]
-/// 有两种用法，一种是
-/// add_node($node_struct:ident to $graph:ident)
-/// 另一种则是
-/// add_node($node_struct:block to $graph:ident)
-/// 一个允许block 一个 允许 ident
+/// 有两种用法，一种是  
+/// add_node($node_struct:ident to $graph:ident)  
+/// 另一种则是  
+/// add_node($node_struct:block to $graph:ident)  
+/// 一个允许block 一个 允许 ident  
 macro_rules! add_node {
     ($node_struct:ident to $graph:ident) => {
         $graph.add_node($node_struct).index() as u32

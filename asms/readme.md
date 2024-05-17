@@ -3,6 +3,8 @@
 运行
 ./run_riscv.sh hello.s
 
+单步运行可执行文件:
+qemu-riscv32-static -d in_asm -singlestep ./asms/hello
 # risc-v
 
 ## 安装
