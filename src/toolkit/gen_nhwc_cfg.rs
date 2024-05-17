@@ -6,7 +6,12 @@ use petgraph::{
 use std::collections::HashMap;
 
 
+<<<<<<< Updated upstream
 
+=======
+use super::et_node::ExprOp;
+use super::nhwc_instr::JumpOp;
+>>>>>>> Stashed changes
 use super::{cfg_edge::CfgEdge, nhwc_instr::Instruction};
 use super::{
     ast_node::AstTree, cfg_node::CfgGraph, et_node::{DeclOrDefOrUse, EtNodeType, EtTree}, gen_et::process_any_stmt, nhwc_instr::InstrType, scope_node::ScopeTree, symtab::{SymIdx, SymTab, SymTabGraph}
@@ -1062,6 +1067,36 @@ fn process_call(
     }
 }
 
+///处理数组内容，遇到arrayidx或arraywapper就后序遍历，其余op报错，返回Some(symidx)说明是idx，vec里面是数组尺寸，返回None，vec里面是数组内容。
+fn process_array(
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, et_tree:&EtTree, scope_tree:&ScopeTree, symtab:&mut SymTab, et_node:u32, scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
+    symtab_graph:&mut Option<&mut SymTabGraph>,
+) -> () {
+    // Result<(Option<Symidx>,Vec<u32>)>
+    let et_type = node!(at et_node in et_tree).et_node_type;
+    match et_type {
+        EtNodeType::Operator { op, ast_node, text } => {
+            match op{
+                ExprOp::ArrayIndex => {
+                    let op_children = direct_child_nodes!(at et_node in et_tree);
+                    let () = process_array(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_children[0], scope_node, cfg_bb, counter, instr_slab, symtab_graph);
+                },
+                ExprOp::ArrayWrapper => {
+    
+                },
+                ExprOp::Add | ExprOp::Sub | ExprOp::Mul | ExprOp::Div | ExprOp::Mod |
+                 ExprOp::ArrayIndex | ExprOp::Call | 
+                ExprOp::LMinusMinus | ExprOp::RMinusMinus | ExprOp::LPlusPlus | ExprOp::RPlusPlus => {
+
+                }
+            }
+        }
+        EtNodeType::Symbol { sym_idx, ast_node, text, def_or_use } => {
+
+        },
+    }
+}
+
 fn process_et(
     ast_tree:&AstTree, cfg_graph:&mut CfgGraph, et_tree:&EtTree, scope_tree:&ScopeTree, symtab:&mut SymTab, et_node:u32, scope_node:u32, cfg_bb:u32, counter:&mut u32, instr_slab:&mut InstrSlab,
     symtab_graph:&mut Option<&mut SymTabGraph>,
@@ -1280,6 +1315,12 @@ fn process_et(
                         return Err(anyhow!("操作符{}下缺少符号", et_node));
                     }
                 }
+                super::et_node::ExprOp::ArrayIndex => {
+                    
+                },
+                super::et_node::ExprOp::ArrayWrapper => {
+                    todo!();
+                },
                 _ => return Err(anyhow!("表达式{:?}内不应存在带有显性赋值性质的操作符", op)),
             }
         }
@@ -1317,8 +1358,20 @@ fn parse_declaration2nhwc(
                 //获得变量类型，做成symidx
                 let vartype_node = find!(rule RULE_declarationSpecifiers at ast_decl_node in ast_tree).unwrap();
                 let var_type = Type::new(vartype_node, ast_tree);
+                //判断左孩子节点是否是有意义的
+                let var = op_values[0];
+                let var_ettype = &node!(at var in et_tree).et_node_type;
+                match var_ettype {
+                    EtNodeType::Symbol { sym_idx:_, ast_node:_, text:_, def_or_use:_ } => {},
+                    EtNodeType::Operator { op, ast_node, text } =>{},
+                    _ => return Err(anyhow!("赋值号左边形式错误")),
+                }
+                //处理左右子树
                 let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[0], decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
                 let value_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[1], decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
+                //大纲：
+                //将var_symidx处理看是普通变量还是数组变量，如果是数组，则将value_symidx的内容和var_symidx进行比对整合
+                
                 let mut value_type = symtab.get_symbol(&value_symidx)?.get_type()?.clone();
                 if let Type::Fn { arg_syms:_, ret_sym }= value_type{
                     value_type = symtab.get_symbol(&ret_sym)?.get_type()?.clone();
