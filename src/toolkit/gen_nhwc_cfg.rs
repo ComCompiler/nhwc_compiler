@@ -7,6 +7,7 @@ use std::collections::HashMap;
 
 
 
+use super::mem_layout::MemLayout;
 use super::{cfg_edge::CfgEdge, nhwc_instr::Instruction};
 use super::{
     ast_node::AstTree, cfg_node::CfgGraph, et_node::{DeclOrDefOrUse, EtNodeType, EtTree}, gen_et::process_any_stmt, nhwc_instr::InstrType, scope_node::ScopeTree, symtab::{SymIdx, SymTab, SymTabGraph}
@@ -35,15 +36,17 @@ make_field_trait_for_struct!(
     UseCounter,
     bool,
     Type,
-    CfgInstrIdx
+    CfgInstrIdx,
+    MemLayout
 );
 
 // for variables symbol
 reg_field_for_struct!(Symbol {
         DEF_INSTRS_VEC:Vec<usize>,
-         DEF_CFG_NODE_VEC:Vec<u32>,
+        DEF_CFG_NODE_VEC:Vec<u32>,
         IS_CONST:bool,
         IS_TEMP:bool,
+        MEM_OFFSET:usize,
     } with_fields fields);
 // for compilation unit symbol
 reg_field_for_struct!(Symbol {
@@ -58,6 +61,7 @@ reg_field_for_struct!(Symbol {
 reg_field_for_struct!(CfgNode {
     FUNC_COR_SYMIDX:SymIdx,
     DEF_SYMIDX_INSTR_TUPLE_VEC:Vec<(SymIdx,usize)>,
+    MEM_LAYOUT:MemLayout,
 } with_fields info);
 // for Instruction
 reg_field_for_struct!(Instruction {
@@ -1332,14 +1336,21 @@ fn parse_declaration2nhwc(
                 // let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
                 let transed_value_symidx = force_trans_type(cfg_graph, symtab, &var_type, &value_type, &value_symidx, decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
 
+
+                // 加入 alloc 指令 分配内存
+                let alloc_instr = InstrType::new_alloc(var_type.clone(), var_symidx.clone()).to_instr();
+                if !matches!(&node!(at cfg_node in cfg_graph).cfg_node_type,CfgNodeType::Root { static_ast_nodes: _ }){
+                    // 是 局部变量(在函数内定义的变量)
+                    let cfg_entry = get_cfg_entry_by_cfg_node(cfg_graph, symtab, cfg_node)?.with_context(||format!("这个cfg node:{} 没有对应的entry节点",cfg_node))?;
+                    push_instr!(alloc_instr to cfg_entry in cfg_graph slab instr_slab);
+                }else{
+                    // 说明这个 cfg_node 就是root ，那么直接把 alloc 指令加入 root 就行了
+                    push_instr!(alloc_instr to cfg_node in cfg_graph slab instr_slab);
+                }
+
+                // 加入 defvar 指令 给变量赋值
                 let defvar_instr = InstrType::new_def_var(var_type.clone(), var_symidx.clone(), Some(transed_value_symidx.clone())).to_instr();
                 push_instr!(defvar_instr to cfg_node in cfg_graph slab instr_slab);
-
-                let alloc_instr = InstrType::new_alloc(var_type, var_symidx).to_instr();
-                if !matches!(&node!(at cfg_node in cfg_graph).cfg_node_type,CfgNodeType::Root { static_ast_nodes: _ }){
-                let cfg_entry = get_cfg_entry_by_cfg_node(cfg_graph, symtab, cfg_node)?.with_context(||format!("这个cfg node:{} 没有对应的entry节点",cfg_node))?;
-                push_instr!(alloc_instr to cfg_entry in cfg_graph slab instr_slab);
-                }
             }
             EtNodeType::Constant { const_sym_idx: _, ast_node: _, text: _ } => todo!(),
             EtNodeType::Symbol { sym_idx: _, ast_node, text:_, def_or_use } => {

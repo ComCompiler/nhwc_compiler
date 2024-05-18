@@ -8,6 +8,7 @@ use crate::node;
 use super::ast_node::AstTree;
 
 pub type ScopeTree = StableDiGraph<ScopeNode, (), u32>;
+pub static ST_ROOT:u32 = 0;
 
 #[derive(Clone)]
 pub struct ScopeNode {

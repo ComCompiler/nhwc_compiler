@@ -64,7 +64,7 @@ pub enum Value {
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
     Array {
         value_map:ArrayMap,
-        dims:Vec<u32>,
+        dims:Vec<usize>,
         ele_type:Type,
     }
     // // 这个类型用来表示不确定的值或其代数表达式
@@ -110,7 +110,7 @@ pub enum Type {
     Void,
     Label,
     Array{
-        dims:Vec<u32>,
+        dims:Vec<usize>,
         ty:Box<Type>,
     },
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
@@ -205,7 +205,7 @@ impl Type {
     }
     /// 这个函数接受一个元素类型和各个维度的大小来构建一个数组类型
     /// 但是禁止创建数组的数组
-    pub fn new_array(ele_ty:Type,dims:Vec<u32>)->Result<Self>{
+    pub fn new_array(ele_ty:Type,dims:Vec<usize>)->Result<Self>{
         match &ele_ty{
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
             _=>{}
@@ -218,6 +218,17 @@ impl Type {
             Type::F32
         } else {
             Type::I32
+        }
+    }
+    pub fn mem_len(&self)->Result<usize>{
+        match &self{
+            Type::I32 => Ok(4),
+            Type::F32 => Ok(4),
+            Type::I1 => Ok(1),
+            Type::Void => todo!(),
+            Type::Label => todo!(),
+            Type::Array { dims, ty } => Ok({let array_size:usize = dims.iter().product() ;  array_size*ty.mem_len()?}),
+            Type::Fn { arg_syms, ret_sym } => todo!(),
         }
     }
     pub fn can_implicit_trans_to(another_type:&Type) -> bool {

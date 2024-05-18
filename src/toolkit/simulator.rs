@@ -87,7 +87,7 @@ impl Simulator{
         let instr = &self.instr_list;
         let simu_symtab = &mut self.simu_symtab;
 
-        // 先扫一遍,找到所有的label 并存入symtab
+        // 先扫一遍,找到所有的label 和 函数起始位置 并存入symtab
         let mut op_cur_define_func = None;
         for (pos,&l) in instr.iter().enumerate(){
             let instr_struct = instr_slab.get_instr(l)?.clone();

@@ -12,7 +12,7 @@ use clap::Parser;
 
 use passes::{ast2cfg_pass::Ast2CfgPass, ast2et_debug_pass::Ast2EtDebugPass, ast2st_pass::Ast2StPass, cfg2ncfg_pass::Cfg2NcfgPass, code2ast_pass::Code2AstPass};
 
-use crate::{passes::{cfg_debug_pass::CfgDebugPass, def_use_chain_debug_pass::DefUseChainDebugPass, ncfg2djg_pass::Ncfg2DjgPass, nhwc_collect_pass::{NhwcCollectPass}, simulator_debug_pass::{SimulatorDebugPass}, ssa_pass::SsaPass}, toolkit::pass_manager::PassManager};
+use crate::{passes::{cfg_debug_pass::CfgDebugPass, def_use_chain_debug_pass::DefUseChainDebugPass, mem_alloc_pass::MemAllocPass, ncfg2djg_pass::Ncfg2DjgPass, nhwc_collect_pass::NhwcCollectPass, simulator_debug_pass::SimulatorDebugPass, ssa_pass::SsaPass}, toolkit::{mem_layout::MemLayout, pass_manager::PassManager, symtab::SymIdx}};
 #[derive(Parser, Clone, Default)]
 #[command(author, version, about)]
 pub struct Args {
@@ -54,6 +54,7 @@ fn main() {
     // let symtab_debug_pass = SymtabDebugPass::new(true && is_gen_png_global);
     let simulator_debug_pass = SimulatorDebugPass::new(true && is_gen_png_global,false);
     let nhwc_collect_pass = NhwcCollectPass::new(true);
+    let mem_alloc_pass = MemAllocPass::new();
     add_passes!(
         code2ast_pass
         then ast2et_debug_pass
@@ -61,6 +62,7 @@ fn main() {
         then ast2cfg_pass
         then cfg2ncfg_pass
         then ncfg2djg_pass
+        then mem_alloc_pass
         then ssa_pass
         then cfg_debug_pass
         then def_use_chain_debug_pass

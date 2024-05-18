@@ -18,6 +18,7 @@ use super::field::Fields;
 use super::nhwc_instr::{InstrSlab};
 
 //use crate::toolkit::ast_node::AstNode;
+pub static CFG_ROOT:u32 = 0;
 
 pub type CfgGraph = StableDiGraph<CfgNode, CfgEdge, u32>;
 /* 用于指示这个cfg_node 的类型 */

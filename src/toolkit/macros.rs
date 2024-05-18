@@ -1,10 +1,9 @@
 /// ? 返回下一层找到的第一个rule_id符合的节点，使用这个宏的时候必须确保语境中有ast_tree,node
 /// ```rust    
 /// let node =3;  // 三号节点是一个 function def
-///     let node =3;  // 三号节点是一个 function def
-///     let node_ids= find!(rule RULE_compoundStatement
-///                             finally RULE_blockItemList
-///                             at node in ast_tree).unwrap();
+/// let node_ids= find!(rule RULE_compoundStatement
+///                    finally RULE_blockItemList
+///                    at node in ast_tree).unwrap();
 /// assert_eq!(node_ids , vec![119,24,12] ,"找到的 node id 不对");
 /// ```
 #[macro_export]
@@ -159,7 +158,10 @@ macro_rules! direct_parent_node {
     }};
 }
 #[macro_export]
-/// 用法: direct_parent_nodes!(at $node in $graph)
+/// 用法:   
+/// ```
+/// direct_parent_nodes!(at $node in $graph)
+/// ```
 macro_rules! direct_parent_nodes {
     (at $node:ident in $graph:ident) => {{
         use petgraph::visit::EdgeRef;
@@ -177,8 +179,11 @@ macro_rules! direct_parent_nodes {
 }
 
 #[macro_export]
-/// 找到这个点的所有出边 EdgeRef
-/// 用法 outgoing_edges(at $node in $graph)
+/// 找到这个点的所有出边 EdgeRef  
+/// # Example
+/// ```
+/// outgoing_edges(at $node in $graph)
+/// ```
 macro_rules! outgoing_edges {
     (at $node:ident in $graph:ident) => {{
         let edges = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing).collect();
@@ -187,7 +192,10 @@ macro_rules! outgoing_edges {
 }
 #[macro_export]
 /// 找到这个点的唯一出边的weight
-/// 用法 outoing_edge_weight(at $node in $graph)
+/// # Example
+/// ```
+/// outoing_edge_weight(at $node in $graph)
+/// ```
 macro_rules! outgoing_edge_weight {
     (at $node:ident in $graph:ident) => {{
         use petgraph::visit::EdgeRef;
@@ -197,7 +205,10 @@ macro_rules! outgoing_edge_weight {
 }
 #[macro_export]
 /// 找到这个点的唯一出边的weight
-/// 用法 outoing_edge_weight(at $node in $graph)
+/// # Example
+/// ```
+/// outoing_edge_weight(at $node in $graph)
+/// ```
 macro_rules! outgoing_edge_weights {
     (at $node:ident in $graph:ident) => {{
         use petgraph::visit::EdgeRef;
