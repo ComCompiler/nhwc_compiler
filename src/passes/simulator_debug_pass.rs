@@ -3,7 +3,7 @@ use std::vec;
 use crate::{ debug_info_red, debug_info_yellow, toolkit::{ context::NhwcCtx, pass_manager::Pass, simulator::Simulator, symtab::{SymTabGraph}}};
 use itertools::Itertools;
 use crate::toolkit::dot::Config;
-use crate::toolkit::etc::generate_png_by_graph;
+use crate::toolkit::etc::generate_png_by_graph_multi_tasks;
 use anyhow::Result;
 #[derive(Debug)]
 pub struct SimulatorDebugPass {
@@ -124,7 +124,7 @@ impl Pass for SimulatorDebugPass {
             }
 
             
-            generate_png_by_graph(&simulator_g.clone(), "simulator_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab, Config::Title("simulator_debug_graph".to_string())],&mut ctx.io_task_list)?;
+            generate_png_by_graph_multi_tasks(&simulator_g.clone(), "simulator_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab, Config::Title("simulator_debug_graph".to_string())],&mut ctx.io_task_list)?;
         }
         Ok(())
     }

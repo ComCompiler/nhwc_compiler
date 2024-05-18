@@ -1,5 +1,5 @@
 use crate::toolkit::{
-    context::NhwcCtx, dot::Config, etc::{generate_png_by_graph, read_file_content}, gen_ast::parse_as_ast_tree, pass_manager::Pass
+    context::NhwcCtx, dot::Config, etc::{generate_png_by_graph_multi_tasks, read_file_content}, gen_ast::parse_as_ast_tree, pass_manager::Pass
 };
 use anyhow::Result;
 #[derive(Debug)]
@@ -18,7 +18,7 @@ impl Pass for Code2AstPass {
         // 生成对应的png
         if self.is_gen_png {
             let ast_tree = &mut ctx.ast_tree;
-            generate_png_by_graph(&ast_tree.clone(), "ast_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("ast_tree".to_string())],&mut ctx.io_task_list);
+            generate_png_by_graph_multi_tasks(&ast_tree.clone(), "ast_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("ast_tree".to_string())],&mut ctx.io_task_list);
         }
         Ok(())
     }

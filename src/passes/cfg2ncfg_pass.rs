@@ -1,7 +1,7 @@
 use crate::toolkit::dot::Config;
 use anyhow::Result;
 
-use crate::toolkit::{context::NhwcCtx, etc::generate_png_by_graph, gen_nhwc_cfg::parse_cfg_into_nhwc_cfg, pass_manager::Pass};
+use crate::toolkit::{context::NhwcCtx, etc::generate_png_by_graph_multi_tasks, gen_nhwc_cfg::parse_cfg_into_nhwc_cfg, pass_manager::Pass};
 #[derive(Debug)]
 pub struct Cfg2NcfgPass {
     is_gen_ncfg_png:bool,
@@ -26,13 +26,13 @@ impl Pass for Cfg2NcfgPass {
             for cfg_node in ctx.cfg_graph.node_weights_mut() {
                 cfg_node.load_instrs_text(&ctx.instr_slab)?;
             }
-            generate_png_by_graph(&ctx.cfg_graph.clone(), "nhwc_cfg_graph".to_string(), 
+            generate_png_by_graph_multi_tasks(&ctx.cfg_graph.clone(), "nhwc_cfg_graph".to_string(), 
             &[
                 Config::Record, 
                 Config::Rounded, Config::CfgBlock,Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel],&mut ctx.io_task_list)?;
         }
         if self.is_gen_symtab_png {
-            generate_png_by_graph(&ctx.symtab_graph.clone(), "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab, Config::Title("symtab_graph".to_string()),Config::CfgBlock],&mut ctx.io_task_list)?;
+            generate_png_by_graph_multi_tasks(&ctx.symtab_graph.clone(), "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab, Config::Title("symtab_graph".to_string()),Config::CfgBlock],&mut ctx.io_task_list)?;
         }
         rst?;
         Ok(())

@@ -1,4 +1,4 @@
-use crate::toolkit::{context::NhwcCtx, dot::Config, etc::generate_png_by_graph, gen_djg::parse_ncfg2dj_graph, pass_manager::Pass};
+use crate::toolkit::{context::NhwcCtx, dot::Config, etc::generate_png_by_graph_multi_tasks, gen_djg::parse_ncfg2dj_graph, pass_manager::Pass};
 use anyhow::Result;
 ///计算 dominnace frontier 
 #[derive(Debug)]
@@ -12,10 +12,10 @@ impl Pass for Ncfg2DjgPass {
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> { 
         parse_ncfg2dj_graph(&mut ctx.cfg_graph, &mut ctx.dj_graph)?;
         if self.is_ncfg_png{
-            generate_png_by_graph(&ctx.dj_graph.clone(), "dj_graph".to_string(),&[Config::Record, Config::Rounded, Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel],&mut ctx.io_task_list)?
+            generate_png_by_graph_multi_tasks(&ctx.dj_graph.clone(), "dj_graph".to_string(),&[Config::Record, Config::Rounded, Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel],&mut ctx.io_task_list)?
         }
         if self.is_ncfg_png{
-            generate_png_by_graph(&ctx.cfg_graph.clone(), "nhwc_cfg_graph".to_string(),&[Config::Record, Config::Rounded, Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel, Config::CfgBlock],&mut ctx.io_task_list )?
+            generate_png_by_graph_multi_tasks(&ctx.cfg_graph.clone(), "nhwc_cfg_graph".to_string(),&[Config::Record, Config::Rounded, Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel, Config::CfgBlock],&mut ctx.io_task_list )?
         }
         Ok(()) 
     }

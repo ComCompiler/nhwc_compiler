@@ -1,4 +1,4 @@
-use crate::{ reg_field_for_struct, toolkit::{context::NhwcCtx, dot::Config, etc::{generate_png_by_graph}, gen_dug::{parse_dug}, nhwc_instr::Instruction, pass_manager::Pass, symtab::{SymTab, SymTabEdge, SymTabGraph}}};
+use crate::{ reg_field_for_struct, toolkit::{context::NhwcCtx, dot::Config, etc::{generate_png_by_graph_multi_tasks}, gen_dug::{parse_dug}, nhwc_instr::Instruction, pass_manager::Pass, symtab::{SymTab, SymTabEdge, SymTabGraph}}};
 use anyhow::*;
 #[derive(Debug)]
 pub struct DefUseChainDebugPass {
@@ -26,7 +26,7 @@ impl Pass for DefUseChainDebugPass {
         
         if self.is_gen_png {
             // let symt = self.op_cfg_graph.unwrap();
-            generate_png_by_graph(&ctx.def_use_graph.clone(), "def_use_graph".to_string(), &[Config::Record, Config::Title("def_use_graph".to_string()),Config::RankDirLR],&mut ctx.io_task_list)?;
+            generate_png_by_graph_multi_tasks(&ctx.def_use_graph.clone(), "def_use_graph".to_string(), &[Config::Record, Config::Title("def_use_graph".to_string()),Config::RankDirLR],&mut ctx.io_task_list)?;
         }
 
         Ok(()) 

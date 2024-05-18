@@ -1,5 +1,5 @@
 use crate::{
-    add_edge, antlr_parser::cparser::{RULE_declaration, RULE_expression, RULE_forDeclaration}, toolkit::{self, ast_node::find_dfs_rule_ast, context::NhwcCtx, dot::Config, et_node::EtNodeType, etc::generate_png_by_graph, pass_manager::Pass}
+    add_edge, antlr_parser::cparser::{RULE_declaration, RULE_expression, RULE_forDeclaration}, toolkit::{self, ast_node::find_dfs_rule_ast, context::NhwcCtx, dot::Config, et_node::EtNodeType, etc::generate_png_by_graph_multi_tasks, pass_manager::Pass}
 };
 use anyhow::Result;
 #[derive(Debug)]
@@ -33,7 +33,7 @@ impl Pass for Ast2EtDebugPass {
         }
         // 1.1 生成对应的png
         if self.is_gen_png {
-            generate_png_by_graph(&ctx.et_tree.clone(), "et_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("et_tree".to_string())],&mut ctx.io_task_list)?;
+            generate_png_by_graph_multi_tasks(&ctx.et_tree.clone(), "et_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("et_tree".to_string())],&mut ctx.io_task_list)?;
         }
 
         Ok(())

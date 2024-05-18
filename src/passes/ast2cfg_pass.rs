@@ -1,4 +1,4 @@
-use crate::toolkit::{context::NhwcCtx, dot::Config, etc::generate_png_by_graph, gen_cfg::parse_ast_to_cfg, pass_manager::Pass};
+use crate::toolkit::{context::NhwcCtx, dot::Config, etc::generate_png_by_graph_multi_tasks, gen_cfg::parse_ast_to_cfg, pass_manager::Pass};
 use anyhow::Result;
 #[derive(Debug)]
 pub struct Ast2CfgPass {
@@ -20,7 +20,7 @@ impl Pass for Ast2CfgPass {
             cfg_edge.load_ast_node_text(&ctx.ast_tree)?;
         }
         if self.is_gen_png {
-            generate_png_by_graph(&ctx.cfg_graph.clone(), "cfg_graph".to_string(), &[Config::Record, Config::Rounded,Config::CfgBlock, Config::Title("cfg_graph".to_string()), Config::NodeIndexLabel],&mut ctx.io_task_list)?;
+            generate_png_by_graph_multi_tasks(&ctx.cfg_graph.clone(), "cfg_graph".to_string(), &[Config::Record, Config::Rounded,Config::CfgBlock, Config::Title("cfg_graph".to_string()), Config::NodeIndexLabel],&mut ctx.io_task_list)?;
         }
         Ok(())
     }

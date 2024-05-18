@@ -1,6 +1,6 @@
 use anyhow::{Result};
 
-use crate::toolkit::{ dot::Config, etc::generate_png_by_graph, gen_ssa::{add_phi_nodes, variable_renaming}, pass_manager::Pass};
+use crate::toolkit::{ dot::Config, etc::generate_png_by_graph_multi_tasks, gen_ssa::{add_phi_nodes, variable_renaming}, pass_manager::Pass};
 #[derive(Debug)]
 pub struct SsaPass {is_gen_ssa_cfg_png:bool,is_gen_symtab_graph_png:bool}
 impl SsaPass {
@@ -21,12 +21,12 @@ impl Pass for SsaPass {
                 cfg_node_struct.load_ast_node_text(&ctx.ast_tree)?;
                 cfg_node_struct.load_instrs_text(&ctx.instr_slab)?;
             }
-            generate_png_by_graph(&ctx.cfg_graph.clone(), "ssa_cfg".to_string(), &[Config::Record, Config::Rounded, Config::Title("ssa_cfg".to_string()), Config::NodeIndexLabel, Config::CfgBlock],&mut ctx.io_task_list)?
+            generate_png_by_graph_multi_tasks(&ctx.cfg_graph.clone(), "ssa_cfg".to_string(), &[Config::Record, Config::Rounded, Config::Title("ssa_cfg".to_string()), Config::NodeIndexLabel, Config::CfgBlock],&mut ctx.io_task_list)?
         }
         if self.is_gen_symtab_graph_png {
             ctx.symtab_graph.clear();
             ctx.symtab.debug_symtab_graph(format!("after ssa pass"), &mut ctx.symtab_graph,vec![]);
-            generate_png_by_graph(&ctx.symtab_graph.clone(), "ssa_symtab".to_string(), &[Config::Record, Config::Rounded, Config::Title("ssa_cfg".to_string()), Config::NodeIndexLabel, Config::CfgBlock],&mut ctx.io_task_list)?
+            generate_png_by_graph_multi_tasks(&ctx.symtab_graph.clone(), "ssa_symtab".to_string(), &[Config::Record, Config::Rounded, Config::Title("ssa_symtab".to_string()), Config::NodeIndexLabel, Config::CfgBlock],&mut ctx.io_task_list)?
         }
         add_phi_rst.and(variable_renaming_rst)
 

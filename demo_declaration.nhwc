@@ -1,60 +1,13 @@
  0    Define main _s0 [] -> main_ret _s0 
-         1    Alloc f32 %temp_0_s2 _i0 
-         2    temp_0_s2 _i1 = sitofp i32 3 _s0 to f32 
-         3    Alloc f32 %temp_1_s2 _i0 
-         4    temp_1_s2 _i1 = Add f32 temp_0_s2 _i1, 3.4 _s0 
-         5    Alloc f32 %temp_2_s2 _i0 
-         6    temp_2_s2 _i1 = fptosi f32 temp_1_s2 _i1 to i32 
-         7    Alloc i32 %a_s2 _i0 = temp_2_s2 _i1 
-         8    Alloc i32 %temp_3_s2 _i0 
-         9    temp_3_s2 _i1 = Add i32 3 _s0, 6 _s0 
-         10   Alloc f32 %temp_4_s2 _i0 
-         11   temp_4_s2 _i1 = sitofp i32 temp_3_s2 _i1 to f32 
-         12   Alloc f32 %b_s2 _i0 = temp_4_s2 _i1 
-         13   Alloc f32 %temp_5_s2 _i0 
-         14   temp_5_s2 _i1 = sitofp i32 a_s2 _i0 to f32 
-         15   Alloc f32 %temp_6_s2 _i0 
-         16   temp_6_s2 _i1 = Add f32 temp_5_s2 _i1, b_s2 _i0 
-         17   Alloc i1 %temp_7_s2 _i0 
-         18   temp_7_s2 _i1 = ucmp i1 One temp_6_s2 _i1, 0.0 _s0 
-         19   Alloc i1 %c_s2 _i0 = temp_7_s2 _i1 
-         20   Alloc f32 %temp_8_s2 _i0 
-         21   temp_8_s2 _i1 = sitofp i32 3 _s0 to f32 
-         22   Alloc f32 %d_s2 _i0 = temp_8_s2 _i1 
-         23   Alloc i1 %temp_9_s2 _i0 
-         24   temp_9_s2 _i1 = ucmp i1 One b_s2 _i0, 0.0 _s0 
-         25   Alloc i1 %temp_10_s2 _i0 
-         26   temp_10_s2 _i1 = Or i1 temp_9_s2 _i1, c_s2 _i0 
-         27   Alloc i1 %temp_11_s2 _i0 
-         28   temp_11_s2 _i1 = icmp i1 Ne a_s2 _i0, 0 _s0 
-         29   Alloc i1 %temp_12_s2 _i0 
-         30   temp_12_s2 _i1 = Or i1 temp_11_s2 _i1, temp_10_s2 _i1 
-         31   Alloc i1 %e_s2 _i0 = temp_12_s2 _i1 
-         32   Alloc f32 %temp_13_s2 _i0 
-         33   temp_13_s2 _i1 = fptosi f32 2.45 _s0 to i32 
-         34   Alloc i32 %f_s2 _i0 = temp_13_s2 _i1 
-         35   Alloc f32 %temp_14_s2 _i0 
-         36   temp_14_s2 _i1 = b_s2 _i0 
-         37   Alloc f32 %temp_15_s2 _i0 
-         38   temp_15_s2 _i1 = Add f32 b_s2 _i0, 1.0 _s0 
-         39   b_s2 _i1 = temp_15_s2 _i1 
-         40   Alloc f32 %temp_16_s2 _i0 
-         41   temp_16_s2 _i1 = fptosi f32 temp_14_s2 _i1 to i32 
-         42   Alloc i32 %g_s2 _i0 = temp_16_s2 _i1 
-         43   Alloc f32 %temp_17_s2 _i0 
-         44   temp_17_s2 _i1 = sitofp i32 a_s2 _i0 to f32 
-         45   Alloc f32 %temp_18_s2 _i0 
-         46   temp_18_s2 _i1 = Add f32 temp_17_s2 _i1, 5.6 _s0 
-         47   Alloc f32 %temp_19_s2 _i0 
-         48   temp_19_s2 _i1 = fptosi f32 temp_18_s2 _i1 to i32 
-         49   temp_17_s2 _i2 = temp_19_s2 _i1 
-         50   Alloc f32 %temp_20_s2 _i0 
-         51   temp_20_s2 _i1 = sitofp i32 2 _s0 to f32 
-         52   Alloc f32 %temp_21_s2 _i0 
-         53   temp_21_s2 _i1 = Mul f32 b_s2 _i1, temp_20_s2 _i1 
-         54   b_s2 _i2 = temp_21_s2 _i1 
-         55   Alloc f32 %temp_22_s2 _i0 
-         56   temp_22_s2 _i1 = b_s2 _i2 
-         57   Alloc f32 %temp_23_s2 _i0 
-         58   temp_23_s2 _i1 = Add f32 b_s2 _i2, 1.0 _s0 
-         59   b_s2 _i3 = temp_23_s2 _i1 
+         2    alloc f32 temp_0 _s2 
+         5    alloc f32 temp_1 _s2 
+         8    alloc f32 temp_2 _s2 
+         11   alloc i32 a _s2 
+         1    new_var f32 %temp_00 
+         3    temp_01 = sitofp i32 3 _s0 to f32 
+         4    new_var f32 %temp_10 
+         6    temp_11 = Add f32 temp_01, 3.4 _s0 
+         7    new_var f32 %temp_20 
+         9    temp_21 = fptosi f32 temp_11 to i32 
+         10   new_var i32 %a0 = temp_21 
+         12   23 _s0 = a0 

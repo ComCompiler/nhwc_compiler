@@ -4,7 +4,7 @@ use ahash::AHashMap;
 use strum_macros::EnumIs;
 use anyhow::*;
 
-use super::ast_node::AstTree;
+use super::{ast_node::AstTree, scope_node::ST_ROOT};
 use super::symtab::SymIdx;
 use crate::node;
 
@@ -63,8 +63,8 @@ pub enum Value {
     Void,
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
     Array {
-        value_map:ArrayMap,
-        dims:Vec<usize>,
+        value_map:ArrayEleMap,
+        dims:Vec<SymIdx>,
         ele_type:Type,
     }
     // // 这个类型用来表示不确定的值或其代数表达式
@@ -72,16 +72,16 @@ pub enum Value {
     // // Unsure {},
 }
 #[derive(Clone)]
-pub struct ArrayMap{
+pub struct ArrayEleMap{
     map:AHashMap<Vec<u32>,Value>
     
 }
-impl ArrayMap{
+impl ArrayEleMap{
     pub fn new()->Self{
         Self { map: AHashMap::new() }
     }
 }
-impl Debug for ArrayMap{
+impl Debug for ArrayEleMap{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut text = String::new();
         for (k,v) in self.map.iter(){
@@ -91,12 +91,12 @@ impl Debug for ArrayMap{
         write!(f,"{}",text)
     }
 }
-impl PartialEq for ArrayMap{
+impl PartialEq for ArrayEleMap{
     fn eq(&self, other: &Self) -> bool {
         self.map == other.map
     }
 } 
-impl PartialOrd for ArrayMap{
+impl PartialOrd for ArrayEleMap{
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         panic!("不能比较 array {:?} 和 array {:?} 类型",self, other);
     }
@@ -110,7 +110,7 @@ pub enum Type {
     Void,
     Label,
     Array{
-        dims:Vec<usize>,
+        dims:Vec<SymIdx>,
         ty:Box<Type>,
     },
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
@@ -129,12 +129,17 @@ impl Value {
             Type::I1 => Value::I1(None),
             Type::Void => Value::Void,
             Type::Label => todo!(),
-            Type::Array { dims: _, ty } => Value::Array { value_map: ArrayMap::new(), dims: vec![], ele_type: *ty.clone()},
+            Type::Array { dims: _, ty } => Value::Array { value_map: ArrayEleMap::new(), dims: vec![], ele_type: *ty.clone()},
             Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
         }
     }
-    pub fn is_unsure(){
-
+    pub fn is_unsure(&self)->Result<bool>{
+        match self{
+            Value::I32(op) => Ok(op.is_none()),
+            Value::F32(op) => Ok(op.is_none()),
+            Value::I1(op) => Ok(op.is_none()),
+            _ => Err(anyhow!("无法确认 value:{:?} 是否 unsure ",self)),
+        }
     }
     pub fn new_i1(value:bool) -> Self { Value::I1(Some(value)) }
     pub fn new_void() -> Self { Value::Void }
@@ -187,6 +192,20 @@ impl Value {
     pub fn adapt(&self, value2:&Value) -> Result<Type> {
         Type::adapt(&self.to_type() ,&value2.to_type())
     }
+
+    /// 当且仅当它为整数时可以转化为symidx
+    pub fn to_symidx(&self)->Result<SymIdx>{
+        match self{
+            Value::I32(op_i32) => {
+                if let Some(i32_value) = op_i32{
+                    Ok(SymIdx::new(ST_ROOT,i32_value.to_string()))
+                }else{
+                    Err(anyhow!("i32 {:?} unsure 无法转化为 symidx",self))
+                }
+            },
+            _ => Err(anyhow!("{:?}无法转化为 symidx",self))
+        }
+    }
 }
 impl Type {
     /// 这个函数接受一个ast_node 和 ast_tree 通过识别 ast_node 来完成基本类型的识别  
@@ -205,12 +224,57 @@ impl Type {
     }
     /// 这个函数接受一个元素类型和各个维度的大小来构建一个数组类型
     /// 但是禁止创建数组的数组
-    pub fn new_array(ele_ty:Type,dims:Vec<usize>)->Result<Self>{
+    pub fn new_array(ele_ty:Type,dims:Vec<SymIdx>)->Result<Self>{
         match &ele_ty{
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
             _=>{}
         }
-        Ok(Type::Array { dims: dims, ty: Box::new(ele_ty) })
+        Ok(Type::Array { dims, ty: Box::new(ele_ty) })
+    }
+    pub fn get_align(&self)->Result<usize>{
+        match &self{
+            Type::I32 => Ok(4),
+            Type::F32 => Ok(4),
+            Type::I1 => Ok(1),
+            Type::Void => Err(anyhow!("can't get alignment of void type {:?}",self)),
+            Type::Label => Err(anyhow!("can't get alignment of label type {:?}",self)),
+            Type::Array { dims, ty } => Ok(ty.get_align()?),
+            Type::Fn { arg_syms, ret_sym } =>Err(anyhow!("can't get alignment of func type {:?}",self)),
+        }
+    }
+
+    pub fn push_dim(&mut self,dim_symidx:SymIdx)->Result<()>{
+        match self{
+            Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
+            Type::Void => Err(anyhow!("无法新建void类型的数组"))?,
+            Type::Label => Err(anyhow!("无法新建label类型的数组"))?,
+            Type::I32 => *self = Type::new_array(self.clone(), vec![dim_symidx])?,
+            Type::F32 => *self =Type::new_array(self.clone(), vec![dim_symidx])?,
+            Type::I1 => *self =Type::new_array(self.clone(), vec![dim_symidx])?,
+            Type::Array { dims, ty } => {
+                dims.push(dim_symidx);
+            },
+        }
+        Ok(())
+    }
+
+    /// 首先这一定得是一个 array 然后
+    pub fn get_array_dim_weght_vec(&self)->Result<Vec<SymIdx>>{
+        match self{
+            Self::Array { dims, ty }=>{
+                let mut v1 = Value::new_i32(1);
+                let mut weighted_dims = vec![v1.to_symidx()?];
+                for dim in dims.get(0..dims.len()-1).unwrap().iter().rev(){
+                    let v2 = Value::from_string_with_specific_type(&dim.symbol_name, &Type::I32)?;
+                    v1 = (v1*v2)?;
+                    weighted_dims.push(v1.to_symidx()?)
+                }
+                weighted_dims.reverse();
+                Ok(weighted_dims)
+            },
+            _=> {Err(anyhow!("get_array_dim_weight_vec 仅能对 array type 使用，无法根据给定type:{:?}给出",self))}
+        }
+
     }
 
     pub fn new_from_const(const_str:&String) -> Self {
@@ -227,7 +291,8 @@ impl Type {
             Type::I1 => Ok(1),
             Type::Void => todo!(),
             Type::Label => todo!(),
-            Type::Array { dims, ty } => Ok({let array_size:usize = dims.iter().product() ;  array_size*ty.mem_len()?}),
+            Type::Array { dims, ty } => Ok({let array_size:usize = dims.iter().
+                map(|d|{let ans:usize = d.symbol_name.parse().unwrap();ans}).product() ;  array_size*ty.mem_len()?}),
             Type::Fn { arg_syms, ret_sym } => todo!(),
         }
     }
@@ -256,7 +321,7 @@ impl Debug for Type {
             Type::Void => write!(f, "void"),
             Type::Label => write!(f, "label"),
             // Type::Unsure {  } => write!(f, "unsure"),
-            Type::Array { dims, ty } => write!(f,"{:?}{:?}",ty,dims),
+            Type::Array { dims, ty } => write!(f,"Array:{:?}:{:?}",ty,dims),
         }
     }
 }

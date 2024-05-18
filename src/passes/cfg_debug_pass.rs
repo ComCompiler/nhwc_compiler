@@ -1,4 +1,4 @@
-use crate::{toolkit::{context::NhwcCtx, dot::Config, etc::generate_png_by_graph, pass_manager::Pass}};
+use crate::{toolkit::{context::NhwcCtx, dot::Config, etc::generate_png_by_graph_multi_tasks, pass_manager::Pass}};
 use anyhow::Result;
 #[derive(Debug)]
 pub struct CfgDebugPass {
@@ -16,7 +16,7 @@ impl Pass for CfgDebugPass {
             cfg_node.load_instrs_text(&ctx.instr_slab)?;
         }
         if self.is_gen_brief_cfg{
-            generate_png_by_graph(&ctx.cfg_graph.clone(), "brief_cfg_graph".to_string(), &[Config::Record, Config::Rounded,  Config::Title("brief_cfg_graph".to_string()),Config::CfgBlock],&mut ctx.io_task_list)?;
+            generate_png_by_graph_multi_tasks(&ctx.cfg_graph.clone(), "brief_cfg_graph".to_string(), &[Config::Record, Config::Rounded,  Config::Title("brief_cfg_graph".to_string()),Config::CfgBlock],&mut ctx.io_task_list)?;
         }
         Ok(()) 
     }

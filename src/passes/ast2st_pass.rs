@@ -1,4 +1,4 @@
-use crate::toolkit::{context::NhwcCtx, dot::Config, etc::generate_png_by_graph, gen_scope::parse_ast_to_scope, pass_manager::Pass};
+use crate::toolkit::{context::NhwcCtx, dot::Config, etc::generate_png_by_graph_multi_tasks, gen_scope::parse_ast_to_scope, pass_manager::Pass};
 use anyhow::Result;
 #[derive(Debug)]
 pub struct Ast2StPass {
@@ -18,7 +18,7 @@ impl Pass for Ast2StPass {
             for scope_node in ctx.scope_tree.node_weights_mut() {
                 scope_node.load_ast_node_text(&ctx.ast_tree);
             }
-            generate_png_by_graph(&ctx.scope_tree.clone(), "scope_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("scope_tree".to_string()),Config::NodeIndexLabel],&mut ctx.io_task_list)?;
+            generate_png_by_graph_multi_tasks(&ctx.scope_tree.clone(), "scope_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("scope_tree".to_string()),Config::NodeIndexLabel],&mut ctx.io_task_list)?;
         }
         Ok(())
     }
