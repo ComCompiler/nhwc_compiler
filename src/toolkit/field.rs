@@ -63,7 +63,7 @@ pub enum Value {
     I1(Option<bool>),
     Void,
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
-    Ptr64{ty:Box<Type>,op_pointed_symidx:Option<SymIdx>,offset:usize},
+    Ptr64{pointed_ty:Box<Type>,op_pointed_symidx:Option<SymIdx>,offset:Box<Value>},
     Array {
         value_map:ArrayEleMap,
         dims:Vec<SymIdx>,
@@ -75,20 +75,47 @@ pub enum Value {
 }
 #[derive(Clone)]
 pub struct ArrayEleMap{
-    map:AHashMap<Vec<u32>,Value>
-    
+    map:AHashMap<usize,Value>
 }
 impl ArrayEleMap{
     pub fn new()->Self{
         Self { map: AHashMap::new() }
     }
 }
+impl ArrayEleMap{
+    pub fn get_ele(&self,offset:usize)->Result<&Value>{
+        match self.map.get(&offset){
+            Some(ele) => Ok(ele),
+            None => {
+                Err(anyhow!("在map:{:?}中找不到元素{}",self,offset))
+            },
+        }
+    }
+    pub fn get_mut_ele(&mut self,offset:usize) -> Result<&mut Value>{
+        match self.map.get_mut(&offset){
+            Some(ele) => Ok(ele),
+            None => {
+                Err(anyhow!("在map中找不到元素{}",offset))
+            },
+        }
+    }
+    pub fn add_ele(&mut self,offset:&Value,val:Value) -> Result<()>{
+        let &offset = match &offset{
+            Value::I32(Some(i)) => i,
+            _ => {
+                return Err(anyhow!("add_ele 中 offset 类型不应为 {:?}",val))
+            }
+        };
+        self.map.insert(offset as usize, val);
+        Ok(())
+    }
+}
 impl Debug for ArrayEleMap{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut text = String::new();
         for (k,v) in self.map.iter(){
-            let s:String  = k.iter().map(|&dim_index| format!("[{}]",dim_index)).collect();
-            text += format!("{} ={:?}",s,v).as_str();
+            // let s:String  = k.iter().map(|&dim_index| format!("[{}]",dim_index)).collect();
+            text += format!("offset {} ={:?}",k,v).as_str();
         }
         write!(f,"{}",text)
     }
@@ -116,7 +143,7 @@ pub enum Type {
     },
     Array{
         dims:Vec<SymIdx>,
-        ty:Box<Type>,
+        ele_ty:Box<Type>,
     },
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
 }
@@ -134,12 +161,15 @@ impl Value {
             Type::I1 => Value::I1(None),
             Type::Void => Value::Void,
             Type::Label => todo!(),
-            Type::Array { dims: _, ty } => Value::Array { value_map: ArrayEleMap::new(), dims: vec![], ele_type: *ty.clone()},
+            Type::Array { dims: _, ele_ty } => Value::Array { value_map: ArrayEleMap::new(), dims: vec![], ele_type: *ele_ty.clone()},
             Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
             Type::Ptr64 { ty } => {
-                 Value::Ptr64 { op_pointed_symidx: None, offset: 0, ty: Box::new(specified_ty.clone())   }
+                 Value::Ptr64 { op_pointed_symidx: None, offset: Box::new(Value::new_unsure_from_specific_type(&Type::I32)), pointed_ty: Box::new(specified_ty.clone()) }
             },
         }
+    }
+    pub fn new_ptr64_from_array_with_offset(array_symidx:SymIdx,pointed_ty:Type,offset:Value) -> Self{
+        Value::Ptr64 { pointed_ty:Box::new(pointed_ty), op_pointed_symidx: Some(array_symidx), offset:Box::new(offset) }
     }
     pub fn is_unsure(&self)->Result<bool>{
         match self{
@@ -183,7 +213,7 @@ impl Value {
             Type::Label => Err(anyhow!("不能从string 转化为 Label 类型的value"))?,
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("不能从string 转化为 Fn 类型的value"))?,
             // Type::Unsure {  } => Err(anyhow!("不能从string 转化为 Unsure 类型的value"))?,
-            Type::Array { dims: _, ty: _ } => todo!(),
+            Type::Array { dims: _, ele_ty: _ } => todo!(),
             Type::Ptr64 { ty } => todo!(),
         })
     }
@@ -194,8 +224,8 @@ impl Value {
             Value::I1(_) => Type::I1,
             Value::Void => Type::Void,
             Value::Fn { arg_syms, ret_sym } => Type::Fn { arg_syms: arg_syms.clone(), ret_sym: ret_sym.clone() },
-            Value::Array { value_map: _, dims , ele_type } => Type::Array { dims: dims.clone(), ty:Box::new(ele_type.clone())  },
-            Value::Ptr64 { ty, op_pointed_symidx, offset  } => Type::Ptr64 { ty: Box::new(*ty.clone()) },
+            Value::Array { value_map: _, dims , ele_type } => Type::Array { dims: dims.clone(), ele_ty:Box::new(ele_type.clone())  },
+            Value::Ptr64 { pointed_ty: ty, op_pointed_symidx, offset  } => Type::Ptr64 { ty: Box::new(*ty.clone()) },
             // Value::Unsure {  } => Type::Unsure {  },
         }
     }
@@ -239,7 +269,7 @@ impl Type {
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
             _=>{}
         }
-        Ok(Type::Array { dims, ty: Box::new(ele_ty) })
+        Ok(Type::Array { dims, ele_ty: Box::new(ele_ty) })
     }
     pub fn get_align(&self)->Result<usize>{
         match &self{
@@ -248,7 +278,7 @@ impl Type {
             Type::I1 => Ok(1),
             Type::Void => Err(anyhow!("can't get alignment of void type {:?}",self)),
             Type::Label => Err(anyhow!("can't get alignment of label type {:?}",self)),
-            Type::Array { dims, ty } => Ok(ty.get_align()?),
+            Type::Array { dims, ele_ty: ty } => Ok(ty.get_align()?),
             Type::Fn { arg_syms, ret_sym } =>Err(anyhow!("can't get alignment of func type {:?}",self)),
             Type::Ptr64 { ty } => Ok(8),
         }
@@ -262,7 +292,7 @@ impl Type {
             Type::I32 => *self = Type::new_array(self.clone(), vec![dim_symidx])?,
             Type::F32 => *self =Type::new_array(self.clone(), vec![dim_symidx])?,
             Type::I1 => *self =Type::new_array(self.clone(), vec![dim_symidx])?,
-            Type::Array { dims, ty } => {
+            Type::Array { dims, ele_ty: ty } => {
                 dims.push(dim_symidx);
             },
             Type::Ptr64 { ty } => {
@@ -274,7 +304,7 @@ impl Type {
 
     pub fn pop_dim(&mut self)->Result<()>{
         match self{
-            Type::Array { dims, ty } => {
+            Type::Array { dims, ele_ty: ty } => {
                 if dims.len()>=1{
                     dims.remove(0);
                 }else{
@@ -290,9 +320,9 @@ impl Type {
     }
 
     /// 首先这一定得是一个 array 然后
-    pub fn get_array_dim_weght_vec(&self)->Result<Vec<SymIdx>>{
+    pub fn get_array_dim_weight_vec(&self)->Result<Vec<SymIdx>>{
         match self{
-            Self::Array { dims, ty }=>{
+            Self::Array { dims, ele_ty: ty }=>{
                 let mut v1 = Value::new_i32(1);
                 let mut weighted_dims = vec![v1.to_symidx()?];
                 for dim in dims.get(0..dims.len()-1).unwrap().iter().rev(){
@@ -322,7 +352,7 @@ impl Type {
             Type::I1 => Ok(1),
             Type::Void => todo!(),
             Type::Label => todo!(),
-            Type::Array { dims, ty } => Ok({let array_size:usize = dims.iter().
+            Type::Array { dims, ele_ty: ty } => Ok({let array_size:usize = dims.iter().
                 map(|d|{let ans:usize = d.symbol_name.parse().unwrap();ans}).product() ;  array_size*ty.mem_len()?}),
             Type::Fn { arg_syms, ret_sym } => todo!(),
             Type::Ptr64 { ty } => Ok(TARGET_POINTER_MEM_LEN),
@@ -336,7 +366,7 @@ impl Type {
             Type::Void => todo!(),
             Type::Label => todo!(),
             Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
-            Type::Array { dims: _, ty: _ } => todo!(),
+            Type::Array { dims: _, ele_ty: _ } => todo!(),
             Type::Ptr64 { ty } => todo!(),
         }
     }
@@ -367,22 +397,34 @@ impl Type {
             Type::Void => todo!(),
             Type::Label => todo!(),
             Type::Ptr64 { ty } => Ok(Type::Ptr64 { ty: Box::new(self.clone())}),
-            Type::Array { dims, ty } => Ok({let mut poped_array = self.clone();poped_array.pop_dim()?;Type::Ptr64 { ty: Box::new(poped_array)}}),
+            Type::Array { dims, ele_ty: ty } => Ok({let mut poped_array = self.clone();poped_array.pop_dim()?;Type::Ptr64 { ty: Box::new(poped_array)}}),
             Type::Fn { arg_syms, ret_sym } => Ok(Type::Ptr64 { ty: Box::new(self.clone())}),
         }
     }
-    pub fn type_when_use(&self) -> Self{
+    pub fn deref_type(&self) -> Result<Self>{
         match self{
-            Type::I32 => Type::Ptr64 { ty: Box::new(Type::I32)},
-            Type::F32 => Type::Ptr64 { ty: Box::new(Type::F32)},
-            Type::I1 => Type::Ptr64 { ty: Box::new(Type::I1)},
-            Type::Void => todo!(),
-            Type::Label => todo!(),
-            Type::Ptr64 { ty } => Type::Ptr64 { ty: Box::new(self.clone())},
-            Type::Array { dims, ty } => Type::Ptr64 { ty: Box::new(self.clone())},
-            Type::Fn { arg_syms, ret_sym } => Type::Ptr64 { ty: Box::new(self.clone())},
+            Type::I32 => return Err(anyhow!("{:?}无法被deref_type",self)),
+            Type::F32 => return Err(anyhow!("{:?}无法被deref_type",self)),
+            Type::I1 => return Err(anyhow!("{:?}无法被deref_type",self)),
+            Type::Label => return Err(anyhow!("{:?}无法被deref_type",self)),
+            Type::Void => return Err(anyhow!("{:?}无法被deref_type",self)),
+            Type::Ptr64 { ty } => Ok(*ty.clone()),
+            Type::Array { dims, ele_ty: ty } => return Err(anyhow!("{:?}无法被deref_type",self)),
+            Type::Fn { arg_syms, ret_sym } => return Err(anyhow!("{:?}无法被deref_type",self)),
         }
     }
+    // pub fn type_when_use(&self) -> Self{
+    //     match self{
+    //         Type::I32 => Type::Ptr64 { ty: Box::new(Type::I32)},
+    //         Type::F32 => Type::Ptr64 { ty: Box::new(Type::F32)},
+    //         Type::I1 => Type::Ptr64 { ty: Box::new(Type::I1)},
+    //         Type::Void => todo!(),
+    //         Type::Label => todo!(),
+    //         Type::Ptr64 { ty } => Type::Ptr64 { ty: Box::new(self.clone())},
+    //         Type::Array { dims, ty } => Type::Ptr64 { ty: Box::new(self.clone())},
+    //         Type::Fn { arg_syms, ret_sym } => Type::Ptr64 { ty: Box::new(self.clone())},
+    //     }
+    // }
 }
 
 impl Debug for Type {
@@ -397,7 +439,7 @@ impl Debug for Type {
             Type::Void => write!(f, "void"),
             Type::Label => write!(f, "label"),
             // Type::Unsure {  } => write!(f, "unsure"),
-            Type::Array { dims, ty } => write!(f,"Array:{:?}:{:?}",ty,dims),
+            Type::Array { dims, ele_ty: ty } => write!(f,"Array:{:?}:{:?}",ty,dims),
             Type::Ptr64 { ty } => write!(f,"ptr->{:?}",ty),
         }
     }

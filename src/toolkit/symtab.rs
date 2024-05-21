@@ -38,7 +38,7 @@ impl SymIdx {
         cloned.index_ssa = None;
         cloned
     }
-    pub fn as_src_symidx(&mut self)-> &mut SymIdx{
+    pub fn as_src_symidx(mut self)-> SymIdx{
         self.index_ssa = None;
         self
     }
@@ -47,7 +47,7 @@ impl SymIdx {
         cloned.index_ssa = Some(index_ssa);
         cloned
     }
-    pub fn as_ssa_symidx(&mut self,index_ssa:u32)-> &mut SymIdx{
+    pub fn as_ssa_symidx(mut self,index_ssa:u32)-> SymIdx{
         self.index_ssa = Some(index_ssa);
         self
     }

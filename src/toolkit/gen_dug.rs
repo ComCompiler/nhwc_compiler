@@ -32,9 +32,9 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab,symtab:&SymTa
                     InstrType::TranType { lhs: _, op: _ } => {},
                     InstrType::BreakPoint { symidx: _, breakpoint_args: _ } => continue,
                     InstrType::Global { lhs, var_symidx, vartype } => continue,
-                    InstrType::Load { lhs, ptr_symdix, ptr_ty } => {},
-                    InstrType::Store { value, value_ty, ptr_symidx, ptr_ty } => {},
-                    InstrType::GetElementPtr { lhs, ty, array_symidx, idx_vec } => {},
+                    InstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => {},
+                    InstrType::Store { value_symidx: value, value_ty, ptr_symidx, ptr_ty } => {},
+                    InstrType::GetElementPtr { lhs, array_ty: ty, array_symidx, idx_vec } => {},
                 }
                 let dug_node = add_node!({DefUseNode::new(instr)} to def_use_graph);
                 node_mut!(at dug_node in def_use_graph).load_instr_text(instr_slab);
@@ -80,9 +80,9 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab,symtab:&SymTa
                     InstrType::TranType { lhs: _, op: _ } => {},
                     InstrType::BreakPoint { symidx: _, breakpoint_args: _ } => continue,
                     InstrType::Global { lhs, var_symidx, vartype } => continue,
-                    InstrType::Load { lhs, ptr_symdix, ptr_ty } => {},
-                    InstrType::Store { value, value_ty, ptr_symidx, ptr_ty } => {},
-                    InstrType::GetElementPtr { lhs, ty, array_symidx, idx_vec } => {},
+                    InstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => {},
+                    InstrType::Store { value_symidx: value, value_ty, ptr_symidx, ptr_ty } => {},
+                    InstrType::GetElementPtr { lhs, array_ty: ty, array_symidx, idx_vec } => {},
                 }
                 let instr_struct = instr!(at instr in instr_slab)?;
                 for use_symidx in instr_struct.get_use_symidx_vec() {

@@ -714,7 +714,7 @@ fn force_trans_type(
     symtab_graph:&mut Option<&mut SymTabGraph>,op_et_node:Option<u32>,et_tree:&mut EtTree,
 ) -> Result<SymIdx> {
     // 如果是数组类型，就直接转化为 ty 
-    let type_to_trans_to = if let Type::Array { dims, ty } = type_to_trans_to.clone(){
+    let type_to_trans_to = if let Type::Array { dims, ele_ty: ty } = type_to_trans_to.clone(){
         *ty
     }else{
         type_to_trans_to.clone()

@@ -6,10 +6,11 @@ use anyhow::*;
 
 use crate::{add_symbol, debug_info_red, debug_info_yellow, make_field_trait_for_struct, reg_field_for_struct};
 use super::cfg_node::InstrList;
+use super::etc::InstrAnyhow;
 use super::field::Type::{self, F32, I32};
 
 use super::nhwc_instr::{BreakpointArg, Instruction};
-use super::symtab::SymIdx;
+use super::symtab::{self, SymIdx};
 use super::{field::{Field, Value}, nhwc_instr::{ArithOp::*, InstrSlab, InstrType::*}, symbol::Symbol, symtab::{SymTab, SymTabEdge, SymTabGraph}};
 make_field_trait_for_struct!(Value,(usize,usize));
 // simu_func_pos_range 是一个左闭右开区间
@@ -568,11 +569,83 @@ impl Simulator{
                     );
                 }
             },
-            Load { lhs, ptr_symdix, ptr_ty } => {
-                  todo!()
+            Load { lhs, ptr_symidx, ptr_ty } => {
+                let simu_symtab = &mut self.simu_symtab;
+                if !simu_symtab.has_symbol(lhs){
+                    add_symbol!({lhs.clone().into_symbol()}
+                        with_field SIMU_VAL:{Value::new_unsure_from_specific_type(&ptr_ty.deref_type()?)}
+                        with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
+                        to simu_symtab
+                    );
+                }
+                match simu_symtab.get_symbol(ptr_symidx)?.get_simu_val()?{
+                    Value::Ptr64 { pointed_ty: ty, op_pointed_symidx, offset } => {
+                        match op_pointed_symidx{
+                            Some(pointed_symidx) => {
+                                let val = simu_symtab.get_symbol(pointed_symidx)?.get_simu_val()?.clone();
+                                self.simu_add_value(lhs, val)?;
+                            },
+                            None => todo!(),
+                        }
+                    },
+                    _ => {return Err(anyhow!("{:?} 不是pointer,无法使用load指令",ptr_symidx))}
+                }
             },
-            Store { value, value_ty, ptr_symidx, ptr_ty } => todo!(),
-            GetElementPtr { lhs, ty, array_symidx, idx_vec } => todo!(),
+            Store { value_symidx, value_ty, ptr_symidx, ptr_ty } => {
+                match self.simu_symtab.get_symbol(ptr_symidx)?.get_simu_val()?.clone(){
+                    Value::Ptr64 { pointed_ty: ty, op_pointed_symidx, offset } => {
+                        match op_pointed_symidx{
+                            Some(pointed_symidx) => {
+                                // 这里要分两种情况，一种是数组，另一种是普通指针
+                                let val = self.simu_symtab.get_symbol(value_symidx)?.get_simu_val()?.clone();
+                                let var_be_assigned = self.simu_symtab.get_mut_symbol(&pointed_symidx)?.get_mut_simu_val()?;
+                                match var_be_assigned{
+                                    // 数组
+                                    Value::Array { value_map, dims, ele_type } => {
+                                        // 在数组中我们无法追踪 def_instr 因此无法使用 simu_add_value
+                                        value_map.add_ele(&offset, val)?
+                                    },
+                                    _ => {
+                                        // 普通指针
+                                        self.simu_add_value(&pointed_symidx, val)?;
+                                    }
+                                }
+                            },
+                            None => todo!(),
+                        }
+                    },
+                    _ => {return Err(anyhow!("{:?} 不是pointer,无法使用load指令",ptr_symidx))}
+                }
+            },
+            GetElementPtr { lhs, array_ty, array_symidx, idx_vec } => {
+                match array_ty{
+                    Type::Array { dims, ele_ty } => {
+                        if dims.len() != idx_vec.len(){
+                            return Err(anyhow!("getelementptr 中数组shape 和 idx_vec 维度应该相同 {:?} {:?}",dims,idx_vec))
+                        }
+                        let simu_symtab = &mut self.simu_symtab;
+                        let weights = array_ty.get_array_dim_weight_vec()?;
+                        let mut offset = Value::new_i32(0);
+                        for (weight_symidx,idx_symidx) in weights.iter().zip(idx_vec.iter()){
+                            let weight_val = Value::from_string_with_specific_type(&weight_symidx.symbol_name, &Type::I32)?;
+                            // 两种情况，一种是 idx_symidx 直接是常量 一种是 普通变量
+                            // let idx_val = Value::from_string_with_specific_type(&idx_vec.symbol_name, &Type::I32)?;
+                            offset = (offset + (weight_val * simu_symtab.get_symbol(idx_symidx)?.get_simu_val()?.clone())?)?;
+                        }
+                        if !simu_symtab.has_symbol(lhs){
+                            add_symbol!({lhs.clone().into_symbol()}
+                                // with_field SIMU_VAL:{Value::new_unsure_from_specific_type(&ele_ty.ref_type()?)}
+                                with_field SIMU_VAL:{Value::new_ptr64_from_array_with_offset(array_symidx.clone(), *ele_ty.clone(), offset)}
+                                with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
+                                to simu_symtab
+                            );
+                        }
+                    },
+                    _ => {
+                        return Err(anyhow!("getelementptr 的作用对象不应为 {:?}",array_ty))
+                    }
+                }
+            },
         }
         Ok(instr_struct.clone())
     }

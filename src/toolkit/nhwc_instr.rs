@@ -164,10 +164,10 @@ pub enum InstrType {
     DefineVar { var_symidx:SymIdx, vartype:Type, op_value:Option<SymIdx> },
     Alloc { var_symidx:SymIdx, vartype:Type },
     Global { lhs:SymIdx ,var_symidx:SymIdx, vartype:Type },
-    Load { lhs:SymIdx ,ptr_symdix:SymIdx ,ptr_ty:Type},
-    Store { value:SymIdx, value_ty:Type, ptr_symidx:SymIdx , ptr_ty:Type},
+    Load { lhs:SymIdx ,ptr_symidx:SymIdx ,ptr_ty:Type},
+    Store { value_symidx:SymIdx, value_ty:Type, ptr_symidx:SymIdx , ptr_ty:Type},
     /// 注意getelementptr 的 ty 必须是一个 数组
-    GetElementPtr { lhs:SymIdx ,ty:Type, array_symidx:SymIdx, idx_vec:Vec<SymIdx>},
+    GetElementPtr { lhs:SymIdx  ,array_symidx:SymIdx,array_ty:Type, idx_vec:Vec<SymIdx>},
     // 算数运算符 + - * / etc.
     Arith { lhs:SymIdx, rhs:ArithOp },
     SimpleAssign { lhs:SymIdx, rhs:SymIdx },
@@ -217,12 +217,12 @@ impl Instruction {
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op: _ } => vec![lhs],
             InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe } => vec![],
-            InstrType::GetElementPtr { ty, array_symidx, idx_vec, lhs } => vec![lhs],
+            InstrType::GetElementPtr { array_ty: ty, array_symidx, idx_vec, lhs } => vec![lhs],
             /// 这几个都认为是没有ssa 层面上的def 
             InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
             InstrType::Global { var_symidx, vartype, lhs } => vec![],
-            InstrType::Load { ptr_symdix, lhs, ptr_ty } => vec![lhs],
-            InstrType::Store { value, ptr_symidx, ptr_ty, value_ty } => vec![],
+            InstrType::Load { ptr_symidx: ptr_symdix, lhs, ptr_ty } => vec![lhs],
+            InstrType::Store { value_symidx: value, ptr_symidx, ptr_ty, value_ty } => vec![],
         };
         vec
     }
@@ -276,9 +276,9 @@ impl Instruction {
             InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
             InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
             InstrType::Global { lhs, var_symidx, vartype } => todo!(),
-            InstrType::Load { lhs, ptr_symdix, ptr_ty } => vec![ptr_symdix],
-            InstrType::Store { value, ptr_symidx, ptr_ty, value_ty } => vec![value,ptr_symidx],
-            InstrType::GetElementPtr { lhs, ty, array_symidx, idx_vec } => idx_vec.iter().chain(vec![array_symidx].into_iter()).collect_vec(),
+            InstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => vec![ptr_symdix],
+            InstrType::Store { value_symidx: value, ptr_symidx, ptr_ty, value_ty } => vec![value,ptr_symidx],
+            InstrType::GetElementPtr { lhs, array_ty: ty, array_symidx, idx_vec } => idx_vec.iter().chain(vec![array_symidx].into_iter()).collect_vec(),
         };
         vec
     }
@@ -311,9 +311,9 @@ impl Instruction {
             InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
             InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
             InstrType::Global { lhs, var_symidx, vartype } => vec![],
-            InstrType::Load { lhs, ptr_symdix, ptr_ty } => vec![lhs],
-            InstrType::Store { value, ptr_symidx, ptr_ty, value_ty } => vec![],
-            InstrType::GetElementPtr { lhs, ty, array_symidx, idx_vec } => vec![lhs],
+            InstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => vec![lhs],
+            InstrType::Store { value_symidx: value, ptr_symidx, ptr_ty, value_ty } => vec![],
+            InstrType::GetElementPtr { lhs, array_ty: ty, array_symidx, idx_vec } => vec![lhs],
         }
     }
     pub fn get_mut_use_symidx_vec(&mut self)->Vec<&mut SymIdx>{
@@ -366,9 +366,9 @@ impl Instruction {
             InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
             InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
             InstrType::Global { lhs, var_symidx, vartype } => todo!(),
-            InstrType::Load { lhs, ptr_symdix, ptr_ty } => vec![ptr_symdix],
-            InstrType::Store { value, ptr_symidx, ptr_ty, value_ty } => vec![value,ptr_symidx],
-            InstrType::GetElementPtr { lhs, ty, array_symidx, idx_vec } => idx_vec.iter_mut().chain(vec![array_symidx].into_iter()).collect_vec(),
+            InstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => vec![ptr_symdix],
+            InstrType::Store { value_symidx: value, ptr_symidx, ptr_ty, value_ty } => vec![value,ptr_symidx],
+            InstrType::GetElementPtr { lhs, array_ty: ty, array_symidx, idx_vec } => idx_vec.iter_mut().chain(vec![array_symidx].into_iter()).collect_vec(),
         }
     }
     pub fn is_phi(&self)->bool{
@@ -615,9 +615,9 @@ impl Debug for InstrType {
             InstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args  } => write!(f,"breakpoint {:?}({:?}) !",breakpoint_symidx,breakpoint_args),
             InstrType::Alloc { var_symidx, vartype, } => write!(f,"alloc {:?} {:?}",vartype,var_symidx),
             InstrType::Global { lhs, var_symidx, vartype } => write!(f,"global {:?} {:?}",vartype,var_symidx),
-            InstrType::Load { lhs, ptr_symdix, ptr_ty } => write!(f,"{:?} = load {:?}:{:?}",lhs,ptr_symdix,ptr_ty),
-            InstrType::Store { value, ptr_symidx, ptr_ty, value_ty } => write!(f,"store {:?}:{:?} {:?}:{:?}",value,value_ty,ptr_symidx,ptr_ty),
-            InstrType::GetElementPtr { lhs, ty, array_symidx, idx_vec } => write!(f,"{:?} = getelementptr {:?}:{:?} {:?}",lhs,array_symidx,ty,idx_vec,),
+            InstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => write!(f,"{:?} = load {:?}:{:?}",lhs,ptr_symdix,ptr_ty),
+            InstrType::Store { value_symidx: value, ptr_symidx, ptr_ty, value_ty } => write!(f,"store {:?}:{:?} {:?}:{:?}",value,value_ty,ptr_symidx,ptr_ty),
+            InstrType::GetElementPtr { lhs, array_ty: ty, array_symidx, idx_vec } => write!(f,"{:?} = getelementptr {:?}:{:?} {:?}",lhs,array_symidx,ty,idx_vec,),
         }
     }
 }
