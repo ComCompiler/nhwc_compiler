@@ -1,7 +1,11 @@
 use std::fs;
 use std::io::{Write};
 
-use crate::{instr};
+use crate::toolkit::cfg_node;
+use crate::toolkit::nhwc_instr::InstrType;
+use crate::toolkit::scope_node::ST_ROOT;
+use crate::toolkit::symtab::SymIdx;
+use crate::{direct_child_node, instr, node_mut, push_instr};
 
 use crate::{node, toolkit::{cfg_edge::CfgEdgeType, context::NhwcCtx, etc::dfs_with_priority, pass_manager::Pass}};
 use anyhow::*;
@@ -40,6 +44,33 @@ impl Pass for NhwcCollectPass {
             CfgEdgeType::GatherTrue {  } => -1,
             CfgEdgeType::GatherFalse {  } => 5,
         });
+
+        let mut anonymous_label_count = 0;
+        for &cfg_node in dfs_node_vec.iter(){
+            let cfg_node_struct = node_mut!(at cfg_node in cfg_graph);
+            if !(cfg_node_struct.cfg_node_type.is_exit() || 
+                cfg_node_struct.cfg_node_type.is_entry() ||
+                cfg_node_struct.cfg_node_type.is_root()) && cfg_node_struct.op_label_instr.is_none(){
+                    let anonymous_label= InstrType::new_label(SymIdx::new(ST_ROOT, format!("%{}",anonymous_label_count))).to_instr();
+                    push_instr!(anonymous_label to cfg_node in cfg_graph slab instr_slab);
+                    anonymous_label_count +=1;
+            }
+        }
+        for &cfg_node in dfs_node_vec.iter(){
+            if (node!(at cfg_node in cfg_graph).cfg_node_type.is_basic_block()){
+                let cfg_node_to_jump =direct_child_node!(at cfg_node in cfg_graph); 
+                let op_label_instr = node!(at cfg_node_to_jump in cfg_graph).op_label_instr;
+                if let Some(label_instr) = op_label_instr{
+                    match &instr!(at label_instr in instr_slab)?.instr_type{
+                        InstrType::Label { label_symidx } => {
+                            let jump_instr_struct = InstrType::new_jump(label_symidx.clone()).to_instr();
+                            push_instr!(jump_instr_struct to cfg_node in cfg_graph slab instr_slab);
+                        },
+                        _=>{return Err(anyhow!("cfg_node 的 label_instr 不可能为 除了label 以外的类型"))}
+                    }
+                }
+            }
+        }
         for cfg_node in dfs_node_vec{
             for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
                 let mut cur_tab = 0;

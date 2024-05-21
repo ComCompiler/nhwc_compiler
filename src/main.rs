@@ -12,7 +12,7 @@ use clap::Parser;
 
 use passes::{ast2cfg_pass::Ast2CfgPass, ast2et_debug_pass::Ast2EtDebugPass, ast2st_pass::Ast2StPass, cfg2ncfg_pass::Cfg2NcfgPass, code2ast_pass::Code2AstPass};
 
-use crate::{passes::{cfg_debug_pass::CfgDebugPass, def_use_chain_debug_pass::DefUseChainDebugPass, mem_alloc_pass::MemAllocPass, ncfg2djg_pass::Ncfg2DjgPass, nhwc_collect_pass::NhwcCollectPass, simulator_debug_pass::SimulatorDebugPass, ssa_pass::SsaPass}, toolkit::{mem_layout::MemLayout, pass_manager::PassManager, symtab::SymIdx}};
+use crate::{passes::{cfg_debug_pass::CfgDebugPass, def_use_chain_debug_pass::DefUseChainDebugPass, mem_alloc_pass::MemAllocPass, ncfg2djg_pass::Ncfg2DjgPass, nhwc_dump_pass::NhwcCollectPass, simulator_debug_pass::SimulatorDebugPass, ssa_pass::SsaPass}, toolkit::{mem_layout::MemLayout, pass_manager::PassManager, symtab::SymIdx}};
 #[derive(Parser, Clone, Default)]
 #[command(author, version, about)]
 pub struct Args {

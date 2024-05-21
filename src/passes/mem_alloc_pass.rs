@@ -1,4 +1,4 @@
-use crate::{direct_child_nodes, node, node_mut, toolkit::{cfg_node::CFG_ROOT, context::NhwcCtx, mem_layout::alloc_stack_mem_for_cfg_entry, pass_manager::Pass}};
+use crate::{direct_child_nodes, node, node_mut, toolkit::{cfg_node::CFG_ROOT, context::NhwcCtx, mem_layout::{alloc_stack_mem_for_cfg_entry, MemLayout}, pass_manager::Pass}};
 use anyhow::*;
 use crate::instr;
 /// 定义额外的信息，这样我们就可以把 add_field 宏加入到符号表或者任何实现了 Fields trait 的地方
@@ -26,6 +26,7 @@ impl Pass for MemAllocPass {
         let (cfg_graph ,instr_slab, symtab)= (&mut ctx.cfg_graph,&ctx.instr_slab,&mut ctx.symtab);
         let cfg_entries = direct_child_nodes!(at CFG_ROOT in cfg_graph);
         for &cfg_entry in &cfg_entries{
+            node_mut!(at cfg_entry in cfg_graph).add_mem_layout(MemLayout::new());
             for &instr in node!(at cfg_entry in cfg_graph).instrs.clone().iter(){
                 match &instr!(at instr in instr_slab)?.instr_type{
                     crate::toolkit::nhwc_instr::InstrType::DefineFunc { func_symidx, ret_symidx, args } => {

@@ -55,12 +55,13 @@ genericAssociation
     ;
 
 postfixExpression
-    : postfixExpression ('[' expression ']' | '(' argumentExpressionList? ')' | ('.' | '->') Identifier | '++' | '--')
+    : postfixExpression ('[' expression ']' | '(' argumentExpressionList ')' | ('.' | '->') Identifier | '++' | '--')
     | primaryExpression
     ;
 
 argumentExpressionList
     :   assignmentExpression (',' assignmentExpression)*
+    |      
     ;
 
 unaryExpression

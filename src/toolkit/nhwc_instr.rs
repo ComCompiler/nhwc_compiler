@@ -144,12 +144,10 @@ impl PhiOp{
         Ok(())
     }
 }
-#[derive(Clone)]
-pub enum MemOp {
-    Load { ptr:SymIdx },
-    Store { value:SymIdx, ptr:SymIdx },
-    Alloca { align:u32 },
-}
+// #[derive(Clone)]
+// pub enum MemOp {
+//     Alloca { align:u32 },
+// }
 // #[derive(Clone)]
 // pub enum Op{
 //     ArithOp(ArithOp),
@@ -165,6 +163,11 @@ pub enum InstrType {
     //定义变量
     DefineVar { var_symidx:SymIdx, vartype:Type, op_value:Option<SymIdx> },
     Alloc { var_symidx:SymIdx, vartype:Type },
+    Global { lhs:SymIdx ,var_symidx:SymIdx, vartype:Type },
+    Load { lhs:SymIdx ,ptr_symdix:SymIdx ,ptr_ty:Type},
+    Store { value:SymIdx, value_ty:Type, ptr_symidx:SymIdx , ptr_ty:Type},
+    /// 注意getelementptr 的 ty 必须是一个 数组
+    GetElementPtr { lhs:SymIdx ,ty:Type, array_symidx:SymIdx, idx_vec:Vec<SymIdx>},
     // 算数运算符 + - * / etc.
     Arith { lhs:SymIdx, rhs:ArithOp },
     SimpleAssign { lhs:SymIdx, rhs:SymIdx },
@@ -189,7 +192,7 @@ impl Instruction {
         self.text += format!("{}",instr).as_str()
     }
     pub fn get_def_symidx_vec(&self)->Vec<&SymIdx>{
-        match &self.instr_type{
+        let vec = match &self.instr_type{
             InstrType::Label { label_symidx:_ } => vec![],
             InstrType::DefineFunc { func_symidx, ret_symidx:_, args } => {
                 {
@@ -214,11 +217,17 @@ impl Instruction {
             InstrType::Phi { lhs, rhs:_ } => vec![lhs],
             InstrType::TranType { lhs, op: _ } => vec![lhs],
             InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe } => vec![],
+            InstrType::GetElementPtr { ty, array_symidx, idx_vec, lhs } => vec![lhs],
+            /// 这几个都认为是没有ssa 层面上的def 
             InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
-        }
+            InstrType::Global { var_symidx, vartype, lhs } => vec![],
+            InstrType::Load { ptr_symdix, lhs, ptr_ty } => vec![lhs],
+            InstrType::Store { value, ptr_symidx, ptr_ty, value_ty } => vec![],
+        };
+        vec
     }
     pub fn get_use_symidx_vec(&self)->Vec<&SymIdx>{
-        match &self.instr_type{
+        let vec = match &self.instr_type{
             InstrType::Label { label_symidx:_ } => vec![],
             InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args: _ } => {
                 vec![]
@@ -249,7 +258,8 @@ impl Instruction {
             },
             InstrType::Jump { jump_op } => {
                 match jump_op{
-                    JumpOp::Ret { ret_sym } => vec![ret_sym],
+                    JumpOp::Ret { op_ret_sym: Some(ret_sym) } => vec![ret_sym],
+                    JumpOp::Ret { op_ret_sym: None } => vec![],
                     JumpOp::Br { cond, t1: _, t2: _ } => vec![cond],
                     JumpOp::Switch { cond, default: _, compared: _ } => vec![cond],
                     JumpOp::DirectJump { label_symidx: _ } => vec![],
@@ -265,7 +275,12 @@ impl Instruction {
             ,
             InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
             InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
-        }
+            InstrType::Global { lhs, var_symidx, vartype } => todo!(),
+            InstrType::Load { lhs, ptr_symdix, ptr_ty } => vec![ptr_symdix],
+            InstrType::Store { value, ptr_symidx, ptr_ty, value_ty } => vec![value,ptr_symidx],
+            InstrType::GetElementPtr { lhs, ty, array_symidx, idx_vec } => idx_vec.iter().chain(vec![array_symidx].into_iter()).collect_vec(),
+        };
+        vec
     }
         pub fn get_mut_def_symidx_vec(&mut self)->Vec<&mut SymIdx>{
         match &mut self.instr_type{
@@ -295,6 +310,10 @@ impl Instruction {
             InstrType::TranType { lhs, op:_ } => vec![lhs],
             InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
             InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
+            InstrType::Global { lhs, var_symidx, vartype } => vec![],
+            InstrType::Load { lhs, ptr_symdix, ptr_ty } => vec![lhs],
+            InstrType::Store { value, ptr_symidx, ptr_ty, value_ty } => vec![],
+            InstrType::GetElementPtr { lhs, ty, array_symidx, idx_vec } => vec![lhs],
         }
     }
     pub fn get_mut_use_symidx_vec(&mut self)->Vec<&mut SymIdx>{
@@ -329,7 +348,8 @@ impl Instruction {
             },
             InstrType::Jump { jump_op } => {
                 match jump_op{
-                    JumpOp::Ret { ret_sym } => vec![ret_sym],
+                    JumpOp::Ret { op_ret_sym: Some(ret_sym) } => vec![ret_sym],
+                    JumpOp::Ret { op_ret_sym: None } => vec![],
                     JumpOp::Br { cond, t1: _, t2: _ } => vec![cond],
                     JumpOp::Switch { cond, default: _, compared: _ } => vec![cond],
                     JumpOp::DirectJump { label_symidx: _ } => vec![],
@@ -345,6 +365,10 @@ impl Instruction {
             ,
             InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
             InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
+            InstrType::Global { lhs, var_symidx, vartype } => todo!(),
+            InstrType::Load { lhs, ptr_symdix, ptr_ty } => vec![ptr_symdix],
+            InstrType::Store { value, ptr_symidx, ptr_ty, value_ty } => vec![value,ptr_symidx],
+            InstrType::GetElementPtr { lhs, ty, array_symidx, idx_vec } => idx_vec.iter_mut().chain(vec![array_symidx].into_iter()).collect_vec(),
         }
     }
     pub fn is_phi(&self)->bool{
@@ -387,7 +411,7 @@ pub struct ComparedPair {
 #[derive(Clone,EnumIs)]
 pub enum JumpOp {
     Ret {
-        ret_sym:SymIdx, // 这是返回的类型
+        op_ret_sym:Option<SymIdx>, // 这是返回的类型
     },
     Br {
         cond:SymIdx,
@@ -461,7 +485,7 @@ impl InstrType {
         Self::Call { op_assigned_symidx: assigned, func_op:FuncOp { func_symidx: func, actual_arg_symidx_vec: args,ret_type } }
     }
     // Instruction -> Jump ->JumpOp
-    pub fn new_ret(ret_sym:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::Ret { ret_sym } } }
+    pub fn new_ret(op_ret_sym:Option<SymIdx>) -> Self { Self::Jump { jump_op:JumpOp::Ret { op_ret_sym } } }
     pub fn new_br(cond:SymIdx, t1:SymIdx, t2:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::Br { cond:cond, t1, t2 } } }
     pub fn new_switch(cond:SymIdx, default:SymIdx, compared:Vec<ComparedPair>) -> Self { Self::Jump { jump_op:JumpOp::Switch { cond, default, compared } } }
     pub fn new_jump(label_symidx:SymIdx) -> Self { Self::Jump { jump_op:JumpOp::DirectJump { label_symidx } } }
@@ -539,7 +563,8 @@ impl Debug for FuncOp {
 impl Debug for JumpOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Ret { ret_sym } => write!(f, "ret {:?}", ret_sym),
+            Self::Ret { op_ret_sym:Some(ret_sym) } => write!(f, "ret {:?}", ret_sym),
+            Self::Ret { op_ret_sym:None } => write!(f, "ret" ),
 
             Self::Br { cond, t1, t2 } => {
                 write!(f, "br i1 {:?}, label {:?}, label {:?}", cond, t1, t2)
@@ -589,6 +614,10 @@ impl Debug for InstrType {
             InstrType::TranType { lhs, op } => write!(f, "{:?} = {:?}", lhs, op),
             InstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args  } => write!(f,"breakpoint {:?}({:?}) !",breakpoint_symidx,breakpoint_args),
             InstrType::Alloc { var_symidx, vartype, } => write!(f,"alloc {:?} {:?}",vartype,var_symidx),
+            InstrType::Global { lhs, var_symidx, vartype } => write!(f,"global {:?} {:?}",vartype,var_symidx),
+            InstrType::Load { lhs, ptr_symdix, ptr_ty } => write!(f,"{:?} = load {:?}:{:?}",lhs,ptr_symdix,ptr_ty),
+            InstrType::Store { value, ptr_symidx, ptr_ty, value_ty } => write!(f,"store {:?}:{:?} {:?}:{:?}",value,value_ty,ptr_symidx,ptr_ty),
+            InstrType::GetElementPtr { lhs, ty, array_symidx, idx_vec } => write!(f,"{:?} = getelementptr {:?}:{:?} {:?}",lhs,array_symidx,ty,idx_vec,),
         }
     }
 }

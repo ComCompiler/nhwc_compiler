@@ -237,15 +237,18 @@ impl Simulator{
         Ok(())
     }
 
-    pub fn pop_func_call(&mut self,actual_ret_symidx:&SymIdx)->Result<()>{
+    pub fn pop_func_call(&mut self,op_actual_ret_symidx:Option<&SymIdx>)->Result<()>{
         let func_call_ctx = self.func_call_ctx_stack.pop().ok_or(anyhow!("simulator pop_func_call 出栈失败，因为栈为空"))?;
         self.cur_instr_pos = func_call_ctx.instr_pos_before_call;
 
-        // 将实际返回值 赋值给 形式返回值
-        let actual_ret_val = self.simu_symtab.get_symbol(actual_ret_symidx)?.get_simu_val()?.clone();
-        self.simu_symtab.get_mut_symbol(&func_call_ctx.formal_ret_symidx)?.add_simu_val(actual_ret_val);
+        let mut op_ret_value = None;
+        if let Some(actual_ret_symidx) = &op_actual_ret_symidx{
+            // 将实际返回值 赋值给 形式返回值
+            let actual_ret_val = self.simu_symtab.get_symbol(actual_ret_symidx)?.get_simu_val()?.clone();
+            self.simu_symtab.get_mut_symbol(&func_call_ctx.formal_ret_symidx)?.add_simu_val(actual_ret_val);
 
-        let ret_value = self.simu_symtab.get_symbol(&func_call_ctx.formal_ret_symidx)?.get_simu_val()?.clone();
+            op_ret_value = Some(self.simu_symtab.get_symbol(&func_call_ctx.formal_ret_symidx)?.get_simu_val()?.clone());
+        }
         // 恢复上下文
         for sym_ctx in &func_call_ctx.sym_ctx_vec{
             self.simu_restore_sym_ctx(sym_ctx)?;
@@ -254,8 +257,16 @@ impl Simulator{
 
         // 将形式返回值赋值给 op_assigned
         // 这一步一定要在恢复上下文之后做
-        if let Some(assigned_symidx) = func_call_ctx.op_assigned_symidx{
-            self.simu_symtab.get_mut_symbol(&assigned_symidx)?.add_simu_val(ret_value);
+        // (assigned_symidx,ret_value) =
+        match (func_call_ctx.op_assigned_symidx,op_ret_value){
+            (None, None) => {},
+            (None, Some(ret_value)) => {},
+            (Some(_), None) => {
+                Err(anyhow!("函数并没有返回值，无法为变量赋值"))?
+            },
+            (Some(assigned_symidx), Some(ret_value)) => {
+                self.simu_symtab.get_mut_symbol(&assigned_symidx)?.add_simu_val(ret_value);
+            },
         }
         Ok(())
     }
@@ -469,8 +480,8 @@ impl Simulator{
             },
             Jump {  jump_op } => {
                 match jump_op {
-                    super::nhwc_instr::JumpOp::Ret { ret_sym } => {
-                        self.pop_func_call(ret_sym)?;
+                    super::nhwc_instr::JumpOp::Ret { op_ret_sym} => {
+                        self.pop_func_call(op_ret_sym.as_ref())?;
                     },
 
                     super::nhwc_instr::JumpOp::Br { cond, t1, t2 } => {
@@ -507,7 +518,7 @@ impl Simulator{
                 }
             },
             TranType { lhs, op } => {
-                let _lhs_val = self.simu_symtab.get_symbol(lhs)?.get_simu_val()?;
+                // let _lhs_val = self.simu_symtab.get_symbol(lhs)?.get_simu_val()?;
                 let _result = match op {
                     super::nhwc_instr::Trans::Fptosi { float_symidx } => {
                         let float_val = self.simu_symtab.get_symbol(float_symidx)?.get_simu_val()?;
@@ -545,6 +556,23 @@ impl Simulator{
                     );
                 }
             },
+            Global { lhs, var_symidx, vartype } => {
+                // 全局变量
+                let simu_symtab = &mut self.simu_symtab;
+                let src_var_symidx = var_symidx.to_src_symidx();
+                if !simu_symtab.has_symbol(&src_var_symidx){
+                    add_symbol!({src_var_symidx.into_symbol()}
+                        with_field SIMU_VAL:{Value::new_unsure_from_specific_type(&vartype)}
+                        with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
+                        to simu_symtab
+                    );
+                }
+            },
+            Load { lhs, ptr_symdix, ptr_ty } => {
+                  todo!()
+            },
+            Store { value, value_ty, ptr_symidx, ptr_ty } => todo!(),
+            GetElementPtr { lhs, ty, array_symidx, idx_vec } => todo!(),
         }
         Ok(instr_struct.clone())
     }

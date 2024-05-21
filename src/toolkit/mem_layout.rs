@@ -1,11 +1,20 @@
 use std::rc::Rc;
+use crate::toolkit::symtab::*;
 
 use std::fmt::Debug;
 use anyhow::*;
-use crate::{debug_info_blue, node_mut};
+use crate::{debug_info_blue, node_mut, reg_field_for_struct};
 
-use super::{cfg_node::CfgGraph, symtab::{SymIdx, SymTab}};
+use super::{cfg_node::{CfgGraph, CfgNode}, symbol::Symbol, symtab::{SymIdx, SymTab}};
 use itertools::{self, Itertools};
+
+
+reg_field_for_struct!(Symbol {
+        MEM_OFFSET:usize,
+    } with_fields fields);
+reg_field_for_struct!(CfgNode {
+    MEM_LAYOUT:MemLayout,
+} with_fields info);
 
 
 pub type SymIdxRc = Rc<SymIdx>;
@@ -27,10 +36,10 @@ impl MemLayout{
             mem: Vec::new(),
         }
     }
-    pub fn find_available(&mut self, data_len:usize) -> Option<usize>{
-        debug_info_blue!("{:?}",self);
+    pub fn find_available(&mut self, align:usize,data_len:usize) -> Option<usize>{
+        // debug_info_blue!("{:?}",self);
         for (idx,_byte) in self.mem.iter()
-            .enumerate().step_by(data_len){
+            .enumerate().step_by(align){
             if let Some(mem_range)=self.mem.get(idx..idx+data_len){
                 let mut available = true;
                 for mem_byte in mem_range{
@@ -48,10 +57,10 @@ impl MemLayout{
         None
     }
     /// 返回这个 新插入data 的起始位置
-    pub fn insert_data(&mut self, data_len:usize, symidx:&SymIdx)-> usize{
+    pub fn insert_data(&mut self, align:usize,data_len:usize, symidx:&SymIdx)-> usize{
         let symidx_rc = Rc::new(symidx.clone());
         loop{
-            let rst = self.find_available(data_len);
+            let rst = self.find_available(align,data_len);
             if rst.is_none(){
                 self.mem.push(None)
             }else if let Some(idx) = rst{
@@ -63,12 +72,13 @@ impl MemLayout{
         } 
         
     }
-    /// 获取对齐后的所有数据的总长度
+    /// 获取目前layout的总长度
     pub fn get_mem_len(&self)->usize{
         self.mem.len()
     }
-    pub fn align_mem_with_blank(&mut self,align_len:usize){
-        while self.mem.len()%align_len !=0{
+    /// 会在末尾填充足够的空内存以对齐给定align
+    pub fn align_mem_with_blank(&mut self,align:usize){
+        while self.mem.len()%align !=0{
             self.mem.push(None)
         }
     }
@@ -93,7 +103,8 @@ pub fn alloc_stack_mem_for_cfg_entry(cfg_graph:&mut CfgGraph,cfg_entry:u32,symta
     if !cfg_node_struct.has_mem_layout(){
         cfg_node_struct.add_mem_layout(MemLayout::new())
     }
-    let mem_offset = cfg_node_struct.get_mut_mem_layout()?.insert_data(symbol_struct.get_type()?.mem_len()?, symidx);
+    let sym_type =symbol_struct.get_type()?;
+    let mem_offset = cfg_node_struct.get_mut_mem_layout()?.insert_data(sym_type.get_align()?,sym_type.mem_len()?,symidx);
     symbol_struct.add_mem_offset(mem_offset);
     Ok(())
 }

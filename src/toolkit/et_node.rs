@@ -273,7 +273,7 @@ impl Debug for EtNodeType {
             // EtNakedNode::ArraySym { sym_idx, ast_node, text, def_or_use } =>
             // write!(f,"{:?} {} {}",def_or_use,text,sym_idx.symbol_name),
             EtNodeType::Separator { ast_node: _, text } => {
-                write!(f, "{}", text)
+                write!(f, "Sep {}", text)
             }
         }
     }

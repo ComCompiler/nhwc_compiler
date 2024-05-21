@@ -9,6 +9,7 @@ use super::symtab::SymIdx;
 use crate::node;
 
 pub type Fields = HashMap<&'static str, Box<dyn Field>>;
+pub static TARGET_POINTER_MEM_LEN:usize = 8;
 
 /// 你实现的类型必须继承这个 trait
 pub trait Field: Any + Debug {
@@ -62,6 +63,7 @@ pub enum Value {
     I1(Option<bool>),
     Void,
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
+    Ptr64{ty:Box<Type>,op_pointed_symidx:Option<SymIdx>,offset:usize},
     Array {
         value_map:ArrayEleMap,
         dims:Vec<SymIdx>,
@@ -109,6 +111,9 @@ pub enum Type {
     I1,
     Void,
     Label,
+    Ptr64{
+        ty:Box<Type>,
+    },
     Array{
         dims:Vec<SymIdx>,
         ty:Box<Type>,
@@ -131,6 +136,9 @@ impl Value {
             Type::Label => todo!(),
             Type::Array { dims: _, ty } => Value::Array { value_map: ArrayEleMap::new(), dims: vec![], ele_type: *ty.clone()},
             Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
+            Type::Ptr64 { ty } => {
+                 Value::Ptr64 { op_pointed_symidx: None, offset: 0, ty: Box::new(specified_ty.clone())   }
+            },
         }
     }
     pub fn is_unsure(&self)->Result<bool>{
@@ -176,6 +184,7 @@ impl Value {
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("不能从string 转化为 Fn 类型的value"))?,
             // Type::Unsure {  } => Err(anyhow!("不能从string 转化为 Unsure 类型的value"))?,
             Type::Array { dims: _, ty: _ } => todo!(),
+            Type::Ptr64 { ty } => todo!(),
         })
     }
     pub fn to_type(&self)->Type{
@@ -186,11 +195,12 @@ impl Value {
             Value::Void => Type::Void,
             Value::Fn { arg_syms, ret_sym } => Type::Fn { arg_syms: arg_syms.clone(), ret_sym: ret_sym.clone() },
             Value::Array { value_map: _, dims , ele_type } => Type::Array { dims: dims.clone(), ty:Box::new(ele_type.clone())  },
+            Value::Ptr64 { ty, op_pointed_symidx, offset  } => Type::Ptr64 { ty: Box::new(*ty.clone()) },
             // Value::Unsure {  } => Type::Unsure {  },
         }
     }
     pub fn adapt(&self, value2:&Value) -> Result<Type> {
-        Type::adapt(&self.to_type() ,&value2.to_type())
+        Type::arith_adapt(&self.to_type() ,&value2.to_type())
     }
 
     /// 当且仅当它为整数时可以转化为symidx
@@ -240,6 +250,7 @@ impl Type {
             Type::Label => Err(anyhow!("can't get alignment of label type {:?}",self)),
             Type::Array { dims, ty } => Ok(ty.get_align()?),
             Type::Fn { arg_syms, ret_sym } =>Err(anyhow!("can't get alignment of func type {:?}",self)),
+            Type::Ptr64 { ty } => Ok(8),
         }
     }
 
@@ -254,6 +265,26 @@ impl Type {
             Type::Array { dims, ty } => {
                 dims.push(dim_symidx);
             },
+            Type::Ptr64 { ty } => {
+                ty.push_dim(dim_symidx)?;
+            }
+        }
+        Ok(())
+    }
+
+    pub fn pop_dim(&mut self)->Result<()>{
+        match self{
+            Type::Array { dims, ty } => {
+                if dims.len()>=1{
+                    dims.remove(0);
+                }else{
+                    *self = *ty.clone();
+                }
+            },
+            Type::Ptr64 { ty } => {
+                ty.pop_dim()?;
+            },
+            _ => {todo!()}
         }
         Ok(())
     }
@@ -294,6 +325,7 @@ impl Type {
             Type::Array { dims, ty } => Ok({let array_size:usize = dims.iter().
                 map(|d|{let ans:usize = d.symbol_name.parse().unwrap();ans}).product() ;  array_size*ty.mem_len()?}),
             Type::Fn { arg_syms, ret_sym } => todo!(),
+            Type::Ptr64 { ty } => Ok(TARGET_POINTER_MEM_LEN),
         }
     }
     pub fn can_implicit_trans_to(another_type:&Type) -> bool {
@@ -305,6 +337,50 @@ impl Type {
             Type::Label => todo!(),
             Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
             Type::Array { dims: _, ty: _ } => todo!(),
+            Type::Ptr64 { ty } => todo!(),
+        }
+    }
+    pub fn arith_adapt(ty1:&Type, ty2:&Type) -> Result<Self> {
+        match (ty1, ty2) {
+            (Type::I32, Type::I32) => Ok(Type::I32),
+            (Type::I32, Type::F32) => Ok(Type::F32),
+            (Type::F32, Type::I32) => Ok(Type::F32),
+            (Type::F32, Type::F32) => Ok(Type::F32),
+            (Type::I32, Type::I1) => Ok(Type::I32),
+            (Type::F32, Type::I1) => Ok(Type::F32),
+            (Type::I1, Type::I32) => Ok(Type::I32),
+            (Type::I1, Type::F32) => Ok(Type::F32),
+            (Type::I1, Type::I1) => Ok(Type::I1),
+            (Type::Ptr64 { ty:ty1 }, Type::Ptr64 { ty:ty2 }) => Type::arith_adapt(ty1, ty2),
+            (Type::Ptr64 { ty:ty1 },  ty2) => Type::arith_adapt(ty1, ty2),
+            (ty1, Type::Ptr64 { ty:ty2 }) => Type::arith_adapt(ty1, ty2),
+            _ => {
+                Err(anyhow!("{:?}和{:?}不能进行兼容", ty1, ty2))
+            }
+        }
+    }
+    pub fn ref_type(&self) -> Result<Self>{
+        match self{
+            Type::I32 => Ok(Type::Ptr64 { ty: Box::new(Type::I32)}),
+            Type::F32 => Ok(Type::Ptr64 { ty: Box::new(Type::F32)}),
+            Type::I1 => Ok(Type::Ptr64 { ty: Box::new(Type::I1)}),
+            Type::Void => todo!(),
+            Type::Label => todo!(),
+            Type::Ptr64 { ty } => Ok(Type::Ptr64 { ty: Box::new(self.clone())}),
+            Type::Array { dims, ty } => Ok({let mut poped_array = self.clone();poped_array.pop_dim()?;Type::Ptr64 { ty: Box::new(poped_array)}}),
+            Type::Fn { arg_syms, ret_sym } => Ok(Type::Ptr64 { ty: Box::new(self.clone())}),
+        }
+    }
+    pub fn type_when_use(&self) -> Self{
+        match self{
+            Type::I32 => Type::Ptr64 { ty: Box::new(Type::I32)},
+            Type::F32 => Type::Ptr64 { ty: Box::new(Type::F32)},
+            Type::I1 => Type::Ptr64 { ty: Box::new(Type::I1)},
+            Type::Void => todo!(),
+            Type::Label => todo!(),
+            Type::Ptr64 { ty } => Type::Ptr64 { ty: Box::new(self.clone())},
+            Type::Array { dims, ty } => Type::Ptr64 { ty: Box::new(self.clone())},
+            Type::Fn { arg_syms, ret_sym } => Type::Ptr64 { ty: Box::new(self.clone())},
         }
     }
 }
@@ -322,24 +398,7 @@ impl Debug for Type {
             Type::Label => write!(f, "label"),
             // Type::Unsure {  } => write!(f, "unsure"),
             Type::Array { dims, ty } => write!(f,"Array:{:?}:{:?}",ty,dims),
-        }
-    }
-}
-impl Type {
-    pub fn adapt(ty1:&Type, ty2:&Type) -> Result<Self> {
-        match (ty1, ty2) {
-            (Type::I32, Type::I32) => Ok(Type::I32),
-            (Type::I32, Type::F32) => Ok(Type::F32),
-            (Type::F32, Type::I32) => Ok(Type::F32),
-            (Type::F32, Type::F32) => Ok(Type::F32),
-            (Type::I32, Type::I1) => Ok(Type::I32),
-            (Type::F32, Type::I1) => Ok(Type::F32),
-            (Type::I1, Type::I32) => Ok(Type::I32),
-            (Type::I1, Type::F32) => Ok(Type::F32),
-            (Type::I1, Type::I1) => Ok(Type::I1),
-            _ => {
-                Err(anyhow!("{:?}和{:?}不能进行兼容", ty1, ty2))
-            }
+            Type::Ptr64 { ty } => write!(f,"ptr->{:?}",ty),
         }
     }
 }

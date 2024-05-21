@@ -6,6 +6,7 @@ use itertools::{Itertools};
 use crate::toolkit::symtab::{SymTabEdge,SymTabGraph};
 use super::{cfg_node::{CfgGraph, CfgInstrIdx, InCfgNodeInstrPos, InstrList}, context::DjGraph, etc, nhwc_instr::{InstrSlab, InstrType, PhiPair}, symbol::Symbol, symtab::{SymIdx, SymTab}};
 use anyhow::{anyhow, Result, Context};
+use etc::InstrAnyhow;
 
 
 reg_field_for_struct!(Symbol {
@@ -117,7 +118,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                 // for non-phi-instr i
                 if !instr_struct.is_phi(){
                     for use_symidx in instr_struct.get_mut_use_symidx_vec(){
-                        let &is_const = symtab.get_symbol(&use_symidx)?.get_is_const()?;
+                        let &is_const = symtab.get_symbol(&use_symidx).with_instr_context(instr,&instr_slab)?.get_is_const()?;
                         // let &is_temp = symtab.get_symbol(&use_symidx)?.get_is_temp()?;
                         if !is_const {
                             update_reaching_def(instr, use_symidx, symtab, cfg_graph, dj_graph, instr_slab)?;

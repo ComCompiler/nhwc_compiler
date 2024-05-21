@@ -14,5 +14,5 @@ pub mod simulator_debug_pass;
 pub mod def_use_chain_debug_pass;
 pub mod cfg_loop_unrolling_pass;
 pub mod func_call_graph_pass;
-pub mod nhwc_collect_pass;
+pub mod nhwc_dump_pass;
 pub mod mem_alloc_pass;
