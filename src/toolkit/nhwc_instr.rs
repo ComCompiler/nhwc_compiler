@@ -478,6 +478,9 @@ impl InstrType {
     
     pub fn new_assign(lhs:SymIdx, rhs:SymIdx) -> Self { Self::SimpleAssign { lhs, rhs } }
 
+    pub fn new_get_element_ptr(lhs:SymIdx, array_symidx:SymIdx, array_ty:Type, idx_vec:Vec<SymIdx> ) -> Self { Self::GetElementPtr { lhs, array_symidx, array_ty, idx_vec }}
+    pub fn new_load(lhs:SymIdx, ptr_symidx:SymIdx, ptr_ty:Type) -> Self { Self::Load { lhs, ptr_symidx, ptr_ty}}
+    pub fn new_store(ptr_symidx:SymIdx, ptr_ty:Type, value_symidx:SymIdx, value_ty:Type,) -> Self { Self::Store { value_symidx, value_ty, ptr_symidx, ptr_ty } }
 
     // Instruction -> Call -> FuncOp
     pub fn new_func_call(assigned:Option<SymIdx>, func:SymIdx, args:Vec<SymIdx>,ret_type:Type) -> Self {

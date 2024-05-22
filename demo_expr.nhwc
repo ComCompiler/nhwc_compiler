@@ -2,13 +2,14 @@
          2    alloc i32 temp_0 _s2 
          5    alloc i32 temp_1 _s2 
          8    alloc i32 temp_2 _s2 
-         11   alloc i32 a _s2 
+         10   alloc i32 a _s2 
+          label %0 _s0: 
          1    new_var i32 %temp_00 
          3    temp_01 = Add i32 2 _s0, 3 _s0 
          4    new_var i32 %temp_10 
          6    temp_11 = Mul i32 4 _s0, temp_01 
          7    new_var i32 %temp_20 
          9    temp_21 = Add i32 temp_11, 5 _s0 
-         10   new_var i32 %a0 = temp_21 
-         12   breakpoint m _s4 ! 
+         11   new_var i32 %a0 = temp_21 
+         12   breakpoint m _s4([]) ! 
          13   ret a0 

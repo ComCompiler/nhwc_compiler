@@ -6,7 +6,7 @@ use anyhow::*;
 
 use super::{ast_node::AstTree, scope_node::ST_ROOT};
 use super::symtab::SymIdx;
-use crate::node;
+use crate::{debug_info_blue, node};
 
 pub type Fields = HashMap<&'static str, Box<dyn Field>>;
 pub static TARGET_POINTER_MEM_LEN:usize = 8;
@@ -314,7 +314,7 @@ impl Type {
             Type::Ptr64 { ty } => {
                 ty.pop_dim()?;
             },
-            _ => {todo!()}
+            _ => {return Err(anyhow!("{:?} 无法 pop_dim ",self))}
         }
         Ok(())
     }
@@ -325,12 +325,14 @@ impl Type {
             Self::Array { dims, ele_ty: ty }=>{
                 let mut v1 = Value::new_i32(1);
                 let mut weighted_dims = vec![v1.to_symidx()?];
-                for dim in dims.get(0..dims.len()-1).unwrap().iter().rev(){
-                    let v2 = Value::from_string_with_specific_type(&dim.symbol_name, &Type::I32)?;
+                for dim_symidx in dims.get(1..dims.len()).unwrap().iter().rev(){
+                    let v2 = Value::from_string_with_specific_type(&dim_symidx.symbol_name, &Type::I32)?;
+                    debug_info_blue!(" v2 is  {:?}",v2);
                     v1 = (v1*v2)?;
                     weighted_dims.push(v1.to_symidx()?)
                 }
                 weighted_dims.reverse();
+                debug_info_blue!("weight vec calcuated is {:?}",weighted_dims);
                 Ok(weighted_dims)
             },
             _=> {Err(anyhow!("get_array_dim_weight_vec 仅能对 array type 使用，无法根据给定type:{:?}给出",self))}
@@ -389,7 +391,7 @@ impl Type {
             }
         }
     }
-    pub fn ref_type(&self) -> Result<Self>{
+    pub fn to_ref_type(&self) -> Result<Self>{
         match self{
             Type::I32 => Ok(Type::Ptr64 { ty: Box::new(Type::I32)}),
             Type::F32 => Ok(Type::Ptr64 { ty: Box::new(Type::F32)}),
@@ -401,7 +403,7 @@ impl Type {
             Type::Fn { arg_syms, ret_sym } => Ok(Type::Ptr64 { ty: Box::new(self.clone())}),
         }
     }
-    pub fn deref_type(&self) -> Result<Self>{
+    pub fn to_deref_type(&self) -> Result<Self>{
         match self{
             Type::I32 => return Err(anyhow!("{:?}无法被deref_type",self)),
             Type::F32 => return Err(anyhow!("{:?}无法被deref_type",self)),

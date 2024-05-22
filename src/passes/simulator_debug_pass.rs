@@ -117,6 +117,9 @@ impl Pass for SimulatorDebugPass {
                     simu.clear_text();
                     simu.load_instr_text(Some(6),instr_slab,)?;
                     simu.load_stack_text()?;
+                    simu.simu_symtab.debug_symtab_graph(format!("Err "), &mut simulator_g,
+                        vec![]
+                    );
                     debug_info_yellow!("{:?}",simu);
                     debug_info_red!("{:?}",e);
                     break;

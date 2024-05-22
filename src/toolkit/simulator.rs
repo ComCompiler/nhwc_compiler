@@ -573,7 +573,7 @@ impl Simulator{
                 let simu_symtab = &mut self.simu_symtab;
                 if !simu_symtab.has_symbol(lhs){
                     add_symbol!({lhs.clone().into_symbol()}
-                        with_field SIMU_VAL:{Value::new_unsure_from_specific_type(&ptr_ty.deref_type()?)}
+                        with_field SIMU_VAL:{Value::new_unsure_from_specific_type(&ptr_ty.to_deref_type()?)}
                         with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
                         to simu_symtab
                     );
@@ -635,10 +635,13 @@ impl Simulator{
                         if !simu_symtab.has_symbol(lhs){
                             add_symbol!({lhs.clone().into_symbol()}
                                 // with_field SIMU_VAL:{Value::new_unsure_from_specific_type(&ele_ty.ref_type()?)}
-                                with_field SIMU_VAL:{Value::new_ptr64_from_array_with_offset(array_symidx.clone(), *ele_ty.clone(), offset)}
+                                // 对于数组要特殊处理一下，我们要保证返回的是 src_symidx 回头禁止一下数组的ssa
+                                with_field SIMU_VAL:{Value::new_ptr64_from_array_with_offset(array_symidx.to_src_symidx(), *ele_ty.clone(), offset)}
                                 with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
                                 to simu_symtab
                             );
+                        }else {
+                            self.simu_add_value(lhs, Value::new_ptr64_from_array_with_offset(array_symidx.to_src_symidx(), *ele_ty.clone(), offset))?;
                         }
                     },
                     _ => {
