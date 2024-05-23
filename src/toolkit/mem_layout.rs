@@ -72,7 +72,7 @@ impl MemLayout{
         } 
         
     }
-    /// 获取目前layout的总长度
+    /// 获取目前mem layout的总长度
     pub fn get_mem_len(&self)->usize{
         self.mem.len()
     }

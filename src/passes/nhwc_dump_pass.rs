@@ -22,14 +22,14 @@ use anyhow::*;
 /// 这个结构体，用于存储与Pass 相关的数据
 ///
 #[derive(Debug)]
-pub struct NhwcCollectPass {
+pub struct NhwcDumpPass {
     is_gen_nhwc_ir_file:bool
 }
-impl NhwcCollectPass {
-    pub fn new(is_gen_nhwc_ir_file:bool) -> Self { NhwcCollectPass {  is_gen_nhwc_ir_file } }
+impl NhwcDumpPass {
+    pub fn new(is_gen_nhwc_ir_file:bool) -> Self { NhwcDumpPass {  is_gen_nhwc_ir_file } }
 }
 
-impl Pass for NhwcCollectPass {
+impl Pass for NhwcDumpPass {
     // 运行这个pass
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> { 
         let mut nhwc_ir_vec = vec![];
@@ -59,12 +59,13 @@ impl Pass for NhwcCollectPass {
         for &cfg_node in dfs_node_vec.iter(){
             if node!(at cfg_node in cfg_graph).cfg_node_type.is_basic_block() {
                 let cfg_node_to_jump =direct_child_node!(at cfg_node in cfg_graph); 
-                let op_label_instr = node!(at cfg_node_to_jump in cfg_graph).op_label_instr;
-                if let Some(label_instr) = op_label_instr{
-                    match &instr!(at label_instr in instr_slab)?.instr_type{
+                if let Some(label_instr_to_jump) =node!(at cfg_node_to_jump in cfg_graph).op_label_instr{
+                    match &instr!(at label_instr_to_jump in instr_slab)?.instr_type{
                         InstrType::Label { label_symidx } => {
                             let jump_instr_struct = InstrType::new_jump(label_symidx.clone()).to_instr();
-                            push_instr!(jump_instr_struct to cfg_node in cfg_graph slab instr_slab);
+                            if let None = node!(at cfg_node in cfg_graph).op_jump_instr{
+                                push_instr!(jump_instr_struct to cfg_node in cfg_graph slab instr_slab);
+                            }
                         },
                         _=>{return Err(anyhow!("cfg_node 的 label_instr 不可能为 除了label 以外的类型"))}
                     }

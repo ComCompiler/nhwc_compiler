@@ -168,34 +168,33 @@ fn parse_bb2nhwc(
                 }
             }
             (RULE_jumpStatement, jump_node) => {
+                debug_info_blue!("visit jumpstmt at {jump_node}");
                 if let Some(&jump_scope) = ast2scope.get(&jump_node){
                     let jump_parent_scope = node!(at jump_scope in scope_tree).parent.unwrap();
-                    let jump_et_sep;
-                    if let Some(ret_expr_ast) = find!(rule RULE_returnStatement finally RULE_expression at jump_node in ast_tree){
-                        jump_et_sep = process_any_stmt(et_tree, ast_tree, scope_tree, ret_expr_ast, jump_parent_scope);
-                    }else{
-                        return Err(anyhow!("return语句缺少返回的表达式"))
-                    }
-                    if let EtNodeType::Separator { ast_node:_, text:_ } = &node!(at jump_et_sep in et_tree).et_node_type{
-                        let jump_child_nodes = direct_child_nodes!(at jump_et_sep in et_tree);
-                        debug_info_blue!("jump child nodes of {} is {:?}",jump_et_sep , jump_child_nodes);
-                        // check_child_nodes(&jump_stmt, 1)?;
-                        match jump_child_nodes.len(){
-                            x if x ==1 =>{
-                                let ret_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, jump_child_nodes[0], jump_parent_scope, cfg_bb, counter, instr_slab, symtab_g)?;
-                                let ret_instr = InstrType::new_ret(Some(ret_symidx)).to_instr();
-                                push_instr!(ret_instr to cfg_bb in cfg_graph slab instr_slab);
+                    if let Some(ret_stmt_ast) = find!(rule RULE_returnStatement at jump_node in ast_tree){
+                        let ret_instr = InstrType::new_ret(None).to_instr();
+                        push_instr!(ret_instr to cfg_bb in cfg_graph slab instr_slab);
+                        if let  Some(ret_expr_ast)= find!(rule RULE_expression at ret_stmt_ast in ast_tree){
+                            let ret_et_sep = process_any_stmt(et_tree, ast_tree, scope_tree, ret_expr_ast, jump_parent_scope);
+                            let ret_sep_child_nodes = direct_child_nodes!(at ret_et_sep in et_tree);
+                            debug_info_blue!("jump child nodes of {} is {:?}",ret_et_sep , ret_sep_child_nodes);
+                            // check_child_nodes(&jump_stmt, 1)?;
+                            match ret_sep_child_nodes.len(){
+                                x if x ==1 =>{
+                                    let ret_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ret_sep_child_nodes[0], jump_parent_scope, cfg_bb, counter, instr_slab, symtab_g)?;
+                                    let ret_instr = InstrType::new_ret(Some(ret_symidx)).to_instr();
+                                    push_instr!(ret_instr to cfg_bb in cfg_graph slab instr_slab);
+                                }
+                                _=>{
+                                    return Err(anyhow!("ret语句下参数数量不正确 et_node:{ret_et_sep}"))
+                                }
                             }
-                            x if x==0 =>{
-                                let ret_instr = InstrType::new_ret(None).to_instr();
-                                push_instr!(ret_instr to cfg_bb in cfg_graph slab instr_slab);
-                            }
-                            _=>{
-                                return Err(anyhow!("jump底下参数太多了"))
-                            }
+                        }else{
+                            let ret_instr = InstrType::new_ret(None).to_instr();
+                            push_instr!(ret_instr to cfg_bb in cfg_graph slab instr_slab);
                         }
                     }else{
-                        return Err(anyhow!("返回的etroot不是sep类型，et生成错误"))
+                        todo!()
                     }
                 }
             }

@@ -124,7 +124,7 @@ impl Debug for ArrayEleMap{
         let mut text = String::new();
         for (k,v) in self.map.iter(){
             // let s:String  = k.iter().map(|&dim_index| format!("[{}]",dim_index)).collect();
-            text += format!("offset {} ={:?}",k,v).as_str();
+            text += format!("offset {} ={:?}\n",k,v).as_str();
         }
         write!(f,"{}",text)
     }
