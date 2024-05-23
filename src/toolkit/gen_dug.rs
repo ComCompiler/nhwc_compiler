@@ -9,7 +9,7 @@ use super::{cfg_node::CfgGraph, def_use_node::{DefUseEdge, DefUseGraph, DefUseNo
 use anyhow::*;
 use petgraph::visit::EdgeRef;
 
-pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab,symtab:&SymTab,def_use_graph:&mut DefUseGraph,dj_graph:&DjGraph) -> Result<()>{
+pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab,symtab:&SymTab,def_use_graph:&mut DefUseGraph,_dj_graph:&DjGraph) -> Result<()>{
     for (_func_symidx,cfg_entry) in symtab.get_global_info().get_all_cfg_func_name_entry_tuples()?{
         for &cfg_node in etc::dfs(cfg_graph, *cfg_entry).iter(){
             for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
@@ -31,10 +31,10 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab,symtab:&SymTa
                     InstrType::Phi { lhs: _, rhs: _ } => {},
                     InstrType::TranType { lhs: _, op: _ } => {},
                     InstrType::BreakPoint { symidx: _, breakpoint_args: _ } => continue,
-                    InstrType::Global { lhs, var_symidx, vartype } => continue,
-                    InstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => {},
-                    InstrType::Store { value_symidx: value, value_ty, ptr_symidx, ptr_ty } => {},
-                    InstrType::GetElementPtr { lhs, array_ty: ty, array_symidx, idx_vec } => {},
+                    InstrType::Global { lhs: _, var_symidx: _, vartype: _ } => continue,
+                    InstrType::Load { lhs: _, ptr_symidx: _ptr_symdix, ptr_ty: _ } => {},
+                    InstrType::Store { value_symidx: _value, value_ty: _, ptr_symidx: _, ptr_ty: _ } => {},
+                    InstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx: _, idx_vec: _ } => {},
                 }
                 let dug_node = add_node!({DefUseNode::new(instr)} to def_use_graph);
                 node_mut!(at dug_node in def_use_graph).load_instr_text(instr_slab);
@@ -79,10 +79,10 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab,symtab:&SymTa
                     InstrType::Phi { lhs: _, rhs: _ } => {},
                     InstrType::TranType { lhs: _, op: _ } => {},
                     InstrType::BreakPoint { symidx: _, breakpoint_args: _ } => continue,
-                    InstrType::Global { lhs, var_symidx, vartype } => continue,
-                    InstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => {},
-                    InstrType::Store { value_symidx: value, value_ty, ptr_symidx, ptr_ty } => {},
-                    InstrType::GetElementPtr { lhs, array_ty: ty, array_symidx, idx_vec } => {},
+                    InstrType::Global { lhs: _, var_symidx: _, vartype: _ } => continue,
+                    InstrType::Load { lhs: _, ptr_symidx: _ptr_symdix, ptr_ty: _ } => {},
+                    InstrType::Store { value_symidx: _value, value_ty: _, ptr_symidx: _, ptr_ty: _ } => {},
+                    InstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx: _, idx_vec: _ } => {},
                 }
                 let instr_struct = instr!(at instr in instr_slab)?;
                 for use_symidx in instr_struct.get_use_symidx_vec() {

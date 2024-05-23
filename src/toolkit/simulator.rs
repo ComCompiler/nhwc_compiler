@@ -6,11 +6,11 @@ use anyhow::*;
 
 use crate::{add_symbol, debug_info_red, debug_info_yellow, make_field_trait_for_struct, reg_field_for_struct};
 use super::cfg_node::InstrList;
-use super::etc::InstrAnyhow;
+
 use super::field::Type::{self, F32, I32};
 
 use super::nhwc_instr::{BreakpointArg, Instruction};
-use super::symtab::{self, SymIdx};
+use super::symtab::{SymIdx};
 use super::{field::{Field, Value}, nhwc_instr::{ArithOp::*, InstrSlab, InstrType::*}, symbol::Symbol, symtab::{SymTab, SymTabEdge, SymTabGraph}};
 make_field_trait_for_struct!(Value,(usize,usize));
 // simu_func_pos_range 是一个左闭右开区间
@@ -261,7 +261,7 @@ impl Simulator{
         // (assigned_symidx,ret_value) =
         match (func_call_ctx.op_assigned_symidx,op_ret_value){
             (None, None) => {},
-            (None, Some(ret_value)) => {},
+            (None, Some(_ret_value)) => {},
             (Some(_), None) => {
                 Err(anyhow!("函数并没有返回值，无法为变量赋值"))?
             },
@@ -557,7 +557,7 @@ impl Simulator{
                     );
                 }
             },
-            Global { lhs, var_symidx, vartype } => {
+            Global { lhs: _, var_symidx, vartype } => {
                 // 全局变量
                 let simu_symtab = &mut self.simu_symtab;
                 let src_var_symidx = var_symidx.to_src_symidx();
@@ -579,7 +579,7 @@ impl Simulator{
                     );
                 }
                 match simu_symtab.get_symbol(ptr_symidx)?.get_simu_val()?{
-                    Value::Ptr64 { pointed_ty: ty, op_pointed_symidx, offset } => {
+                    Value::Ptr64 { pointed_ty: _ty, op_pointed_symidx, offset: _ } => {
                         match op_pointed_symidx{
                             Some(pointed_symidx) => {
                                 let val = simu_symtab.get_symbol(pointed_symidx)?.get_simu_val()?.clone();
@@ -591,9 +591,9 @@ impl Simulator{
                     _ => {return Err(anyhow!("{:?} 不是pointer,无法使用load指令",ptr_symidx))}
                 }
             },
-            Store { value_symidx, value_ty, ptr_symidx, ptr_ty } => {
+            Store { value_symidx, value_ty: _, ptr_symidx, ptr_ty: _ } => {
                 match self.simu_symtab.get_symbol(ptr_symidx)?.get_simu_val()?.clone(){
-                    Value::Ptr64 { pointed_ty: ty, op_pointed_symidx, offset } => {
+                    Value::Ptr64 { pointed_ty: _ty, op_pointed_symidx, offset } => {
                         match op_pointed_symidx{
                             Some(pointed_symidx) => {
                                 // 这里要分两种情况，一种是数组，另一种是普通指针
@@ -601,9 +601,9 @@ impl Simulator{
                                 let var_be_assigned = self.simu_symtab.get_mut_symbol(&pointed_symidx)?.get_mut_simu_val()?;
                                 match var_be_assigned{
                                     // 数组
-                                    Value::Array { value_map, dims, ele_type } => {
+                                    Value::Array { value_map, dims: _, ele_ty: _ele_type } => {
                                         // 在数组中我们无法追踪 def_instr 因此无法使用 simu_add_value
-                                        value_map.add_ele(&offset, val)?
+                                        value_map.add_ele_from_value(&offset, val)?
                                     },
                                     _ => {
                                         // 普通指针

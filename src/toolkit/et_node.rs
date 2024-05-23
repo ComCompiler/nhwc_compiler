@@ -1,4 +1,5 @@
 use anyhow::Result;
+use strum_macros::EnumIs;
 use std::fmt::Debug;
 use std::{mem, u32};
 
@@ -17,7 +18,7 @@ pub enum DeclOrDefOrUse {
     Use,
     Def 
 }
-#[derive(Clone)]
+#[derive(Clone,EnumIs)]
 pub enum EtNodeType {
     // et 树的terminal 要么是一个 Constant ，要么是一个 SymbolIndex
     // 而 et 树的 non-terminal node 要么是 root 要么是一个 op

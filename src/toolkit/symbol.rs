@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use crate::{ reg_field_for_struct};
 
-use super::field::{Fields, Type, UseCounter};
+use super::field::{Fields, Type, UseCounter, Value};
 use super::symtab::SymTab;
 use super::symtab::{SymTabEdge, SymTabGraph};
 use super::{field::Field, symtab::SymIdx};
@@ -20,7 +20,11 @@ impl Debug for Symbol {
 }
 /* 引用计数 */
 /* 符号的类型 */
-reg_field_for_struct! {Symbol { USE_COUNTER:UseCounter,TYPE:Type, } with_fields fields}
+/* 常量符号的值 */
+reg_field_for_struct! {Symbol { USE_COUNTER:UseCounter,
+    TYPE:Type, 
+    VALUE:Value,
+} with_fields fields}
 
 impl Symbol {
     pub fn new_verbose(scope_node:u32, symbol_name:String, index_ssa:Option<u32>) -> Symbol { Symbol { fields:HashMap::new(), symidx:SymIdx::new_verbose(scope_node, symbol_name, index_ssa) } }

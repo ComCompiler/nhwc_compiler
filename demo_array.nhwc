@@ -1,21 +1,53 @@
  0    Define main _s0 [] -> main_ret _s0 
-         2    alloc Array:f32:[2 _s0, 4 _s0, 6 _s0] b _s2 
-         5    alloc f32 temp_0 _s2 
-         8    alloc f32 temp_1 _s2 
-         11   alloc f32 temp_2 _s2 
-         14   alloc f32 temp_3 _s2 
-         17   alloc ptr->f32 temp_4 _s2 
+         3    alloc ptr->f32 temp_0 _s2 
+         7    alloc ptr->f32 temp_1 _s2 
+         11   alloc ptr->f32 temp_2 _s2 
+         15   alloc ptr->f32 temp_3 _s2 
+         19   alloc ptr->f32 temp_4 _s2 
+         23   alloc ptr->f32 temp_5 _s2 
+         27   alloc ptr->f32 temp_6 _s2 
+         31   alloc ptr->f32 temp_7 _s2 
+         34   alloc Array:f32:[3 _s0, 2 _s0, 2 _s0] b _s2 
+         37   alloc ptr->f32 temp_8 _s2 
+         40   alloc f32 temp_9 _s2 
+         43   alloc f32 temp_10 _s2 
+         46   alloc f32 temp_11 _s2 
+         49   alloc f32 temp_12 _s2 
           label %0 _s0: 
-         1    new_var Array:f32:[2 _s0, 4 _s0, 6 _s0] %b0 
-         3    breakpoint bp1 _s4([]) ! 
-         4    new_var f32 %temp_00 
-         6    temp_01 = sitofp i32 2 _s0 to f32 
-         7    new_var f32 %temp_10 
-         9    temp_11 = Add f32 temp_01, 1.0 _s0 
-         10   new_var f32 %temp_20 
-         12   temp_21 = sitofp i32 3 _s0 to f32 
-         13   new_var f32 %temp_30 
-         15   temp_31 = Mul f32 temp_21, temp_11 
-         16   new_var ptr->f32 %temp_40 
-         18   temp_41 = getelementptr b0:Array:f32:[2 _s0, 4 _s0, 6 _s0] [1 _s0, 1 _s0, 2 _s0] 
-         19   store temp_31:f32 temp_41:ptr->f32 
+         1    new_var Array:f32:[3 _s0, 2 _s0, 2 _s0] %b0 
+         2    new_var ptr->f32 %temp_00 
+         4    temp_01 = getelementptr b0:Array:f32:[3 _s0, 2 _s0, 2 _s0] [0 _s0, 1 _s0, 3 _s0] 
+         5    store 1 _s0:f32 temp_01:ptr->Array:f32:[2 _s0, 2 _s0] 
+         6    new_var ptr->f32 %temp_10 
+         8    temp_11 = getelementptr b0:Array:f32:[3 _s0, 2 _s0, 2 _s0] [1 _s0, 2 _s0, 4 _s0] 
+         9    store 2 _s0:f32 temp_11:ptr->Array:f32:[2 _s0, 2 _s0] 
+         10   new_var ptr->f32 %temp_20 
+         12   temp_21 = getelementptr b0:Array:f32:[3 _s0, 2 _s0, 2 _s0] [0 _s0, 0 _s0, 0 _s0] 
+         13   store 0 _s0:f32 temp_21:ptr->Array:f32:[2 _s0, 2 _s0] 
+         14   new_var ptr->f32 %temp_30 
+         16   temp_31 = getelementptr b0:Array:f32:[3 _s0, 2 _s0, 2 _s0] [1 _s0, 2 _s0, 5 _s0] 
+         17   store 3 _s0:f32 temp_31:ptr->Array:f32:[2 _s0, 2 _s0] 
+         18   new_var ptr->f32 %temp_40 
+         20   temp_41 = getelementptr b0:Array:f32:[3 _s0, 2 _s0, 2 _s0] [0 _s0, 0 _s0, 1 _s0] 
+         21   store 3 _s0:f32 temp_41:ptr->Array:f32:[2 _s0, 2 _s0] 
+         22   new_var ptr->f32 %temp_50 
+         24   temp_51 = getelementptr b0:Array:f32:[3 _s0, 2 _s0, 2 _s0] [2 _s0, 4 _s0, 9 _s0] 
+         25   store 7 _s0:f32 temp_51:ptr->Array:f32:[2 _s0, 2 _s0] 
+         26   new_var ptr->f32 %temp_60 
+         28   temp_61 = getelementptr b0:Array:f32:[3 _s0, 2 _s0, 2 _s0] [2 _s0, 4 _s0, 8 _s0] 
+         29   store 6 _s0:f32 temp_61:ptr->Array:f32:[2 _s0, 2 _s0] 
+         30   new_var ptr->f32 %temp_70 
+         32   temp_71 = getelementptr b0:Array:f32:[3 _s0, 2 _s0, 2 _s0] [0 _s0, 1 _s0, 2 _s0] 
+         33   store 2 _s0:f32 temp_71:ptr->Array:f32:[2 _s0, 2 _s0] 
+         35   breakpoint bp1 _s4([]) ! 
+         36   new_var ptr->f32 %temp_80 
+         38   temp_81 = getelementptr b0:Array:f32:[3 _s0, 2 _s0, 2 _s0] [1 _s0, 1 _s0, 2 _s0] 
+         39   new_var f32 %temp_90 
+         41   temp_91 = sitofp i32 2 _s0 to f32 
+         42   new_var f32 %temp_100 
+         44   temp_101 = Add f32 temp_91, 1.0 _s0 
+         45   new_var f32 %temp_110 
+         47   temp_111 = sitofp i32 3 _s0 to f32 
+         48   new_var f32 %temp_120 
+         50   temp_121 = Mul f32 temp_111, temp_101 
+         51   store temp_121:f32 temp_81:ptr->f32 

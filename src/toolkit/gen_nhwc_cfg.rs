@@ -1,18 +1,19 @@
 use anyhow::{anyhow, Context, Ok, Result};
 use itertools::Itertools;
 use petgraph::{
-    graph::node_index, stable_graph::NodeIndex, visit::EdgeRef
+    graph::node_index, visit::EdgeRef
 };
-use syn::ExprAssignOp;
-use std::array;
+
+
 use std::collections::HashMap;
 
 
-use super::ast_node;
-use super::dot::Config;
+
+
 use super::et_node::{EtNode, ExprOp};
 
-use super::etc::generate_png_by_graph;
+
+use super::field::{ArrayEleMap, Value};
 use super::mem_layout::MemLayout;
 use super::{cfg_edge::CfgEdge, nhwc_instr::Instruction};
 use super::{
@@ -22,7 +23,8 @@ use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_ins
 use crate::antlr_parser::clexer::Identifier;
 use crate::antlr_parser::cparser::{RULE_breakpointArg, RULE_breakpointStatement, RULE_returnStatement};
 use crate::toolkit::nhwc_instr::BreakpointArg;
-use crate::{debug_info_blue, debug_info_green, debug_info_red, debug_info_yellow, direct_parent_node, insert_instr};
+use crate::toolkit::scope_node::ST_ROOT;
+use crate::{debug_info_blue, direct_parent_node};
 use crate::{
     add_edge, add_node_with_edge, add_symbol, antlr_parser::cparser::{
         RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_jumpStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
@@ -301,13 +303,9 @@ fn parse_forloop2nhwc(
                 if ret_vec.len()>1{
                     return Err(anyhow!("条件表达式错误，返回类型不能转为bool"))
                 }
-                let r2bool_symidx;
-                if let result_symidx = &ret_vec[0]{
-                    let result_type = symtab.get_symbol(&result_symidx)?.get_type()?.clone();
-                    r2bool_symidx = force_trans_type(cfg_graph, symtab, &Type::I1,  &result_type,&result_symidx, ast_mid_node, cfg_forloop, counter, instr_slab, symtab_graph,None,et_tree)?;
-                }else{
-                    return Err(anyhow!("条件表达式错误，返回类型不能转为bool"))
-                }
+                let result_symidx = &ret_vec[0];
+                let result_type = symtab.get_symbol(&result_symidx)?.get_type()?.clone();
+                let r2bool_symidx = force_trans_type(cfg_graph, symtab, &Type::I1,  &result_type,&result_symidx, ast_mid_node, cfg_forloop, counter, instr_slab, symtab_graph,None,et_tree)?;
                 node_mut!(at cfg_forloop in cfg_graph).add_jump_det(r2bool_symidx);
             } else {
                 return Err(anyhow!("找不到astnode的scope"));
@@ -399,7 +397,7 @@ fn process_constant(symtab:&mut SymTab, const_literal:&String, symtab_graph:&mut
                 with_field TYPE:{Type::new_from_const(const_literal)} 
                 with_field IS_CONST:{true}
                 with_field IS_TEMP:{false}
-                to symtab debug symtab_graph);
+            to symtab debug symtab_graph);
         }
     }
     let const_symidx = SymIdx::new(0, const_literal.to_string());
@@ -529,6 +527,10 @@ fn force_trans_type(
     // }else{
     //     type_to_trans_to.clone()
     // };
+    if type_be_transed == type_to_trans_to{
+        //相同类型不需要转换
+        return Ok(symidx.clone());
+    }
     match (type_be_transed, type_to_trans_to) {
         (Type::I32, Type::F32) => {
             //创建f32类型的临时变量
@@ -536,10 +538,6 @@ fn force_trans_type(
             let i2f_instr = InstrType::new_int2float(symidx.clone(), ftmp_type_symidx.clone()).to_instr();
             push_instr!(i2f_instr to cfg_bb in cfg_graph slab instr_slab);
             return Ok(ftmp_type_symidx);
-        }
-        (Type::I32, Type::I32) | (Type::F32, Type::F32) | (Type::I1, Type::I1) => {
-            //相同类型不需要转换
-            return Ok(symidx.clone());
         }
         (Type::I32, Type::I1) => {
             //创建i1类型的变临时量
@@ -1186,7 +1184,7 @@ fn process_et(
                     let array_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_l_child, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
 
                     match &node!(at et_l_child in et_tree).et_node_type {
-                        EtNodeType::Symbol { sym_idx, ast_node, text, def_or_use:DeclOrDefOrUse::Def } => {
+                        EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, def_or_use:DeclOrDefOrUse::Def } => {
                             // 在最接近 symbol 的一层 array_index 插入 getelementptr 语句
 
                             // 可删此段
@@ -1198,7 +1196,7 @@ fn process_et(
 
                             let array_ty = symtab.get_symbol(&array_symidx)?.get_type()?.clone();
                             let ele_ty = match &array_ty{
-                                Type::Array { dims, ele_ty } => {
+                                Type::Array { dims: _, ele_ty } => {
                                     *ele_ty.clone()
                                 },
                                 _ => {return Err(anyhow!("在 [] 符号左边的 不是一个array et_node:{}",et_node))}
@@ -1210,18 +1208,18 @@ fn process_et(
 
                             Ok(temp_ptr_symidx)
                         },
-                        EtNodeType::Symbol { sym_idx, ast_node, text, def_or_use:DeclOrDefOrUse::Use } => {
+                        EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, def_or_use:DeclOrDefOrUse::Use } => {
                             // 在最接近 symbol 的一层 array_index 插入 getelementptr 语句
                             let array_ty = symtab.get_symbol(&array_symidx)?.get_type()?.clone();
                             debug_info_blue!("array {:?} type is {:?}", array_symidx,array_ty);
                             // 可删此段
-                            let mut l_child_type = node!(at et_l_child in et_tree).get_type()?.clone();
+                            let l_child_type = node!(at et_l_child in et_tree).get_type()?.clone();
                             debug_info_blue!("left child type {:?}",l_child_type);
                             debug_info_blue!("poped left child type {:?}",l_child_type);
                             node_mut!(at et_node in et_tree).add_type(l_child_type);
 
                             let ele_ty = match &array_ty{
-                                Type::Array { dims, ele_ty } => {
+                                Type::Array { dims: _, ele_ty } => {
                                     *ele_ty.clone()
                                 },
                                 _ => {return Err(anyhow!("在 [] 符号左边的 不是一个array et_node:{}",et_node))}
@@ -1235,10 +1233,10 @@ fn process_et(
                             
                             Ok(temp_symidx)
                         },
-                        EtNodeType::Symbol { sym_idx, ast_node, text, def_or_use:DeclOrDefOrUse::DeclDef { type_ast_node } } => {
+                        EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, def_or_use:DeclOrDefOrUse::DeclDef { type_ast_node: _ } } => {
 
                             // 可删此段
-                            let mut l_child_type = node!(at et_l_child in et_tree).get_type()?.clone();
+                            let l_child_type = node!(at et_l_child in et_tree).get_type()?.clone();
                             debug_info_blue!("left child type {:?}",l_child_type);
                             debug_info_blue!("poped left child type {:?}",l_child_type);
                             node_mut!(at et_node in et_tree).add_type(l_child_type);
@@ -1250,43 +1248,87 @@ fn process_et(
                             Ok(array_symidx)
                         },
                         _ => {
+                            node_mut!(at et_node in et_tree).add_type(symtab.get_symbol(&array_symidx)?.get_type()?.clone());
                             Ok(array_symidx)
                         }
                     }
                 },
                 super::et_node::ExprOp::ArrayWrapper => {
-                    todo!();
+                    // 遇到arraywrapper后，就不会由 process_et 递归处理了
+                    let et_node_vec = vec![et_node];
+                    let mut array_ele_map = ArrayEleMap::new();
+                    // 这里假定了et_node 父亲一定是 assign 并且左子节点一定有等号
+                    let et_assign_node = direct_parent_node!(at et_node in et_tree);
+                    let array_ty = node!(at et_assign_node in et_tree).get_type()?.clone();
+                    match &array_ty{
+                        Type::Array { dims, ele_ty } => {
+                            let mut reversed_remained_dims = dims.iter().rev().map(|symidx| {let idx:usize; idx = symidx.symbol_name.parse().unwrap(); idx}).collect_vec();
+                            array_initialize(et_node_vec, et_tree, &mut array_ele_map, &ele_ty, &mut reversed_remained_dims, &mut 0)?;
+                            let initializer_symidx = process_constant(symtab, &"initializer".to_string(), symtab_graph)?;
+                            symtab.get_mut_symbol(&initializer_symidx)?.add_value(Value::new_array(array_ele_map, dims.clone(), *ele_ty.clone()));
+                            symtab.get_mut_symbol(&initializer_symidx)?.add_type(array_ty);
+                            Ok(initializer_symidx)
+                        },
+                        _ => {
+                            Err(anyhow!("数组初始化的左侧不是数组类型"))
+                        }
+                    }
                 },
                 crate::toolkit::et_node::ExprOp::Assign => {
                     let op_values = direct_child_nodes!(at et_node in et_tree);
                     check_child_nodes(&op_values.clone(), 2)?;
                     // 后序遍历 右边
-                    let value_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[1], scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
-                    // let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
-                    let value_type = symtab.get_symbol(&value_symidx).unwrap().get_type_with_debug(symtab, symtab_graph)?.clone();
                     // 后序遍历 左边
-                    let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[0], scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
+                    let l_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[0], scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
                     // let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
-                    let var_type = symtab.get_symbol(&var_symidx).unwrap().get_type_with_debug(symtab, symtab_graph)?.clone();
+                    let l_type = symtab.get_symbol(&l_symidx).unwrap().get_type_with_debug(symtab, symtab_graph)?.clone();
+                    node_mut!(at et_node in et_tree).add_type(l_type.clone());
+                    let r_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[1], scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
+                    // let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
+                    let r_type = symtab.get_symbol(&r_symidx).unwrap().get_type_with_debug(symtab, symtab_graph)?.clone();
                     //如果结果和变量类型不同，添加自动转化instr
-                    match &var_type{
-                        Type::Ptr64 { ty:deref_var_type } => {
-                            let transed_value_symidx = force_trans_type(cfg_graph, symtab, &deref_var_type, &value_type, &value_symidx, scope_node, cfg_bb, counter, instr_slab, symtab_graph,Some(et_node),et_tree)?;
-                            let store_instr_struct = InstrType::new_store(var_symidx.clone(), var_type.clone(),  transed_value_symidx, *deref_var_type.clone()).to_instr();
-                            node_mut!(at et_node in et_tree).add_type(*deref_var_type.clone());
+                    match (&l_type,&r_type){
+                        (Type::Ptr64 { ty:l_deref_var_type },_)=> {
+                            let transed_value_symidx = force_trans_type(cfg_graph, symtab, &l_deref_var_type, &r_type, &r_symidx, scope_node, cfg_bb, counter, instr_slab, symtab_graph,Some(et_node),et_tree)?;
+                            let store_instr_struct = InstrType::new_store(l_symidx.clone(), l_type.clone(),  transed_value_symidx, *l_deref_var_type.clone()).to_instr();
+                            node_mut!(at et_node in et_tree).add_type(*l_deref_var_type.clone());
                             push_instr!(store_instr_struct to cfg_bb in cfg_graph slab instr_slab);
-                            Ok(var_symidx)
+                            Ok(l_symidx)
                         },
-                        Type::Array { dims, ele_ty } => {
+                        (Type::Array { dims: _l_dims, ele_ty: l_ele_ty },Type::Array { dims: _r_dims, ele_ty: r_ele_ty }) => {
                             // 这里是数组专属初始化
-                            todo!()
+                            if r_ele_ty != l_ele_ty {
+                                return Err(anyhow!("数组初始化时 左右元素类型不同 at et_node:{}",et_node))
+                            }
+                            let r_value = symtab.get_symbol(&r_symidx)?.get_value()?.clone();
+                            let value_map = match r_value{
+                                Value::Array { value_map, dims: _, ele_ty: _ } => {value_map},
+                                _ => {return Err(anyhow!("右边必须是 array 类型"))}
+                            };
+                            for (&offset,value) in value_map.iter(){
+                                let value_symidx = value.to_symidx()?;
+                                process_constant(symtab, &value_symidx.symbol_name, symtab_graph)?;
+                                let array_idx_vec = deduce_offset_to_symidx_vec(offset, r_type.get_array_dim_weight_vec()?.into_iter().map(|s| s.symbol_name.parse().unwrap()).collect_vec());
+                                for &array_idx in array_idx_vec.iter(){
+                                    process_constant(symtab, &array_idx.to_string(), symtab_graph)?;
+                                }
+
+                                let temp_ptr_symidx = process_temp_symbol(cfg_graph, symtab, &l_ele_ty.to_ref_type()?, scope_node, cfg_bb, counter, instr_slab, symtab_graph, Some(et_node), et_tree)?;
+                                let get_ele_ptr_instr_struct = InstrType::new_get_element_ptr(temp_ptr_symidx.clone(), l_symidx.clone(), l_type.clone(), array_idx_vec.into_iter().map(|idx| SymIdx::new(ST_ROOT,idx.to_string())).collect_vec()).to_instr();
+                                push_instr!(get_ele_ptr_instr_struct to cfg_bb in cfg_graph slab instr_slab);
+
+                                // let transed_value_symidx = force_trans_type(cfg_graph, symtab, &l_deref_var_type, &r_type, &r_symidx, scope_node, cfg_bb, counter, instr_slab, symtab_graph,Some(et_node),et_tree)?;
+                                let store_instr_struct = InstrType::new_store(temp_ptr_symidx, l_type.to_ref_type()?,  value_symidx, *l_ele_ty.clone()).to_instr();
+                                push_instr!(store_instr_struct to cfg_bb in cfg_graph slab instr_slab);
+                            }
+                            Ok(l_symidx)
                         },
                         _ => {
-                            let new_value_symidx = force_trans_type(cfg_graph, symtab, &var_type, &value_type, &value_symidx, scope_node, cfg_bb, counter, instr_slab, symtab_graph,Some(et_node),et_tree)?;
-                            let assign_instr_struct = InstrType::new_assign(var_symidx.clone(), new_value_symidx).to_instr();
-                            node_mut!(at et_node in et_tree).add_type(var_type.clone());
+                            let new_value_symidx = force_trans_type(cfg_graph, symtab, &l_type, &r_type, &r_symidx, scope_node, cfg_bb, counter, instr_slab, symtab_graph,Some(et_node),et_tree)?;
+                            let assign_instr_struct = InstrType::new_assign(l_symidx.clone(), new_value_symidx).to_instr();
+                            node_mut!(at et_node in et_tree).add_type(l_type.clone());
                             push_instr!(assign_instr_struct to cfg_bb in cfg_graph slab instr_slab);
-                            Ok(var_symidx)
+                            Ok(l_symidx)
                          }
                     }
                }
@@ -1321,30 +1363,32 @@ fn parse_declaration2nhwc(
         match et_node_type {
             /// 先考虑这个语句存在 = 的情况
             EtNodeType::Operator { op: ExprOp::Assign, ast_node: _, text: _ } => {
-                let op_values = direct_child_nodes!(at et_sep_item_node in et_tree);
-                //获得变量类型，做成symidx
-                //判断左孩子节点是否是有意义的
-                let var_et_node = op_values[0];
-                let var_et_type = &node!(at var_et_node in et_tree).et_node_type;
-                match var_et_type {
-                    EtNodeType::Symbol { sym_idx:_, ast_node:_, text:_, def_or_use:_ } => {},
-                    EtNodeType::Operator { op, ast_node, text } =>{},
-                    _ => return Err(anyhow!("赋值号左边形式错误")),
-                }
-                //处理左右子树
-                let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[0], decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
-                let var_type = symtab.get_symbol(&var_symidx)?.get_type()?.clone();
-                let value_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[1], decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
-                //大纲：
-                //将var_symidx处理看是普通变量还是数组变量，如果是数组，则将value_symidx的内容和var_symidx进行比对整合
+                // let et_assign_node = et_sep_item_node;
+                // let op_values = direct_child_nodes!(at et_sep_item_node in et_tree);
+                // //获得变量类型，做成symidx
+                // //判断左孩子节点是否是有意义的
+                // let var_et_node = op_values[0];
+                // let var_et_type = &node!(at var_et_node in et_tree).et_node_type;
+                // match var_et_type {
+                //     EtNodeType::Symbol { sym_idx:_, ast_node:_, text:_, def_or_use:_ } => {},
+                //     EtNodeType::Operator { op, ast_node, text } =>{},
+                //     _ => return Err(anyhow!("赋值号左边形式错误")),
+                // }
+                // //处理左右子树
+                // // 这是个等于号
+                // let value_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[1], decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
+                // //大纲：
+                // //将var_symidx处理看是普通变量还是数组变量，如果是数组，则将value_symidx的内容和var_symidx进行比对整合
                 
-                let mut value_type = symtab.get_symbol(&value_symidx)?.get_type()?.clone();
-                if let Type::Fn { arg_syms:_, ret_sym }= value_type{
-                    value_type = symtab.get_symbol(&ret_sym)?.get_type()?.clone();
-                }
-                // let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
-                let transed_value_symidx = force_trans_type(cfg_graph, symtab, &var_type, &value_type, &value_symidx, decl_parent_scope, cfg_node, counter, instr_slab, symtab_g,None,et_tree)?;
-
+                // let mut value_type = symtab.get_symbol(&value_symidx)?.get_type()?.clone();
+                // if let Type::Fn { arg_syms:_, ret_sym }= value_type{
+                //     value_type = symtab.get_symbol(&ret_sym)?.get_type()?.clone();
+                // }
+                // // let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
+                // let transed_value_symidx = force_trans_type(cfg_graph, symtab, &var_type, &value_type, &value_symidx, decl_parent_scope, cfg_node, counter, instr_slab, symtab_g,None,et_tree)?;
+                
+                let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_sep_item_node, decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
+                let var_type = symtab.get_symbol(&var_symidx)?.get_type()?.clone();
 
                 // 加入 alloc 指令 分配内存
                 let alloc_instr = InstrType::new_alloc(var_type.clone(), var_symidx.clone()).to_instr();
@@ -1358,13 +1402,13 @@ fn parse_declaration2nhwc(
                 }
 
                 // 加入 defvar 指令 给变量赋值
-                let defvar_instr = InstrType::new_def_var(var_type.clone(), var_symidx.clone(), Some(transed_value_symidx.clone())).to_instr();
-                push_instr!(defvar_instr to cfg_node in cfg_graph slab instr_slab);
+                // let defvar_instr = InstrType::new_def_var(var_type.clone(), var_symidx.clone(), Some(transed_value_symidx.clone())).to_instr();
+                // push_instr!(defvar_instr to cfg_node in cfg_graph slab instr_slab);
             }
             /// 考虑这个语句的 et_sep_item_node 不是 = 的情况
-            EtNodeType::Operator { op, ast_node: _, text: _ } => {
+            EtNodeType::Operator { op: _, ast_node: _, text: _ } => {
                 // debug_info_red!("no =  as start ");
-                let op_values = direct_child_nodes!(at et_sep_item_node in et_tree);
+                let _op_values = direct_child_nodes!(at et_sep_item_node in et_tree);
                 let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_sep_item_node, decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
                 let var_type = symtab.get_symbol(&var_symidx)?.get_type()?.clone();
                 //大纲：
@@ -1676,4 +1720,66 @@ pub fn get_cfg_entry_by_cfg_node(cfg_graph:&CfgGraph,symtab:&SymTab,cfg_node:u32
         Ok(None)
     }
     
+}
+
+/// 数组初始化
+/// 要求输入维度数组必须是 reversed 倒序的
+pub fn array_initialize(et_node_vec:Vec<u32>, et_tree:&mut EtTree, array_ele_map:&mut ArrayEleMap, ele_type:&Type,reversed_remained_dims:&mut Vec<usize>, array_offset:&mut usize) -> Result<()>{
+    debug_info_blue!("array_init " );
+    let mut i = 0;
+    while i < et_node_vec.len(){
+        let et_node = et_node_vec[i];
+        if let EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _ } = &node!(at et_node in et_tree).et_node_type{
+            let ele_and_sub_array_vec = direct_child_nodes!(at et_node in et_tree);
+            // let last_dim = reversed_remained_dims.pop().unwrap();
+            array_initialize(ele_and_sub_array_vec, et_tree, array_ele_map, ele_type,reversed_remained_dims, array_offset)?;
+            // reversed_remained_dims.push(last_dim);
+            i+=1;
+        }else if let EtNodeType::Constant { const_sym_idx: _, ast_node: _, text: _ } = &node!(at et_node in et_tree).et_node_type{
+            // 如果遇到Constant 那么应该继续读几个？
+            // 这里 pop 掉
+            let cur_dim = reversed_remained_dims.pop().unwrap();
+            let ele_count_to_read:usize = reversed_remained_dims.iter().product();
+            debug_info_blue!("ele_count_to_read =  {},{:?}",ele_count_to_read , reversed_remained_dims);
+
+            let last_i = i;
+            while i < last_i+ele_count_to_read{
+                if i >= et_node_vec.len(){
+                    break;
+                }
+                let et_node = et_node_vec[i];
+                match &node!(at et_node in et_tree).et_node_type{
+                    EtNodeType::Constant { const_sym_idx, ast_node: _, text: _ } => {
+                        array_ele_map.add_ele_from_usize(*array_offset, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?)?;
+                        debug_info_blue!("add array ele with offset {},{:?}",i, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?);
+                        *array_offset +=1;
+                    },
+                    EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _ }=>{
+                        return Err(anyhow!("expect a constant but meet a array wrapper {}",et_node))
+                    },
+                    _ => {
+                        return Err(anyhow!("expect a constant or arraywrapper but meet nor of them at {}",et_node))
+                    }
+                };
+                i+=1;
+            }
+            // 不足的补 0 
+            while i< last_i + ele_count_to_read{
+                // array_ele_map.add_ele_from_usize(*array_offset, Value::from_string_with_specific_type(&"0".to_string(), ele_type)?)?;
+                debug_info_blue!("add array ele with offset {},{:?}",*array_offset, Value::from_string_with_specific_type(&"0".to_string(), ele_type)?);
+                *array_offset+=1;
+                i+=1;
+            }
+            reversed_remained_dims.push(cur_dim);
+        }
+    }
+    Ok(())
+}
+pub fn deduce_offset_to_symidx_vec(offset:usize, weights:Vec<usize>) -> Vec<usize>{
+    let mut decoded_vec = vec![];
+    for weight in weights{
+        let _remained = offset % weight;
+        decoded_vec.push(offset / weight);
+    }
+    decoded_vec
 }

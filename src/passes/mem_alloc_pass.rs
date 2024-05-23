@@ -29,12 +29,12 @@ impl Pass for MemAllocPass {
             node_mut!(at cfg_entry in cfg_graph).add_mem_layout(MemLayout::new());
             for &instr in node!(at cfg_entry in cfg_graph).instrs.clone().iter(){
                 match &instr!(at instr in instr_slab)?.instr_type{
-                    crate::toolkit::nhwc_instr::InstrType::DefineFunc { func_symidx, ret_symidx, args } => {
+                    crate::toolkit::nhwc_instr::InstrType::DefineFunc { func_symidx: _, ret_symidx: _, args } => {
                         for arg in args{
                             alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &arg.to_src_symidx())?;
                         }
                     },
-                    crate::toolkit::nhwc_instr::InstrType::Alloc { var_symidx, vartype } => {
+                    crate::toolkit::nhwc_instr::InstrType::Alloc { var_symidx, vartype: _ } => {
                         alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &var_symidx.to_src_symidx())?;
                     },
                     _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 之外的 instr"));},

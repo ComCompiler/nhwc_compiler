@@ -1,7 +1,7 @@
 use std::{
     env, fmt::Debug, fs::File, io::{Read, Write}, process::Command, thread::{spawn, JoinHandle}
 };
-use antlr_rust::ErrorStrategy;
+
 use colored::Colorize;
 use crate::instr;
 
@@ -17,12 +17,12 @@ use super::nhwc_instr::InstrSlab;
 /// 生成在./assembly_repo/目录下
 pub fn generate_s_by_c(cfile_path:String) -> Result<()>{
     // let c_name = cfile_path.split("/").last().unwrap().split(".").next().unwrap();
-    let output = Command::new("./llvm/c2s.sh").args([cfile_path]).output().with_context(||".c文件转.s文件失败")?;
+    let _output = Command::new("./llvm/c2s.sh").args([cfile_path]).output().with_context(||".c文件转.s文件失败")?;
     Ok(())
 }
-pub fn run_s(sfile_path:String) -> Result<()>{
+pub fn run_s(_sfile_path:String) -> Result<()>{
     // let c_name = cfile_path.split("/").last().unwrap().split(".").next().unwrap();
-    let output = Command::new("./assembly_repo/").args(["a.out"]).output().with_context(||".s文件执行失败")?;
+    let _output = Command::new("./assembly_repo/").args(["a.out"]).output().with_context(||".s文件执行失败")?;
     Ok(())
 }
 

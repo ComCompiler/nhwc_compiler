@@ -3,7 +3,7 @@ use crate::toolkit::symtab::*;
 
 use std::fmt::Debug;
 use anyhow::*;
-use crate::{debug_info_blue, node_mut, reg_field_for_struct};
+use crate::{node_mut, reg_field_for_struct};
 
 use super::{cfg_node::{CfgGraph, CfgNode}, symbol::Symbol, symtab::{SymIdx, SymTab}};
 use itertools::{self, Itertools};

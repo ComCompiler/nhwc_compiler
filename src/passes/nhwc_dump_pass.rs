@@ -1,7 +1,7 @@
 use std::fs;
 use std::io::{Write};
 
-use crate::toolkit::cfg_node;
+
 use crate::toolkit::nhwc_instr::InstrType;
 use crate::toolkit::scope_node::ST_ROOT;
 use crate::toolkit::symtab::SymIdx;
@@ -57,7 +57,7 @@ impl Pass for NhwcCollectPass {
             }
         }
         for &cfg_node in dfs_node_vec.iter(){
-            if (node!(at cfg_node in cfg_graph).cfg_node_type.is_basic_block()){
+            if node!(at cfg_node in cfg_graph).cfg_node_type.is_basic_block() {
                 let cfg_node_to_jump =direct_child_node!(at cfg_node in cfg_graph); 
                 let op_label_instr = node!(at cfg_node_to_jump in cfg_graph).op_label_instr;
                 if let Some(label_instr) = op_label_instr{
