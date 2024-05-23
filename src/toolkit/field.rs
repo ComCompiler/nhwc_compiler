@@ -122,7 +122,7 @@ impl ArrayEleMap{
 impl Debug for ArrayEleMap{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut text = String::new();
-        for (k,v) in self.map.iter(){
+        for (k,v) in self.map.iter().sorted_by_key(|x| x.0){
             // let s:String  = k.iter().map(|&dim_index| format!("[{}]",dim_index)).collect();
             text += format!("offset {} ={:?}\n",k,v).as_str();
         }
@@ -264,6 +264,16 @@ impl Value {
 
             },
             _ => Err(anyhow!("{:?}无法转化为 symidx",self))
+        }
+    }
+    pub fn index_array(&self,offset:usize) -> Result<Value> {
+        match self{
+            Value::Array { value_map, dims, ele_ty } => {
+                value_map.get_ele(offset).cloned()
+            },
+            _ => {
+                Err(anyhow!("index_array 无法对 非数组类型 使用 {:?}",&self))
+            }
         }
     }
 }

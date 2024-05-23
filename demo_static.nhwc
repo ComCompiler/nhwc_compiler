@@ -1,6 +1,0 @@
- 0    alloc i32 a _s0 
- 1    new_var i32 %a _s0 = 3 _s0 
- 2    Define main _s0 [] -> main_ret _s0 
-         3    alloc i32 b _s3 
-         4    new_var i32 %b0 = 5 _s0 
-         5    ret 0 _s0 

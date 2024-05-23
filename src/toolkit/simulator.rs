@@ -579,13 +579,24 @@ impl Simulator{
                     );
                 }
                 match simu_symtab.get_symbol(ptr_symidx)?.get_simu_val()?{
-                    Value::Ptr64 { pointed_ty: _ty, op_pointed_symidx, offset: _ } => {
+                    Value::Ptr64 { pointed_ty: _ty, op_pointed_symidx, offset} => {
                         match op_pointed_symidx{
                             Some(pointed_symidx) => {
-                                let val = simu_symtab.get_symbol(pointed_symidx)?.get_simu_val()?.clone();
-                                self.simu_add_value(lhs, val)?;
+                                match offset.as_ref(){
+                                   Value::I32(Some(offset)) => {
+                                        let val = simu_symtab.get_symbol(pointed_symidx)?.get_simu_val()?.index_array(*offset as usize)?;
+                                        self.simu_add_value(lhs, val)?;
+                                    },
+                                    Value::I32(None) => {
+                                        let val = simu_symtab.get_symbol(pointed_symidx)?.get_simu_val()?.clone();
+                                        self.simu_add_value(lhs, val)?;
+                                    },
+                                    _ => {
+
+                                    }
+                                }
                             },
-                            None => todo!(),
+                            None => return Err(anyhow!("这个指针没有指向任何 普通变量或数组元素")),
                         }
                     },
                     _ => {return Err(anyhow!("{:?} 不是pointer,无法使用load指令",ptr_symidx))}

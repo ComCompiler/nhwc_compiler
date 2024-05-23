@@ -7,5 +7,6 @@ void main(){
     // int b = 4;
     int a =Fibo(6); // 输出55
     // int a =Fibo(b); // 输出55
-    return ;
+    breakpoint bp1(a);
+    return;
 }

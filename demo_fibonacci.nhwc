@@ -1,37 +1,43 @@
  1    Define main _s0 [] -> main_ret _s0 
-         33   alloc i32 temp_7 _s12 
-         35   alloc i32 a _s12 
-         32   new_var i32 %temp_70 
-         34   temp_71 =  Call i32 Fibo _s0(6 _s0) 
-         36   new_var i32 %a0 = temp_71 
+         36   alloc i32 temp_7 _s12 
+         39   alloc i32 a _s12 
+          label %0 _s0: 
+         35   new_var i32 %temp_70 
+         37   temp_71 =  Call i32 Fibo _s0(6 _s0) 
+         38   a0 = temp_71 
+         40   breakpoint bp1 _s14([a _s14]) ! 
+         42   ret 
  0    Define Fibo _s0 [n0] -> Fibo_ret _s0 
-         3    alloc i32 temp_0 _s7 
-         6    alloc i32 temp_1 _s7 
-         9    alloc i32 temp_2 _s7 
-         12   alloc i32 temp_3 _s7 
-         15   alloc i32 temp_4 _s7 
-         23   alloc i1 temp_5 _s4 
-         29   alloc i1 temp_6 _s7 
-         22   new_var i1 %temp_50 
-         24   temp_51 = icmp i1 Eq n0, 0 _s0 
-         25   br i1 temp_51, label branch.true: _s5, label branch.false: _s5 
-     20   label branch.true: _s5: 
-         19   ret 0 _s0 
-     21   label branch.false: _s5: 
-         28   new_var i1 %temp_60 
-         30   temp_61 = icmp i1 Eq n0, 1 _s0 
-         31   br i1 temp_61, label branch.true: _s8, label branch.false: _s8 
-     26   label branch.true: _s8: 
-         18   ret 1 _s0 
-     27   label branch.false: _s8: 
-         2    new_var i32 %temp_00 
-         4    temp_01 = Sub i32 n0, 2 _s0 
-         5    new_var i32 %temp_10 
-         7    temp_11 =  Call i32 Fibo _s0(temp_01) 
-         8    new_var i32 %temp_20 
-         10   temp_21 = Sub i32 n0, 1 _s0 
-         11   new_var i32 %temp_30 
-         13   temp_31 =  Call i32 Fibo _s0(temp_21) 
-         14   new_var i32 %temp_40 
-         16   temp_41 = Add i32 temp_31, temp_11 
-         17   ret temp_41 
+         4    alloc i32 temp_0 _s7 
+         7    alloc i32 temp_1 _s7 
+         10   alloc i32 temp_2 _s7 
+         13   alloc i32 temp_3 _s7 
+         16   alloc i32 temp_4 _s7 
+         26   alloc i1 temp_5 _s4 
+         32   alloc i1 temp_6 _s7 
+          label %1 _s0: 
+         25   new_var i1 %temp_50 
+         27   temp_51 = icmp i1 Eq n0, 0 _s0 
+         28   br i1 temp_51, label branch.true: _s5, label branch.false: _s5 
+     23   label branch.true: _s5: 
+         22   ret 0 _s0 
+     24   label branch.false: _s5: 
+         31   new_var i1 %temp_60 
+         33   temp_61 = icmp i1 Eq n0, 1 _s0 
+         34   br i1 temp_61, label branch.true: _s8, label branch.false: _s8 
+     29   label branch.true: _s8: 
+         20   ret 1 _s0 
+     30   label branch.false: _s8: 
+         3    new_var i32 %temp_00 
+         5    temp_01 = Sub i32 n0, 2 _s0 
+         6    new_var i32 %temp_10 
+         8    temp_11 =  Call i32 Fibo _s0(temp_01) 
+         9    new_var i32 %temp_20 
+         11   temp_21 = Sub i32 n0, 1 _s0 
+         12   new_var i32 %temp_30 
+         14   temp_31 =  Call i32 Fibo _s0(temp_21) 
+         15   new_var i32 %temp_40 
+         17   temp_41 = Add i32 temp_31, temp_11 
+         18   ret temp_41 
+          label %2 _s0: 
+          label %3 _s0: 
