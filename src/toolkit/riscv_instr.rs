@@ -1,7 +1,21 @@
+use std::fmt::{Debug, Formatter};
+
+use super::{field::{Fields, Value}, symtab::SymIdx};
+
+
+#[derive(Clone)]
+pub struct RiscvInstr {
+    pub instr_type:RiscvInstrType,
+    pub info:Fields,
+    pub text:String,
+}
+
 //只写了riscv手册里rv32 的 base的部分
-pub enum RiscInstr {
+#[derive(Clone)]
+pub enum RiscvInstrType {
     BaseIntInstr(BaseIntInstr),
 }
+#[derive(Clone, Debug)]
 pub enum BaseIntInstr {
     Shifts(Shifts),
     Arithmetic(Arithmetic),
@@ -15,12 +29,14 @@ pub enum BaseIntInstr {
     Stores(Stores),
 }
 
+#[derive(Clone)]
 pub struct Register {
     reg_name:SymIdx,
 }
 impl Debug for Register {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result { write!(f, "{:?}", self.reg_name) }
 }
+#[derive(Clone)]
 pub enum Shifts {
     /// Shift Left Logical
     /// 逻辑左移
@@ -53,6 +69,7 @@ impl Debug for Shifts {
         }
     }
 }
+#[derive(Clone)]
 pub enum Arithmetic {
     /// ADD
     ADD { rd:Register, rs1:Register, rs2:Register },
@@ -76,6 +93,7 @@ impl Debug for Arithmetic {
         }
     }
 }
+#[derive(Clone)]
 pub enum Logical {
     /// XOR
     XOR { rd:Register, rs1:Register, rs2:Register },
@@ -104,6 +122,7 @@ impl Debug for Logical {
         }
     }
 }
+#[derive(Clone)]
 pub enum Compare {
     /// Set <
     SLT { rd:Register, rs1:Register, rs2:Register },
@@ -124,6 +143,7 @@ impl Debug for Compare {
         }
     }
 }
+#[derive(Clone)]
 pub enum Branch {
     /// Branch =
     BEQ { rs1:Register, rs2:Register, imm:Value },
@@ -150,6 +170,7 @@ impl Debug for Branch {
         }
     }
 }
+#[derive(Clone)]
 pub enum JumpAndLink {
     /// Jump & Link
     JAL { rd:Register, imm:Value },
@@ -164,6 +185,7 @@ impl Debug for JumpAndLink {
         }
     }
 }
+#[derive(Clone)]
 pub enum Environment {
     /// CALL
     ECALL {},
@@ -179,6 +201,7 @@ impl Debug for Environment {
     }
 }
 /// Control Status Register 控制和状态寄存器
+#[derive(Clone)]
 pub enum CSR {
     ///Read / Write
     CSRRW { rd:Register, csr:Register, rs1:Register },
@@ -205,6 +228,7 @@ impl Debug for CSR {
         }
     }
 }
+#[derive(Clone)]
 pub enum Loads {
     /// Load Byte
     LB { rd:Register, rs1:Register, imm:Value },
@@ -228,6 +252,7 @@ impl Debug for Loads {
         }
     }
 }
+#[derive(Clone)]
 pub enum Stores {
     /// Store Byte
     SB { rs1:Register, rs2:Register, imm:Value },

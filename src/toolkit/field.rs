@@ -268,7 +268,7 @@ impl Value {
     }
     pub fn index_array(&self,offset:usize) -> Result<Value> {
         match self{
-            Value::Array { value_map, dims, ele_ty } => {
+            Value::Array { value_map, dims: _, ele_ty: _ } => {
                 value_map.get_ele(offset).cloned()
             },
             _ => {

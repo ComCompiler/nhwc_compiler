@@ -6,8 +6,10 @@ use anyhow::Result;
 use crate::Args;
 
 use super::cfg_node::InstrList;
+use super::nhwc_instr::NhwcInstr;
+use super::riscv_instr::RiscvInstr;
 use super::{
-    ast_node::AstTree, cfg_node::CfgGraph, def_use_node::DefUseGraph, dj_node::DjNode, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symbol::Symbol, symtab::{SymTab, SymTabGraph}
+    ast_node::AstTree, cfg_node::CfgGraph, dug_node::DefUseGraph, dj_node::DjNode, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symbol::Symbol, symtab::{SymTab, SymTabGraph}
 };
 use super::dj_edge::DjEdge;
 
@@ -24,7 +26,8 @@ pub struct NhwcCtx {
     pub et_tree:EtTree,
     pub ast2scope:HashMap<u32, u32>,
     pub symtab_graph:SymTabGraph,
-    pub instr_slab:InstrSlab,
+    pub nhwc_instr_slab:InstrSlab<NhwcInstr>,
+    pub riscv_instr_slab:InstrSlab<RiscvInstr>,
     pub def_use_graph:DefUseGraph,
     pub collected_nhwc_ir: InstrList,
     pub io_task_list: Vec<JoinHandle<Result<()>>>,
@@ -46,7 +49,8 @@ impl NhwcCtx {
             et_tree:EtTree::new(),
             ast2scope:HashMap::new(),
             symtab_graph:SymTabGraph::new(),
-            instr_slab:InstrSlab::new(),
+            nhwc_instr_slab:InstrSlab::new(),
+            riscv_instr_slab: InstrSlab::new(),
             dj_graph: DjGraph::new(),
             def_use_graph: DefUseGraph::new(),
             io_task_list: vec![],

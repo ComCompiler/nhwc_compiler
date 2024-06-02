@@ -19,12 +19,12 @@ impl Pass for Cfg2NcfgPass {
             (&mut ctx.cfg_graph, &mut ctx.scope_tree, &mut ctx.ast_tree, &mut ctx.symtab, &mut ctx.et_tree, &mut ctx.ast2scope, &mut ctx.symtab_graph);
 
         // let rst = parse_cfg_into_nhwc_cfg(cfg_graph, scope_tree, ast_tree, symtab, et_tree, ast2scope, 0, &mut ctx.instr_slab, &mut Some(symtab_graph));
-        let rst = parse_cfg_into_nhwc_cfg(cfg_graph, scope_tree, ast_tree, symtab, et_tree, ast2scope, 0, &mut ctx.instr_slab, &mut self.is_gen_symtab_png.then(||symtab_graph));
+        let rst = parse_cfg_into_nhwc_cfg(cfg_graph, scope_tree, ast_tree, symtab, et_tree, ast2scope, 0, &mut ctx.nhwc_instr_slab, &mut self.is_gen_symtab_png.then(||symtab_graph));
 
         //4.1可视化
         if self.is_gen_ncfg_png {
             for cfg_node in ctx.cfg_graph.node_weights_mut() {
-                cfg_node.load_instrs_text(&ctx.instr_slab)?;
+                cfg_node.load_instrs_text(&ctx.nhwc_instr_slab)?;
             }
             generate_png_by_graph_multi_tasks(&ctx.cfg_graph.clone(), "nhwc_cfg_graph".to_string(), 
             &[

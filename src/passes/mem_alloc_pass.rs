@@ -23,18 +23,18 @@ pub static RISCV_STACK_MEM_ALIGN:usize = 8;
 impl Pass for MemAllocPass {
     // 运行这个pass
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> { 
-        let (cfg_graph ,instr_slab, symtab)= (&mut ctx.cfg_graph,&ctx.instr_slab,&mut ctx.symtab);
+        let (cfg_graph ,instr_slab, symtab)= (&mut ctx.cfg_graph,&ctx.nhwc_instr_slab,&mut ctx.symtab);
         let cfg_entries = direct_child_nodes!(at CFG_ROOT in cfg_graph);
         for &cfg_entry in &cfg_entries{
             node_mut!(at cfg_entry in cfg_graph).add_mem_layout(MemLayout::new());
             for &instr in node!(at cfg_entry in cfg_graph).instrs.clone().iter(){
                 match &instr!(at instr in instr_slab)?.instr_type{
-                    crate::toolkit::nhwc_instr::InstrType::DefineFunc { func_symidx: _, ret_symidx: _, args } => {
+                    crate::toolkit::nhwc_instr::NhwcInstrType::DefineFunc { func_symidx: _, ret_symidx: _, args } => {
                         for arg in args{
                             alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &arg.to_src_symidx())?;
                         }
                     },
-                    crate::toolkit::nhwc_instr::InstrType::Alloc { var_symidx, vartype: _ } => {
+                    crate::toolkit::nhwc_instr::NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
                         alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &var_symidx.to_src_symidx())?;
                     },
                     _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 之外的 instr"));},

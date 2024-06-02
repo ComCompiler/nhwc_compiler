@@ -11,30 +11,30 @@ use super::{
 
 
 #[derive(Clone,Default,Debug)]
-pub struct InstrSlab {
-    instr_slab : Slab<Instruction>,
+pub struct InstrSlab<T:Clone> {
+    instr_slab : Slab<T>,
     pub info : Fields,
 }
 
-impl InstrSlab{
+impl<T: Clone> InstrSlab<T>{
     pub fn new() -> Self {
         Self { instr_slab: Slab::new(), info: Fields::new() }
     }
-    pub fn insert_instr(&mut self,instr:Instruction) -> usize{
+    pub fn insert_instr(&mut self,instr:T) -> usize{
         self.instr_slab.insert(instr)
     }
-    pub fn get_instr(&self,idx:usize) -> Result<&Instruction>{
+    pub fn get_instr(&self,idx:usize) -> Result<&T>{
         self.instr_slab.get(idx).ok_or(anyhow!("在 instr_slab 中找不到对应的instruction"))
     }
-    pub fn get_mut_instr(&mut self,idx:usize) -> Result<&mut Instruction>{
+    pub fn get_mut_instr(&mut self,idx:usize) -> Result<&mut T>{
         self.instr_slab.get_mut(idx).ok_or(anyhow!("在 instr_slab 中找不到对应的instruction"))
     }
     delegate!{
         to self.instr_slab {
-            pub fn iter(&self) -> slab::Iter<'_, Instruction> ;
+            pub fn iter(&self) -> slab::Iter<'_, T> ;
         }
         to self.instr_slab {
-            pub fn iter_mut(&mut self) -> slab::IterMut<'_, Instruction> ;
+            pub fn iter_mut(&mut self) -> slab::IterMut<'_, T> ;
         }
     }
 }
@@ -156,14 +156,14 @@ impl PhiOp{
 // }
 
 #[derive(Clone,EnumIs)]
-pub enum InstrType {
+pub enum NhwcInstrType {
     Label { label_symidx:SymIdx },
     //定义函数
     DefineFunc { func_symidx:SymIdx, ret_symidx:SymIdx, args:Vec<SymIdx> },
     //定义变量
     DefineVar { var_symidx:SymIdx, vartype:Type, op_value:Option<SymIdx> },
     Alloc { var_symidx:SymIdx, vartype:Type },
-    Global { lhs:SymIdx ,var_symidx:SymIdx, vartype:Type },
+    Global { var_symidx:SymIdx, vartype:Type },
     Load { lhs:SymIdx ,ptr_symidx:SymIdx ,ptr_ty:Type},
     Store { value_symidx:SymIdx, value_ty:Type, ptr_symidx:SymIdx , ptr_ty:Type},
     /// 注意getelementptr 的 ty 必须是一个 数组
@@ -180,65 +180,72 @@ pub enum InstrType {
     TranType { lhs:SymIdx, op:Trans },
     // 断点     只在simulator中使用
     BreakPoint { symidx:SymIdx, breakpoint_args:Vec<BreakpointArg>},
+    Nope{},
 }
 #[derive(Clone)]
-pub struct Instruction {
-    pub instr_type:InstrType,
+pub struct NhwcInstr {
+    pub instr_type:NhwcInstrType,
     pub info:Fields,
     pub text:String,
 }
-impl Instruction {
+impl NhwcInstr {
     pub fn load_idx_text(&mut self,instr:usize){
         self.text += format!("{}",instr).as_str()
     }
+    pub fn get_def_and_use_symidx_vec(&self)->Vec<&SymIdx>{
+        let all_symidx_vec = self.get_def_symidx_vec();
+        self.get_use_symidx_vec().append(&mut self.get_use_symidx_vec());
+        all_symidx_vec
+    }
     pub fn get_def_symidx_vec(&self)->Vec<&SymIdx>{
         let vec = match &self.instr_type{
-            InstrType::Label { label_symidx:_ } => vec![],
-            InstrType::DefineFunc { func_symidx, ret_symidx:_, args } => {
+            NhwcInstrType::Label { label_symidx:_ } => vec![],
+            NhwcInstrType::DefineFunc { func_symidx, ret_symidx:_, args } => {
                 {
                     let mut symidx_vec= vec![func_symidx];
                     args.iter().map(|arg| symidx_vec.push(arg)).count();
                     symidx_vec
                 }
             },
-            InstrType::DefineVar { var_symidx, vartype:_, op_value:_ } => {
+            NhwcInstrType::DefineVar { var_symidx, vartype:_, op_value:_ } => {
                 vec![var_symidx]
             },
-            InstrType::Arith { lhs, rhs:_ } => { vec![lhs] },
-            InstrType::SimpleAssign { lhs, rhs:_ } => {
+            NhwcInstrType::Arith { lhs, rhs:_ } => { vec![lhs] },
+            NhwcInstrType::SimpleAssign { lhs, rhs:_ } => {
                  vec![lhs] 
             },
-            InstrType::Call { op_assigned_symidx: assigned, func_op:_} => if let  Some(symidx)= assigned{
+            NhwcInstrType::Call { op_assigned_symidx: assigned, func_op:_} => if let  Some(symidx)= assigned{
                 vec![symidx]
             }else{
                 vec![]
             },
-            InstrType::Jump { jump_op: _op } => vec![],
-            InstrType::Phi { lhs, rhs:_ } => vec![lhs],
-            InstrType::TranType { lhs, op: _ } => vec![lhs],
-            InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe } => vec![],
-            InstrType::GetElementPtr { array_ty: _ty, array_symidx: _, idx_vec: _, lhs } => vec![lhs],
+            NhwcInstrType::Jump { jump_op: _op } => vec![],
+            NhwcInstrType::Phi { lhs, rhs:_ } => vec![lhs],
+            NhwcInstrType::TranType { lhs, op: _ } => vec![lhs],
+            NhwcInstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe } => vec![],
+            NhwcInstrType::GetElementPtr { array_ty: _ty, array_symidx: _, idx_vec: _, lhs } => vec![lhs],
+            NhwcInstrType::Global { var_symidx: _, vartype: _, } => vec![],
             /// 这几个都认为是没有ssa 层面上的def 
-            InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
-            InstrType::Global { var_symidx: _, vartype: _, lhs: _ } => vec![],
-            InstrType::Load { ptr_symidx: _ptr_symdix, lhs, ptr_ty: _ } => vec![lhs],
-            InstrType::Store { value_symidx: _value, ptr_symidx: _, ptr_ty: _, value_ty: _ } => vec![],
+            NhwcInstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
+            NhwcInstrType::Load { ptr_symidx: _ptr_symdix, lhs, ptr_ty: _ } => vec![lhs],
+            NhwcInstrType::Store { value_symidx: _value, ptr_symidx: _, ptr_ty: _, value_ty: _ } => vec![],
+            NhwcInstrType::Nope {  } => vec![],
         };
         vec
     }
     pub fn get_use_symidx_vec(&self)->Vec<&SymIdx>{
         let vec = match &self.instr_type{
-            InstrType::Label { label_symidx:_ } => vec![],
-            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args: _ } => {
+            NhwcInstrType::Label { label_symidx:_ } => vec![],
+            NhwcInstrType::DefineFunc { func_symidx:_, ret_symidx:_, args: _ } => {
                 vec![]
             },
-            InstrType::DefineVar { var_symidx:_, vartype:_, op_value } => {
+            NhwcInstrType::DefineVar { var_symidx:_, vartype:_, op_value } => {
                 match op_value{
                     Some(value) => vec![value],
                     None => vec![],
                 }
             },
-            InstrType::Arith { lhs:_, rhs } => { match rhs{
+            NhwcInstrType::Arith { lhs:_, rhs } => { match rhs{
                 ArithOp::Add { a, b, vartype:_ } => vec![a,b],
                 ArithOp::Mul { a, b, vartype:_ } => vec![a,b],
                 ArithOp::Div { a, b, vartype:_ } => vec![a,b],
@@ -250,13 +257,13 @@ impl Instruction {
                 ArithOp::LogicOr { a, b, vartype:_ } => vec![a,b],
                 ArithOp::LogicNot { a, vartype:_ } => vec![a],
             }},
-            InstrType::SimpleAssign { lhs:_, rhs } => {
+            NhwcInstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
-            InstrType::Call { op_assigned_symidx: _assigned, func_op } => {
+            NhwcInstrType::Call { op_assigned_symidx: _assigned, func_op } => {
                 func_op.actual_arg_symidx_vec.iter().collect_vec()
             },
-            InstrType::Jump { jump_op } => {
+            NhwcInstrType::Jump { jump_op } => {
                 match jump_op{
                     JumpOp::Ret { op_ret_sym: Some(ret_sym) } => vec![ret_sym],
                     JumpOp::Ret { op_ret_sym: None } => vec![],
@@ -265,27 +272,28 @@ impl Instruction {
                     JumpOp::DirectJump { label_symidx: _ } => vec![],
                 }
             },
-            InstrType::Phi { lhs:_, rhs } => rhs.phi_pairs.iter().map(|p| &p.symidx).collect_vec(),
-            InstrType::TranType { lhs:_, op } => match op{
+            NhwcInstrType::Phi { lhs:_, rhs } => rhs.phi_pairs.iter().map(|p| &p.symidx).collect_vec(),
+            NhwcInstrType::TranType { lhs:_, op } => match op{
                 Trans::Fptosi { float_symidx } => vec![float_symidx],
                 Trans::Sitofp { int_symidx } => vec![int_symidx],
                 Trans::Zext { bool_symidx } => vec![bool_symidx],
                 Trans::Bitcast { rptr_symidx, rptr_type:_, lptr_type:_ } => vec![rptr_symidx],
             }
             ,
-            InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
-            InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
-            InstrType::Global { lhs: _, var_symidx: _, vartype: _ } => todo!(),
-            InstrType::Load { lhs: _, ptr_symidx: ptr_symdix, ptr_ty: _ } => vec![ptr_symdix],
-            InstrType::Store { value_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
-            InstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx, idx_vec } => idx_vec.iter().chain(vec![array_symidx].into_iter()).collect_vec(),
+            NhwcInstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
+            NhwcInstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
+            NhwcInstrType::Global { var_symidx: _, vartype: _ } => vec![],
+            NhwcInstrType::Load { lhs: _, ptr_symidx: ptr_symdix, ptr_ty: _ } => vec![ptr_symdix],
+            NhwcInstrType::Store { value_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
+            NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx, idx_vec } => idx_vec.iter().chain(vec![array_symidx].into_iter()).collect_vec(),
+            NhwcInstrType::Nope {  } => vec![],
         };
         vec
     }
         pub fn get_mut_def_symidx_vec(&mut self)->Vec<&mut SymIdx>{
         match &mut self.instr_type{
-            InstrType::Label { label_symidx:_ } => vec![],
-            InstrType::DefineFunc { func_symidx, ret_symidx:_, args } => {
+            NhwcInstrType::Label { label_symidx:_ } => vec![],
+            NhwcInstrType::DefineFunc { func_symidx, ret_symidx:_, args } => {
                 {
                     let mut symidx_vec= vec![func_symidx];
                     args.iter_mut().map(|arg| symidx_vec.push(arg)).count();
@@ -293,42 +301,43 @@ impl Instruction {
 
                 }
             },
-            InstrType::DefineVar { var_symidx, vartype:_, op_value:_ } => {
+            NhwcInstrType::DefineVar { var_symidx, vartype:_, op_value:_ } => {
                 vec![var_symidx]
             },
-            InstrType::Arith { lhs, rhs:_ } => { vec![lhs] },
-            InstrType::SimpleAssign { lhs, rhs:_ } => {
+            NhwcInstrType::Arith { lhs, rhs:_ } => { vec![lhs] },
+            NhwcInstrType::SimpleAssign { lhs, rhs:_ } => {
                  vec![lhs] 
             },
-            InstrType::Call { op_assigned_symidx: assigned, func_op:_ } => if let  Some(symidx)= assigned{
+            NhwcInstrType::Call { op_assigned_symidx: assigned, func_op:_ } => if let  Some(symidx)= assigned{
                 vec![symidx]
             }else{
                 vec![]
             },
-            InstrType::Jump { jump_op: _op } => vec![],
-            InstrType::Phi { lhs, rhs:_ } => vec![lhs],
-            InstrType::TranType { lhs, op:_ } => vec![lhs],
-            InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
-            InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
-            InstrType::Global { lhs: _, var_symidx: _, vartype: _ } => vec![],
-            InstrType::Load { lhs, ptr_symidx: _ptr_symdix, ptr_ty: _ } => vec![lhs],
-            InstrType::Store { value_symidx: _value, ptr_symidx: _, ptr_ty: _, value_ty: _ } => vec![],
-            InstrType::GetElementPtr { lhs, array_ty: _ty, array_symidx: _, idx_vec: _ } => vec![lhs],
+            NhwcInstrType::Jump { jump_op: _op } => vec![],
+            NhwcInstrType::Phi { lhs, rhs:_ } => vec![lhs],
+            NhwcInstrType::TranType { lhs, op:_ } => vec![lhs],
+            NhwcInstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
+            NhwcInstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
+            NhwcInstrType::Global { var_symidx: _, vartype: _ } => vec![],
+            NhwcInstrType::Load { lhs, ptr_symidx: _ptr_symdix, ptr_ty: _ } => vec![lhs],
+            NhwcInstrType::Store { value_symidx: _value, ptr_symidx: _, ptr_ty: _, value_ty: _ } => vec![],
+            NhwcInstrType::GetElementPtr { lhs, array_ty: _ty, array_symidx: _, idx_vec: _ } => vec![lhs],
+            NhwcInstrType::Nope {  } => vec![],
         }
     }
     pub fn get_mut_use_symidx_vec(&mut self)->Vec<&mut SymIdx>{
         match &mut self.instr_type{
-            InstrType::Label { label_symidx:_ } => vec![],
-            InstrType::DefineFunc { func_symidx:_, ret_symidx:_, args: _ } => {
+            NhwcInstrType::Label { label_symidx:_ } => vec![],
+            NhwcInstrType::DefineFunc { func_symidx:_, ret_symidx:_, args: _ } => {
                 vec![]
             },
-            InstrType::DefineVar { var_symidx:_, vartype:_, op_value } => {
+            NhwcInstrType::DefineVar { var_symidx:_, vartype:_, op_value } => {
                 match op_value{
                     Some(value) => vec![value],
                     None => vec![],
                 }
             },
-            InstrType::Arith { lhs:_, rhs } => { match rhs{
+            NhwcInstrType::Arith { lhs:_, rhs } => { match rhs{
                 ArithOp::Add { a, b, vartype:_ } => vec![a,b],
                 ArithOp::Mul { a, b, vartype:_ } => vec![a,b],
                 ArithOp::Div { a, b, vartype:_ } => vec![a,b],
@@ -340,13 +349,13 @@ impl Instruction {
                 ArithOp::LogicOr { a, b, vartype:_ } => vec![a,b],
                 ArithOp::LogicNot { a, vartype :_} => vec![a],
             }},
-            InstrType::SimpleAssign { lhs:_, rhs } => {
+            NhwcInstrType::SimpleAssign { lhs:_, rhs } => {
                  vec![rhs] 
             },
-            InstrType::Call { op_assigned_symidx: _assigned, func_op } => {
+            NhwcInstrType::Call { op_assigned_symidx: _assigned, func_op } => {
                 func_op.actual_arg_symidx_vec.iter_mut().collect_vec()
             },
-            InstrType::Jump { jump_op } => {
+            NhwcInstrType::Jump { jump_op } => {
                 match jump_op{
                     JumpOp::Ret { op_ret_sym: Some(ret_sym) } => vec![ret_sym],
                     JumpOp::Ret { op_ret_sym: None } => vec![],
@@ -355,24 +364,25 @@ impl Instruction {
                     JumpOp::DirectJump { label_symidx: _ } => vec![],
                 }
             },
-            InstrType::Phi { lhs:_, rhs } => rhs.phi_pairs.iter_mut().map(|p|&mut p.symidx).collect_vec(),
-            InstrType::TranType { lhs:_, op } => match op{
+            NhwcInstrType::Phi { lhs:_, rhs } => rhs.phi_pairs.iter_mut().map(|p|&mut p.symidx).collect_vec(),
+            NhwcInstrType::TranType { lhs:_, op } => match op{
                 Trans::Fptosi { float_symidx } => vec![float_symidx],
                 Trans::Sitofp { int_symidx } => vec![int_symidx],
                 Trans::Zext { bool_symidx } => vec![bool_symidx],
                 Trans::Bitcast { rptr_symidx, rptr_type:_, lptr_type:_ } => vec![rptr_symidx],
             }
             ,
-            InstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
-            InstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
-            InstrType::Global { lhs: _, var_symidx: _, vartype: _ } => todo!(),
-            InstrType::Load { lhs: _, ptr_symidx: ptr_symdix, ptr_ty: _ } => vec![ptr_symdix],
-            InstrType::Store { value_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
-            InstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx, idx_vec } => idx_vec.iter_mut().chain(vec![array_symidx].into_iter()).collect_vec(),
+            NhwcInstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
+            NhwcInstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
+            NhwcInstrType::Global { var_symidx: _, vartype: _ } => vec![],
+            NhwcInstrType::Load { lhs: _, ptr_symidx: ptr_symdix, ptr_ty: _ } => vec![ptr_symdix],
+            NhwcInstrType::Store { value_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
+            NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx, idx_vec } => idx_vec.iter_mut().chain(vec![array_symidx].into_iter()).collect_vec(),
+            NhwcInstrType::Nope {  } => vec![],
         }
     }
     pub fn is_phi(&self)->bool{
-        if let InstrType::Phi { lhs:_, rhs:_ } = &self.instr_type{
+        if let NhwcInstrType::Phi { lhs:_, rhs:_ } = &self.instr_type{
             true
         }else{
             false
@@ -453,8 +463,8 @@ impl Debug for Trans {
     }
 }
 // 以下是构造函数:
-impl InstrType {
-    pub fn to_instr(self) -> Instruction { Instruction { instr_type:self, info:Fields::new(), text: String::new() } }
+impl NhwcInstrType {
+    pub fn to_instr(self) -> NhwcInstr { NhwcInstr { instr_type:self, info:Fields::new(), text: String::new() } }
 
     pub fn new_label(label_symidx:SymIdx) -> Self { Self::Label { label_symidx } }
     
@@ -463,6 +473,7 @@ impl InstrType {
     pub fn new_def_var(vartype:Type, var_symidx:SymIdx, value:Option<SymIdx>) -> Self { Self::DefineVar { var_symidx, vartype, op_value: value } }
 
     pub fn new_alloc(vartype:Type, var_symidx:SymIdx) -> Self { Self::Alloc { var_symidx, vartype, }  }
+    pub fn new_global(vartype:Type, var_symidx:SymIdx) -> Self { Self::Global { var_symidx, vartype, }  }
 
     // Instruction -> Arith -> ArithOp
     pub fn new_add(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::Add { a, b, vartype } } }
@@ -498,6 +509,7 @@ impl InstrType {
     }
 
     pub fn new_breakpoint(symidx:SymIdx,breakpoint_args:Vec<BreakpointArg>) -> Self { Self::BreakPoint {symidx ,breakpoint_args } }
+    pub fn new_exit_breakpoint(breakpoint_args:Vec<BreakpointArg>) -> Self { Self::BreakPoint {symidx:SymIdx::new(0, "exit".to_string()) ,breakpoint_args } }
 
     //自动类型转换
     pub fn new_int2float(int_symidx:SymIdx, float_symidx:SymIdx) -> Self { Self::TranType { lhs:float_symidx, op:Trans::Sitofp { int_symidx } } }
@@ -507,14 +519,14 @@ impl InstrType {
 
     pub fn get_lhs(&self)->Option<SymIdx>{
         match self{
-            InstrType::Arith { lhs, rhs: _ } => Some(lhs.clone()),
-            InstrType::SimpleAssign { lhs, rhs: _ } => Some(lhs.clone()),
-            InstrType::Phi { lhs, rhs: _ } => Some(lhs.clone()),
+            NhwcInstrType::Arith { lhs, rhs: _ } => Some(lhs.clone()),
+            NhwcInstrType::SimpleAssign { lhs, rhs: _ } => Some(lhs.clone()),
+            NhwcInstrType::Phi { lhs, rhs: _ } => Some(lhs.clone()),
             _=>None
         }
     }
     pub fn is_br(&self) -> bool{
-        if let InstrType::Jump { jump_op } = &self{
+        if let NhwcInstrType::Jump { jump_op } = &self{
             if let JumpOp::Br { cond: _, t1: _, t2: _ } = jump_op{
                 return true
             }
@@ -590,41 +602,42 @@ impl Debug for PhiOp {
         write!(f,"phi {}",s)
     }
 }
-impl Debug for InstrType {
+impl Debug for NhwcInstrType {
     // 以类似llvm ir的格式打印输出
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            InstrType::Label { label_symidx } => {
+            NhwcInstrType::Label { label_symidx } => {
                 write!(f, "label {:?}:", label_symidx)
             }
-            InstrType::DefineFunc { func_symidx, ret_symidx, args } => {
+            NhwcInstrType::DefineFunc { func_symidx, ret_symidx, args } => {
                 write!(f, "Define {:?} {:?} -> {:?}", func_symidx, args, ret_symidx)
             }
-            InstrType::DefineVar { var_symidx: varname, vartype, op_value: value } => {
+            NhwcInstrType::DefineVar { var_symidx: varname, vartype, op_value: value } => {
                 match value{
-                    Some(value) => write!(f, "new_var {:?} %{:?} = {:?}", vartype, varname, value),
-                    None => write!(f, "new_var {:?} %{:?}", vartype, varname),
+                    Some(value) => write!(f, "new_var {:?}:{:?} = {:?}",  varname, vartype, value),
+                    None => write!(f, "new_var {:?}:{:?}",  varname, vartype),
                 }
             }
-            InstrType::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
-            InstrType::SimpleAssign { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
-            InstrType::Call { op_assigned_symidx: assigned, func_op } => match assigned {
+            NhwcInstrType::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
+            NhwcInstrType::SimpleAssign { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
+            NhwcInstrType::Call { op_assigned_symidx: assigned, func_op } => match assigned {
                 Some(symidx) => write!(f, "{:?} = {:?}",symidx, func_op),
                 None => write!(f, "{:?}", func_op),
             },
-            InstrType::Jump { jump_op: op } => write!(f, "{:?}", op),
-            InstrType::Phi { lhs, rhs } => write!(f, "{:?} = {:?}",lhs,rhs),
-            InstrType::TranType { lhs, op } => write!(f, "{:?} = {:?}", lhs, op),
-            InstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args  } => write!(f,"breakpoint {:?}({:?}) !",breakpoint_symidx,breakpoint_args),
-            InstrType::Alloc { var_symidx, vartype, } => write!(f,"alloc {:?} {:?}",vartype,var_symidx),
-            InstrType::Global { lhs: _, var_symidx, vartype } => write!(f,"global {:?} {:?}",vartype,var_symidx),
-            InstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => write!(f,"{:?} = load {:?}:{:?}",lhs,ptr_symdix,ptr_ty),
-            InstrType::Store { value_symidx: value, ptr_symidx, ptr_ty, value_ty } => write!(f,"store {:?}:{:?} {:?}:{:?}",value,value_ty,ptr_symidx,ptr_ty),
-            InstrType::GetElementPtr { lhs, array_ty: ty, array_symidx, idx_vec } => write!(f,"{:?} = getelementptr {:?}:{:?} {:?}",lhs,array_symidx,ty,idx_vec,),
+            NhwcInstrType::Jump { jump_op: op } => write!(f, "{:?}", op),
+            NhwcInstrType::Phi { lhs, rhs } => write!(f, "{:?} = {:?}",lhs,rhs),
+            NhwcInstrType::TranType { lhs, op } => write!(f, "{:?} = {:?}", lhs, op),
+            NhwcInstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args  } => write!(f,"breakpoint {:?}({:?}) !",breakpoint_symidx,breakpoint_args),
+            NhwcInstrType::Alloc { var_symidx, vartype, } => write!(f,"alloc {:?} {:?}",vartype,var_symidx),
+            NhwcInstrType::Global { var_symidx, vartype } => write!(f,"global {:?} {:?}",vartype,var_symidx),
+            NhwcInstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => write!(f,"{:?} = load {:?}:{:?}",lhs,ptr_symdix,ptr_ty),
+            NhwcInstrType::Store { value_symidx: value, ptr_symidx, ptr_ty, value_ty } => write!(f,"store {:?}:{:?} {:?}:{:?}",value,value_ty,ptr_symidx,ptr_ty),
+            NhwcInstrType::GetElementPtr { lhs, array_ty: ty, array_symidx, idx_vec } => write!(f,"{:?} = getelementptr {:?}:{:?} {:?}",lhs,array_symidx,ty,idx_vec,),
+            NhwcInstrType::Nope {  } => {write!(f,"(nop)")},
         }
     }
 }
-impl Debug for Instruction {
+impl Debug for NhwcInstr {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
         write!(f, " {:5}{:?} ", self.text,self.instr_type)
         // write!(f, "{} {:?} ", self.text,self.instr_type)

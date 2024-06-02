@@ -1,12 +1,11 @@
 use std::vec;
 
-use petgraph::{adj::NodeIndex, algo::dominators::simple_fast, visit::EdgeRef};
+use petgraph::{adj::NodeIndex, algo::dominators::simple_fast};
 
 use crate::{add_edge, add_node, direct_child_nodes, direct_parent_nodes, reg_field_for_struct, node, node_mut, toolkit::{dj_edge::DjEdge, dj_node::DjNode}};
 
-use super::{cfg_node::{CfgGraph, CfgNode}, context::DjGraph, etc::{dfs_with_priority}};
+use super::{cfg_node::{CfgGraph, CfgNode}, context::DjGraph, etc::dfs_with_priority};
 use super::symtab::{SymTab,SymTabEdge,SymTabGraph};
-use super::field::Field;
 use anyhow::{Result,Context};
 
 // reg_field_name!(COR_DJ_NODE);

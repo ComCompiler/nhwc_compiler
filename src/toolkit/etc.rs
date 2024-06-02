@@ -12,7 +12,7 @@ use petgraph::{stable_graph::StableGraph, EdgeType};
 use anyhow::*;
 use anyhow::Context;
 
-use super::nhwc_instr::InstrSlab;
+use super::nhwc_instr::{InstrSlab, NhwcInstr};
 /// 传入C文件(带有.c后缀),生成.s汇编文件,  
 /// 生成在./assembly_repo/目录下
 pub fn generate_s_by_c(cfile_path:String) -> Result<()>{
@@ -143,10 +143,10 @@ pub fn element_remained_after_exclusion_in_vec<T:PartialEq+Clone>(v:Vec<T>,eleme
 }
 
 pub trait InstrAnyhow<T>:Context<T,anyhow::Error>{
-    fn with_instr_context(self,instr:usize,instr_slab:&InstrSlab)->Result<T,anyhow::Error>;
+    fn with_instr_context(self,instr:usize,instr_slab:&InstrSlab<NhwcInstr>)->Result<T,anyhow::Error>;
 }
 impl<T> InstrAnyhow<T> for anyhow::Result<T,anyhow::Error> {
-    fn with_instr_context(self,instr:usize,instr_slab:&InstrSlab) -> Result<T,anyhow::Error>{
+    fn with_instr_context(self,instr:usize,instr_slab:&InstrSlab<NhwcInstr>) -> Result<T,anyhow::Error>{
         self.with_context(||format!("{:?}",instr!(at instr in instr_slab).unwrap()))
     }
 }

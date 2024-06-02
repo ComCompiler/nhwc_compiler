@@ -8,7 +8,7 @@ mod tests {
 
     use crate::{
         add_passes, passes::pass_demo::PassDemo, toolkit::{
-            nhwc_instr::{InstrSlab}, pass_manager::{Pass, PassManager}, symbol::Symbol, symtab::SymTab
+            pass_manager::{Pass, PassManager}, symbol::Symbol, symtab::SymTab
         }, Args
     };
 
@@ -292,7 +292,4 @@ mod tests {
         add_passes!(pass1 to pass_manager);
         pass_manager.execute_passes();
     }
-
-    #[test]
-    fn test_slab() { let _slab = InstrSlab::new(); }
 }

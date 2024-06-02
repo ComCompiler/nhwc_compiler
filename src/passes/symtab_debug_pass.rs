@@ -22,7 +22,7 @@ impl Pass for SymtabDebugPass {
             // println!("ctx的symtab内容为{:#?}",ctx.symtab);
             add_node!({ctx.symtab.clone()} to symtab_g);
             let root = 0;
-            add_node_with_edge!({ctx.symtab.clone()} with edge {SymTabEdge::new("SymTabDebugPass".to_owned())} from root in symtab_g);
+            add_node_with_edge!({ctx.symtab.clone()} with_edge {SymTabEdge::new("SymTabDebugPass".to_owned())} from root in symtab_g);
             generate_png_by_graph_multi_tasks(&symtab_g.clone(), "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab, Config::Title("symtab_graph".to_string())],&mut ctx.io_task_list)?;
         }
         Ok(())
@@ -32,3 +32,4 @@ impl Pass for SymtabDebugPass {
     // 返回pass的名称
     fn get_pass_name(&self) -> String { return "SymtabDebugPass".to_string(); }
 }
+

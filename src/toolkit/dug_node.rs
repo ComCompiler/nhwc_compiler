@@ -1,6 +1,6 @@
 use petgraph::stable_graph::StableDiGraph;
 
-use super::{nhwc_instr::InstrSlab, symtab::SymIdx};
+use super::{nhwc_instr::{InstrSlab, NhwcInstr}, symtab::SymIdx};
 use std::fmt::Debug;
 
 pub type DefUseGraph = StableDiGraph<DefUseNode, DefUseEdge, u32>;
@@ -15,7 +15,9 @@ pub struct DefUseNode{
 pub enum DepType{
     PhiDep{ },
     Dep{ },
-    FinalDep{}
+    FinalDep{},
+    AllocDep{},
+    GlobalDep{},
 }
 
 #[derive(Clone)]
@@ -27,15 +29,21 @@ impl DefUseEdge{
     pub fn new(symidx:SymIdx)->Self{
         Self { dep_type: DepType::Dep {  }, symidx }
     }
+    pub fn new_alloc_dep(symidx:SymIdx)->Self{
+        Self { dep_type: DepType::AllocDep {  }, symidx }
+    }
     pub fn new_phi_dep(symidx:SymIdx)->Self{
         Self { dep_type: DepType::PhiDep {  }, symidx }
     }
     pub fn new_final_dep(symidx:SymIdx)->Self{
         Self { dep_type: DepType::FinalDep {  } , symidx }
     }
+    pub fn new_global_dep(symidx:SymIdx)->Self{
+        Self { dep_type: DepType::GlobalDep {  } , symidx }
+    }
 }
 impl DefUseNode{
-    pub fn load_instr_text(&mut self , instr_slab:&InstrSlab){
+    pub fn load_instr_text(&mut self , instr_slab:&InstrSlab<NhwcInstr>){
         self.text += format!("{:?}", instr_slab.get_instr(self.instr).unwrap()).as_str();
     }
     pub fn new(instr:usize)->Self{
@@ -50,10 +58,10 @@ impl DefUseNode{
 impl Debug for DepType{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f,"{}",match &self{
-            DepType::PhiDep { } => "PhiDep",
-            DepType::Dep { } => "",
-            DepType::FinalDep {  } => "FinalDep",
-        })
+            DepType::PhiDep{}=>"PhiDep",
+            DepType::Dep{}=>"",DepType::FinalDep{}=>"FinalDep",
+            DepType::AllocDep {  } => "AllocDep",
+            DepType::GlobalDep {  } => "GlobalDep", })
     }
 }
 impl Debug for DefUseNode{

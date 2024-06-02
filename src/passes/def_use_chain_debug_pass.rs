@@ -1,4 +1,4 @@
-use crate::{ reg_field_for_struct, toolkit::{context::NhwcCtx, dot::Config, etc::{generate_png_by_graph_multi_tasks}, gen_dug::{parse_dug}, nhwc_instr::Instruction, pass_manager::Pass, symtab::{SymTab, SymTabEdge, SymTabGraph}}};
+use crate::{ reg_field_for_struct, toolkit::{context::NhwcCtx, dot::Config, etc::{generate_png_by_graph_multi_tasks}, gen_dug::{parse_dug}, nhwc_instr::NhwcInstr, pass_manager::Pass, symtab::{SymTab, SymTabEdge, SymTabGraph}}};
 use anyhow::*;
 #[derive(Debug)]
 pub struct DefUseChainDebugPass {
@@ -8,7 +8,7 @@ impl DefUseChainDebugPass {
     pub fn new(is_gen_png:bool) -> Self { DefUseChainDebugPass { is_gen_png } }
 }
 
-reg_field_for_struct!(Instruction
+reg_field_for_struct!(NhwcInstr
     {
         COR_DEF_USE_NODE:u32,
     }
@@ -20,7 +20,7 @@ impl Pass for DefUseChainDebugPass {
     // 运行这个pass
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> { 
         // 先建立一个图 
-        let (instr_slab,cfg_graph,def_use_graph,symtab,dj_graph)= (&mut ctx.instr_slab,&mut ctx.cfg_graph,&mut ctx.def_use_graph,&ctx.symtab,&ctx.dj_graph);
+        let (instr_slab,cfg_graph,def_use_graph,symtab,dj_graph)= (&mut ctx.nhwc_instr_slab,&mut ctx.cfg_graph,&mut ctx.def_use_graph,&mut ctx.symtab,&ctx.dj_graph);
         
         parse_dug(cfg_graph, instr_slab, symtab, def_use_graph, dj_graph)?;
         

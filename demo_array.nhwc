@@ -12,34 +12,34 @@
          33   alloc i32 temp_8 _s7 
          40   alloc i1 temp_9 _s5 
           label %0 _s0: 
-         1    new_var Array:f32:[10 _s0] %b0 
-         2    new_var ptr->f32 %temp_00 
+         1    new_var b0:Array:f32:[10 _s0] 
+         2    new_var temp_00:ptr->f32 
          4    temp_01 = getelementptr b0:Array:f32:[10 _s0] [0 _s0] 
          5    store 1 _s0:f32 temp_01:ptr->Array:f32:[] 
          7    i0 = 1 _s0 
               jump label: while.head _s6 
      37   label while.head _s6: 
          44   i1 = phi [i0,instr:7],[i2,instr:35], 
-         39   new_var i1 %temp_90 
+         39   new_var temp_90:i1 
          41   temp_91 = icmp i1 Slt i1, 10 _s0 
          42   br i1 temp_91, label while.body _s6, label while.exit _s6 
      36   label while.body _s6: 
-         10   new_var ptr->f32 %temp_10 
+         10   new_var temp_10:ptr->f32 
          12   temp_11 = getelementptr b0:Array:f32:[10 _s0] [i1] 
-         13   new_var i32 %temp_20 
+         13   new_var temp_20:i32 
          15   temp_21 = Sub i32 i1, 1 _s0 
-         16   new_var ptr->f32 %temp_30 
-         18   new_var f32 %temp_40 
+         16   new_var temp_30:ptr->f32 
+         18   new_var temp_40:f32 
          20   temp_31 = getelementptr b0:Array:f32:[10 _s0] [temp_21] 
          21   temp_41 = load temp_31:ptr->f32 
-         22   new_var f32 %temp_50 
+         22   new_var temp_50:f32 
          24   temp_51 = sitofp i32 2 _s0 to f32 
-         25   new_var f32 %temp_60 
+         25   new_var temp_60:f32 
          27   temp_61 = Mul f32 temp_41, temp_51 
          28   store temp_61:f32 temp_11:ptr->f32 
-         29   new_var i32 %temp_70 
+         29   new_var temp_70:i32 
          31   temp_71 = i1 
-         32   new_var i32 %temp_80 
+         32   new_var temp_80:i32 
          34   temp_81 = Add i32 i1, 1 _s0 
          35   i2 = temp_81 
          43   jump label: while.head _s6 

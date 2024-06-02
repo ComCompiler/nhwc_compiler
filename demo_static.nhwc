@@ -1,0 +1,11 @@
+ 5    global i32 b _s0 
+ 1    global i32 a _s0 
+ 0    a _s0 = 3 _s0 
+ 2    new_var temp_0 _s0:i32 
+ 3    temp_0 _s0 = Mul i32 a _s0, 2 _s0 
+ 4    b _s0 = temp_0 _s0 
+ 6    Define main _s0 [] -> main_ret _s0 
+         8    alloc i32 b _s4 
+          label %0 _s0: 
+         7    b0 = 5 _s0 
+         10   ret 0 _s0 

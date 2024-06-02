@@ -8,14 +8,15 @@ use delegate::delegate;
 
 use petgraph::stable_graph::StableDiGraph;
 
+use super::riscv_instr::{RiscvInstr};
 use super::symtab::{SymIdx, SymTab, SymTabEdge, SymTabGraph};
 use crate::toolkit::cfg_edge::CfgEdge;
-use crate::toolkit::field::{Field};
+use crate::toolkit::field::Field;
 use crate::{instr, toolkit::ast_node::AstTree};
 use crate::{ reg_field_for_struct, node};
 
 use super::field::Fields;
-use super::nhwc_instr::{InstrSlab};
+use super::nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType};
 
 //use crate::toolkit::ast_node::AstNode;
 pub static CFG_ROOT:u32 = 0;
@@ -74,10 +75,15 @@ pub enum CfgNodeType {
 #[derive(Clone)]
 pub struct CfgNode {
     pub cfg_node_type:CfgNodeType,
+
     pub op_label_instr:Option<usize>,
     pub phi_instrs:InstrList,
     pub instrs:InstrList,
     pub op_jump_instr:Option<usize>,
+
+    /// currently to be riscv instr 
+    pub asms:InstrSlab<RiscvInstr>,
+
     pub text:String,
     pub info:Fields,
     // instructions of this basic block (第二步才生成这个 instrs)
@@ -123,6 +129,27 @@ impl Index<usize> for InstrList{
     }
 }
 impl CfgNode {
+    pub fn push_nhwc_instr(&mut self,instr:NhwcInstr,instr_slab:&mut InstrSlab<NhwcInstr>) -> Result<usize>{
+        let instr = instr_slab.insert_instr(instr);
+        match &instr!(at instr in instr_slab)?.instr_type{
+            NhwcInstrType::Label { label_symidx: _ } => self.op_label_instr = Some(instr),
+            NhwcInstrType::Phi { lhs: _, rhs: _ } => self.phi_instrs.push(instr),
+            NhwcInstrType::Jump { jump_op: _ } => self.op_jump_instr = Some(instr),
+            _ => self.instrs.push(instr),
+        }
+        // $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.instrs.len()-1, false));
+        Ok(instr)
+    }
+    pub fn insert_nhwc_instr(&mut self,instr:NhwcInstr, pos:usize ,instr_slab:&mut InstrSlab<NhwcInstr>) -> Result<usize>{
+        let instr = instr_slab.insert_instr(instr);
+        match &instr!(at instr in instr_slab)?.instr_type{
+            NhwcInstrType::Label { label_symidx: _ } => self.op_label_instr = Some(instr),
+            NhwcInstrType::Phi { lhs: _, rhs: _ } => self.phi_instrs.push(instr),
+            NhwcInstrType::Jump { jump_op: _ } => self.op_jump_instr = Some(instr),
+            _ => self.instrs.insert(pos,instr),
+        }
+        Ok(instr)
+    }
     pub fn load_ast_node_text(&mut self, ast_tree:&AstTree)  -> Result<()>{
         match self.cfg_node_type.clone() {
             CfgNodeType::Entry { ast_node, calls_in_func: _ } => {
@@ -186,7 +213,7 @@ impl CfgNode {
         self.text +="\n";
         Ok(())
     }
-    pub fn load_instrs_text(&mut self, instr_slab:&InstrSlab) -> Result<()>{
+    pub fn load_instrs_text(&mut self, instr_slab:&InstrSlab<NhwcInstr>) -> Result<()>{
         if let Some(label_instr) = self.op_label_instr {
             self.text += "LabelInstr: \n";
             self.text += format!("{:?} \n", instr!(at label_instr in instr_slab)?).as_str();
@@ -213,14 +240,14 @@ impl CfgNode {
         self.text = String::new();
     }
     pub fn new_bb(ast_nodes:Vec<u32>) -> Self { 
-        let mut cfg_node_struct = Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(), phi_instrs: InstrList::new(), cfg_node_type: CfgNodeType::BasicBlock { ast_nodes ,},op_label_instr:None, op_jump_instr: None } ;
+        let mut cfg_node_struct = Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(), phi_instrs: InstrList::new(), cfg_node_type: CfgNodeType::BasicBlock { ast_nodes ,},op_label_instr:None, op_jump_instr: None, asms: InstrSlab::new() } ;
         cfg_node_struct.add_def_symidx_instr_tuple_vec(vec![]);
         cfg_node_struct
     }
-    pub fn new_gather() -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type: CfgNodeType::Gather {},op_label_instr:None, phi_instrs: InstrList::new(),  op_jump_instr: None } }
-    pub fn new_root(ast_nodes:Vec<u32>) -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Root {static_ast_nodes:ast_nodes},op_label_instr:None, phi_instrs: InstrList::new(),  op_jump_instr: None } }
+    pub fn new_gather() -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type: CfgNodeType::Gather {},op_label_instr:None, phi_instrs: InstrList::new(),  op_jump_instr: None, asms: InstrSlab::new() } }
+    pub fn new_root(ast_nodes:Vec<u32>) -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Root {static_ast_nodes:ast_nodes},op_label_instr:None, phi_instrs: InstrList::new(),  op_jump_instr: None, asms: InstrSlab::new() } }
     pub fn new_branch(ast_node:u32) -> Self {
-        Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Branch { ast_expr_node:ast_node, },op_label_instr:None, phi_instrs: InstrList::new(),  op_jump_instr: None }
+        Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Branch { ast_expr_node:ast_node, },op_label_instr:None, phi_instrs: InstrList::new(),  op_jump_instr: None, asms: InstrSlab::new() }
     }
     pub fn new_for( ast_before_node:u32, ast_mid_node:u32, ast_after_node:u32,) -> Self {
         Self {
@@ -230,18 +257,19 @@ impl CfgNode {
             phi_instrs: InstrList::new(),
             op_label_instr: None,
             op_jump_instr: None,
+            asms: InstrSlab::new(),
         }
     }
     pub fn new_while(
         ast_expr_node:u32,
     ) -> Self {
-        Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::WhileLoop { ast_expr_node, }, phi_instrs: InstrList::new(), op_label_instr:None, op_jump_instr: None }
+        Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::WhileLoop { ast_expr_node, }, phi_instrs: InstrList::new(), op_label_instr:None, op_jump_instr: None, asms: InstrSlab::new() }
     }
-    pub fn new_switch(ast_expr_node:u32) -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Switch { ast_expr_node ,}, phi_instrs: InstrList::new(), op_label_instr: None, op_jump_instr: None } }
+    pub fn new_switch(ast_expr_node:u32) -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Switch { ast_expr_node ,}, phi_instrs: InstrList::new(), op_label_instr: None, op_jump_instr: None, asms: InstrSlab::new() } }
     pub fn new_entry(ast_node:u32, _instr:usize) -> Self {
-        Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Entry { ast_node, calls_in_func:vec![] ,}, phi_instrs: InstrList::new(), op_label_instr: None, op_jump_instr: None }
+        Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Entry { ast_node, calls_in_func:vec![] ,}, phi_instrs: InstrList::new(), op_label_instr: None, op_jump_instr: None, asms: InstrSlab::new() }
     }
-    pub fn new_exit(ast_node:u32) -> Self { Self { text:String::new(), instrs:InstrList::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Exit { ast_node }, phi_instrs: InstrList::new(), op_label_instr: None,  op_jump_instr: None } }
+    pub fn new_exit(ast_node:u32) -> Self { Self { text:String::new(), instrs:InstrList::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Exit { ast_node }, phi_instrs: InstrList::new(), op_label_instr: None,  op_jump_instr: None, asms: InstrSlab::new() } }
     pub fn iter_all_instrs(&self)->impl Iterator<Item=&usize>+'_{
         self.op_label_instr.iter().chain(self.phi_instrs.iter().chain(self.instrs.iter().chain(self.op_jump_instr.iter())))
     }
