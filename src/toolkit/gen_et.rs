@@ -11,12 +11,13 @@ use crate::toolkit::symtab::SymIdx;
 use crate::{add_node, add_node_with_edge, direct_child_node, find, find_nodes, node, rule_id, term_id};
 
 use super::et_node::{DeclOrDefOrUse, EtNodeType, EtTree};
+use super::eval::{eval_et, replace_et_node};
 use super::{ast_node::AstTree, scope_node::ScopeTree};
 
 // 这个函数 返回 separator node
 // 只能处理三类  expr_stmt & declaration & expr
 pub fn process_any_stmt(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, any_stmt_node:u32, scope_node:u32) -> u32 {
-    match node!(at any_stmt_node in ast_tree).rule_id {
+    let sep_node = match node!(at any_stmt_node in ast_tree).rule_id {
         RULE_expressionStatement => {
             let sep_node = add_node!({EtNodeType::new_sep(any_stmt_node).as_et_node()} to et_tree);
             process_expr_stmt(et_tree, ast_tree, scope_tree, any_stmt_node, scope_node, sep_node);
@@ -54,7 +55,15 @@ pub fn process_any_stmt(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Scop
             sep_node
         }
         _ => panic!("试图解析不合法的 ast_node {} with rule_id {:?} 为表达式树(et_tree)", any_stmt_node, node!(at any_stmt_node in ast_tree).rule_id),
-    }
+    };
+    // 写一个函数,用来替换,
+    // 在上方的let match块中就已经把et-tree生成好了,就在这里进行节点的替换
+    // 可以直接删除
+    let _ = replace_et_node(et_tree, sep_node);
+    // let calcuate_expr_node = eval_et(et_tree, sep_node);
+    // et_tree.remove_node(find_nodes!());
+    // let _ = eval_et(et_tree, sep_node);
+    sep_node
 }
 fn process_declaration(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, decl_node:u32, scope_node:u32, parent_et_node:u32) {
     let type_ast_node = find!(

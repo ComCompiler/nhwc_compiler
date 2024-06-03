@@ -22,24 +22,25 @@ impl Debug for Register {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result { write!(f, "{:?}", self.reg_name) }
 }
 pub enum Shifts {
+    /// RV32I Base                                   RV64I
     /// Shift Left Logical
     /// 逻辑左移
-    SLL { rd:Register, rs1:Register, rs2:Register },
+    SLL { rd:Register, rs1:Register, rs2:Register }, SLLW { rd:Register, rs1:Register, rs2:Register },
     /// Shift Left Log Imm
     /// 立即数逻辑左移
-    SLLI { rd:Register, rs1:Register, shamt:Value },
+    SLLI { rd:Register, rs1:Register, shamt:Value }, SLLIW { rd:Register, rs1:Register, shamt:Value },
     /// Shift Right Logical
     /// 逻辑右移
-    SRL { rd:Register, rs1:Register, rs2:Register },
+    SRL { rd:Register, rs1:Register, rs2:Register }, SRLW { rd:Register, rs1:Register, rs2:Register },
     /// Shift Right Log Imm
     /// 立即数逻辑右移
-    SRLI { rd:Register, rs1:Register, shamt:Value },
+    SRLI { rd:Register, rs1:Register, shamt:Value }, SRLIW { rd:Register, rs1:Register, shamt:Value },
     /// Shift Right Arithmetic
     /// 算术右移
-    SRA { rd:Register, rs1:Register, rs2:Register },
+    SRA { rd:Register, rs1:Register, rs2:Register }, SRAW { rd:Register, rs1:Register, rs2:Register },
     ///Shift Right ArithImm
     /// 立即数算术右移
-    SRAI { rd:Register, rs1:Register, shamt:Value },
+    SRAI { rd:Register, rs1:Register, shamt:Value }, SRAIW { rd:Register, rs1:Register, shamt:Value },
 }
 impl Debug for Shifts {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
@@ -50,16 +51,24 @@ impl Debug for Shifts {
             Shifts::SRLI { rd, rs1, shamt } => write!(f, "SRLI %{:?},%{:?},{:?}", rd, rs1, shamt),
             Shifts::SRA { rd, rs1, rs2 } => write!(f, "SRA %{:?},%{:?},%{:?}", rd, rs1, rs2),
             Shifts::SRAI { rd, rs1, shamt } => write!(f, "SRAI %{:?},%{:?},{:?}", rd, rs1, shamt),
+
+            Shifts::SLLW { rd, rs1, rs2 } => write!(f, "SLLW %{:?},%{:?},%{:?}", rd, rs1, rs2),
+            Shifts::SLLIW { rd, rs1, shamt } => write!(f, "SLLIW %{:?},%{:?},{:?}", rd, rs1, shamt),
+            Shifts::SRLW { rd, rs1, rs2 } => write!(f, "SRLW %{:?},%{:?},%{:?}", rd, rs1, rs2),
+            Shifts::SRLIW { rd, rs1, shamt } => write!(f, "SRLIW %{:?},%{:?},{:?}", rd, rs1, shamt),
+            Shifts::SRAW { rd, rs1, rs2 } => write!(f, "SRAW %{:?},%{:?},%{:?}", rd, rs1, rs2),
+            Shifts::SRAIW { rd, rs1, shamt } => write!(f, "SRAIW %{:?},%{:?},{:?}", rd, rs1, shamt),
         }
     }
 }
 pub enum Arithmetic {
+    /// RV32I Base                                  RV64I
     /// ADD
-    ADD { rd:Register, rs1:Register, rs2:Register },
+    ADD { rd:Register, rs1:Register, rs2:Register }, ADDW { rd:Register, rs1:Register, rs2:Register },
     /// ADD Imediate
-    ADDI { rd:Register, rs1:Register, imm:Value },
+    ADDI { rd:Register, rs1:Register, imm:Value }, ADDIW { rd:Register, rs1:Register, imm:Value },
     /// SUBtract
-    SUB { rd:Register, rs1:Register, rs2:Register },
+    SUB { rd:Register, rs1:Register, rs2:Register }, SUBW { rd:Register, rs1:Register, rs2:Register },
     /// Load Upper Imm
     LUI { rd:Register, imm:Value },
     /// Add Upper Imm To PC
@@ -73,6 +82,10 @@ impl Debug for Arithmetic {
             Arithmetic::SUB { rd, rs1, rs2 } => write!(f, "SUB %{:?},%{:?},%{:?}", rd, rs1, rs2),
             Arithmetic::LUI { rd, imm } => write!(f, "LUI %{:?},{:?}", rd, imm),
             Arithmetic::AUIPC { rd, imm } => write!(f, "AUIPC %{:?},{:?}", rd, imm),
+
+            Arithmetic::ADDW { rd, rs1, rs2 } => write!(f, "ADDW %{:?},%{:?},%{:?}", rd, rs1, rs2),
+            Arithmetic::ADDIW { rd, rs1, imm } => write!(f, "ADDIW %{:?},%{:?},{:?}", rd, rs1, imm),
+            Arithmetic::SUBW { rd, rs1, rs2 } => write!(f, "SUBW %{:?},%{:?},%{:?}", rd, rs1, rs2),
         }
     }
 }
@@ -206,6 +219,7 @@ impl Debug for CSR {
     }
 }
 pub enum Loads {
+    /// RV32I Base                              RV64I
     /// Load Byte
     LB { rd:Register, rs1:Register, imm:Value },
     /// Load Halfword
@@ -213,9 +227,9 @@ pub enum Loads {
     /// Load Byte Unsigned
     LBU { rd:Register, rs1:Register, imm:Value },
     /// Load Half Unsigned
-    LHU { rd:Register, rs1:Register, imm:Value },
+    LHU { rd:Register, rs1:Register, imm:Value }, LWU { rd:Register, rs1:Register, imm:Value},
     /// Load Word
-    LW { rd:Register, rs1:Register, imm:Value },
+    LW { rd:Register, rs1:Register, imm:Value }, LD { rd:Register, rs1:Register, imm:Value},
 }
 impl Debug for Loads {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -225,16 +239,20 @@ impl Debug for Loads {
             Loads::LBU { rd, rs1, imm } => write!(f, "LBU %{:?},%{:?}(%{:?})", rd, imm, rs1),
             Loads::LHU { rd, rs1, imm } => write!(f, "LHU %{:?},%{:?}(%{:?})", rd, imm, rs1),
             Loads::LW { rd, rs1, imm } => write!(f, "LW %{:?},%{:?}(%{:?})", rd, imm, rs1),
+
+            Loads::LWU { rd, rs1, imm } => write!(f, "LWU %{:?},%{:?}(%{:?})", rd, imm, rs1),
+            Loads::LD { rd, rs1, imm } => write!(f, "LD %{:?},%{:?}(%{:?})", rd, imm, rs1),
         }
     }
 }
 pub enum Stores {
+    /// RV32I Base                               RV64
     /// Store Byte
     SB { rs1:Register, rs2:Register, imm:Value },
     /// Store Halfword
     SH { rs1:Register, rs2:Register, imm:Value },
     ///Store Word
-    SW { rs1:Register, rs2:Register, imm:Value },
+    SW { rs1:Register, rs2:Register, imm:Value }, SD { rs1:Register, rs2:Register, imm:Value},
 }
 impl Debug for Stores {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -242,6 +260,8 @@ impl Debug for Stores {
             Stores::SB { rs1, rs2, imm } => write!(f, "SB %{:?},%{:?}(%{:?})", rs1, rs2, imm),
             Stores::SH { rs1, rs2, imm } => write!(f, "SH %{:?},%{:?}(%{:?})", rs1, rs2, imm),
             Stores::SW { rs1, rs2, imm } => write!(f, "SW %{:?},%{:?}(%{:?})", rs1, rs2, imm),
+
+            Stores::SD { rs1, rs2, imm } => write!(f, "SD %{:?},%{:?}(%{:?})", rs1, rs2, imm),
         }
     }
 }

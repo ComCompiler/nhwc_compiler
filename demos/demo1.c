@@ -20,7 +20,7 @@ int f(){
 	int b = 4;
 	if(a<4){
 		if(a>0){
-			int c = 1/(a+b)*2+6;
+			int c = 1/(a+b)*2+6+7*8-9;
 		}
 	}
 	int d = a*b;

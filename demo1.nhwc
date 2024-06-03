@@ -1,0 +1,94 @@
+ 1    Define f _s0 [] -> f_ret _s0 
+         39   alloc i32 a _s17 
+         41   alloc i32 b _s17 
+         43   alloc i32 temp_6 _s17 
+         46   alloc i32 d _s17 
+         48   alloc i32 temp_7 _s25 
+         51   alloc i32 temp_8 _s25 
+         54   alloc i32 temp_9 _s25 
+         57   alloc i32 temp_10 _s25 
+         60   alloc i32 temp_11 _s25 
+         63   alloc i32 temp_12 _s25 
+         66   alloc i32 temp_13 _s25 
+         69   alloc i32 c _s25 
+         73   alloc i1 temp_14 _s20 
+         79   alloc i1 temp_15 _s23 
+          label %0 _s0: 
+         38   a0 = 3 _s0 
+         40   b0 = 4 _s0 
+              jump label: %1 _s0 
+          label %1 _s0: 
+         72   new_var i1 %temp_140 
+         74   temp_141 = icmp i1 Slt a0, 4 _s0 
+         75   br i1 temp_141, label branch.true: _s21, label branch.false: _s21 
+     70   label branch.true: _s21: 
+         78   new_var i1 %temp_150 
+         80   temp_151 = icmp i1 Sgt a0, 0 _s0 
+         81   br i1 temp_151, label branch.true: _s24, label branch.false: _s24 
+     76   label branch.true: _s24: 
+         47   new_var i32 %temp_70 
+         49   temp_71 = Mul i32 7 _s0, 8 _s0 
+         50   new_var i32 %temp_80 
+         52   temp_81 = Sub i32 temp_71, 9 _s0 
+         53   new_var i32 %temp_90 
+         55   temp_91 = Add i32 6 _s0, temp_81 
+         56   new_var i32 %temp_100 
+         58   temp_101 = Add i32 a0, b0 
+         59   new_var i32 %temp_110 
+         61   temp_111 = Mul i32 temp_101, 2 _s0 
+         62   new_var i32 %temp_120 
+         64   temp_121 = Div i32 1 _s0, temp_111 
+         65   new_var i32 %temp_130 
+         67   temp_131 = Add i32 temp_121, temp_91 
+         68   c0 = temp_131 
+              jump label: branch.false: _s24 
+     77   label branch.false: _s24: 
+     71   label branch.false: _s21: 
+          label %2 _s0: 
+         42   new_var i32 %temp_60 
+         44   temp_61 = Mul i32 a0, b0 
+         45   d0 = temp_61 
+ 0    Define main _s0 [] -> main_ret _s0 
+         3    alloc i32 i _s2 
+         5    alloc i32 j _s2 
+         7    alloc i32 temp_0 _s13 
+         10   alloc i32 sum _s13 
+         14   alloc i32 temp_1 _s11 
+         18   alloc i32 temp_2 _s7 
+         21   alloc i32 temp_3 _s7 
+         28   alloc i1 temp_4 _s5 
+         35   alloc i1 temp_5 _s9 
+          label %3 _s0: 
+         2    i0 = 0 _s0 
+         4    j0 = 2 _s0 
+              jump label: while.head _s6 
+     25   label while.head _s6: 
+         83   i1 = phi [i0,instr:2],[i4,instr:23], 
+         27   new_var i1 %temp_40 
+         29   temp_41 = icmp i1 Slt i1, 3 _s0 
+         30   br i1 temp_41, label while.body _s6, label while.exit _s6 
+     24   label while.body _s6: 
+         17   new_var i32 %temp_20 
+         19   temp_21 = i1 
+         20   new_var i32 %temp_30 
+         22   temp_31 = Add i32 i1, 1 _s0 
+         23   i4 = temp_31 
+         31   jump label: while.head _s6 
+     26   label while.exit _s6: 
+         34   new_var i1 %temp_50 
+         36   temp_51 = icmp i1 Sgt i1, 0 _s0 
+         37   br i1 temp_51, label branch.true: _s10, label branch.false: _s10 
+     32   label branch.true: _s10: 
+         13   new_var i32 %temp_10 
+         15   temp_11 = Add i32 i1, 2 _s0 
+         16   i3 = temp_11 
+              jump label: %4 _s0 
+     33   label branch.false: _s10: 
+         6    new_var i32 %temp_00 
+         8    temp_01 = Add i32 i1, j0 
+         9    sum0 = temp_01 
+              jump label: %4 _s0 
+          label %4 _s0: 
+         82   i2 = phi [i1,instr:83],[i3,instr:16], 
+          label %5 _s0: 
+         12   ret 0 _s0 
