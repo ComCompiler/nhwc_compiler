@@ -227,12 +227,9 @@ fn parse_whileloop2nhwc(
                     return Err(anyhow!("条件表达式错误，返回参数不能大于一个"))
                 }
                 let r2bool_symidx;
-                if let result_symidx = &ret_vec[0]{
-                    let result_type = symtab.get_symbol(&result_symidx)?.get_type()?.clone();
-                    r2bool_symidx = force_trans_type(cfg_graph, symtab, &Type::I1,  &result_type,&result_symidx, ast_expr_node, cfg_whileloop, counter, instr_slab, symtab_graph,None,et_tree)?;
-                }else{
-                    return Err(anyhow!("条件表达式错误，返回类型不能转为bool"))
-                }
+                let symidx = &ret_vec[0];
+                let result_type = symtab.get_symbol(&symidx)?.get_type()?.clone();
+                r2bool_symidx = force_trans_type(cfg_graph, symtab, &Type::I1,  &result_type,&symidx, ast_expr_node, cfg_whileloop, counter, instr_slab, symtab_graph,None,et_tree)?;
                 // 添加 br 语句
                 let br_whileloop_instr_struct = NhwcInstrType::new_br(r2bool_symidx.clone(),while_body_symidx,while_exit_symidx).to_instr();
                 node_mut!(at cfg_whileloop in cfg_graph).push_nhwc_instr(br_whileloop_instr_struct, instr_slab)?;
@@ -1174,7 +1171,6 @@ fn process_et(
                     };
                     node_mut!(at et_l_child in et_tree).add_dims(l_child_dims.clone());
 
-                    // 这个是降维操作 (debug 用，可删)
                     debug_info_blue!("the current et_node is {}",et_node);
 
                     //通过 process_et 递归至下一层 根据 declordef 有不同的可能返回值 declare 可能返回指针  
@@ -1260,6 +1256,7 @@ fn process_et(
                     match &array_ty{
                         Type::Array { dims, ele_ty } => {
                             let mut reversed_remained_dims = dims.iter().rev().map(|symidx| {let idx:usize; idx = symidx.symbol_name.parse().unwrap(); idx}).collect_vec();
+                            // add values to value_map according to initializer
                             array_initialize(et_node_vec, et_tree, &mut array_ele_map, &ele_ty, &mut reversed_remained_dims, &mut 0)?;
                             let initializer_symidx = process_constant(symtab, &"initializer".to_string(), symtab_graph)?;
                             symtab.get_mut_symbol(&initializer_symidx)?.add_value(Value::new_array(array_ele_map, dims.clone(), *ele_ty.clone()));
@@ -1305,7 +1302,7 @@ fn process_et(
                             for (&offset,value) in value_map.iter(){
                                 let value_symidx = value.to_symidx()?;
                                 process_constant(symtab, &value_symidx.symbol_name, symtab_graph)?;
-                                let array_idx_vec = deduce_offset_to_symidx_vec(offset, r_type.get_array_dim_weight_vec()?.into_iter().map(|s| s.symbol_name.parse().unwrap()).collect_vec());
+                                let array_idx_vec = deduce_linear_offset_by_weights(offset, r_type.get_array_dim_weight_vec()?.into_iter().map(|s| s.symbol_name.parse().unwrap()).collect_vec());
                                 for &array_idx in array_idx_vec.iter(){
                                     process_constant(symtab, &array_idx.to_string(), symtab_graph)?;
                                 }
@@ -1334,6 +1331,7 @@ fn process_et(
         EtNodeType::Constant { const_sym_idx: _, ast_node, text: _ } => {
             let ast_node = *ast_node;
             let constant_literal = &node!(at ast_node in ast_tree).text;
+            debug_info_blue!("add constant {}",constant_literal);
             Ok(process_constant(symtab, constant_literal, symtab_graph)?)
         }
         EtNodeType::Symbol { sym_idx: _, ast_node, text: _, def_or_use } => {
@@ -1360,30 +1358,6 @@ fn parse_declaration2nhwc(
         match et_node_type {
             /// 先考虑这个语句存在 = 的情况
             EtNodeType::Operator { op: ExprOp::Assign, ast_node: _, text: _ } => {
-                // let et_assign_node = et_sep_item_node;
-                // let op_values = direct_child_nodes!(at et_sep_item_node in et_tree);
-                // //获得变量类型，做成symidx
-                // //判断左孩子节点是否是有意义的
-                // let var_et_node = op_values[0];
-                // let var_et_type = &node!(at var_et_node in et_tree).et_node_type;
-                // match var_et_type {
-                //     EtNodeType::Symbol { sym_idx:_, ast_node:_, text:_, def_or_use:_ } => {},
-                //     EtNodeType::Operator { op, ast_node, text } =>{},
-                //     _ => return Err(anyhow!("赋值号左边形式错误")),
-                // }
-                // //处理左右子树
-                // // 这是个等于号
-                // let value_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[1], decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
-                // //大纲：
-                // //将var_symidx处理看是普通变量还是数组变量，如果是数组，则将value_symidx的内容和var_symidx进行比对整合
-                
-                // let mut value_type = symtab.get_symbol(&value_symidx)?.get_type()?.clone();
-                // if let Type::Fn { arg_syms:_, ret_sym }= value_type{
-                //     value_type = symtab.get_symbol(&ret_sym)?.get_type()?.clone();
-                // }
-                // // let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
-                // let transed_value_symidx = force_trans_type(cfg_graph, symtab, &var_type, &value_type, &value_symidx, decl_parent_scope, cfg_node, counter, instr_slab, symtab_g,None,et_tree)?;
-                
                 let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_sep_item_node, decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
                 let var_type = symtab.get_symbol(&var_symidx)?.get_type()?.clone();
 
@@ -1640,6 +1614,7 @@ pub fn insert_bb_between(cfg_node1:u32, cfg_node2:u32, cfg_graph:&mut CfgGraph) 
 }
 
 
+/// return head and tail of `cfg_while_node` or `cfg_for_node` 
 pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph) -> Result<(u32, u32)> {
     let head = {
         let outgoing_edges:Vec<_> = outgoing_edges!(at cfg_node in cfg_graph);
@@ -1669,9 +1644,9 @@ pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph)
 
 pub fn find_gather_of_branch_downward(cfg_branch_node:u32,cfg_graph:&CfgGraph)-> Result<u32>{
     let cur_branch_layer_count = 0;
-    _recursive_find_gather(cfg_branch_node, cfg_graph, cur_branch_layer_count)
+    recursive_find_gather(cfg_branch_node, cfg_graph, cur_branch_layer_count)
 }
-pub fn _recursive_find_gather(cfg_node:u32,cfg_graph:&CfgGraph, mut cur_branch_layer_count: u32) -> Result<u32>{
+fn recursive_find_gather(cfg_node:u32,cfg_graph:&CfgGraph, mut cur_branch_layer_count: u32) -> Result<u32>{
     if node!(at cfg_node in cfg_graph).cfg_node_type.is_gather(){
         cur_branch_layer_count -= 1;
     }else if node!(at cfg_node in cfg_graph).cfg_node_type.is_branch(){
@@ -1683,16 +1658,16 @@ pub fn _recursive_find_gather(cfg_node:u32,cfg_graph:&CfgGraph, mut cur_branch_l
     }else{
         let mut rst = Err(anyhow!("找不到此 if 对应的gather"));
         for neighbor in direct_child_nodes!(at cfg_node in cfg_graph){
-            rst = rst.or(_recursive_find_gather(neighbor, cfg_graph, cur_branch_layer_count));
+            rst = rst.or(recursive_find_gather(neighbor, cfg_graph, cur_branch_layer_count));
         }
         rst
     }
 }
-pub fn find_branch_of_gather_upwnward(cfg_branch_node:u32,cfg_graph:&CfgGraph)-> Result<u32>{
+pub fn find_branch_of_gather_upward(cfg_branch_node:u32,cfg_graph:&CfgGraph)-> Result<u32>{
     let cur_branch_layer_count = 0;
     _recursive_find_branch(cfg_branch_node, cfg_graph, cur_branch_layer_count)
 }
-pub fn _recursive_find_branch(cfg_node:u32,cfg_graph:&CfgGraph, mut cur_branch_layer_count: u32) -> Result<u32>{
+fn _recursive_find_branch(cfg_node:u32,cfg_graph:&CfgGraph, mut cur_branch_layer_count: u32) -> Result<u32>{
     if node!(at cfg_node in cfg_graph).cfg_node_type.is_gather(){
         cur_branch_layer_count += 1;
     }else if node!(at cfg_node in cfg_graph).cfg_node_type.is_branch(){
@@ -1710,6 +1685,10 @@ pub fn _recursive_find_branch(cfg_node:u32,cfg_graph:&CfgGraph, mut cur_branch_l
     }
 }
 
+/// get corresponding `cfg_entry` by speicified `cfg_node`
+/// its correctness depends on
+/// 1. `cfg_entry_node` field of `func_symidx` symbol 
+/// 2. `func_cor_symidx` field of `cfg_node`
 pub fn get_cfg_entry_by_cfg_node(cfg_graph:&CfgGraph,symtab:&SymTab,cfg_node:u32)-> Result<Option<u32>>{
     if node!(at cfg_node in cfg_graph).has_func_cor_symidx(){
         let func_symidx = node!(at cfg_node in cfg_graph).get_func_cor_symidx()?;
@@ -1721,8 +1700,8 @@ pub fn get_cfg_entry_by_cfg_node(cfg_graph:&CfgGraph,symtab:&SymTab,cfg_node:u32
     
 }
 
-/// 数组初始化
-/// 要求输入维度数组必须是 reversed 倒序的
+/// array init
+/// require input `reversed_remained_dims` dimensions to be reversed 
 pub fn array_initialize(et_node_vec:Vec<u32>, et_tree:&mut EtTree, array_ele_map:&mut ArrayEleMap, ele_type:&Type,reversed_remained_dims:&mut Vec<usize>, array_offset:&mut usize) -> Result<()>{
     debug_info_blue!("array_init " );
     let mut i = 0;
@@ -1749,7 +1728,7 @@ pub fn array_initialize(et_node_vec:Vec<u32>, et_tree:&mut EtTree, array_ele_map
                 let et_node = et_node_vec[i];
                 match &node!(at et_node in et_tree).et_node_type{
                     EtNodeType::Constant { const_sym_idx, ast_node: _, text: _ } => {
-                        array_ele_map.add_ele_from_usize(*array_offset, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?)?;
+                        array_ele_map.insert_ele(*array_offset, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?)?;
                         debug_info_blue!("add array ele with offset {},{:?}",i, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?);
                         *array_offset +=1;
                     },
@@ -1774,11 +1753,13 @@ pub fn array_initialize(et_node_vec:Vec<u32>, et_tree:&mut EtTree, array_ele_map
     }
     Ok(())
 }
-pub fn deduce_offset_to_symidx_vec(offset:usize, weights:Vec<usize>) -> Vec<usize>{
+/// transform the linear offset into vec<usize> which represent the offsets of all dimensions 
+pub fn deduce_linear_offset_by_weights(offset:usize, weights:Vec<usize>) -> Vec<usize>{
     let mut decoded_vec = vec![];
+    let mut remained = offset;
     for weight in weights{
-        let _remained = offset % weight;
-        decoded_vec.push(offset / weight);
+        decoded_vec.push(remained / weight);
+        remained %= weight;
     }
     decoded_vec
 }

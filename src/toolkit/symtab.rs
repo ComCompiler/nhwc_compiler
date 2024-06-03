@@ -148,9 +148,9 @@ impl Debug for SymIdx {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
         match self.index_ssa {
             // Some(index_ssa) => write!(f, "{} _s{} _i{}", self.symbol_name, self.scope_node, index_ssa),
-            Some(index_ssa) => write!(f, "{}{}", self.symbol_name,  index_ssa),
+            Some(index_ssa) => write!(f, "{}-{}", self.symbol_name,  index_ssa),
             // None => write!(f, "{} _s{}", self.symbol_name, self.scope_node),
-            None => write!(f, "{} _s{}", self.symbol_name, self.scope_node),
+            None => write!(f, "{}", self.symbol_name),
         }
     }
 }

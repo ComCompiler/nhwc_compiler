@@ -10,7 +10,7 @@ use super::etc::InstrAnyhow;
 use super::nhwc_instr::NhwcInstr;
 use super::symbol::Symbol;
 use super::symtab;
-use super::{cfg_node::CfgGraph, dug_node::{DefUseEdge, DefUseGraph, DefUseNode}, etc, gen_nhwc_cfg::find_branch_of_gather_upwnward, gen_ssa::{update_cfg_instr_idx_in_cfg_graph}, nhwc_instr::{InstrSlab, NhwcInstrType, JumpOp}, symtab::{SymTab}};
+use super::{cfg_node::CfgGraph, dug_node::{DefUseEdge, DefUseGraph, DefUseNode}, etc, gen_nhwc_cfg::find_branch_of_gather_upward, gen_ssa::{update_cfg_instr_idx_in_cfg_graph}, nhwc_instr::{InstrSlab, NhwcInstrType, JumpOp}, symtab::{SymTab}};
 use anyhow::*;
 use petgraph::visit::EdgeRef;
 use symtab::*;
@@ -179,7 +179,7 @@ pub fn get_cor_br_instr_of_phi_instr(cfg_graph:&CfgGraph,instr_slab:&InstrSlab<N
     let phi_instr_struct = instr!(at phi_instr in instr_slab)?;
     let phi_cfg_node  = phi_instr_struct.get_cfg_instr_idx()?.cfg_node;
     if node!(at phi_cfg_node in cfg_graph).cfg_node_type.is_gather(){
-        let cfg_branch_node = find_branch_of_gather_upwnward(phi_cfg_node, cfg_graph)?;
+        let cfg_branch_node = find_branch_of_gather_upward(phi_cfg_node, cfg_graph)?;
         Ok(node!(at cfg_branch_node in cfg_graph).op_jump_instr.ok_or(anyhow!("这个 cfg_node:{} 没有 jump_instr ",cfg_branch_node))?)
     }else if node!(at phi_cfg_node in cfg_graph).cfg_node_type.is_while_loop(){
         Ok(node!(at phi_cfg_node in cfg_graph).op_jump_instr.ok_or(anyhow!("这个 cfg_node:{} 没有 jump_instr ",phi_cfg_node))?)

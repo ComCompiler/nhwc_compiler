@@ -104,7 +104,7 @@ pub fn alloc_stack_mem_for_cfg_entry(cfg_graph:&mut CfgGraph,cfg_entry:u32,symta
         cfg_node_struct.add_mem_layout(MemLayout::new())
     }
     let sym_type =symbol_struct.get_type()?;
-    let mem_offset = cfg_node_struct.get_mut_mem_layout()?.insert_data(sym_type.get_align()?,sym_type.mem_len()?,symidx);
+    let mem_offset = cfg_node_struct.get_mut_mem_layout()?.insert_data(sym_type.get_align()?,sym_type.get_mem_len()?,symidx);
     symbol_struct.add_mem_offset(mem_offset);
     Ok(())
 }

@@ -628,7 +628,7 @@ impl Simulator{
                                     // 数组
                                     Value::Array { value_map, dims: _, ele_ty: _ele_type } => {
                                         // 在数组中我们无法追踪 def_instr 因此无法使用 simu_add_value
-                                        value_map.add_ele_from_value(&offset, val)?
+                                        value_map.insert_ele_by_value_type_offset(&offset, val)?
                                     },
                                     _ => {
                                         // 普通指针
