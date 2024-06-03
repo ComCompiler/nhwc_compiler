@@ -117,7 +117,7 @@ impl SymTab {
             add_node!({let mut s = self.clone(); s.load_symtab_text(symidx_vec);s } to symtab_graph);
         }else {//如果已经有节点了,在最后一个节点上加点加边
             idx-=1;
-            add_node_with_edge!({let mut s = self.clone(); s.load_symtab_text(symidx_vec);s } with edge {SymTabEdge::new(desc)} from idx in symtab_graph);
+            add_node_with_edge!({let mut s = self.clone(); s.load_symtab_text(symidx_vec);s } with_edge {SymTabEdge::new(desc)} from idx in symtab_graph);
         }
 
     }
@@ -148,9 +148,9 @@ impl Debug for SymIdx {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
         match self.index_ssa {
             // Some(index_ssa) => write!(f, "{} _s{} _i{}", self.symbol_name, self.scope_node, index_ssa),
-            Some(index_ssa) => write!(f, "{}{}", self.symbol_name,  index_ssa),
+            Some(index_ssa) => write!(f, "{}-{}", self.symbol_name,  index_ssa),
             // None => write!(f, "{} _s{}", self.symbol_name, self.scope_node),
-            None => write!(f, "{} _s{}", self.symbol_name, self.scope_node),
+            None => write!(f, "{}", self.symbol_name),
         }
     }
 }

@@ -8,7 +8,7 @@ use regex::{self, Regex};
 
 use super::{ast_node::AstTree, scope_node::ST_ROOT};
 use super::symtab::SymIdx;
-use crate::{debug_info_blue, node};
+use crate::{debug_info_blue, debug_info_red, node};
 
 pub type Fields = HashMap<&'static str, Box<dyn Field>>;
 pub static TARGET_POINTER_MEM_LEN:usize = 8;
@@ -85,7 +85,7 @@ impl ArrayEleMap{
     }
 }
 impl ArrayEleMap{
-    pub fn get_ele(&self,offset:usize)->Result<&Value>{
+    pub fn get_ele_at(&self,offset:usize)->Result<&Value>{
         match self.map.get(&offset){
             Some(ele) => Ok(ele),
             None => {
@@ -101,7 +101,8 @@ impl ArrayEleMap{
             },
         }
     }
-    pub fn add_ele_from_value(&mut self,offset:&Value,val:Value) -> Result<()>{
+    /// insert element by `Value` type offset
+    pub fn insert_ele_by_value_type_offset(&mut self,offset:&Value,val:Value) -> Result<()>{
         let &offset = match &offset{
             Value::I32(Some(i)) => i,
             _ => {
@@ -111,7 +112,8 @@ impl ArrayEleMap{
         self.map.insert(offset as usize, val);
         Ok(())
     }
-    pub fn add_ele_from_usize(&mut self,offset:usize,val:Value) -> Result<()>{
+    /// insert element by `usize` offset
+    pub fn insert_ele(&mut self,offset:usize,val:Value) -> Result<()>{
         self.map.insert(offset, val);
         Ok(())
     }
@@ -257,7 +259,11 @@ impl Value {
             },
             Value::F32(op_f32) => {
                 if let Some(f32_value) = op_f32{
-                    Ok(SymIdx::new(ST_ROOT,f32_value.to_string()))
+                    let mut f32_str = f32_value.to_string();
+                    if !f32_str.contains("."){
+                        f32_str.push('.');
+                    }
+                    Ok(SymIdx::new(ST_ROOT,f32_str))
                 }else{
                     Err(anyhow!("f32 {:?} unsure 无法转化为 symidx",self))
                 }
@@ -268,14 +274,21 @@ impl Value {
     }
     pub fn index_array(&self,offset:usize) -> Result<Value> {
         match self{
-            Value::Array { value_map, dims, ele_ty } => {
-                value_map.get_ele(offset).cloned()
+            Value::Array { value_map, dims: _, ele_ty: _ } => {
+                value_map.get_ele_at(offset).cloned()
             },
             _ => {
                 Err(anyhow!("index_array 无法对 非数组类型 使用 {:?}",&self))
             }
         }
     }
+    pub fn get_ele_size(&self) -> Result<usize>{
+        self.to_type().get_ele_size()
+    }
+    pub fn get_mem_len(&self) -> Result<usize>{
+        self.to_type().get_mem_len()
+    }
+
 }
 impl Type {
     /// 这个函数接受一个ast_node 和 ast_tree 通过识别 ast_node 来完成基本类型的识别  
@@ -301,6 +314,7 @@ impl Type {
         }
         Ok(Type::Array { dims, ele_ty: Box::new(ele_ty) })
     }
+    /// get align of the type, it will return ele align if it is a array
     pub fn get_align(&self)->Result<usize>{
         match &self{
             Type::I32 => Ok(4),
@@ -311,6 +325,18 @@ impl Type {
             Type::Array { dims: _, ele_ty: ty } => Ok(ty.get_align()?),
             Type::Fn { arg_syms: _, ret_sym: _ } =>Err(anyhow!("can't get alignment of func type {:?}",self)),
             Type::Ptr64 { ty: _ } => Ok(8),
+        }
+    }
+
+    /// return the size of element if it is an array or else its size 
+    pub fn get_ele_size(&self) -> Result<usize>{
+        match &self{
+            Type::Array { dims, ele_ty } => {
+                ele_ty.get_mem_len()
+            },
+            _ => {
+                self.get_mem_len()
+            }
         }
     }
 
@@ -403,16 +429,27 @@ impl Type {
             }
         }
     }
+    pub fn get_ele_len(&self) -> Result<usize>{
+        match self{
+            Type::Array { dims, ele_ty } => {
+                let array_size:usize = dims.iter()
+                    .map(|d|{let ans:usize = d.symbol_name.parse().unwrap();ans}).product() ;
+                Ok(array_size)
+            },
+            _ => {
+                Ok(1)
+            }
+        }
+    }
 
-    pub fn mem_len(&self)->Result<usize>{
+    pub fn get_mem_len(&self)->Result<usize>{
         match &self{
             Type::I32 => Ok(4),
             Type::F32 => Ok(4),
             Type::I1 => Ok(1),
             Type::Void => todo!(),
             Type::Label => todo!(),
-            Type::Array { dims, ele_ty: ty } => Ok({let array_size:usize = dims.iter().
-                map(|d|{let ans:usize = d.symbol_name.parse().unwrap();ans}).product() ;  array_size*ty.mem_len()?}),
+            Type::Array { dims, ele_ty: ty } => Ok({  self.get_ele_len()?*ty.get_ele_size()?}),
             Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
             Type::Ptr64 { ty: _ } => Ok(TARGET_POINTER_MEM_LEN),
         }

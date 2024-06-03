@@ -1,5 +1,6 @@
 use core::panic;
 
+
 use crate::toolkit::nhwc_instr::ArithOp::{Add , Sub, Mul, Div};
 use std::fmt::Debug;
 use anyhow::*;
@@ -9,9 +10,9 @@ use super::cfg_node::InstrList;
 
 use super::field::Type::{self, F32, I32};
 
-use super::nhwc_instr::{BreakpointArg, Instruction};
+use super::nhwc_instr::{BreakpointArg, NhwcInstr};
 use super::symtab::{SymIdx};
-use super::{field::{Field, Value}, nhwc_instr::{ArithOp::*, InstrSlab, InstrType::*}, symbol::Symbol, symtab::{SymTab, SymTabEdge, SymTabGraph}};
+use super::{field::{Field, Value}, nhwc_instr::{ArithOp::*, InstrSlab, NhwcInstrType::*}, symbol::Symbol, symtab::{SymTab, SymTabEdge, SymTabGraph}};
 make_field_trait_for_struct!(Value,(usize,usize));
 // simu_func_pos_range 是一个左闭右开区间
 reg_field_for_struct!(Symbol{
@@ -27,6 +28,7 @@ pub struct Simulator{
     pub instr_list:InstrList,
     pub func_call_ctx_stack:Vec<FuncCallCtx>,
     pub text:String,
+    pub is_alloc_global_required:bool,
 }
 pub struct FuncCallCtx{
     func_symidx:SymIdx,   
@@ -58,17 +60,20 @@ pub struct SimuSymCtx{
     def_pos:Option<Option<usize>>,
 }
 impl Simulator{
-    // 输入从别处获得到的symtab , instr_list里是指令的序列
-    pub fn new(instr_l:InstrList) -> Self{
+    // 输入从别处获得到的symtab , instr_list里是指令的序列, is_alloc_global_required 是用于指定是否强制要求变量声明使用前必须 alloc或 global 的选项
+    pub fn new(instr_l:InstrList, is_alloc_global_required:bool) -> Self{
         Simulator{
             simu_symtab:SymTab::new(),
             cur_instr_pos:0,
             instr_list:instr_l,
             func_call_ctx_stack: vec![],
             text: String::new(),
+            is_alloc_global_required,
         }
     }
-    pub fn set_instr_pos_to_main(&mut self,instr_slab:&mut InstrSlab)->Result<()>{
+    /// Set the instr_pos to main and push the main frame to stack  
+    /// Add exit breakpoint and let simulator run it when main returned 
+    pub fn set_instr_pos_to_main(&mut self,instr_slab:&mut InstrSlab<NhwcInstr>)->Result<()>{
         let main_func_symidx = SymIdx::new(0, "main".to_string());
         let func_type = self.simu_symtab.get_symbol(&main_func_symidx).with_context(||format!("在设置main函数为开始运行点时找不到main符号"))?.get_type()?.clone();
         let ret_symidx = if let Type::Fn { arg_syms: _formal_arg_symidx_vec, ret_sym: ret_symidx } = &func_type {
@@ -78,20 +83,23 @@ impl Simulator{
         };
         let &main_pos = self.simu_symtab.get_symbol(&main_func_symidx)?.get_simu_label_pos()?;
         self.cur_instr_pos = main_pos;
+
+        // add exit breakpoint and let simulator run it when main returned 
         self.instr_list.push(instr_slab.insert_instr(BreakPoint { symidx: SymIdx::new(0, "exit".to_string()), breakpoint_args: vec![] }.to_instr()));
         self.func_call_ctx_stack.push(FuncCallCtx::new(main_func_symidx, ret_symidx, vec![], vec![], self.instr_list.len()-2, None));
+
         Ok(())
     }
     /// load函数负责在运行前将所有包含的函数符号及其参数和形式返回值以及label和Deffunc行号记录在案  
     /// 以确定跳转位置(ret or br)
-    pub fn load_instrs(&mut self,instr_slab:&InstrSlab) -> Result<()>{
+    pub fn load_instrs(&mut self,nhwc_instr_slab:&InstrSlab<NhwcInstr>) -> Result<()>{
         let instr = &self.instr_list;
         let simu_symtab = &mut self.simu_symtab;
 
         // 先扫一遍,找到所有的label 和 函数起始位置 并存入symtab
         let mut op_cur_define_func = None;
         for (pos,&l) in instr.iter().enumerate(){
-            let instr_struct = instr_slab.get_instr(l)?.clone();
+            let instr_struct = nhwc_instr_slab.get_instr(l)?.clone();
             match &instr_struct.instr_type {
                 Label { label_symidx } => {
                     add_symbol!({Symbol::new_from_symidx(label_symidx)}
@@ -141,7 +149,7 @@ impl Simulator{
         Ok(())
     }
     /// 这个函数会从cur_instr_pos 一直运行，一直到跑到断点或栈为空为止
-    pub fn exec_till_breakpoint(&mut self,instr_slab:&InstrSlab,src_symtab:&SymTab) -> Result<Option<(SymIdx,Vec<(BreakpointArg,SymIdx,Result<Box<dyn Field>>)>)>>{
+    pub fn exec_till_breakpoint(&mut self,instr_slab:&InstrSlab<NhwcInstr>,src_symtab:&SymTab) -> Result<Option<(SymIdx,Vec<(BreakpointArg,SymIdx,Result<Box<dyn Field>>)>)>>{
         // 运行完毕
         if self.cur_instr_pos >= self.instr_list.len() {
             return Err(anyhow!("simulator 运行到instr_list末尾了"));
@@ -273,7 +281,7 @@ impl Simulator{
     }
 
     /// 执行单条命令，返回 执行的Instruction的引用，并且，不会对cur_instr_pos 进行增加 返回 执行的Instruction 
-    pub fn exec_cur_instr(&mut self, instr_slab:&InstrSlab, src_symtab:&SymTab) -> Result<Instruction>{
+    pub fn exec_cur_instr(&mut self, instr_slab:&InstrSlab<NhwcInstr>, src_symtab:&SymTab) -> Result<NhwcInstr>{
         let instr = self.instr_list[self.cur_instr_pos];
         let instr_struct = instr_slab.get_instr(self.instr_list[self.cur_instr_pos])?;
         // println!("exec_single_instr : {:?}",instr_struct);
@@ -290,20 +298,26 @@ impl Simulator{
         }
         
         for def_symidx in instr_struct.get_def_symidx_vec(){
-            let _simu_symtab = &mut self.simu_symtab;
             let src_var_symidx= def_symidx.to_src_symidx();
-            if self.simu_symtab.has_symbol(&src_var_symidx){
-                let simu_symtab = &mut self.simu_symtab;
-                if !simu_symtab.has_symbol(&def_symidx){
-                    // 如果没有这个 var_symidx说名这是个 ssa变量，只是src_symidx 的一个版本，因此不妨定义一下这个版本
-                    add_symbol!({def_symidx.clone().into_symbol()}
-                        with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
-                        to simu_symtab
-                    );
-                }
-            }else{
+            let simu_symtab = &mut self.simu_symtab;
+            // 根据 is_alloc_global_required 选项选择是否报错（如果找不到 src_symidx 对应的符号）
+            if !simu_symtab.has_symbol(&src_var_symidx) && self.is_alloc_global_required{
                 return Err(anyhow!("变量 {:?} 的内存还没有被分配过",src_var_symidx))
+            }else if !simu_symtab.has_symbol(&src_var_symidx) && !self.is_alloc_global_required {
+                add_symbol!({src_var_symidx.clone().into_symbol()}
+                    with_field SIMU_VAL:{Value::new_unsure_from_specific_type(src_symtab.get_symbol(&src_var_symidx)?.get_type()?)}
+                    with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
+                    to simu_symtab
+                );
             }
+            
+            if !simu_symtab.has_symbol(&def_symidx){
+                // 如果没有这个 var_symidx说名这是个 ssa变量，只是src_symidx 的一个版本，因此不妨定义一下这个版本
+                add_symbol!({def_symidx.clone().into_symbol()}
+                    with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
+                    to simu_symtab
+                );
+            }            
         }
 
         match &instr_struct.instr_type{
@@ -557,7 +571,7 @@ impl Simulator{
                     );
                 }
             },
-            Global { lhs: _, var_symidx, vartype } => {
+            Global { var_symidx, vartype } => {
                 // 全局变量
                 let simu_symtab = &mut self.simu_symtab;
                 let src_var_symidx = var_symidx.to_src_symidx();
@@ -614,7 +628,7 @@ impl Simulator{
                                     // 数组
                                     Value::Array { value_map, dims: _, ele_ty: _ele_type } => {
                                         // 在数组中我们无法追踪 def_instr 因此无法使用 simu_add_value
-                                        value_map.add_ele_from_value(&offset, val)?
+                                        value_map.insert_ele_by_value_type_offset(&offset, val)?
                                     },
                                     _ => {
                                         // 普通指针
@@ -660,10 +674,11 @@ impl Simulator{
                     }
                 }
             },
+            Nope {  } => {},
         }
         Ok(instr_struct.clone())
     }
-    pub fn load_instr_text(&mut self,op_max_display_instr_num:Option<usize>,instr_slab:&InstrSlab) -> Result<()>{
+    pub fn load_instr_text(&mut self,op_max_display_instr_num:Option<usize>,instr_slab:&InstrSlab<NhwcInstr>) -> Result<()>{
         let instr_pos_num_radius= (op_max_display_instr_num.or(Some(self.instr_list.len())).unwrap().min(self.instr_list.len())+1)/2-1;
         let center_pos = self.cur_instr_pos.clamp(instr_pos_num_radius, self.instr_list.len() - instr_pos_num_radius-1);
         for instr_idx in center_pos - instr_pos_num_radius .. center_pos {
@@ -753,3 +768,4 @@ impl Debug for FuncCallCtx{
         write!(f,"func_symidx : {:?} \n args : {:?}",self.func_symidx,self.args)
     }
 }
+

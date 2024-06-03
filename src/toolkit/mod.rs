@@ -1,4 +1,5 @@
 pub mod ast_node;
+pub mod riscv_instr;
 pub mod cfg_edge;
 pub mod cfg_node;
 pub mod context;
@@ -22,7 +23,8 @@ pub mod gen_djg;
 pub mod dj_edge;
 pub mod dj_node;
 pub mod gen_ssa;
-pub mod def_use_node;
+pub mod dug_node;
 pub mod simulator;
 pub mod gen_dug;
 pub mod mem_layout;
+pub mod gen_riscv_asm;

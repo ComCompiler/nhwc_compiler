@@ -1,4 +1,4 @@
-use crate::toolkit::{context::NhwcCtx, pass_manager::Pass};
+use crate::toolkit::{context::NhwcCtx, gen_riscv_asm::parse_nhwcir2riscv, pass_manager::Pass};
 use anyhow::Result;
 #[derive(Debug)]
 pub struct Nhwc2RiscvDebugPass {
@@ -10,8 +10,10 @@ impl Nhwc2RiscvDebugPass {
 
 impl Pass for Nhwc2RiscvDebugPass {
     // 运行这个pass
-    fn run(&mut self, _ctx:&mut NhwcCtx) -> Result<()> {
+    fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> {
         // 拿到一个nhwc的vec,转化成汇编语言
+        let (cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab) = (&mut ctx.cfg_graph, &mut ctx.nhwc_instr_slab, &mut ctx.riscv_instr_slab, &mut ctx.symtab);
+        parse_nhwcir2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab)?;
         Ok(())
     }
     // 返回pass的描述，具体作用
@@ -19,15 +21,4 @@ impl Pass for Nhwc2RiscvDebugPass {
 
     // 返回pass的名称
     fn get_pass_name(&self) -> String { return "Nhwc2RiscvDebugPass".to_string(); }
-}
-impl Nhwc2RiscvDebugPass {
-    // pub fn nhwc2asm(&self,ctx:&mut Context , nhwc_vec : &Vec<Instruction>) -> Vec<String>{
-    //     // 拿到一个nhwc的vec,转化成汇编语言
-    //     let mut asm_vec : Vec<String> = Vec::new();
-    //     for inst in nhwc_vec{
-    //         let asm = inst.to_asm();
-    //         asm_vec.push(asm);
-    //     }
-    //     asm_vec
-    // }
 }

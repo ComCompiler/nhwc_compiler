@@ -14,7 +14,7 @@ use std::{cell::RefCell, mem, rc::Rc};
 
 */
 pub type ParserContext<'input> = <CParserContextType as antlr_rust::parser::ParserNodeType<'input>>::Type;
-pub type ASTGraphRcCell = Rc<RefCell<Graph<AstNode, (), petgraph::Directed>>>;
+// pub type ASTGraphRcCell = Rc<RefCell<Graph<AstNode, (), petgraph::Directed>>>;
 pub struct TerminalOnlyListener<S> {
     pub st:S, // status passing through the tree
     pub visit_term_f:Box<dyn FnMut(&ParserContext, &mut S) -> ()>,

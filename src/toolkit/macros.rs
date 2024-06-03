@@ -319,7 +319,7 @@ macro_rules! add_node {
 }
 
 #[macro_export]
-/// 用法 add_node_with_edge!($node_struct with edge $edgestruct from $node in $graph)
+/// 用法 add_node_with_edge!($node_struct with_edge $edgestruct from $node in $graph)
 /// 或你可以省略Edge(当你这个图中Edge确实定义是空的时候) add_node_with_edge!($node_struct $edgestruct from $node in $graph)
 macro_rules! add_node_with_edge {
     ($node_struct:ident from $from_node:ident in $graph:ident) => {{
@@ -327,7 +327,7 @@ macro_rules! add_node_with_edge {
         $graph.add_edge(petgraph::matrix_graph::NodeIndex::from($from_node), petgraph::matrix_graph::NodeIndex::from(node_id), ());
         node_id
     }};
-    ($node_struct:ident with edge $edgestruct:ident from $from_node:ident in $graph:ident) => {{
+    ($node_struct:ident with_edge $edgestruct:ident from $from_node:ident in $graph:ident) => {{
         let node_id = $graph.add_node($node_struct).index() as u32;
         $graph.add_edge(petgraph::matrix_graph::NodeIndex::from($from_node), petgraph::matrix_graph::NodeIndex::from(node_id), $edgestruct);
         node_id
@@ -337,7 +337,7 @@ macro_rules! add_node_with_edge {
         $graph.add_edge(petgraph::matrix_graph::NodeIndex::from($from_node), petgraph::matrix_graph::NodeIndex::from(node_id), ());
         node_id
     }};
-    ($node_struct:block with edge $edgestruct:block from $from_node:ident in $graph:ident) => {{
+    ($node_struct:block with_edge $edgestruct:block from $from_node:ident in $graph:ident) => {{
         let node_id = $graph.add_node($node_struct).index() as u32;
         $graph.add_edge(petgraph::matrix_graph::NodeIndex::from($from_node), petgraph::matrix_graph::NodeIndex::from(node_id), $edgestruct);
         node_id
@@ -360,7 +360,7 @@ macro_rules! add_symbol {
                         $crate::add_node!({$symtab.clone()} to symg);
                     }else {//如果已经有节点了,在最后一个节点上加点加边
                         idx-=1;
-                        $crate::add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("add_sym {}",symidx.symbol_name))} from idx in symg);
+                        $crate::add_node_with_edge!({$symtab.clone()} with_edge {SymTabEdge::new(format!("add_sym {}",symidx.symbol_name))} from idx in symg);
                     }
                 }
                 None => {},
@@ -391,7 +391,7 @@ macro_rules! add_symbol {
                         $crate::add_node!({$symtab.clone()} to symg);
                     }else {//如果已经有节点了,在最后一个节点上加点加边
                         idx-=1;
-                        $crate::add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("add_sym {}",symidx.symbol_name))} from idx in symg);
+                        $crate::add_node_with_edge!({$symtab.clone()} with_edge {SymTabEdge::new(format!("add_sym {}",symidx.symbol_name))} from idx in symg);
                     }
                 }
                 None => {},
@@ -416,7 +416,7 @@ macro_rules! add_symbol {
                         $crate::add_node!({$symtab.clone()} to symg);
                     }else {//如果已经有节点了,在最后一个节点上加点加边
                         idx-=1;
-                        $crate::add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("add_sym {}",symidx.symbol_name))} from idx in symg);
+                        $crate::add_node_with_edge!({$symtab.clone()} with_edge {SymTabEdge::new(format!("add_sym {}",symidx.symbol_name))} from idx in symg);
                     }
                 }
                 None => {},
@@ -439,7 +439,7 @@ macro_rules! add_field {
                     add_node!({$symtab.clone()} to symg);
                 }else {//如果已经有节点了,在最后一个节点上加点加边
                     idx-=1;
-                    add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("add_field {:?} to symbol {}",$field_name,$symidx.symbol_name))} from idx in symg);
+                    add_node_with_edge!({$symtab.clone()} with_edge {SymTabEdge::new(format!("add_field {:?} to symbol {}",$field_name,$symidx.symbol_name))} from idx in symg);
                 }
             }
             None => {},
@@ -462,7 +462,7 @@ macro_rules! add_field {
                     add_node!({$symtab.clone()} to symg);
                 }else {//如果已经有节点了,在最后一个节点上加点加边
                     idx-=1;
-                    add_node_with_edge!({$symtab.clone()} with edge {SymTabEdge::new(format!("add_field {:?} to symbol {}" ,$field_name ,$fields.symidx.symbol_name))} from idx in symg);
+                    add_node_with_edge!({$symtab.clone()} with_edge {SymTabEdge::new(format!("add_field {:?} to symbol {}" ,$field_name ,$fields.symidx.symbol_name))} from idx in symg);
                 }
             }
             None => {},
@@ -520,24 +520,6 @@ macro_rules! insert_instr {
             let cfg_node_struct = node_mut!(at $node in $graph);
             let instr = $instrslab.insert_instr($instr);
             cfg_node_struct.$instr_list.insert($idx,instr);
-            // $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.instrs.len()-1, false));
-            instr
-        }
-    };
-}
-#[macro_export]
-macro_rules! push_instr {
-    ($instr:ident to $node:ident in $graph:ident slab $instrslab:ident) =>{
-        {
-            let cfg_node_struct = node_mut!(at $node in $graph);
-            let instr = $instrslab.insert_instr($instr);
-            match &instr!(at instr in $instrslab)?.instr_type{
-                InstrType::Label { label_symidx: _ } => cfg_node_struct.op_label_instr = Some(instr),
-                InstrType::Phi { lhs: _, rhs: _ } => cfg_node_struct.phi_instrs.push(instr),
-                InstrType::Jump { jump_op: _ } => cfg_node_struct.op_jump_instr = Some(instr),
-                _ => cfg_node_struct.instrs.push(instr),
-            }
-
             // $instrslab.get_mut_instr(instr)?.add_cfg_instr_idx(CfgInstrIdx::new($node,cfg_node_struct.instrs.len()-1, false));
             instr
         }
@@ -649,7 +631,7 @@ macro_rules! reg_field_for_struct {
                                 $crate::add_node!({symtab.clone()} to symg);
                             }else {//如果已经有节点了,在最后一个节点上加点加边
                                 idx-=1;
-                                $crate::add_node_with_edge!({symtab.clone()} with edge {SymTabEdge::new(format!("get_field {}",$upper_field_name))} from idx in symg);
+                                $crate::add_node_with_edge!({symtab.clone()} with_edge {SymTabEdge::new(format!("get_field {}",$upper_field_name))} from idx in symg);
                             }
                         }
                         None => {},
@@ -666,7 +648,7 @@ macro_rules! reg_field_for_struct {
                                 $crate::add_node!({symtab.clone()} to symg);
                             }else {//如果已经有节点了,在最后一个节点上加点加边
                                 idx-=1;
-                                $crate::add_node_with_edge!({symtab.clone()} with edge {SymTabEdge::new(format!("get_mut_field {}",$upper_field_name))} from idx in symg);
+                                $crate::add_node_with_edge!({symtab.clone()} with_edge {SymTabEdge::new(format!("get_mut_field {}",$upper_field_name))} from idx in symg);
                             }
                         }
                         None => {},
@@ -685,7 +667,7 @@ macro_rules! reg_field_for_struct {
                                 $crate::add_node!({symtab.clone()} to symg);
                             }else {//如果已经有节点了,在最后一个节点上加点加边
                                 idx-=1;
-                                $crate::add_node_with_edge!({symtab.clone()} with edge {SymTabEdge::new(format!("add_field {}",stringify!($upper_field_name)))} from idx in symg);
+                                $crate::add_node_with_edge!({symtab.clone()} with_edge {SymTabEdge::new(format!("add_field {}",stringify!($upper_field_name)))} from idx in symg);
                             }
                         }
                         None => {},
@@ -700,7 +682,7 @@ macro_rules! reg_field_for_struct {
                                 $crate::add_node!({symtab.clone()} to symg);
                             }else {//如果已经有节点了,在最后一个节点上加点加边
                                 idx-=1;
-                                $crate::add_node_with_edge!({symtab.clone()} with edge {SymTabEdge::new(format!("remove_field {}",$upper_field_name))} from idx in symg);
+                                $crate::add_node_with_edge!({symtab.clone()} with_edge {SymTabEdge::new(format!("remove_field {}",$upper_field_name))} from idx in symg);
                             }
                         }
                         None => {},
@@ -738,77 +720,6 @@ macro_rules! make_field_trait_for_struct {
         )*
     };
 }
-// #[macro_export]
-// /// 生成 get 和 get_mut 函数  
-// /// 用法: make_get_field_fn_for_struct（structname with fields member_of_type_fields)
-// macro_rules! make_get_field_fn_for_struct {
-//     ($struct_name:ident with_fields $fields:ident) => {
-//         impl $struct_name {
-//             pub fn get_field(&self,field_name:&'static str) -> Option<&Box<dyn Field>>{
-//                 // println!("get field:{}",field_name);
-//                 self.$fields.get(field_name)
-//             }
-//             pub fn get_mut_field(&mut self, field_name:&'static str) -> Option<&mut Box<dyn Field>>{
-//                 // println!("get mut field:{}",field_name);
-//                 self.$fields.get_mut(field_name)
-//             }
-//             pub fn add_field(&mut self, field_name:&'static str ,field:Box<dyn Field>) -> Option<Box<dyn Field>>{
-//                 // println!("add field:{}",field_name);
-//                 self.$fields.insert(field_name,field)
-//             }
-
-//             // this is for debug 会把这个记录显示在 symttab graph 上，一般建议使用这个
-//             pub fn get_field_with_debug(&self,field_name:&'static str,symtab:&SymTab,symtab_graph:&mut Option<&mut SymTabGraph>) -> Option<&Box<dyn Field>>{
-//                 match symtab_graph{
-//                     Some(symg) => {
-//                         let mut idx:u32=(symg.node_count()).try_into().unwrap();
-//                         // 如果图里没有节点,即idx=0,add_node
-//                         if idx==0{
-//                             $crate::add_node!({symtab.clone()} to symg);
-//                         }else {//如果已经有节点了,在最后一个节点上加点加边
-//                             idx-=1;
-//                             $crate::add_node_with_edge!({symtab.clone()} with edge {SymTabEdge::new(format!("get_field {}",field_name))} from idx in symg);
-//                         }
-//                     }
-//                     None => {},
-//                 };
-//                 self.$fields.get(field_name)
-//             }
-//             pub fn get_mut_field_with_debug(&mut self, field_name:&str,symtab:&SymTab,symtab_graph:&mut Option<&mut SymTabGraph>) -> Option<&mut Box<dyn Field>>{
-//                 match symtab_graph{
-//                     Some(symg) => {
-//                         let mut idx:u32=(symg.node_count()).try_into().unwrap();
-//                         // 如果图里没有节点,即idx=0,add_node
-//                         if idx==0{
-//                             $crate::add_node!({symtab.clone()} to symg);
-//                         }else {//如果已经有节点了,在最后一个节点上加点加边
-//                             idx-=1;
-//                             $crate::add_node_with_edge!({symtab.clone()} with edge {SymTabEdge::new(format!("get_mut_field {}",field_name))} from idx in symg);
-//                         }
-//                     }
-//                     None => {},
-//                 };
-//                 self.$fields.get_mut(field_name)
-//             }
-//             pub fn add_field_with_debug(&mut self, field_name:&'static str ,field:Box<dyn Field>,symtab:&SymTab,symtab_graph:&mut Option<&mut SymTabGraph>) -> Option<Box<dyn Field>>{
-//                 match symtab_graph{
-//                     Some(symg) => {
-//                         let mut idx:u32=(symg.node_count()).try_into().unwrap();
-//                         // 如果图里没有节点,即idx=0,add_node
-//                         if idx==0{
-//                             $crate::add_node!({symtab.clone()} to symg);
-//                         }else {//如果已经有节点了,在最后一个节点上加点加边
-//                             idx-=1;
-//                             $crate::add_node_with_edge!({symtab.clone()} with edge {SymTabEdge::new(format!("add_field {}",field_name))} from idx in symg);
-//                         }
-//                     }
-//                     None => {},
-//                 }
-//                 self.$fields.insert(field_name,field)
-//             }
-//         }
-//     };
-// }
 
 #[macro_export]
 macro_rules! instr {

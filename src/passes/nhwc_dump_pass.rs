@@ -2,10 +2,10 @@ use std::fs;
 use std::io::{Write};
 
 
-use crate::toolkit::nhwc_instr::InstrType;
+use crate::toolkit::nhwc_instr::NhwcInstrType;
 use crate::toolkit::scope_node::ST_ROOT;
 use crate::toolkit::symtab::SymIdx;
-use crate::{direct_child_node, instr, node_mut, push_instr};
+use crate::{direct_child_node, instr, node_mut};
 
 use crate::{node, toolkit::{cfg_edge::CfgEdgeType, context::NhwcCtx, etc::dfs_with_priority, pass_manager::Pass}};
 use anyhow::*;
@@ -34,7 +34,7 @@ impl Pass for NhwcDumpPass {
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> { 
         let mut nhwc_ir_vec = vec![];
         
-        let (args,instr_slab,cfg_graph,nhwc_ir_list) = (&ctx.args,&mut ctx.instr_slab,&mut ctx.cfg_graph, &mut ctx.collected_nhwc_ir);
+        let (args,instr_slab,cfg_graph,nhwc_ir_list) = (&ctx.args,&mut ctx.nhwc_instr_slab,&mut ctx.cfg_graph, &mut ctx.collected_nhwc_ir);
         let dfs_node_vec = dfs_with_priority(cfg_graph,0,|e| match &e.weight().cfg_edge_type{
             CfgEdgeType::BodyHead {  } => 1,
             CfgEdgeType::IfFalse {  } => 2,
@@ -51,8 +51,8 @@ impl Pass for NhwcDumpPass {
             if !(cfg_node_struct.cfg_node_type.is_exit() || 
                 cfg_node_struct.cfg_node_type.is_entry() ||
                 cfg_node_struct.cfg_node_type.is_root()) && cfg_node_struct.op_label_instr.is_none(){
-                    let anonymous_label= InstrType::new_label(SymIdx::new(ST_ROOT, format!("%{}",anonymous_label_count))).to_instr();
-                    push_instr!(anonymous_label to cfg_node in cfg_graph slab instr_slab);
+                    let anonymous_label= NhwcInstrType::new_label(SymIdx::new(ST_ROOT, format!("%{}",anonymous_label_count))).to_instr();
+                    node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(anonymous_label, instr_slab);
                     anonymous_label_count +=1;
             }
         }
@@ -61,10 +61,10 @@ impl Pass for NhwcDumpPass {
                 let cfg_node_to_jump =direct_child_node!(at cfg_node in cfg_graph); 
                 if let Some(label_instr_to_jump) =node!(at cfg_node_to_jump in cfg_graph).op_label_instr{
                     match &instr!(at label_instr_to_jump in instr_slab)?.instr_type{
-                        InstrType::Label { label_symidx } => {
-                            let jump_instr_struct = InstrType::new_jump(label_symidx.clone()).to_instr();
+                        NhwcInstrType::Label { label_symidx } => {
+                            let jump_instr_struct = NhwcInstrType::new_jump(label_symidx.clone()).to_instr();
                             if let None = node!(at cfg_node in cfg_graph).op_jump_instr{
-                                push_instr!(jump_instr_struct to cfg_node in cfg_graph slab instr_slab);
+                                node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(jump_instr_struct, instr_slab);
                             }
                         },
                         _=>{return Err(anyhow!("cfg_node 的 label_instr 不可能为 除了label 以外的类型"))}
