@@ -28,8 +28,6 @@ macro_rules! find {
             find!(term $fin_id at new_node in $ast_tree)
         }
     };
-
-
     (term $term_name:ident at $node:ident in $ast_tree:ident) => {
         {
             let mut iter  = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,Some($term_name));

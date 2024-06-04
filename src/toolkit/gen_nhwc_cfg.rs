@@ -4,6 +4,7 @@ use petgraph::{
     graph::node_index, visit::EdgeRef
 };
 use std::collections::HashMap;
+use super::cfg_node::CFG_ROOT;
 use super::et_node::{EtNode, ExprOp};
 use super::field::{ArrayEleMap, Value};
 use super::mem_layout::MemLayout;
@@ -12,11 +13,11 @@ use super::{
     ast_node::AstTree, cfg_node::CfgGraph, et_node::{DeclOrDefOrUse, EtNodeType, EtTree}, gen_et::process_any_stmt, nhwc_instr::NhwcInstrType, scope_node::ScopeTree, symtab::{SymIdx, SymTab, SymTabGraph}
 };
 use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_instr::InstrSlab};
-use crate::antlr_parser::clexer::Identifier;
-use crate::antlr_parser::cparser::{RULE_breakpointArg, RULE_breakpointStatement, RULE_returnStatement};
+use crate::antlr_parser::clexer::{Identifier, LeftParen};
+use crate::antlr_parser::cparser::{RULE_breakpointArg, RULE_breakpointStatement, RULE_initDeclarator, RULE_initDeclaratorList, RULE_returnStatement};
 use crate::toolkit::nhwc_instr::BreakpointArg;
 use crate::toolkit::scope_node::ST_ROOT;
-use crate::{debug_info_blue, direct_parent_node};
+use crate::{direct_parent_node};
 use crate::{
     add_edge, add_node_with_edge, add_symbol, antlr_parser::cparser::{
         RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_jumpStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
@@ -109,7 +110,7 @@ fn parse_bb2nhwc(
             (RULE_declaration, declaration_node) => {
                 if let Some(&decl_scope) = ast2scope.get(&declaration_node) {
                     let decl_scope = node!(at decl_scope in scope_tree).parent.unwrap();
-                    parse_declaration2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, decl_scope, declaration_node, cfg_bb, counter, instr_slab, symtab_g)?
+                    parse_declvar2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, decl_scope, declaration_node, cfg_bb, counter, instr_slab, symtab_g)?
                 } else {
                     return Err(anyhow!("找不到astnode{}的scope", declaration_node));
                 }
@@ -161,7 +162,7 @@ fn parse_bb2nhwc(
                 }
             }
             (RULE_jumpStatement, jump_node) => {
-                debug_info_blue!("visit jumpstmt at {jump_node}");
+                // debug_info_blue!("visit jumpstmt at {jump_node}");
                 if let Some(&jump_scope) = ast2scope.get(&jump_node){
                     let jump_parent_scope = node!(at jump_scope in scope_tree).parent.unwrap();
                     if let Some(ret_stmt_ast) = find!(rule RULE_returnStatement at jump_node in ast_tree){
@@ -170,7 +171,7 @@ fn parse_bb2nhwc(
                         if let  Some(ret_expr_ast)= find!(rule RULE_expression at ret_stmt_ast in ast_tree){
                             let ret_et_sep = process_any_stmt(et_tree, ast_tree, scope_tree, ret_expr_ast, jump_parent_scope);
                             let ret_sep_child_nodes = direct_child_nodes!(at ret_et_sep in et_tree);
-                            debug_info_blue!("jump child nodes of {} is {:?}",ret_et_sep , ret_sep_child_nodes);
+                            // debug_info_blue!("jump child nodes of {} is {:?}",ret_et_sep , ret_sep_child_nodes);
                             // check_child_nodes(&jump_stmt, 1)?;
                             match ret_sep_child_nodes.len(){
                                 x if x ==1 =>{
@@ -273,7 +274,7 @@ fn parse_forloop2nhwc(
             if let Some(&before_scope) = ast2scope.get(&ast_before_node) {
                 let before_parent_scope = node!(at before_scope in scope_tree).parent.unwrap();
                 let before_ast = direct_child_node!(at ast_before_node in ast_tree);
-                parse_declaration2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, before_parent_scope, before_ast, cfg_new_bb_node, counter, instr_slab, symtab_graph)?
+                parse_declvar2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, before_parent_scope, before_ast, cfg_new_bb_node, counter, instr_slab, symtab_graph)?
             } else {
                 return Err(anyhow!("找不到astnode的scope"));
             }
@@ -1171,7 +1172,7 @@ fn process_et(
                     };
                     node_mut!(at et_l_child in et_tree).add_dims(l_child_dims.clone());
 
-                    debug_info_blue!("the current et_node is {}",et_node);
+                    // debug_info_blue!("the current et_node is {}",et_node);
 
                     //通过 process_et 递归至下一层 根据 declordef 有不同的可能返回值 declare 可能返回指针  
                     let array_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_l_child, scope_node, cfg_bb, counter, instr_slab, symtab_graph)?;
@@ -1182,9 +1183,9 @@ fn process_et(
 
                             // 可删此段
                             let mut l_child_type = node!(at et_l_child in et_tree).get_type()?.clone();
-                            debug_info_blue!("left child type {:?}",l_child_type);
+                            // debug_info_blue!("left child type {:?}",l_child_type);
                             l_child_type.pop_dim()?;
-                            debug_info_blue!("poped left child type {:?}",l_child_type);
+                            // debug_info_blue!("poped left child type {:?}",l_child_type);
                             node_mut!(at et_node in et_tree).add_type(l_child_type);
 
                             let array_ty = symtab.get_symbol(&array_symidx)?.get_type()?.clone();
@@ -1204,11 +1205,11 @@ fn process_et(
                         EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, def_or_use:DeclOrDefOrUse::Use } => {
                             // 在最接近 symbol 的一层 array_index 插入 getelementptr 语句
                             let array_ty = symtab.get_symbol(&array_symidx)?.get_type()?.clone();
-                            debug_info_blue!("array {:?} type is {:?}", array_symidx,array_ty);
+                            // debug_info_blue!("array {:?} type is {:?}", array_symidx,array_ty);
                             // 可删此段
                             let l_child_type = node!(at et_l_child in et_tree).get_type()?.clone();
-                            debug_info_blue!("left child type {:?}",l_child_type);
-                            debug_info_blue!("poped left child type {:?}",l_child_type);
+                            // debug_info_blue!("left child type {:?}",l_child_type);
+                            // debug_info_blue!("poped left child type {:?}",l_child_type);
                             node_mut!(at et_node in et_tree).add_type(l_child_type);
 
                             let ele_ty = match &array_ty{
@@ -1230,8 +1231,8 @@ fn process_et(
 
                             // 可删此段
                             let l_child_type = node!(at et_l_child in et_tree).get_type()?.clone();
-                            debug_info_blue!("left child type {:?}",l_child_type);
-                            debug_info_blue!("poped left child type {:?}",l_child_type);
+                            // debug_info_blue!("left child type {:?}",l_child_type);
+                            // debug_info_blue!("poped left child type {:?}",l_child_type);
                             node_mut!(at et_node in et_tree).add_type(l_child_type);
 
                             let array_ty = symtab.get_symbol(&array_symidx)?.get_type()?.clone();
@@ -1331,7 +1332,7 @@ fn process_et(
         EtNodeType::Constant { const_sym_idx: _, ast_node, text: _ } => {
             let ast_node = *ast_node;
             let constant_literal = &node!(at ast_node in ast_tree).text;
-            debug_info_blue!("add constant {}",constant_literal);
+            // debug_info_blue!("add constant {}",constant_literal);
             Ok(process_constant(symtab, constant_literal, symtab_graph)?)
         }
         EtNodeType::Symbol { sym_idx: _, ast_node, text: _, def_or_use } => {
@@ -1343,9 +1344,59 @@ fn process_et(
         _ => return Err(anyhow!("{}不应出现sep类型的et", et_node)),
     }
 }
+/// add func symbol to symtab and push def_func instr to cfg_root
+fn parse_declfunc2nhwc(
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab,et_tree:&mut EtTree, ast2scope:&HashMap<u32, u32>, decl_func_ast_node:u32, func_name_ast_node:u32, cfg_root:u32, instr_slab:&mut InstrSlab<NhwcInstr>,
+    op_symtab_graph:&mut Option<&mut SymTabGraph>,scope_tree:&mut ScopeTree,
+) -> Result<()> {
+    //获取函数所对应的scopenode
+    if let Some(&func_scope) = ast2scope.get(&decl_func_ast_node) {
+        //获取函数名称
+        let func_name = &node!(at func_name_ast_node in ast_tree).text;
+        // let name_symidx = SymIdx::new(0, func_name.to_string());
+        //获取返回类型
+        let ast_retype = find!(rule RULE_declarationSpecifiers at decl_func_ast_node in ast_tree).unwrap();
+        let _func_rettype = &node!(at ast_retype in ast_tree).text;
+        //获取参数列表
+        let mut arg_syms:Vec<SymIdx> = vec![];
+        //添加到符号表中，
+        let func_symidx = process_func_symbol(symtab, op_symtab_graph,func_name)?;
+        let _:Vec<_> = etc::dfs(cfg_graph, cfg_root).iter().map(|&cfg_node|{node_mut!(at cfg_node in cfg_graph).add_func_cor_symidx(func_symidx.clone())}).collect();
+        // 添加返回值到符号表
+        let func_ret_symidx = process_symbol(ast_tree, scope_tree, symtab, &DeclOrDefOrUse::DeclDef { type_ast_node: ast_retype }, &format!("{}_{}",func_name,"ret"), 0, op_symtab_graph, cfg_root, cfg_graph, None,et_tree)?;
+        //函数有参数
+        let func_type = if let Some(para) = find!(rule RULE_initDeclaratorList then RULE_initDeclarator then RULE_declarator then RULE_directDeclarator finally RULE_parameterTypeList at decl_func_ast_node in ast_tree) {
+            let ast_func_args = find_nodes!(rule RULE_parameterList finally RULE_parameterDeclaration at para in ast_tree);
+            for ast_func_arg in ast_func_args {
+                let ast_para_sym = find!(rule RULE_declarator at ast_func_arg in ast_tree).unwrap();
+                let ast_arg_type = find!(rule RULE_declarationSpecifiers at ast_func_arg in ast_tree).unwrap();
+                let func_arg_str = &node!(at ast_para_sym in ast_tree).text;
+                let arg_symidx = process_symbol(ast_tree, scope_tree, symtab, &DeclOrDefOrUse::DeclDef { type_ast_node:ast_arg_type }, func_arg_str, func_scope, op_symtab_graph, cfg_root, cfg_graph,None,et_tree)?;
+                arg_syms.push(arg_symidx);
+            }
+            let func_type = Type::Fn { arg_syms: arg_syms.clone(), ret_sym:func_ret_symidx.clone()};
+            symtab.get_mut_symbol(&func_symidx)?.add_type(func_type.clone());
+            // label:function
+            func_type
+        }
+        //函数无参数，则不需要处理参数部分
+        else {
+            let func_type = Type::Fn { arg_syms: vec![], ret_sym:func_ret_symidx.clone()};
+            symtab.get_mut_symbol(&func_symidx)?.add_type(func_type.clone());
+            func_type
+        };
+        //将函数签名转为 global ir
+        let func_instr = NhwcInstrType::new_global(func_type,func_symidx.clone()).to_instr();
+
+        node_mut!(at cfg_root in cfg_graph ).push_nhwc_instr(func_instr, instr_slab)?;
+    } else {
+        return Err(anyhow!("找不到ast_node:{}对应函数的scopenode!", decl_func_ast_node));
+    }
+    Ok(())
+}
 
 ///定义变量的decl转为ir，并通过et查找元素是否合法
-fn parse_declaration2nhwc(
+fn parse_declvar2nhwc(
     ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab, scope_tree:&ScopeTree, et_tree:&mut EtTree, decl_parent_scope:u32, ast_decl_node:u32, cfg_node:u32, counter:&mut u32,
     instr_slab:&mut InstrSlab<NhwcInstr>, symtab_g:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
@@ -1356,7 +1407,7 @@ fn parse_declaration2nhwc(
     for et_sep_item_node in detail_et_nodes {
         let et_node_type = &node!(at et_sep_item_node in et_tree).et_node_type.clone();
         match et_node_type {
-            /// 先考虑这个语句存在 = 的情况
+            // 先考虑这个语句存在 = 的情况
             EtNodeType::Operator { op: ExprOp::Assign, ast_node: _, text: _ } => {
                 let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_sep_item_node, decl_parent_scope, cfg_node, counter, instr_slab, symtab_g)?;
                 let var_type = symtab.get_symbol(&var_symidx)?.get_type()?.clone();
@@ -1378,7 +1429,7 @@ fn parse_declaration2nhwc(
                 // let defvar_instr = InstrType::new_def_var(var_type.clone(), var_symidx.clone(), Some(transed_value_symidx.clone())).to_instr();
                 // node_mut!(at cfg_node in cfg_graph ).push_nhwc_instr(defvar_instr, instr_slab)??;
             }
-            /// 考虑这个语句的 et_sep_item_node 不是 = 的情况
+            // 考虑这个语句的 et_sep_item_node 不是 = 的情况
             EtNodeType::Operator { op: _, ast_node: _, text: _ } => {
                 // debug_info_red!("no =  as start ");
                 let _op_values = direct_child_nodes!(at et_sep_item_node in et_tree);
@@ -1427,18 +1478,18 @@ fn parse_declaration2nhwc(
     Ok(())
 }
 
-///将函数名存入符号表，将函数签名处理为ir，并处理函数体内的语句
+/// add func symbol to symtab and push def_func instr to cfg_entry
 fn parse_func2nhwc(
-    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab,et_tree:&mut EtTree, ast2scope:&HashMap<u32, u32>, ast_fun:u32, ast_funsign:u32, cfg_entry:u32, instr_slab:&mut InstrSlab<NhwcInstr>,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab,et_tree:&mut EtTree, ast2scope:&HashMap<u32, u32>, func_def_ast_node:u32, func_name_ast_node:u32, cfg_entry:u32, instr_slab:&mut InstrSlab<NhwcInstr>,
     op_symtab_graph:&mut Option<&mut SymTabGraph>,scope_tree:&mut ScopeTree,
 ) -> Result<()> {
     //获取函数所对应的scopenode
-    if let Some(&func_scope) = ast2scope.get(&ast_fun) {
+    if let Some(&func_scope) = ast2scope.get(&func_def_ast_node) {
         //获取函数名称
-        let func_name = &node!(at ast_funsign in ast_tree).text;
+        let func_name = &node!(at func_name_ast_node in ast_tree).text;
         // let name_symidx = SymIdx::new(0, func_name.to_string());
         //获取返回类型
-        let ast_retype = find!(rule RULE_declarationSpecifiers at ast_fun in ast_tree).unwrap();
+        let ast_retype = find!(rule RULE_declarationSpecifiers at func_def_ast_node in ast_tree).unwrap();
         let _func_rettype = &node!(at ast_retype in ast_tree).text;
         //获取参数列表
         let mut arg_syms:Vec<SymIdx> = vec![];
@@ -1448,7 +1499,7 @@ fn parse_func2nhwc(
         // 添加返回值到符号表
         let func_ret_symidx = process_symbol(ast_tree, scope_tree, symtab, &DeclOrDefOrUse::DeclDef { type_ast_node: ast_retype }, &format!("{}_{}",func_name,"ret"), 0, op_symtab_graph, cfg_entry, cfg_graph, None,et_tree)?;
         //函数有参数
-        if let Some(para) = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_parameterTypeList at ast_fun in ast_tree) {
+        if let Some(para) = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_parameterTypeList at func_def_ast_node in ast_tree) {
             let ast_func_args = find_nodes!(rule RULE_parameterList finally RULE_parameterDeclaration at para in ast_tree);
             //将函数签名转为ir
             for ast_func_arg in ast_func_args {
@@ -1478,7 +1529,7 @@ fn parse_func2nhwc(
 
         node_mut!(at cfg_entry in cfg_graph ).push_nhwc_instr(func_instr, instr_slab)?;
     } else {
-        return Err(anyhow!("找不到{}该函数的scopenode!", ast_fun));
+        return Err(anyhow!("找不到{}该函数的scopenode!", func_def_ast_node));
     }
     Ok(())
 }
@@ -1493,8 +1544,23 @@ pub fn parse_cfg_into_nhwc_cfg(
 
     let start_node=0;
     if let CfgNodeType::Root { static_ast_nodes } = &node!(at start_node in cfg_graph).cfg_node_type{
-        for static_ast_node in static_ast_nodes.clone().iter(){
-            parse_declaration2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, 0, *static_ast_node, start_node, &mut counter, instr_slab, symtab_graph)?;
+        for &static_ast_node in static_ast_nodes.clone().iter(){
+            let op_arg_parenthesis = find!(rule RULE_initDeclaratorList
+                then RULE_initDeclarator
+                then RULE_declarator
+                then RULE_directDeclarator
+                finally term LeftParen
+                at static_ast_node in ast_tree
+            );
+            match op_arg_parenthesis{
+                Some(_) => {
+                    let func_name_ast_node = find!(rule RULE_initDeclaratorList then RULE_initDeclarator then RULE_declarator then RULE_directDeclarator finally RULE_directDeclarator at static_ast_node in ast_tree).unwrap();
+                    parse_declfunc2nhwc(ast_tree, cfg_graph, symtab, et_tree, &ast2scope, static_ast_node, func_name_ast_node, CFG_ROOT, instr_slab, symtab_graph, scope_tree)?;
+                },
+                None => {
+                    parse_declvar2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, 0, static_ast_node, start_node, &mut counter, instr_slab, symtab_graph)?;
+                },
+            }
         } 
     }
     //先遍历一遍函数名，将函数名加入到符号表中
@@ -1504,9 +1570,9 @@ pub fn parse_cfg_into_nhwc_cfg(
             CfgNodeType::Entry { ast_node, calls_in_func: _ } => {
                 //查找函数名称所在节点
                 let func_def_ast_node = *ast_node;
-                let ast_funsign = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_directDeclarator at func_def_ast_node in ast_tree).unwrap();
+                let func_name_ast_node = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_directDeclarator at func_def_ast_node in ast_tree).unwrap();
 
-                parse_func2nhwc(ast_tree, cfg_graph, symtab,et_tree, ast2scope, func_def_ast_node, ast_funsign, cfg_entry, instr_slab, symtab_graph, scope_tree)?;
+                parse_func2nhwc(ast_tree, cfg_graph, symtab,et_tree, ast2scope, func_def_ast_node, func_name_ast_node, cfg_entry, instr_slab, symtab_graph, scope_tree)?;
             }
             _ => return Err(anyhow!("entry不是函数签名,cfg出错")),
         }
@@ -1703,7 +1769,7 @@ pub fn get_cfg_entry_by_cfg_node(cfg_graph:&CfgGraph,symtab:&SymTab,cfg_node:u32
 /// array init
 /// require input `reversed_remained_dims` dimensions to be reversed 
 pub fn array_initialize(et_node_vec:Vec<u32>, et_tree:&mut EtTree, array_ele_map:&mut ArrayEleMap, ele_type:&Type,reversed_remained_dims:&mut Vec<usize>, array_offset:&mut usize) -> Result<()>{
-    debug_info_blue!("array_init " );
+    // debug_info_blue!("array_init " );
     let mut i = 0;
     while i < et_node_vec.len(){
         let et_node = et_node_vec[i];
@@ -1718,7 +1784,7 @@ pub fn array_initialize(et_node_vec:Vec<u32>, et_tree:&mut EtTree, array_ele_map
             // 这里 pop 掉
             let cur_dim = reversed_remained_dims.pop().unwrap();
             let ele_count_to_read:usize = reversed_remained_dims.iter().product();
-            debug_info_blue!("ele_count_to_read =  {},{:?}",ele_count_to_read , reversed_remained_dims);
+            // debug_info_blue!("ele_count_to_read =  {},{:?}",ele_count_to_read , reversed_remained_dims);
 
             let last_i = i;
             while i < last_i+ele_count_to_read{
@@ -1729,7 +1795,7 @@ pub fn array_initialize(et_node_vec:Vec<u32>, et_tree:&mut EtTree, array_ele_map
                 match &node!(at et_node in et_tree).et_node_type{
                     EtNodeType::Constant { const_sym_idx, ast_node: _, text: _ } => {
                         array_ele_map.insert_ele(*array_offset, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?)?;
-                        debug_info_blue!("add array ele with offset {},{:?}",i, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?);
+                        // debug_info_blue!("add array ele with offset {},{:?}",i, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?);
                         *array_offset +=1;
                     },
                     EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _ }=>{
@@ -1744,7 +1810,7 @@ pub fn array_initialize(et_node_vec:Vec<u32>, et_tree:&mut EtTree, array_ele_map
             // 不足的补 0 
             while i< last_i + ele_count_to_read{
                 // array_ele_map.add_ele_from_usize(*array_offset, Value::from_string_with_specific_type(&"0".to_string(), ele_type)?)?;
-                debug_info_blue!("add array ele with offset {},{:?}",*array_offset, Value::from_string_with_specific_type(&"0".to_string(), ele_type)?);
+                // debug_info_blue!("add array ele with offset {},{:?}",*array_offset, Value::from_string_with_specific_type(&"0".to_string(), ele_type)?);
                 *array_offset+=1;
                 i+=1;
             }

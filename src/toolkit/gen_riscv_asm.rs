@@ -1,18 +1,23 @@
 use itertools::*;
-use std::{fmt::{format, Debug}};
 
-use crate::{debug_info_green, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run};
+use std::{fmt::{format, Debug}, ops::Index};
+
+use crate::{debug_info_green, direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run};
 use anyhow::*;
 use itertools::Itertools;
 
-use super::{cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::generate_png_by_graph, field::{Fields, Value}, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, riscv_instr::RiscvInstr, simulator::Simulator, symtab::{SymIdx, SymTab}};
+use super::{cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::generate_png_by_graph, field::{Fields, Value}, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, riscv_instr::{Imm, Register, RiscvInstr}, simulator::Simulator, symtab::{self, SymIdx, SymTab}};
 
 /// convert nhwc ir into riscv
 pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RiscvInstr>, src_symtab:&SymTab)->Result<()>{
     // firstly process root which contains global vars 
-    parse_root2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab)?;
+    let mut asm_structure = AsmStructure::new();
+    let static_init_sect = parse_root2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab)?;
+    asm_structure.sects.push(static_init_sect);
+    let func_entry_sect = parse_entry2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab)?;
+    asm_structure.sects.push(func_entry_sect);
+    println!("{:?}",asm_structure);
     Ok(())
-    
 }
 /// convert `cfg_root_node` into riscv  
 /// assumes that there are only global and some calculating instrs so that `simulator` can run directly
@@ -33,25 +38,205 @@ fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhwc
     for &instr in node!(at CFG_ROOT in cfg_graph).instrs.iter(){
         match &instr!(at instr in nhwc_instr_slab)?.instr_type{
             NhwcInstrType::Global { var_symidx, vartype } => {
-                asm_sect.align(vartype.get_align()?);
-                asm_sect.global(var_symidx.clone());
-                asm_sect.obj_type(var_symidx.clone());
-                asm_sect.label(var_symidx.clone());
-                asm_sect.apply_value(simulator.simu_symtab.get_symbol(&var_symidx.to_src_symidx())?.get_simu_val()?)?;
+                match vartype{
+                    super::field::Type::Fn { arg_syms, ret_sym } => {
+                        // do nothing when it is a function
+                    },
+                    _ => {
+                        asm_sect.align(vartype.get_align()?);
+                        asm_sect.global(var_symidx.clone());
+                        asm_sect.annotation(format!("{:?}",&instr!(at instr in nhwc_instr_slab)?));
+                        asm_sect.obj_type(var_symidx.clone());
+                        asm_sect.label(var_symidx.clone());
+                        asm_sect.apply_value(simulator.simu_symtab.get_symbol(&var_symidx.to_src_symidx())?.get_simu_val()?)?;
+                    }
+                }
             },
             _ => {
                 // do nothing 
             }
         }
     }
-    println!("{:?}",asm_sect);
        
     Ok(asm_sect)
 }
+///    ($func_name:ident,$a:ident,$b:ident,$reg1:ident,$reg2:ident,$reg3:ident with_symtab $src_symtab:ident) => {
+macro_rules! BinOp {
+    (sect $asm_sect:ident func_name $func_name:ident args{$a:ident,$b:ident,$reg1:expr,$reg2:expr,$reg3:expr} with_symtab $src_symtab:ident) => {
+        match (*$src_symtab.get_symbol($a)?.get_is_const()?,*$src_symtab.get_symbol($a)?.get_is_const()?){
+            (true, true) => {
+                $asm_sect.asm(RiscvInstr::new_ADDI(Register::new_s($reg1), Register::Zero, Imm::Constant { symidx:$a.clone() }));
+                $asm_sect.asm(RiscvInstr::new_ADDI(Register::new_s($reg1), Register::new_s($reg2), Imm::Constant { symidx:$a.clone() }));
+            },
+            (true, false) => {
+                $asm_sect.asm(RiscvInstr::new_ADDI(Register::new_s($reg1), Register::Zero, Imm::Constant { symidx:$a.clone() }));
+                load_sym(&mut $asm_sect, $a, Register::new_s($reg2), $src_symtab)?;
+                $asm_sect.asm(RiscvInstr::$func_name(Register::new_s($reg3), Register::new_s($reg1), Register::new_s($reg2)));
+            },
+            (false, true) => {
+                load_sym(&mut $asm_sect, $a, Register::new_s($reg1), $src_symtab)?;
+                $asm_sect.asm(RiscvInstr::new_ADDI(Register::new_s($reg2), Register::Zero, Imm::Constant { symidx:$a.clone() }));
+                $asm_sect.asm(RiscvInstr::$func_name(Register::new_s($reg3), Register::new_s($reg1), Register::new_s($reg2)));
+            },
+            (false, false) => {
+                load_sym(&mut $asm_sect, $a, Register::new_s($reg1), $src_symtab)?;
+                load_sym(&mut $asm_sect, $b, Register::new_s($reg2), $src_symtab)?;
+                $asm_sect.asm(RiscvInstr::$func_name(Register::new_s($reg3), Register::new_s($reg1), Register::new_s($reg2)));
+            },
+        }
+
+    };
+}
 /// convert `cfg_entry_node` into riscv 
 /// assume first instr be func_def instr while others are alloc instr
-fn parse_entry2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RiscvInstr>, src_symtab:&SymTab){
+fn parse_entry2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RiscvInstr>, src_symtab:&SymTab) -> Result<AsmSection>{
+    let entries = direct_child_nodes!(at CFG_ROOT in cfg_graph);
+    let mut asm_sect = AsmSection::new();
+    asm_sect.data() ;
+    for entry in entries{
+        let entry_node = node_mut!(at entry in cfg_graph);
+        // 
+        // if entry_node.instrs.len()> 0{
+        //     let func_def_instr = entry_node.instrs[0];
+        //     match &instr!(at func_def_instr in nhwc_instr_slab)?.instr_type{
+        //         NhwcInstrType::DefineFunc { func_symidx, ret_symidx, args } => {
+        //             asm_sect.global(func_symidx.clone());
+        //             asm_sect.func_type(func_symidx.clone());
+        //             asm_sect.label(func_symidx.clone());
+        //         },
+        //         _ => {
+        //             return Err(anyhow!("the first instr of cfg_entry_node is not func_def_instr but {:?}",&instr!(at func_def_instr in nhwc_instr_slab)?));
+        //         }
+        //     }
+        // }else{
+        //     return Err(anyhow!("no instr in entry {entry}"));
+        // }
+        for &instr in entry_node.instrs.iter().skip(1) {
+            let instr_struct = instr!(at instr in nhwc_instr_slab)?;
+            match &instr_struct.instr_type{
+                NhwcInstrType::Label { label_symidx } => {
+                    asm_sect.label(label_symidx.clone());
+                },
+                NhwcInstrType::DefineFunc { func_symidx, ret_symidx, args } => {
+                    asm_sect.global(func_symidx.clone());
+                    asm_sect.func_type(func_symidx.clone());
+                    asm_sect.label(func_symidx.clone());
+                },
+                NhwcInstrType::DefineVar { var_symidx, vartype, op_value } => {
+                    match op_value{
+                        Some(symidx) => {
+                            asm_sect.asm(RiscvInstr::new_ADDI(Register::new_s(3) , Register::Zero {  }, Imm::new_const(symidx.clone())));
+                        },
+                        None => {},
+                    }
+                },
+                NhwcInstrType::Alloc { var_symidx, vartype } => {
+                    
+                },
+                NhwcInstrType::Global { var_symidx, vartype } => {
 
+                },
+                NhwcInstrType::Load { lhs, ptr_symidx, ptr_ty } => {
+                    // // load the pointer to s1
+                    // let &ptr_offset2sp = src_symtab.get_symbol(ptr_symidx)?.get_mem_offset2sp()?;
+                    // asm_sect.asm(RiscvInstr::new_LW(Register::new_s(1) , Register::SP {  }, Imm::from_offset(ptr_offset2sp)));
+                    // // load the value to s2
+                    // let &value_offset2sp = src_symtab.get_symbol()?.get_mem_offset2sp()?;
+                    // asm_sect.asm(RiscvInstr::new_LW(Register::new_s(2) , Register::SP {  }, Imm::from_offset(value_offset2sp)));
+                },
+                NhwcInstrType::Store { value_symidx, value_ty, ptr_symidx, ptr_ty } => {
+                    // load the pointer to s1
+                    // load the value to s2
+                    // let &value_offset2sp = src_symtab.get_symbol(value_symidx)?.get_mem_offset2sp()?;
+                    // asm_sect.asm(RiscvInstr::new_LW(Register::new_s(2) , Register::SP {  }, Imm::from_offset(value_offset2sp)));
+                    // store s2 to s1
+                    // asm_sect.asm(RiscvInstr::new_SW(Register::new_s(1) , Register::new_s(2), Imm::from_offset(0)));
+                },
+                NhwcInstrType::GetElementPtr { lhs, array_symidx, array_ty, idx_vec } => {
+
+                },
+                NhwcInstrType::Arith { lhs, rhs } => {
+                    // we will store rst to reg3
+                    match rhs{
+                        super::nhwc_instr::ArithOp::Add { a, b, vartype } => {
+                            BinOp!(sect asm_sect func_name new_ADD args{a,b,1,2,3} with_symtab src_symtab);
+                        },
+                        super::nhwc_instr::ArithOp::Mul { a, b, vartype } => {
+                            BinOp!(sect asm_sect func_name new_MUL args{a,b,1,2,3} with_symtab src_symtab);
+                        },
+                        super::nhwc_instr::ArithOp::Div { a, b, vartype } => {
+                            BinOp!(sect asm_sect func_name new_DIV args{a,b,1,2,3} with_symtab src_symtab);
+                        },
+                        super::nhwc_instr::ArithOp::Sub { a, b, vartype } => {
+                            BinOp!(sect asm_sect func_name new_SUB args{a,b,1,2,3} with_symtab src_symtab);
+                        },
+                        super::nhwc_instr::ArithOp::Mod { a, b, vartype } => {
+                            BinOp!(sect asm_sect func_name new_REM args{a,b,1,2,3} with_symtab src_symtab);
+                        },
+                        super::nhwc_instr::ArithOp::Icmp { plan, a, b, vartype } => {
+                            match plan{
+                                super::nhwc_instr::IcmpPlan::Eq => {
+                                    // BinOp!(sect asm_sect func_name new_BEQ args{a,b,1,2,3} with_symtab src_symtab);
+                                },
+                                super::nhwc_instr::IcmpPlan::Ne => {
+
+                                },
+                                super::nhwc_instr::IcmpPlan::Ugt => todo!(),
+                                super::nhwc_instr::IcmpPlan::Uge => todo!(),
+                                super::nhwc_instr::IcmpPlan::Ult => todo!(),
+                                super::nhwc_instr::IcmpPlan::Ule => todo!(),
+                                super::nhwc_instr::IcmpPlan::Sgt => todo!(),
+                                super::nhwc_instr::IcmpPlan::Sge => todo!(),
+                                super::nhwc_instr::IcmpPlan::Slt => todo!(),
+                                super::nhwc_instr::IcmpPlan::Sle => todo!(),
+                            }
+                        },
+                        super::nhwc_instr::ArithOp::Ucmp { plan, a, b, vartype } => {
+
+                        },
+                        super::nhwc_instr::ArithOp::LogicAnd { a, b, vartype } => {
+
+                        },
+                        super::nhwc_instr::ArithOp::LogicOr { a, b, vartype } => {
+
+                        },
+                        super::nhwc_instr::ArithOp::LogicNot { a, vartype } => {
+
+                        },
+                    }
+                    // store reg1 to lhs
+                    store_sym(&mut asm_sect, lhs, Register::new_s(3), src_symtab)?;
+                },
+                NhwcInstrType::SimpleAssign { lhs, rhs } => todo!(),
+                NhwcInstrType::Call { op_assigned_symidx, func_op } => todo!(),
+                NhwcInstrType::Jump { jump_op } => todo!(),
+                NhwcInstrType::Phi { lhs, rhs } => todo!(),
+                NhwcInstrType::TranType { lhs, op } => todo!(),
+                NhwcInstrType::BreakPoint { symidx, breakpoint_args } => todo!(),
+                NhwcInstrType::Nope {  } => todo!(),
+            }
+        }
+    }
+    Ok(asm_sect)
+}
+///  sym in memory -> reg
+pub fn load_sym(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,src_symtab:&SymTab) -> Result<()>{
+    let &symidx_offset2sp = src_symtab.get_symbol(symidx)?.get_mem_offset2sp()?;
+    asm_sect.asm(RiscvInstr::new_LW(reg, Register::SP {  }, Imm::from_offset(symidx_offset2sp)));
+    Ok(())
+}
+/// reg value -> sym in memory
+pub fn store_sym(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,src_symtab:&SymTab) -> Result<()>{
+    let &symidx_offset2sp = src_symtab.get_symbol(symidx)?.get_mem_offset2sp()?;
+    asm_sect.asm(RiscvInstr::new_SW(reg, Register::new_sp(), Imm::from_offset(0)));
+    Ok(())
+}
+/// reg value -> M[ptr_sym]
+pub fn store_ptr(asm_sect:&mut AsmSection,ptr_symidx:&SymIdx,value_symidx:&SymIdx,ptr_reg:Register, value_reg:Register ,src_symtab:&SymTab)-> Result<()>{
+    load_sym(asm_sect, ptr_symidx, ptr_reg.clone(), src_symtab)?;
+    load_sym(asm_sect, value_symidx, value_reg.clone(), src_symtab)?;
+    asm_sect.asm(RiscvInstr::new_SW(ptr_reg, value_reg, Imm::from_offset(0)));
+    Ok(())
 }
 
 
@@ -60,46 +245,69 @@ fn parse_entry2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
 pub struct AsmStructure{
     pub sects:Vec<AsmSection>
 }
+impl Debug for AsmStructure{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        for sect in &self.sects{
+            s += format!("{:?}",sect).as_str();
+        }
+        write!(f,"{}",s)
+    }
+}
+impl AsmStructure{
+    pub fn new() -> Self{
+        Self { sects: vec![] }
+    }
+}
 impl AsmSection{
     pub fn new() -> Self{
         Self{
             attrs: vec![],
         }
     }
+    pub fn annotation(&mut self, annotation:String){
+        self.attrs.push(AsmAttr::Annotation { annotation }.into())
+    }
     pub fn global(&mut self, symidx:SymIdx){
-        self.attrs.push(AsmAttrType::Global { symidx }.into())
+        self.attrs.push(AsmAttr::Global { symidx }.into())
     }
     pub fn obj_type(&mut self, symidx:SymIdx, ){
-        self.attrs.push(AsmAttrType::DataType { attr_ty:DataType::Object,  symidx } .into())
+        self.attrs.push(AsmAttr::DataType { attr_ty:DataType::Object,  symidx } .into())
     }
     pub fn func_type(&mut self, symidx:SymIdx, ){
-        self.attrs.push(AsmAttrType::DataType { attr_ty:DataType::Function,  symidx } .into())
+        self.attrs.push(AsmAttr::DataType { attr_ty:DataType::Function,  symidx } .into())
     }
     pub fn label(&mut self, symidx:SymIdx){
-        self.attrs.push(AsmAttrType::Label  { symidx }.into())
+        self.attrs.push(AsmAttr::Label  { symidx }.into())
     }
     pub fn double(&mut self, symidx:SymIdx){
-        self.attrs.push(AsmAttrType::Double { symidx: symidx }.into())
+        self.attrs.push(AsmAttr::Double { symidx: symidx }.into())
     }
     pub fn word(&mut self, symidx:SymIdx){
-        self.attrs.push(AsmAttrType::Word { symidx: symidx }.into())
+        self.attrs.push(AsmAttr::Word { symidx: symidx }.into())
     }
     pub fn half(&mut self, symidx:SymIdx){
-        self.attrs.push(AsmAttrType::Half { symidx: symidx }.into())
+        self.attrs.push(AsmAttr::Half { symidx: symidx }.into())
     }
     pub fn byte(&mut self, symidx:SymIdx){
-        self.attrs.push(AsmAttrType::Half { symidx: symidx }.into())
+        self.attrs.push(AsmAttr::Byte { symidx: symidx }.into())
     }
     pub fn zero(&mut self, len:usize){
         if len >0 {
-            self.attrs.push(AsmAttrType::Zero { len }.into())
+            self.attrs.push(AsmAttr::Zero { len }.into())
         }
     }
     pub fn align(&mut self, align:usize){
-        self.attrs.push(AsmAttrType::Align { align } .into())
+        self.attrs.push(AsmAttr::Align { align } .into())
     }
     pub fn data(&mut self){
-        self.attrs.push(AsmAttrType::Data {  } .into())
+        self.attrs.push(AsmAttr::Data {  } .into())
+    }
+    pub fn text(&mut self){
+        self.attrs.push(AsmAttr::Text {  } .into())
+    }
+    pub fn asm(&mut self, riscv_instr:RiscvInstr){
+        self.attrs.push(Asm::Riscv { instr: riscv_instr })
     }
     /// generate asm that initialize the value 
     pub fn apply_value(&mut self,val:&Value) -> Result<()>{
@@ -153,60 +361,77 @@ impl AsmSection{
 
 /// a section contains several attributes and then asm instrs
 pub struct AsmSection{
-    pub attrs:Vec<AsmAttr>
+    pub attrs:Vec<Asm>
 }
 
 /// all kinds of Attr 
-pub struct AsmAttr{
-    attr_ty:AsmAttrType,
+pub enum Asm{
+    Attr{attr:AsmAttr},
+    Riscv{
+        instr:RiscvInstr
+    }
 }
-impl Debug for AsmAttr{
+impl Debug for Asm{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &self.attr_ty{
-            AsmAttrType::Align { align } => {
-                writeln!(f,"    .align {}",align)
+        match self{
+            Asm::Attr { attr } => {
+                match attr{
+                    AsmAttr::Align { align } => {
+                        writeln!(f,"    .align {}",align)
+                    },
+                    AsmAttr::Global { symidx } => {
+                        writeln!(f,"    .global {:?}",symidx)
+                    },
+                    AsmAttr::Data {  } => {
+                        writeln!(f,"    .data")
+                    },
+                    AsmAttr::Text {  } => {
+                        writeln!(f,"    .text")
+                    },
+                    AsmAttr::Double { symidx } => {
+                        writeln!(f,"    .double {}",symidx)
+                    },
+                    AsmAttr::Word { symidx } => {
+                        writeln!(f,"    .word {}",symidx)
+                    },
+                    AsmAttr::Half { symidx } => {
+                        writeln!(f,"    .half {}",symidx)
+                    },
+                    AsmAttr::Byte { symidx } => {
+                        writeln!(f,"    .byte {}",symidx)
+                    },
+                    AsmAttr::Zero { len } => {
+                        writeln!(f,"    .zero {}",len)
+                    },
+                    AsmAttr::Label { symidx } => {
+                        writeln!(f,"{:?}:",symidx)
+                    },
+                    AsmAttr::DataType { attr_ty, symidx } => {
+                        writeln!(f,"    .type {} {:?}",symidx, attr_ty)
+                    },
+                    AsmAttr::Annotation { annotation } => {
+                        writeln!(f,"                    ;{}",annotation, )
+                    },
+                }
             },
-            AsmAttrType::Global { symidx } => {
-                writeln!(f,"    .global {:?}",symidx)
-            },
-            AsmAttrType::Data {  } => {
-                writeln!(f,"    .data")
-            },
-            AsmAttrType::Double { symidx } => {
-                writeln!(f,"    .double {}",symidx)
-            },
-            AsmAttrType::Word { symidx } => {
-                writeln!(f,"    .word {}",symidx)
-            },
-            AsmAttrType::Half { symidx } => {
-                writeln!(f,"    .half {}",symidx)
-            },
-            AsmAttrType::Byte { symidx } => {
-                writeln!(f,"    .byte {}",symidx)
-            },
-            AsmAttrType::Zero { len } => {
-                writeln!(f,"    .zero {}",len)
-            },
-            AsmAttrType::Label { symidx } => {
-                writeln!(f,"{:?}:",symidx)
-            },
-            AsmAttrType::DataType { attr_ty, symidx } => {
-                writeln!(f,"    .type {} {:?}",symidx, attr_ty)
+            Asm::Riscv { instr } => {
+                writeln!(f,"    {:?}", instr)
             },
         }
     }
 }
 
-pub enum AsmAttrType{
+pub enum AsmAttr{
+    Annotation{
+        annotation:String
+    },
     Align{
         align:usize
     },
     Global{
         symidx:SymIdx
     },
-    Data{
-        
-    },
+    Data{ },Text{},
     Double{
         symidx:SymIdx
     },
@@ -242,9 +467,14 @@ impl Debug for DataType{
         }
     }
 }
-impl Into<AsmAttr> for AsmAttrType{
-    fn into(self) -> AsmAttr {
-        AsmAttr { attr_ty: self }
+impl Into<Asm> for AsmAttr{
+    fn into(self) -> Asm {
+        Asm::Attr { attr: self }
+    }
+}
+impl Into<Asm> for RiscvInstr{
+    fn into(self) -> Asm {
+        Asm::Riscv { instr: self } 
     }
 }
 impl Debug for AsmSection{

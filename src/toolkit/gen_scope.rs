@@ -219,7 +219,8 @@ pub fn parse_ast_to_scope(ast_tree:&AstTree,_cfg_graph:&CfgGraph,scope_tree:&mut
 
     //处理静态decl
     for static_decl in static_decl_nodes{
-        add_node_with_edge!({ScopeNode{ast_node:static_decl,text:String::new(),parent:Some(scope_func_parent_node),scope_type:ScopeType::Terminal}} from scope_func_parent_node in scope_tree);
+        let st_node = add_node_with_edge!({ScopeNode{ast_node:static_decl,text:String::new(),parent:Some(scope_func_parent_node),scope_type:ScopeType::Terminal}} from scope_func_parent_node in scope_tree);
+        ast2scope.insert(static_decl, st_node);
     }
     //处理函数体内容
     for func_ast in funcdef_nodes {

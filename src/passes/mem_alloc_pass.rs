@@ -1,4 +1,4 @@
-use crate::{add_symbol, direct_child_nodes, node, node_mut, toolkit::{cfg_node::CFG_ROOT, context::NhwcCtx, mem_layout::{alloc_stack_mem_for_cfg_entry, MemLayout}, pass_manager::Pass, scope_node::ST_ROOT, symbol::Symbol, symtab::SymIdx}};
+use crate::{add_symbol, direct_child_nodes, node, node_mut, toolkit::{cfg_node::{CfgGraph, CFG_ROOT}, context::NhwcCtx, mem_layout::MemLayout, pass_manager::Pass, scope_node::ST_ROOT, symbol::Symbol, symtab::{SymIdx, SymTab}}};
 use anyhow::*;
 use crate::toolkit::field::Type;
 use lazy_static::lazy_static;
@@ -56,6 +56,25 @@ impl Pass for MemAllocPass {
             }
             node_mut!(at cfg_entry in cfg_graph).get_mut_mem_layout()?.align_mem_with_blank(RISCV_STACK_MEM_ALIGN);
         }
+        // for &cfg_entry in &cfg_entries{
+        //     node_mut!(at cfg_entry in cfg_graph).add_mem_layout(MemLayout::new());
+        //     calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &S0)?;
+        //     calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &RA)?;
+        //     for &instr in node!(at cfg_entry in cfg_graph).instrs.clone().iter(){
+        //         match &instr!(at instr in instr_slab)?.instr_type{
+        //             crate::toolkit::nhwc_instr::NhwcInstrType::DefineFunc { func_symidx: _, ret_symidx: _, args } => {
+        //                 for arg in args{
+        //                     calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &arg.to_src_symidx())?;
+        //                 }
+        //             },
+        //             crate::toolkit::nhwc_instr::NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
+        //                 calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &var_symidx.to_src_symidx())?;
+        //             },
+        //             _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 之外的 instr"));},
+        //         }
+        //     }
+        // }
+
         Ok(()) 
     }
     // 返回pass的描述，具体作用
@@ -64,4 +83,23 @@ impl Pass for MemAllocPass {
     // 返回pass的名称
     fn get_pass_name(&self) -> String { return "DemoPass".to_string(); }
 }
+pub fn calculate_mem_offset2sp(cfg_graph:&mut CfgGraph,cfg_entry:u32,symtab:&mut SymTab,symidx:&SymIdx) -> Result<()>{
+    let mem_layout = node!(at cfg_entry in cfg_graph).get_mem_layout()?;
+    let mem_offset2sp = mem_layout.get_mem_len() - symtab.get_symbol(symidx)?.get_mem_offset2s0()?;
+    symtab.get_mut_symbol(symidx)?.add_mem_offset2sp(mem_offset2sp);
+    Ok(())
+}
 
+
+/// 接受一个symidx 以索引 symtab 中的符号，获取这个符号的类型然后加入到 cfg_entry 的mem_layout 中
+pub fn alloc_stack_mem_for_cfg_entry(cfg_graph:&mut CfgGraph,cfg_entry:u32,symtab:&mut SymTab,symidx:&SymIdx)->Result<()>{
+    let cfg_node_struct = node_mut!(at cfg_entry in cfg_graph);
+    let symbol_struct = symtab.get_mut_symbol(symidx)?;
+    if !cfg_node_struct.has_mem_layout(){
+        cfg_node_struct.add_mem_layout(MemLayout::new())
+    }
+    let sym_type =symbol_struct.get_type()?;
+    let mem_offset = cfg_node_struct.get_mut_mem_layout()?.insert_data(sym_type.get_align()?,sym_type.get_mem_len()?,symidx);
+    symbol_struct.add_mem_offset2s0(mem_offset);
+    Ok(())
+}

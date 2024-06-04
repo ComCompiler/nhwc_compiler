@@ -1,20 +1,29 @@
- 18   global Array:f32:[10, 10] d 
- 4    global Array:i32:[10] c 
- 0    new_var c:Array:i32:[10] 
- 1    new_var temp_0:ptr->i32 
- 2    temp_0 = getelementptr c:Array:i32:[10] [0] 
- 3    store 1:i32 temp_0:ptr->Array:i32:[] 
- 5    new_var d:Array:f32:[10, 10] 
- 6    new_var temp_1:ptr->f32 
- 7    temp_1 = getelementptr d:Array:f32:[10, 10] [0, 0] 
- 8    store 0.:f32 temp_1:ptr->Array:f32:[10] 
- 9    new_var temp_2:ptr->f32 
- 10   temp_2 = getelementptr d:Array:f32:[10, 10] [0, 2] 
- 11   store 1.:f32 temp_2:ptr->Array:f32:[10] 
- 12   new_var temp_3:ptr->f32 
- 13   temp_3 = getelementptr d:Array:f32:[10, 10] [1, 0] 
- 14   store 3.:f32 temp_3:ptr->Array:f32:[10] 
- 15   new_var temp_4:ptr->f32 
- 16   temp_4 = getelementptr d:Array:f32:[10, 10] [0, 1] 
- 17   store 0.:f32 temp_4:ptr->Array:f32:[10] 
- 19   Define main [] -> main_ret 
+      global Array:f32:[10, 10] d 
+      global Array:i32:[10] c 
+      new_var c:Array:i32:[10] 
+      new_var temp_0:ptr->i32 
+      temp_0 = getelementptr c:Array:i32:[10] [0] 
+      store 1:i32 temp_0:ptr->Array:i32:[] 
+      new_var d:Array:f32:[10, 10] 
+      new_var temp_1:ptr->f32 
+      temp_1 = getelementptr d:Array:f32:[10, 10] [0, 0] 
+      store 0.:f32 temp_1:ptr->Array:f32:[10] 
+      new_var temp_2:ptr->f32 
+      temp_2 = getelementptr d:Array:f32:[10, 10] [0, 1] 
+      store 0.:f32 temp_2:ptr->Array:f32:[10] 
+      new_var temp_3:ptr->f32 
+      temp_3 = getelementptr d:Array:f32:[10, 10] [1, 0] 
+      store 3.:f32 temp_3:ptr->Array:f32:[10] 
+      new_var temp_4:ptr->f32 
+      temp_4 = getelementptr d:Array:f32:[10, 10] [0, 2] 
+      store 1.:f32 temp_4:ptr->Array:f32:[10] 
+      global Fn[m]->a_ret a 
+      Define main [] -> main_ret 
+              alloc i32 temp_5 
+          label %0: 
+              new_var temp_5:i32 
+              temp_5 =  Call i32 a(3) 
+              ret 0 
+      Define b [s] -> b_ret 
+          label %1: 
+              ret s 

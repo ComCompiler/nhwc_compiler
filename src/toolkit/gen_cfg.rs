@@ -304,15 +304,16 @@ pub fn process_compound(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut 
     Ok(opt_current_cfg_head_and_tail)
 }
 
+pub static AST_ROOT:u32 = 0;
 /// 这个函数依赖 ast
 pub fn parse_ast_to_cfg(ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab) -> Result<()> {
-    let ast_root_node = 1;
-    let static_nodes:Vec<u32> = direct_child_nodes!(at ast_root_node in ast_tree);
+    let compilation_unit_node = direct_child_node!(at AST_ROOT in ast_tree);
+    let static_nodes:Vec<u32> = direct_child_nodes!(at compilation_unit_node in ast_tree);
     let mut static_decl_nodes = vec![];
     let mut funcdef_nodes = vec![];
     for static_node in static_nodes{
-        let gloabl_ast_node = direct_child_node!(at static_node in ast_tree);
-        match (rule_id!(at gloabl_ast_node in ast_tree),gloabl_ast_node){
+        let gloabl_var_ast_node = direct_child_node!(at static_node in ast_tree);
+        match (rule_id!(at gloabl_var_ast_node in ast_tree),gloabl_var_ast_node){
             (RULE_declaration,static_decl_node) => {
                 static_decl_nodes.push(static_decl_node);
             },

@@ -21,6 +21,8 @@ impl Pass for SymtabDebugPass {
             let mut symtab_g = SymTabGraph::new();
             // println!("ctx的symtab内容为{:#?}",ctx.symtab);
             add_node!({ctx.symtab.clone()} to symtab_g);
+            ctx.symtab_graph.clear();
+            ctx.symtab.debug_symtab_graph(format!("after ssa pass"), &mut symtab_g,vec![]);
             generate_png_by_graph_multi_tasks(&symtab_g.clone(), "symtab".to_string(), &[Config::Record, Config::Rounded, Config::SymTab, Config::Title("symtab_graph".to_string())],&mut ctx.io_task_list)?;
         }
         Ok(())

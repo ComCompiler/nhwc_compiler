@@ -66,6 +66,7 @@ pub fn process_any_stmt(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Scop
     sep_node
 }
 fn process_declaration(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, decl_node:u32, scope_node:u32, parent_et_node:u32) {
+    // only consider variable declaration
     let type_ast_node = find!(
         rule RULE_declarationSpecifiers
         // 这里我们假定只有一个 修饰符

@@ -173,7 +173,9 @@ impl Value {
             Type::Void => Value::Void,
             Type::Label => todo!(),
             Type::Array { dims: _, ele_ty } => Value::Array { value_map: ArrayEleMap::new(), dims: vec![], ele_ty: *ele_ty.clone()},
-            Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
+            Type::Fn { arg_syms, ret_sym } => {
+                Value::Fn { arg_syms: arg_syms.clone(), ret_sym: ret_sym.clone() }
+            },
             Type::Ptr64 { ty: _ } => {
                  Value::Ptr64 { op_pointed_symidx: None, offset: Box::new(Value::new_unsure_from_specific_type(&Type::I32)), pointed_ty: Box::new(specified_ty.clone()) }
             },

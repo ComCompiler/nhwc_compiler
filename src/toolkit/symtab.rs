@@ -1,16 +1,18 @@
 use super::{context::COMPILATION_UNIT, symbol::Symbol};
 use crate::{add_node, add_node_with_edge };
 use core::fmt::Debug;
+use ahash::{AHashMap, AHashSet};
 use anyhow::{anyhow,Result};
 use delegate::delegate;
 use petgraph::stable_graph::StableDiGraph;
-use std::{collections::{btree_map, BTreeMap}, fmt::{Display, Formatter}};
+use std::{collections::{btree_map, hash_map::{Iter, IterMut}, BTreeMap}, fmt::{Display, Formatter}};
 
 pub type SymTabGraph = StableDiGraph<SymTab, SymTabEdge, u32>;
 
 #[derive(Clone)]
 pub struct SymTab {
-    map:BTreeMap<SymIdx, Symbol>,
+    // map:BTreeMap<SymIdx, Symbol>,
+    map:AHashMap<SymIdx, Symbol>,
     text:String,
 }
 #[derive(Clone)]
@@ -24,11 +26,16 @@ impl SymTabEdge {
     pub fn new(text:String) -> Self { SymTabEdge { text } }
 }
 /// 由于我们对 Symbol 的索引必须同时考虑 symbol 所在的scope 的层级以及 symbol的名字，不如直接改成结构体SymbolIndex
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SymIdx {
     pub scope_node:u32,
     pub symbol_name:String,
     pub index_ssa:Option<u32>,
+}
+impl From<usize> for SymIdx{
+    fn from(value: usize) -> Self {
+        SymIdx { scope_node: 0, symbol_name: value.to_string(), index_ssa: None }
+    }
 }
 impl SymIdx {
     pub fn new(scope_node:u32, symbol_name:String) -> Self { SymIdx { scope_node, symbol_name, index_ssa:None } }
@@ -71,7 +78,8 @@ impl SymIdx {
 
 impl SymTab {
     // 创建一个新的符号表
-    pub fn new() -> SymTab { SymTab { map:BTreeMap::new(), text: String::new() } }
+    // pub fn new() -> SymTab { SymTab { map:BTreeMap::new(), text: String::new() } }
+    pub fn new() -> SymTab { SymTab { map:AHashMap::new(), text: String::new() } }
     
     // 添加或更新符号，如果是更新，那么返回旧的符号
     pub fn add_symbol(&mut self, sym:Symbol) -> Result<SymIdx> {
@@ -85,14 +93,14 @@ impl SymTab {
 
     // 查找符号
     pub fn get_symbol_verbose(&self, symbol_name:String, scope_node:u32) -> Result<&Symbol> {let symidx = SymIdx { scope_node, symbol_name, index_ssa:None}; self.map.get(&symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx)) }
-    pub fn get_symbol(&self, symbol_index:&SymIdx) -> Result<&Symbol> { self.map.get(symbol_index).ok_or(anyhow!("找不到{:?}对应的symbol",symbol_index)) }
+    pub fn get_symbol(&self, symidx:&SymIdx) -> Result<&Symbol> { self.map.get(symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx)) }
     pub fn get_mut_symbol_verbose(&mut self, symbol_name:String, scope_node:u32) -> Result<&mut Symbol> { let symidx = SymIdx { scope_node, symbol_name, index_ssa:None }; self.map.get_mut(&symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx )) }
-    pub fn get_mut_symbol(&mut self, symbol_index:&SymIdx) -> Result<&mut Symbol> { self.map.get_mut(symbol_index).ok_or(anyhow!("找不到{:?}对应的symbol",symbol_index)) }
+    pub fn get_mut_symbol(&mut self, symidx:&SymIdx) -> Result<&mut Symbol> { self.map.get_mut(symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx)) }
 
     delegate!{
         to self.map {
-            pub fn iter(&self)->btree_map::Iter<SymIdx,Symbol>;
-            pub fn iter_mut(&mut self)->btree_map::IterMut<SymIdx,Symbol>;
+            pub fn iter(&self)->Iter<SymIdx,Symbol>;
+            pub fn iter_mut(&mut self)->IterMut<SymIdx,Symbol>;
         }
     }
 

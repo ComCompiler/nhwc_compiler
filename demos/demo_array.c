@@ -1,5 +1,9 @@
 int c[10] = {1};
 float d[10][10] = {{0,0,1.0},{3.0}};
+int b(int s){
+    return s;
+}
+int a(int m);
 int main(){
     // int a[5]={1,2,3,4,5};
     // a[3] = 2;
@@ -14,4 +18,6 @@ int main(){
     // int b , c = 3;
     // int d[2][3] = {{1,2,3},{4,5,6}};
     // a[0]=d[1][2];
+    a(3);
+    return 0;
 }

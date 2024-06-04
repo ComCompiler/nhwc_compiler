@@ -8,9 +8,10 @@ use crate::{node_mut, reg_field_for_struct};
 use super::{cfg_node::{CfgGraph, CfgNode}, symbol::Symbol, symtab::{SymIdx, SymTab}};
 use itertools::{self, Itertools};
 
-
+///  mem offset is the offset to s0 (so you should divide stack_size by mem_offset to get offset to sp)
 reg_field_for_struct!(Symbol {
-        MEM_OFFSET:usize,
+        MEM_OFFSET2S0:usize,
+        MEM_OFFSET2SP:usize,
     } with_fields fields);
 reg_field_for_struct!(CfgNode {
     MEM_LAYOUT:MemLayout,
@@ -94,17 +95,4 @@ impl Debug for MemLayout{
         }
         write!(f,"{}",s)
     }
-}
-
-/// 接受一个symidx 以索引 symtab 中的符号，获取这个符号的类型然后加入到 cfg_entry 的mem_layout 中
-pub fn alloc_stack_mem_for_cfg_entry(cfg_graph:&mut CfgGraph,cfg_entry:u32,symtab:&mut SymTab,symidx:&SymIdx)->Result<()>{
-    let cfg_node_struct = node_mut!(at cfg_entry in cfg_graph);
-    let symbol_struct = symtab.get_mut_symbol(symidx)?;
-    if !cfg_node_struct.has_mem_layout(){
-        cfg_node_struct.add_mem_layout(MemLayout::new())
-    }
-    let sym_type =symbol_struct.get_type()?;
-    let mem_offset = cfg_node_struct.get_mut_mem_layout()?.insert_data(sym_type.get_align()?,sym_type.get_mem_len()?,symidx);
-    symbol_struct.add_mem_offset(mem_offset);
-    Ok(())
 }

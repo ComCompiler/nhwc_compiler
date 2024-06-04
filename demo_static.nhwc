@@ -1,22 +1,22 @@
- 16   global Array:i32:[10] c 
- 5    global i32 b 
- 1    global i32 a 
- 0    a = 3 
- 2    new_var temp_0:i32 
- 3    temp_0 = Mul i32 a, 2 
- 4    b = temp_0 
- 6    new_var c:Array:i32:[10] 
- 7    new_var temp_1:ptr->i32 
- 8    temp_1 = getelementptr c:Array:i32:[10] [0] 
- 9    store 1:i32 temp_1:ptr->Array:i32:[] 
- 10   new_var temp_2:ptr->i32 
- 11   temp_2 = getelementptr c:Array:i32:[10] [1] 
- 12   store 2:i32 temp_2:ptr->Array:i32:[] 
- 13   new_var temp_3:ptr->i32 
- 14   temp_3 = getelementptr c:Array:i32:[10] [2] 
- 15   store 3:i32 temp_3:ptr->Array:i32:[] 
- 17   Define main [] -> main_ret 
-         19   alloc i32 b 
+      global Array:i32:[10] c 
+      global i32 b 
+      global i32 a 
+      a = 3 
+      new_var temp_0:i32 
+      temp_0 = Mul i32 a, 2 
+      b = temp_0 
+      new_var c:Array:i32:[10] 
+      new_var temp_1:ptr->i32 
+      temp_1 = getelementptr c:Array:i32:[10] [0] 
+      store 1:i32 temp_1:ptr->Array:i32:[] 
+      new_var temp_2:ptr->i32 
+      temp_2 = getelementptr c:Array:i32:[10] [1] 
+      store 2:i32 temp_2:ptr->Array:i32:[] 
+      new_var temp_3:ptr->i32 
+      temp_3 = getelementptr c:Array:i32:[10] [2] 
+      store 3:i32 temp_3:ptr->Array:i32:[] 
+      Define main [] -> main_ret 
+              alloc i32 b 
           label %0: 
-         18   b-0 = 5 
-         21   ret 0 
+              b = 5 
+              ret 0 
