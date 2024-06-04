@@ -17,6 +17,81 @@ pub enum RiscvInstrType {
 }
 
 #[derive(Clone, Debug)]
+pub enum Pseudoinstruction {
+    nop {},
+    neg {rd:Register ,rs:Register},
+    negw {rd:Register ,rs:Register},
+
+    snez {rd:Register ,rs:Register},
+    sltz {rd:Register ,rs:Register},
+    sgtz {rd:Register ,rs:Register},
+
+    beqz {rs:Register ,offset:Value},
+    bnez {rs:Register ,offset:Value},
+    blez {rs:Register ,offset:Value},
+    bgez {rs:Register ,offset:Value},
+    bltz {rs:Register ,offset:Value},
+    bgtz {rs:Register ,offset:Value},
+
+    j {offset:Value},
+    jr {rs:Register },
+    ret {},
+
+    tail {offset:Value},
+
+    rdinstret {rd:Register },
+    rdinstreth {rd:Register },
+    rdcycle {rd:Register },
+    rdcycleh {rd:Register },
+    rdtime {rd:Register },
+    rdtimeh {rd:Register },
+
+    lla {rd:Register ,symbol:SymIdx},
+
+    la {rd:Register ,symbol:SymIdx},
+
+    lb {rd:Register ,symbol:SymIdx},
+    lh {rd:Register ,symbol:SymIdx},
+    lw {rd:Register ,symbol:SymIdx},
+    ld {rd:Register ,symbol:SymIdx},
+
+    sb {rd:Register ,symbol:SymIdx ,rt:Register},
+    sh {rd:Register ,symbol:SymIdx ,rt:Register},
+    sw {rd:Register ,symbol:SymIdx ,rt:Register},
+    sd {rd:Register ,symbol:SymIdx ,rt:Register},
+
+    flw {rd:Register ,symbol:SymIdx ,rt:Register},
+    fld {rd:Register ,symbol:SymIdx ,rt:Register},
+
+    fsw {rd:Register ,symbol:SymIdx ,rt:Register},
+    fsd {rd:Register ,symbol:SymIdx ,rt:Register},
+
+    li {rd:Register ,imm:Value},
+    mv {rd:Register ,rs:Register},
+    not {rd:Register ,rs:Register},
+    sext_w {rd:Register ,rs:Register},
+    seqz {rd:Register ,rs:Register},
+
+    fmv_s {rd:Register ,rs:Register},
+    fabs_s {rd:Register ,rs:Register},
+    fneg_s {rd:Register ,rs:Register},
+    fmv_d {rd:Register ,rs:Register},
+    fabs_d {rd:Register ,rs:Register},
+    fneg_d {rd:Register ,rs:Register},
+
+    bgt {rs:Register ,rd:Register ,offset:Value},
+    ble {rs:Register ,rd:Register ,offset:Value},
+    bgtu {rs:Register ,rd:Register ,offset:Value},
+    bleu {rs:Register ,rd:Register ,offset:Value},
+
+    jal {offset:Value},
+    jalr {rs:Register},
+
+    call {offset:Value},
+
+    fence {},
+}
+#[derive(Clone, Debug)]
 pub enum BaseIntInstr {
     Shifts(Shifts),
     Arithmetic(Arithmetic),
