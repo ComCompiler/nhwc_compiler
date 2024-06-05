@@ -1,43 +1,54 @@
- 1    Define main _s0 [] -> main_ret _s0 
-         36   alloc i32 temp_7 _s12 
-         39   alloc i32 a _s12 
-          label %0 _s0: 
-         35   new_var i32 %temp_70 
-         37   temp_71 =  Call i32 Fibo _s0(6 _s0) 
-         38   a0 = temp_71 
-         40   breakpoint bp1 _s14([a _s14]) ! 
-         42   ret 
- 0    Define Fibo _s0 [n0] -> Fibo_ret _s0 
-         4    alloc i32 temp_0 _s7 
-         7    alloc i32 temp_1 _s7 
-         10   alloc i32 temp_2 _s7 
-         13   alloc i32 temp_3 _s7 
-         16   alloc i32 temp_4 _s7 
-         26   alloc i1 temp_5 _s4 
-         32   alloc i1 temp_6 _s7 
-          label %1 _s0: 
-         25   new_var i1 %temp_50 
-         27   temp_51 = icmp i1 Eq n0, 0 _s0 
-         28   br i1 temp_51, label branch.true: _s5, label branch.false: _s5 
-     23   label branch.true: _s5: 
-         22   ret 0 _s0 
-     24   label branch.false: _s5: 
-         31   new_var i1 %temp_60 
-         33   temp_61 = icmp i1 Eq n0, 1 _s0 
-         34   br i1 temp_61, label branch.true: _s8, label branch.false: _s8 
-     29   label branch.true: _s8: 
-         20   ret 1 _s0 
-     30   label branch.false: _s8: 
-         3    new_var i32 %temp_00 
-         5    temp_01 = Sub i32 n0, 2 _s0 
-         6    new_var i32 %temp_10 
-         8    temp_11 =  Call i32 Fibo _s0(temp_01) 
-         9    new_var i32 %temp_20 
-         11   temp_21 = Sub i32 n0, 1 _s0 
-         12   new_var i32 %temp_30 
-         14   temp_31 =  Call i32 Fibo _s0(temp_21) 
-         15   new_var i32 %temp_40 
-         17   temp_41 = Add i32 temp_31, temp_11 
-         18   ret temp_41 
-          label %2 _s0: 
-          label %3 _s0: 
+      global Array:i32:[2, 2] m 
+      new_var m:Array:i32:[2, 2] 
+      new_var temp_0:ptr->i32 
+      temp_0 = getelementptr m:Array:i32:[2, 2] [1, 1] 
+      store 2:i32 temp_0:ptr->Array:i32:[2] 
+      new_var temp_1:ptr->i32 
+      temp_1 = getelementptr m:Array:i32:[2, 2] [0, 0] 
+      store 1:i32 temp_1:ptr->Array:i32:[2] 
+      new_var temp_2:ptr->i32 
+      temp_2 = getelementptr m:Array:i32:[2, 2] [1, 0] 
+      store 1:i32 temp_2:ptr->Array:i32:[2] 
+      Define main [] -> main_ret 
+              alloc i32 temp_10 
+              alloc i32 a 
+          label %0: 
+              new_var temp_10:i32 
+              temp_10 =  Call i32 Fibo(6) 
+              a = temp_10 
+              breakpoint bp1([a]) ! 
+              ret 
+      Define Fibo [n] -> Fibo_ret 
+              alloc i32 temp_3 
+              alloc i32 temp_4 
+              alloc i32 temp_5 
+              alloc i32 temp_6 
+              alloc i32 temp_7 
+              alloc i1 temp_8 
+              alloc i1 temp_9 
+          label %1: 
+              new_var temp_8:i1 
+              temp_8 = icmp i1 Eq n, 0 
+              br i1 temp_8, label branch.true:, label branch.false: 
+          label branch.true:: 
+              ret 0 
+          label branch.false:: 
+              new_var temp_9:i1 
+              temp_9 = icmp i1 Eq n, 1 
+              br i1 temp_9, label branch.true:, label branch.false: 
+          label branch.true:: 
+              ret 1 
+          label branch.false:: 
+              new_var temp_3:i32 
+              temp_3 = Sub i32 n, 2 
+              new_var temp_4:i32 
+              temp_4 =  Call i32 Fibo(temp_3) 
+              new_var temp_5:i32 
+              temp_5 = Sub i32 n, 1 
+              new_var temp_6:i32 
+              temp_6 =  Call i32 Fibo(temp_5) 
+              new_var temp_7:i32 
+              temp_7 = Add i32 temp_6, temp_4 
+              ret temp_7 
+          label %2: 
+          label %3: 

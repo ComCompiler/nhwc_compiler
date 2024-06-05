@@ -1,7 +1,8 @@
 use std::fs;
-use std::io::{Write};
+use std::io::Write;
 
 
+use crate::toolkit::cfg_node::CFG_ROOT;
 use crate::toolkit::nhwc_instr::NhwcInstrType;
 use crate::toolkit::scope_node::ST_ROOT;
 use crate::toolkit::symtab::SymIdx;
@@ -35,7 +36,7 @@ impl Pass for NhwcDumpPass {
         let mut nhwc_ir_vec = vec![];
         
         let (args,instr_slab,cfg_graph,nhwc_ir_list) = (&ctx.args,&mut ctx.nhwc_instr_slab,&mut ctx.cfg_graph, &mut ctx.collected_nhwc_ir);
-        let dfs_node_vec = dfs_with_priority(cfg_graph,0,|e| match &e.weight().cfg_edge_type{
+        let dfs_node_vec = dfs_with_priority(cfg_graph,CFG_ROOT,|e| match &e.weight().cfg_edge_type{
             CfgEdgeType::BodyHead {  } => 1,
             CfgEdgeType::IfFalse {  } => 2,
             CfgEdgeType::Direct {  } => 2,
@@ -52,7 +53,7 @@ impl Pass for NhwcDumpPass {
                 cfg_node_struct.cfg_node_type.is_entry() ||
                 cfg_node_struct.cfg_node_type.is_root()) && cfg_node_struct.op_label_instr.is_none(){
                     let anonymous_label= NhwcInstrType::new_label(SymIdx::new(ST_ROOT, format!("%{}",anonymous_label_count))).to_instr();
-                    node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(anonymous_label, instr_slab);
+                    node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(anonymous_label, instr_slab)?;
                     anonymous_label_count +=1;
             }
         }
@@ -64,7 +65,7 @@ impl Pass for NhwcDumpPass {
                         NhwcInstrType::Label { label_symidx } => {
                             let jump_instr_struct = NhwcInstrType::new_jump(label_symidx.clone()).to_instr();
                             if let None = node!(at cfg_node in cfg_graph).op_jump_instr{
-                                node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(jump_instr_struct, instr_slab);
+                                node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(jump_instr_struct, instr_slab)?;
                             }
                         },
                         _=>{return Err(anyhow!("cfg_node 的 label_instr 不可能为 除了label 以外的类型"))}
@@ -74,7 +75,7 @@ impl Pass for NhwcDumpPass {
         }
         for cfg_node in dfs_node_vec{
             for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
-                let mut cur_tab = 0;
+                let mut cur_tab ;
                 if instr!(at instr in instr_slab)?.instr_type.is_define_func(){
                     cur_tab = 0;
                 }else if instr!(at instr in instr_slab)?.instr_type.is_label(){

@@ -444,6 +444,7 @@ fn process_symbol(
                 with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
                 with_field IS_CONST:{false}
                 with_field IS_TEMP:{false} 
+                with_field IS_LITERAL:{false}
             to symtab debug op_symtab_graph);
             if node!(at cfg_node in cfg_graph).has_func_cor_symidx(){
                 let func_symidx = node_mut!(at cfg_node in cfg_graph).get_func_cor_symidx_with_debug(&symtab,op_symtab_graph)?;
@@ -493,6 +494,7 @@ fn process_temp_symbol(
             with_field TYPE:{temp_type.clone()} 
             with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
             with_field IS_TEMP:{true} 
+            with_field IS_LITERAL:{false} 
             with_field IS_CONST:{false}
             to symtab debug symtab_graph);
         *counter+=1;       

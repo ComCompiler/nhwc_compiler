@@ -1,4 +1,5 @@
 use std::fmt::{write, Debug, Formatter};
+use anyhow::*;
 
 
 use derive_new::new;
@@ -29,7 +30,7 @@ impl Imm{
     pub fn new_literal(symidx:SymIdx) -> Self{
         Self::Literal { symidx }
     }
-    pub fn from_offset(offset:usize)-> Self{
+    pub fn from_offset(offset:isize)-> Self{
         Self::Literal { symidx:SymIdx::from(offset) }
     }
 }
@@ -219,7 +220,7 @@ impl Debug for PseudoInstr {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub enum BaseIntInstr {
     Shifts(Shifts),
     Arithmetic(Arithmetic),
@@ -231,6 +232,22 @@ pub enum BaseIntInstr {
     CSR(CSR),
     Loads(Loads),
     Stores(Stores),
+}
+impl Debug for BaseIntInstr{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Shifts(arg0) => write!(f,"{:?}",arg0),
+            Self::Arithmetic(arg0) => write!(f,"{:?}",arg0),
+            Self::Logical(arg0) => write!(f,"{:?}",arg0),
+            Self::Compare(arg0) => write!(f,"{:?}",arg0),
+            Self::Branch(arg0) => write!(f,"{:?}",arg0),
+            Self::JumpAndLink(arg0) => write!(f,"{:?}",arg0),
+            Self::Environment(arg0) => write!(f,"{:?}",arg0),
+            Self::CSR(arg0) => write!(f,"{:?}",arg0),
+            Self::Loads(arg0) => write!(f,"{:?}",arg0),
+            Self::Stores(arg0) => write!(f,"{:?}",arg0),
+        }
+    }
 }
 
 macro_rules! impl_from {
@@ -324,7 +341,7 @@ impl Register{
         Self::Arg { reg_idx: idx } 
     }
 }
-#[derive(Clone)]
+#[derive(Clone,new)]
 pub enum Shifts {
     /// RV32I Base                                   RV64I
     /// Shift Left Logical
@@ -349,20 +366,42 @@ pub enum Shifts {
 impl Debug for Shifts {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Shifts::SLL { rd, rs1, rs2 } => write!(f, "sll %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Shifts::SLLI { rd, rs1, shamt } => write!(f, "slli %{:?},%{:?},{:?}", rd, rs1, shamt),
-            Shifts::SRL { rd, rs1, rs2 } => write!(f, "srl %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Shifts::SRLI { rd, rs1, shamt } => write!(f, "srli %{:?},%{:?},{:?}", rd, rs1, shamt),
-            Shifts::SRA { rd, rs1, rs2 } => write!(f, "sra %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Shifts::SRAI { rd, rs1, shamt } => write!(f, "srai %{:?},%{:?},{:?}", rd, rs1, shamt),
+            Shifts::SLL { rd, rs1, rs2 } => write!(f, "sll {:?},{:?},{:?}", rd, rs1, rs2),
+            Shifts::SLLI { rd, rs1, shamt } => write!(f, "slli {:?},{:?},{:?}", rd, rs1, shamt),
+            Shifts::SRL { rd, rs1, rs2 } => write!(f, "srl {:?},{:?},{:?}", rd, rs1, rs2),
+            Shifts::SRLI { rd, rs1, shamt } => write!(f, "srli {:?},{:?},{:?}", rd, rs1, shamt),
+            Shifts::SRA { rd, rs1, rs2 } => write!(f, "sra {:?},{:?},{:?}", rd, rs1, rs2),
+            Shifts::SRAI { rd, rs1, shamt } => write!(f, "srai {:?},{:?},{:?}", rd, rs1, shamt),
 
-            Shifts::SLLW { rd, rs1, rs2 } => write!(f, "sllw %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Shifts::SLLIW { rd, rs1, shamt } => write!(f, "slliw %{:?},%{:?},{:?}", rd, rs1, shamt),
-            Shifts::SRLW { rd, rs1, rs2 } => write!(f, "srlw %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Shifts::SRLIW { rd, rs1, shamt } => write!(f, "srliw %{:?},%{:?},{:?}", rd, rs1, shamt),
-            Shifts::SRAW { rd, rs1, rs2 } => write!(f, "sraw %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Shifts::SRAIW { rd, rs1, shamt } => write!(f, "sraiw %{:?},%{:?},{:?}", rd, rs1, shamt),
+            Shifts::SLLW { rd, rs1, rs2 } => write!(f, "sllw {:?},{:?},{:?}", rd, rs1, rs2),
+            Shifts::SLLIW { rd, rs1, shamt } => write!(f, "slliw {:?},{:?},{:?}", rd, rs1, shamt),
+            Shifts::SRLW { rd, rs1, rs2 } => write!(f, "srlw {:?},{:?},{:?}", rd, rs1, rs2),
+            Shifts::SRLIW { rd, rs1, shamt } => write!(f, "srliw {:?},{:?},{:?}", rd, rs1, shamt),
+            Shifts::SRAW { rd, rs1, rs2 } => write!(f, "sraw {:?},{:?},{:?}", rd, rs1, rs2),
+            Shifts::SRAIW { rd, rs1, shamt } => write!(f, "sraiw {:?},{:?},{:?}", rd, rs1, shamt),
         }
+    }
+}
+impl Shifts{
+    /// mul 16 => shifts 4
+    pub fn new_slli_from_multiple(reg1:Register,reg2:Register,mul:usize) -> Result<Self>{
+        Ok(match mul{
+            8 => {
+                Shifts::new_slli(reg1, reg2, Imm::from_offset(3))
+            },
+            4 => {
+                Shifts::new_slli(reg1, reg2, Imm::from_offset(2))
+            },
+            2 => {
+                Shifts::new_slli(reg1, reg2, Imm::from_offset(1))
+            },
+            1 => {
+                Shifts::new_slli(reg1, reg2, Imm::from_offset(0))
+            },
+            _ => {
+                return Err(anyhow!("unexpected shift size"))
+            }
+        })
     }
 }
 #[derive(Clone,new)]
@@ -390,21 +429,21 @@ pub enum Arithmetic {
 impl Debug for Arithmetic {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Arithmetic::ADD { rd, rs1, rs2 } => write!(f, "add %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Arithmetic::ADDI { rd, rs1, imm } => write!(f, "addi %{:?},%{:?},{:?}", rd, rs1, imm),
-            Arithmetic::SUB { rd, rs1, rs2 } => write!(f, "sub %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Arithmetic::LUI { rd, imm } => write!(f, "lui %{:?},{:?}", rd, imm),
-            Arithmetic::AUIPC { rd, imm } => write!(f, "auipc %{:?},{:?}", rd, imm),
+            Arithmetic::ADD { rd, rs1, rs2 } => write!(f, "add {:?},{:?},{:?}", rd, rs1, rs2),
+            Arithmetic::ADDI { rd, rs1, imm } => write!(f, "addi {:?},{:?},{:?}", rd, rs1, imm),
+            Arithmetic::SUB { rd, rs1, rs2 } => write!(f, "sub {:?},{:?},{:?}", rd, rs1, rs2),
+            Arithmetic::LUI { rd, imm } => write!(f, "lui {:?},{:?}", rd, imm),
+            Arithmetic::AUIPC { rd, imm } => write!(f, "auipc {:?},{:?}", rd, imm),
 
-            Arithmetic::ADDW { rd, rs1, rs2 } => write!(f, "ADDW %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Arithmetic::ADDIW { rd, rs1, imm } => write!(f, "addiw %{:?},%{:?},{:?}", rd, rs1, imm),
-            Arithmetic::SUBW { rd, rs1, rs2 } => write!(f, "subw %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Arithmetic::MUL { rd, rs1, rs2 } => write!(f, "mul %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Arithmetic::MULW { rd, rs1, rs2 } => write!(f, "mulw %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Arithmetic::DIV { rd, rs1, rs2 } => write!(f, "div %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Arithmetic::DIVW { rd, rs1, rs2 } => write!(f, "divw %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Arithmetic::REM { rd, rs1, rs2 } => write!(f, "rem %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Arithmetic::REMW { rd, rs1, rs2 } => write!(f, "remw %{:?},%{:?},%{:?}", rd, rs1, rs2),
+            Arithmetic::ADDW { rd, rs1, rs2 } => write!(f, "ADDW {:?},{:?},{:?}", rd, rs1, rs2),
+            Arithmetic::ADDIW { rd, rs1, imm } => write!(f, "addiw {:?},{:?},{:?}", rd, rs1, imm),
+            Arithmetic::SUBW { rd, rs1, rs2 } => write!(f, "subw {:?},{:?},{:?}", rd, rs1, rs2),
+            Arithmetic::MUL { rd, rs1, rs2 } => write!(f, "mul {:?},{:?},{:?}", rd, rs1, rs2),
+            Arithmetic::MULW { rd, rs1, rs2 } => write!(f, "mulw {:?},{:?},{:?}", rd, rs1, rs2),
+            Arithmetic::DIV { rd, rs1, rs2 } => write!(f, "div {:?},{:?},{:?}", rd, rs1, rs2),
+            Arithmetic::DIVW { rd, rs1, rs2 } => write!(f, "divw {:?},{:?},{:?}", rd, rs1, rs2),
+            Arithmetic::REM { rd, rs1, rs2 } => write!(f, "rem {:?},{:?},{:?}", rd, rs1, rs2),
+            Arithmetic::REMW { rd, rs1, rs2 } => write!(f, "remw {:?},{:?},{:?}", rd, rs1, rs2),
         }
     }
 }
@@ -426,14 +465,14 @@ pub enum Logical {
 impl Debug for Logical {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Logical::XOR { rd, rs1, rs2 } => write!(f, "xor %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Logical::XORI { rd, rs1, imm } => write!(f, "xori %{:?},%{:?},{:?}", rd, rs1, imm),
-            Logical::OR { rd, rs1, rs2 } => write!(f, "or %{:?},%{:?},%{:?}", rd, rs1, rs2),
+            Logical::XOR { rd, rs1, rs2 } => write!(f, "xor {:?},{:?},{:?}", rd, rs1, rs2),
+            Logical::XORI { rd, rs1, imm } => write!(f, "xori {:?},{:?},{:?}", rd, rs1, imm),
+            Logical::OR { rd, rs1, rs2 } => write!(f, "or {:?},{:?},{:?}", rd, rs1, rs2),
             Logical::ORI { rd, rs1, imm } => {
-                write!(f, "ORI %{:?},%{:?},{:?}", rd, rs1, imm)
+                write!(f, "ORI {:?},{:?},{:?}", rd, rs1, imm)
             }
-            Logical::AND { rd, rs1, rs2 } => write!(f, "and %{:?},%{:?},%{:?}", rd, rs1, rs2),
-            Logical::ANDI { rd, rs1, imm } => write!(f, "andi %{:?},%{:?},{:?}", rd, rs1, imm),
+            Logical::AND { rd, rs1, rs2 } => write!(f, "and {:?},{:?},{:?}", rd, rs1, rs2),
+            Logical::ANDI { rd, rs1, imm } => write!(f, "andi {:?},{:?},{:?}", rd, rs1, imm),
         }
     }
 }
@@ -451,10 +490,10 @@ pub enum Compare {
 impl Debug for Compare {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Compare::SLT { rd, rs1, rs2 } => write!(f, "{:5} %{:?},%{:?},%{:?}","slt" , rd, rs1, rs2),
-            Compare::SLTI { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?},{:?}", "slti", rd, rs1, imm),
-            Compare::SLTU { rd, rs1, rs2 } => write!(f, "{:5} %{:?},%{:?},%{:?}","sltu", rd, rs1, rs2),
-            Compare::SLTUI { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","sltui" , rd, rs1, imm),
+            Compare::SLT { rd, rs1, rs2 } => write!(f, "{:5} {:?},{:?},{:?}","slt" , rd, rs1, rs2),
+            Compare::SLTI { rd, rs1, imm } => write!(f, "{:5} {:?},{:?},{:?}", "slti", rd, rs1, imm),
+            Compare::SLTU { rd, rs1, rs2 } => write!(f, "{:5} {:?},{:?},{:?}","sltu", rd, rs1, rs2),
+            Compare::SLTUI { rd, rs1, imm } => write!(f, "{:5} {:?},{:?},{:?}","sltui" , rd, rs1, imm),
 }
     }
 }
@@ -476,12 +515,12 @@ pub enum Branch {
 impl Debug for Branch {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Branch::BEQ { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","beq", rs1, rs2, imm),
-            Branch::BNE { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","bne", rs1, rs2, imm),
-            Branch::BLT { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","blt", rs1, rs2, imm),
-            Branch::BGE { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","bge", rs1, rs2, imm),
-            Branch::BLTU { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","bltu", rs1, rs2, imm),
-            Branch::BGEU { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","bgeu", rs1, rs2, imm),
+            Branch::BEQ { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?},{:?}","beq", rs1, rs2, imm),
+            Branch::BNE { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?},{:?}","bne", rs1, rs2, imm),
+            Branch::BLT { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?},{:?}","blt", rs1, rs2, imm),
+            Branch::BGE { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?},{:?}","bge", rs1, rs2, imm),
+            Branch::BLTU { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?},{:?}","bltu", rs1, rs2, imm),
+            Branch::BGEU { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?},{:?}","bgeu", rs1, rs2, imm),
         }
     }
 }
@@ -495,8 +534,8 @@ pub enum JumpAndLink {
 impl Debug for JumpAndLink {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            JumpAndLink::JAL { rd, imm } => write!(f, "{:5} %{:?},{:?}","jal", rd, imm),
-            JumpAndLink::JALR { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","jalr", rd, rs1, imm),
+            JumpAndLink::JAL { rd, imm } => write!(f, "{:5} {:?},{:?}","jal", rd, imm),
+            JumpAndLink::JALR { rd, rs1, imm } => write!(f, "{:5} {:?},{:?},{:?}","jalr", rd, rs1, imm),
         }
     }
 }
@@ -534,12 +573,12 @@ pub enum CSR {
 impl Debug for CSR {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CSR::CSRRW { rd, csr, rs1 } => write!(f, "{:6} %{:?},%{:?},%{:?}","csrrw", rd, csr, rs1),
-            CSR::CSRRS { rd, csr, rs1 } => write!(f, "{:6} %{:?},%{:?},%{:?}","csrrs", rd, csr, rs1),
-            CSR::CSRRC { rd, csr, rs1 } => write!(f, "{:6} %{:?},%{:?},%{:?}","csrrc", rd, csr, rs1),
-            CSR::CSRRSI { rd, csr, imm } => write!(f, "{:6} %{:?},%{:?},{:?}","csrrsi", rd, csr, imm),
-            CSR::CSRRCI { rd, csr, imm } => write!(f, "{:6} %{:?},%{:?},{:?}","csrrci", rd, csr, imm),
-            CSR::CSRRWI { rd, csr, imm } => write!(f, "{:6} %{:?},%{:?},{:?}","csrrwi", rd, csr, imm),
+            CSR::CSRRW { rd, csr, rs1 } => write!(f, "{:6} {:?},{:?},{:?}","csrrw", rd, csr, rs1),
+            CSR::CSRRS { rd, csr, rs1 } => write!(f, "{:6} {:?},{:?},{:?}","csrrs", rd, csr, rs1),
+            CSR::CSRRC { rd, csr, rs1 } => write!(f, "{:6} {:?},{:?},{:?}","csrrc", rd, csr, rs1),
+            CSR::CSRRSI { rd, csr, imm } => write!(f, "{:6} {:?},{:?},{:?}","csrrsi", rd, csr, imm),
+            CSR::CSRRCI { rd, csr, imm } => write!(f, "{:6} {:?},{:?},{:?}","csrrci", rd, csr, imm),
+            CSR::CSRRWI { rd, csr, imm } => write!(f, "{:6} {:?},{:?},{:?}","csrrwi", rd, csr, imm),
         }
     }
 }
@@ -562,15 +601,36 @@ pub enum Loads {
 impl Debug for Loads {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Loads::LB { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","lb", rd, imm, rs1),
-            Loads::LH { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","lh", rd, imm, rs1),
-            Loads::LBU { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","lbu", rd, imm, rs1),
-            Loads::LHU { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","lhu", rd, imm, rs1),
-            Loads::LW { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","lw", rd, imm, rs1),
+            Loads::LB { rd, rs1, imm } => write!(f, "{:5} {:?},{:?}({:?})","lb", rd, imm, rs1),
+            Loads::LH { rd, rs1, imm } => write!(f, "{:5} {:?},{:?}({:?})","lh", rd, imm, rs1),
+            Loads::LBU { rd, rs1, imm } => write!(f, "{:5} {:?},{:?}({:?})","lbu", rd, imm, rs1),
+            Loads::LHU { rd, rs1, imm } => write!(f, "{:5} {:?},{:?}({:?})","lhu", rd, imm, rs1),
+            Loads::LW { rd, rs1, imm } => write!(f, "{:5} {:?},{:?}({:?})","lw", rd, imm, rs1),
 
-            Loads::LWU { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","lwu", rd, imm, rs1),
-            Loads::LD { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","ld", rd, imm, rs1),
+            Loads::LWU { rd, rs1, imm } => write!(f, "{:5} {:?},{:?}({:?})","lwu", rd, imm, rs1),
+            Loads::LD { rd, rs1, imm } => write!(f, "{:5} {:?},{:?}({:?})","ld", rd, imm, rs1),
         }
+    }
+}
+impl Loads{
+    pub fn new(size:usize,reg1:Register,reg2:Register, offset:isize) -> Result<Self>{
+        Ok(match size{
+            8 => {
+                Loads::new_ld(reg1, reg2, Imm::from_offset(offset))
+            },
+            4 => {
+                Loads::new_lw(reg1, reg2, Imm::from_offset(offset))
+            },
+            2 => {
+                Loads::new_lh(reg1, reg2, Imm::from_offset(offset))
+            },
+            1 => {
+                Loads::new_lb(reg1, reg2, Imm::from_offset(offset))
+            },
+            _ => {
+                return Err(anyhow!("unexpected load size"))
+            }
+        })
     }
 }
 #[derive(Clone,new)]
@@ -583,14 +643,35 @@ pub enum Stores {
     ///Store Word
     SW { rs1:Register, rs2:Register, imm:Imm }, SD { rs1:Register, rs2:Register, imm:Imm},
 }
+impl Stores{
+    pub fn new(size:usize,reg1:Register,reg2:Register, offset:isize) -> Result<Self>{
+        Ok(match size{
+            8 => {
+                Stores::new_sd(reg1, reg2, Imm::from_offset(offset))
+            },
+            4 => {
+                Stores::new_sw(reg1, reg2, Imm::from_offset(offset))
+            },
+            2 => {
+                Stores::new_sh(reg1, reg2, Imm::from_offset(offset))
+            },
+            1 => {
+                Stores::new_sb(reg1, reg2, Imm::from_offset(offset))
+            },
+            _ => {
+                return Err(anyhow!("unexpected store size"))
+            }
+        })
+    }
+}
 impl Debug for Stores {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Stores::SB { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","sb", rs1, rs2, imm),
-            Stores::SH { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","sh", rs1, rs2, imm),
-            Stores::SW { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","sw", rs1, rs2, imm),
+            Stores::SB { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?}({:?})","sb", rs1, imm, rs2),
+            Stores::SH { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?}({:?})","sh", rs1, imm, rs2),
+            Stores::SW { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?}({:?})","sw", rs1, imm, rs2),
 
-            Stores::SD { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","sd", rs1, rs2, imm),
+            Stores::SD { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?}({:?})","sd", rs1, imm, rs2),
         }
     }
 }

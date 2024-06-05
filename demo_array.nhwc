@@ -6,23 +6,57 @@
       store 1:i32 temp_0:ptr->Array:i32:[] 
       new_var d:Array:f32:[10, 10] 
       new_var temp_1:ptr->f32 
-      temp_1 = getelementptr d:Array:f32:[10, 10] [0, 0] 
-      store 0.:f32 temp_1:ptr->Array:f32:[10] 
+      temp_1 = getelementptr d:Array:f32:[10, 10] [0, 2] 
+      store 1.:f32 temp_1:ptr->Array:f32:[10] 
       new_var temp_2:ptr->f32 
-      temp_2 = getelementptr d:Array:f32:[10, 10] [1, 0] 
-      store 3.:f32 temp_2:ptr->Array:f32:[10] 
+      temp_2 = getelementptr d:Array:f32:[10, 10] [0, 0] 
+      store 0.:f32 temp_2:ptr->Array:f32:[10] 
       new_var temp_3:ptr->f32 
-      temp_3 = getelementptr d:Array:f32:[10, 10] [0, 2] 
-      store 1.:f32 temp_3:ptr->Array:f32:[10] 
+      temp_3 = getelementptr d:Array:f32:[10, 10] [0, 1] 
+      store 0.:f32 temp_3:ptr->Array:f32:[10] 
       new_var temp_4:ptr->f32 
-      temp_4 = getelementptr d:Array:f32:[10, 10] [0, 1] 
-      store 0.:f32 temp_4:ptr->Array:f32:[10] 
+      temp_4 = getelementptr d:Array:f32:[10, 10] [1, 0] 
+      store 3.:f32 temp_4:ptr->Array:f32:[10] 
       global Fn[m]->a_ret a 
       Define main [] -> main_ret 
-              alloc i32 temp_5 
+              alloc i32 b 
+              alloc i32 c 
+              alloc ptr->i32 temp_5 
+              alloc ptr->i32 temp_6 
+              alloc ptr->i32 temp_7 
+              alloc ptr->i32 temp_8 
+              alloc ptr->i32 temp_9 
+              alloc ptr->i32 temp_10 
+              alloc Array:i32:[2, 3] d 
+              alloc ptr->i32 temp_11 
+              alloc i32 temp_12 
           label %0: 
-              new_var temp_5:i32 
-              temp_5 =  Call i32 a(3) 
+              new_var b:i32 
+              c = 3 
+              new_var d:Array:i32:[2, 3] 
+              new_var temp_5:ptr->i32 
+              temp_5 = getelementptr d:Array:i32:[2, 3] [0, 1] 
+              store 2:i32 temp_5:ptr->Array:i32:[3] 
+              new_var temp_6:ptr->i32 
+              temp_6 = getelementptr d:Array:i32:[2, 3] [0, 0] 
+              store 1:i32 temp_6:ptr->Array:i32:[3] 
+              new_var temp_7:ptr->i32 
+              temp_7 = getelementptr d:Array:i32:[2, 3] [0, 2] 
+              store 3:i32 temp_7:ptr->Array:i32:[3] 
+              new_var temp_8:ptr->i32 
+              temp_8 = getelementptr d:Array:i32:[2, 3] [1, 0] 
+              store 4:i32 temp_8:ptr->Array:i32:[3] 
+              new_var temp_9:ptr->i32 
+              temp_9 = getelementptr d:Array:i32:[2, 3] [1, 2] 
+              store 6:i32 temp_9:ptr->Array:i32:[3] 
+              new_var temp_10:ptr->i32 
+              temp_10 = getelementptr d:Array:i32:[2, 3] [1, 1] 
+              store 5:i32 temp_10:ptr->Array:i32:[3] 
+              new_var temp_11:ptr->i32 
+              new_var temp_12:i32 
+              temp_11 = getelementptr d:Array:i32:[2, 3] [1, 2] 
+              temp_12 = load temp_11:ptr->i32 
+              b = temp_12 
               ret 0 
       Define b [s] -> b_ret 
           label %1: 

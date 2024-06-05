@@ -6,6 +6,7 @@ use anyhow::Result;
 use crate::Args;
 
 use super::cfg_node::InstrList;
+use super::gen_riscv_asm::AsmStructure;
 use super::nhwc_instr::NhwcInstr;
 use super::riscv_instr::RiscvInstr;
 use super::{
@@ -28,6 +29,7 @@ pub struct NhwcCtx {
     pub symtab_graph:SymTabGraph,
     pub nhwc_instr_slab:InstrSlab<NhwcInstr>,
     pub riscv_instr_slab:InstrSlab<RiscvInstr>,
+    pub asm_structure:AsmStructure,
     pub def_use_graph:DefUseGraph,
     pub collected_nhwc_ir: InstrList,
     pub io_task_list: Vec<JoinHandle<Result<()>>>,
@@ -51,6 +53,7 @@ impl NhwcCtx {
             symtab_graph:SymTabGraph::new(),
             nhwc_instr_slab:InstrSlab::new(),
             riscv_instr_slab: InstrSlab::new(),
+            asm_structure: AsmStructure::new(),
             dj_graph: DjGraph::new(),
             def_use_graph: DefUseGraph::new(),
             io_task_list: vec![],
