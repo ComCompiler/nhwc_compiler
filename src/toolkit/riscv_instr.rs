@@ -65,7 +65,7 @@ impl Debug for RiscvInstr{
     }
 }
 
-#[derive(Clone, Debug, derive_new::new)]
+#[derive(Clone, derive_new::new)]
 pub enum PseudoInstr {
     Nop {},
     Neg {rd:Register ,rs:Register},
@@ -140,7 +140,86 @@ pub enum PseudoInstr {
 
     Fence {},
 }
-#[derive(Clone, Debug, new)]
+impl Debug for PseudoInstr {
+    fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PseudoInstr::Nop {} => write!(f, "nop"),
+            PseudoInstr::Neg {rd, rs} => write!(f, "neg {:?}, {:?}", rd, rs),
+            PseudoInstr::Negw {rd, rs} => write!(f, "negw {:?}, {:?}", rd, rs),
+
+            PseudoInstr::Snez {rd, rs} => write!(f, "snez {:?}, {:?}", rd, rs),
+            PseudoInstr::Sltz {rd, rs} => write!(f, "sltz {:?}, {:?}", rd, rs),
+            PseudoInstr::Sgtz {rd, rs} => write!(f, "sgtz {:?}, {:?}", rd, rs),
+
+            PseudoInstr::Beqz {rs, offset} => write!(f, "beqz {:?}, {:?}", rs, offset),
+            PseudoInstr::Bnez {rs, offset} => write!(f, "bnez {:?}, {:?}", rs, offset),
+            PseudoInstr::Blez {rs, offset} => write!(f, "blez {:?}, {:?}", rs, offset),
+            PseudoInstr::Bgez {rs, offset} => write!(f, "bgez {:?}, {:?}", rs, offset),
+            PseudoInstr::Bltz {rs, offset} => write!(f, "bltz {:?}, {:?}", rs, offset),
+            PseudoInstr::Bgtz {rs, offset} => write!(f, "bgtz {:?}, {:?}", rs, offset),
+
+            PseudoInstr::J {offset} => write!(f, "j {:?}", offset),
+            PseudoInstr::Jr {rs} => write!(f, "jr {:?}", rs),
+            PseudoInstr::Ret {} => write!(f, "ret"),
+
+            PseudoInstr::Tail {offset} => write!(f, "tail {:?}", offset),
+
+            PseudoInstr::Rdinstret {rd} => write!(f, "rdinstret {:?}", rd),
+            PseudoInstr::Rdinstreth {rd} => write!(f, "rdinstreth {:?}", rd),
+            PseudoInstr::Rdcycle {rd} => write!(f, "rdcycle {:?}", rd),
+            PseudoInstr::Rdtime {rd} => write!(f, "rdtime {:?}", rd),
+            PseudoInstr::Rdcycleh {rd} => write!(f, "rdcycleh {:?}", rd),
+            PseudoInstr::Rdtimeh {rd} => write!(f, "rdtimeh {:?}", rd),
+
+            PseudoInstr::Lla { rd, symbol } => write!(f, "lla {:?}, {:?}", rd, symbol),
+
+            PseudoInstr::La { rd, symbol } => write!(f, "la {:?}, {:?}", rd, symbol),
+            
+            PseudoInstr::Lb { rd, symbol } => write!(f, "lb {:?}, {:?}", rd, symbol),
+            PseudoInstr::Lh { rd, symbol } => write!(f, "lh {:?}, {:?}", rd, symbol),
+            PseudoInstr::Lw { rd, symbol } => write!(f, "lw {:?}, {:?}", rd, symbol),
+            PseudoInstr::Ld { rd, symbol } => write!(f, "ld {:?}, {:?}", rd, symbol),
+
+            PseudoInstr::Sb { rd, symbol, rt } => write!(f, "sb {:?}, {:?}, {:?}", rd, symbol, rt),
+            PseudoInstr::Sh { rd, symbol, rt } => write!(f, "sh {:?}, {:?}, {:?}", rd, symbol, rt),
+            PseudoInstr::Sw { rd, symbol, rt } => write!(f, "sw {:?}, {:?}, {:?}", rd, symbol, rt),
+            PseudoInstr::Sd { rd, symbol, rt } => write!(f, "sd {:?}, {:?}, {:?}", rd, symbol, rt),
+
+            PseudoInstr::Flw { rd, symbol, rt } => write!(f, "flw {:?}, {:?}, {:?}", rd, symbol, rt),
+            PseudoInstr::Fld { rd, symbol, rt } => write!(f, "fld {:?}, {:?}, {:?}", rd, symbol, rt),
+
+            PseudoInstr::Fsw { rd, symbol, rt } => write!(f, "fsw {:?}, {:?}, {:?}", rd, symbol, rt),
+            PseudoInstr::Fsd { rd, symbol, rt } => write!(f, "fsd {:?}, {:?}, {:?}", rd, symbol, rt),
+
+            PseudoInstr::Li { rd, imm } => write!(f, "li {:?}, {:?}", rd, imm),
+            PseudoInstr::Mv { rd, rs } => write!(f, "mv {:?}, {:?}", rd, rs),
+            PseudoInstr::Not { rd, rs } => write!(f, "not {:?}, {:?}", rd, rs),
+            PseudoInstr::Sext_w { rd, rs } => write!(f, "sext.w {:?}, {:?}", rd, rs),
+            PseudoInstr::Seqz { rd, rs } => write!(f, "seqz {:?}, {:?}", rd, rs),
+
+            PseudoInstr::Fmv_s { rd, rs } => write!(f, "fmv.s {:?}, {:?}", rd, rs),
+            PseudoInstr::Fabs_s { rd, rs } => write!(f, "fabs.s {:?}, {:?}", rd, rs),
+            PseudoInstr::Fneg_s { rd, rs } => write!(f, "fneg.s {:?}, {:?}", rd, rs),
+            PseudoInstr::Fmv_d { rd, rs } => write!(f, "fmv.d {:?}, {:?}", rd, rs),
+            PseudoInstr::Fabs_d { rd, rs } => write!(f, "fabs.d {:?}, {:?}", rd, rs),
+            PseudoInstr::Fneg_d { rd, rs } => write!(f, "fneg.d {:?}, {:?}", rd, rs),
+
+            PseudoInstr::Bgt { rs, rd, offset } => write!(f, "bgt {:?}, {:?}, {:?}", rs, rd, offset),
+            PseudoInstr::Ble { rs, rd, offset } => write!(f, "ble {:?}, {:?}, {:?}", rs, rd, offset),
+            PseudoInstr::Bgtu { rs, rd, offset } => write!(f, "bgtu {:?}, {:?}, {:?}", rs, rd, offset),
+            PseudoInstr::Bleu { rs, rd, offset } => write!(f, "bleu {:?}, {:?}, {:?}", rs, rd, offset),
+
+            PseudoInstr::Jal { offset } => write!(f, "jal x1, {:?}", offset),
+            PseudoInstr::Jalr { rs} => write!(f, "jalr x1, {:?}, 0", rs),
+
+            PseudoInstr::Call { offset } => write!(f, "call {:?}", offset),
+
+            PseudoInstr::Fence {  } => write!(f, "fence iorw, iorw"),
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
 pub enum BaseIntInstr {
     Shifts(Shifts),
     Arithmetic(Arithmetic),
