@@ -16,7 +16,7 @@ pub enum RiscvInstrType {
     BaseIntInstr(BaseIntInstr),
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub enum Pseudoinstruction {
     nop {},
     neg {rd:Register ,rs:Register},
@@ -91,6 +91,85 @@ pub enum Pseudoinstruction {
 
     fence {},
 }
+impl Debug for Pseudoinstruction {
+    fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Pseudoinstruction::nop {} => write!(f, "nop"),
+            Pseudoinstruction::neg {rd, rs} => write!(f, "neg {:?}, {:?}", rd, rs),
+            Pseudoinstruction::negw {rd, rs} => write!(f, "negw {:?}, {:?}", rd, rs),
+
+            Pseudoinstruction::snez {rd, rs} => write!(f, "snez {:?}, {:?}", rd, rs),
+            Pseudoinstruction::sltz {rd, rs} => write!(f, "sltz {:?}, {:?}", rd, rs),
+            Pseudoinstruction::sgtz {rd, rs} => write!(f, "sgtz {:?}, {:?}", rd, rs),
+
+            Pseudoinstruction::beqz {rs, offset} => write!(f, "beqz {:?}, {:?}", rs, offset),
+            Pseudoinstruction::bnez {rs, offset} => write!(f, "bnez {:?}, {:?}", rs, offset),
+            Pseudoinstruction::blez {rs, offset} => write!(f, "blez {:?}, {:?}", rs, offset),
+            Pseudoinstruction::bgez {rs, offset} => write!(f, "bgez {:?}, {:?}", rs, offset),
+            Pseudoinstruction::bltz {rs, offset} => write!(f, "bltz {:?}, {:?}", rs, offset),
+            Pseudoinstruction::bgtz {rs, offset} => write!(f, "bgtz {:?}, {:?}", rs, offset),
+
+            Pseudoinstruction::j {offset} => write!(f, "j {:?}", offset),
+            Pseudoinstruction::jr {rs} => write!(f, "jr {:?}", rs),
+            Pseudoinstruction::ret {} => write!(f, "ret"),
+
+            Pseudoinstruction::tail {offset} => write!(f, "tail {:?}", offset),
+
+            Pseudoinstruction::rdinstret {rd} => write!(f, "rdinstret {:?}", rd),
+            Pseudoinstruction::rdinstreth {rd} => write!(f, "rdinstreth {:?}", rd),
+            Pseudoinstruction::rdcycle {rd} => write!(f, "rdcycle {:?}", rd),
+            Pseudoinstruction::rdtime {rd} => write!(f, "rdtime {:?}", rd),
+            Pseudoinstruction::rdcycleh {rd} => write!(f, "rdcycleh {:?}", rd),
+            Pseudoinstruction::rdtimeh {rd} => write!(f, "rdtimeh {:?}", rd),
+
+            Pseudoinstruction::lla { rd, symbol } => write!(f, "lla {:?}, {:?}", rd, symbol),
+
+            Pseudoinstruction::la { rd, symbol } => write!(f, "la {:?}, {:?}", rd, symbol),
+            
+            Pseudoinstruction::lb { rd, symbol } => write!(f, "lb {:?}, {:?}", rd, symbol),
+            Pseudoinstruction::lh { rd, symbol } => write!(f, "lh {:?}, {:?}", rd, symbol),
+            Pseudoinstruction::lw { rd, symbol } => write!(f, "lw {:?}, {:?}", rd, symbol),
+            Pseudoinstruction::ld { rd, symbol } => write!(f, "ld {:?}, {:?}", rd, symbol),
+
+            Pseudoinstruction::sb { rd, symbol, rt } => write!(f, "sb {:?}, {:?}, {:?}", rd, symbol, rt),
+            Pseudoinstruction::sh { rd, symbol, rt } => write!(f, "sh {:?}, {:?}, {:?}", rd, symbol, rt),
+            Pseudoinstruction::sw { rd, symbol, rt } => write!(f, "sw {:?}, {:?}, {:?}", rd, symbol, rt),
+            Pseudoinstruction::sd { rd, symbol, rt } => write!(f, "sd {:?}, {:?}, {:?}", rd, symbol, rt),
+
+            Pseudoinstruction::flw { rd, symbol, rt } => write!(f, "flw {:?}, {:?}, {:?}", rd, symbol, rt),
+            Pseudoinstruction::fld { rd, symbol, rt } => write!(f, "fld {:?}, {:?}, {:?}", rd, symbol, rt),
+
+            Pseudoinstruction::fsw { rd, symbol, rt } => write!(f, "fsw {:?}, {:?}, {:?}", rd, symbol, rt),
+            Pseudoinstruction::fsd { rd, symbol, rt } => write!(f, "fsd {:?}, {:?}, {:?}", rd, symbol, rt),
+
+            Pseudoinstruction::li { rd, imm } => write!(f, "li {:?}, {:?}", rd, imm),
+            Pseudoinstruction::mv { rd, rs } => write!(f, "mv {:?}, {:?}", rd, rs),
+            Pseudoinstruction::not { rd, rs } => write!(f, "not {:?}, {:?}", rd, rs),
+            Pseudoinstruction::sext_w { rd, rs } => write!(f, "sext.w {:?}, {:?}", rd, rs),
+            Pseudoinstruction::seqz { rd, rs } => write!(f, "seqz {:?}, {:?}", rd, rs),
+
+            Pseudoinstruction::fmv_s { rd, rs } => write!(f, "fmv.s {:?}, {:?}", rd, rs),
+            Pseudoinstruction::fabs_s { rd, rs } => write!(f, "fabs.s {:?}, {:?}", rd, rs),
+            Pseudoinstruction::fneg_s { rd, rs } => write!(f, "fneg.s {:?}, {:?}", rd, rs),
+            Pseudoinstruction::fmv_d { rd, rs } => write!(f, "fmv.d {:?}, {:?}", rd, rs),
+            Pseudoinstruction::fabs_d { rd, rs } => write!(f, "fabs.d {:?}, {:?}", rd, rs),
+            Pseudoinstruction::fneg_d { rd, rs } => write!(f, "fneg.d {:?}, {:?}", rd, rs),
+
+            Pseudoinstruction::bgt { rs, rd, offset } => write!(f, "bgt {:?}, {:?}, {:?}", rs, rd, offset),
+            Pseudoinstruction::ble { rs, rd, offset } => write!(f, "ble {:?}, {:?}, {:?}", rs, rd, offset),
+            Pseudoinstruction::bgtu { rs, rd, offset } => write!(f, "bgtu {:?}, {:?}, {:?}", rs, rd, offset),
+            Pseudoinstruction::bleu { rs, rd, offset } => write!(f, "bleu {:?}, {:?}, {:?}", rs, rd, offset),
+
+            Pseudoinstruction::jal { offset } => write!(f, "jal x1, {:?}", offset),
+            Pseudoinstruction::jalr { rs} => write!(f, "jalr x1, {:?}, 0", rs),
+
+            Pseudoinstruction::call { offset } => write!(f, "call {:?}", offset),
+
+            Pseudoinstruction::fence {  } => write!(f, "fence iorw, iorw"),
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub enum BaseIntInstr {
     Shifts(Shifts),
