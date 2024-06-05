@@ -29,18 +29,30 @@ impl Pass for MemAllocPass {
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> { 
         let (cfg_graph ,instr_slab, symtab)= (&mut ctx.cfg_graph,&ctx.nhwc_instr_slab,&mut ctx.symtab);
         let cfg_entries = direct_child_nodes!(at CFG_ROOT in cfg_graph);
-        add_symbol!({Symbol::new_from_symidx(&S0)}
-            with_field TYPE:{Type::Ptr64 { ty: Box::new(Type::Void) }}
-            to symtab
-        );
-        add_symbol!({Symbol::new_from_symidx(&RA)}
-            with_field TYPE:{Type::Ptr64 { ty: Box::new(Type::Void) }}
-            to symtab
-        );
         for &cfg_entry in &cfg_entries{
+            let s0_symidx = add_symbol!({
+                let mut s0_for_cfg_entry = S0.clone();
+                s0_for_cfg_entry.symbol_name = format!("{}_{}",s0_for_cfg_entry.symbol_name,node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?.symbol_name);
+                Symbol::new_from_symidx(&s0_for_cfg_entry)
+            }
+                with_field TYPE:{Type::Ptr64 { ty: Box::new(Type::Void) }}
+                to symtab
+            );
+            let ra_symidx = add_symbol!({
+                let mut ra_for_cfg_entry = RA.clone();
+                ra_for_cfg_entry.symbol_name = format!("{}_{}",ra_for_cfg_entry.symbol_name,node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?.symbol_name);
+                Symbol::new_from_symidx(&ra_for_cfg_entry)
+            }
+                with_field TYPE:{Type::Ptr64 { ty: Box::new(Type::Void) }}
+                to symtab
+            );
+            // tell func symbol its ra_symidx & s0_symidx
+            symtab.get_mut_symbol(node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?)?.add_func_cor_ra_symidx(ra_symidx.clone());
+            symtab.get_mut_symbol(node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?)?.add_func_cor_s0_symidx(s0_symidx.clone());
+
             node_mut!(at cfg_entry in cfg_graph).add_mem_layout(MemLayout::new());
-            alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &S0)?;
-            alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &RA)?;
+            alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &s0_symidx)?;
+            alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &ra_symidx)?;
             for &instr in node!(at cfg_entry in cfg_graph).instrs.clone().iter(){
                 match &instr!(at instr in instr_slab)?.instr_type{
                     crate::toolkit::nhwc_instr::NhwcInstrType::DefineFunc { func_symidx: _, ret_symidx: _, args } => {
@@ -55,26 +67,23 @@ impl Pass for MemAllocPass {
                 }
             }
             node_mut!(at cfg_entry in cfg_graph).get_mut_mem_layout()?.align_mem_with_blank(RISCV_STACK_MEM_ALIGN);
+            // we now can calculate offset2sp after mem_layout is calculated.
+            calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &ra_symidx)?;
+            calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &s0_symidx)?;
+            for &instr in node!(at cfg_entry in cfg_graph).instrs.clone().iter(){
+                match &instr!(at instr in instr_slab)?.instr_type{
+                    crate::toolkit::nhwc_instr::NhwcInstrType::DefineFunc { func_symidx: _, ret_symidx: _, args } => {
+                        for arg in args{
+                            calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &arg.to_src_symidx())?;
+                        }
+                    },
+                    crate::toolkit::nhwc_instr::NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
+                        calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &var_symidx.to_src_symidx())?;
+                    },
+                    _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 之外的 instr"));},
+                }
+            }
         }
-        // for &cfg_entry in &cfg_entries{
-        //     node_mut!(at cfg_entry in cfg_graph).add_mem_layout(MemLayout::new());
-        //     calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &S0)?;
-        //     calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &RA)?;
-        //     for &instr in node!(at cfg_entry in cfg_graph).instrs.clone().iter(){
-        //         match &instr!(at instr in instr_slab)?.instr_type{
-        //             crate::toolkit::nhwc_instr::NhwcInstrType::DefineFunc { func_symidx: _, ret_symidx: _, args } => {
-        //                 for arg in args{
-        //                     calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &arg.to_src_symidx())?;
-        //                 }
-        //             },
-        //             crate::toolkit::nhwc_instr::NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
-        //                 calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &var_symidx.to_src_symidx())?;
-        //             },
-        //             _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 之外的 instr"));},
-        //         }
-        //     }
-        // }
-
         Ok(()) 
     }
     // 返回pass的描述，具体作用

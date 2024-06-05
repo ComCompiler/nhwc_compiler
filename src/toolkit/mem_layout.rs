@@ -12,6 +12,8 @@ use itertools::{self, Itertools};
 reg_field_for_struct!(Symbol {
         MEM_OFFSET2S0:usize,
         MEM_OFFSET2SP:usize,
+        FUNC_COR_RA_SYMIDX:SymIdx,
+        FUNC_COR_S0_SYMIDX:SymIdx,
     } with_fields fields);
 reg_field_for_struct!(CfgNode {
     MEM_LAYOUT:MemLayout,

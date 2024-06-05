@@ -9,14 +9,14 @@
       temp_1 = getelementptr d:Array:f32:[10, 10] [0, 0] 
       store 0.:f32 temp_1:ptr->Array:f32:[10] 
       new_var temp_2:ptr->f32 
-      temp_2 = getelementptr d:Array:f32:[10, 10] [0, 1] 
-      store 0.:f32 temp_2:ptr->Array:f32:[10] 
+      temp_2 = getelementptr d:Array:f32:[10, 10] [1, 0] 
+      store 3.:f32 temp_2:ptr->Array:f32:[10] 
       new_var temp_3:ptr->f32 
-      temp_3 = getelementptr d:Array:f32:[10, 10] [1, 0] 
-      store 3.:f32 temp_3:ptr->Array:f32:[10] 
+      temp_3 = getelementptr d:Array:f32:[10, 10] [0, 2] 
+      store 1.:f32 temp_3:ptr->Array:f32:[10] 
       new_var temp_4:ptr->f32 
-      temp_4 = getelementptr d:Array:f32:[10, 10] [0, 2] 
-      store 1.:f32 temp_4:ptr->Array:f32:[10] 
+      temp_4 = getelementptr d:Array:f32:[10, 10] [0, 1] 
+      store 0.:f32 temp_4:ptr->Array:f32:[10] 
       global Fn[m]->a_ret a 
       Define main [] -> main_ret 
               alloc i32 temp_5 

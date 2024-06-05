@@ -1,5 +1,8 @@
 use std::fmt::{write, Debug, Formatter};
 
+
+use derive_new::new;
+
 use super::{field::{Fields}, symtab::SymIdx};
 
 
@@ -12,33 +15,32 @@ use super::{field::{Fields}, symtab::SymIdx};
 
 #[derive(Clone)]
 pub enum Imm{
-    OffsetReg{
-        offset:usize,
-        reg: Register,
+    Label{
+        symidx:SymIdx,
     },
-    Constant{
+    Literal{
         symidx:SymIdx,
     }
 }
 impl Imm{
-    pub fn new_offset_reg(offset:usize, reg: Register) -> Self{
-        Self::OffsetReg { offset, reg }
+    pub fn new_label(label:SymIdx) -> Self{
+        Self::Label { symidx:label } 
     }
-    pub fn new_const(symidx:SymIdx) -> Self{
-        Self::Constant { symidx }
+    pub fn new_literal(symidx:SymIdx) -> Self{
+        Self::Literal { symidx }
     }
     pub fn from_offset(offset:usize)-> Self{
-        Self::Constant { symidx:SymIdx::from(offset) }
+        Self::Literal { symidx:SymIdx::from(offset) }
     }
 }
 
 impl Debug for Imm{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::OffsetReg { offset, reg } =>{
-                write!(f,"{}({:?})", offset, reg)
+            Self::Label {symidx} =>{
+                write!(f,"{}",symidx)
             },
-            Self::Constant { symidx } => {
+            Self::Literal { symidx } => {
                 write!(f,"{}", symidx)
             }
         }
@@ -48,6 +50,7 @@ impl Debug for Imm{
 #[derive(Clone)]
 pub enum RiscvInstr {
     BaseIntInstr(BaseIntInstr),
+    PseudoInstr(PseudoInstr),
 }
 impl Debug for RiscvInstr{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -55,86 +58,89 @@ impl Debug for RiscvInstr{
             Self::BaseIntInstr(arg0) => {
                 write!(f,"{:?}",arg0)
             },
+            RiscvInstr::PseudoInstr(arg0) => {
+                write!(f,"{:?}",arg0)
+            },
         }
     }
 }
 
-#[derive(Clone, Debug)]
-pub enum Pseudoinstruction {
-    nop {},
-    neg {rd:Register ,rs:Register},
-    negw {rd:Register ,rs:Register},
+#[derive(Clone, Debug, derive_new::new)]
+pub enum PseudoInstr {
+    Nop {},
+    Neg {rd:Register ,rs:Register},
+    Negw {rd:Register ,rs:Register},
 
-    snez {rd:Register ,rs:Register},
-    sltz {rd:Register ,rs:Register},
-    sgtz {rd:Register ,rs:Register},
+    Snez {rd:Register ,rs:Register},
+    Sltz {rd:Register ,rs:Register},
+    Sgtz {rd:Register ,rs:Register},
 
-    beqz {rs:Register ,offset:Value},
-    bnez {rs:Register ,offset:Value},
-    blez {rs:Register ,offset:Value},
-    bgez {rs:Register ,offset:Value},
-    bltz {rs:Register ,offset:Value},
-    bgtz {rs:Register ,offset:Value},
+    Beqz {rs:Register ,offset:Imm},
+    Bnez {rs:Register ,offset:Imm},
+    Blez {rs:Register ,offset:Imm},
+    Bgez {rs:Register ,offset:Imm},
+    Bltz {rs:Register ,offset:Imm},
+    Bgtz {rs:Register ,offset:Imm},
 
-    j {offset:Value},
-    jr {rs:Register },
-    ret {},
+    J {offset:Imm},
+    Jr {rs:Register },
+    Ret {},
 
-    tail {offset:Value},
+    Tail {offset:Imm},
 
-    rdinstret {rd:Register },
-    rdinstreth {rd:Register },
-    rdcycle {rd:Register },
-    rdcycleh {rd:Register },
-    rdtime {rd:Register },
-    rdtimeh {rd:Register },
+    Rdinstret {rd:Register },
+    Rdinstreth {rd:Register },
+    Rdcycle {rd:Register },
+    Rdcycleh {rd:Register },
+    Rdtime {rd:Register },
+    Rdtimeh {rd:Register },
 
-    lla {rd:Register ,symbol:SymIdx},
+    Lla {rd:Register ,symbol:SymIdx},
 
-    la {rd:Register ,symbol:SymIdx},
+    La {rd:Register ,symbol:SymIdx},
 
-    lb {rd:Register ,symbol:SymIdx},
-    lh {rd:Register ,symbol:SymIdx},
-    lw {rd:Register ,symbol:SymIdx},
-    ld {rd:Register ,symbol:SymIdx},
+    Lb {rd:Register ,symbol:SymIdx},
+    Lh {rd:Register ,symbol:SymIdx},
+    Lw {rd:Register ,symbol:SymIdx},
+    Ld {rd:Register ,symbol:SymIdx},
 
-    sb {rd:Register ,symbol:SymIdx ,rt:Register},
-    sh {rd:Register ,symbol:SymIdx ,rt:Register},
-    sw {rd:Register ,symbol:SymIdx ,rt:Register},
-    sd {rd:Register ,symbol:SymIdx ,rt:Register},
+    Sb {rd:Register ,symbol:SymIdx ,rt:Register},
+    Sh {rd:Register ,symbol:SymIdx ,rt:Register},
+    Sw {rd:Register ,symbol:SymIdx ,rt:Register},
+    Sd {rd:Register ,symbol:SymIdx ,rt:Register},
 
-    flw {rd:Register ,symbol:SymIdx ,rt:Register},
-    fld {rd:Register ,symbol:SymIdx ,rt:Register},
+    Flw {rd:Register ,symbol:SymIdx ,rt:Register},
+    Fld {rd:Register ,symbol:SymIdx ,rt:Register},
 
-    fsw {rd:Register ,symbol:SymIdx ,rt:Register},
-    fsd {rd:Register ,symbol:SymIdx ,rt:Register},
+    Fsw {rd:Register ,symbol:SymIdx ,rt:Register},
+    Fsd {rd:Register ,symbol:SymIdx ,rt:Register},
 
-    li {rd:Register ,imm:Value},
-    mv {rd:Register ,rs:Register},
-    not {rd:Register ,rs:Register},
-    sext_w {rd:Register ,rs:Register},
-    seqz {rd:Register ,rs:Register},
+    Li {rd:Register ,imm:Imm},
+    Mv {rd:Register ,rs:Register},
+    Not {rd:Register ,rs:Register},
+    Sext_w {rd:Register ,rs:Register},
+    Seqz {rd:Register ,rs:Register},
 
-    fmv_s {rd:Register ,rs:Register},
-    fabs_s {rd:Register ,rs:Register},
-    fneg_s {rd:Register ,rs:Register},
-    fmv_d {rd:Register ,rs:Register},
-    fabs_d {rd:Register ,rs:Register},
-    fneg_d {rd:Register ,rs:Register},
+    Fmv_s {rd:Register ,rs:Register},
+    Fabs_s {rd:Register ,rs:Register},
+    Fneg_s {rd:Register ,rs:Register},
+    Fmv_d {rd:Register ,rs:Register},
+    Fabs_d {rd:Register ,rs:Register},
+    Fneg_d {rd:Register ,rs:Register},
 
-    bgt {rs:Register ,rd:Register ,offset:Value},
-    ble {rs:Register ,rd:Register ,offset:Value},
-    bgtu {rs:Register ,rd:Register ,offset:Value},
-    bleu {rs:Register ,rd:Register ,offset:Value},
+    Bgt {rs:Register ,rd:Register ,offset:Imm},
+    Ble {rs:Register ,rd:Register ,offset:Imm},
+    Bgtu {rs:Register ,rd:Register ,offset:Imm},
+    Bleu {rs:Register ,rd:Register ,offset:Imm},
 
-    jal {offset:Value},
-    jalr {rs:Register},
+    Jal {offset:Imm},
+    Jalr {rs:Register},
 
-    call {offset:Value},
+    Call {offset:Imm},
 
-    fence {},
+    Fence {},
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, new)]
 pub enum BaseIntInstr {
     Shifts(Shifts),
     Arithmetic(Arithmetic),
@@ -147,6 +153,48 @@ pub enum BaseIntInstr {
     Loads(Loads),
     Stores(Stores),
 }
+
+macro_rules! impl_from {
+    ($t1:ident,$t2:ty) => {
+        impl From<$t1> for $t2{
+            fn from(value: $t1) -> Self {
+                Self::$t1(value)
+            }
+        }
+    };
+}
+/// before using this macro, you should have impl t1-> t3 , t3-> t2  respectively
+macro_rules! impl_from_indirectly {
+    ($t1:ident,$t3:ident,$t2:ty) => {
+        impl From<$t1> for $t2{
+            fn from(value: $t1) -> Self {
+                Self::$t3(value.into())
+            }
+        }
+    };
+}
+impl_from!(Shifts,BaseIntInstr);
+impl_from!(Arithmetic,BaseIntInstr);
+impl_from!(Logical,BaseIntInstr);
+impl_from!(Compare,BaseIntInstr);
+impl_from!(Branch,BaseIntInstr);
+impl_from!(JumpAndLink,BaseIntInstr);
+impl_from!(Environment,BaseIntInstr);
+impl_from!(CSR,BaseIntInstr);
+impl_from!(Loads,BaseIntInstr);
+impl_from!(Stores,BaseIntInstr);
+
+impl_from_indirectly!(Shifts,BaseIntInstr,RiscvInstr);
+impl_from_indirectly!(Arithmetic,BaseIntInstr,RiscvInstr);
+impl_from_indirectly!(Logical,BaseIntInstr,RiscvInstr);
+impl_from_indirectly!(Compare,BaseIntInstr,RiscvInstr);
+impl_from_indirectly!(Branch,BaseIntInstr,RiscvInstr);
+impl_from_indirectly!(JumpAndLink,BaseIntInstr,RiscvInstr);
+impl_from_indirectly!(Environment,BaseIntInstr,RiscvInstr);
+impl_from_indirectly!(CSR,BaseIntInstr,RiscvInstr);
+impl_from_indirectly!(Loads,BaseIntInstr,RiscvInstr);
+impl_from_indirectly!(Stores,BaseIntInstr,RiscvInstr);
+
 
 #[derive(Clone)]
 pub enum  Register {
@@ -172,8 +220,8 @@ impl Debug for Register {
         match self {
             Register::Zero{} => write!(f, "zero"),
             Register::RA{} => write!(f, "ra"),
-            Register::SP{} => write!(f, "gp"),
-            Register::GP{} => write!(f, "tp"),
+            Register::SP{} => write!(f, "sp"),
+            Register::GP{} => write!(f, "gp"),
             Register::Temp{reg_idx} => write!(f, "t{}", reg_idx),
             Register::Saved { reg_idx } => write!(f, "s{}", reg_idx),
             Register::Arg { reg_idx } => write!(f, "a{}", reg_idx),
@@ -192,6 +240,9 @@ impl Register{
     }
     pub fn new_s(idx:u8)->Self{
         Self::Saved { reg_idx: idx }
+    }
+    pub fn new_a(idx:u8)->Self{
+        Self::Arg { reg_idx: idx } 
     }
 }
 #[derive(Clone)]
@@ -235,7 +286,7 @@ impl Debug for Shifts {
         }
     }
 }
-#[derive(Clone)]
+#[derive(Clone,new)]
 pub enum Arithmetic {
     /// RV32I Base                                  RV64I
     /// ADD
@@ -278,7 +329,7 @@ impl Debug for Arithmetic {
         }
     }
 }
-#[derive(Clone)]
+#[derive(Clone,new)]
 pub enum Logical {
     /// XOR
     XOR { rd:Register, rs1:Register, rs2:Register },
@@ -307,7 +358,7 @@ impl Debug for Logical {
         }
     }
 }
-#[derive(Clone)]
+#[derive(Clone, new)]
 pub enum Compare {
     /// Set <
     SLT { rd:Register, rs1:Register, rs2:Register },
@@ -321,14 +372,14 @@ pub enum Compare {
 impl Debug for Compare {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Compare::SLT { rd, rs1, rs2 } => write!(f, "{:5?} %{:?},%{:?},%{:?}","slt" , rd, rs1, rs2),
-            Compare::SLTI { rd, rs1, imm } => write!(f, "{:5?} %{:?},%{:?},{:?}", "slti", rd, rs1, imm),
-            Compare::SLTU { rd, rs1, rs2 } => write!(f, "{:?} %{:?},%{:?},%{:?}","sltu", rd, rs1, rs2),
-            Compare::SLTUI { rd, rs1, imm } => write!(f, "{:?} %{:?},%{:?},{:?}","sltui" , rd, rs1, imm),
+            Compare::SLT { rd, rs1, rs2 } => write!(f, "{:5} %{:?},%{:?},%{:?}","slt" , rd, rs1, rs2),
+            Compare::SLTI { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?},{:?}", "slti", rd, rs1, imm),
+            Compare::SLTU { rd, rs1, rs2 } => write!(f, "{:5} %{:?},%{:?},%{:?}","sltu", rd, rs1, rs2),
+            Compare::SLTUI { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","sltui" , rd, rs1, imm),
 }
     }
 }
-#[derive(Clone)]
+#[derive(Clone, new)]
 pub enum Branch {
     /// Branch =
     BEQ { rs1:Register, rs2:Register, imm:Imm },
@@ -346,12 +397,12 @@ pub enum Branch {
 impl Debug for Branch {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Branch::BEQ { rs1, rs2, imm } => write!(f, "{:5?} %{:?},%{:?},{:?}","beq", rs1, rs2, imm),
-            Branch::BNE { rs1, rs2, imm } => write!(f, "{:5?} %{:?},%{:?},{:?}","bne", rs1, rs2, imm),
-            Branch::BLT { rs1, rs2, imm } => write!(f, "{:5?} %{:?},%{:?},{:?}","blt", rs1, rs2, imm),
-            Branch::BGE { rs1, rs2, imm } => write!(f, "{:5?} %{:?},%{:?},{:?}","bge", rs1, rs2, imm),
-            Branch::BLTU { rs1, rs2, imm } => write!(f, "{:5?} %{:?},%{:?},{:?}","bltu", rs1, rs2, imm),
-            Branch::BGEU { rs1, rs2, imm } => write!(f, "{:5?} %{:?},%{:?},{:?}","bgeu", rs1, rs2, imm),
+            Branch::BEQ { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","beq", rs1, rs2, imm),
+            Branch::BNE { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","bne", rs1, rs2, imm),
+            Branch::BLT { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","blt", rs1, rs2, imm),
+            Branch::BGE { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","bge", rs1, rs2, imm),
+            Branch::BLTU { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","bltu", rs1, rs2, imm),
+            Branch::BGEU { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","bgeu", rs1, rs2, imm),
         }
     }
 }
@@ -365,8 +416,8 @@ pub enum JumpAndLink {
 impl Debug for JumpAndLink {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            JumpAndLink::JAL { rd, imm } => write!(f, "{:5?} %{:?},{:?}","jal", rd, imm),
-            JumpAndLink::JALR { rd, rs1, imm } => write!(f, "{:5?} %{:?},%{:?},{:?}","jalr", rd, rs1, imm),
+            JumpAndLink::JAL { rd, imm } => write!(f, "{:5} %{:?},{:?}","jal", rd, imm),
+            JumpAndLink::JALR { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?},{:?}","jalr", rd, rs1, imm),
         }
     }
 }
@@ -380,8 +431,8 @@ pub enum Environment {
 impl Debug for Environment {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Environment::ECALL {} => write!(f, "{:5?}","ecall"),
-            Environment::EBREAK {} => write!(f, "{:5?}","ebreak"),
+            Environment::ECALL {} => write!(f, "{:6}","ecall"),
+            Environment::EBREAK {} => write!(f, "{:6}","ebreak"),
         }
     }
 }
@@ -404,16 +455,16 @@ pub enum CSR {
 impl Debug for CSR {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CSR::CSRRW { rd, csr, rs1 } => write!(f, "{:5?} %{:?},%{:?},%{:?}","csrrw", rd, csr, rs1),
-            CSR::CSRRS { rd, csr, rs1 } => write!(f, "{:5?} %{:?},%{:?},%{:?}","csrrs", rd, csr, rs1),
-            CSR::CSRRC { rd, csr, rs1 } => write!(f, "{:5?} %{:?},%{:?},%{:?}","csrrc", rd, csr, rs1),
-            CSR::CSRRSI { rd, csr, imm } => write!(f, "{:5?} %{:?},%{:?},{:?}","csrrsi", rd, csr, imm),
-            CSR::CSRRCI { rd, csr, imm } => write!(f, "{:5?} %{:?},%{:?},{:?}","csrrci", rd, csr, imm),
-            CSR::CSRRWI { rd, csr, imm } => write!(f, "{:5?} %{:?},%{:?},{:?}","csrrwi", rd, csr, imm),
+            CSR::CSRRW { rd, csr, rs1 } => write!(f, "{:6} %{:?},%{:?},%{:?}","csrrw", rd, csr, rs1),
+            CSR::CSRRS { rd, csr, rs1 } => write!(f, "{:6} %{:?},%{:?},%{:?}","csrrs", rd, csr, rs1),
+            CSR::CSRRC { rd, csr, rs1 } => write!(f, "{:6} %{:?},%{:?},%{:?}","csrrc", rd, csr, rs1),
+            CSR::CSRRSI { rd, csr, imm } => write!(f, "{:6} %{:?},%{:?},{:?}","csrrsi", rd, csr, imm),
+            CSR::CSRRCI { rd, csr, imm } => write!(f, "{:6} %{:?},%{:?},{:?}","csrrci", rd, csr, imm),
+            CSR::CSRRWI { rd, csr, imm } => write!(f, "{:6} %{:?},%{:?},{:?}","csrrwi", rd, csr, imm),
         }
     }
 }
-#[derive(Clone)]
+#[derive(Clone,new)]
 pub enum Loads {
     /// RV32I Base                              RV64I
     /// Load Byte
@@ -432,18 +483,18 @@ pub enum Loads {
 impl Debug for Loads {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Loads::LB { rd, rs1, imm } => write!(f, "{:5?} %{:?},%{:?}(%{:?})","lb", rd, imm, rs1),
-            Loads::LH { rd, rs1, imm } => write!(f, "{:5?} %{:?},%{:?}(%{:?})","lh", rd, imm, rs1),
-            Loads::LBU { rd, rs1, imm } => write!(f, "{:5?} %{:?},%{:?}(%{:?})","lbu", rd, imm, rs1),
-            Loads::LHU { rd, rs1, imm } => write!(f, "{:5?} %{:?},%{:?}(%{:?})","lhu", rd, imm, rs1),
-            Loads::LW { rd, rs1, imm } => write!(f, "{:5?} %{:?},%{:?}(%{:?})","lw", rd, imm, rs1),
+            Loads::LB { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","lb", rd, imm, rs1),
+            Loads::LH { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","lh", rd, imm, rs1),
+            Loads::LBU { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","lbu", rd, imm, rs1),
+            Loads::LHU { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","lhu", rd, imm, rs1),
+            Loads::LW { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","lw", rd, imm, rs1),
 
-            Loads::LWU { rd, rs1, imm } => write!(f, "{:5?} %{:?},%{:?}(%{:?})","lwu", rd, imm, rs1),
-            Loads::LD { rd, rs1, imm } => write!(f, "{:5?} %{:?},%{:?}(%{:?})","ld", rd, imm, rs1),
+            Loads::LWU { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","lwu", rd, imm, rs1),
+            Loads::LD { rd, rs1, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","ld", rd, imm, rs1),
         }
     }
 }
-#[derive(Clone)]
+#[derive(Clone,new)]
 pub enum Stores {
     /// RV32I Base                               RV64
     /// Store Byte
@@ -456,222 +507,14 @@ pub enum Stores {
 impl Debug for Stores {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Stores::SB { rs1, rs2, imm } => write!(f, "{:5?} %{:?},%{:?}(%{:?})","sb", rs1, rs2, imm),
-            Stores::SH { rs1, rs2, imm } => write!(f, "{:5?} %{:?},%{:?}(%{:?})","sh", rs1, rs2, imm),
-            Stores::SW { rs1, rs2, imm } => write!(f, "{:5?} %{:?},%{:?}(%{:?})","sw", rs1, rs2, imm),
+            Stores::SB { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","sb", rs1, rs2, imm),
+            Stores::SH { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","sh", rs1, rs2, imm),
+            Stores::SW { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","sw", rs1, rs2, imm),
 
-            Stores::SD { rs1, rs2, imm } => write!(f, "{:5?} %{:?},%{:?}(%{:?})","sd", rs1, rs2, imm),
+            Stores::SD { rs1, rs2, imm } => write!(f, "{:5} %{:?},%{:?}(%{:?})","sd", rs1, rs2, imm),
         }
     }
 }
 
-impl RiscvInstr{
-    // Shifts rv32
-    pub fn new_SLL(rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Shifts(Shifts::SLL{ rd, rs1, rs2}))
-    }
-    pub fn new_SLLI(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Shifts(Shifts::SLLI{ rd, rs1, shamt:imm}))
-    }
-    pub fn new_SRL(rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Shifts(Shifts::SRL{ rd, rs1, rs2}))
-    }
-    pub fn new_SRLI(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Shifts(Shifts::SRLI{ rd, rs1, shamt:imm}))
-    }
-    pub fn new_SRA(rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Shifts(Shifts::SRA{ rd, rs1, rs2}))
-    }
-    pub fn new_SRAI(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Shifts(Shifts::SRAI{ rd, rs1, shamt:imm}))
-    }
-    // Shifts rv64
-    pub fn new_SLLW( rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Shifts(Shifts::SLLW{ rd, rs1, rs2}))
-    }
-    pub fn new_SLLIW( rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Shifts(Shifts::SLLIW { rd, rs1, shamt:imm}))
-    }
-    pub fn new_SRLW( rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Shifts(Shifts::SRLW{ rd, rs1, rs2}))
-    }
-    pub fn new_SRLIW( rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Shifts(Shifts::SRLIW { rd, rs1, shamt:imm}))
-    }
-    pub fn new_SRAW( rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Shifts(Shifts::SRAW{ rd, rs1, rs2}))
-    }
-    pub fn new_SRAIW( rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Shifts(Shifts::SRAIW { rd, rs1, shamt:imm}))
-    }
-    // Arithmetic rv32
-    pub fn new_ADD(rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Arithmetic(Arithmetic::ADD{ rd, rs1, rs2}))
-    }
-    pub fn new_ADDI(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Arithmetic(Arithmetic::ADDI{ rd, rs1, imm}))
-    }
-    pub fn new_SUB(rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Arithmetic(Arithmetic::SUB{ rd, rs1, rs2}))
-    }
-    pub fn new_LUI(rd:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Arithmetic(Arithmetic::LUI{ rd, imm}))
-    }
-    pub fn new_AUIPC(rd:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Arithmetic(Arithmetic::AUIPC{ rd, imm}))
-    }
-    // Arithmetic rv64
-    pub fn new_ADDW(rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Arithmetic(Arithmetic::ADDW{ rd, rs1, rs2}))
-    }
-    pub fn new_ADDIW(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Arithmetic(Arithmetic::ADDIW{ rd, rs1, imm}))
-    }
-    pub fn new_SUBW(rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Arithmetic(Arithmetic::SUBW{ rd, rs1, rs2}))
-    }
-    // 乘法指令
-    pub fn new_MUL(rd: Register, rs1: Register, rs2: Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Arithmetic(Arithmetic::MUL { rd, rs1, rs2 }))
-    }
-    pub fn new_MULW(rd: Register, rs1: Register, rs2: Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Arithmetic(Arithmetic::MULW { rd, rs1, rs2 }))
-    }
-
-    // 除法指令
-    pub fn new_DIV(rd: Register, rs1: Register, rs2: Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Arithmetic(Arithmetic::DIV { rd, rs1, rs2 }))
-    }
-    pub fn new_DIVW(rd: Register, rs1: Register, rs2: Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Arithmetic(Arithmetic::DIVW { rd, rs1, rs2 }))
-    }
-
-    // 取余指令
-    pub fn new_REM(rd: Register, rs1: Register, rs2: Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Arithmetic(Arithmetic::REM { rd, rs1, rs2 }))
-    }
-    pub fn new_REMW(rd: Register, rs1: Register, rs2: Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Arithmetic(Arithmetic::REMW { rd, rs1, rs2 }))
-    }
-    // Logical rv32
-    pub fn new_XOR(rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Logical(Logical::XOR{ rd, rs1, rs2}))
-    }
-    pub fn new_XORI(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Logical(Logical::XORI{ rd, rs1, imm}))
-    }
-    pub fn new_OR(rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Logical(Logical::OR{ rd, rs1, rs2}))
-    }
-    pub fn new_ORI(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Logical(Logical::ORI{ rd, rs1, imm}))
-    }
-    pub fn new_AND(rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Logical(Logical::AND{ rd, rs1, rs2}))
-    }
-    pub fn new_ANDI(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Logical(Logical::ANDI{ rd, rs1, imm}))
-    }
-    // Compare rv32
-    pub fn new_SLT(rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Compare(Compare::SLT{ rd, rs1, rs2}))
-    }
-    pub fn new_SLTI(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Compare(Compare::SLTI{ rd, rs1, imm}))
-    }
-    pub fn new_SLTU(rd:Register, rs1:Register, rs2:Register) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Compare(Compare::SLTU{ rd, rs1, rs2}))
-    }
-    pub fn new_SLTUI(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Compare(Compare::SLTUI{ rd, rs1, imm}))
-    }
-    // Branch rv32
-    pub fn new_BEQ(rs1:Register, rs2:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Branch(Branch::BEQ{ rs1, rs2, imm}))
-    }
-    pub fn new_BNE(rs1:Register, rs2:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Branch(Branch::BNE{ rs1, rs2, imm}))
-    }
-    pub fn new_BLT(rs1:Register, rs2:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Branch(Branch::BLT{ rs1, rs2, imm}))
-    }
-    pub fn new_BGE(rs1:Register, rs2:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Branch(Branch::BGE{ rs1, rs2, imm}))
-    }
-    pub fn new_BLTU(rs1:Register, rs2:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Branch(Branch::BLTU{ rs1, rs2, imm}))
-    }
-    pub fn new_BGEU(rs1:Register, rs2:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Branch(Branch::BGEU{ rs1, rs2, imm}))
-    }
-    // JumpAndLink rv32
-    pub fn new_JAL(rd:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::JumpAndLink(JumpAndLink::JAL{ rd, imm}))
-    }
-    pub fn new_JALR(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::JumpAndLink(JumpAndLink::JALR{ rd, rs1, imm}))
-    }
-    // Environment rv32
-    pub fn new_ECALL() -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Environment(Environment::ECALL{}))
-    }
-    pub fn new_EBREAK() -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Environment(Environment::EBREAK{}))
-    }
-    // CSR rv32
-    pub fn new_CSRRW( rd:Register, csr:Register, rs1:Register ) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::CSR(CSR::CSRRW{ rd, csr, rs1}))
-    }
-    pub fn new_CSRRS( rd:Register, csr:Register, rs1:Register ) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::CSR(CSR::CSRRS{ rd, csr, rs1}))
-    }
-    pub fn new_CSRRC( rd:Register, csr:Register, rs1:Register ) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::CSR(CSR::CSRRC{ rd, csr, rs1}))
-    }
-    pub fn new_CSRRWI(rd:Register, csr:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::CSR(CSR::CSRRWI{ rd, csr, imm}))
-    }
-    pub fn new_CSRRSI(rd:Register, csr:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::CSR(CSR::CSRRSI{ rd, csr, imm}))
-    }
-    pub fn new_CSRRCI(rd:Register, csr:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::CSR(CSR::CSRRCI{ rd, csr, imm}))
-    }
-    // Loads rv32
-    pub fn new_LB(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Loads(Loads::LB{ rd, rs1, imm}))
-    }
-    pub fn new_LH(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Loads(Loads::LH{ rd, rs1, imm}))
-    }
-    pub fn new_LBU(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Loads(Loads::LBU{ rd, rs1, imm}))
-    }
-    pub fn new_LHU(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Loads(Loads::LHU{ rd, rs1, imm}))
-    }
-    pub fn new_LW(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Loads(Loads::LW{ rd, rs1, imm}))
-    }
-    // Loads rv64
-    pub fn new_LWU(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Loads(Loads::LWU{ rd, rs1, imm}))
-    }
-    pub fn new_LD(rd:Register, rs1:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Loads(Loads::LD{ rd, rs1, imm}))
-    }
-    // Stores rv32
-    pub fn new_SB(rs1:Register, rs2:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Stores(Stores::SB{ rs1, rs2, imm}))
-    }
-    pub fn new_SH(rs1:Register, rs2:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Stores(Stores::SH{ rs1, rs2, imm}))
-    }
-    pub fn new_SW(rs1:Register, rs2:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Stores(Stores::SW{ rs1, rs2, imm}))
-    }
-    // Stores rv64
-    pub fn new_SD(rs1:Register, rs2:Register, imm:Imm) -> Self {
-        RiscvInstr::BaseIntInstr(BaseIntInstr::Stores(Stores::SD{ rs1, rs2, imm}))
-    }
-}
+impl_from!(PseudoInstr,RiscvInstr);
+impl_from!(BaseIntInstr,RiscvInstr);

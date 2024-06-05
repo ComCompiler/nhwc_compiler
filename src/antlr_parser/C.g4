@@ -273,7 +273,7 @@ functionSpecifier
     |   '_Noreturn'
     |   '__inline__' // GCC extension
     |   '__stdcall'
-    |   gccAttributeSpecifier
+    // |   gccAttributeSpecifier
     |   '__declspec' '(' Identifier ')'
     ;
 
@@ -282,7 +282,7 @@ alignmentSpecifier
     ;
 
 declarator
-    :   pointer? directDeclarator gccDeclaratorExtension*
+    :   pointer? directDeclarator // gccDeclaratorExtension*
     ;
 
 directDeclarator
@@ -309,23 +309,23 @@ vcSpecificModifer
     ;
 
 
-gccDeclaratorExtension
-    :   '__asm' '(' StringLiteral+ ')'
-    |   gccAttributeSpecifier
-    ;
+// gccDeclaratorExtension
+//     :   '__asm' '(' StringLiteral+ ')'
+//     |   gccAttributeSpecifier
+//     ;
 
-gccAttributeSpecifier
-    :   '__attribute__' '(' '(' gccAttributeList ')' ')'
-    ;
+// gccAttributeSpecifier
+//     :   '__attribute__' '(' '(' gccAttributeList ')' ')'
+//     ;
 
-gccAttributeList
-    :   gccAttribute? (',' gccAttribute?)*
-    ;
+// gccAttributeList
+//     :   gccAttribute? (',' gccAttribute?)*
+//     ;
 
-gccAttribute
-    :   ~(',' | '(' | ')') // relaxed def for "identifier or reserved word"
-        ('(' argumentExpressionList? ')')?
-    ;
+// gccAttribute
+//     :   ~(',' | '(' | ')') // relaxed def for "identifier or reserved word"
+//         ('(' argumentExpressionList? ')')?
+//     ;
 
 nestedParenthesesBlock
     :   (   ~('(' | ')')
@@ -364,21 +364,21 @@ typeName
 
 abstractDeclarator
     :   pointer
-    |   pointer? directAbstractDeclarator gccDeclaratorExtension*
+    |   pointer? directAbstractDeclarator // gccDeclaratorExtension*
     ;
 
 directAbstractDeclarator
-    :   '(' abstractDeclarator ')' gccDeclaratorExtension*
+    :   '(' abstractDeclarator ')' // gccDeclaratorExtension*
     |   '[' typeQualifierList? assignmentExpression? ']'
     |   '[' 'static' typeQualifierList? assignmentExpression ']'
     |   '[' typeQualifierList 'static' assignmentExpression ']'
     |   '[' '*' ']'
-    |   '(' parameterTypeList? ')' gccDeclaratorExtension*
+    |   '(' parameterTypeList? ')' // gccDeclaratorExtension*
     |   directAbstractDeclarator '[' typeQualifierList? assignmentExpression? ']'
     |   directAbstractDeclarator '[' 'static' typeQualifierList? assignmentExpression ']'
     |   directAbstractDeclarator '[' typeQualifierList 'static' assignmentExpression ']'
     |   directAbstractDeclarator '[' '*' ']'
-    |   directAbstractDeclarator '(' parameterTypeList? ')' gccDeclaratorExtension*
+    |   directAbstractDeclarator '(' parameterTypeList? ')' // gccDeclaratorExtension*
     ;
 
 typedefName
