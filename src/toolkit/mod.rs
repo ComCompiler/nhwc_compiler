@@ -28,3 +28,4 @@ pub mod simulator;
 pub mod gen_dug;
 pub mod mem_layout;
 pub mod gen_riscv_asm;
+pub mod asm_struct;

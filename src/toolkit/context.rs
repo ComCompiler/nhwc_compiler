@@ -7,7 +7,7 @@ use crate::toolkit::symtab::SymIdx;
 use crate::{add_symbol, Args};
 
 use super::cfg_node::InstrList;
-use super::gen_riscv_asm::AsmStructure;
+use super::asm_struct::AsmStructure;
 use super::nhwc_instr::NhwcInstr;
 use super::riscv_instr::RiscvInstr;
 use super::{
