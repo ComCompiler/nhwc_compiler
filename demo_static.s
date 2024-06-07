@@ -26,9 +26,10 @@ a:
     .global main
     .type main @function
 main:
+                    ;mem layout:|ra_main:8|s0_main:8|temp_5:8
     addi sp,sp,-24
-    sd    ra,16(sp)
-    sd    s0,24(sp)
+    sd    ra,24(sp)
+    sd    s0,16(sp)
                     ;      alloc ptr->i32 temp_5 
                     ;      label %0: 
 %0:
@@ -39,9 +40,10 @@ main:
     li s2, 1
     mul s4,s1,s2
     add s3,s3,s4
-    slli s4,s4,2
+    slli s3,s3,2
     la s5, c
     add s3,s3,s5
+    sd    s3,8(sp)
                     ;      store 5:i32 temp_5:ptr->i32 
     li s2, 5
     ld    s1,8(sp)
@@ -54,8 +56,8 @@ main:
     la s1, b
     sd    s2,0(s1)
                     ;      ret 0 
-    ld    ra,16(sp)
-    ld    s0,24(sp)
+    ld    ra,24(sp)
+    ld    s0,16(sp)
     li a0, 0
     addi sp,sp,-24
     ret

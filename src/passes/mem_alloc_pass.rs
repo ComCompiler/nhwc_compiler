@@ -57,8 +57,8 @@ impl Pass for MemAllocPass {
             symtab.get_mut_symbol(node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?)?.add_func_cor_s0_symidx(s0_symidx.clone());
 
             node_mut!(at cfg_entry in cfg_graph).add_mem_layout(MemLayout::new());
-            alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &s0_symidx)?;
             alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &ra_symidx)?;
+            alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &s0_symidx)?;
             for &instr in node!(at cfg_entry in cfg_graph).instrs.clone().iter(){
                 match &instr!(at instr in instr_slab)?.instr_type{
                     crate::toolkit::nhwc_instr::NhwcInstrType::DefineFunc { func_symidx: _, ret_symidx: _, args } => {

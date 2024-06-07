@@ -15,9 +15,10 @@ m:
     .global Fibo
     .type Fibo @function
 Fibo:
-    addi sp,sp,48
-    sd    ra,40(sp)
-    sd    s0,48(sp)
+                    ;mem layout:|ra_Fibo:8|s0_Fibo:8|n:4|temp_3:4|temp_4:4|temp_5:4|temp_6:4|temp_7:4|temp_8:1|temp_9:1|none:6
+    addi sp,sp,-48
+    sd    ra,48(sp)
+    sd    s0,40(sp)
     sw    a0,32(sp)
                     ;      alloc i32 temp_3 
                     ;      alloc i32 temp_4 
@@ -32,14 +33,14 @@ Fibo:
                     ;      temp_8 = icmp i1 Eq n, 0 
     sb    s3,8(sp)
                     ;      br i1 temp_8, label branch.true:, label branch.false: 
-    lw    s1,8(sp)
+    lb    s1,8(sp)
     bnez s1, branch.false:
     j branch.false:
                     ;      label branch.true:: 
 branch.true::
                     ;      ret 0 
-    lw    ra,40(sp)
-    lw    s0,48(sp)
+    ld    ra,48(sp)
+    ld    s0,40(sp)
     li a0, 0
     addi sp,sp,-48
     ret
@@ -49,14 +50,14 @@ branch.false::
                     ;      temp_9 = icmp i1 Eq n, 1 
     sb    s3,7(sp)
                     ;      br i1 temp_9, label branch.true:, label branch.false: 
-    lw    s1,7(sp)
+    lb    s1,7(sp)
     bnez s1, branch.false:
     j branch.false:
                     ;      label branch.true:: 
 branch.true::
                     ;      ret 1 
-    lw    ra,40(sp)
-    lw    s0,48(sp)
+    ld    ra,48(sp)
+    ld    s0,40(sp)
     li a0, 1
     addi sp,sp,-48
     ret
@@ -87,8 +88,8 @@ branch.false::
     add s3,s1,s2
     sw    s3,12(sp)
                     ;      ret temp_7 
-    lw    ra,40(sp)
-    lw    s0,48(sp)
+    ld    ra,48(sp)
+    ld    s0,40(sp)
     lw    a0,12(sp)
     addi sp,sp,-48
     ret
@@ -100,9 +101,10 @@ branch.false::
     .global main
     .type main @function
 main:
-    addi sp,sp,24
-    sd    ra,16(sp)
-    sd    s0,24(sp)
+                    ;mem layout:|ra_main:8|s0_main:8|temp_10:4|a:4
+    addi sp,sp,-24
+    sd    ra,24(sp)
+    sd    s0,16(sp)
                     ;      alloc i32 temp_10 
                     ;      alloc i32 a 
                     ;      label %0: 
@@ -115,8 +117,8 @@ main:
     sw    s3,4(sp)
                     ;      breakpoint bp1([a]) ! 
                     ;      ret 
-    lw    ra,16(sp)
-    lw    s0,24(sp)
+    ld    ra,24(sp)
+    ld    s0,16(sp)
     addi sp,sp,-24
     ret
 

@@ -9,18 +9,18 @@
       store temp_1:i32 *b:ptr->i32 
       new_var c:Array:i32:[10] 
       new_var temp_2:ptr->i32 
-      temp_2 = getelementptr c:Array:i32:[10] [2] 
-      store 3:i32 temp_2:ptr->Array:i32:[] 
+      temp_2 = getelementptr c:Array:i32:[10] [1] 
+      store 2:i32 temp_2:ptr->Array:i32:[] 
       mu c:11 
       c = chi c:11 
       new_var temp_3:ptr->i32 
-      temp_3 = getelementptr c:Array:i32:[10] [1] 
-      store 2:i32 temp_3:ptr->Array:i32:[] 
+      temp_3 = getelementptr c:Array:i32:[10] [0] 
+      store 1:i32 temp_3:ptr->Array:i32:[] 
       mu c:16 
       c = chi c:16 
       new_var temp_4:ptr->i32 
-      temp_4 = getelementptr c:Array:i32:[10] [0] 
-      store 1:i32 temp_4:ptr->Array:i32:[] 
+      temp_4 = getelementptr c:Array:i32:[10] [2] 
+      store 3:i32 temp_4:ptr->Array:i32:[] 
       mu c:21 
       c = chi c:21 
       Define main [] -> main_ret 

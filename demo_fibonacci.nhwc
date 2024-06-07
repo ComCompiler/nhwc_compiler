@@ -1,18 +1,18 @@
       global Array:i32:[2, 2] m 
       new_var m:Array:i32:[2, 2] 
       new_var temp_0:ptr->i32 
-      temp_0 = getelementptr m:Array:i32:[2, 2] [0, 0] 
-      store 1:i32 temp_0:ptr->Array:i32:[2] 
+      temp_0 = getelementptr m:Array:i32:[2, 2] [1, 1] 
+      store 2:i32 temp_0:ptr->Array:i32:[2] 
       mu m:3 
       m = chi m:3 
       new_var temp_1:ptr->i32 
-      temp_1 = getelementptr m:Array:i32:[2, 2] [1, 0] 
+      temp_1 = getelementptr m:Array:i32:[2, 2] [0, 0] 
       store 1:i32 temp_1:ptr->Array:i32:[2] 
       mu m:8 
       m = chi m:8 
       new_var temp_2:ptr->i32 
-      temp_2 = getelementptr m:Array:i32:[2, 2] [1, 1] 
-      store 2:i32 temp_2:ptr->Array:i32:[2] 
+      temp_2 = getelementptr m:Array:i32:[2, 2] [1, 0] 
+      store 1:i32 temp_2:ptr->Array:i32:[2] 
       mu m:13 
       m = chi m:13 
       Define main [] -> main_ret 

@@ -5,7 +5,7 @@ use crate::{direct_child_nodes, instr, node, node_mut, passes::simulator_debug_p
 use anyhow::*;
 use itertools::Itertools;
 
-use super::{cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::{Value}, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, riscv_instr::{Imm, Loads, PseudoInstr, Register, RiscvInstr, Shifts, Stores}, simulator::Simulator, symtab::{SymIdx, SymTab}};
+use super::{cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Value, mem_layout::MemLayout, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, riscv_instr::{Imm, Loads, PseudoInstr, Register, RiscvInstr, Shifts, Stores}, simulator::Simulator, symtab::{SymIdx, SymTab}};
 
 /// convert nhwc ir into riscv
 pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RiscvInstr>, asm_structure:&mut AsmStructure, src_symtab:&SymTab)->Result<()>{
@@ -111,8 +111,10 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         asm_sect.global(func_symidx.clone());
                         asm_sect.func_type(func_symidx.clone());
                         asm_sect.label(func_symidx.clone());
+                        let mem_layout = node!(at cfg_entry_node in cfg_graph).get_mem_layout()?;
+                        asm_sect.annotation(format!("mem layout:{:?}",mem_layout));
                         // apply for stack mem
-                        let stack_size = node!(at cfg_entry_node in cfg_graph).get_mem_layout()?.get_mem_len();
+                        let stack_size = mem_layout.get_mem_len();
                         // allocate stack mem
                         asm_sect.asm(Arithmetic::new_addi(Register::new_sp(), Register::new_sp(), Imm::from_offset(-(stack_size as isize))).into());
                         store_sym(&mut asm_sect, src_symtab.get_symbol(func_symidx)?.get_func_cor_ra_symidx()?, Register::RA, src_symtab)?;
@@ -146,7 +148,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         load_sym_or_imm(&mut asm_sect, value_symidx, Register::new_s(2), src_symtab)?;
                         store_from_ptr(&mut asm_sect, ptr_symidx, Register::new_s(1), Register::new_s(2), src_symtab)?;
                     },
-                    NhwcInstrType::GetElementPtr { lhs: _, array_symidx, array_ty, idx_vec } => {
+                    NhwcInstrType::GetElementPtr { lhs, array_symidx, array_ty, idx_vec } => {
                         // clear s3
                         // use reg s3 as rst register
                         // load idx to s2 
@@ -163,7 +165,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                             asm_sect.asm(Arithmetic::new_add(Register::new_s(3), Register::new_s(3), Register::new_s(4)).into());
                         }
                         let ele_size = array_ty.get_ele_size()?;
-                        asm_sect.asm(Shifts::new_slli_from_multiple(Register::new_s(4), Register::new_s(4), ele_size)?.into());
+                        asm_sect.asm(Shifts::new_slli_from_multiple(Register::new_s(3), Register::new_s(3), ele_size)?.into());
                         // 2 situations : 1. array is global  2. array is local to stack
                         match src_symtab.get_symbol(array_symidx)?.has_is_global() 
                             &&*src_symtab.get_symbol(array_symidx)?.get_is_global()?{
@@ -176,6 +178,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                             },
                         }
                         asm_sect.asm(Arithmetic::new_add(Register::new_s(3), Register::new_s(3), Register::new_s(5)).into());
+                        store_sym(&mut asm_sect, lhs,Register::new_s(3), src_symtab)?;
                     },
                     NhwcInstrType::Arith { lhs, rhs } => {
                         // we will store rst to reg3
@@ -368,7 +371,8 @@ impl AsmSection{
             attrs: vec![],
         }
     }
-    pub fn annotation(&mut self, annotation:String){
+    pub fn annotation(&mut self, mut annotation:String){
+        annotation = annotation.replace("\n", "");
         self.attrs.push(AsmAttr::Annotation { annotation }.into())
     }
     pub fn global(&mut self, symidx:SymIdx){
