@@ -1,10 +1,10 @@
-use std::fmt::{write, Debug, Formatter};
+use std::fmt::{Debug, Formatter};
 use anyhow::*;
 
 
 use derive_new::new;
 
-use super::{field::{Fields}, symtab::SymIdx};
+use super::{symtab::SymIdx};
 
 
 // #[derive(Clone)]
@@ -613,19 +613,19 @@ impl Debug for Loads {
     }
 }
 impl Loads{
-    pub fn new(size:usize,reg1:Register,reg2:Register, offset:isize) -> Result<Self>{
+    pub fn new(size:usize,rd:Register,rs1:Register, offset:isize) -> Result<Self>{
         Ok(match size{
             8 => {
-                Loads::new_ld(reg1, reg2, Imm::from_offset(offset))
+                Loads::new_ld(rd, rs1, Imm::from_offset(offset))
             },
             4 => {
-                Loads::new_lw(reg1, reg2, Imm::from_offset(offset))
+                Loads::new_lw(rd, rs1, Imm::from_offset(offset))
             },
             2 => {
-                Loads::new_lh(reg1, reg2, Imm::from_offset(offset))
+                Loads::new_lh(rd, rs1, Imm::from_offset(offset))
             },
             1 => {
-                Loads::new_lb(reg1, reg2, Imm::from_offset(offset))
+                Loads::new_lb(rd, rs1, Imm::from_offset(offset))
             },
             _ => {
                 return Err(anyhow!("unexpected load size"))

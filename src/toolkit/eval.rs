@@ -1,7 +1,7 @@
 use super::et_node::{EtNodeType, EtTree};
-use crate::{add_node, add_node_with_edge, antlr_parser::clexer::Newline, direct_child_node, direct_child_nodes, node, toolkit::{et_node::EtNode, symtab::SymIdx}};
+use crate::{add_node_with_edge, direct_child_node, direct_child_nodes, node, toolkit::{symtab::SymIdx}};
 use anyhow::*;
-use petgraph::graph::{Node, NodeIndex};
+use petgraph::graph::{NodeIndex};
 
 pub fn dfs_et_tree(et_tree:&mut EtTree, et_node:u32, visited:&mut Vec<u32>, dfs_vec:&mut Vec<u32>) -> () {
     if visited[et_node as usize] == 1 {
@@ -29,7 +29,7 @@ pub fn eval_et(et_tree:&mut EtTree, any_et_node:u32) -> Result<SymIdx> {
             }
             Ok(op.eval_sub_et_nodes(et_tree, &sub_nodes_sym_idx))
         },
-        EtNodeType::Separator { ast_node, text } => {
+        EtNodeType::Separator { ast_node: _, text: _ } => {
             let sub_node = direct_child_node!(at any_et_node in et_tree);
             let res = eval_et(et_tree, sub_node)?;
             Ok(res)

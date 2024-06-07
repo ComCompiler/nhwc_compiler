@@ -48,6 +48,8 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::Store { value_symidx: _value, value_ty: _, ptr_symidx: _, ptr_ty: _ } => {},
                     NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx: _, idx_vec: _ } => {},
                     NhwcInstrType::Nope {  } => {continue;},
+                    NhwcInstrType::Mu { may_use_symidx: _, may_use_instr: _ } => {},
+                    NhwcInstrType::Chi { lhs: _, rhs: _, may_def_instr: _ } => {},
                 }
                 let dug_node = add_node!({DefUseNode::new(instr)} to def_use_graph);
                 node_mut!(at dug_node in def_use_graph).load_instr_text(instr_slab);
@@ -113,6 +115,8 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::Store { value_symidx: _value, value_ty: _, ptr_symidx: _, ptr_ty: _ } => {},
                     NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx: _, idx_vec: _ } => {},
                     NhwcInstrType::Nope {  } => continue,
+                    NhwcInstrType::Mu { may_use_symidx: _, may_use_instr: _ } => {},
+                    NhwcInstrType::Chi { lhs: _, rhs: _, may_def_instr: _ } => {},
                 }
                 let instr_struct = instr!(at instr in instr_slab)?;
                 for use_symidx in instr_struct.get_use_symidx_vec() {

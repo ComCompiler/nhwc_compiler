@@ -61,8 +61,8 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
                         // let mut phi_pairs = vec![];
                         // phi_pairs.push(PhiPair::new(variable.clone(),instr));
                         // 由于 c语言要求在 dominator 中 必须已经先声明 变量，因此我们可以直接假定存在这个 dom_instr 故直接 unwrap 是可行的
-                        // let phi_instr_struct = InstrType::new_phi_node(variable.clone(), phi_pairs ).to_instr();
-                        let phi_instr_struct = NhwcInstrType::new_phi_node(variable.clone(), vec![]).to_instr();
+                        // let phi_instr_struct = InstrType::new_phi_node(variable.clone(), phi_pairs ).into();
+                        let phi_instr_struct = NhwcInstrType::new_phi_node(variable.clone(), vec![]).into();
                         let new_phi_instr = node_mut!(at cfg_df_node in cfg_graph).push_nhwc_instr(phi_instr_struct, instr_slab)?;
 
                         // 如果 def_cfg_nodes 不包含 这个 cfg_node ，那么需要把这个cfg_node 添加到 work_list 中，进行phi_node的再生产 reproduction
@@ -72,7 +72,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
                         }
                     }else{
                         // 不符合插入 phi node 条件
-                        let _phi_instr_struct = NhwcInstrType::new_phi_node(variable.clone(), vec![]).to_instr();
+                        // let _phi_instr_struct = NhwcInstrType::new_phi_node(variable.clone(), vec![]).into();
                         // debug_info_yellow!("remove {:?} ",phi_instr_struct);
                     }
                 }

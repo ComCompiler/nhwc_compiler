@@ -1,11 +1,11 @@
-use itertools::*;
 
-use std::{fmt::{format, Debug}, ops::{Deref, Index}};
-use crate::{debug_info_green, direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, toolkit::riscv_instr::{Arithmetic, Compare}};
+
+use std::{fmt::{Debug}, ops::{Index}};
+use crate::{direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, toolkit::riscv_instr::{Arithmetic}};
 use anyhow::*;
 use itertools::Itertools;
 
-use super::{cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::{Fields, Value}, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, riscv_instr::{BaseIntInstr, Imm, JumpAndLink, Loads, PseudoInstr, Register, RiscvInstr, Shifts, Stores}, simulator::Simulator, symtab::{self, SymIdx, SymTab}};
+use super::{cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::{Value}, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, riscv_instr::{Imm, Loads, PseudoInstr, Register, RiscvInstr, Shifts, Stores}, simulator::Simulator, symtab::{SymIdx, SymTab}};
 
 /// convert nhwc ir into riscv
 pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RiscvInstr>, asm_structure:&mut AsmStructure, src_symtab:&SymTab)->Result<()>{
@@ -19,10 +19,10 @@ pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSla
 }
 /// convert `cfg_root_node` into riscv  
 /// assumes that there are only global and some calculating instrs so that `simulator` can run directly
-fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RiscvInstr>, src_symtab:&SymTab)->Result<AsmSection>{
+fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, _riscv_instr_slab:&mut InstrSlab<RiscvInstr>, src_symtab:&SymTab)->Result<AsmSection>{
     let root_node = node_mut!(at CFG_ROOT in cfg_graph);
     let mut simulator = Simulator::new(root_node.instrs.clone(), false);
-    simulator.instr_list.push(nhwc_instr_slab.insert_instr(NhwcInstrType::new_exit_breakpoint( vec![]).to_instr()));
+    simulator.instr_list.push(nhwc_instr_slab.insert_instr(NhwcInstrType::new_exit_breakpoint( vec![]).into()));
     simulator.load_instrs(&nhwc_instr_slab)?;
 
     // run simulator to get values of static variables in `simulator.simu_symtab`
@@ -37,7 +37,7 @@ fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhwc
         match &instr!(at instr in nhwc_instr_slab)?.instr_type{
             NhwcInstrType::Global { var_symidx, vartype } => {
                 match vartype{
-                    super::field::Type::Fn { arg_syms, ret_sym } => {
+                    super::field::Type::Fn { arg_syms: _, ret_sym: _ } => {
                         // do nothing when it is a function
                     },
                     _ => {
@@ -61,33 +61,14 @@ fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhwc
 ///    ($func_name:ident,$a:ident,$b:ident,$reg1:ident,$reg2:ident,$reg3:ident with_symtab $src_symtab:ident) => {
 macro_rules! BinOp {
     (sect $asm_sect:ident func_name $func_name:block args{$a:ident,$b:ident,$reg1:expr,$reg2:expr,$reg3:expr} with_symtab $src_symtab:ident) => {
-        match (*$src_symtab.get_symbol($a)?.get_is_const()?,*$src_symtab.get_symbol($a)?.get_is_const()?){
-            (true, true) => {
-                $asm_sect.asm(PseudoInstr::new_li(Register::new_s($reg1), Imm::Literal { symidx:$a.clone() }).into());
-                $asm_sect.asm(PseudoInstr::new_li(Register::new_s($reg1), Imm::Literal { symidx:$a.clone() }).into());
-            },
-            (true, false) => {
-                $asm_sect.asm(PseudoInstr::new_li(Register::new_s($reg1), Imm::Literal { symidx:$a.clone() }).into());
-                load_sym_or_li(&mut $asm_sect, $a, Register::new_s($reg2), $src_symtab)?;
-                $asm_sect.asm($func_name(Register::new_s($reg3), Register::new_s($reg1), Register::new_s($reg2)).into());
-            },
-            (false, true) => {
-                load_sym_or_li(&mut $asm_sect, $a, Register::new_s($reg1), $src_symtab)?;
-                $asm_sect.asm(PseudoInstr::new_li(Register::new_s($reg2), Imm::Literal { symidx:$a.clone() }).into());
-                $asm_sect.asm($func_name(Register::new_s($reg3), Register::new_s($reg1), Register::new_s($reg2)).into());
-            },
-            (false, false) => {
-                load_sym_or_li(&mut $asm_sect, $a, Register::new_s($reg1), $src_symtab)?;
-                load_sym_or_li(&mut $asm_sect, $b, Register::new_s($reg2), $src_symtab)?;
-                $asm_sect.asm($func_name(Register::new_s($reg3), Register::new_s($reg1), Register::new_s($reg2)).into());
-            },
-        }
-
+        load_sym_or_imm(&mut $asm_sect, $a, Register::new_s($reg1), $src_symtab)?;
+        load_sym_or_imm(&mut $asm_sect, $b, Register::new_s($reg2), $src_symtab)?;
+        $asm_sect.asm($func_name(Register::new_s($reg3), Register::new_s($reg1), Register::new_s($reg2)).into());
     };
 }
 /// convert `cfg_entry_node` into riscv 
 /// assume first instr be func_def instr while others are alloc instr
-fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RiscvInstr>, src_symtab:&SymTab) -> Result<AsmSection>{
+fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, _riscv_instr_slab:&mut InstrSlab<RiscvInstr>, src_symtab:&SymTab) -> Result<AsmSection>{
     let entries = direct_child_nodes!(at CFG_ROOT in cfg_graph);
     let mut asm_sect = AsmSection::new();
     asm_sect.text() ;
@@ -126,23 +107,24 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     NhwcInstrType::Label { label_symidx } => {
                         asm_sect.label(label_symidx.clone());
                     },
-                    NhwcInstrType::DefineFunc { func_symidx, ret_symidx, args } => {
+                    NhwcInstrType::DefineFunc { func_symidx, ret_symidx: _, args } => {
                         asm_sect.global(func_symidx.clone());
                         asm_sect.func_type(func_symidx.clone());
                         asm_sect.label(func_symidx.clone());
                         // apply for stack mem
                         let stack_size = node!(at cfg_entry_node in cfg_graph).get_mem_layout()?.get_mem_len();
-                        asm_sect.asm(Arithmetic::new_addi(Register::new_sp(), Register::new_sp(), Imm::from_offset(stack_size as isize)).into());
+                        // allocate stack mem
+                        asm_sect.asm(Arithmetic::new_addi(Register::new_sp(), Register::new_sp(), Imm::from_offset(-(stack_size as isize))).into());
                         store_sym(&mut asm_sect, src_symtab.get_symbol(func_symidx)?.get_func_cor_ra_symidx()?, Register::RA, src_symtab)?;
                         store_sym(&mut asm_sect, src_symtab.get_symbol(func_symidx)?.get_func_cor_s0_symidx()?, Register::new_s0(), src_symtab)?;
                         for (idx,arg) in args.iter().enumerate(){
                             store_sym(&mut asm_sect, arg, Register::new_a(idx as u8), src_symtab)?;
                         }   
                     },
-                    NhwcInstrType::DefineVar { var_symidx, vartype, op_value } => {
+                    NhwcInstrType::DefineVar { var_symidx, vartype: _, op_value } => {
                         match op_value{
                             Some(value_symidx) => {
-                                load_sym_or_li(&mut asm_sect, value_symidx, Register::new_s(1), src_symtab)?;
+                                load_sym_or_imm(&mut asm_sect, value_symidx, Register::new_s(1), src_symtab)?;
                                 store_sym(&mut asm_sect, var_symidx, Register::new_s(1), src_symtab)?;
                             },
                             None => {
@@ -150,21 +132,21 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                             },
                         }
                     },
-                    NhwcInstrType::Alloc { var_symidx, vartype } => {
+                    NhwcInstrType::Alloc { var_symidx: _, vartype: _ } => {
                         // do nothing
                     },
-                    NhwcInstrType::Global { var_symidx, vartype } => {
+                    NhwcInstrType::Global { var_symidx: _, vartype: _ } => {
                         // do nothing
                     },
-                    NhwcInstrType::Load { lhs, ptr_symidx, ptr_ty } => {
+                    NhwcInstrType::Load { lhs, ptr_symidx, ptr_ty: _ } => {
                         load_from_ptr(&mut asm_sect, ptr_symidx, Register::new_s(1), Register::new_s(2), src_symtab)?;
                         store_sym(&mut asm_sect, lhs, Register::new_s(2), src_symtab)?;
                     },
-                    NhwcInstrType::Store { value_symidx, value_ty, ptr_symidx, ptr_ty } => {
-                        load_sym_or_li(&mut asm_sect, value_symidx, Register::new_s(2), src_symtab)?;
+                    NhwcInstrType::Store { value_symidx, value_ty: _, ptr_symidx, ptr_ty: _ } => {
+                        load_sym_or_imm(&mut asm_sect, value_symidx, Register::new_s(2), src_symtab)?;
                         store_from_ptr(&mut asm_sect, ptr_symidx, Register::new_s(1), Register::new_s(2), src_symtab)?;
                     },
-                    NhwcInstrType::GetElementPtr { lhs, array_symidx, array_ty, idx_vec } => {
+                    NhwcInstrType::GetElementPtr { lhs: _, array_symidx, array_ty, idx_vec } => {
                         // clear s3
                         // use reg s3 as rst register
                         // load idx to s2 
@@ -175,8 +157,8 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         // finally plus array offset 
                         asm_sect.asm(PseudoInstr::new_mv(Register::new_s(3), Register::Zero).into());
                         for (idx,weight) in idx_vec.iter().zip(array_ty.get_array_dim_weight_vec()?.iter()){
-                            load_sym_or_li(&mut asm_sect, weight, Register::new_s(1), src_symtab)?;
-                            load_sym_or_li(&mut asm_sect, idx, Register::new_s(2), src_symtab)?;
+                            load_sym_or_imm(&mut asm_sect, weight, Register::new_s(1), src_symtab)?;
+                            load_sym_or_imm(&mut asm_sect, idx, Register::new_s(2), src_symtab)?;
                             asm_sect.asm(Arithmetic::new_mul(Register::new_s(4), Register::new_s(1), Register::new_s(2)).into());
                             asm_sect.asm(Arithmetic::new_add(Register::new_s(3), Register::new_s(3), Register::new_s(4)).into());
                         }
@@ -190,7 +172,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                             },
                             false => {
                                 let &array_offset2sp = src_symtab.get_symbol(array_symidx)?.get_mem_offset2sp()?;
-                                load_sym_or_li(&mut asm_sect, &SymIdx::from(array_offset2sp), Register::new_s(5), src_symtab)?;
+                                load_sym_or_imm(&mut asm_sect, &SymIdx::from(array_offset2sp), Register::new_s(5), src_symtab)?;
                             },
                         }
                         asm_sect.asm(Arithmetic::new_add(Register::new_s(3), Register::new_s(3), Register::new_s(5)).into());
@@ -198,28 +180,27 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     NhwcInstrType::Arith { lhs, rhs } => {
                         // we will store rst to reg3
                         match rhs{
-                            super::nhwc_instr::ArithOp::Add { a, b, vartype } => {
+                            super::nhwc_instr::ArithOp::Add { a, b, vartype: _ } => {
                                 BinOp!(sect asm_sect func_name {Arithmetic::new_add} args{a,b,1,2,3} with_symtab src_symtab);
                             },
-                            super::nhwc_instr::ArithOp::Mul { a, b, vartype } => {
+                            super::nhwc_instr::ArithOp::Mul { a, b, vartype: _ } => {
                                 BinOp!(sect asm_sect func_name {Arithmetic::new_mul} args{a,b,1,2,3} with_symtab src_symtab);
                             },
-                            super::nhwc_instr::ArithOp::Div { a, b, vartype } => {
+                            super::nhwc_instr::ArithOp::Div { a, b, vartype: _ } => {
                                 BinOp!(sect asm_sect func_name {Arithmetic::new_div} args{a,b,1,2,3} with_symtab src_symtab);
                             },
-                            super::nhwc_instr::ArithOp::Sub { a, b, vartype } => {
+                            super::nhwc_instr::ArithOp::Sub { a, b, vartype: _ } => {
                                 BinOp!(sect asm_sect func_name {Arithmetic::new_sub} args{a,b,1,2,3} with_symtab src_symtab);
                             },
-                            super::nhwc_instr::ArithOp::Mod { a, b, vartype } => {
+                            super::nhwc_instr::ArithOp::Mod { a, b, vartype: _ } => {
                                 BinOp!(sect asm_sect func_name {Arithmetic::new_rem} args{a,b,1,2,3} with_symtab src_symtab);
                             },
-                            super::nhwc_instr::ArithOp::Icmp { plan, a, b, vartype } => {
+                            super::nhwc_instr::ArithOp::Icmp { plan, a: _, b: _, vartype: _ } => {
                                 match plan{
                                     super::nhwc_instr::IcmpPlan::Eq => {
                                         // BinOp!(sect asm_sect func_name {Compare::new} args{a,b,1,2,3} with_symtab src_symtab);
                                     },
                                     super::nhwc_instr::IcmpPlan::Ne => {
-
                                     },
                                     super::nhwc_instr::IcmpPlan::Ugt => todo!(),
                                     super::nhwc_instr::IcmpPlan::Uge => todo!(),
@@ -231,16 +212,24 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                     super::nhwc_instr::IcmpPlan::Sle => todo!(),
                                 }
                             },
-                            super::nhwc_instr::ArithOp::Ucmp { plan, a, b, vartype } => {
+                            super::nhwc_instr::ArithOp::Ucmp { plan, a: _, b: _, vartype: _ } => {
+                                match plan{
+                                    super::nhwc_instr::UcmpPlan::Oeq => todo!(),
+                                    super::nhwc_instr::UcmpPlan::One => todo!(),
+                                    super::nhwc_instr::UcmpPlan::Ogt => todo!(),
+                                    super::nhwc_instr::UcmpPlan::Oge => todo!(),
+                                    super::nhwc_instr::UcmpPlan::Olt => todo!(),
+                                    super::nhwc_instr::UcmpPlan::Ole => todo!(),
+                                }
 
                             },
-                            super::nhwc_instr::ArithOp::LogicAnd { a, b, vartype } => {
+                            super::nhwc_instr::ArithOp::LogicAnd { a: _, b: _, vartype: _ } => {
 
                             },
-                            super::nhwc_instr::ArithOp::LogicOr { a, b, vartype } => {
+                            super::nhwc_instr::ArithOp::LogicOr { a: _, b: _, vartype: _ } => {
 
                             },
-                            super::nhwc_instr::ArithOp::LogicNot { a, vartype } => {
+                            super::nhwc_instr::ArithOp::LogicNot { a: _, vartype: _ } => {
 
                             },
                         }
@@ -248,12 +237,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         store_sym(&mut asm_sect, lhs, Register::new_s(3), src_symtab)?;
                     },
                     NhwcInstrType::SimpleAssign { lhs, rhs } => {
-                        load_sym_or_li(&mut asm_sect, rhs, Register::new_s(3), src_symtab)?;
+                        load_sym_or_imm(&mut asm_sect, rhs, Register::new_s(3), src_symtab)?;
                         store_sym(&mut asm_sect, lhs,Register::new_s(3), src_symtab)?;
                     },
-                    NhwcInstrType::Call { op_assigned_symidx, func_op } => {
+                    NhwcInstrType::Call { op_assigned_symidx: _, func_op } => {
                         for (idx,arg) in func_op.actual_arg_symidx_vec.iter().enumerate(){
-                            load_sym_or_li(&mut asm_sect, arg, Register::new_a(idx as u8), src_symtab)?;
+                            load_sym_or_imm(&mut asm_sect, arg, Register::new_a(idx as u8), src_symtab)?;
                         }   
                         PseudoInstr::new_call(Imm::new_label(func_op.func_symidx.clone()));
                     },
@@ -261,12 +250,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         match jump_op{
                             super::nhwc_instr::JumpOp::Ret { op_ret_sym } => {
                                 let func_symidx = node!(at cfg_entry_node in cfg_graph).get_func_cor_symidx()?;
-                                load_sym_or_li(&mut asm_sect, src_symtab.get_symbol(func_symidx)?.get_func_cor_ra_symidx()?, Register::RA, src_symtab)?;
-                                load_sym_or_li(&mut asm_sect, src_symtab.get_symbol(func_symidx)?.get_func_cor_s0_symidx()?, Register::new_s0(), src_symtab)?;
+                                load_sym_or_imm(&mut asm_sect, src_symtab.get_symbol(func_symidx)?.get_func_cor_ra_symidx()?, Register::RA, src_symtab)?;
+                                load_sym_or_imm(&mut asm_sect, src_symtab.get_symbol(func_symidx)?.get_func_cor_s0_symidx()?, Register::new_s0(), src_symtab)?;
 
                                 match op_ret_sym{
                                     Some(ret_sym) => {
-                                        load_sym_or_li(&mut asm_sect, ret_sym, Register::new_a(0), src_symtab)?;
+                                        load_sym_or_imm(&mut asm_sect, ret_sym, Register::new_a(0), src_symtab)?;
                                     },
                                     None => {
                                         // do nothing 
@@ -276,28 +265,30 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 asm_sect.asm(Arithmetic::new_addi(Register::new_sp(), Register::new_sp(), Imm::from_offset(-(stack_size as isize))).into());
                                 asm_sect.asm(PseudoInstr::new_ret().into());
                             },
-                            super::nhwc_instr::JumpOp::Br { cond, t1, t2 } => {
-                                load_sym_or_li(&mut asm_sect, cond, Register::new_s(1), src_symtab)?;
+                            super::nhwc_instr::JumpOp::Br { cond, t1: _, t2 } => {
+                                load_sym_or_imm(&mut asm_sect, cond, Register::new_s(1), src_symtab)?;
                                 asm_sect.asm(PseudoInstr::new_bnez(Register::new_s(1),Imm::new_label(t2.clone())).into());
                                 asm_sect.asm(PseudoInstr::new_j(Imm::new_label(t2.clone())).into());
                             },
-                            super::nhwc_instr::JumpOp::Switch { cond, default, compared } => todo!(),
+                            super::nhwc_instr::JumpOp::Switch { cond: _, default: _, compared: _ } => todo!(),
                             super::nhwc_instr::JumpOp::DirectJump { label_symidx } => {
                                 asm_sect.asm(PseudoInstr::new_j(Imm::new_label(label_symidx.clone())).into())
                             },
                         }
                     },
-                    NhwcInstrType::Phi { lhs, rhs } => {
+                    NhwcInstrType::Phi { lhs: _, rhs: _ } => {
                         panic!("phi appeared in gen asm pass");
                     },
-                    NhwcInstrType::TranType { lhs, op } => todo!(),
-                    NhwcInstrType::BreakPoint { symidx, breakpoint_args } => {
+                    NhwcInstrType::TranType { lhs: _, op: _ } => todo!(),
+                    NhwcInstrType::BreakPoint { symidx: _, breakpoint_args: _ } => {
                         // panic!("breakpoint appeared in gen asm pass");
                         // nothing to do 
                     },
                     NhwcInstrType::Nope {  } => {
                         asm_sect.asm(PseudoInstr::new_nop().into());
                     },
+                    NhwcInstrType::Mu { may_use_symidx: _, may_use_instr: _ } => {},
+                    NhwcInstrType::Chi { lhs: _, rhs: _, may_def_instr: _ } => {},
                 }
             }
         }
@@ -306,22 +297,28 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
 }
 ///  sym in memory -> reg or literal li -> reg
 /// symidx could be literal or symbol
-pub fn load_sym_or_li(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,src_symtab:&SymTab) -> Result<()>{
-    // if this symidx is not found in symtab, it must be a literal
-    match !(src_symtab.has_symbol(symidx) && !*src_symtab.get_symbol(symidx)?.get_is_literal()?){
-        true => {
-            asm_sect.asm(PseudoInstr::new_li(reg, Imm::new_literal(symidx.clone())).into());
-        },
-        false => {
-            let &symidx_offset2sp = src_symtab.get_symbol(symidx)?.get_mem_offset2sp()?;
-            asm_sect.asm(Loads::new_lw(reg, Register::SP {  }, Imm::from_offset(symidx_offset2sp as isize)).into());
-        },
+pub fn load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,src_symtab:&SymTab) -> Result<()>{
+    if !symidx.is_global_ptr(){
+        // if this symidx is not found in symtab, it must be a literal
+        match !(src_symtab.has_symbol(symidx) && !*src_symtab.get_symbol(symidx)?.get_is_literal()?){
+            true => {
+                asm_sect.asm(PseudoInstr::new_li(reg, Imm::new_literal(symidx.clone())).into());
+            },
+            false => {
+                let &symidx_offset2sp = src_symtab.get_symbol(symidx)?.get_mem_offset2sp()?;
+                let size = src_symtab.get_symbol(symidx)?.get_type()?.get_ele_size()?;
+                asm_sect.asm(Loads::new(size,reg, Register::SP {  }, symidx_offset2sp as isize)?.into());
+            },
+        }
+    }else{
+        asm_sect.annotation(format!("   load label {} as ptr to reg",symidx.to_deglobal_ptr()?));
+        asm_sect.asm(PseudoInstr::new_la(reg, symidx.to_deglobal_ptr()?).into());
     }
     Ok(())
 }
 /// reg value -> sym in memory  
 /// require symidx to be symbol 
-pub fn store_sym(asm_sect:&mut AsmSection,symidx:&SymIdx,value_reg:Register,src_symtab:&SymTab) -> Result<()>{
+pub fn store_sym(asm_sect:&mut AsmSection, symidx:&SymIdx,value_reg:Register,src_symtab:&SymTab) -> Result<()>{
     let &symidx_offset2sp = src_symtab.get_symbol(symidx)?.get_mem_offset2sp()?;
     let size = src_symtab.get_symbol(symidx)?.get_type()?.get_ele_size()?;
     asm_sect.asm(Stores::new( size,value_reg,Register::new_sp(), symidx_offset2sp as isize)?.into());
@@ -330,15 +327,15 @@ pub fn store_sym(asm_sect:&mut AsmSection,symidx:&SymIdx,value_reg:Register,src_
 /// reg value -> M[ptr_sym]
 /// require ptr_symidx to be symbol 
 pub fn store_from_ptr(asm_sect:&mut AsmSection,ptr_symidx:&SymIdx, ptr_reg:Register, value_reg:Register ,src_symtab:&SymTab)-> Result<()>{
-    load_sym_or_li(asm_sect, ptr_symidx, ptr_reg.clone(), src_symtab)?;
-    let size = src_symtab.get_symbol(ptr_symidx)?.get_type()?.deref().get_ele_size()?;
+    load_sym_or_imm(asm_sect, ptr_symidx, ptr_reg.clone(), src_symtab)?;
+    let size = src_symtab.get_symbol(ptr_symidx)?.get_type()?.get_ele_size()?;
     asm_sect.asm(Stores::new( size,value_reg,ptr_reg, 0)?.into());
     Ok(())
 }
 
 // load the value from ptr symidx to value reg
 pub fn load_from_ptr(asm_sect:&mut AsmSection,ptr_symidx:&SymIdx,ptr_reg:Register, value_reg:Register ,src_symtab:&SymTab) ->Result<()>{
-    load_sym_or_li(asm_sect, ptr_symidx, ptr_reg.clone(), src_symtab)?;
+    load_sym_or_imm(asm_sect, ptr_symidx, ptr_reg.clone(), src_symtab)?;
     // deref the ptr then get its ele size
     let size = src_symtab.get_symbol(ptr_symidx)?.get_type()?.to_deref_type()?.get_ele_size()?;
     asm_sect.asm(Loads::new(size, value_reg, ptr_reg, 0)?.into());
@@ -419,7 +416,7 @@ impl AsmSection{
     /// generate asm that initialize the value 
     pub fn apply_value(&mut self,val:&Value) -> Result<()>{
         match val{
-            Value::Array { value_map, dims, ele_ty } => {
+            Value::Array { value_map, dims: _, ele_ty } => {
                 // if array
                 let mut offset_value_pairs = value_map.iter().collect_vec();
                 offset_value_pairs.sort_by_key(|x| x.0);

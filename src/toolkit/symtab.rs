@@ -1,11 +1,11 @@
 use super::{context::COMPILATION_UNIT, symbol::Symbol};
 use crate::{add_node, add_node_with_edge };
 use core::fmt::Debug;
-use ahash::{AHashMap, AHashSet};
+use ahash::{AHashMap};
 use anyhow::{anyhow,Result};
 use delegate::delegate;
 use petgraph::stable_graph::StableDiGraph;
-use std::{collections::{btree_map, hash_map::{Iter, IterMut}, BTreeMap}, fmt::{Display, Formatter}};
+use std::{collections::{hash_map::{Iter, IterMut}}, fmt::{Display, Formatter}};
 
 pub type SymTabGraph = StableDiGraph<SymTab, SymTabEdge, u32>;
 
@@ -45,6 +45,42 @@ impl From<isize> for SymIdx{
 impl SymIdx {
     pub fn new(scope_node:u32, symbol_name:String) -> Self { SymIdx { scope_node, symbol_name, index_ssa:None } }
     pub fn new_verbose(scope_node:u32, symbol_name:String, index_ssa:Option<u32>) -> Self { SymIdx { scope_node, symbol_name, index_ssa } }
+    pub fn as_global_ptr(mut self) -> Result<Self>{
+        if self.symbol_name.starts_with('*'){
+            return Err(anyhow!("can't transform symbol_name to be global ptr twice"))
+        }
+        self.symbol_name.insert(0, '*');
+        Ok(self)
+    }
+    /// check if this symidx is ptr to global variables
+    pub fn is_global_ptr(&self) -> bool{
+        self.symbol_name.starts_with('*')
+    }
+    pub fn as_deglobal_ptr(mut self) -> Result<Self>{
+        if !self.is_global_ptr(){
+            self.symbol_name.remove(0);
+        }else{
+            return Err(anyhow!("can't transform deglobal a symbol_name that is not global ptr twice"))
+        }
+        Ok(self)
+    }
+    pub fn to_deglobal_ptr(&self) -> Result<Self>{
+        let mut cloned = self.clone();
+        if self.is_global_ptr(){
+            cloned.symbol_name.remove(0);
+        }else{
+            return Err(anyhow!("can't transform deglobal a symbol_name that is not global ptr twice"))
+        }
+        Ok(cloned)
+    }
+    pub fn to_global_ptr(&self) -> Result<Self>{
+        let mut cloned = self.clone();
+        if cloned.symbol_name.starts_with('*'){
+            return Err(anyhow!("can't transform symbol_name to be global ptr twice"))
+        }
+        cloned.symbol_name.insert(0, '*');
+        Ok(cloned)
+    }
     pub fn to_src_symidx(&self)-> SymIdx{
         let mut cloned = self.clone();
         cloned.index_ssa = None;
@@ -160,8 +196,8 @@ impl Default for SymTab {
 impl Debug for SymIdx {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
         match self.index_ssa {
-            // Some(index_ssa) => write!(f, "{} _s{} _i{}", self.symbol_name, self.scope_node, index_ssa),
-            Some(index_ssa) => write!(f, "{}-{}", self.symbol_name,  index_ssa),
+            Some(index_ssa) => write!(f, "{}*{}*{}", self.symbol_name, self.scope_node, index_ssa),
+            // Some(index_ssa) => write!(f, "{}*{}*{}", self.symbol_name,  ,index_ssa),
             // None => write!(f, "{} _s{}", self.symbol_name, self.scope_node),
             None => write!(f, "{}", self.symbol_name),
         }

@@ -177,6 +177,8 @@ pub enum NhwcInstrType {
     Jump { jump_op:JumpOp },
     // phi node
     Phi { lhs:SymIdx, rhs:PhiOp },
+    Mu { may_use_symidx:SymIdx, may_use_instr:usize},
+    Chi { lhs:SymIdx, rhs:SymIdx, may_def_instr:usize },
     TranType { lhs:SymIdx, op:Trans },
     // 断点     只在simulator中使用
     BreakPoint { symidx:SymIdx, breakpoint_args:Vec<BreakpointArg>},
@@ -230,6 +232,8 @@ impl NhwcInstr {
             NhwcInstrType::Load { ptr_symidx: _ptr_symdix, lhs, ptr_ty: _ } => vec![lhs],
             NhwcInstrType::Store { value_symidx: _value, ptr_symidx: _, ptr_ty: _, value_ty: _ } => vec![],
             NhwcInstrType::Nope {  } => vec![],
+            NhwcInstrType::Mu { may_use_symidx: _ , may_use_instr:_usize} => vec![],
+            NhwcInstrType::Chi { lhs, rhs: _ ,may_def_instr:_usize} => vec![lhs],
         };
         vec
     }
@@ -287,6 +291,8 @@ impl NhwcInstr {
             NhwcInstrType::Store { value_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
             NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx, idx_vec } => idx_vec.iter().chain(vec![array_symidx].into_iter()).collect_vec(),
             NhwcInstrType::Nope {  } => vec![],
+            NhwcInstrType::Mu { may_use_symidx, may_use_instr: _ } => vec![may_use_symidx],
+            NhwcInstrType::Chi { lhs: _, rhs , may_def_instr: _} => vec![rhs],
         };
         vec
     }
@@ -323,6 +329,8 @@ impl NhwcInstr {
             NhwcInstrType::Store { value_symidx: _value, ptr_symidx: _, ptr_ty: _, value_ty: _ } => vec![],
             NhwcInstrType::GetElementPtr { lhs, array_ty: _ty, array_symidx: _, idx_vec: _ } => vec![lhs],
             NhwcInstrType::Nope {  } => vec![],
+            NhwcInstrType::Mu { may_use_symidx: _ , may_use_instr:_usize} => vec![],
+            NhwcInstrType::Chi { lhs, rhs: _ ,may_def_instr:_usize} => vec![lhs],
         }
     }
     pub fn get_mut_use_symidx_vec(&mut self)->Vec<&mut SymIdx>{
@@ -379,6 +387,8 @@ impl NhwcInstr {
             NhwcInstrType::Store { value_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
             NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx, idx_vec } => idx_vec.iter_mut().chain(vec![array_symidx].into_iter()).collect_vec(),
             NhwcInstrType::Nope {  } => vec![],
+            NhwcInstrType::Mu { may_use_symidx, may_use_instr: _ } => vec![may_use_symidx],
+            NhwcInstrType::Chi { lhs: _, rhs , may_def_instr: _} => vec![rhs],
         }
     }
     pub fn is_phi(&self)->bool{
@@ -462,10 +472,13 @@ impl Debug for Trans {
         }
     }
 }
+impl From<NhwcInstrType> for NhwcInstr{
+    fn from(value: NhwcInstrType) -> Self {
+        NhwcInstr { instr_type: value, info: Fields::new(), text: String::new() }
+    }
+}
 // 以下是构造函数:
 impl NhwcInstrType {
-    pub fn to_instr(self) -> NhwcInstr { NhwcInstr { instr_type:self, info:Fields::new(), text: String::new() } }
-
     pub fn new_label(label_symidx:SymIdx) -> Self { Self::Label { label_symidx } }
     
     pub fn new_def_func(func_symidx:SymIdx, ret_type:SymIdx, args:Vec<SymIdx>) -> Self { Self::DefineFunc { func_symidx, ret_symidx: ret_type, args } }
@@ -506,6 +519,12 @@ impl NhwcInstrType {
     
     pub fn new_phi_node(lhs:SymIdx, phi_pair_vec:Vec<PhiPair>) -> Self{
         Self::Phi { lhs, rhs: PhiOp { phi_pairs:phi_pair_vec  } }
+    }
+    pub fn new_mu(may_use_symidx :SymIdx, may_use_instr:usize) -> Self{
+        Self::Mu { may_use_symidx, may_use_instr }
+    }
+    pub fn new_chi(lhs:SymIdx , rhs :SymIdx, may_def_instr:usize) -> Self{
+        Self::Chi { lhs, rhs, may_def_instr }
     }
 
     pub fn new_breakpoint(symidx:SymIdx,breakpoint_args:Vec<BreakpointArg>) -> Self { Self::BreakPoint {symidx ,breakpoint_args } }
@@ -634,6 +653,8 @@ impl Debug for NhwcInstrType {
             NhwcInstrType::Store { value_symidx: value, ptr_symidx, ptr_ty, value_ty } => write!(f,"store {:?}:{:?} {:?}:{:?}",value,value_ty,ptr_symidx,ptr_ty),
             NhwcInstrType::GetElementPtr { lhs, array_ty: ty, array_symidx, idx_vec } => write!(f,"{:?} = getelementptr {:?}:{:?} {:?}",lhs,array_symidx,ty,idx_vec,),
             NhwcInstrType::Nope {  } => {write!(f,"(nop)")},
+            NhwcInstrType::Mu { may_use_symidx, may_use_instr } => write!(f,"mu {:?}:{}",may_use_symidx, may_use_instr),
+            NhwcInstrType::Chi { lhs, rhs, may_def_instr } => write!(f,"{:?} = chi {:?}:{}",lhs,rhs,may_def_instr),
         }
     }
 }

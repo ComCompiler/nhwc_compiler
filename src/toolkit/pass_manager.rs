@@ -14,7 +14,7 @@ pub struct PassManager {
     ctx:super::context::NhwcCtx,
 }
 impl PassManager {
-    pub fn new(args:Args) -> Self { PassManager { passes:vec![], ctx:super::context::NhwcCtx::new(args) } }
+    pub fn new(args:Args) -> Self { PassManager { passes:vec![], ctx:super::context::NhwcCtx::new(args).unwrap() } }
     pub fn add_pass(&mut self, pass:Box<dyn Pass>) { self.passes.push(pass); }
     /// 调用这个函数运行 PassManager 中的所有函数
     pub fn execute_passes(&mut self) {

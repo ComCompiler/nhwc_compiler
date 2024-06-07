@@ -1,9 +1,9 @@
 use anyhow::Result;
 
 use crate::toolkit::dot::Config;
-use crate::{add_node, add_node_with_edge};
+use crate::{add_node};
 
-use crate::toolkit::symtab::{SymTabEdge, SymTabGraph};
+use crate::toolkit::symtab::{SymTabGraph};
 use crate::toolkit::{context::NhwcCtx, etc::generate_png_by_graph_multi_tasks, pass_manager::Pass};
 #[derive(Debug)]
 pub struct SymtabDebugPass {

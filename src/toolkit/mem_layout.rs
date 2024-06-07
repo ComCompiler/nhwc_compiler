@@ -3,12 +3,12 @@ use crate::toolkit::symtab::*;
 
 use std::fmt::Debug;
 use anyhow::*;
-use crate::{node_mut, reg_field_for_struct};
+use crate::{reg_field_for_struct};
 
-use super::{cfg_node::{CfgGraph, CfgNode}, symbol::Symbol, symtab::{SymIdx, SymTab}};
+use super::{cfg_node::{CfgNode}, symbol::Symbol, symtab::{SymIdx, SymTab}};
 use itertools::{self, Itertools};
 
-///  mem offset is the offset to s0 (so you should divide stack_size by mem_offset to get offset to sp)
+//  mem offset is the offset to s0 (so you should divide stack_size by mem_offset to get offset to sp)
 reg_field_for_struct!(Symbol {
         MEM_OFFSET2S0:usize,
         MEM_OFFSET2SP:usize,

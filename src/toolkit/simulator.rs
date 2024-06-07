@@ -5,7 +5,7 @@ use crate::toolkit::nhwc_instr::ArithOp::{Add , Sub, Mul, Div};
 use std::fmt::Debug;
 use anyhow::*;
 
-use crate::{add_symbol, debug_info_red, debug_info_yellow, make_field_trait_for_struct, reg_field_for_struct};
+use crate::{add_symbol, debug_info_red, debug_info_yellow, instr, make_field_trait_for_struct, reg_field_for_struct};
 use super::cfg_node::InstrList;
 
 use super::field::Type::{self, F32, I32};
@@ -28,6 +28,7 @@ pub struct Simulator{
     pub instr_list:InstrList,
     pub func_call_ctx_stack:Vec<FuncCallCtx>,
     pub text:String,
+    /// optional requirement that variable should be alloc before refered
     pub is_alloc_global_required:bool,
 }
 pub struct FuncCallCtx{
@@ -71,6 +72,27 @@ impl Simulator{
             is_alloc_global_required,
         }
     }
+    pub fn run_global_scope(&mut self,src_symtab:&SymTab,instr_slab:&mut InstrSlab<NhwcInstr>)->Result<()>{
+        self.cur_instr_pos =0 ;
+        // we will disable requirement that variable should be alloc before refered
+        let former_is_alloc_global_required = self.is_alloc_global_required;
+        self.is_alloc_global_required =false;
+        loop{
+            let cur_instr = self.instr_list[self.cur_instr_pos];
+            match &instr!(at cur_instr in instr_slab)?.instr_type{
+                DefineFunc { func_symidx: _, ret_symidx: _, args: _ } => {
+                    // debug_info_green!("break when meet define {:?}",func_symidx)
+                    break;
+                },
+                _ => {
+                    self.exec_cur_instr(instr_slab, src_symtab)?;
+                    self.cur_instr_pos += 1;
+                }
+            }
+        }
+        self.is_alloc_global_required = former_is_alloc_global_required;
+        Ok(())
+    }
     /// Set the instr_pos to main and push the main frame to stack  
     /// Add exit breakpoint and let simulator run it when main returned 
     pub fn set_instr_pos_to_main(&mut self,instr_slab:&mut InstrSlab<NhwcInstr>)->Result<()>{
@@ -85,17 +107,16 @@ impl Simulator{
         self.cur_instr_pos = main_pos;
 
         // add exit breakpoint and let simulator run it when main returned 
-        self.instr_list.push(instr_slab.insert_instr(BreakPoint { symidx: SymIdx::new(0, "exit".to_string()), breakpoint_args: vec![] }.to_instr()));
+        self.instr_list.push(instr_slab.insert_instr(BreakPoint { symidx: SymIdx::new(0, "exit".to_string()), breakpoint_args: vec![] }.into()));
         self.func_call_ctx_stack.push(FuncCallCtx::new(main_func_symidx, ret_symidx, vec![], vec![], self.instr_list.len()-2, None));
 
         Ok(())
     }
-    /// load函数负责在运行前将所有包含的函数符号及其参数和形式返回值以及label和Deffunc行号记录在案  
-    /// 以确定跳转位置(ret or br)
+    /// load func will put all func symbols,their args in simu symtab to note all jump pos (ret or br)  
+    /// but global variables will not be put in.
     pub fn load_instrs(&mut self,nhwc_instr_slab:&InstrSlab<NhwcInstr>) -> Result<()>{
         let instr = &self.instr_list;
         let simu_symtab = &mut self.simu_symtab;
-
         // 先扫一遍,找到所有的label 和 函数起始位置 并存入symtab
         let mut op_cur_define_func = None;
         for (pos,&l) in instr.iter().enumerate(){
@@ -576,8 +597,16 @@ impl Simulator{
                 let simu_symtab = &mut self.simu_symtab;
                 let src_var_symidx = var_symidx.to_src_symidx();
                 if !simu_symtab.has_symbol(&src_var_symidx){
-                    add_symbol!({src_var_symidx.into_symbol()}
+                    add_symbol!({src_var_symidx.clone().into_symbol()}
                         with_field SIMU_VAL:{Value::new_unsure_from_specific_type(&vartype)}
+                        with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
+                        to simu_symtab
+                    );
+                }
+                // add its global ptr to simu_symtab
+                if !simu_symtab.has_symbol(&src_var_symidx.to_global_ptr()?){
+                    add_symbol!({src_var_symidx.clone().to_global_ptr()?.into_symbol()}
+                        with_field SIMU_VAL:{Value::new_ptr64_to_variable(src_var_symidx.clone(),vartype.clone())}
                         with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
                         to simu_symtab
                     );
@@ -675,6 +704,8 @@ impl Simulator{
                 }
             },
             Nope {  } => {},
+            Mu { may_use_symidx: _, may_use_instr: _ } => {},
+            Chi { lhs: _, rhs: _, may_def_instr: _ } => {},
         }
         Ok(instr_struct.clone())
     }

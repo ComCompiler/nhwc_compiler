@@ -84,6 +84,8 @@ impl Pass for SimulatorDebugPass {
         // // 实例化simulator
         let mut simu = Simulator::new(ctx.collected_nhwc_ir.clone(), true);
         simu.load_instrs( &instr_slab)?;
+        // calculate global variables 
+        simu.run_global_scope(&ctx.symtab, instr_slab)?;
         simu.set_instr_pos_to_main(instr_slab)?;
         let simulator_g = debug_simu_run(&mut simu, instr_slab, &ctx.symtab, true)?;
         if self.is_gen_png{

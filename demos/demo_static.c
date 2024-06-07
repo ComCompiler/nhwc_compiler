@@ -3,7 +3,8 @@ int b = a * 2 ;
 int c[10] = {1,2,3};
 int main(){
     // return 0;
-    int b = 5;
+    c[1] =5 ;
+    b =3 ;   
     return 0;
 }
 

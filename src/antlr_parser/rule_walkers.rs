@@ -1,12 +1,12 @@
 use crate::{
-    antlr_parser::{self, cvisitor::CVisitorCompat}, toolkit::ast_node::AstNode
+    antlr_parser::{self, cvisitor::CVisitorCompat}
 };
 use antlr_parser::{clistener::CListener, cparser::CParserContextType};
 use antlr_rust::{
     parser::ParserNodeType, token::Token, tree::{ParseTreeListener, ParseTreeVisitorCompat, TerminalNode}
 };
-use petgraph::Graph;
-use std::{cell::RefCell, mem, rc::Rc};
+
+use std::{mem};
 /*
 
 这个文件的所有代码都用于将 antlr 生成的 AST 转化为 petgraph 的 图

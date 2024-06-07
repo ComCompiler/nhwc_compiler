@@ -8,7 +8,7 @@ use regex::{self, Regex};
 
 use super::{ast_node::AstTree, scope_node::ST_ROOT};
 use super::symtab::SymIdx;
-use crate::{debug_info_blue, debug_info_red, node};
+use crate::{debug_info_blue, node};
 
 pub type Fields = HashMap<&'static str, Box<dyn Field>>;
 pub static TARGET_POINTER_MEM_LEN:usize = 8;
@@ -184,6 +184,9 @@ impl Value {
     pub fn new_ptr64_from_array_with_offset(array_symidx:SymIdx,pointed_ty:Type,offset:Value) -> Self{
         Value::Ptr64 { pointed_ty:Box::new(pointed_ty), op_pointed_symidx: Some(array_symidx), offset:Box::new(offset) }
     }
+    pub fn new_ptr64_to_variable(pointed_symidx:SymIdx,pointed_ty:Type) -> Self{
+        Value::Ptr64 { pointed_ty:Box::new(pointed_ty), op_pointed_symidx: Some(pointed_symidx), offset:Box::new(Value::I32(None)) }
+    }
     pub fn is_unsure(&self)->Result<bool>{
         match self{
             Value::I32(op) => Ok(op.is_none()),
@@ -333,7 +336,7 @@ impl Type {
     /// return the size of element if it is an array or else its size 
     pub fn get_ele_size(&self) -> Result<usize>{
         match &self{
-            Type::Array { dims, ele_ty } => {
+            Type::Array { dims: _, ele_ty } => {
                 ele_ty.get_mem_len()
             },
             _ => {
@@ -433,7 +436,7 @@ impl Type {
     }
     pub fn get_ele_len(&self) -> Result<usize>{
         match self{
-            Type::Array { dims, ele_ty } => {
+            Type::Array { dims, ele_ty: _ } => {
                 let array_size:usize = dims.iter()
                     .map(|d|{let ans:usize = d.symbol_name.parse().unwrap();ans}).product() ;
                 Ok(array_size)
@@ -451,7 +454,7 @@ impl Type {
             Type::I1 => Ok(1),
             Type::Void => todo!(),
             Type::Label => todo!(),
-            Type::Array { dims, ele_ty: ty } => Ok({  self.get_ele_len()?*ty.get_ele_size()?}),
+            Type::Array { dims: _, ele_ty: ty } => Ok(self.get_ele_len()?*ty.get_ele_size()?),
             Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
             Type::Ptr64 { ty: _ } => Ok(TARGET_POINTER_MEM_LEN),
         }
@@ -492,7 +495,7 @@ impl Type {
             Type::I32 => Ok(Type::Ptr64 { ty: Box::new(Type::I32)}),
             Type::F32 => Ok(Type::Ptr64 { ty: Box::new(Type::F32)}),
             Type::I1 => Ok(Type::Ptr64 { ty: Box::new(Type::I1)}),
-            Type::Void => todo!(),
+            Type::Void => Ok(Type::Ptr64 { ty: Box::new(Type::Void)}),
             Type::Label => todo!(),
             Type::Ptr64 { ty: _ } => Ok(Type::Ptr64 { ty: Box::new(self.clone())}),
             Type::Array { dims: _, ele_ty: _ty } => Ok({let mut poped_array = self.clone();poped_array.pop_dim()?;Type::Ptr64 { ty: Box::new(poped_array)}}),

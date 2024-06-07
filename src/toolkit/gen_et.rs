@@ -11,7 +11,7 @@ use crate::toolkit::symtab::SymIdx;
 use crate::{add_node, add_node_with_edge, direct_child_node, find, find_nodes, node, rule_id, term_id};
 
 use super::et_node::{DeclOrDefOrUse, EtNodeType, EtTree};
-use super::eval::{eval_et, replace_et_node};
+use super::eval::{replace_et_node};
 use super::{ast_node::AstTree, scope_node::ScopeTree};
 
 // 这个函数 返回 separator node

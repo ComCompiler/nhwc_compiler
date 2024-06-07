@@ -96,7 +96,7 @@ impl Pass for MemAllocPass {
     fn get_desc(&self) -> String { return "pass demo description".to_string(); }
 
     // 返回pass的名称
-    fn get_pass_name(&self) -> String { return "DemoPass".to_string(); }
+    fn get_pass_name(&self) -> String { return "MemAllocPass".to_string(); }
 }
 pub fn calculate_mem_offset2sp(cfg_graph:&mut CfgGraph,cfg_entry:u32,symtab:&mut SymTab,symidx:&SymIdx) -> Result<()>{
     let mem_layout = node!(at cfg_entry in cfg_graph).get_mem_layout()?;

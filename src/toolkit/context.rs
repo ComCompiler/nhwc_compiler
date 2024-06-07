@@ -3,14 +3,15 @@ use std::{collections::HashMap, thread::JoinHandle};
 use anyhow::Result;
 
 
-use crate::Args;
+use crate::toolkit::symtab::SymIdx;
+use crate::{add_symbol, Args};
 
 use super::cfg_node::InstrList;
 use super::gen_riscv_asm::AsmStructure;
 use super::nhwc_instr::NhwcInstr;
 use super::riscv_instr::RiscvInstr;
 use super::{
-    ast_node::AstTree, cfg_node::CfgGraph, dug_node::DefUseGraph, dj_node::DjNode, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symbol::Symbol, symtab::{SymTab, SymTabGraph}
+    ast_node::AstTree, cfg_node::CfgGraph, dug_node::DefUseGraph, dj_node::DjNode, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symtab::{SymTab, SymTabGraph}
 };
 use super::dj_edge::DjEdge;
 
@@ -36,16 +37,18 @@ pub struct NhwcCtx {
 }
 pub(crate) static COMPILATION_UNIT:&str = "!compilation_unit";
 impl NhwcCtx {
-    pub fn new(args:Args) -> Self {
-        NhwcCtx {
+    pub fn new(args:Args) -> Result<Self> {
+        Ok(NhwcCtx {
             args,
             cfg_graph:CfgGraph::new(),
             ast_tree:AstTree::new(),
-            symtab:{let mut symtab = SymTab::new(); 
-                    let mut symbol = Symbol::new_verbose(0, COMPILATION_UNIT.to_string(), None);
-                    symbol.add_all_cfg_func_name_entry_tuples(vec![]);
-                    let _compilation_symidx = symtab.add_symbol(symbol);
-                    symtab},
+            symtab:{
+                let mut symtab = SymTab::new(); 
+                add_symbol!({SymIdx::new(0, COMPILATION_UNIT.to_string()).into_symbol()} 
+                    with_field ALL_CFG_FUNC_NAME_ENTRY_TUPLES:{vec![]}
+                    with_field TEMP_COUNTER:{0}
+                to symtab);
+                symtab},
             code:String::new(),
             scope_tree:ScopeTree::new(),
             et_tree:EtTree::new(),
@@ -58,6 +61,6 @@ impl NhwcCtx {
             def_use_graph: DefUseGraph::new(),
             io_task_list: vec![],
             collected_nhwc_ir: InstrList::new(),
-        }
+        })
     }
 }
