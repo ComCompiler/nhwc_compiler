@@ -68,71 +68,73 @@ impl Debug for RV64Instr{
 
 #[derive(Clone, derive_new::new)]
 pub enum PseudoInstr {
-    Nop {},
-    Neg {rd:Register ,rs:Register},
-    Negw {rd:Register ,rs:Register},
+    Nop {}, //无操作指令
+    Neg {rd:Register ,rs:Register},//rs取反存到rd中
+    Negw {rd:Register ,rs:Register},//同上
 
-    Snez {rd:Register ,rs:Register},
-    Sltz {rd:Register ,rs:Register},
-    Sgtz {rd:Register ,rs:Register},
+    //和0直接比较
+    Snez {rd:Register ,rs:Register},//如果寄存器rs非零，则将1存入寄存器rd中。
+    Sltz {rd:Register ,rs:Register},//如果寄存器rs小于零，则将1存入寄存器rd中。
+    Sgtz {rd:Register ,rs:Register},//如果寄存器rs大于零，则将1存入寄存器rd中。
+    Seqz {rd:Register ,rs:Register},//如果寄存器rs等于零，则将1存入寄存器rd中。
 
-    Beqz {rs:Register ,offset:Imm},
-    Bnez {rs:Register ,offset:Imm},
-    Blez {rs:Register ,offset:Imm},
-    Bgez {rs:Register ,offset:Imm},
-    Bltz {rs:Register ,offset:Imm},
-    Bgtz {rs:Register ,offset:Imm},
+    //有条件跳转
+    //和0比较
+    Beqz {rs:Register ,offset:Imm},//如果寄存器rs等于零，根据偏移量offset进行分支。
+    Bnez {rs:Register ,offset:Imm},//如果寄存器rs不等于零，根据偏移量offset进行分支。
+    Blez {rs:Register ,offset:Imm},//如果寄存器rs小于等于零，根据偏移量offset进行分支。
+    Bgez {rs:Register ,offset:Imm},//如果寄存器rs大于等于零，根据偏移量offset进行分支。
+    Bltz {rs:Register ,offset:Imm},//如果寄存器rs小于零，根据偏移量offset进行分支。
+    Bgtz {rs:Register ,offset:Imm},//如果寄存器rs大于零，根据偏移量offset进行分支。
+    //两两比较
+    Bgt {rs1:Register ,rs2:Register ,offset:Imm},//按有符号比较大于rs与rd的值，根据比较结果和offset进行跳转。
+    Ble {rs1:Register ,rs2:Register ,offset:Imm},//按有符号或无符号比较rs与rd的值，根据比较结果和offset进行跳转。
+    Bgtu {rs1:Register ,rs2:Register ,offset:Imm},
+    Bleu {rs1:Register ,rs2:Register ,offset:Imm},
 
-    J {offset:Imm},
-    Jr {rs:Register },
+    //无条件跳转
+    J {offset:Imm},//无条件跳转到指定偏移量或寄存器rs指示的地址。
+    Jr {rs:Register },//无条件跳转到寄存器rs指示的地址/返回到调用函数。
     Ret {},
+    Tail {offset:Imm},//用于尾调用优化，跳转到偏移量offset指示的地址
 
-    Tail {offset:Imm},
-
-    Rdinstret {rd:Register },
+    //特殊寄存器操作
+    Rdinstret {rd:Register },//读取特定硬件寄存器（如指令计数器、周期计数器、时间寄存器）的值到寄存器rd中
     Rdinstreth {rd:Register },
     Rdcycle {rd:Register },
     Rdcycleh {rd:Register },
     Rdtime {rd:Register },
     Rdtimeh {rd:Register },
 
-    Lla {rd:Register ,symbol:SymIdx},
+    //内存访问load
+    Lla {rd:Register ,symbol:SymIdx},//加载指定加载局部或相对地址到一个寄存器rd中。
+    La {rd:Register ,symbol:SymIdx},//加载一个全局或绝对地址到寄存器rd中
+    Lb {rd:Register ,symbol:SymIdx},//加载符号位置的字节到寄存器rd中
+    Lh {rd:Register ,symbol:SymIdx},//加载符号位置的半字到寄存器rd中
+    Lw {rd:Register ,symbol:SymIdx},//加载符号位置的字到寄存器rd中
+    Ld {rd:Register ,symbol:SymIdx},//加载符号双字到寄存器rd中
+    //内存访问store
+    Sb {rd:Register ,symbol:SymIdx ,rt:Register},//将寄存器rt的字节字存储到指定地址或符号位置
+    Sh {rd:Register ,symbol:SymIdx ,rt:Register},//将寄存器rt的半字存储到指定地址或符号位置
+    Sw {rd:Register ,symbol:SymIdx ,rt:Register},//将寄存器rt的字存储到指定地址或符号位置
+    Sd {rd:Register ,symbol:SymIdx ,rt:Register},//将寄存器rt的双字存储到指定地址或符号位置
 
-    La {rd:Register ,symbol:SymIdx},
+    //浮点指令
+    Flw {rd:Register ,symbol:SymIdx ,rt:Register},//加载一个单精度浮点数（32位）到浮点寄存器中
+    Fld {rd:Register ,symbol:SymIdx ,rt:Register},//加载一个双精度浮点数（位64）到浮点寄存器中
+    Fsw {rd:Register ,symbol:SymIdx ,rt:Register},//将一个单精度浮点数（32位）从浮点寄存器存储到内存中
+    Fsd {rd:Register ,symbol:SymIdx ,rt:Register},//将一个双精度浮点数（64位）从浮点寄存器存储到内存中。
+    Fmv_s {rd:Register ,rs:Register},//单精度符点移动
+    Fabs_s {rd:Register ,rs:Register},//单精度取绝对值
+    Fneg_s {rd:Register ,rs:Register},//单精度取反
+    Fmv_d {rd:Register ,rs:Register},//双精度移动
+    Fabs_d {rd:Register ,rs:Register},//双精度绝对值
+    Fneg_d {rd:Register ,rs:Register},//双精度取反
 
-    Lb {rd:Register ,symbol:SymIdx},
-    Lh {rd:Register ,symbol:SymIdx},
-    Lw {rd:Register ,symbol:SymIdx},
-    Ld {rd:Register ,symbol:SymIdx},
-
-    Sb {rd:Register ,symbol:SymIdx ,rt:Register},
-    Sh {rd:Register ,symbol:SymIdx ,rt:Register},
-    Sw {rd:Register ,symbol:SymIdx ,rt:Register},
-    Sd {rd:Register ,symbol:SymIdx ,rt:Register},
-
-    Flw {rd:Register ,symbol:SymIdx ,rt:Register},
-    Fld {rd:Register ,symbol:SymIdx ,rt:Register},
-
-    Fsw {rd:Register ,symbol:SymIdx ,rt:Register},
-    Fsd {rd:Register ,symbol:SymIdx ,rt:Register},
-
-    Li {rd:Register ,imm:Imm},
-    Mv {rd:Register ,rs:Register},
-    Not {rd:Register ,rs:Register},
-    Sext_w {rd:Register ,rs:Register},
-    Seqz {rd:Register ,rs:Register},
-
-    Fmv_s {rd:Register ,rs:Register},
-    Fabs_s {rd:Register ,rs:Register},
-    Fneg_s {rd:Register ,rs:Register},
-    Fmv_d {rd:Register ,rs:Register},
-    Fabs_d {rd:Register ,rs:Register},
-    Fneg_d {rd:Register ,rs:Register},
-
-    Bgt {rs:Register ,rd:Register ,offset:Imm},
-    Ble {rs:Register ,rd:Register ,offset:Imm},
-    Bgtu {rs:Register ,rd:Register ,offset:Imm},
-    Bleu {rs:Register ,rd:Register ,offset:Imm},
+    Li {rd:Register ,imm:Imm},//将立即数imm加载到寄存器rd中。
+    Mv {rd:Register ,rs:Register},//将寄存器rs的值移动到寄存器rd中。
+    Not {rd:Register ,rs:Register},//将寄存器rs的位取反存入寄存器rd中。
+    Sext_w {rd:Register ,rs:Register},//符号扩展寄存器rs的值到寄存器rd中。
 
     Jal {offset:Imm},
     Jalr {rs:Register},
@@ -205,10 +207,10 @@ impl Debug for PseudoInstr {
             PseudoInstr::Fabs_d { rd, rs } => write!(f, "fabs.d {:?}, {:?}", rd, rs),
             PseudoInstr::Fneg_d { rd, rs } => write!(f, "fneg.d {:?}, {:?}", rd, rs),
 
-            PseudoInstr::Bgt { rs, rd, offset } => write!(f, "bgt {:?}, {:?}, {:?}", rs, rd, offset),
-            PseudoInstr::Ble { rs, rd, offset } => write!(f, "ble {:?}, {:?}, {:?}", rs, rd, offset),
-            PseudoInstr::Bgtu { rs, rd, offset } => write!(f, "bgtu {:?}, {:?}, {:?}", rs, rd, offset),
-            PseudoInstr::Bleu { rs, rd, offset } => write!(f, "bleu {:?}, {:?}, {:?}", rs, rd, offset),
+            PseudoInstr::Bgt { rs1: rs, rs2: rd, offset } => write!(f, "bgt {:?}, {:?}, {:?}", rs, rd, offset),
+            PseudoInstr::Ble { rs1: rs, rs2: rd, offset } => write!(f, "ble {:?}, {:?}, {:?}", rs, rd, offset),
+            PseudoInstr::Bgtu { rs1: rs, rs2: rd, offset } => write!(f, "bgtu {:?}, {:?}, {:?}", rs, rd, offset),
+            PseudoInstr::Bleu { rs1: rs, rs2: rd, offset } => write!(f, "bleu {:?}, {:?}, {:?}", rs, rd, offset),
 
             PseudoInstr::Jal { offset } => write!(f, "jal x1, {:?}", offset),
             PseudoInstr::Jalr { rs} => write!(f, "jalr x1, {:?}, 0", rs),
@@ -500,7 +502,7 @@ pub enum Compare {
     /// Set < Unsigned
     SLTU { rd:Register, rs1:Register, rs2:Register },
     /// Set < Imm Unsigned
-    SLTUI { rd:Register, rs1:Register, imm:Imm },
+    SLTIU { rd:Register, rs1:Register, imm:Imm },
 }
 impl Debug for Compare {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -508,7 +510,7 @@ impl Debug for Compare {
             Compare::SLT { rd, rs1, rs2 } => write!(f, "{:5} {:?},{:?},{:?}","slt" , rd, rs1, rs2),
             Compare::SLTI { rd, rs1, imm } => write!(f, "{:5} {:?},{:?},{:?}", "slti", rd, rs1, imm),
             Compare::SLTU { rd, rs1, rs2 } => write!(f, "{:5} {:?},{:?},{:?}","sltu", rd, rs1, rs2),
-            Compare::SLTUI { rd, rs1, imm } => write!(f, "{:5} {:?},{:?},{:?}","sltui" , rd, rs1, imm),
+            Compare::SLTIU { rd, rs1, imm } => write!(f, "{:5} {:?},{:?},{:?}","sltiu" , rd, rs1, imm),
 }
     }
 }

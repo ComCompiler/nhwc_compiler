@@ -4,8 +4,7 @@ use std::{ops::{Index}};
 use crate::{direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, toolkit::rv64_instr::{Arithmetic}};
 use anyhow::*;
 
-
-use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, rv64_instr::{Imm, Loads, PseudoInstr, Register, RV64Instr, Shifts, Stores}, simulator::Simulator, symtab::{SymIdx, SymTab}};
+use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Value, mem_layout::MemLayout, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, rv64_instr::{Branch, Compare, Imm, Loads, Logical, PseudoInstr, Register, RV64Instr, Shifts, Stores}, simulator::Simulator, symtab::{SymIdx, SymTab}};
 
 /// convert nhwc ir into riscv
 pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RV64Instr>, asm_structure:&mut AsmStructure, src_symtab:&SymTab)->Result<()>{
@@ -184,35 +183,95 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         // we will store rst to reg3
                         match rhs{
                             super::nhwc_instr::ArithOp::Add { a, b, vartype: _ } => {
-                                BinOp!(sect asm_sect func_name {Arithmetic::new_add} args{a,b,1,2,3} with_symtab src_symtab);
+                                // BinOp!(sect asm_sect func_name {Arithmetic::new_add} args{a,b,1,2,3} with_symtab src_symtab);
+                                load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                asm_sect.asm({Arithmetic::new_add} (Register::new_s(3), Register::new_s(1), Register::new_s(2)).into());
                             },
                             super::nhwc_instr::ArithOp::Mul { a, b, vartype: _ } => {
-                                BinOp!(sect asm_sect func_name {Arithmetic::new_mul} args{a,b,1,2,3} with_symtab src_symtab);
+                                // BinOp!(sect asm_sect func_name {Arithmetic::new_mul} args{a,b,1,2,3} with_symtab src_symtab);
+                                load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                asm_sect.asm({Arithmetic::new_mul} (Register::new_s(3), Register::new_s(1), Register::new_s(2)).into());
                             },
                             super::nhwc_instr::ArithOp::Div { a, b, vartype: _ } => {
-                                BinOp!(sect asm_sect func_name {Arithmetic::new_div} args{a,b,1,2,3} with_symtab src_symtab);
+                                // BinOp!(sect asm_sect func_name {Arithmetic::new_div} args{a,b,1,2,3} with_symtab src_symtab);
+                                load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                asm_sect.asm({Arithmetic::new_div} (Register::new_s(3), Register::new_s(1), Register::new_s(2)).into());
                             },
                             super::nhwc_instr::ArithOp::Sub { a, b, vartype: _ } => {
-                                BinOp!(sect asm_sect func_name {Arithmetic::new_sub} args{a,b,1,2,3} with_symtab src_symtab);
+                                // BinOp!(sect asm_sect func_name {Arithmetic::new_sub} args{a,b,1,2,3} with_symtab src_symtab);
+                                load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                asm_sect.asm({Arithmetic::new_sub} (Register::new_s(3), Register::new_s(1), Register::new_s(2)).into());
                             },
                             super::nhwc_instr::ArithOp::Mod { a, b, vartype: _ } => {
-                                BinOp!(sect asm_sect func_name {Arithmetic::new_rem} args{a,b,1,2,3} with_symtab src_symtab);
+                                // BinOp!(sect asm_sect func_name {Arithmetic::new_rem} args{a,b,1,2,3} with_symtab src_symtab);
+                                load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                asm_sect.asm({Arithmetic::new_rem} (Register::new_s(3), Register::new_s(1), Register::new_s(2)).into());
                             },
-                            super::nhwc_instr::ArithOp::Icmp { plan, a: _, b: _, vartype: _ } => {
+                            super::nhwc_instr::ArithOp::Icmp { plan, a, b, vartype: _ } => {
                                 match plan{
                                     super::nhwc_instr::IcmpPlan::Eq => {
                                         // BinOp!(sect asm_sect func_name {Compare::new} args{a,b,1,2,3} with_symtab src_symtab);
+                                        load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                        load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                        asm_sect.asm({Logical::new_xor } (Register::new_s(3), Register::new_s(1), Register::new_s(2)).into());
+                                        asm_sect.asm({Compare::new_sltiu} (Register::new_s(3),Register::new_s(3),Imm::from_offset(1)).into());
                                     },
                                     super::nhwc_instr::IcmpPlan::Ne => {
+                                        load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                        load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                        asm_sect.asm({Logical::new_xor } (Register::new_s(3), Register::new_s(1), Register::new_s(2)).into());
+                                        asm_sect.asm({Compare::new_sltiu} (Register::new_s(3),Register::new_s(3),Imm::from_offset(1)).into());
+                                        asm_sect.asm({Logical::new_xori} (Register::new_s(3),Register::new_s(3),Imm::from_offset(1)).into());
                                     },
-                                    super::nhwc_instr::IcmpPlan::Ugt => todo!(),
-                                    super::nhwc_instr::IcmpPlan::Uge => todo!(),
-                                    super::nhwc_instr::IcmpPlan::Ult => todo!(),
-                                    super::nhwc_instr::IcmpPlan::Ule => todo!(),
-                                    super::nhwc_instr::IcmpPlan::Sgt => todo!(),
-                                    super::nhwc_instr::IcmpPlan::Sge => todo!(),
-                                    super::nhwc_instr::IcmpPlan::Slt => todo!(),
-                                    super::nhwc_instr::IcmpPlan::Sle => todo!(),
+                                    super::nhwc_instr::IcmpPlan::Ugt => {
+                                        load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                        load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                        asm_sect.asm({Compare::new_sltu } (Register::new_s(3), Register::new_s(2), Register::new_s(1)).into());
+                                    },
+                                    super::nhwc_instr::IcmpPlan::Uge => {
+                                        load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                        load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                        asm_sect.asm({Compare::new_sltu } (Register::new_s(3), Register::new_s(2), Register::new_s(1)).into());
+                                        asm_sect.asm({Logical::new_xori } (Register::new_s(3), Register::new_s(3), Imm::from_offset(1)).into());
+                                    },
+                                    super::nhwc_instr::IcmpPlan::Ult => {
+                                        load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                        load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                        asm_sect.asm({Compare::new_sltu } (Register::new_s(3), Register::new_s(1), Register::new_s(2)).into());
+                                    },
+                                    super::nhwc_instr::IcmpPlan::Ule => {
+                                        load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                        load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                        asm_sect.asm({Compare::new_sltu } (Register::new_s(3), Register::new_s(1), Register::new_s(2)).into());
+                                        asm_sect.asm({Logical::new_xori } (Register::new_s(3), Register::new_s(3), Imm::from_offset(1)).into());
+                                    },
+                                    super::nhwc_instr::IcmpPlan::Sgt => {
+                                        load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                        load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                        asm_sect.asm({Compare::new_slt } (Register::new_s(3), Register::new_s(2), Register::new_s(1)).into());
+                                    },
+                                    super::nhwc_instr::IcmpPlan::Sge => {
+                                        load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                        load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                        asm_sect.asm({Compare::new_slt } (Register::new_s(3), Register::new_s(2), Register::new_s(1)).into());
+                                        asm_sect.asm({Logical::new_xori } (Register::new_s(3), Register::new_s(3), Imm::from_offset(1)).into());
+                                    },
+                                    super::nhwc_instr::IcmpPlan::Slt => {
+                                        load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                        load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                        asm_sect.asm({Compare::new_slt } (Register::new_s(3), Register::new_s(1), Register::new_s(2)).into());
+                                    },
+                                    super::nhwc_instr::IcmpPlan::Sle => {
+                                        load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                        load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                        asm_sect.asm({Compare::new_slt } (Register::new_s(3), Register::new_s(1), Register::new_s(2)).into());
+                                        asm_sect.asm({Logical::new_xori } (Register::new_s(3), Register::new_s(3), Imm::from_offset(1)).into());
+                                    },
                                 }
                             },
                             super::nhwc_instr::ArithOp::Ucmp { plan, a: _, b: _, vartype: _ } => {
@@ -226,14 +285,19 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 }
 
                             },
-                            super::nhwc_instr::ArithOp::LogicAnd { a: _, b: _, vartype: _ } => {
-
+                            super::nhwc_instr::ArithOp::LogicAnd { a, b, vartype: _ } => {
+                                load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                asm_sect.asm({Logical::new_and } (Register::new_s(3), Register::new_s(1), Register::new_s(2)).into());
                             },
-                            super::nhwc_instr::ArithOp::LogicOr { a: _, b: _, vartype: _ } => {
-
+                            super::nhwc_instr::ArithOp::LogicOr { a, b, vartype: _ } => {
+                                load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                load_sym_or_imm(&mut asm_sect, b, Register::new_s(2), src_symtab)?;
+                                asm_sect.asm({Logical::new_or } (Register::new_s(3), Register::new_s(1), Register::new_s(2)).into());
                             },
-                            super::nhwc_instr::ArithOp::LogicNot { a: _, vartype: _ } => {
-
+                            super::nhwc_instr::ArithOp::LogicNot { a, vartype: _ } => {
+                                load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
+                                asm_sect.asm({Logical::new_xori } (Register::new_s(3), Register::new_s(1), Imm::from_offset(-1)).into());
                             },
                         }
                         // store reg3 to lhs
