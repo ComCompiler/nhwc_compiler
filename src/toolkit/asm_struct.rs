@@ -2,7 +2,7 @@ use std::fmt::Debug;
 use anyhow::*;
 use itertools::Itertools;
 
-use super::{field::Value, riscv_instr::RiscvInstr, symtab::SymIdx};
+use super::{field::Value, rv64_instr::RV64Instr, symtab::SymIdx};
 
 /// a asm file contains several sections
 pub struct AsmStructure{
@@ -70,7 +70,7 @@ impl AsmSection{
     pub fn text(&mut self){
         self.attrs.push(AsmAttr::Text {  } .into())
     }
-    pub fn asm(&mut self, riscv_instr:RiscvInstr){
+    pub fn asm(&mut self, riscv_instr:RV64Instr){
         self.attrs.push(Asm::Riscv { instr: riscv_instr })
     }
 
@@ -122,7 +122,7 @@ pub struct AsmSection{
 pub enum Asm{
     Attr{attr:AsmAttr},
     Riscv{
-        instr:RiscvInstr
+        instr:RV64Instr
     }
 }
 impl Debug for Asm{
@@ -226,7 +226,7 @@ impl Into<Asm> for AsmAttr{
         Asm::Attr { attr: self }
     }
 }
-impl Into<Asm> for RiscvInstr{
+impl Into<Asm> for RV64Instr{
     fn into(self) -> Asm {
         Asm::Riscv { instr: self } 
     }

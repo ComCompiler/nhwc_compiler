@@ -1,14 +1,13 @@
 
 
-use std::{fmt::{Debug}, ops::{Index}};
-use crate::{direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, toolkit::riscv_instr::{Arithmetic}};
+use std::{ops::{Index}};
+use crate::{direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, toolkit::rv64_instr::{Arithmetic}};
 use anyhow::*;
-use itertools::Itertools;
 
-use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Value, mem_layout::MemLayout, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, riscv_instr::{Branch, Compare, Imm, Loads, Logical, PseudoInstr, Register, RiscvInstr, Shifts, Stores, Trans}, simulator::Simulator, symtab::{SymIdx, SymTab}};
+use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Value, mem_layout::MemLayout, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, rv64_instr::{Branch, Compare, Imm, Loads, Logical, PseudoInstr, Register, RV64Instr, Shifts, Stores}, simulator::Simulator, symtab::{SymIdx, SymTab}};
 
 /// convert nhwc ir into riscv
-pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RiscvInstr>, asm_structure:&mut AsmStructure, src_symtab:&SymTab)->Result<()>{
+pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RV64Instr>, asm_structure:&mut AsmStructure, src_symtab:&SymTab)->Result<()>{
     // firstly process root which contains global vars 
     let static_init_sect = parse_root2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab)?;
     asm_structure.sects.push(static_init_sect);
@@ -19,7 +18,7 @@ pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSla
 }
 /// convert `cfg_root_node` into riscv  
 /// assumes that there are only global and some calculating instrs so that `simulator` can run directly
-fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, _riscv_instr_slab:&mut InstrSlab<RiscvInstr>, src_symtab:&SymTab)->Result<AsmSection>{
+fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, _riscv_instr_slab:&mut InstrSlab<RV64Instr>, src_symtab:&SymTab)->Result<AsmSection>{
     let root_node = node_mut!(at CFG_ROOT in cfg_graph);
     let mut simulator = Simulator::new(root_node.instrs.clone(), false);
     simulator.instr_list.push(nhwc_instr_slab.insert_instr(NhwcInstrType::new_exit_breakpoint( vec![]).into()));
@@ -68,7 +67,7 @@ macro_rules! BinOp {
 }
 /// convert `cfg_entry_node` into riscv 
 /// assume first instr be func_def instr while others are alloc instr
-fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, _riscv_instr_slab:&mut InstrSlab<RiscvInstr>, src_symtab:&SymTab) -> Result<AsmSection>{
+fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, _riscv_instr_slab:&mut InstrSlab<RV64Instr>, src_symtab:&SymTab) -> Result<AsmSection>{
     let entries = direct_child_nodes!(at CFG_ROOT in cfg_graph);
     let mut asm_sect = AsmSection::new();
     asm_sect.text() ;
