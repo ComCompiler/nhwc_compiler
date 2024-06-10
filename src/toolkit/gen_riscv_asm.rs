@@ -5,7 +5,7 @@ use crate::{direct_child_nodes, instr, node, node_mut, passes::simulator_debug_p
 use anyhow::*;
 use itertools::Itertools;
 
-use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Value, mem_layout::MemLayout, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, riscv_instr::{Branch, Compare, Imm, Loads, Logical, PseudoInstr, Register, RiscvInstr, Shifts, Stores}, simulator::Simulator, symtab::{SymIdx, SymTab}};
+use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Value, mem_layout::MemLayout, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, riscv_instr::{Branch, Compare, Imm, Loads, Logical, PseudoInstr, Register, RiscvInstr, Shifts, Stores, Trans}, simulator::Simulator, symtab::{SymIdx, SymTab}};
 
 /// convert nhwc ir into riscv
 pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RiscvInstr>, asm_structure:&mut AsmStructure, src_symtab:&SymTab)->Result<()>{
@@ -347,7 +347,23 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     NhwcInstrType::Phi { lhs: _, rhs: _ } => {
                         panic!("phi appeared in gen asm pass");
                     },
-                    NhwcInstrType::TranType { lhs: _, op: _ } => todo!(),
+                    NhwcInstrType::TranType { lhs, op } => {
+                        match op{
+                            super::nhwc_instr::Trans::Fptosi { float_symidx } => {
+                                load_sym_or_imm(&mut asm_sect, float_symidx, Register::new_s(1), src_symtab)?;
+                                asm_sect.asm({Trans::new_fcvt_w_s} (Register::new_s(1)))
+                            },
+                            super::nhwc_instr::Trans::Sitofp { int_symidx } => {
+                                //i->f
+                            },
+                            super::nhwc_instr::Trans::Zext { bool_symidx } => {
+                                //b->i
+                            },
+                            super::nhwc_instr::Trans::Bitcast { rptr_symidx, rptr_type, lptr_type } => {
+                                //p->p
+                            },
+                        }
+                    },
                     NhwcInstrType::BreakPoint { symidx: _, breakpoint_args: _ } => {
                         // panic!("breakpoint appeared in gen asm pass");
                         // nothing to do 
