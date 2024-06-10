@@ -9,7 +9,7 @@ use crate::{add_symbol, Args};
 use super::cfg_node::InstrList;
 use super::asm_struct::AsmStructure;
 use super::nhwc_instr::NhwcInstr;
-use super::riscv_instr::RiscvInstr;
+use super::rv64_instr::RV64Instr;
 use super::{
     ast_node::AstTree, cfg_node::CfgGraph, dug_node::DefUseGraph, dj_node::DjNode, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symtab::{SymTab, SymTabGraph}
 };
@@ -29,7 +29,7 @@ pub struct NhwcCtx {
     pub ast2scope:HashMap<u32, u32>,
     pub symtab_graph:SymTabGraph,
     pub nhwc_instr_slab:InstrSlab<NhwcInstr>,
-    pub riscv_instr_slab:InstrSlab<RiscvInstr>,
+    pub riscv_instr_slab:InstrSlab<RV64Instr>,
     pub asm_structure:AsmStructure,
     pub def_use_graph:DefUseGraph,
     pub collected_nhwc_ir: InstrList,

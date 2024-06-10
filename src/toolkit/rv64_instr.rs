@@ -49,17 +49,17 @@ impl Debug for Imm{
 }
 //只写了riscv手册里rv32 的 base的部分
 #[derive(Clone)]
-pub enum RiscvInstr {
+pub enum RV64Instr {
     BaseIntInstr(BaseIntInstr),
     PseudoInstr(PseudoInstr),
 }
-impl Debug for RiscvInstr{
+impl Debug for RV64Instr{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::BaseIntInstr(arg0) => {
                 write!(f,"{:?}",arg0)
             },
-            RiscvInstr::PseudoInstr(arg0) => {
+            RV64Instr::PseudoInstr(arg0) => {
                 write!(f,"{:?}",arg0)
             },
         }
@@ -280,36 +280,43 @@ impl_from!(CSR,BaseIntInstr);
 impl_from!(Loads,BaseIntInstr);
 impl_from!(Stores,BaseIntInstr);
 
-impl_from_indirectly!(Shifts,BaseIntInstr,RiscvInstr);
-impl_from_indirectly!(Arithmetic,BaseIntInstr,RiscvInstr);
-impl_from_indirectly!(Logical,BaseIntInstr,RiscvInstr);
-impl_from_indirectly!(Compare,BaseIntInstr,RiscvInstr);
-impl_from_indirectly!(Branch,BaseIntInstr,RiscvInstr);
-impl_from_indirectly!(JumpAndLink,BaseIntInstr,RiscvInstr);
-impl_from_indirectly!(Environment,BaseIntInstr,RiscvInstr);
-impl_from_indirectly!(CSR,BaseIntInstr,RiscvInstr);
-impl_from_indirectly!(Loads,BaseIntInstr,RiscvInstr);
-impl_from_indirectly!(Stores,BaseIntInstr,RiscvInstr);
+impl_from_indirectly!(Shifts,BaseIntInstr,RV64Instr);
+impl_from_indirectly!(Arithmetic,BaseIntInstr,RV64Instr);
+impl_from_indirectly!(Logical,BaseIntInstr,RV64Instr);
+impl_from_indirectly!(Compare,BaseIntInstr,RV64Instr);
+impl_from_indirectly!(Branch,BaseIntInstr,RV64Instr);
+impl_from_indirectly!(JumpAndLink,BaseIntInstr,RV64Instr);
+impl_from_indirectly!(Environment,BaseIntInstr,RV64Instr);
+impl_from_indirectly!(CSR,BaseIntInstr,RV64Instr);
+impl_from_indirectly!(Loads,BaseIntInstr,RV64Instr);
+impl_from_indirectly!(Stores,BaseIntInstr,RV64Instr);
 
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum  Register {
     Zero,
     RA,
     SP,
     GP,
-    /// t0-t6 一共7个
+    /// ranging from t0 to t6 
     Temp{
         reg_idx:u8,
     },
-    /// s0-s11 一共12个
+    /// ranging from s0 to s11 
     Saved{
         reg_idx:u8,
     },
-    /// a0-a7 一共8个
+    /// ranging from a0 to a7 
     Arg{
         reg_idx:u8,
     },
+    /// ranging from fa0 to fa7
+    FArg{
+        reg_idx:u8,
+    },
+    Fsaved{
+        reg_idx:u8,
+    }
 }
 impl Debug for Register {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
@@ -321,6 +328,8 @@ impl Debug for Register {
             Register::Temp{reg_idx} => write!(f, "t{}", reg_idx),
             Register::Saved { reg_idx } => write!(f, "s{}", reg_idx),
             Register::Arg { reg_idx } => write!(f, "a{}", reg_idx),
+            Register::FArg { reg_idx } => write!(f, "fa{}", reg_idx),
+            Register::Fsaved { reg_idx } => write!(f, "fs{}", reg_idx),
         }
     }
 }
@@ -339,6 +348,12 @@ impl Register{
     }
     pub fn new_a(idx:u8)->Self{
         Self::Arg { reg_idx: idx } 
+    }
+    pub fn is_f_reg(){
+
+    }
+    pub fn is_i_reg(){
+        
     }
 }
 #[derive(Clone,new)]
@@ -676,5 +691,5 @@ impl Debug for Stores {
     }
 }
 
-impl_from!(PseudoInstr,RiscvInstr);
-impl_from!(BaseIntInstr,RiscvInstr);
+impl_from!(PseudoInstr,RV64Instr);
+impl_from!(BaseIntInstr,RV64Instr);
