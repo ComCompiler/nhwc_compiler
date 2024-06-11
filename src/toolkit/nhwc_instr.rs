@@ -74,8 +74,8 @@ pub enum ArithOp {
         b:SymIdx,
         vartype:Type,
     },
-    Ucmp {
-        plan:UcmpPlan,
+    Fcmp {
+        plan:FcmpPlan,
         a:SymIdx, //寄存器或者数
         b:SymIdx,
         vartype:Type,
@@ -256,7 +256,7 @@ impl NhwcInstr {
                 ArithOp::Sub { a, b, vartype:_ } => vec![a,b],
                 ArithOp::Mod { a, b, vartype:_ } => vec![a,b],
                 ArithOp::Icmp { plan:_, a, b, vartype:_ } => vec![a,b],
-                ArithOp::Ucmp { plan:_, a, b, vartype:_ } => vec![a,b],
+                ArithOp::Fcmp { plan:_, a, b, vartype:_ } => vec![a,b],
                 ArithOp::LogicAnd { a, b, vartype:_ } => vec![a,b],
                 ArithOp::LogicOr { a, b, vartype:_ } => vec![a,b],
                 ArithOp::LogicNot { a, vartype:_ } => vec![a],
@@ -352,7 +352,7 @@ impl NhwcInstr {
                 ArithOp::Sub { a, b, vartype:_ } => vec![a,b],
                 ArithOp::Mod { a, b, vartype:_ } => vec![a,b],
                 ArithOp::Icmp { plan:_, a, b, vartype:_ } => vec![a,b],
-                ArithOp::Ucmp { plan:_, a, b, vartype:_ } => vec![a,b],
+                ArithOp::Fcmp { plan:_, a, b, vartype:_ } => vec![a,b],
                 ArithOp::LogicAnd { a, b, vartype:_ } => vec![a,b],
                 ArithOp::LogicOr { a, b, vartype:_ } => vec![a,b],
                 ArithOp::LogicNot { a, vartype :_} => vec![a],
@@ -401,6 +401,37 @@ impl NhwcInstr {
 
 } 
 #[derive(Clone, Debug)]
+pub enum CmpPlan{
+    Eq,
+    Ne, 
+    Gt,
+    Ge,
+    Lt,
+    Le,
+}
+impl CmpPlan{
+    pub fn to_icmp_plan(&self) -> IcmpPlan{
+        match self{
+            CmpPlan::Eq => IcmpPlan::Eq,
+            CmpPlan::Ne => IcmpPlan::Ne,
+            CmpPlan::Gt => IcmpPlan::Sgt,
+            CmpPlan::Ge => IcmpPlan::Sge,
+            CmpPlan::Lt => IcmpPlan::Slt,
+            CmpPlan::Le => IcmpPlan::Sle,
+        }
+    }
+    pub fn to_fcmp_plan(&self) -> FcmpPlan{
+        match self{
+            CmpPlan::Eq => FcmpPlan::Oeq,
+            CmpPlan::Ne => FcmpPlan::One,
+            CmpPlan::Gt => FcmpPlan::Ogt,
+            CmpPlan::Ge => FcmpPlan::Oge,
+            CmpPlan::Lt => FcmpPlan::Olt,
+            CmpPlan::Le => FcmpPlan::Ole,
+        }
+    }
+}
+#[derive(Clone, Debug)]
 pub enum IcmpPlan {
     Eq,
     Ne, // 等与不等
@@ -414,7 +445,7 @@ pub enum IcmpPlan {
     Sle, //有符号比较
 }
 #[derive(Clone, Debug)]
-pub enum UcmpPlan {
+pub enum FcmpPlan {
     Oeq,
     One, // 等与不等
     Ogt,
@@ -495,7 +526,7 @@ impl NhwcInstrType {
     pub fn new_sub(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::Sub { a, b, vartype } } }
     pub fn new_mod(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::Mod { a, b, vartype } } }
     pub fn new_icmp(lhs:SymIdx, plan:IcmpPlan, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::Icmp { plan, a, b, vartype } } }
-    pub fn new_ucmp(lhs:SymIdx, plan:UcmpPlan, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::Ucmp { plan, a, b, vartype } } }
+    pub fn new_fcmp(lhs:SymIdx, plan:FcmpPlan, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::Fcmp { plan, a, b, vartype } } }
     pub fn new_logic_and(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::LogicAnd { a, b, vartype } } }
     pub fn new_logic_or(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::LogicOr { a, b, vartype } } }
     pub fn new_logic_not(lhs:SymIdx, a:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::LogicNot { a, vartype } } }
@@ -577,7 +608,7 @@ impl Debug for ArithOp {
             Self::Icmp { plan, a, b, vartype } => {
                 write!(f, "icmp {:?} {:?} {:?}, {:?}", vartype, plan, a, b)
             }
-            Self::Ucmp { plan, a, b, vartype } => {
+            Self::Fcmp { plan, a, b, vartype } => {
                 write!(f, "ucmp {:?} {:?} {:?}, {:?}", vartype, plan, a, b)
             }
             Self::LogicAnd { a, b, vartype } => write!(f, "And {:?} {:?}, {:?}", vartype, a, b),

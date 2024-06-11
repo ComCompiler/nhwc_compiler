@@ -93,7 +93,7 @@ impl Pass for NhwcDumpPass {
         }
         if self.is_gen_nhwc_ir_file{
             
-            let mut f =fs::File::create(args.c_file_path.file_stem().unwrap().to_string_lossy().to_string() + ".nhwc")?;
+            let mut f =fs::File::create(args.input.file_stem().unwrap().to_string_lossy().to_string() + ".nhwc")?;
             for &(instr,cur_tab) in nhwc_ir_vec.iter(){
                 // instr_mut!(at instr in instr_slab)?.text.clear();
                 

@@ -199,7 +199,7 @@ impl Debug for SymIdx {
             Some(index_ssa) => write!(f, "{}*{}*{}", self.symbol_name, self.scope_node, index_ssa),
             // Some(index_ssa) => write!(f, "{}*{}*{}", self.symbol_name,  ,index_ssa),
             // None => write!(f, "{} _s{}", self.symbol_name, self.scope_node),
-            None => write!(f, "{}", self.symbol_name),
+            None => write!(f, "{}_{}", self.symbol_name, self.scope_node),
         }
     }
 }

@@ -15,8 +15,10 @@ int main(){
     // }
     // breakpoint bp1(b)
     
-    int b , c = 3;
-    int d[2][3] = {{1,2,3},{4,5,6}};
-    b=d[1][2];
+    // int b , c = 3;
+    // int d[2][3] = {{1,2,3},{4,5,6}};
+    // b=d[1][2];
+    putarray(5, c);
     return 0;
 }
+

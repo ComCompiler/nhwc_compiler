@@ -102,31 +102,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
-name = "beginner_compiler"
-version = "0.1.0"
-dependencies = [
- "ahash",
- "antlr-rust",
- "anyhow",
- "casey",
- "clap",
- "colored",
- "delegate",
- "derive-new",
- "derive_builder",
- "eval",
- "itertools",
- "lazy_static",
- "paste",
- "petgraph",
- "regex",
- "slab",
- "strum",
- "strum_macros",
- "syn 1.0.109",
-]
-
-[[package]]
 name = "better_any"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -228,6 +203,31 @@ checksum = "cbf2150cce219b664a8a70df7a1f933836724b503f8a413af9365b4dcc4d90b8"
 dependencies = [
  "lazy_static",
  "windows-sys",
+]
+
+[[package]]
+name = "compiler"
+version = "0.1.0"
+dependencies = [
+ "ahash",
+ "antlr-rust",
+ "anyhow",
+ "casey",
+ "clap",
+ "colored",
+ "delegate",
+ "derive-new",
+ "derive_builder",
+ "eval",
+ "itertools",
+ "lazy_static",
+ "paste",
+ "petgraph",
+ "regex",
+ "slab",
+ "strum",
+ "strum_macros",
+ "syn 1.0.109",
 ]
 
 [[package]]

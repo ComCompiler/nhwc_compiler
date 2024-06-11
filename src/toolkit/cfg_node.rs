@@ -8,7 +8,7 @@ use delegate::delegate;
 
 use petgraph::stable_graph::StableDiGraph;
 
-use super::riscv_instr::{RiscvInstr};
+use super::rv64_instr::{RV64Instr};
 use super::symtab::{SymIdx, SymTab, SymTabEdge, SymTabGraph};
 use crate::toolkit::cfg_edge::CfgEdge;
 use crate::toolkit::field::Field;
@@ -82,7 +82,7 @@ pub struct CfgNode {
     pub op_jump_instr:Option<usize>,
 
     /// currently to be riscv instr 
-    pub asms:InstrSlab<RiscvInstr>,
+    pub asms:InstrSlab<RV64Instr>,
 
     pub text:String,
     pub info:Fields,

@@ -6,6 +6,7 @@ use strum_macros::EnumIs;
 use anyhow::*;
 use regex::{self, Regex};
 
+
 use super::{ast_node::AstTree, scope_node::ST_ROOT};
 use super::symtab::SymIdx;
 use crate::{debug_info_blue, node};
@@ -153,7 +154,7 @@ pub enum Type {
         ty:Box<Type>,
     },
     Array{
-        dims:Vec<SymIdx>,
+        dims:Vec<Option<SymIdx>>,
         ele_ty:Box<Type>,
     },
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
@@ -232,7 +233,7 @@ impl Value {
             Type::Label => Err(anyhow!("不能从string 转化为 Label 类型的value"))?,
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("不能从string 转化为 Fn 类型的value"))?,
             // Type::Unsure {  } => Err(anyhow!("不能从string 转化为 Unsure 类型的value"))?,
-            Type::Array { dims, ele_ty} => Value::new_array(ArrayEleMap::new(), dims.clone(), *ele_ty.clone()),
+            Type::Array { dims, ele_ty} => Value::new_array(ArrayEleMap::new(), dims.clone().into_iter().map(|x| x.unwrap()).collect_vec(), *ele_ty.clone()),
             Type::Ptr64 { ty: _ } => todo!(),
         })
     }
@@ -243,7 +244,7 @@ impl Value {
             Value::I1(_) => Type::I1,
             Value::Void => Type::Void,
             Value::Fn { arg_syms, ret_sym } => Type::Fn { arg_syms: arg_syms.clone(), ret_sym: ret_sym.clone() },
-            Value::Array { value_map: _, dims , ele_ty: ele_type } => Type::Array { dims: dims.clone(), ele_ty:Box::new(ele_type.clone())  },
+            Value::Array { value_map: _, dims , ele_ty: ele_type } => Type::Array { dims: dims.clone().into_iter().map(|x| Some(x)).collect_vec(), ele_ty:Box::new(ele_type.clone())  },
             Value::Ptr64 { pointed_ty: ty, op_pointed_symidx: _, offset: _  } => Type::Ptr64 { ty: Box::new(*ty.clone()) },
             // Value::Unsure {  } => Type::Unsure {  },
         }
@@ -312,12 +313,29 @@ impl Type {
     }
     /// 这个函数接受一个元素类型和各个维度的大小来构建一个数组类型
     /// 但是禁止创建数组的数组
-    pub fn new_array(ele_ty:Type,dims:Vec<SymIdx>)->Result<Self>{
+    pub fn new_array_dims_known(ele_ty:Type,dims:Vec<SymIdx>)->Result<Self>{
+        match &ele_ty{
+            Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
+            _=>{}
+        }
+        Ok(Type::Array { dims:dims.into_iter().map(|x| Some(x)).collect_vec(), ele_ty: Box::new(ele_ty) })
+    }
+    pub fn new_array_dims_may_unknown(ele_ty:Type,dims:Vec<Option<SymIdx>>)->Result<Self>{
         match &ele_ty{
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
             _=>{}
         }
         Ok(Type::Array { dims, ele_ty: Box::new(ele_ty) })
+    }
+    pub fn suits(&self, another_type:&Type) -> bool{
+        match (self,another_type){
+            (Type::Array { dims, ele_ty },Type::Array { dims:dims2, ele_ty:ele_ty2 }) => {
+                dims.len() == dims2.len() && ele_ty == ele_ty2
+            },
+            _ => {
+                self == another_type
+            }
+        }
     }
     /// get align of the type, it will return ele align if it is a array
     pub fn get_align(&self)->Result<usize>{
@@ -350,11 +368,11 @@ impl Type {
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
             Type::Void => Err(anyhow!("无法新建void类型的数组"))?,
             Type::Label => Err(anyhow!("无法新建label类型的数组"))?,
-            Type::I32 => *self = Type::new_array(self.clone(), vec![dim_symidx])?,
-            Type::F32 => *self =Type::new_array(self.clone(), vec![dim_symidx])?,
-            Type::I1 => *self =Type::new_array(self.clone(), vec![dim_symidx])?,
+            Type::I32 => *self = Type::new_array_dims_known(self.clone(), vec![dim_symidx])?,
+            Type::F32 => *self =Type::new_array_dims_known(self.clone(), vec![dim_symidx])?,
+            Type::I1 => *self =Type::new_array_dims_known(self.clone(), vec![dim_symidx])?,
             Type::Array { dims, ele_ty: _ty } => {
-                dims.push(dim_symidx);
+                dims.push(Some(dim_symidx));
             },
             Type::Ptr64 { ty } => {
                 ty.push_dim(dim_symidx)?;
@@ -387,7 +405,7 @@ impl Type {
                 let mut v1 = Value::new_i32(1);
                 let mut weighted_dims = vec![v1.to_symidx()?];
                 for dim_symidx in dims.get(1..dims.len()).unwrap().iter().rev(){
-                    let v2 = Value::from_string_with_specific_type(&dim_symidx.symbol_name, &Type::I32)?;
+                    let v2 = Value::from_string_with_specific_type(&dim_symidx.as_ref().unwrap().symbol_name, &Type::I32)?;
                     debug_info_blue!(" v2 is  {:?}",v2);
                     v1 = (v1*v2)?;
                     weighted_dims.push(v1.to_symidx()?)
@@ -427,7 +445,7 @@ impl Type {
                         .split(|c| c == '[' || c == ']')
                         .map(|s| SymIdx::new(ST_ROOT,s.to_string())).into_iter()
                         .collect_vec();
-                    Ok(Type::Array { dims, ele_ty  })
+                    Ok(Type::Array { dims:dims.into_iter().map(|x| Some(x)).collect_vec(), ele_ty  })
                 } else {
                     Err(anyhow!("无法识别为 type: {:?}",ty_str))
                 }
@@ -438,7 +456,7 @@ impl Type {
         match self{
             Type::Array { dims, ele_ty: _ } => {
                 let array_size:usize = dims.iter()
-                    .map(|d|{let ans:usize = d.symbol_name.parse().unwrap();ans}).product() ;
+                    .map(|d|{let ans:usize = d.as_ref().unwrap().symbol_name.parse().unwrap();ans}).product() ;
                 Ok(array_size)
             },
             _ => {

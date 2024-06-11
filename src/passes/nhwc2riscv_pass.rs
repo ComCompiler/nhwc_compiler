@@ -16,10 +16,27 @@ impl Pass for Nhwc2RiscvDebugPass {
     // 运行这个pass
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> {
         // 拿到一个nhwc的vec,转化成汇编语言
+        let _built_in_part = "# Built-in library\n
+    .text\n
+    .align 4\n
+    .globl starttime\n
+    .type starttime, @function\n
+starttime:\n
+    mv a0, zero\n
+    tail _sysy_starttime\n
+\n
+    .text\n
+    .align 4\n
+    .globl stoptime\n
+    .type stoptime, @function\n
+stoptime:\n
+    mv a0, zero\n
+    tail _sysy_stoptime";
+
         let (cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab, asm_structure) = (&mut ctx.cfg_graph, &mut ctx.nhwc_instr_slab, &mut ctx.riscv_instr_slab, &mut ctx.symtab, &mut ctx.asm_structure);
         parse_nhwcir2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, asm_structure, src_symtab)?;
         if self.is_write_s_file{
-            let mut f = fs::File::create(ctx.args.c_file_path.file_stem().unwrap().to_string_lossy().to_string() + ".s")?;
+            let mut f = fs::File::create(ctx.args.output.file_stem().unwrap().to_string_lossy().to_string() + ".s")?;
             writeln!(f,"{:?}",ctx.asm_structure)?;
         }
         Ok(())
