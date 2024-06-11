@@ -247,6 +247,8 @@ pub enum BaseIntInstr {
     Loads(Loads),
     Stores(Stores),
     Trans(Trans),
+    MulAdd(MulAdd),
+    MinMax(MinMax),
 }
 impl Debug for BaseIntInstr{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -262,6 +264,8 @@ impl Debug for BaseIntInstr{
             Self::Loads(arg0) => write!(f,"{:?}",arg0),
             Self::Stores(arg0) => write!(f,"{:?}",arg0),
             Self::Trans(arg0) => write!(f,"{:?}",arg0),
+            Self::MulAdd(arg0) => write!(f,"{:?}",arg0),
+            Self::MinMax(arg0) => write!(f,"{:?}",arg0),
         }
     }
 }
@@ -491,6 +495,7 @@ pub enum Arithmetic {
     FSUBS { rd:Register, rs1:Register, rs2:Register },
     FMULS { rd:Register, rs1:Register, rs2:Register },
     FDIVS { rd:Register, rs1:Register, rs2:Register },
+    FSQRTS { rd:Register, rs1:Register },
 }
 impl Debug for Arithmetic {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -510,10 +515,11 @@ impl Debug for Arithmetic {
             Arithmetic::DIVW { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","divw", rd, rs1, rs2),
             Arithmetic::REM { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","rem", rd, rs1, rs2),
             Arithmetic::REMW { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","remw", rd, rs1, rs2),
-            Arithmetic::FADD { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fadd.s", rd, rs1, rs2),
-            Arithmetic::FSUB { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fsub.s", rd, rs1, rs2),
-            Arithmetic::FMUL { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fmul.s", rd, rs1, rs2),
-            Arithmetic::FDIV { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fdiv.s", rd, rs1, rs2),
+            Arithmetic::FADDS { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fadd.s", rd, rs1, rs2),
+            Arithmetic::FSUBS { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fsub.s", rd, rs1, rs2),
+            Arithmetic::FMULS { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fmul.s", rd, rs1, rs2),
+            Arithmetic::FDIVS { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fdiv.s", rd, rs1, rs2),   
+            Arithmetic::FSQRTS { rd, rs1 } => write!(f, "{:7} {:?},{:?}","fsqrt.s", rd, rs1),
         }
     }
 }
@@ -546,7 +552,7 @@ impl Debug for Logical {
         }
     }
 }
-#[derive(Clone, new)]
+#[derive(Clone,new)]
 pub enum Compare {
     /// Set <
     SLT { rd:Register, rs1:Register, rs2:Register },
@@ -556,6 +562,10 @@ pub enum Compare {
     SLTU { rd:Register, rs1:Register, rs2:Register },
     /// Set < Imm Unsigned
     SLTIU { rd:Register, rs1:Register, imm:Imm },
+    /// for float
+    FEQS { rd:Register, rs1:Register, rs2:Register },
+    FLTS { rd:Register, rs1:Register, rs2:Register },
+    FLES { rd:Register, rs1:Register, rs2:Register },
 }
 impl Debug for Compare {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -564,7 +574,10 @@ impl Debug for Compare {
             Compare::SLTI { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}", "slti", rd, rs1, imm),
             Compare::SLTU { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","sltu", rd, rs1, rs2),
             Compare::SLTIU { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}","sltiu" , rd, rs1, imm),
-}
+            Compare::FEQS { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","feq.s", rd, rs1, rs2),
+            Compare::FLTS { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","flt.s", rd, rs1, rs2),
+            Compare::FLES { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fle.s", rd, rs1, rs2),
+        }
     }
 }
 #[derive(Clone, new)]
@@ -791,3 +804,37 @@ impl Debug for Trans{
 
 impl_from!(PseudoInstr,RV64Instr);
 impl_from!(BaseIntInstr,RV64Instr);
+
+#[derive(Clone,new)]
+pub enum MulAdd{
+    /// for matrix, 矩阵运算常用 ×+ ×－
+    /// 先将两个操作数相乘然后将乘积加上(fmadd.s)或减去(fmsub.s)第三个操作数的指令
+    Fmadds	{ rd:Register, rs1:Register, rs2:Register, rs3:Register },
+    Fmsubs	{ rd:Register, rs1:Register, rs2:Register, rs3:Register },
+    /// 在加上或减去第三个操作数之前对乘积取反的版本
+    Fnmadds { rd:Register, rs1:Register, rs2:Register, rs3:Register },
+    Fnmsubs { rd:Register, rs1:Register, rs2:Register, rs3:Register },
+}
+impl Debug for MulAdd {
+    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Fmadds { rd, rs1, rs2, rs3 } => write!(f, "{:7} {:?},{:?},{:?},{:?}","fmadd.s", rd, rs1, rs2, rs3),
+            Self::Fmsubs { rd, rs1, rs2, rs3 } => write!(f, "{:7} {:?},{:?},{:?},{:?}","fmsub.s", rd, rs1, rs2, rs3),
+            Self::Fnmadds { rd, rs1, rs2, rs3 } => write!(f, "{:7} {:?},{:?},{:?},{:?}","fnmadd.s", rd, rs1, rs2, rs3),
+            Self::Fnmsubs { rd, rs1, rs2, rs3 } => write!(f, "{:7} {:?},{:?},{:?},{:?}","fnmsub.s", rd, rs1, rs2, rs3),
+        }
+    }
+}
+#[derive(Clone,new)]
+pub enum MinMax{
+    Fmins { rd:Register, rs1:Register, rs2:Register },
+    Fmaxs { rd:Register, rs1:Register, rs2:Register },
+}
+impl Debug for MinMax {
+    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Fmins { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fmin.s", rd, rs1, rs2),
+            Self::Fmaxs { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fmax.s", rd, rs1, rs2),
+        }
+    }
+}
