@@ -924,14 +924,14 @@ fn process_call(
     let func_name_symidx = SymIdx::new(0, func_name_str);
     // 给func call节点的field中添加cor symidx信息
     let func_symidx = node_mut!(at cfg_bb in cfg_graph).get_func_cor_symidx()?.clone();
-    symtab.get_mut_symbol(&func_name_symidx)?.add_func_call_vec(vec![func_symidx]);
+    // 
+    symtab.get_mut_symbol(&func_symidx)?.get_mut_func_call_vec()?.push(func_name_symidx.clone());
 
     let mut para_symidxs = vec![];
     for &para_et_node in func_name_and_args[1..].iter() {
         para_symidxs.push(process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, para_et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?)
     }
-    let ret_type = 
-    if let Type::Fn { arg_syms, ret_sym } = symtab.get_symbol(&func_name_symidx)?.get_type()?.clone(){
+    let ret_type = if let Type::Fn { arg_syms, ret_sym } = symtab.get_symbol(&func_name_symidx)?.get_type()?.clone(){
         //检查形参和实参是否一致
         if para_symidxs.len() == arg_syms.len(){
             for arg_idx in 0..arg_syms.len(){
@@ -942,12 +942,10 @@ fn process_call(
         }else{
             return Err(anyhow!("传入实参与函数形参不符"))
         }
-        let ret_type = symtab.get_symbol(&ret_sym)?.get_type()?.clone();
-        Ok(ret_type)
+        symtab.get_symbol(&ret_sym)?.get_type()?.clone()
     }else{
         return Err(anyhow!("调用对象不是函数类型"))
     };
-    let ret_type = ret_type?;
     if let Type::Void = ret_type{
         let call_instr = NhwcInstrType::new_func_call(None, func_name_symidx, para_symidxs, ret_type).into();
         Ok((None,node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(call_instr, instr_slab)?))

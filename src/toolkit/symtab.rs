@@ -12,7 +12,7 @@ pub type SymTabGraph = StableDiGraph<SymTab, SymTabEdge, u32>;
 #[derive(Clone)]
 pub struct SymTab {
     // map:BTreeMap<SymIdx, Symbol>,
-    map:AHashMap<SymIdx, Symbol>,
+    pub map:AHashMap<SymIdx, Symbol>,
     text:String,
 }
 #[derive(Clone)]
