@@ -13,7 +13,7 @@ impl Code2AstPass {
 impl Pass for Code2AstPass {
     // 运行这个pass
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> {
-        ctx.code = read_file_content(ctx.args.c_file_path.to_string_lossy().into_owned());
+        ctx.code = read_file_content(ctx.args.input.to_string_lossy().into_owned());
         let defs = "int getint();
             int getch();
             int getarray(int a[]);

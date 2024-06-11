@@ -341,8 +341,8 @@ fn parse_branch2nhwc(
     ast_tree:&AstTree, cfg_graph:&mut CfgGraph, scope_tree:&ScopeTree, et_tree:&mut EtTree, symtab:&mut SymTab, ast2scope:&HashMap<u32, u32>, ast_expr_node:u32, cfg_branch_node:u32, 
     instr_slab:&mut InstrSlab<NhwcInstr>, symtab_g:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
-    let label_true_symidx = process_label_symbol(*ast2scope.get(&ast_expr_node).unwrap(), "branch.true:".to_string(), symtab)?;
-    let label_false_symidx = process_label_symbol(*ast2scope.get(&ast_expr_node).unwrap(), "branch.false:".to_string(), symtab)?;
+    let label_true_symidx = process_label_symbol(*ast2scope.get(&ast_expr_node).unwrap(), "branch_true".to_string(), symtab)?;
+    let label_false_symidx = process_label_symbol(*ast2scope.get(&ast_expr_node).unwrap(), "branch_false".to_string(), symtab)?;
 
     let label_true_instr = NhwcInstrType::new_label(label_true_symidx.clone()).into();
     let label_false_instr = NhwcInstrType::new_label(label_false_symidx.clone()).into();

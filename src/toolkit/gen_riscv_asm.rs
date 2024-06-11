@@ -337,7 +337,9 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     NhwcInstrType::Phi { lhs: _, rhs: _ } => {
                         panic!("phi appeared in gen asm pass");
                     },
-                    NhwcInstrType::TranType { lhs: _, op: _ } => todo!(),
+                    NhwcInstrType::TranType { lhs: _, op: _ } => {
+
+                    },
                     NhwcInstrType::BreakPoint { symidx: _, breakpoint_args: _ } => {
                         // panic!("breakpoint appeared in gen asm pass");
                         // nothing to do 

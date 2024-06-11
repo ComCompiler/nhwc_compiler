@@ -316,7 +316,7 @@ pub enum  Register {
     FArg{
         reg_idx:u8,
     },
-    Fsaved{
+    FSaved{
         reg_idx:u8,
     }
 }
@@ -331,7 +331,7 @@ impl Debug for Register {
             Register::Saved { reg_idx } => write!(f, "s{}", reg_idx),
             Register::Arg { reg_idx } => write!(f, "a{}", reg_idx),
             Register::FArg { reg_idx } => write!(f, "fa{}", reg_idx),
-            Register::Fsaved { reg_idx } => write!(f, "fs{}", reg_idx),
+            Register::FSaved { reg_idx } => write!(f, "fs{}", reg_idx),
         }
     }
 }
@@ -357,6 +357,16 @@ impl Register{
     pub fn is_i_reg(){
         
     }
+    // pub fn to_f_reg(&self) -> Register{
+    //     match self{
+    //         Register::Saved { reg_idx } => {
+    //         },
+    //         Register::Arg { reg_idx } => todo!(),
+    //         _ => {
+    //             panic!("illegal reg {:?} can't trans to f_reg",self)
+    //         }
+    //     }
+    // }
 }
 #[derive(Clone,new)]
 pub enum Shifts {

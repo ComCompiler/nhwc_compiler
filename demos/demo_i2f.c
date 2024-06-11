@@ -4,4 +4,5 @@ int main(){
     if (a>2) {
         putfloat(b);
     }
+    return a;
 }
