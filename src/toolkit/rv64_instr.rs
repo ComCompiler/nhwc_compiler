@@ -547,6 +547,9 @@ pub enum Compare {
     SLTU { rd:Register, rs1:Register, rs2:Register },
     /// Set < Imm Unsigned
     SLTIU { rd:Register, rs1:Register, imm:Imm },
+    FEQ_S{rd:Register,rs1:Register,rs2:Register},
+    FLT_S{rd:Register,rs1:Register,rs2:Register},
+    FLE_S{rd:Register,rs1:Register,rs2:Register},
 }
 impl Debug for Compare {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -555,9 +558,13 @@ impl Debug for Compare {
             Compare::SLTI { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}", "slti", rd, rs1, imm),
             Compare::SLTU { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","sltu", rd, rs1, rs2),
             Compare::SLTIU { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}","sltiu" , rd, rs1, imm),
-}
+            Compare::FEQ_S { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","feq.s" , rd, rs1, rs2),
+            Compare::FLT_S { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","flt.s" , rd, rs1, rs2),
+            Compare::FLE_S { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fle.s" , rd, rs1, rs2),
+        }
     }
 }
+
 #[derive(Clone, new)]
 pub enum Branch {
     /// Branch =

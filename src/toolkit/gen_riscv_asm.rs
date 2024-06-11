@@ -267,16 +267,38 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                     },
                                 }
                             },
-                            super::nhwc_instr::ArithOp::Fcmp { plan, a: _, b: _, vartype: _ } => {
+                            super::nhwc_instr::ArithOp::Fcmp { plan, a, b, vartype: _ } => {
+                                let val_reg1 = load_sym_or_imm(&mut asm_sect, a, Register::new_fs(1), src_symtab)?;
+                                let val_reg2 = load_sym_or_imm(&mut asm_sect, b, Register::new_fs(2), src_symtab)?;
                                 match plan{
                                     super::nhwc_instr::FcmpPlan::Oeq => {
-                                       todo!()
+                                        asm_sect.asm({Compare::new_feq_s} (Register::new_s(3),val_reg1,val_reg2).into());
                                     },
-                                    super::nhwc_instr::FcmpPlan::One => todo!(),
-                                    super::nhwc_instr::FcmpPlan::Ogt => todo!(),
-                                    super::nhwc_instr::FcmpPlan::Oge => todo!(),
-                                    super::nhwc_instr::FcmpPlan::Olt => todo!(),
-                                    super::nhwc_instr::FcmpPlan::Ole => todo!(),
+                                    super::nhwc_instr::FcmpPlan::One => {
+                                        asm_sect.asm({Compare::new_feq_s} (Register::new_s(3),val_reg1,val_reg2).into());
+                                        asm_sect.asm({PseudoInstr::new_seqz} (Register::new_s(3),Register::new_s(3)).into());
+                                    },
+                                    super::nhwc_instr::FcmpPlan::Ogt => {
+                                        asm_sect.asm({Compare::new_flt_s} (Register::new_s(3),val_reg2,val_reg1).into());
+                                    },
+                                    super::nhwc_instr::FcmpPlan::Oge => {
+                                        let rd1 = Register::new_s(3);
+                                        let rd2 = Register::new_s(4);
+                                        asm_sect.asm({Compare::new_feq_s} (rd1.clone(),val_reg1.clone(),val_reg2.clone()).into());
+                                        asm_sect.asm({Compare::new_flt_s} (rd2.clone(),val_reg2,val_reg1).into());
+                                        asm_sect.asm({PseudoInstr::new_not} (rd2.clone(),rd2.clone()).into());
+                                        asm_sect.asm({Logical::new_or} (Register::new_s(5),rd1,rd2).into());
+                                    },
+                                    super::nhwc_instr::FcmpPlan::Olt => {
+                                        asm_sect.asm({Compare::new_flt_s} (Register::new_s(3),val_reg1,val_reg2).into());
+                                    },
+                                    super::nhwc_instr::FcmpPlan::Ole => {
+                                        let rd1 = Register::new_s(3);
+                                        let rd2 = Register::new_s(4);
+                                        asm_sect.asm({Compare::new_feq_s} (rd1.clone(),val_reg1.clone(),val_reg2.clone()).into());
+                                        asm_sect.asm({Compare::new_flt_s} (rd2.clone(),val_reg1,val_reg2).into());
+                                        asm_sect.asm({Logical::new_or} (Register::new_s(5),rd1,rd2).into());
+                                    },
                                 }
                             },
                             super::nhwc_instr::ArithOp::LogicAnd { a, b, vartype: _ } => {
