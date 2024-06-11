@@ -3,7 +3,7 @@
 use crate::{direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, toolkit::rv64_instr::{Arithmetic}};
 use anyhow::*;
 
-use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, rv64_instr::{Compare, Imm, Loads, Logical, PseudoInstr, Register, RV64Instr, Shifts, Stores}, simulator::Simulator, symtab::{SymIdx, SymTab}};
+use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, rv64_instr::{Compare, Imm, Loads, Logical, PseudoInstr, RV64Instr, Register, Shifts, Stores, Trans}, simulator::Simulator, symtab::{SymIdx, SymTab}};
 
 /// convert nhwc ir into riscv
 pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RV64Instr>, asm_structure:&mut AsmStructure, src_symtab:&SymTab)->Result<()>{
@@ -266,15 +266,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 }
                             },
                             super::nhwc_instr::ArithOp::Ucmp { plan, a: _, b: _, vartype: _ } => {
-                                match plan{
-                                    super::nhwc_instr::UcmpPlan::Oeq => todo!(),
-                                    super::nhwc_instr::UcmpPlan::One => todo!(),
-                                    super::nhwc_instr::UcmpPlan::Ogt => todo!(),
-                                    super::nhwc_instr::UcmpPlan::Oge => todo!(),
-                                    super::nhwc_instr::UcmpPlan::Olt => todo!(),
-                                    super::nhwc_instr::UcmpPlan::Ole => todo!(),
-                                }
-
+                                todo!();
                             },
                             super::nhwc_instr::ArithOp::LogicAnd { a, b, vartype: _ } => {
                                 load_sym_or_imm(&mut asm_sect, a, Register::new_s(1), src_symtab)?;
@@ -337,8 +329,26 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     NhwcInstrType::Phi { lhs: _, rhs: _ } => {
                         panic!("phi appeared in gen asm pass");
                     },
-                    NhwcInstrType::TranType { lhs: _, op: _ } => {
-
+                    NhwcInstrType::TranType { lhs, op } => {
+                        match op{
+                            super::nhwc_instr::Trans::Fptosi { float_symidx } => {
+                                load_sym_or_imm(&mut asm_sect, float_symidx, Register::new_s(1), src_symtab)?;
+                                asm_sect.asm({Trans::new_fcvt_w_s} (Register::new_s(1),Register::new_fs(2)).into());
+                            },
+                            super::nhwc_instr::Trans::Sitofp { int_symidx } => {
+                                load_sym_or_imm(&mut asm_sect, int_symidx, Register::new_s(1), src_symtab)?;
+                                asm_sect.asm({Trans::new_fcvt_s_w} (Register::new_fs(1),Register::new_s(2)).into());
+                            },
+                            super::nhwc_instr::Trans::Zext { bool_symidx } => {
+                                //b->i
+                                load_sym_or_imm(&mut asm_sect, bool_symidx, Register::new_s(1), src_symtab)?;
+                                asm_sect.asm({Logical::new_andi} (Register::new_s(3),Register::new_s(1),Imm::from_offset(1)).into());
+                            },
+                            super::nhwc_instr::Trans::Bitcast { rptr_symidx, rptr_type, lptr_type } => {
+                                //p->p
+                                todo!();
+                            },
+                        }
                     },
                     NhwcInstrType::BreakPoint { symidx: _, breakpoint_args: _ } => {
                         // panic!("breakpoint appeared in gen asm pass");
