@@ -4,6 +4,8 @@ use anyhow::*;
 
 use derive_new::new;
 
+use crate::toolkit::field::Type;
+
 use super::symtab::SymIdx;
 
 
@@ -16,7 +18,10 @@ use super::symtab::SymIdx;
 
 #[derive(Clone)]
 pub enum Imm{
-    Label{
+    FuncLabel{
+        symidx:SymIdx,
+    },
+    JumpLabel{
         symidx:SymIdx,
     },
     Literal{
@@ -24,8 +29,11 @@ pub enum Imm{
     }
 }
 impl Imm{
-    pub fn new_label(label:SymIdx) -> Self{
-        Self::Label { symidx:label } 
+    pub fn new_jump_label(label:SymIdx) -> Self{
+        Self::JumpLabel { symidx:label } 
+    }
+    pub fn new_func_label(label:SymIdx) -> Self{
+        Self::FuncLabel  { symidx:label } 
     }
     pub fn new_literal(symidx:SymIdx) -> Self{
         Self::Literal { symidx }
@@ -38,12 +46,26 @@ impl Imm{
 impl Debug for Imm{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Label {symidx} =>{
-                write!(f,"{:?}",symidx)
+            Self::FuncLabel {symidx} =>{
+                write!(f,"{}",symidx.symbol_name)
             },
             Self::Literal { symidx } => {
-                write!(f,"{}", symidx)
+                match &Type::new_from_const(&symidx.symbol_name){
+                    Type::I32 => {
+                        write!(f,"{}", symidx)
+                    },
+                    Type::F32 => {
+                        let f_val:f32 = symidx.symbol_name.parse().unwrap();
+                        write!(f,"{}", f_val.to_bits())
+                    },
+                    _ => {
+                        write!(f,"{}", symidx)
+                    }
+                }
             }
+            Self::JumpLabel { symidx } => {
+                write!(f,"{:?}",symidx)
+            },
         }
     }
 }
@@ -119,11 +141,6 @@ pub enum PseudoInstr {
     Sw {rd:Register ,symbol:SymIdx ,rt:Register},//将寄存器rt的字存储到指定地址或符号位置
     Sd {rd:Register ,symbol:SymIdx ,rt:Register},//将寄存器rt的双字存储到指定地址或符号位置
 
-    //浮点指令
-    Flw {rd:Register ,symbol:SymIdx ,rt:Register},//加载一个单精度浮点数（32位）到浮点寄存器中
-    Fld {rd:Register ,symbol:SymIdx ,rt:Register},//加载一个双精度浮点数（位64）到浮点寄存器中
-    Fsw {rd:Register ,symbol:SymIdx ,rt:Register},//将一个单精度浮点数（32位）从浮点寄存器存储到内存中
-    Fsd {rd:Register ,symbol:SymIdx ,rt:Register},//将一个双精度浮点数（64位）从浮点寄存器存储到内存中。
     Fmv_s {rd:Register ,rs:Register},//单精度符点移动
     Fabs_s {rd:Register ,rs:Register},//单精度取绝对值
     Fneg_s {rd:Register ,rs:Register},//单精度取反
@@ -188,11 +205,6 @@ impl Debug for PseudoInstr {
             PseudoInstr::Sw { rd, symbol, rt } => write!(f, "{:7} {:?}, {:?}, {:?}","sw", rd, symbol, rt),
             PseudoInstr::Sd { rd, symbol, rt } => write!(f, "{:7} {:?}, {:?}, {:?}","sd", rd, symbol, rt),
 
-            PseudoInstr::Flw { rd, symbol, rt } => write!(f, "{:7} {:?}, {:?}, {:?}","flw", rd, symbol, rt),
-            PseudoInstr::Fld { rd, symbol, rt } => write!(f, "{:7} {:?}, {:?}, {:?}","fld", rd, symbol, rt),
-
-            PseudoInstr::Fsw { rd, symbol, rt } => write!(f, "{:7} {:?}, {:?}, {:?}","fsw", rd, symbol, rt),
-            PseudoInstr::Fsd { rd, symbol, rt } => write!(f, "{:7} {:?}, {:?}, {:?}","fsd", rd, symbol, rt),
 
             PseudoInstr::Li { rd, imm } => write!(f, "{:7} {:?}, {:?}","li", rd, imm),
             PseudoInstr::Mv { rd, rs } => write!(f, "{:7} {:?}, {:?}","mv", rd, rs),
@@ -320,6 +332,7 @@ pub enum  Register {
     FArg{
         reg_idx:u8,
     },
+    /// ranging from f0 to f9 and f18 to f31
     FSaved{
         reg_idx:u8,
     }
@@ -359,24 +372,35 @@ impl Register{
         Self::FArg { reg_idx: idx }
     }
     pub fn new_fs(idx:u8)->Self{
-        Self::Fsaved { reg_idx: idx }
+        Self::FSaved { reg_idx: idx }
     }
-    pub fn is_f_reg(){
-
+    pub fn is_f_reg(&self) -> bool{
+        match self{
+            Register::FArg { reg_idx } => true,
+            Register::FSaved { reg_idx } => true,
+            _ => {false}
+        }
     }
-    pub fn is_i_reg(){
-        
+    pub fn is_i_reg(&self) -> bool{
+        match self{
+            Register::FArg { reg_idx } => false,
+            Register::FSaved { reg_idx } => false,
+            _ => {true}
+        }
     }
-    // pub fn to_f_reg(&self) -> Register{
-    //     match self{
-    //         Register::Saved { reg_idx } => {
-    //         },
-    //         Register::Arg { reg_idx } => todo!(),
-    //         _ => {
-    //             panic!("illegal reg {:?} can't trans to f_reg",self)
-    //         }
-    //     }
-    // }
+    pub fn to_f_reg(&self) -> Register{
+        match self{
+            Register::Saved { reg_idx} => {
+                Register::new_fs(*reg_idx)
+            },
+            Register::Arg { reg_idx } => {
+                Register::new_fa(*reg_idx)
+            },
+            _ => {
+                panic!("illegal reg {:?} can't trans to f_reg",self)
+            }
+        }
+    }
 }
 #[derive(Clone,new)]
 pub enum Shifts {
@@ -623,48 +647,65 @@ impl Debug for CSR {
 pub enum Loads {
     /// RV32I Base                              RV64I
     /// Load Byte
-    LB { rd:Register, rs1:Register, imm:Imm },
+    Lb { rd:Register, rs1:Register, imm:Imm },
     /// Load Halfword
-    LH { rd:Register, rs1:Register, imm:Imm },
+    Lh { rd:Register, rs1:Register, imm:Imm },
     /// Load Byte Unsigned
-    LBU { rd:Register, rs1:Register, imm:Imm },
+    Lbu { rd:Register, rs1:Register, imm:Imm },
     /// Load Half Unsigned
-    LHU { rd:Register, rs1:Register, imm:Imm }, LWU { rd:Register, rs1:Register, imm:Imm},
+    Lhu { rd:Register, rs1:Register, imm:Imm }, Lwu { rd:Register, rs1:Register, imm:Imm},
     /// Load Word
-    LW { rd:Register, rs1:Register, imm:Imm }, LD { rd:Register, rs1:Register, imm:Imm},
+    Lw { rd:Register, rs1:Register, imm:Imm }, Ld { rd:Register, rs1:Register, imm:Imm},
     // Load Imm
     // LI { rd:Register, imm:Imm}
+    //浮点指令
+    Flw {rd:Register ,rs1:Register,imm:Imm },//加载一个单精度浮点数（32位）到浮点寄存器中
+    Fld {rd:Register ,rs1:Register,imm:Imm },//加载一个双精度浮点数（位64）到浮点寄存器中
 }
 impl Debug for Loads {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Loads::LB { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lb", rd, imm, rs1),
-            Loads::LH { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lh", rd, imm, rs1),
-            Loads::LBU { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lbu", rd, imm, rs1),
-            Loads::LHU { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lhu", rd, imm, rs1),
-            Loads::LW { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lw", rd, imm, rs1),
+            Loads::Lb { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lb", rd, imm, rs1),
+            Loads::Lh { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lh", rd, imm, rs1),
+            Loads::Lbu { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lbu", rd, imm, rs1),
+            Loads::Lhu { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lhu", rd, imm, rs1),
+            Loads::Lw { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lw", rd, imm, rs1),
 
-            Loads::LWU { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lwu", rd, imm, rs1),
-            Loads::LD { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","ld", rd, imm, rs1),
+            Loads::Lwu { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lwu", rd, imm, rs1),
+            Loads::Ld { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","ld", rd, imm, rs1),
+            Loads::Fld { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","fld", rd,  rs1,imm),
+            Loads::Flw { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","flw", rd,  rs1, imm),
         }
     }
 }
 impl Loads{
-    pub fn new(size:usize,rd:Register,rs1:Register, offset:isize) -> Result<Self>{
-        Ok(match size{
-            8 => {
+    pub fn new(size:usize,rd:Register,rs1:Register, offset:isize, is_float:bool) -> Result<Self>{
+        if rd.is_f_reg() != is_float{
+            panic!("can't load to {:?}",rd)
+        }
+        Ok(match (size,is_float){
+            (8,false)=> {
                 Loads::new_ld(rd, rs1, Imm::from_offset(offset))
             },
-            4 => {
+            (4,false)=> {
                 Loads::new_lw(rd, rs1, Imm::from_offset(offset))
             },
-            2 => {
+            (2,false)=> {
                 Loads::new_lh(rd, rs1, Imm::from_offset(offset))
             },
-            1 => {
+            (1,false)=> {
                 Loads::new_lb(rd, rs1, Imm::from_offset(offset))
             },
-            _ => {
+            (_,false)=> {
+                return Err(anyhow!("unexpected load size"))
+            }
+            (8,true)=> {
+                Loads::new_fld(rd, rs1, Imm::from_offset(offset))
+            },
+            (4,true)=> {
+                Loads::new_flw(rd, rs1, Imm::from_offset(offset))
+            },
+            (_,true)=> {
                 return Err(anyhow!("unexpected load size"))
             }
         })
@@ -674,28 +715,39 @@ impl Loads{
 pub enum Stores {
     /// RV32I Base                               RV64
     /// Store Byte
-    SB { rs1:Register, rs2:Register, imm:Imm },
+    Sb { rs1:Register, rs2:Register, imm:Imm },
     /// Store Halfword
-    SH { rs1:Register, rs2:Register, imm:Imm },
+    Sh { rs1:Register, rs2:Register, imm:Imm },
     ///Store Word
-    SW { rs1:Register, rs2:Register, imm:Imm }, SD { rs1:Register, rs2:Register, imm:Imm},
+    Sw { rs1:Register, rs2:Register, imm:Imm }, Sd { rs1:Register, rs2:Register, imm:Imm},
+    Fsw {rs1:Register ,rs2:Register,imm:Imm},//将一个单精度浮点数（32位）从浮点寄存器存储到内存中
+    Fsd {rs1:Register ,rs2:Register,imm:Imm},//将一个双精度浮点数（64位）从浮点寄存器存储到内存中。
 }
 impl Stores{
-    pub fn new(size:usize,reg1:Register,reg2:Register, offset:isize) -> Result<Self>{
-        Ok(match size{
-            8 => {
+    pub fn new(size:usize,reg1:Register,reg2:Register, offset:isize, is_f32:bool) -> Result<Self>{
+        Ok(match (size,is_f32){
+            (8,false)=> {
                 Stores::new_sd(reg1, reg2, Imm::from_offset(offset))
             },
-            4 => {
+            (4,false)=> {
                 Stores::new_sw(reg1, reg2, Imm::from_offset(offset))
             },
-            2 => {
+            (2,false)=> {
                 Stores::new_sh(reg1, reg2, Imm::from_offset(offset))
             },
-            1 => {
+            (1,false)=> {
                 Stores::new_sb(reg1, reg2, Imm::from_offset(offset))
             },
-            _ => {
+            (_,false)=> {
+                return Err(anyhow!("unexpected store size"))
+            },
+            (8,true)=> {
+                Stores::new_fsd(reg1, reg2, Imm::from_offset(offset))
+            },
+            (4,true)=> {
+                Stores::new_fsw(reg1, reg2, Imm::from_offset(offset))
+            },
+            (_,true)=> {
                 return Err(anyhow!("unexpected store size"))
             }
         })
@@ -704,25 +756,26 @@ impl Stores{
 impl Debug for Stores {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Stores::SB { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?}({:?})","sb", rs1, imm, rs2),
-            Stores::SH { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?}({:?})","sh", rs1, imm, rs2),
-            Stores::SW { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?}({:?})","sw", rs1, imm, rs2),
-
-            Stores::SD { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?}({:?})","sd", rs1, imm, rs2),
+            Stores::Sb { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?}({:?})","sb", rs1, imm, rs2),
+            Stores::Sh { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?}({:?})","sh", rs1, imm, rs2),
+            Stores::Sw { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?}({:?})","sw", rs1, imm, rs2),
+            Stores::Sd { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?}({:?})","sd", rs1, imm, rs2),
+            Stores::Fsw { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?}({:?})","fsw", rs1, imm, rs2),
+            Stores::Fsd { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?}({:?})","fsd", rs1, imm, rs2),
         }
     }
 }
 
 #[derive(Clone,new)]
 pub enum Trans{
-    FCVT_W_S{rd:Register,rs1:Register},
-    FCVT_S_W{rd:Register,rs1:Register},
+    Fcvt_w_s{rd:Register,rs1:Register},
+    Fcvt_s_w{rd:Register,rs1:Register},
 }
 impl Debug for Trans{
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self{
-            Trans::FCVT_W_S { rd, rs1 } => write!(f, "{:5} {:?},{:?},rm","FCVT_W_S", rd, rs1),
-            Trans::FCVT_S_W { rd, rs1 } => write!(f, "{:5} {:?},{:?},rm","FCVT_S_W", rd, rs1),
+            Trans::Fcvt_w_s { rd, rs1 } => write!(f, "{:5} {:?},{:?},rdn","fcvt_w_s", rd, rs1),
+            Trans::Fcvt_s_w { rd, rs1 } => write!(f, "{:5} {:?},{:?},rdn","fcvt_s_w", rd, rs1),
         }
     }
 }

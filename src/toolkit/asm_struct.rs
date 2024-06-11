@@ -2,7 +2,7 @@ use std::fmt::Debug;
 use anyhow::*;
 use itertools::Itertools;
 
-use super::{field::Value, rv64_instr::RV64Instr, symtab::SymIdx};
+use super::{field::Value, rv64_instr::{Imm, RV64Instr}, symtab::SymIdx};
 
 /// a asm file contains several sections
 pub struct AsmStructure{
@@ -34,29 +34,29 @@ impl AsmSection{
         annotation = annotation.replace("\n", "");
         self.attrs.push(AsmAttr::Annotation { annotation }.into())
     }
-    pub fn global(&mut self, symidx:SymIdx){
-        self.attrs.push(AsmAttr::Global { symidx }.into())
+    pub fn global(&mut self, imm:Imm){
+        self.attrs.push(AsmAttr::Global { label: imm }.into())
     }
-    pub fn obj_type(&mut self, symidx:SymIdx, ){
-        self.attrs.push(AsmAttr::DataType { attr_ty:DataType::Object,  symidx } .into())
+    pub fn obj_type(&mut self, imm:Imm, ){
+        self.attrs.push(AsmAttr::DataType { attr_ty:DataType::Object,  imm } .into())
     }
-    pub fn func_type(&mut self, symidx:SymIdx, ){
-        self.attrs.push(AsmAttr::DataType { attr_ty:DataType::Function,  symidx } .into())
+    pub fn func_type(&mut self, imm:Imm){
+        self.attrs.push(AsmAttr::DataType { attr_ty:DataType::Function,  imm} .into())
     }
-    pub fn label(&mut self, symidx:SymIdx){
-        self.attrs.push(AsmAttr::Label  { symidx }.into())
+    pub fn label(&mut self, imm:Imm){
+        self.attrs.push(AsmAttr::Label  { imm }.into())
     }
-    pub fn double(&mut self, symidx:SymIdx){
-        self.attrs.push(AsmAttr::Double { symidx: symidx }.into())
+    pub fn double(&mut self, imm:Imm){
+        self.attrs.push(AsmAttr::Double { imm: imm }.into())
     }
-    pub fn word(&mut self, symidx:SymIdx){
-        self.attrs.push(AsmAttr::Word { symidx: symidx }.into())
+    pub fn word(&mut self, imm:Imm){
+        self.attrs.push(AsmAttr::Word { imm: imm }.into())
     }
-    pub fn half(&mut self, symidx:SymIdx){
-        self.attrs.push(AsmAttr::Half { symidx: symidx }.into())
+    pub fn half(&mut self, imm:Imm){
+        self.attrs.push(AsmAttr::Half { imm: imm }.into())
     }
-    pub fn byte(&mut self, symidx:SymIdx){
-        self.attrs.push(AsmAttr::Byte { symidx: symidx }.into())
+    pub fn byte(&mut self, imm:Imm){
+        self.attrs.push(AsmAttr::Byte { imm: imm }.into())
     }
     pub fn zero(&mut self, len:usize){
         if len >0 {
@@ -102,10 +102,10 @@ impl AsmSection{
             },
             _ => {
                 match val.get_ele_size()?{
-                    8 => { self.double(val.to_symidx()?) }
-                    4 => { self.word(val.to_symidx()?) }
-                    2 => { self.half(val.to_symidx()?) }
-                    1 => { self.byte(val.to_symidx()?) }
+                    8 => { self.double(Imm::new_literal(val.to_symidx()?)) }
+                    4 => { self.word(Imm::new_literal(val.to_symidx()?)) }
+                    2 => { self.half(Imm::new_literal(val.to_symidx()?)) }
+                    1 => { self.byte(Imm::new_literal(val.to_symidx()?)) }
                     _ => { return Err(anyhow!("unexpected ele size")) }
                 }
                 Ok(())
@@ -135,8 +135,8 @@ impl Debug for Asm{
                     AsmAttr::Align { align } => {
                         writeln!(f,"    .align {}",align)
                     },
-                    AsmAttr::Global { symidx } => {
-                        writeln!(f,"    .global {:?}",symidx)
+                    AsmAttr::Global { label} => {
+                        writeln!(f,"    .global {:?}",label)
                     },
                     AsmAttr::Data {  } => {
                         writeln!(f,"    .data")
@@ -144,26 +144,26 @@ impl Debug for Asm{
                     AsmAttr::Text {  } => {
                         writeln!(f,"    .text")
                     },
-                    AsmAttr::Double { symidx } => {
-                        writeln!(f,"    .double {}",symidx)
+                    AsmAttr::Double { imm } => {
+                        writeln!(f,"    .double {:?}",imm)
                     },
-                    AsmAttr::Word { symidx } => {
-                        writeln!(f,"    .word {}",symidx)
+                    AsmAttr::Word { imm } => {
+                        writeln!(f,"    .word {:?}",imm)
                     },
-                    AsmAttr::Half { symidx } => {
-                        writeln!(f,"    .half {}",symidx)
+                    AsmAttr::Half { imm } => {
+                        writeln!(f,"    .half {:?}",imm)
                     },
-                    AsmAttr::Byte { symidx } => {
-                        writeln!(f,"    .byte {}",symidx)
+                    AsmAttr::Byte { imm } => {
+                        writeln!(f,"    .byte {:?}",imm)
                     },
                     AsmAttr::Zero { len } => {
-                        writeln!(f,"    .zero {}",len)
+                        writeln!(f,"    .zero {:?}",len)
                     },
-                    AsmAttr::Label { symidx } => {
-                        writeln!(f,"{:?}:",symidx)
+                    AsmAttr::Label { imm } => {
+                        writeln!(f,"{:?}:",imm)
                     },
-                    AsmAttr::DataType { attr_ty, symidx } => {
-                        writeln!(f,"    .type {} {:?}",symidx, attr_ty)
+                    AsmAttr::DataType { attr_ty, imm: symidx } => {
+                        writeln!(f,"    .type {:?} {:?}",symidx, attr_ty)
                     },
                     AsmAttr::Annotation { annotation } => {
                         writeln!(f,"                    ;{}",annotation, )
@@ -185,30 +185,30 @@ pub enum AsmAttr{
         align:usize
     },
     Global{
-        symidx:SymIdx
+        label:Imm
     },
     Data{ },Text{},
     Double{
-        symidx:SymIdx
+        imm:Imm
     },
     Word{
-        symidx:SymIdx
+        imm:Imm
     },
     Half{
-        symidx:SymIdx
+        imm:Imm
     },
     Byte{
-        symidx:SymIdx
+        imm:Imm
     },
     Zero{
         len:usize
     },
     Label{
-        symidx:SymIdx
+        imm:Imm
     },
     DataType{
         attr_ty:DataType,
-        symidx:SymIdx
+        imm:Imm
     }
 }
 pub enum DataType{

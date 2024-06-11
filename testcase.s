@@ -19,9 +19,9 @@
 .section
     .text
                     ;      Define main_0 [] -> main_ret_0 
-    .global main_0
+    .global main
     .type main @function
-main_0:
+main:
                     ;mem layout:|ra_main:8|s0_main:8|a:4|temp_0:4|temp_1:4|b:4|temp_2:1|none:7
     addi    sp,sp,-40
     sd      ra,32(sp)
@@ -36,14 +36,19 @@ main_0:
     sw      s3,20(sp)
                     ;      new_var temp_0_17:f32 
                     ;      temp_0_17 = sitofp i32 a_17 to f32 
+    lw      s1,20(sp)
+    fcvt_s_w fs1,s2,rdn
                     ;      new_var temp_1_17:f32 
                     ;      temp_1_17 = Mul f32 temp_0_17, 2.3_0 
     lw      s1,16(sp)
-    li      s2, 2.3
+    fcvt_s_w fs1,s1,rdn
+    li      s2, 1075000115
+    fcvt_s_w fs2,s2,rdn
     mul     s3,s1,s2
     sw      s3,12(sp)
                     ;      b_17 = temp_1_17 
     lw      s3,12(sp)
+    fcvt_s_w fs3,s3,rdn
     sw      s3,8(sp)
                     ;      new_var temp_2_20:i1 
                     ;      temp_2_20 = icmp i1 Sgt a_17, 2_0 
@@ -59,7 +64,8 @@ main_0:
 branch_true_21:
                     ;       Call void putfloat_0(b_17) 
     lw      a0,8(sp)
-    call    putfloat_0
+    fcvt_s_w fa0,a0,rdn
+    call    putfloat
                     ;      label branch_false_21: 
 branch_false_21:
                     ;      ret a_17 

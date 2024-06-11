@@ -464,31 +464,31 @@ impl Simulator{
                         },
                     }
                 },
-                Ucmp { plan, a, b, vartype: _ } => {
+                Fcmp { plan, a, b, vartype: _ } => {
                     let a_val=self.simu_symtab.get_symbol(a)?.get_simu_val()?;
                     let b_val = self.simu_symtab.get_symbol(b)?.get_simu_val()?;
                     match plan {
-                        super::nhwc_instr::UcmpPlan::Oeq => {
+                        super::nhwc_instr::FcmpPlan::Oeq => {
                             let result = Value::new_i1(a_val.clone() == b_val.clone());
                             self.simu_add_value(lhs,result)?;
                         },
-                        super::nhwc_instr::UcmpPlan::One => {
+                        super::nhwc_instr::FcmpPlan::One => {
                             let result = Value::new_i1(a_val.clone() != b_val.clone());
                             self.simu_add_value(lhs,result)?;
                         },
-                        super::nhwc_instr::UcmpPlan::Ogt => {
+                        super::nhwc_instr::FcmpPlan::Ogt => {
                             let result = Value::new_i1(a_val.clone() > b_val.clone());
                             self.simu_add_value(lhs,result)?;
                         },
-                        super::nhwc_instr::UcmpPlan::Oge => {
+                        super::nhwc_instr::FcmpPlan::Oge => {
                             let result = Value::new_i1(a_val.clone() >= b_val.clone());
                             self.simu_add_value(lhs,result)?;
                         },
-                        super::nhwc_instr::UcmpPlan::Olt => {
+                        super::nhwc_instr::FcmpPlan::Olt => {
                             let result = Value::new_i1(a_val.clone() < b_val.clone());
                             self.simu_add_value(lhs,result)?;
                         },
-                        super::nhwc_instr::UcmpPlan::Ole => {
+                        super::nhwc_instr::FcmpPlan::Ole => {
                             let result = Value::new_i1(a_val.clone() <= b_val.clone());
                             self.simu_add_value(lhs,result)?;
                         },
