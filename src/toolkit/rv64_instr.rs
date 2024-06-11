@@ -479,13 +479,18 @@ pub enum Arithmetic {
     /// Add Upper Imm To PC
     AUIPC { rd:Register, imm:Imm },
 
+
     MUL { rd: Register, rs1: Register, rs2: Register },
     MULW { rd: Register, rs1: Register, rs2: Register },
     DIV { rd: Register, rs1: Register, rs2: Register },
     DIVW { rd: Register, rs1: Register, rs2: Register },
     REM { rd: Register, rs1: Register, rs2: Register },
     REMW { rd: Register, rs1: Register, rs2: Register },
-
+    /// float Arithmetic
+    FADDS { rd:Register, rs1:Register, rs2:Register },
+    FSUBS { rd:Register, rs1:Register, rs2:Register },
+    FMULS { rd:Register, rs1:Register, rs2:Register },
+    FDIVS { rd:Register, rs1:Register, rs2:Register },
 }
 impl Debug for Arithmetic {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -505,6 +510,10 @@ impl Debug for Arithmetic {
             Arithmetic::DIVW { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","divw", rd, rs1, rs2),
             Arithmetic::REM { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","rem", rd, rs1, rs2),
             Arithmetic::REMW { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","remw", rd, rs1, rs2),
+            Arithmetic::FADD { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fadd.s", rd, rs1, rs2),
+            Arithmetic::FSUB { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fsub.s", rd, rs1, rs2),
+            Arithmetic::FMUL { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fmul.s", rd, rs1, rs2),
+            Arithmetic::FDIV { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fdiv.s", rd, rs1, rs2),
         }
     }
 }
