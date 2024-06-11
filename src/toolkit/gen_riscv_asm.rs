@@ -1,10 +1,9 @@
 
 
-use std::{ops::{Index}};
 use crate::{direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, toolkit::rv64_instr::{Arithmetic}};
 use anyhow::*;
 
-use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Value, mem_layout::MemLayout, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, rv64_instr::{Branch, Compare, Imm, Loads, Logical, PseudoInstr, Register, RV64Instr, Shifts, Stores}, simulator::Simulator, symtab::{SymIdx, SymTab}};
+use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, rv64_instr::{Compare, Imm, Loads, Logical, PseudoInstr, Register, RV64Instr, Shifts, Stores}, simulator::Simulator, symtab::{SymIdx, SymTab}};
 
 /// convert nhwc ir into riscv
 pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RV64Instr>, asm_structure:&mut AsmStructure, src_symtab:&SymTab)->Result<()>{
@@ -56,14 +55,6 @@ fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhwc
     }
        
     Ok(asm_sect)
-}
-///    ($func_name:ident,$a:ident,$b:ident,$reg1:ident,$reg2:ident,$reg3:ident with_symtab $src_symtab:ident) => {
-macro_rules! BinOp {
-    (sect $asm_sect:ident func_name $func_name:block args{$a:ident,$b:ident,$reg1:expr,$reg2:expr,$reg3:expr} with_symtab $src_symtab:ident) => {
-        load_sym_or_imm(&mut $asm_sect, $a, Register::new_s($reg1), $src_symtab)?;
-        load_sym_or_imm(&mut $asm_sect, $b, Register::new_s($reg2), $src_symtab)?;
-        $asm_sect.asm($func_name(Register::new_s($reg3), Register::new_s($reg1), Register::new_s($reg2)).into());
-    };
 }
 /// convert `cfg_entry_node` into riscv 
 /// assume first instr be func_def instr while others are alloc instr
@@ -311,7 +302,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         for (idx,arg) in func_op.actual_arg_symidx_vec.iter().enumerate(){
                             load_sym_or_imm(&mut asm_sect, arg, Register::new_a(idx as u8), src_symtab)?;
                         }   
-                        PseudoInstr::new_call(Imm::new_label(func_op.func_symidx.clone()));
+                        asm_sect.asm(PseudoInstr::new_call(Imm::new_label(func_op.func_symidx.clone())).into());
                     },
                     NhwcInstrType::Jump { jump_op } => {
                         match jump_op{

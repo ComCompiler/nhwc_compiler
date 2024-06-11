@@ -1,0 +1,12 @@
+      Define main [] -> main_ret 
+              alloc i32 a 
+              alloc f32 temp_0 
+              alloc f32 temp_1 
+              alloc f32 b 
+          label %0: 
+              a = 3 
+              new_var temp_0:f32 
+              temp_0 = sitofp i32 a to f32 
+              new_var temp_1:f32 
+              temp_1 = Mul f32 temp_0, 2.3 
+              b = temp_1 

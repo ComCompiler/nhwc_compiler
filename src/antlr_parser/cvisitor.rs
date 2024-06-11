@@ -309,30 +309,6 @@ pub trait CVisitor<'input>: ParseTreeVisitor<'input,CParserContextType>{
 	fn visit_vcSpecificModifer(&mut self, ctx: &VcSpecificModiferContext<'input>) { self.visit_children(ctx) }
 
 	/**
-	 * Visit a parse tree produced by {@link CParser#gccDeclaratorExtension}.
-	 * @param ctx the parse tree
-	 */
-	fn visit_gccDeclaratorExtension(&mut self, ctx: &GccDeclaratorExtensionContext<'input>) { self.visit_children(ctx) }
-
-	/**
-	 * Visit a parse tree produced by {@link CParser#gccAttributeSpecifier}.
-	 * @param ctx the parse tree
-	 */
-	fn visit_gccAttributeSpecifier(&mut self, ctx: &GccAttributeSpecifierContext<'input>) { self.visit_children(ctx) }
-
-	/**
-	 * Visit a parse tree produced by {@link CParser#gccAttributeList}.
-	 * @param ctx the parse tree
-	 */
-	fn visit_gccAttributeList(&mut self, ctx: &GccAttributeListContext<'input>) { self.visit_children(ctx) }
-
-	/**
-	 * Visit a parse tree produced by {@link CParser#gccAttribute}.
-	 * @param ctx the parse tree
-	 */
-	fn visit_gccAttribute(&mut self, ctx: &GccAttributeContext<'input>) { self.visit_children(ctx) }
-
-	/**
 	 * Visit a parse tree produced by {@link CParser#nestedParenthesesBlock}.
 	 * @param ctx the parse tree
 	 */
@@ -1012,38 +988,6 @@ pub trait CVisitorCompat<'input>:ParseTreeVisitorCompat<'input, Node= CParserCon
 		}
 
 	/**
-	 * Visit a parse tree produced by {@link CParser#gccDeclaratorExtension}.
-	 * @param ctx the parse tree
-	 */
-		fn visit_gccDeclaratorExtension(&mut self, ctx: &GccDeclaratorExtensionContext<'input>) -> Self::Return {
-			self.visit_children(ctx)
-		}
-
-	/**
-	 * Visit a parse tree produced by {@link CParser#gccAttributeSpecifier}.
-	 * @param ctx the parse tree
-	 */
-		fn visit_gccAttributeSpecifier(&mut self, ctx: &GccAttributeSpecifierContext<'input>) -> Self::Return {
-			self.visit_children(ctx)
-		}
-
-	/**
-	 * Visit a parse tree produced by {@link CParser#gccAttributeList}.
-	 * @param ctx the parse tree
-	 */
-		fn visit_gccAttributeList(&mut self, ctx: &GccAttributeListContext<'input>) -> Self::Return {
-			self.visit_children(ctx)
-		}
-
-	/**
-	 * Visit a parse tree produced by {@link CParser#gccAttribute}.
-	 * @param ctx the parse tree
-	 */
-		fn visit_gccAttribute(&mut self, ctx: &GccAttributeContext<'input>) -> Self::Return {
-			self.visit_children(ctx)
-		}
-
-	/**
 	 * Visit a parse tree produced by {@link CParser#nestedParenthesesBlock}.
 	 * @param ctx the parse tree
 	 */
@@ -1664,26 +1608,6 @@ where
 
 	fn visit_vcSpecificModifer(&mut self, ctx: &VcSpecificModiferContext<'input>){
 		let result = <Self as CVisitorCompat>::visit_vcSpecificModifer(self, ctx);
-        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
-	}
-
-	fn visit_gccDeclaratorExtension(&mut self, ctx: &GccDeclaratorExtensionContext<'input>){
-		let result = <Self as CVisitorCompat>::visit_gccDeclaratorExtension(self, ctx);
-        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
-	}
-
-	fn visit_gccAttributeSpecifier(&mut self, ctx: &GccAttributeSpecifierContext<'input>){
-		let result = <Self as CVisitorCompat>::visit_gccAttributeSpecifier(self, ctx);
-        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
-	}
-
-	fn visit_gccAttributeList(&mut self, ctx: &GccAttributeListContext<'input>){
-		let result = <Self as CVisitorCompat>::visit_gccAttributeList(self, ctx);
-        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
-	}
-
-	fn visit_gccAttribute(&mut self, ctx: &GccAttributeContext<'input>){
-		let result = <Self as CVisitorCompat>::visit_gccAttribute(self, ctx);
         *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
 	}
 

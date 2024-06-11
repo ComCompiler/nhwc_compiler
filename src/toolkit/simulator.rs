@@ -222,46 +222,51 @@ impl Simulator{
     /// func_symidx 是被调用的函数的symidx
     /// args_vec 是实参，而不是形参
     pub fn push_func_call(&mut self,op_assinged_symidx:Option<&SymIdx>,func_symidx:&SymIdx, actual_args_vec:&Vec<SymIdx>, src_symtab:&SymTab)->Result<()>{
-        let mut sym_ctx_vec = vec![];
-        //ctx_symidx 应该包括一切在这个函数调用后可能被更改的变量
-        for ctx_symidx in src_symtab.get_symbol(func_symidx)?.get_declared_vars()?{
-            if self.simu_symtab.has_symbol(ctx_symidx){
-                sym_ctx_vec.push(self.simu_store_sym_ctx(ctx_symidx.clone())?);
-                // debug_info_yellow!("保存上下文 {:?} {:?}",ctx_symidx,ctx_value)
+        // consider 2 situations:
+        // 1. code just declare the function but without its definition (*external*)
+        //    => ignore this function 
+        // 2. code do both declaration and definition
+        //    => run this function
+        if !*src_symtab.get_symbol(func_symidx)?.get_is_external()?{
+            let mut sym_ctx_vec = vec![];
+            //ctx_symidx 应该包括一切在这个函数调用后可能被更改的变量
+            for ctx_symidx in src_symtab.get_symbol(func_symidx)?.get_declared_vars()?{
+                if self.simu_symtab.has_symbol(ctx_symidx){
+                    sym_ctx_vec.push(self.simu_store_sym_ctx(ctx_symidx.clone())?);
+                    // debug_info_yellow!("保存上下文 {:?} {:?}",ctx_symidx,ctx_value)
+                }
             }
-        }
 
-        // 由于可能存在递归导致把 值覆盖，我们先保存一下后面再恢复上下文
-
-        // 获取形参以及返回值
-        let mut args_vec = vec![];
-        let func_type = self.simu_symtab.get_symbol(func_symidx)?.get_type()?.clone();
-        let ret_symidx = if let Type::Fn { arg_syms: formal_arg_symidx_vec, ret_sym: ret_symidx } = &func_type {
-            if formal_arg_symidx_vec.len()!= actual_args_vec.len() {
-                return Err(anyhow!("实参和形参数量不一致"));
-            }
-            
-            // 实参赋值给形参
-            for (formal_arg_symidx,actual_arg_symidx) in formal_arg_symidx_vec.iter().zip(actual_args_vec.iter()) {
-                let value = self.simu_symtab.get_symbol(actual_arg_symidx)?.get_simu_val()?.clone();
-                self.simu_add_value(formal_arg_symidx, value)?;
-                args_vec.push(self.simu_symtab.get_symbol(actual_arg_symidx)?.get_simu_val()?.clone());
-            }
-            
-            ret_symidx.clone()
-        }else{
-            return Err(anyhow!("在 simulator 中运行的call语句对象不是函数类型"));
-        };
-        // 先保留调用此函数之前的 cur_instr_pos
-        self.func_call_ctx_stack.push(FuncCallCtx::new(func_symidx.clone(), ret_symidx,args_vec, sym_ctx_vec, self.cur_instr_pos,op_assinged_symidx.cloned()));
-        // 跳转
-        self.cur_instr_pos = *self.simu_symtab.get_symbol(func_symidx)?.get_simu_label_pos()?;
-        // 跳转后再赋值
-        if let Type::Fn { arg_syms: formal_arg_symidx_vec, ret_sym: _ret_symidx } = func_type {
-            // 实参赋值给形参
-            for (formal_arg_symidx,actual_arg_symidx) in formal_arg_symidx_vec.iter().zip(actual_args_vec.iter()) {
-                let value = self.simu_symtab.get_symbol(actual_arg_symidx)?.get_simu_val()?.clone();
-                self.simu_add_value(formal_arg_symidx, value)?;
+            // 获取形参以及返回值
+            let mut args_vec = vec![];
+            let func_type = self.simu_symtab.get_symbol(func_symidx)?.get_type()?.clone();
+            let ret_symidx = if let Type::Fn { arg_syms: formal_arg_symidx_vec, ret_sym: ret_symidx } = &func_type {
+                if formal_arg_symidx_vec.len()!= actual_args_vec.len() {
+                    return Err(anyhow!("实参和形参数量不一致"));
+                }
+                
+                // 实参赋值给形参
+                for (formal_arg_symidx,actual_arg_symidx) in formal_arg_symidx_vec.iter().zip(actual_args_vec.iter()) {
+                    let value = self.simu_symtab.get_symbol(actual_arg_symidx)?.get_simu_val()?.clone();
+                    self.simu_add_value(formal_arg_symidx, value)?;
+                    args_vec.push(self.simu_symtab.get_symbol(actual_arg_symidx)?.get_simu_val()?.clone());
+                }
+                
+                ret_symidx.clone()
+            }else{
+                return Err(anyhow!("在 simulator 中运行的call语句对象不是函数类型"));
+            };
+            // 先保留调用此函数之前的 cur_instr_pos
+            self.func_call_ctx_stack.push(FuncCallCtx::new(func_symidx.clone(), ret_symidx,args_vec, sym_ctx_vec, self.cur_instr_pos,op_assinged_symidx.cloned()));
+            // 跳转
+            self.cur_instr_pos = *self.simu_symtab.get_symbol(func_symidx)?.get_simu_label_pos()?;
+            // 跳转后再赋值
+            if let Type::Fn { arg_syms: formal_arg_symidx_vec, ret_sym: _ret_symidx } = func_type {
+                // 实参赋值给形参
+                for (formal_arg_symidx,actual_arg_symidx) in formal_arg_symidx_vec.iter().zip(actual_args_vec.iter()) {
+                    let value = self.simu_symtab.get_symbol(actual_arg_symidx)?.get_simu_val()?.clone();
+                    self.simu_add_value(formal_arg_symidx, value)?;
+                }
             }
         }
         Ok(())

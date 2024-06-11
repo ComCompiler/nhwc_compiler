@@ -1,5 +1,5 @@
 use crate::{
-    add_edge, antlr_parser::cparser::{RULE_declaration, RULE_expression, RULE_forDeclaration}, toolkit::{self, ast_node::find_dfs_rule_ast, context::NhwcCtx, dot::Config, et_node::EtNodeType, etc::generate_png_by_graph_multi_tasks, pass_manager::Pass}
+    add_edge, antlr_parser::cparser::{RULE_declaration, RULE_expression, RULE_forDeclaration, RULE_parameterList}, toolkit::{self, ast_node::find_dfs_rule_ast, context::NhwcCtx, dot::Config, et_node::EtNodeType, etc::generate_png_by_graph_multi_tasks, pass_manager::Pass}
 };
 use anyhow::Result;
 #[derive(Debug)]
@@ -21,6 +21,7 @@ impl Pass for Ast2EtDebugPass {
         // nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expressionStatement));
         nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expression));
         nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_forDeclaration));
+        nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_parameterList));
         let root = 0;
         et_tree.add_node(EtNodeType::new_sep(root).as_et_node());
         for node in nodes {
