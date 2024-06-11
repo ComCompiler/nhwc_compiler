@@ -234,6 +234,7 @@ pub enum BaseIntInstr {
     CSR(CSR),
     Loads(Loads),
     Stores(Stores),
+    Trans(Trans),
 }
 impl Debug for BaseIntInstr{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -248,6 +249,7 @@ impl Debug for BaseIntInstr{
             Self::CSR(arg0) => write!(f,"{:?}",arg0),
             Self::Loads(arg0) => write!(f,"{:?}",arg0),
             Self::Stores(arg0) => write!(f,"{:?}",arg0),
+            Self::Trans(arg0) => write!(f,"{:?}",arg0),
         }
     }
 }
@@ -281,6 +283,7 @@ impl_from!(Environment,BaseIntInstr);
 impl_from!(CSR,BaseIntInstr);
 impl_from!(Loads,BaseIntInstr);
 impl_from!(Stores,BaseIntInstr);
+impl_from!(Trans,BaseIntInstr);
 
 impl_from_indirectly!(Shifts,BaseIntInstr,RV64Instr);
 impl_from_indirectly!(Arithmetic,BaseIntInstr,RV64Instr);
@@ -292,6 +295,7 @@ impl_from_indirectly!(Environment,BaseIntInstr,RV64Instr);
 impl_from_indirectly!(CSR,BaseIntInstr,RV64Instr);
 impl_from_indirectly!(Loads,BaseIntInstr,RV64Instr);
 impl_from_indirectly!(Stores,BaseIntInstr,RV64Instr);
+impl_from_indirectly!(Trans,BaseIntInstr,RV64Instr);
 
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -350,6 +354,12 @@ impl Register{
     }
     pub fn new_a(idx:u8)->Self{
         Self::Arg { reg_idx: idx } 
+    }
+    pub fn new_fa(idx:u8)->Self{
+        Self::FArg { reg_idx: idx }
+    }
+    pub fn new_fs(idx:u8)->Self{
+        Self::Fsaved { reg_idx: idx }
     }
     pub fn is_f_reg(){
 
@@ -689,6 +699,20 @@ impl Debug for Stores {
             Stores::SW { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?}({:?})","sw", rs1, imm, rs2),
 
             Stores::SD { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?}({:?})","sd", rs1, imm, rs2),
+        }
+    }
+}
+
+#[derive(Clone,new)]
+pub enum Trans{
+    FCVT_W_S{rd:Register,rs1:Register},
+    FCVT_S_W{rd:Register,rs1:Register},
+}
+impl Debug for Trans{
+    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self{
+            Trans::FCVT_W_S { rd, rs1 } => write!(f, "{:5} {:?},{:?},rm","FCVT_W_S", rd, rs1),
+            Trans::FCVT_S_W { rd, rs1 } => write!(f, "{:5} {:?},{:?},rm","FCVT_S_W", rd, rs1),
         }
     }
 }
