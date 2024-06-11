@@ -58,7 +58,6 @@ fn main() {
     let mem_alloc_pass = MemAllocPass::new();
     add_passes!(
         code2ast_pass
-        then ast2et_debug_pass
         then ast2st_pass
         then ast2cfg_pass
         then cfg2ncfg_pass
@@ -69,6 +68,7 @@ fn main() {
         then def_use_chain_debug_pass
         then nhwc_collect_pass
         then simulator_debug_pass
+        then ast2et_debug_pass
         then nhwc2riscv_pass
         then symtab_debug_pass
         to pass_manager

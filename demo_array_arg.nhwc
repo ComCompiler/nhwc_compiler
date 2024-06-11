@@ -1,0 +1,5 @@
+      global Fn[a_1]->hello_ret_0 hello_0 
+      global Fn[]->hello2_ret_0 hello2_0 
+      Define main_0 [] -> main_ret_0 
+          label %0_0: 
+              ret 0_0 

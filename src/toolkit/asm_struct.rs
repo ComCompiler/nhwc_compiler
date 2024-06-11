@@ -10,11 +10,13 @@ pub struct AsmStructure{
 }
 impl Debug for AsmStructure{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let built_in_part = "# Built-in library\n .text\n .align 4\n .globl starttime\n .type starttime, @function\n starttime:\n mv a0, zero\n tail _sysy_starttime\n \n .text\n .align 4\n .globl stoptime\n .type stoptime, @function\n stoptime:\n mv a0, zero\n tail _sysy_stoptime\n";
+        // let built_in_part = "";
         let mut s = String::new();
         for sect in &self.sects{
             s += format!("{:?}",sect).as_str();
         }
-        write!(f,"{}",s)
+        write!(f,"{}{}",built_in_part,s)
     }
 }
 impl AsmStructure{

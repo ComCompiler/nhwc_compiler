@@ -4,7 +4,7 @@ use anyhow::*;
 
 use derive_new::new;
 
-use super::{symtab::SymIdx};
+use super::symtab::SymIdx;
 
 
 // #[derive(Clone)]
@@ -39,7 +39,7 @@ impl Debug for Imm{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Label {symidx} =>{
-                write!(f,"{}",symidx)
+                write!(f,"{:?}",symidx)
             },
             Self::Literal { symidx } => {
                 write!(f,"{}", symidx)
@@ -147,75 +147,75 @@ impl Debug for PseudoInstr {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
         match self {
             PseudoInstr::Nop {} => write!(f, "nop"),
-            PseudoInstr::Neg {rd, rs} => write!(f, "neg {:?}, {:?}", rd, rs),
-            PseudoInstr::Negw {rd, rs} => write!(f, "negw {:?}, {:?}", rd, rs),
+            PseudoInstr::Neg {rd, rs} => write!(f, "{:7} {:?}, {:?}","neg", rd, rs),
+            PseudoInstr::Negw {rd, rs} => write!(f, "{:7} {:?}, {:?}","negw", rd, rs),
 
-            PseudoInstr::Snez {rd, rs} => write!(f, "snez {:?}, {:?}", rd, rs),
-            PseudoInstr::Sltz {rd, rs} => write!(f, "sltz {:?}, {:?}", rd, rs),
-            PseudoInstr::Sgtz {rd, rs} => write!(f, "sgtz {:?}, {:?}", rd, rs),
+            PseudoInstr::Snez {rd, rs} => write!(f, "{:7} {:?}, {:?}","snez", rd, rs),
+            PseudoInstr::Sltz {rd, rs} => write!(f, "{:7} {:?}, {:?}","sltz", rd, rs),
+            PseudoInstr::Sgtz {rd, rs} => write!(f, "{:7} {:?}, {:?}","sgtz", rd, rs),
 
-            PseudoInstr::Beqz {rs, offset} => write!(f, "beqz {:?}, {:?}", rs, offset),
-            PseudoInstr::Bnez {rs, offset} => write!(f, "bnez {:?}, {:?}", rs, offset),
-            PseudoInstr::Blez {rs, offset} => write!(f, "blez {:?}, {:?}", rs, offset),
-            PseudoInstr::Bgez {rs, offset} => write!(f, "bgez {:?}, {:?}", rs, offset),
-            PseudoInstr::Bltz {rs, offset} => write!(f, "bltz {:?}, {:?}", rs, offset),
-            PseudoInstr::Bgtz {rs, offset} => write!(f, "bgtz {:?}, {:?}", rs, offset),
+            PseudoInstr::Beqz {rs, offset} => write!(f, "{:7} {:?}, {:?}","beqz", rs, offset),
+            PseudoInstr::Bnez {rs, offset} => write!(f, "{:7} {:?}, {:?}","bnez", rs, offset),
+            PseudoInstr::Blez {rs, offset} => write!(f, "{:7} {:?}, {:?}","blez", rs, offset),
+            PseudoInstr::Bgez {rs, offset} => write!(f, "{:7} {:?}, {:?}","bgez", rs, offset),
+            PseudoInstr::Bltz {rs, offset} => write!(f, "{:7} {:?}, {:?}","bltz", rs, offset),
+            PseudoInstr::Bgtz {rs, offset} => write!(f, "{:7} {:?}, {:?}","bgtz", rs, offset),
 
-            PseudoInstr::J {offset} => write!(f, "j {:?}", offset),
-            PseudoInstr::Jr {rs} => write!(f, "jr {:?}", rs),
+            PseudoInstr::J {offset} => write!(f, "{:7} {:?}","j", offset),
+            PseudoInstr::Jr {rs} => write!(f, "{:7} {:?}","jr", rs),
             PseudoInstr::Ret {} => write!(f, "ret"),
 
-            PseudoInstr::Tail {offset} => write!(f, "tail {:?}", offset),
+            PseudoInstr::Tail {offset} => write!(f, "{:7} {:?}","tail", offset),
 
-            PseudoInstr::Rdinstret {rd} => write!(f, "rdinstret {:?}", rd),
-            PseudoInstr::Rdinstreth {rd} => write!(f, "rdinstreth {:?}", rd),
-            PseudoInstr::Rdcycle {rd} => write!(f, "rdcycle {:?}", rd),
-            PseudoInstr::Rdtime {rd} => write!(f, "rdtime {:?}", rd),
-            PseudoInstr::Rdcycleh {rd} => write!(f, "rdcycleh {:?}", rd),
-            PseudoInstr::Rdtimeh {rd} => write!(f, "rdtimeh {:?}", rd),
+            PseudoInstr::Rdinstret {rd} => write!(f, "{:7} {:?}","rdinstret", rd),
+            PseudoInstr::Rdinstreth {rd} => write!(f, "{:7} {:?}","rdinstreth", rd),
+            PseudoInstr::Rdcycle {rd} => write!(f, "{:7} {:?}","rdcycle", rd),
+            PseudoInstr::Rdtime {rd} => write!(f, "{:7} {:?}","rdtime", rd),
+            PseudoInstr::Rdcycleh {rd} => write!(f, "{:7} {:?}","rdcycleh", rd),
+            PseudoInstr::Rdtimeh {rd} => write!(f, "{:7} {:?}","rdtimeh", rd),
 
-            PseudoInstr::Lla { rd, symbol } => write!(f, "lla {:?}, {:?}", rd, symbol),
+            PseudoInstr::Lla { rd, symbol } => write!(f, "{:7} {:?}, {:?}","lla", rd, symbol),
 
-            PseudoInstr::La { rd, symbol } => write!(f, "la {:?}, {:?}", rd, symbol),
+            PseudoInstr::La { rd, symbol } => write!(f, "{:7} {:?}, {:?}","la", rd, symbol),
             
-            PseudoInstr::Lb { rd, symbol } => write!(f, "lb {:?}, {:?}", rd, symbol),
-            PseudoInstr::Lh { rd, symbol } => write!(f, "lh {:?}, {:?}", rd, symbol),
-            PseudoInstr::Lw { rd, symbol } => write!(f, "lw {:?}, {:?}", rd, symbol),
-            PseudoInstr::Ld { rd, symbol } => write!(f, "ld {:?}, {:?}", rd, symbol),
+            PseudoInstr::Lb { rd, symbol } => write!(f, "{:7} {:?}, {:?}","lb", rd, symbol),
+            PseudoInstr::Lh { rd, symbol } => write!(f, "{:7} {:?}, {:?}","lh", rd, symbol),
+            PseudoInstr::Lw { rd, symbol } => write!(f, "{:7} {:?}, {:?}","lw", rd, symbol),
+            PseudoInstr::Ld { rd, symbol } => write!(f, "{:7} {:?}, {:?}","ld", rd, symbol),
 
-            PseudoInstr::Sb { rd, symbol, rt } => write!(f, "sb {:?}, {:?}, {:?}", rd, symbol, rt),
-            PseudoInstr::Sh { rd, symbol, rt } => write!(f, "sh {:?}, {:?}, {:?}", rd, symbol, rt),
-            PseudoInstr::Sw { rd, symbol, rt } => write!(f, "sw {:?}, {:?}, {:?}", rd, symbol, rt),
-            PseudoInstr::Sd { rd, symbol, rt } => write!(f, "sd {:?}, {:?}, {:?}", rd, symbol, rt),
+            PseudoInstr::Sb { rd, symbol, rt } => write!(f, "{:7} {:?}, {:?}, {:?}","sb", rd, symbol, rt),
+            PseudoInstr::Sh { rd, symbol, rt } => write!(f, "{:7} {:?}, {:?}, {:?}","sh", rd, symbol, rt),
+            PseudoInstr::Sw { rd, symbol, rt } => write!(f, "{:7} {:?}, {:?}, {:?}","sw", rd, symbol, rt),
+            PseudoInstr::Sd { rd, symbol, rt } => write!(f, "{:7} {:?}, {:?}, {:?}","sd", rd, symbol, rt),
 
-            PseudoInstr::Flw { rd, symbol, rt } => write!(f, "flw {:?}, {:?}, {:?}", rd, symbol, rt),
-            PseudoInstr::Fld { rd, symbol, rt } => write!(f, "fld {:?}, {:?}, {:?}", rd, symbol, rt),
+            PseudoInstr::Flw { rd, symbol, rt } => write!(f, "{:7} {:?}, {:?}, {:?}","flw", rd, symbol, rt),
+            PseudoInstr::Fld { rd, symbol, rt } => write!(f, "{:7} {:?}, {:?}, {:?}","fld", rd, symbol, rt),
 
-            PseudoInstr::Fsw { rd, symbol, rt } => write!(f, "fsw {:?}, {:?}, {:?}", rd, symbol, rt),
-            PseudoInstr::Fsd { rd, symbol, rt } => write!(f, "fsd {:?}, {:?}, {:?}", rd, symbol, rt),
+            PseudoInstr::Fsw { rd, symbol, rt } => write!(f, "{:7} {:?}, {:?}, {:?}","fsw", rd, symbol, rt),
+            PseudoInstr::Fsd { rd, symbol, rt } => write!(f, "{:7} {:?}, {:?}, {:?}","fsd", rd, symbol, rt),
 
-            PseudoInstr::Li { rd, imm } => write!(f, "li {:?}, {:?}", rd, imm),
-            PseudoInstr::Mv { rd, rs } => write!(f, "mv {:?}, {:?}", rd, rs),
-            PseudoInstr::Not { rd, rs } => write!(f, "not {:?}, {:?}", rd, rs),
-            PseudoInstr::Sext_w { rd, rs } => write!(f, "sext.w {:?}, {:?}", rd, rs),
-            PseudoInstr::Seqz { rd, rs } => write!(f, "seqz {:?}, {:?}", rd, rs),
+            PseudoInstr::Li { rd, imm } => write!(f, "{:7} {:?}, {:?}","li", rd, imm),
+            PseudoInstr::Mv { rd, rs } => write!(f, "{:7} {:?}, {:?}","mv", rd, rs),
+            PseudoInstr::Not { rd, rs } => write!(f, "{:7} {:?}, {:?}","not", rd, rs),
+            PseudoInstr::Sext_w { rd, rs } => write!(f, "{:7} {:?}, {:?}","sext.w", rd, rs),
+            PseudoInstr::Seqz { rd, rs } => write!(f, "{:7} {:?}, {:?}","seqz", rd, rs),
 
-            PseudoInstr::Fmv_s { rd, rs } => write!(f, "fmv.s {:?}, {:?}", rd, rs),
-            PseudoInstr::Fabs_s { rd, rs } => write!(f, "fabs.s {:?}, {:?}", rd, rs),
-            PseudoInstr::Fneg_s { rd, rs } => write!(f, "fneg.s {:?}, {:?}", rd, rs),
-            PseudoInstr::Fmv_d { rd, rs } => write!(f, "fmv.d {:?}, {:?}", rd, rs),
-            PseudoInstr::Fabs_d { rd, rs } => write!(f, "fabs.d {:?}, {:?}", rd, rs),
-            PseudoInstr::Fneg_d { rd, rs } => write!(f, "fneg.d {:?}, {:?}", rd, rs),
+            PseudoInstr::Fmv_s { rd, rs } => write!(f, "{:7} {:?}, {:?}","fmv.s", rd, rs),
+            PseudoInstr::Fabs_s { rd, rs } => write!(f, "{:7} {:?}, {:?}","fabs.s", rd, rs),
+            PseudoInstr::Fneg_s { rd, rs } => write!(f, "{:7} {:?}, {:?}","fneg.s", rd, rs),
+            PseudoInstr::Fmv_d { rd, rs } => write!(f, "{:7} {:?}, {:?}","fmv.d", rd, rs),
+            PseudoInstr::Fabs_d { rd, rs } => write!(f, "{:7} {:?}, {:?}","fabs.d", rd, rs),
+            PseudoInstr::Fneg_d { rd, rs } => write!(f, "{:7} {:?}, {:?}","fneg.d", rd, rs),
 
-            PseudoInstr::Bgt { rs1: rs, rs2: rd, offset } => write!(f, "bgt {:?}, {:?}, {:?}", rs, rd, offset),
-            PseudoInstr::Ble { rs1: rs, rs2: rd, offset } => write!(f, "ble {:?}, {:?}, {:?}", rs, rd, offset),
-            PseudoInstr::Bgtu { rs1: rs, rs2: rd, offset } => write!(f, "bgtu {:?}, {:?}, {:?}", rs, rd, offset),
-            PseudoInstr::Bleu { rs1: rs, rs2: rd, offset } => write!(f, "bleu {:?}, {:?}, {:?}", rs, rd, offset),
+            PseudoInstr::Bgt { rs1: rs, rs2: rd, offset } => write!(f, "{:7} {:?}, {:?}, {:?}","bgt", rs, rd, offset),
+            PseudoInstr::Ble { rs1: rs, rs2: rd, offset } => write!(f, "{:7} {:?}, {:?}, {:?}","ble", rs, rd, offset),
+            PseudoInstr::Bgtu { rs1: rs, rs2: rd, offset } => write!(f, "{:7} {:?}, {:?}, {:?}","bgtu", rs, rd, offset),
+            PseudoInstr::Bleu { rs1: rs, rs2: rd, offset } => write!(f, "{:7} {:?}, {:?}, {:?}","bleu", rs, rd, offset),
 
-            PseudoInstr::Jal { offset } => write!(f, "jal x1, {:?}", offset),
-            PseudoInstr::Jalr { rs} => write!(f, "jalr x1, {:?}, 0", rs),
+            PseudoInstr::Jal { offset } => write!(f, "{:7} x1, {:?}","jal", offset),
+            PseudoInstr::Jalr { rs} => write!(f, "{:7} x1, {:?}, 0","jalr", rs),
 
-            PseudoInstr::Call { offset } => write!(f, "call {:?}", offset),
+            PseudoInstr::Call { offset } => write!(f, "{:7} {:?}","call", offset),
 
             PseudoInstr::Fence {  } => write!(f, "fence iorw, iorw"),
         }
@@ -456,21 +456,21 @@ pub enum Arithmetic {
 impl Debug for Arithmetic {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Arithmetic::ADD { rd, rs1, rs2 } => write!(f, "add {:?},{:?},{:?}", rd, rs1, rs2),
-            Arithmetic::ADDI { rd, rs1, imm } => write!(f, "addi {:?},{:?},{:?}", rd, rs1, imm),
-            Arithmetic::SUB { rd, rs1, rs2 } => write!(f, "sub {:?},{:?},{:?}", rd, rs1, rs2),
-            Arithmetic::LUI { rd, imm } => write!(f, "lui {:?},{:?}", rd, imm),
-            Arithmetic::AUIPC { rd, imm } => write!(f, "auipc {:?},{:?}", rd, imm),
+            Arithmetic::ADD { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","add", rd, rs1, rs2),
+            Arithmetic::ADDI { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}","addi", rd, rs1, imm),
+            Arithmetic::SUB { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","sub", rd, rs1, rs2),
+            Arithmetic::LUI { rd, imm } => write!(f, "{:7} {:?},{:?}","lui", rd, imm),
+            Arithmetic::AUIPC { rd, imm } => write!(f, "{:7} {:?},{:?}","auipc", rd, imm),
 
-            Arithmetic::ADDW { rd, rs1, rs2 } => write!(f, "ADDW {:?},{:?},{:?}", rd, rs1, rs2),
-            Arithmetic::ADDIW { rd, rs1, imm } => write!(f, "addiw {:?},{:?},{:?}", rd, rs1, imm),
-            Arithmetic::SUBW { rd, rs1, rs2 } => write!(f, "subw {:?},{:?},{:?}", rd, rs1, rs2),
-            Arithmetic::MUL { rd, rs1, rs2 } => write!(f, "mul {:?},{:?},{:?}", rd, rs1, rs2),
-            Arithmetic::MULW { rd, rs1, rs2 } => write!(f, "mulw {:?},{:?},{:?}", rd, rs1, rs2),
-            Arithmetic::DIV { rd, rs1, rs2 } => write!(f, "div {:?},{:?},{:?}", rd, rs1, rs2),
-            Arithmetic::DIVW { rd, rs1, rs2 } => write!(f, "divw {:?},{:?},{:?}", rd, rs1, rs2),
-            Arithmetic::REM { rd, rs1, rs2 } => write!(f, "rem {:?},{:?},{:?}", rd, rs1, rs2),
-            Arithmetic::REMW { rd, rs1, rs2 } => write!(f, "remw {:?},{:?},{:?}", rd, rs1, rs2),
+            Arithmetic::ADDW { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","ADDW", rd, rs1, rs2),
+            Arithmetic::ADDIW { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}","addiw", rd, rs1, imm),
+            Arithmetic::SUBW { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","subw", rd, rs1, rs2),
+            Arithmetic::MUL { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","mul", rd, rs1, rs2),
+            Arithmetic::MULW { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","mulw", rd, rs1, rs2),
+            Arithmetic::DIV { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","div", rd, rs1, rs2),
+            Arithmetic::DIVW { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","divw", rd, rs1, rs2),
+            Arithmetic::REM { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","rem", rd, rs1, rs2),
+            Arithmetic::REMW { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","remw", rd, rs1, rs2),
         }
     }
 }
@@ -492,14 +492,14 @@ pub enum Logical {
 impl Debug for Logical {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Logical::XOR { rd, rs1, rs2 } => write!(f, "xor {:?},{:?},{:?}", rd, rs1, rs2),
-            Logical::XORI { rd, rs1, imm } => write!(f, "xori {:?},{:?},{:?}", rd, rs1, imm),
-            Logical::OR { rd, rs1, rs2 } => write!(f, "or {:?},{:?},{:?}", rd, rs1, rs2),
+            Logical::XOR { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","xor", rd, rs1, rs2),
+            Logical::XORI { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}","xori", rd, rs1, imm),
+            Logical::OR { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","or", rd, rs1, rs2),
             Logical::ORI { rd, rs1, imm } => {
-                write!(f, "ORI {:?},{:?},{:?}", rd, rs1, imm)
+                write!(f, "{:7} {:?},{:?},{:?}","ORI", rd, rs1, imm)
             }
-            Logical::AND { rd, rs1, rs2 } => write!(f, "and {:?},{:?},{:?}", rd, rs1, rs2),
-            Logical::ANDI { rd, rs1, imm } => write!(f, "andi {:?},{:?},{:?}", rd, rs1, imm),
+            Logical::AND { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","and", rd, rs1, rs2),
+            Logical::ANDI { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}","andi", rd, rs1, imm),
         }
     }
 }
@@ -517,10 +517,10 @@ pub enum Compare {
 impl Debug for Compare {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Compare::SLT { rd, rs1, rs2 } => write!(f, "{:5} {:?},{:?},{:?}","slt" , rd, rs1, rs2),
-            Compare::SLTI { rd, rs1, imm } => write!(f, "{:5} {:?},{:?},{:?}", "slti", rd, rs1, imm),
-            Compare::SLTU { rd, rs1, rs2 } => write!(f, "{:5} {:?},{:?},{:?}","sltu", rd, rs1, rs2),
-            Compare::SLTIU { rd, rs1, imm } => write!(f, "{:5} {:?},{:?},{:?}","sltiu" , rd, rs1, imm),
+            Compare::SLT { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","slt" , rd, rs1, rs2),
+            Compare::SLTI { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}", "slti", rd, rs1, imm),
+            Compare::SLTU { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","sltu", rd, rs1, rs2),
+            Compare::SLTIU { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}","sltiu" , rd, rs1, imm),
 }
     }
 }
@@ -542,12 +542,12 @@ pub enum Branch {
 impl Debug for Branch {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Branch::BEQ { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?},{:?}","beq", rs1, rs2, imm),
-            Branch::BNE { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?},{:?}","bne", rs1, rs2, imm),
-            Branch::BLT { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?},{:?}","blt", rs1, rs2, imm),
-            Branch::BGE { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?},{:?}","bge", rs1, rs2, imm),
-            Branch::BLTU { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?},{:?}","bltu", rs1, rs2, imm),
-            Branch::BGEU { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?},{:?}","bgeu", rs1, rs2, imm),
+            Branch::BEQ { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?},{:?}","beq", rs1, rs2, imm),
+            Branch::BNE { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?},{:?}","bne", rs1, rs2, imm),
+            Branch::BLT { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?},{:?}","blt", rs1, rs2, imm),
+            Branch::BGE { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?},{:?}","bge", rs1, rs2, imm),
+            Branch::BLTU { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?},{:?}","bltu", rs1, rs2, imm),
+            Branch::BGEU { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?},{:?}","bgeu", rs1, rs2, imm),
         }
     }
 }
@@ -561,8 +561,8 @@ pub enum JumpAndLink {
 impl Debug for JumpAndLink {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            JumpAndLink::JAL { rd, imm } => write!(f, "{:5} {:?},{:?}","jal", rd, imm),
-            JumpAndLink::JALR { rd, rs1, imm } => write!(f, "{:5} {:?},{:?},{:?}","jalr", rd, rs1, imm),
+            JumpAndLink::JAL { rd, imm } => write!(f, "{:7} {:?},{:?}","jal", rd, imm),
+            JumpAndLink::JALR { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}","jalr", rd, rs1, imm),
         }
     }
 }
@@ -576,8 +576,8 @@ pub enum Environment {
 impl Debug for Environment {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Environment::ECALL {} => write!(f, "{:6}","ecall"),
-            Environment::EBREAK {} => write!(f, "{:6}","ebreak"),
+            Environment::ECALL {} => write!(f, "{:7}","ecall"),
+            Environment::EBREAK {} => write!(f, "{:7}","ebreak"),
         }
     }
 }
@@ -600,12 +600,12 @@ pub enum CSR {
 impl Debug for CSR {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CSR::CSRRW { rd, csr, rs1 } => write!(f, "{:6} {:?},{:?},{:?}","csrrw", rd, csr, rs1),
-            CSR::CSRRS { rd, csr, rs1 } => write!(f, "{:6} {:?},{:?},{:?}","csrrs", rd, csr, rs1),
-            CSR::CSRRC { rd, csr, rs1 } => write!(f, "{:6} {:?},{:?},{:?}","csrrc", rd, csr, rs1),
-            CSR::CSRRSI { rd, csr, imm } => write!(f, "{:6} {:?},{:?},{:?}","csrrsi", rd, csr, imm),
-            CSR::CSRRCI { rd, csr, imm } => write!(f, "{:6} {:?},{:?},{:?}","csrrci", rd, csr, imm),
-            CSR::CSRRWI { rd, csr, imm } => write!(f, "{:6} {:?},{:?},{:?}","csrrwi", rd, csr, imm),
+            CSR::CSRRW { rd, csr, rs1 } => write!(f, "{:7} {:?},{:?},{:?}","csrrw", rd, csr, rs1),
+            CSR::CSRRS { rd, csr, rs1 } => write!(f, "{:7} {:?},{:?},{:?}","csrrs", rd, csr, rs1),
+            CSR::CSRRC { rd, csr, rs1 } => write!(f, "{:7} {:?},{:?},{:?}","csrrc", rd, csr, rs1),
+            CSR::CSRRSI { rd, csr, imm } => write!(f, "{:7} {:?},{:?},{:?}","csrrsi", rd, csr, imm),
+            CSR::CSRRCI { rd, csr, imm } => write!(f, "{:7} {:?},{:?},{:?}","csrrci", rd, csr, imm),
+            CSR::CSRRWI { rd, csr, imm } => write!(f, "{:7} {:?},{:?},{:?}","csrrwi", rd, csr, imm),
         }
     }
 }
@@ -628,14 +628,14 @@ pub enum Loads {
 impl Debug for Loads {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Loads::LB { rd, rs1, imm } => write!(f, "{:5} {:?},{:?}({:?})","lb", rd, imm, rs1),
-            Loads::LH { rd, rs1, imm } => write!(f, "{:5} {:?},{:?}({:?})","lh", rd, imm, rs1),
-            Loads::LBU { rd, rs1, imm } => write!(f, "{:5} {:?},{:?}({:?})","lbu", rd, imm, rs1),
-            Loads::LHU { rd, rs1, imm } => write!(f, "{:5} {:?},{:?}({:?})","lhu", rd, imm, rs1),
-            Loads::LW { rd, rs1, imm } => write!(f, "{:5} {:?},{:?}({:?})","lw", rd, imm, rs1),
+            Loads::LB { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lb", rd, imm, rs1),
+            Loads::LH { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lh", rd, imm, rs1),
+            Loads::LBU { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lbu", rd, imm, rs1),
+            Loads::LHU { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lhu", rd, imm, rs1),
+            Loads::LW { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lw", rd, imm, rs1),
 
-            Loads::LWU { rd, rs1, imm } => write!(f, "{:5} {:?},{:?}({:?})","lwu", rd, imm, rs1),
-            Loads::LD { rd, rs1, imm } => write!(f, "{:5} {:?},{:?}({:?})","ld", rd, imm, rs1),
+            Loads::LWU { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lwu", rd, imm, rs1),
+            Loads::LD { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","ld", rd, imm, rs1),
         }
     }
 }
@@ -694,11 +694,11 @@ impl Stores{
 impl Debug for Stores {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Stores::SB { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?}({:?})","sb", rs1, imm, rs2),
-            Stores::SH { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?}({:?})","sh", rs1, imm, rs2),
-            Stores::SW { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?}({:?})","sw", rs1, imm, rs2),
+            Stores::SB { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?}({:?})","sb", rs1, imm, rs2),
+            Stores::SH { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?}({:?})","sh", rs1, imm, rs2),
+            Stores::SW { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?}({:?})","sw", rs1, imm, rs2),
 
-            Stores::SD { rs1, rs2, imm } => write!(f, "{:5} {:?},{:?}({:?})","sd", rs1, imm, rs2),
+            Stores::SD { rs1, rs2, imm } => write!(f, "{:7} {:?},{:?}({:?})","sd", rs1, imm, rs2),
         }
     }
 }

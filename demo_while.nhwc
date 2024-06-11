@@ -1,0 +1,47 @@
+      global Fn[]->getint_ret_0 getint_0 
+      global Fn[]->getch_ret_0 getch_0 
+      global Fn[a[]_3]->getarray_ret_0 getarray_0 
+      global Fn[]->getfloat_ret_0 getfloat_0 
+      global Fn[a[]_5]->getfarray_ret_0 getfarray_0 
+      global Fn[x_6]->putint_ret_0 putint_0 
+      global Fn[x_7]->putch_ret_0 putch_0 
+      global Fn[x_8, a[]_8]->putarray_ret_0 putarray_0 
+      global Fn[x_9]->putfloat_ret_0 putfloat_0 
+      global Fn[x_10, a[]_10]->putfarray_ret_0 putfarray_0 
+      global Fn[]->putf_ret_0 putf_0 
+      global Fn[]->starttime_ret_0 starttime_0 
+      global Fn[]->stoptime_ret_0 stoptime_0 
+      global Fn[*s_14, c_14, n_14]->memset_ret_0 memset_0 
+      global Fn[*dest_15, *src_15, n_15]->memcpy_ret_0 memcpy_0 
+      Define square_0 [num_28] -> square_ret_0 
+              alloc i32 temp_3_30 
+          label %0_0: 
+              new_var temp_3_30:i32 
+              temp_3_30 = Mul i32 num_28, num_28 
+              ret temp_3_30 
+      Define main_0 [] -> main_ret_0 
+              alloc i32 x_17 
+              alloc i32 temp_0_17 
+              alloc i32 b_17 
+              alloc i32 temp_1_21 
+              alloc i1 temp_2_19 
+          label %1_0: 
+              x_17 = 4_0 
+              jump label: while.head_20 
+          label while.head_20: 
+              new_var temp_2_19:i1 
+              temp_2_19 = icmp i1 Slt x_17, 7_0 
+              br i1 temp_2_19, label while.body_20, label while.exit_20 
+          label while.body_20: 
+              new_var temp_1_21:i32 
+              temp_1_21 = Add i32 x_17, 1_0 
+              x_17 = temp_1_21 
+               Call void putint_0(x_17) 
+              breakpoint bp0_24([x_24.simu_val]) ! 
+              jump label: while.head_20 
+          label while.exit_20: 
+              new_var temp_0_17:i32 
+              temp_0_17 =  Call i32 square_0(x_17) 
+              b_17 = temp_0_17 
+              breakpoint bp1_26([b_26.simu_val, x_26.simu_val]) ! 
+              ret 0_0 

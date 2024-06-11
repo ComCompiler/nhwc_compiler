@@ -4,7 +4,7 @@ use crate::antlr_parser::clexer::{
     And, Arrow, Constant, Div, DivAssign, Dot, Equal, Greater, GreaterEqual, Identifier, LeftShift, Less, LessEqual, Minus, MinusAssign, MinusMinus, Mod, MulAssign, Not, NotEqual, Plus, PlusAssign, PlusPlus, RightShift, Star, StringLiteral, Tilde
 };
 use crate::antlr_parser::cparser::{
-    Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_declaration, RULE_declarationSpecifier, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forDeclaration, RULE_forMidExpression, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_initializerList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_parameterTypeList, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_typeSpecifier, RULE_unaryExpression, RULE_unaryOperator
+    Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_declaration, RULE_declarationSpecifier, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forDeclaration, RULE_forMidExpression, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_initializerList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_typeSpecifier, RULE_unaryExpression, RULE_unaryOperator
 };
 
 use crate::toolkit::symtab::SymIdx;
@@ -54,6 +54,18 @@ pub fn process_any_stmt(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Scop
             process_expr(et_tree, ast_tree, scope_tree, direct_child_node!(at any_stmt_node in ast_tree), scope_node, sep_node);
             sep_node
         }
+        RULE_parameterDeclaration => {
+            let sep_node = add_node!({EtNodeType::new_sep(any_stmt_node).as_et_node()} to et_tree);
+            process_parameter_declaration(et_tree, ast_tree, scope_tree, any_stmt_node, scope_node, sep_node);
+            sep_node
+        }
+        RULE_parameterList => {
+            let sep_node = add_node!({EtNodeType::new_sep(any_stmt_node).as_et_node()} to et_tree);
+            for parameter_decl_node in find_nodes!(rule RULE_parameterDeclaration at any_stmt_node in ast_tree){
+                process_parameter_declaration(et_tree, ast_tree, scope_tree, parameter_decl_node, scope_node, sep_node);
+            }
+            sep_node
+        }
         _ => panic!("试图解析不合法的 ast_node {} with rule_id {:?} 为表达式树(et_tree)", any_stmt_node, node!(at any_stmt_node in ast_tree).rule_id),
     };
     // 写一个函数,用来替换,
@@ -65,6 +77,19 @@ pub fn process_any_stmt(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Scop
     // let _ = eval_et(et_tree, sep_node);
     sep_node
 }
+fn process_parameter_declaration(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, parameter_decl_node:u32, scope_node:u32, parent_et_node:u32) {
+    let type_ast_node = find!(
+        rule RULE_declarationSpecifiers
+        // 这里我们假定只有一个 修饰符
+        then RULE_declarationSpecifier
+        finally RULE_typeSpecifier at parameter_decl_node in ast_tree
+    ) .unwrap();
+    let direct_decl_node = find!(rule RULE_declarator 
+        finally RULE_directDeclarator
+        at parameter_decl_node in ast_tree
+    ).unwrap();
+    process_direct_decl(et_tree, ast_tree, scope_tree, direct_decl_node, type_ast_node, scope_node, parent_et_node);
+}
 fn process_declaration(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, decl_node:u32, scope_node:u32, parent_et_node:u32) {
     // only consider variable declaration
     let type_ast_node = find!(
@@ -74,12 +99,12 @@ fn process_declaration(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Scope
         finally RULE_typeSpecifier at decl_node in ast_tree
     )
     .unwrap();
-    let init_declarator_nodes = find_nodes!(
+    let declarator_node = find_nodes!(
         rule RULE_initDeclaratorList
         finally RULE_initDeclarator
         at decl_node in ast_tree
     );
-    for init_decl_node in init_declarator_nodes {
+    for init_decl_node in declarator_node {
         process_init_declarator(et_tree, ast_tree, scope_tree, init_decl_node, type_ast_node, scope_node, parent_et_node);
     }
 }
@@ -127,6 +152,10 @@ fn process_direct_decl(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Scope
         let sub_direct_decl_node = find!(rule RULE_directDeclarator at direct_decl_node in ast_tree).unwrap();
         process_direct_decl(et_tree, ast_tree, scope_tree, sub_direct_decl_node, type_ast_node, scope_node, et_direct_decl_node);
         process_assign_expr(et_tree, ast_tree, scope_tree, assign_expr_node, scope_node, et_direct_decl_node);
+    } else if let Some(sub_direct_decl) = find!(rule RULE_directDeclarator at direct_decl_node in ast_tree) {
+        // implies that it is a parameter declarator in func args
+        let et_direct_decl_node = add_node_with_edge!({EtNodeType::new_op_array_idx(direct_decl_node).as_et_node()} from parent_et_node in et_tree);
+        process_direct_decl(et_tree, ast_tree, scope_tree, sub_direct_decl, type_ast_node, scope_node, et_direct_decl_node);
     }
 }
 

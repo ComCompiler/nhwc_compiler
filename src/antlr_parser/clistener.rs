@@ -505,46 +505,6 @@ fn enter_vcSpecificModifer(&mut self, _ctx: &VcSpecificModiferContext<'input>) {
  */
 fn exit_vcSpecificModifer(&mut self, _ctx: &VcSpecificModiferContext<'input>) { }
 /**
- * Enter a parse tree produced by {@link CParser#gccDeclaratorExtension}.
- * @param ctx the parse tree
- */
-fn enter_gccDeclaratorExtension(&mut self, _ctx: &GccDeclaratorExtensionContext<'input>) { }
-/**
- * Exit a parse tree produced by {@link CParser#gccDeclaratorExtension}.
- * @param ctx the parse tree
- */
-fn exit_gccDeclaratorExtension(&mut self, _ctx: &GccDeclaratorExtensionContext<'input>) { }
-/**
- * Enter a parse tree produced by {@link CParser#gccAttributeSpecifier}.
- * @param ctx the parse tree
- */
-fn enter_gccAttributeSpecifier(&mut self, _ctx: &GccAttributeSpecifierContext<'input>) { }
-/**
- * Exit a parse tree produced by {@link CParser#gccAttributeSpecifier}.
- * @param ctx the parse tree
- */
-fn exit_gccAttributeSpecifier(&mut self, _ctx: &GccAttributeSpecifierContext<'input>) { }
-/**
- * Enter a parse tree produced by {@link CParser#gccAttributeList}.
- * @param ctx the parse tree
- */
-fn enter_gccAttributeList(&mut self, _ctx: &GccAttributeListContext<'input>) { }
-/**
- * Exit a parse tree produced by {@link CParser#gccAttributeList}.
- * @param ctx the parse tree
- */
-fn exit_gccAttributeList(&mut self, _ctx: &GccAttributeListContext<'input>) { }
-/**
- * Enter a parse tree produced by {@link CParser#gccAttribute}.
- * @param ctx the parse tree
- */
-fn enter_gccAttribute(&mut self, _ctx: &GccAttributeContext<'input>) { }
-/**
- * Exit a parse tree produced by {@link CParser#gccAttribute}.
- * @param ctx the parse tree
- */
-fn exit_gccAttribute(&mut self, _ctx: &GccAttributeContext<'input>) { }
-/**
  * Enter a parse tree produced by {@link CParser#nestedParenthesesBlock}.
  * @param ctx the parse tree
  */

@@ -531,6 +531,8 @@ translationUnit
 externalDeclaration
     :   functionDefinition
     |   declaration
+    |   BlockComment
+    |   LineComment
     |   ';' // stray ;
     ;
 
@@ -919,4 +921,3 @@ LineComment
     :   '//' ~[\r\n]*
         -> channel(HIDDEN)
     ;
-
