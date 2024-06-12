@@ -31,7 +31,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::DefineVar { var_symidx: _, vartype: _, op_value: _ } => {},
                     NhwcInstrType::Alloc { var_symidx: _, vartype: _ } => {},
                     NhwcInstrType::Arith { lhs: _, rhs: _ } => {},
-                    NhwcInstrType::SimpleAssign { lhs: _, rhs: _ } => {},
+                    NhwcInstrType::SimpleAssign { lhs: _, rhs: _, vartype } => {},
                     NhwcInstrType::Call { op_assigned_symidx: _, func_op: _ } => {},
                     NhwcInstrType::Jump { jump_op } => 
                         match jump_op{
@@ -98,7 +98,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     },
                     NhwcInstrType::Alloc { var_symidx: _, vartype: _ } => continue,
                     NhwcInstrType::Arith { lhs: _, rhs: _ } => {},
-                    NhwcInstrType::SimpleAssign { lhs: _, rhs: _ } => {},
+                    NhwcInstrType::SimpleAssign { lhs: _, rhs: _, vartype } => {},
                     NhwcInstrType::Call { op_assigned_symidx: _, func_op: _ } => {},
                     NhwcInstrType::Jump { jump_op } => 
                         match jump_op{

@@ -26,30 +26,36 @@ main:
     addi    sp,sp,-40
     sd      ra,32(sp)
     sd      s0,24(sp)
+    addi    s0,sp,40
                     ;      alloc i32 a_17 
                     ;      alloc f32 temp_0_17 
                     ;      alloc f32 temp_1_17 
                     ;      alloc f32 b_17 
                     ;      alloc i1 temp_2_20 
-                    ;      a_17 = 3_0 
-    li      s3, 3
-    sw      s3,20(sp)
+                    ;      label L0_0: 
+L0_0:
+                    ;      a_17 = i32 3_0 
+    li      s1, 3
+    sw      s1,20(sp)
                     ;      new_var temp_0_17:f32 
                     ;      temp_0_17 = sitofp i32 a_17 to f32 
     lw      s1,20(sp)
-    fcvt_s_w fs1,s2,rdn
+    fcvt.s.w f1,s1,rdn
+    fsw     f1,16(sp)
                     ;      new_var temp_1_17:f32 
                     ;      temp_1_17 = Mul f32 temp_0_17, 2.3_0 
-    lw      s1,16(sp)
-    fcvt_s_w fs1,s1,rdn
-    li      s2, 1075000115
-    fcvt_s_w fs2,s2,rdn
-    mul     s3,s1,s2
-    sw      s3,12(sp)
-                    ;      b_17 = temp_1_17 
-    lw      s3,12(sp)
-    fcvt_s_w fs3,s3,rdn
-    sw      s3,8(sp)
+    flw     f1,sp(16)
+    li      s7, 1075000115
+    fmv.s   f2, s7
+    fmul.s  f3,f1,f2
+    fsw     f3,12(sp)
+                    ;      b_17 = f32 temp_1_17 
+    flw     f1,sp(12)
+    fsw     f1,8(sp)
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L1_0: 
+L1_0:
                     ;      new_var temp_2_20:i1 
                     ;      temp_2_20 = icmp i1 Sgt a_17, 2_0 
     lw      s1,20(sp)
@@ -58,16 +64,19 @@ main:
     sb      s3,7(sp)
                     ;      br i1 temp_2_20, label branch_true_21, label branch_false_21 
     lb      s1,7(sp)
-    bnez    s1, branch_false_21
+    bnez    s1, branch_true_21
     j       branch_false_21
                     ;      label branch_true_21: 
 branch_true_21:
                     ;       Call void putfloat_0(b_17) 
-    lw      a0,8(sp)
-    fcvt_s_w fa0,a0,rdn
+    flw     fa0,sp(8)
     call    putfloat
+                    ;      jump label: branch_false_21 
+    j       branch_false_21
                     ;      label branch_false_21: 
 branch_false_21:
+                    ;      label L2_0: 
+L2_0:
                     ;      ret a_17 
     ld      ra,32(sp)
     ld      s0,24(sp)

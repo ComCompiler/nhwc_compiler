@@ -52,7 +52,7 @@ impl Pass for NhwcDumpPass {
             if !(cfg_node_struct.cfg_node_type.is_exit() || 
                 cfg_node_struct.cfg_node_type.is_entry() ||
                 cfg_node_struct.cfg_node_type.is_root()) && cfg_node_struct.op_label_instr.is_none(){
-                    let anonymous_label= NhwcInstrType::new_label(SymIdx::new(ST_ROOT, format!("%{}",anonymous_label_count))).into();
+                    let anonymous_label= NhwcInstrType::new_label(SymIdx::new(ST_ROOT, format!("L{}",anonymous_label_count))).into();
                     node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(anonymous_label, instr_slab)?;
                     anonymous_label_count +=1;
             }

@@ -512,7 +512,7 @@ impl Simulator{
                     self.simu_add_value(lhs,result)?;
                 },
             }
-            SimpleAssign { lhs, rhs } => {
+            SimpleAssign { lhs, rhs, vartype } => {
                 let rhs_val = self.simu_symtab.get_symbol(rhs)?.get_simu_val()?.clone();
                 self.simu_add_value(lhs,rhs_val)?;
             },

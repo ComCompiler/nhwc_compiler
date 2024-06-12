@@ -352,7 +352,7 @@ impl Debug for Register {
             Register::Saved { reg_idx } => write!(f, "s{}", reg_idx),
             Register::Arg { reg_idx } => write!(f, "a{}", reg_idx),
             Register::FArg { reg_idx } => write!(f, "fa{}", reg_idx),
-            Register::FSaved { reg_idx } => write!(f, "fs{}", reg_idx),
+            Register::FSaved { reg_idx } => write!(f, "f{}", reg_idx),
         }
     }
 }
@@ -378,72 +378,72 @@ impl Register{
     pub fn new_fs(idx:u8)->Self{
         Self::FSaved { reg_idx: idx }
     }
-    pub fn is_f_reg(&self) -> bool{
+    pub fn is_fpu(&self) -> bool{
         match self{
             Register::FArg { reg_idx } => true,
             Register::FSaved { reg_idx } => true,
             _ => {false}
         }
     }
-    pub fn is_i_reg(&self) -> bool{
+    pub fn is_gpr(&self) -> bool{
         match self{
             Register::FArg { reg_idx } => false,
             Register::FSaved { reg_idx } => false,
             _ => {true}
         }
     }
-    pub fn to_f_reg(&self) -> Register{
-        match self{
-            Register::Saved { reg_idx} => {
-                Register::new_fs(*reg_idx)
-            },
-            Register::Arg { reg_idx } => {
-                Register::new_fa(*reg_idx)
-            },
-            _ => {
-                panic!("illegal reg {:?} can't trans to f_reg",self)
-            }
-        }
-    }
+    // pub fn to_f_reg(&self) -> Register{
+    //     match self{
+    //         Register::Saved { reg_idx} => {
+    //             Register::new_fs(*reg_idx)
+    //         },
+    //         Register::Arg { reg_idx } => {
+    //             Register::new_fa(*reg_idx)
+    //         },
+    //         _ => {
+    //             panic!("illegal reg {:?} can't trans to f_reg",self)
+    //         }
+    //     }
+    // }
 }
 #[derive(Clone,new)]
 pub enum Shifts {
     /// RV32I Base                                   RV64I
     /// Shift Left Logical
     /// 逻辑左移
-    SLL { rd:Register, rs1:Register, rs2:Register }, SLLW { rd:Register, rs1:Register, rs2:Register },
+    Sll { rd:Register, rs1:Register, rs2:Register }, Sllw { rd:Register, rs1:Register, rs2:Register },
     /// Shift Left Log Imm
     /// 立即数逻辑左移
-    SLLI { rd:Register, rs1:Register, shamt:Imm }, SLLIW { rd:Register, rs1:Register, shamt:Imm },
+    Slli { rd:Register, rs1:Register, shamt:Imm }, Slliw { rd:Register, rs1:Register, shamt:Imm },
     /// Shift Right Logical
     /// 逻辑右移
-    SRL { rd:Register, rs1:Register, rs2:Register }, SRLW { rd:Register, rs1:Register, rs2:Register },
+    Srl { rd:Register, rs1:Register, rs2:Register }, Srlw { rd:Register, rs1:Register, rs2:Register },
     /// Shift Right Log Imm
     /// 立即数逻辑右移
-    SRLI { rd:Register, rs1:Register, shamt:Imm }, SRLIW { rd:Register, rs1:Register, shamt:Imm },
+    Srli { rd:Register, rs1:Register, shamt:Imm }, Srliw { rd:Register, rs1:Register, shamt:Imm },
     /// Shift Right Arithmetic
     /// 算术右移
-    SRA { rd:Register, rs1:Register, rs2:Register }, SRAW { rd:Register, rs1:Register, rs2:Register },
+    Sra { rd:Register, rs1:Register, rs2:Register }, Sraw { rd:Register, rs1:Register, rs2:Register },
     ///Shift Right ArithImm
     /// 立即数算术右移
-    SRAI { rd:Register, rs1:Register, shamt:Imm }, SRAIW { rd:Register, rs1:Register, shamt:Imm },
+    Srai { rd:Register, rs1:Register, shamt:Imm }, Sraiw { rd:Register, rs1:Register, shamt:Imm },
 }
 impl Debug for Shifts {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Shifts::SLL { rd, rs1, rs2 } => write!(f, "sll {:?},{:?},{:?}", rd, rs1, rs2),
-            Shifts::SLLI { rd, rs1, shamt } => write!(f, "slli {:?},{:?},{:?}", rd, rs1, shamt),
-            Shifts::SRL { rd, rs1, rs2 } => write!(f, "srl {:?},{:?},{:?}", rd, rs1, rs2),
-            Shifts::SRLI { rd, rs1, shamt } => write!(f, "srli {:?},{:?},{:?}", rd, rs1, shamt),
-            Shifts::SRA { rd, rs1, rs2 } => write!(f, "sra {:?},{:?},{:?}", rd, rs1, rs2),
-            Shifts::SRAI { rd, rs1, shamt } => write!(f, "srai {:?},{:?},{:?}", rd, rs1, shamt),
+            Shifts::Sll { rd, rs1, rs2 } => write!(f, "sll {:?},{:?},{:?}", rd, rs1, rs2),
+            Shifts::Slli { rd, rs1, shamt } => write!(f, "slli {:?},{:?},{:?}", rd, rs1, shamt),
+            Shifts::Srl { rd, rs1, rs2 } => write!(f, "srl {:?},{:?},{:?}", rd, rs1, rs2),
+            Shifts::Srli { rd, rs1, shamt } => write!(f, "srli {:?},{:?},{:?}", rd, rs1, shamt),
+            Shifts::Sra { rd, rs1, rs2 } => write!(f, "sra {:?},{:?},{:?}", rd, rs1, rs2),
+            Shifts::Srai { rd, rs1, shamt } => write!(f, "srai {:?},{:?},{:?}", rd, rs1, shamt),
 
-            Shifts::SLLW { rd, rs1, rs2 } => write!(f, "sllw {:?},{:?},{:?}", rd, rs1, rs2),
-            Shifts::SLLIW { rd, rs1, shamt } => write!(f, "slliw {:?},{:?},{:?}", rd, rs1, shamt),
-            Shifts::SRLW { rd, rs1, rs2 } => write!(f, "srlw {:?},{:?},{:?}", rd, rs1, rs2),
-            Shifts::SRLIW { rd, rs1, shamt } => write!(f, "srliw {:?},{:?},{:?}", rd, rs1, shamt),
-            Shifts::SRAW { rd, rs1, rs2 } => write!(f, "sraw {:?},{:?},{:?}", rd, rs1, rs2),
-            Shifts::SRAIW { rd, rs1, shamt } => write!(f, "sraiw {:?},{:?},{:?}", rd, rs1, shamt),
+            Shifts::Sllw { rd, rs1, rs2 } => write!(f, "sllw {:?},{:?},{:?}", rd, rs1, rs2),
+            Shifts::Slliw { rd, rs1, shamt } => write!(f, "slliw {:?},{:?},{:?}", rd, rs1, shamt),
+            Shifts::Srlw { rd, rs1, rs2 } => write!(f, "srlw {:?},{:?},{:?}", rd, rs1, rs2),
+            Shifts::Srliw { rd, rs1, shamt } => write!(f, "srliw {:?},{:?},{:?}", rd, rs1, shamt),
+            Shifts::Sraw { rd, rs1, rs2 } => write!(f, "sraw {:?},{:?},{:?}", rd, rs1, rs2),
+            Shifts::Sraiw { rd, rs1, shamt } => write!(f, "sraiw {:?},{:?},{:?}", rd, rs1, shamt),
         }
     }
 }
@@ -526,56 +526,56 @@ impl Debug for Arithmetic {
 #[derive(Clone,new)]
 pub enum Logical {
     /// XOR
-    XOR { rd:Register, rs1:Register, rs2:Register },
+    Xor { rd:Register, rs1:Register, rs2:Register },
     /// XOR Immediate
-    XORI { rd:Register, rs1:Register, imm:Imm },
+    Xori { rd:Register, rs1:Register, imm:Imm },
     /// OR
-    OR { rd:Register, rs1:Register, rs2:Register },
+    Or { rd:Register, rs1:Register, rs2:Register },
     /// OR Immdiate
-    ORI { rd:Register, rs1:Register, imm:Imm },
+    Ori { rd:Register, rs1:Register, imm:Imm },
     /// AND
-    AND { rd:Register, rs1:Register, rs2:Register },
+    And { rd:Register, rs1:Register, rs2:Register },
     /// AND Immediate
-    ANDI { rd:Register, rs1:Register, imm:Imm },
+    Andi { rd:Register, rs1:Register, imm:Imm },
 }
 impl Debug for Logical {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Logical::XOR { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","xor", rd, rs1, rs2),
-            Logical::XORI { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}","xori", rd, rs1, imm),
-            Logical::OR { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","or", rd, rs1, rs2),
-            Logical::ORI { rd, rs1, imm } => {
+            Logical::Xor { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","xor", rd, rs1, rs2),
+            Logical::Xori { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}","xori", rd, rs1, imm),
+            Logical::Or { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","or", rd, rs1, rs2),
+            Logical::Ori { rd, rs1, imm } => {
                 write!(f, "{:7} {:?},{:?},{:?}","ORI", rd, rs1, imm)
             }
-            Logical::AND { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","and", rd, rs1, rs2),
-            Logical::ANDI { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}","andi", rd, rs1, imm),
+            Logical::And { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","and", rd, rs1, rs2),
+            Logical::Andi { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}","andi", rd, rs1, imm),
         }
     }
 }
 #[derive(Clone,new)]
 pub enum Compare {
     /// Set <
-    SLT { rd:Register, rs1:Register, rs2:Register },
+    Slt { rd:Register, rs1:Register, rs2:Register },
     ///Set < Immediate
-    SLTI { rd:Register, rs1:Register, imm:Imm },
+    Slti { rd:Register, rs1:Register, imm:Imm },
     /// Set < Unsigned
-    SLTU { rd:Register, rs1:Register, rs2:Register },
+    Sltu { rd:Register, rs1:Register, rs2:Register },
     /// Set < Imm Unsigned
-    SLTIU { rd:Register, rs1:Register, imm:Imm },
-    FEQ_S{rd:Register,rs1:Register,rs2:Register},
-    FLT_S{rd:Register,rs1:Register,rs2:Register},
-    FLE_S{rd:Register,rs1:Register,rs2:Register},
+    Sltiu { rd:Register, rs1:Register, imm:Imm },
+    Feq_s{rd:Register,rs1:Register,rs2:Register},
+    Flt_s{rd:Register,rs1:Register,rs2:Register},
+    Fle_s{rd:Register,rs1:Register,rs2:Register},
 }
 impl Debug for Compare {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Compare::SLT { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","slt" , rd, rs1, rs2),
-            Compare::SLTI { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}", "slti", rd, rs1, imm),
-            Compare::SLTU { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","sltu", rd, rs1, rs2),
-            Compare::SLTIU { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}","sltiu" , rd, rs1, imm),
-            Compare::FEQ_S { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","feq.s" , rd, rs1, rs2),
-            Compare::FLT_S { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","flt.s" , rd, rs1, rs2),
-            Compare::FLE_S { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fle.s" , rd, rs1, rs2),
+            Compare::Slt { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","slt" , rd, rs1, rs2),
+            Compare::Slti { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}", "slti", rd, rs1, imm),
+            Compare::Sltu { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","sltu", rd, rs1, rs2),
+            Compare::Sltiu { rd, rs1, imm } => write!(f, "{:7} {:?},{:?},{:?}","sltiu" , rd, rs1, imm),
+            Compare::Feq_s { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","feq.s" , rd, rs1, rs2),
+            Compare::Flt_s { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","flt.s" , rd, rs1, rs2),
+            Compare::Fle_s { rd, rs1, rs2 } => write!(f, "{:7} {:?},{:?},{:?}","fle.s" , rd, rs1, rs2),
         }
     }
 }
@@ -702,7 +702,7 @@ impl Debug for Loads {
 }
 impl Loads{
     pub fn new(size:usize,rd:Register,rs1:Register, offset:isize, is_float:bool) -> Result<Self>{
-        if rd.is_f_reg() != is_float{
+        if rd.is_fpu() != is_float{
             panic!("can't load to {:?}",rd)
         }
         Ok(match (size,is_float){
@@ -796,8 +796,8 @@ pub enum Trans{
 impl Debug for Trans{
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self{
-            Trans::Fcvt_w_s { rd, rs1 } => write!(f, "{:5} {:?},{:?},rdn","fcvt_w_s", rd, rs1),
-            Trans::Fcvt_s_w { rd, rs1 } => write!(f, "{:5} {:?},{:?},rdn","fcvt_s_w", rd, rs1),
+            Trans::Fcvt_w_s { rd, rs1 } => write!(f, "{:5} {:?},{:?},rdn","fcvt.w.s", rd, rs1),
+            Trans::Fcvt_s_w { rd, rs1 } => write!(f, "{:5} {:?},{:?},rdn","fcvt.s.w", rd, rs1),
         }
     }
 }

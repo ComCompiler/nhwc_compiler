@@ -170,7 +170,7 @@ pub enum NhwcInstrType {
     GetElementPtr { lhs:SymIdx  ,array_symidx:SymIdx,array_ty:Type, idx_vec:Vec<SymIdx>},
     // 算数运算符 + - * / etc.
     Arith { lhs:SymIdx, rhs:ArithOp },
-    SimpleAssign { lhs:SymIdx, rhs:SymIdx },
+    SimpleAssign { lhs:SymIdx, rhs:SymIdx ,vartype:Type},
     // 调用函数
     Call { op_assigned_symidx:Option<SymIdx>, func_op:FuncOp },
     // 跳转  break continue  return  etc.
@@ -213,7 +213,7 @@ impl NhwcInstr {
                 vec![var_symidx]
             },
             NhwcInstrType::Arith { lhs, rhs:_ } => { vec![lhs] },
-            NhwcInstrType::SimpleAssign { lhs, rhs:_ } => {
+            NhwcInstrType::SimpleAssign { lhs, rhs:_, vartype } => {
                  vec![lhs] 
             },
             NhwcInstrType::Call { op_assigned_symidx: assigned, func_op:_} => if let  Some(symidx)= assigned{
@@ -261,7 +261,7 @@ impl NhwcInstr {
                 ArithOp::LogicOr { a, b, vartype:_ } => vec![a,b],
                 ArithOp::LogicNot { a, vartype:_ } => vec![a],
             }},
-            NhwcInstrType::SimpleAssign { lhs:_, rhs } => {
+            NhwcInstrType::SimpleAssign { lhs:_, rhs, vartype } => {
                  vec![rhs] 
             },
             NhwcInstrType::Call { op_assigned_symidx: _assigned, func_op } => {
@@ -311,7 +311,7 @@ impl NhwcInstr {
                 vec![var_symidx]
             },
             NhwcInstrType::Arith { lhs, rhs:_ } => { vec![lhs] },
-            NhwcInstrType::SimpleAssign { lhs, rhs:_ } => {
+            NhwcInstrType::SimpleAssign { lhs, rhs:_, vartype } => {
                  vec![lhs] 
             },
             NhwcInstrType::Call { op_assigned_symidx: assigned, func_op:_ } => if let  Some(symidx)= assigned{
@@ -357,7 +357,7 @@ impl NhwcInstr {
                 ArithOp::LogicOr { a, b, vartype:_ } => vec![a,b],
                 ArithOp::LogicNot { a, vartype :_} => vec![a],
             }},
-            NhwcInstrType::SimpleAssign { lhs:_, rhs } => {
+            NhwcInstrType::SimpleAssign { lhs:_, rhs, vartype } => {
                  vec![rhs] 
             },
             NhwcInstrType::Call { op_assigned_symidx: _assigned, func_op } => {
@@ -531,7 +531,7 @@ impl NhwcInstrType {
     pub fn new_logic_or(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::LogicOr { a, b, vartype } } }
     pub fn new_logic_not(lhs:SymIdx, a:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::LogicNot { a, vartype } } }
     
-    pub fn new_assign(lhs:SymIdx, rhs:SymIdx) -> Self { Self::SimpleAssign { lhs, rhs } }
+    pub fn new_assign(lhs:SymIdx, rhs:SymIdx, vartype:Type) -> Self { Self::SimpleAssign { lhs, rhs, vartype } }
 
     pub fn new_get_element_ptr(lhs:SymIdx, array_symidx:SymIdx, array_ty:Type, idx_vec:Vec<SymIdx> ) -> Self { Self::GetElementPtr { lhs, array_symidx, array_ty, idx_vec }}
     pub fn new_load(lhs:SymIdx, ptr_symidx:SymIdx, ptr_ty:Type) -> Self { Self::Load { lhs, ptr_symidx, ptr_ty}}
@@ -570,7 +570,7 @@ impl NhwcInstrType {
     pub fn get_lhs(&self)->Option<SymIdx>{
         match self{
             NhwcInstrType::Arith { lhs, rhs: _ } => Some(lhs.clone()),
-            NhwcInstrType::SimpleAssign { lhs, rhs: _ } => Some(lhs.clone()),
+            NhwcInstrType::SimpleAssign { lhs, rhs: _, vartype } => Some(lhs.clone()),
             NhwcInstrType::Phi { lhs, rhs: _ } => Some(lhs.clone()),
             _=>None
         }
@@ -669,7 +669,7 @@ impl Debug for NhwcInstrType {
                 }
             }
             NhwcInstrType::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
-            NhwcInstrType::SimpleAssign { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
+            NhwcInstrType::SimpleAssign { lhs, rhs, vartype } => write!(f, "{:?} = {:?} {:?}", lhs,vartype, rhs),
             NhwcInstrType::Call { op_assigned_symidx: assigned, func_op } => match assigned {
                 Some(symidx) => write!(f, "{:?} = {:?}",symidx, func_op),
                 None => write!(f, "{:?}", func_op),
