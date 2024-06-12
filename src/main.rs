@@ -59,7 +59,7 @@ fn main() {
     let cfg2ncfg_pass = Cfg2NcfgPass::new(true && is_gen_png_global, true && is_gen_png_global);
     let ast2st_pass = Ast2StPass::new(true && is_gen_png_global);
     let ncfg2djg_pass = Ncfg2DjgPass::new(true && is_gen_png_global);
-    let _ssa_pass = SsaPass::new(true && is_gen_png_global, true && is_gen_png_global);
+    let ssa_pass = SsaPass::new(true && is_gen_png_global, true && is_gen_png_global);
     let cfg_debug_pass = CfgDebugPass::new(true && is_gen_png_global);
     let def_use_chain_debug_pass: DefUseChainDebugPass = DefUseChainDebugPass::new(true && is_gen_png_global);
     let symtab_debug_pass = SymtabDebugPass::new(true && is_gen_png_global);
@@ -76,11 +76,11 @@ fn main() {
         then mem_alloc_pass
         // then ssa_pass
         then cfg_debug_pass
-        then def_use_chain_debug_pass
+        // then def_use_chain_debug_pass
         then nhwc_collect_pass
         // then simulator_debug_pass
         then ast2et_debug_pass
-        then nhwc2riscv_pass
+        // then nhwc2riscv_pass
         then symtab_debug_pass
         to pass_manager
         

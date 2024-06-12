@@ -347,7 +347,7 @@ macro_rules! add_node_with_edge {
 /// add_symbol(x with field field_name_A:field_value_A to some_symtab)
 #[macro_export]
 macro_rules! add_symbol {
-    ($sym:ident $(with_field $field_name:ident:$field_value:block)* to $symtab:ident $(debug $symtab_graph:ident)?) => {
+    ($sym:ident $(with_field $field_name:ident:$field_value:block )* to $symtab:ident $(debug $symtab_graph:ident)?) => {
         {
             let symidx = $symtab.add_symbol($sym)?;
             $(match $symtab_graph{
@@ -364,22 +364,26 @@ macro_rules! add_symbol {
                 None => {},
             })?
             $(
-                let sym =  $symtab.get_mut_symbol(&symidx).unwrap();
-                paste::paste!{
+                $(if $if_block )? {
+                    let sym =  $symtab.get_mut_symbol(&symidx).unwrap();
+                    paste::paste!{
                     sym.[<add_ $field_name:lower>]($field_value);
-                };
+                    };
+                }
             )*
             symidx
         }
     };
-    ($sym:block $(with_field $field_name:ident:$field_value:block)* to $symtab:ident $(debug $symtab_graph:ident)?) => {
+    ($sym:block $(with_field $field_name:ident:$field_value:block $(if $if_block:block)?)* to $symtab:ident $(debug $symtab_graph:ident)?) => {
         {
             let symidx = $symtab.add_symbol($sym)?;
             $(
-            let sym =  $symtab.get_mut_symbol(&symidx).unwrap();
-            paste::paste!{
-                sym.[<add_ $field_name:lower>]($field_value);
-            };
+            $(if $if_block )? {
+                let sym =  $symtab.get_mut_symbol(&symidx).unwrap();
+                paste::paste!{
+                    sym.[<add_ $field_name:lower>]($field_value);
+                };
+            }
             )*
             $(match $symtab_graph{
                 Some(ref mut symg) => {

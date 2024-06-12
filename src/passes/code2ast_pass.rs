@@ -37,13 +37,13 @@ impl Pass for Code2AstPass {
 
             void memset(void *s, int c, int n);
             void memcpy(void *dest, void *src, int n);";
-        ctx.code += defs;
+        // ctx.code += defs;
 
         parse_as_ast_tree(ctx);
         // 生成对应的png
         if self.is_gen_png {
             let ast_tree = &mut ctx.ast_tree;
-            generate_png_by_graph_multi_tasks(&ast_tree.clone(), "ast_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("ast_tree".to_string())],&mut ctx.io_task_list);
+            generate_png_by_graph_multi_tasks(&ast_tree.clone(), "ast_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("ast_tree".to_string())],&mut ctx.io_task_list)?;
         }
         Ok(())
     }

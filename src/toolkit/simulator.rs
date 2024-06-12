@@ -314,8 +314,8 @@ impl Simulator{
         // 对于 use 到常量时的处理
         for use_symidx in instr_struct.get_use_symidx_vec(){
             let simu_symtab = &mut self.simu_symtab;
-            if !simu_symtab.has_symbol(use_symidx) && *src_symtab.get_symbol(use_symidx)?.get_is_const()?{
-                // 将常量加入
+            if !simu_symtab.has_symbol(use_symidx) && *src_symtab.get_symbol(use_symidx)?.get_is_literal()?{
+                // 将字面量加入
                 add_symbol!({Symbol::new_from_symidx(use_symidx)}
                     with_field SIMU_VAL:{Value::from_string_with_specific_type(&src_symtab.get_symbol(use_symidx)?.symidx.symbol_name, src_symtab.get_symbol(use_symidx)?.get_type()?)?}
                 to simu_symtab);

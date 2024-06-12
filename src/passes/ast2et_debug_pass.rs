@@ -17,24 +17,24 @@ impl Pass for Ast2EtDebugPass {
 
         //dfs遍历ast找到第一个 expr stmt
         let mut nodes:Vec<u32> = vec![];
-        nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_declaration));
-        // nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expressionStatement));
-        nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expression));
-        nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_forDeclaration));
-        nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_parameterList));
-        let root = 0;
-        et_tree.add_node(EtNodeType::new_sep(root).as_et_node());
-        for node in nodes {
-            let any_root = toolkit::gen_et::process_any_stmt(et_tree, &ctx.ast_tree, &ctx.scope_tree, node, 0);
-            add_edge!(from root to any_root in et_tree);
-        }
+        // nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_declaration));
+        // // nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expressionStatement));
+        // nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_expression));
+        // nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_forDeclaration));
+        // nodes.extend(find_dfs_rule_ast(&ctx.ast_tree, 0, RULE_parameterList));
+        // let root = 0;
+        // et_tree.add_node(EtNodeType::new_sep(root).as_et_node());
+        // for node in nodes {
+        //     let any_root = toolkit::gen_et::process_any_stmt(et_tree, &ctx.ast_tree, &ctx.scope_tree, node, 0);
+        //     add_edge!(from root to any_root in et_tree);
+        // }
         //debug输出et_node内容
-        for et_node in et_tree.node_weights_mut() {
-            et_node.load_ast_node_text(&ctx.ast_tree)?
-        }
+        // for et_node in et_tree.node_weights_mut() {
+        //     et_node.load_ast_node_text(&ctx.ast_tree)?
+        // }
         // 1.1 生成对应的png
         if self.is_gen_png {
-            generate_png_by_graph_multi_tasks(&ctx.et_tree.clone(), "et_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("et_tree".to_string())],&mut ctx.io_task_list)?;
+            generate_png_by_graph_multi_tasks(&ctx.et_tree.clone(), "et_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("et_tree".to_string()),Config::NodeIndexLabel],&mut ctx.io_task_list)?;
         }
 
         Ok(())

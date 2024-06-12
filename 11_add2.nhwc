@@ -1,0 +1,23 @@
+ 1    global i32 a_0 
+ 0    store 5_0:i32 *a_0:ptr->i32 
+ 2    global Fn[]->getint_ret_0 getint_0 
+ 3    global Fn[]->getch_ret_0 getch_0 
+ 4    global Fn[a_4]->getarray_ret_0 getarray_0 
+ 5    global Fn[]->getfloat_ret_0 getfloat_0 
+ 6    global Fn[a_6]->getfarray_ret_0 getfarray_0 
+ 7    global Fn[x_7]->putint_ret_0 putint_0 
+ 8    global Fn[x_8]->putch_ret_0 putch_0 
+ 9    global Fn[x_9, a_9]->putarray_ret_0 putarray_0 
+ 10   global Fn[x_10]->putfloat_ret_0 putfloat_0 
+ 11   global Fn[x_11, a_11]->putfarray_ret_0 putfarray_0 
+ 12   global Fn[]->putf_ret_0 putf_0 
+ 13   global Fn[]->starttime_ret_0 starttime_0 
+ 14   global Fn[]->stoptime_ret_0 stoptime_0 
+ 15   global Fn[s_15, c_15, n_15]->memset_ret_0 memset_0 
+ 16   global Fn[dest_16, src_16, n_16]->memcpy_ret_0 memcpy_0 
+ 17   Define main_0 [] -> main_ret_0 
+         19   alloc i32 a_18 
+         21   alloc i32 b_18 
+          label L0_0: 
+         18   new_var a_18:i32 
+         20   new_var b_18:i32 

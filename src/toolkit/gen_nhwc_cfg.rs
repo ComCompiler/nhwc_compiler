@@ -8,6 +8,7 @@ use std::collections::HashMap;
 
 use super::cfg_node::CFG_ROOT;
 use super::et_node::{EtNode, ExprOp};
+use super::eval_et::{self};
 use super::field::{ArrayEleMap, Value};
 use super::gen_et;
 use super::mem_layout::MemLayout;
@@ -21,7 +22,7 @@ use crate::antlr_parser::clexer::{Identifier, LeftParen};
 use crate::antlr_parser::cparser::{RULE_breakpointArg, RULE_breakpointStatement, RULE_initDeclarator, RULE_initDeclaratorList, RULE_returnStatement};
 use crate::toolkit::nhwc_instr::BreakpointArg;
 use crate::toolkit::scope_node::ST_ROOT;
-use crate::{direct_parent_node};
+use crate::{debug_info_blue, debug_info_red, direct_parent_node};
 use crate::{
     add_edge, add_node_with_edge, add_symbol, antlr_parser::cparser::{
         RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_jumpStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
@@ -53,7 +54,7 @@ reg_field_for_struct!(EtNode {
 reg_field_for_struct!(Symbol {
         DEF_INSTRS_VEC:Vec<usize>,
         DEF_CFG_NODE_VEC:Vec<u32>,
-        IS_CONST:bool,
+        CONST_SYMIDX:SymIdx,
         IS_TEMP:bool,
         IS_GLOBAL:bool,
         IS_LITERAL:bool,
@@ -96,11 +97,13 @@ fn parse_stmt_or_expr2nhwc(
     instr_slab:&mut InstrSlab<NhwcInstr>, symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<Vec<Option<SymIdx>>> {
     //将declaration生成et
-    let et_root = process_any_stmt(et_tree, ast_tree, scope_tree, ast_stmt_node, stmt_parent_scope);
+    // let sep_node = process_any_stmt(et_tree, ast_tree, scope_tree, ast_stmt_node, stmt_parent_scope);
+    let sep_node = gen_et::process_any_stmt(et_tree, ast_tree, scope_tree, ast_stmt_node, stmt_parent_scope);
+    eval_et::compress_et(et_tree, sep_node, &symtab,stmt_parent_scope ,scope_tree)?;
     // generate_png_by_graph(&et_tree, "et_src".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("et_tree".to_string()),Config::NodeIndexLabel])?;
 
     //如果该节点有子树
-    let et_nodes = direct_child_nodes!(at et_root in et_tree);
+    let et_nodes = direct_child_nodes!(at sep_node in et_tree);
     let mut sep_symidx_vec= vec![];
     for et_node in et_nodes {
         let op_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, stmt_parent_scope, cfg_node, instr_slab, symtab_graph)?;
@@ -177,7 +180,10 @@ fn parse_bb2nhwc(
                         let ret_instr = NhwcInstrType::new_ret(None).into();
                         node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
                         if let  Some(ret_expr_ast)= find!(rule RULE_expression at ret_stmt_ast in ast_tree){
+
                             let ret_et_sep = process_any_stmt(et_tree, ast_tree, scope_tree, ret_expr_ast, jump_parent_scope);
+                            eval_et::compress_et(et_tree, ret_et_sep, &symtab,jump_parent_scope ,scope_tree)?;
+
                             let ret_sep_child_nodes = direct_child_nodes!(at ret_et_sep in et_tree);
                             // debug_info_blue!("jump child nodes of {} is {:?}",ret_et_sep , ret_sep_child_nodes);
                             // check_child_nodes(&jump_stmt, 1)?;
@@ -400,7 +406,6 @@ fn process_literal(symtab:&mut SymTab, const_literal:&String, symtab_graph:&mut 
             add_symbol!({Symbol::new(0, const_literal.clone())} 
                 with_field USE_COUNTER:{UseCounter{ use_count: 1}} 
                 with_field TYPE:{Type::new_from_const(const_literal)} 
-                with_field IS_CONST:{true}
                 with_field IS_TEMP:{false}
                 with_field IS_LITERAL:{true}
             to symtab debug symtab_graph);
@@ -416,7 +421,6 @@ fn process_func_symbol(
         with_field DECLARED_VARS:{vec![]}
         // with_field SSA_REACHING_DEF:{None}
         with_field DEF_INSTRS_VEC:{vec![]}
-        with_field IS_CONST:{true} 
         with_field IS_TEMP:{false}
         with_field IS_LITERAL:{false}
         with_field IS_EXTERNAL:{is_external}
@@ -425,7 +429,7 @@ fn process_func_symbol(
     Ok(func_symidx)
 }
 
-// let the symbol be immediately available
+/// let the symbol be immediately available in symtab
 fn process_symbol(
     ast_tree:&AstTree, scope_tree:&ScopeTree, symtab:&mut SymTab,instr_slab:&mut InstrSlab<NhwcInstr>, decldef_def_or_use:&DeclOrDefOrUse, op_symtab_graph:&mut Option<&mut SymTabGraph>,scope_parent_node:u32, symbol_name:&String, 
     cfg_node:u32,cfg_graph:&mut CfgGraph,op_et_node:Option<u32>,et_tree:&mut EtTree, 
@@ -436,14 +440,13 @@ fn process_symbol(
         if node!(at et_node in et_tree).has_dims(){ Some(node!(at et_node in et_tree).get_dims()?) }else{ None }
     }else { None };
     match decldef_def_or_use {
-        DeclOrDefOrUse::DeclDef { type_ast_node } => {
+        &DeclOrDefOrUse::DeclDef { type_ast_node, is_const } => {
             let var_type: Type ;
-
             // 这里有两种可能，一种是数组，一种是普通变量，如果是数组，那么et_node 上一定有 dims 字段
-            if let Some(dims) = op_dims{
-                var_type = Type::new_array_dims_may_unknown(Type::new(*type_ast_node, ast_tree), dims.clone())?;
+            if let Some(op_dims) = op_dims{
+                var_type = Type::new_array_dims_may_unknown(Type::new(type_ast_node, ast_tree), op_dims.clone())?;
             }else{
-                var_type = Type::new(*type_ast_node, ast_tree);
+                var_type = Type::new(type_ast_node, ast_tree);
             }
             let symbol_name_cloned = symbol_name.clone();
             // let var_type = Type::new(*type_ast_node, ast_tree);
@@ -454,7 +457,6 @@ fn process_symbol(
                 with_field DEF_CFG_NODE_VEC:{vec![cfg_node]}
                 with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
                 with_field IS_GLOBAL:{is_global}
-                with_field IS_CONST:{false}
                 with_field IS_TEMP:{false} 
                 with_field IS_LITERAL:{false}
             to symtab debug op_symtab_graph);
@@ -465,7 +467,6 @@ fn process_symbol(
                     with_field DEF_CFG_NODE_VEC:{vec![cfg_node]}
                     with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
                     with_field IS_GLOBAL:{is_global}
-                    with_field IS_CONST:{false}
                     with_field IS_TEMP:{false} 
                     with_field IS_LITERAL:{false}
                     with_field POINTED_SYMIDX:{symidx.clone()}
@@ -493,6 +494,7 @@ fn process_symbol(
             let symidx = SymIdx::new(symbol_scope, symbol_name.clone());
             if let Some(et_node) = op_et_node.clone(){
                 node_mut!(at et_node in et_tree).add_type(symtab.get_symbol(&symidx)?.get_type()?.clone());
+                // node_mut!(at et_node in et_tree).add_scope_node(scope_parent_node);
             }
             if *symtab.get_symbol(&symidx)?.get_is_global()?{
                 let temp_type = symtab.get_symbol(&symidx)?.get_type()?.clone();
@@ -529,7 +531,6 @@ fn process_temp_symbol(
             with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
             with_field IS_TEMP:{true} 
             with_field IS_LITERAL:{false} 
-            with_field IS_CONST:{false}
             with_field IS_GLOBAL:{false}
             to symtab debug symtab_graph);
         *symtab.get_mut_global_info().get_mut_temp_counter()? += 1;
@@ -930,7 +931,7 @@ fn process_call(
     let et_type = &node!(at func_name_et_node in et_tree).et_node_type;
     let func_name_str ;
     match et_type {
-        EtNodeType::Symbol { sym_idx:_, ast_node, text:_, def_or_use:_ } => {
+        EtNodeType::Symbol { sym_idx:_, ast_node, text:_, decldef_def_or_use } => {
             let ast_node = *ast_node;
             func_name_str = node!(at ast_node in ast_tree).text.clone();
         }
@@ -1257,7 +1258,7 @@ fn process_et(
                     let array_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_l_child, scope_node, cfg_bb, instr_slab, symtab_graph)?.unwrap();
 
                     match &node!(at et_l_child in et_tree).et_node_type {
-                        EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, def_or_use:DeclOrDefOrUse::Def } => {
+                        EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, decldef_def_or_use:DeclOrDefOrUse::Def } => {
                             // 在最接近 symbol 的一层 array_index 插入 getelementptr 语句
 
                             // 可删此段
@@ -1282,7 +1283,7 @@ fn process_et(
 
                             Ok(Some(temp_ptr_symidx))
                         },
-                        EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, def_or_use:DeclOrDefOrUse::Use } => {
+                        EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, decldef_def_or_use:DeclOrDefOrUse::Use } => {
                             // 在最接近 symbol 的一层 array_index 插入 getelementptr 语句
                             let array_ty = symtab.get_symbol(&array_symidx)?.get_type()?.clone();
                             // debug_info_blue!("array {:?} type is {:?}", array_symidx,array_ty);
@@ -1309,8 +1310,7 @@ fn process_et(
 
                             Ok(Some(temp_symidx))
                         },
-                        EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, def_or_use:DeclOrDefOrUse::DeclDef { type_ast_node: _ } } => {
-
+                        EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, decldef_def_or_use:DeclOrDefOrUse::DeclDef { type_ast_node: _, is_const } } => {
                             // 可删此段
                             let l_child_type = node!(at et_l_child in et_tree).get_type()?.clone();
                             // debug_info_blue!("left child type {:?}",l_child_type);
@@ -1338,10 +1338,27 @@ fn process_et(
                     let array_ty = node!(at et_assign_node in et_tree).get_type()?.clone();
                     match &array_ty{
                         Type::Array { dims, ele_ty } => {
-                            let mut reversed_remained_dims = dims.iter().rev().map(|symidx| {let idx:usize; idx = symidx.as_ref().unwrap().symbol_name.parse().unwrap(); idx}).collect_vec();
+                            debug_info_red!("{:?}",dims);
+                            
+                            // because symidx maybe const symbol so you should match the parsing error 
+                            let mut reversed_remained_dims = vec![];
+                            for op_symidx in dims{
+                                let symidx = op_symidx.as_ref().unwrap();
+                                let idx:usize = match symidx.symbol_name.parse(){
+                                    std::result::Result::Ok(idx) => {
+                                        idx
+                                    },
+                                    Err(_) => {
+                                        symtab.get_symbol(symidx)?.get_const_symidx()?.symbol_name.parse().unwrap()
+                                    },
+                                };
+                                reversed_remained_dims.push(idx);
+                            }
+                            reversed_remained_dims.reverse();
+
                             // add values to value_map according to initializer
-                            array_initialize(et_node_vec, et_tree, &mut array_ele_map, &ele_ty, &mut reversed_remained_dims, &mut 0)?;
-                            let initializer_symidx = process_literal(symtab, &"initializer".to_string(), symtab_graph)?;
+                            array_initialize(et_node_vec, et_tree, &mut array_ele_map, &ele_ty, &mut reversed_remained_dims, &mut 0, ast_tree, cfg_graph, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
+                            let initializer_symidx = process_literal(symtab, &"_initializer".to_string(), symtab_graph)?;
                             symtab.get_mut_symbol(&initializer_symidx)?.add_value(Value::new_array(array_ele_map, dims.clone().into_iter().map(|x| x.unwrap()).collect_vec(), *ele_ty.clone()));
                             symtab.get_mut_symbol(&initializer_symidx)?.add_type(array_ty);
                             Ok(Some(initializer_symidx))
@@ -1354,17 +1371,30 @@ fn process_et(
                 crate::toolkit::et_node::ExprOp::Assign => {
                     let op_values = direct_child_nodes!(at et_node in et_tree);
                     check_child_nodes(&op_values.clone(), 2)?;
-                    // 后序遍历 右边
+
+                    let left_child_et_node = op_values[0];
+                    let right_child_et_node = op_values[1];
+
+                    // 这里我们需要先遍历左边再遍历右边，因为 类型推导 的实现依赖于这个顺序
                     // 后序遍历 左边
-                    let l_symidx =  process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[0], scope_node, cfg_bb, instr_slab, symtab_graph)?.unwrap();
+                    let l_symidx =  process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, left_child_et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?.unwrap();
                     // let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
                     let l_type = symtab.get_symbol(&l_symidx)?.get_type_with_debug(symtab, symtab_graph)?.clone();
-
-
                     node_mut!(at et_node in et_tree).add_type(l_type.clone());
-                    let r_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, op_values[1], scope_node, cfg_bb, instr_slab, symtab_graph)?.unwrap();
+
+                    // 后序遍历 右边
+                    let r_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, right_child_et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?.unwrap();
                     // let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
                     let r_type = symtab.get_symbol(&r_symidx)?.get_type_with_debug(symtab, symtab_graph)?.clone();
+
+                    if let EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use:DeclOrDefOrUse::DeclDef { type_ast_node, is_const }} = &node!(at left_child_et_node in et_tree).et_node_type {
+                        if *is_const {
+                            symtab.get_mut_symbol(sym_idx)?.add_const_symidx(r_symidx.clone());
+                        }
+                    };
+
+                    node_mut!(at et_node in et_tree).add_type(l_type.clone());
+
                     //如果结果和变量类型不同，添加自动转化instr
                     match (&l_type,&r_type){
                         (Type::Ptr64 { ty:l_deref_var_type },_)=> {
@@ -1434,16 +1464,15 @@ fn process_et(
                }
             }
         }
-        EtNodeType::Constant { const_sym_idx: _, ast_node, text: _ } => {
+        EtNodeType::Constant { const_sym_idx, ast_node, text: _ } => {
             let ast_node = *ast_node;
-            let constant_literal = &node!(at ast_node in ast_tree).text;
+            let constant_literal = &const_sym_idx.symbol_name;
             // debug_info_blue!("add constant {}",constant_literal);
             Ok(Some(process_literal(symtab, constant_literal, symtab_graph)?))
         }
-        EtNodeType::Symbol { sym_idx: _, ast_node, text: _, def_or_use } => {
-            let ast_node = *ast_node;
-            let symbol_literal = &node!(at ast_node in ast_tree).text;
-            let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab, def_or_use, symtab_graph,scope_node,symbol_literal,  cfg_bb,cfg_graph,Some(et_node),et_tree)?;
+        EtNodeType::Symbol { sym_idx: _, ast_node, text: _, decldef_def_or_use }=> {
+            let symbol_literal = &node!(at et_node in et_tree).name_text();
+            let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab, decldef_def_or_use, symtab_graph,scope_node,symbol_literal,  cfg_bb,cfg_graph,Some(et_node),et_tree)?;
             Ok(Some(symbol_symidx))
         }
         _ => return Err(anyhow!("{}不应出现sep类型的et", et_node)),
@@ -1466,7 +1495,7 @@ fn parse_extern_declfunc2nhwc(
         //添加到符号表中，
         let func_symidx = process_func_symbol(symtab, op_symtab_graph,func_name,true)?;
         // 添加返回值到符号表
-        let func_ret_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab, &DeclOrDefOrUse::DeclDef { type_ast_node: ast_retype }, op_symtab_graph,ST_ROOT, &format!("{}_{}",func_name,"ret"), cfg_root, cfg_graph, None,et_tree)?;
+        let func_ret_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab, &DeclOrDefOrUse::DeclDef { type_ast_node: ast_retype, is_const: false }, op_symtab_graph,ST_ROOT, &format!("{}_{}",func_name,"ret"), cfg_root, cfg_graph, None,et_tree)?;
         //获取参数列表
         let mut arg_syms = vec![];
         //函数有参数
@@ -1501,7 +1530,7 @@ fn parse_extern_declfunc2nhwc(
                                 let cur_dims = node_mut!(at cur_et_node in et_tree).get_dims()?.clone();
                                 node_mut!(at child_et_node in et_tree).add_dims(cur_dims);
                             }
-                        }else if let EtNodeType::Symbol { sym_idx: _, ast_node, text: _, def_or_use: _ } = &node!(at child_et_node in et_tree).et_node_type{
+                        }else if let EtNodeType::Symbol { sym_idx: _, ast_node, text: _, decldef_def_or_use: _ } = &node!(at child_et_node in et_tree).et_node_type{
                             // implies this is symbol et_node
                             ast_sym_name_node = *ast_node;
                             if node!(at cur_et_node in et_tree).has_dims(){
@@ -1519,7 +1548,7 @@ fn parse_extern_declfunc2nhwc(
                 };
                 let sym_name = &node!(at ast_sym_name_node in ast_tree).text;
 
-                let arg_symidx = process_symbol(ast_tree, scope_tree, symtab, instr_slab, &DeclOrDefOrUse::DeclDef { type_ast_node:ast_arg_type }, op_symtab_graph,func_scope, sym_name, cfg_root, cfg_graph,Some(et_sym_node),et_tree)?;
+                let arg_symidx = process_symbol(ast_tree, scope_tree, symtab, instr_slab, &DeclOrDefOrUse::DeclDef { type_ast_node:ast_arg_type , is_const:false}, op_symtab_graph,func_scope, sym_name, cfg_root, cfg_graph,Some(et_sym_node),et_tree)?;
                 arg_syms.push(arg_symidx);
             }
             let func_type = Type::Fn { arg_syms: arg_syms.clone(), ret_sym:func_ret_symidx.clone()};
@@ -1549,9 +1578,10 @@ fn parse_declvar2nhwc(
     instr_slab:&mut InstrSlab<NhwcInstr>, symtab_g:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
     //将declaration生成et
-    let et_root = process_any_stmt(et_tree, ast_tree, scope_tree, ast_decl_node, decl_parent_scope);
+    let et_sep_node = process_any_stmt(et_tree, ast_tree, scope_tree, ast_decl_node, decl_parent_scope);
+    eval_et::compress_et(et_tree, et_sep_node, symtab, decl_parent_scope, scope_tree)?;
     //如果该节点有子树
-    let detail_et_nodes = direct_child_nodes!(at et_root in et_tree);
+    let detail_et_nodes = direct_child_nodes!(at et_sep_node in et_tree);
     for et_sep_item_node in detail_et_nodes {
         let et_node_type = &node!(at et_sep_item_node in et_tree).et_node_type.clone();
         match et_node_type {
@@ -1604,13 +1634,12 @@ fn parse_declvar2nhwc(
             }
             // 首个 operator 不是 = assign 的情况
             EtNodeType::Constant { const_sym_idx: _, ast_node: _, text: _ } => todo!(),
-            EtNodeType::Symbol { sym_idx: _, ast_node, text:_, def_or_use } => {
+            EtNodeType::Symbol { sym_idx, ast_node, text:_, decldef_def_or_use } => {
                 //获得变量类型，做成symidx
                 let type_ast_node = find!(rule RULE_declarationSpecifiers at ast_decl_node in ast_tree).unwrap();
                 let var_type = Type::new(type_ast_node, ast_tree);
-                let ast_node = *ast_node;
-                let var_str = &node!(at ast_node in ast_tree).text;
-                let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab, &def_or_use, symtab_g, decl_parent_scope,var_str ,cfg_node,cfg_graph,Some(et_sep_item_node),et_tree)?;
+                let var_str = &sym_idx.symbol_name;
+                let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab, &decldef_def_or_use, symtab_g, decl_parent_scope,var_str ,cfg_node,cfg_graph,Some(et_sep_item_node),et_tree)?;
                 let def_instr = NhwcInstrType::new_def_var(var_type.clone(), symbol_symidx.clone(), None).into();
                 let alloc_instr = NhwcInstrType::new_alloc(var_type.clone(), symbol_symidx.clone().clone()).into();
                 let cfg_entry =get_cfg_entry_by_cfg_node(cfg_graph, symtab, cfg_node)?.with_context(||format!("这个cfg node:{} 没有对应的entry节点",cfg_node))?;
@@ -1644,7 +1673,7 @@ fn parse_func2nhwc(
         let func_symidx = process_func_symbol(symtab,  op_symtab_graph,func_name, false)?;
         let _:Vec<_> = etc::dfs(cfg_graph, cfg_entry).iter().map(|&cfg_node|{node_mut!(at cfg_node in cfg_graph).add_func_cor_symidx(func_symidx.clone())}).collect();
         // 添加返回值到符号表
-        let func_ret_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab, &DeclOrDefOrUse::DeclDef { type_ast_node: ast_retype }, op_symtab_graph,ST_ROOT,&format!("{}_{}",func_name,"ret"), cfg_entry, cfg_graph, None,et_tree)?;
+        let func_ret_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab, &DeclOrDefOrUse::DeclDef { type_ast_node: ast_retype, is_const: false }, op_symtab_graph,ST_ROOT,&format!("{}_{}",func_name,"ret"), cfg_entry, cfg_graph, None,et_tree)?;
         //函数有参数
         if let Some(para) = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_parameterTypeList at func_def_ast_node in ast_tree) {
             let ast_func_args = find_nodes!(rule RULE_parameterList finally RULE_parameterDeclaration at para in ast_tree);
@@ -1653,7 +1682,7 @@ fn parse_func2nhwc(
                 let ast_para_sym = find!(rule RULE_declarator at ast_func_arg in ast_tree).unwrap();
                 let ast_arg_type = find!(rule RULE_declarationSpecifiers at ast_func_arg in ast_tree).unwrap();
                 let func_arg_str = &node!(at ast_para_sym in ast_tree).text;
-                let arg_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab,&DeclOrDefOrUse::DeclDef { type_ast_node:ast_arg_type }, op_symtab_graph,func_scope,func_arg_str, cfg_entry, cfg_graph,None,et_tree)?;
+                let arg_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab,&DeclOrDefOrUse::DeclDef { type_ast_node:ast_arg_type, is_const: false }, op_symtab_graph,func_scope,func_arg_str, cfg_entry, cfg_graph,None,et_tree)?;
                 arg_syms.push(arg_symidx);
             }
             let func_type = Type::Fn { arg_syms: arg_syms.clone(), ret_sym:func_ret_symidx.clone()};
@@ -1914,53 +1943,70 @@ pub fn get_cfg_entry_by_cfg_node(cfg_graph:&CfgGraph,symtab:&SymTab,cfg_node:u32
 
 /// array init
 /// require input `reversed_remained_dims` dimensions to be reversed 
-pub fn array_initialize(et_node_vec:Vec<u32>, et_tree:&mut EtTree, array_ele_map:&mut ArrayEleMap, ele_type:&Type,reversed_remained_dims:&mut Vec<usize>, array_offset:&mut usize) -> Result<()>{
-    // debug_info_blue!("array_init " );
+pub fn array_initialize(et_node_vec:Vec<u32>, et_tree:&mut EtTree, array_ele_map:&mut ArrayEleMap, ele_type:&Type,reversed_remained_dims:&mut Vec<usize>, array_offset:&mut usize,
+    ast_tree:&AstTree, cfg_graph:&mut CfgGraph,  scope_tree:&ScopeTree, symtab:&mut SymTab, et_node:u32, scope_node:u32, cfg_bb:u32, instr_slab:&mut InstrSlab<NhwcInstr>,
+    symtab_graph:&mut Option<&mut SymTabGraph>,
+) -> Result<()>
+
+{
+    debug_info_blue!("array_init {:?} ",reversed_remained_dims);
     let mut i = 0;
     while i < et_node_vec.len(){
         let et_node = et_node_vec[i];
-        if let EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _ } = &node!(at et_node in et_tree).et_node_type{
-            let ele_and_sub_array_vec = direct_child_nodes!(at et_node in et_tree);
-            // let last_dim = reversed_remained_dims.pop().unwrap();
-            array_initialize(ele_and_sub_array_vec, et_tree, array_ele_map, ele_type,reversed_remained_dims, array_offset)?;
-            // reversed_remained_dims.push(last_dim);
-            i+=1;
-        }else if let EtNodeType::Constant { const_sym_idx: _, ast_node: _, text: _ } = &node!(at et_node in et_tree).et_node_type{
-            // 如果遇到Constant 那么应该继续读几个？
-            // 这里 pop 掉
-            let cur_dim = reversed_remained_dims.pop().unwrap();
-            let ele_count_to_read:usize = reversed_remained_dims.iter().product();
-            // debug_info_blue!("ele_count_to_read =  {},{:?}",ele_count_to_read , reversed_remained_dims);
+        match &node!(at et_node in et_tree).et_node_type {
+            EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _ } => {
+                let ele_and_sub_array_vec = direct_child_nodes!(at et_node in et_tree);
+                // let last_dim = reversed_remained_dims.pop().unwrap();
+                array_initialize(ele_and_sub_array_vec, et_tree, array_ele_map, ele_type,reversed_remained_dims, array_offset,ast_tree, cfg_graph, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
+                // reversed_remained_dims.push(last_dim);
+                i+=1;
+            }
+            _ => {
+                // 如果遇到Constant 那么应该继续读几个？
+                // 这里 pop 掉
+                let cur_dim = reversed_remained_dims.pop().unwrap();
+                let ele_count_to_read:usize = reversed_remained_dims.iter().product();
+                // debug_info_blue!("ele_count_to_read =  {},{:?}",ele_count_to_read , reversed_remained_dims);
 
-            let last_i = i;
-            while i < last_i+ele_count_to_read{
-                if i >= et_node_vec.len(){
-                    break;
-                }
-                let et_node = et_node_vec[i];
-                match &node!(at et_node in et_tree).et_node_type{
-                    EtNodeType::Constant { const_sym_idx, ast_node: _, text: _ } => {
-                        array_ele_map.insert_ele(*array_offset, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?)?;
-                        // debug_info_blue!("add array ele with offset {},{:?}",i, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?);
-                        *array_offset +=1;
-                    },
-                    EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _ }=>{
-                        return Err(anyhow!("expect a constant but meet a array wrapper {}",et_node))
-                    },
-                    _ => {
-                        return Err(anyhow!("expect a constant or arraywrapper but meet nor of them at {}",et_node))
+                let last_i = i;
+                while i < last_i+ele_count_to_read{
+                    if i >= et_node_vec.len(){
+                        break;
                     }
-                };
-                i+=1;
+                    let et_node = et_node_vec[i];
+                    match &node!(at et_node in et_tree).et_node_type{
+                        EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _ }=>{
+                            return Err(anyhow!("expect a constant but meet a array wrapper {}",et_node))
+                        },
+                        EtNodeType::Constant { const_sym_idx, ast_node: _, text: _ } => {
+                            array_ele_map.insert_ele(*array_offset, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?)?;
+                            // debug_info_blue!("add array ele with offset {},{:?}",i, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?);
+                            *array_offset +=1;
+                        },
+                        _ => {
+                            let l_type = ele_type;
+                            let r_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?.with_context(|| format!("no value of this expr et node{}",et_node))?;
+                            // only 2 types should be considered, f32 & i32
+                            let r_type = symtab.get_symbol(&r_symidx)?.get_type()?.clone();
+                            let new_value_symidx = force_trans_type(cfg_graph, symtab, l_type, &r_type, &r_symidx, scope_node, cfg_bb, instr_slab, symtab_graph,Some(et_node),et_tree)?;
+                            array_ele_map.insert_ele(*array_offset, Value::new_ref(new_value_symidx, r_type))?;
+                            *array_offset +=1;
+                        },
+                        _ => {
+                            return Err(anyhow!("expect a constant or arraywrapper but meet nor of them at {}",et_node))
+                        }
+                    };
+                    i+=1;
+                }
+                // 不足的补 0 
+                while i< last_i + ele_count_to_read{
+                    // array_ele_map.add_ele_from_usize(*array_offset, Value::from_string_with_specific_type(&"0".to_string(), ele_type)?)?;
+                    // debug_info_blue!("add array ele with offset {},{:?}",*array_offset, Value::from_string_with_specific_type(&"0".to_string(), ele_type)?);
+                    *array_offset+=1;
+                    i+=1;
+                }
+                reversed_remained_dims.push(cur_dim);
             }
-            // 不足的补 0 
-            while i< last_i + ele_count_to_read{
-                // array_ele_map.add_ele_from_usize(*array_offset, Value::from_string_with_specific_type(&"0".to_string(), ele_type)?)?;
-                // debug_info_blue!("add array ele with offset {},{:?}",*array_offset, Value::from_string_with_specific_type(&"0".to_string(), ele_type)?);
-                *array_offset+=1;
-                i+=1;
-            }
-            reversed_remained_dims.push(cur_dim);
         }
     }
     Ok(())

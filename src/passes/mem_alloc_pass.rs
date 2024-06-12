@@ -36,7 +36,6 @@ impl Pass for MemAllocPass {
                 Symbol::new_from_symidx(&s0_for_cfg_entry)
             }
                 with_field TYPE:{Type::Ptr64 { ty: Box::new(Type::Void) }}
-                with_field IS_CONST:{false}
                 with_field IS_LITERAL:{false}
                 with_field IS_GLOBAL:{false}
                 to symtab
@@ -47,7 +46,6 @@ impl Pass for MemAllocPass {
                 Symbol::new_from_symidx(&ra_for_cfg_entry)
             }
                 with_field TYPE:{Type::Ptr64 { ty: Box::new(Type::Void) }}
-                with_field IS_CONST:{false}
                 with_field IS_LITERAL:{false}
                 with_field IS_GLOBAL:{false}
                 to symtab

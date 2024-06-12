@@ -1,17 +1,19 @@
 use std::panic;
+use anyhow::*;
 
 use crate::antlr_parser::clexer::{
     And, Arrow, Constant, Div, DivAssign, Dot, Equal, Greater, GreaterEqual, Identifier, LeftShift, Less, LessEqual, Minus, MinusAssign, MinusMinus, Mod, MulAssign, Not, NotEqual, Plus, PlusAssign, PlusPlus, RightShift, Star, StringLiteral, Tilde
 };
 use crate::antlr_parser::cparser::{
-    Assign, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_declaration, RULE_declarationSpecifier, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forDeclaration, RULE_forMidExpression, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_initializerList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_typeSpecifier, RULE_unaryExpression, RULE_unaryOperator
+    Const,Assign,RULE_typeQualifier, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_declaration, RULE_declarationSpecifier, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forDeclaration, RULE_forMidExpression, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_initializerList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_typeSpecifier, RULE_unaryExpression, RULE_unaryOperator
 };
 
 use crate::toolkit::symtab::SymIdx;
-use crate::{add_node, add_node_with_edge, direct_child_node, find, find_nodes, node, rule_id, term_id};
+use crate::{add_node, add_node_with_edge, debug_info_red, direct_child_node, find, find_nodes, node, rule_id, term_id};
 
 use super::et_node::{DeclOrDefOrUse, EtNodeType, EtTree};
-use super::eval::{replace_et_node};
+use super::eval_et::{compress_et};
+use super::symtab::SymTab;
 use super::{ast_node::AstTree, scope_node::ScopeTree};
 
 // 这个函数 返回 separator node
@@ -71,7 +73,6 @@ pub fn process_any_stmt(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Scop
     // 写一个函数,用来替换,
     // 在上方的let match块中就已经把et-tree生成好了,就在这里进行节点的替换
     // 可以直接删除
-    let _ = replace_et_node(et_tree, sep_node);
     // let calcuate_expr_node = eval_et(et_tree, sep_node);
     // et_tree.remove_node(find_nodes!());
     // let _ = eval_et(et_tree, sep_node);
@@ -83,29 +84,39 @@ fn process_parameter_declaration(et_tree:&mut EtTree, ast_tree:&AstTree, scope_t
         // 这里我们假定只有一个 修饰符
         then RULE_declarationSpecifier
         finally RULE_typeSpecifier at parameter_decl_node in ast_tree
-    ) .unwrap();
+    ).unwrap();
     let direct_decl_node = find!(rule RULE_declarator 
         finally RULE_directDeclarator
         at parameter_decl_node in ast_tree
     ).unwrap();
-    process_direct_decl(et_tree, ast_tree, scope_tree, direct_decl_node, type_ast_node, scope_node, parent_et_node);
+    process_direct_decl(et_tree, ast_tree, scope_tree, direct_decl_node, type_ast_node,false, scope_node, parent_et_node);
 }
 fn process_declaration(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, decl_node:u32, scope_node:u32, parent_et_node:u32) {
     // only consider variable declaration
-    let type_ast_node = find!(
+    let specifier_nodes = find_nodes!(
         rule RULE_declarationSpecifiers
         // 这里我们假定只有一个 修饰符
-        then RULE_declarationSpecifier
-        finally RULE_typeSpecifier at decl_node in ast_tree
-    )
-    .unwrap();
+        finally RULE_declarationSpecifier
+        at decl_node in ast_tree
+    );
+    let mut op_type_ast_node = None;
+    let mut is_const = false;
+    for specifier_node in specifier_nodes{
+        let temp_node = direct_child_node!(at specifier_node in ast_tree);
+        if rule_id!(at temp_node in ast_tree) == RULE_typeQualifier{
+            is_const = true;
+        }else {
+            op_type_ast_node = Some(temp_node);
+        }
+    }
     let declarator_node = find_nodes!(
         rule RULE_initDeclaratorList
         finally RULE_initDeclarator
         at decl_node in ast_tree
     );
+    debug_info_red!("is_const:{is_const} at decl_ndoe:{decl_node}");
     for init_decl_node in declarator_node {
-        process_init_declarator(et_tree, ast_tree, scope_tree, init_decl_node, type_ast_node, scope_node, parent_et_node);
+        process_init_declarator(et_tree, ast_tree, scope_tree, init_decl_node, op_type_ast_node.unwrap(), is_const,scope_node, parent_et_node);
     }
 }
 fn process_for_before_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, for_before_expr:u32, scope_node:u32, parent_et_node:u32) {
@@ -116,7 +127,7 @@ fn process_for_before_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&S
         _ => panic!("在这个 for before expression 底下既没有 forDeclaration 也没有 expression"),
     }
 }
-fn process_init_declarator(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, init_decl_node:u32, type_ast_node:u32, scope_node:u32, parent_et_node:u32) {
+fn process_init_declarator(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, init_decl_node:u32, type_ast_node:u32, is_const:bool, scope_node:u32, parent_et_node:u32) {
     let declarator_node = find!(rule RULE_declarator at init_decl_node in ast_tree).unwrap();
 
     // 考虑到direct_decl_node 可能有 数组运算符，所以要进行进一步解析
@@ -129,33 +140,33 @@ fn process_init_declarator(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&S
         Some(assign_node) => {
             // 这里手动生成 et_assign_node 然后在它的左边放上新定义的变量
             let et_assign_node = add_node_with_edge!({EtNodeType::new_op_assign(assign_node).as_et_node()} from parent_et_node in et_tree );
-            process_direct_decl(et_tree, ast_tree, scope_tree, direct_decl_node, type_ast_node, scope_node, et_assign_node);
+            process_direct_decl(et_tree, ast_tree, scope_tree, direct_decl_node, type_ast_node, is_const,scope_node, et_assign_node);
             let initializer_node = find!(rule RULE_initializer at init_decl_node in ast_tree).unwrap();
             process_initializer(et_tree, ast_tree, scope_tree, initializer_node, scope_node, et_assign_node);
         }
         None => {
             // 说明这是一个 类似于 int a; 或者 int a[3][3]; 的形式，没有初始值，因此只需要把变量放在 parent et node 下面就行了
-            process_direct_decl(et_tree, ast_tree, scope_tree, direct_decl_node, type_ast_node, scope_node, parent_et_node);
+            process_direct_decl(et_tree, ast_tree, scope_tree, direct_decl_node, type_ast_node,is_const, scope_node, parent_et_node);
         }
     }
 }
 
-fn process_direct_decl(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, direct_decl_node:u32, type_ast_node:u32, scope_node:u32, parent_et_node:u32) {
+fn process_direct_decl(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, direct_decl_node:u32, type_ast_node:u32,is_const:bool, scope_node:u32, parent_et_node:u32) {
     if let Some(_para_type_list_node) = find!(rule RULE_parameterTypeList at direct_decl_node in ast_tree) {
         // 这说明这是一个至少有一个参数的 函数 声明
     } else if let Some(ident_node) = find!(term Identifier at direct_decl_node in ast_tree) {
         // 这说明这只是一个简单的 ident
-        process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, parent_et_node, DeclOrDefOrUse::DeclDef { type_ast_node });
+        process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, parent_et_node, DeclOrDefOrUse::DeclDef { type_ast_node, is_const});
     } else if let Some(assign_expr_node) = find!(rule RULE_assignmentExpression at direct_decl_node in ast_tree) {
         // 说明这是一个数组，其中索引有表达式 assign_expr_node
         let et_direct_decl_node = add_node_with_edge!({EtNodeType::new_op_array_idx(direct_decl_node).as_et_node()} from parent_et_node in et_tree);
         let sub_direct_decl_node = find!(rule RULE_directDeclarator at direct_decl_node in ast_tree).unwrap();
-        process_direct_decl(et_tree, ast_tree, scope_tree, sub_direct_decl_node, type_ast_node, scope_node, et_direct_decl_node);
+        process_direct_decl(et_tree, ast_tree, scope_tree, sub_direct_decl_node, type_ast_node,is_const, scope_node, et_direct_decl_node);
         process_assign_expr(et_tree, ast_tree, scope_tree, assign_expr_node, scope_node, et_direct_decl_node);
     } else if let Some(sub_direct_decl) = find!(rule RULE_directDeclarator at direct_decl_node in ast_tree) {
         // implies that it is a parameter declarator in func args
         let et_direct_decl_node = add_node_with_edge!({EtNodeType::new_op_array_idx(direct_decl_node).as_et_node()} from parent_et_node in et_tree);
-        process_direct_decl(et_tree, ast_tree, scope_tree, sub_direct_decl, type_ast_node, scope_node, et_direct_decl_node);
+        process_direct_decl(et_tree, ast_tree, scope_tree, sub_direct_decl, type_ast_node,is_const, scope_node, et_direct_decl_node);
     }
 }
 

@@ -118,7 +118,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                 // for non-phi-instr i
                 if !instr_struct.is_phi(){
                     for use_symidx in instr_struct.get_mut_use_symidx_vec(){
-                        let &is_const = symtab.get_symbol(&use_symidx).with_instr_context(instr,&instr_slab)?.get_is_const()?;
+                        let is_const = symtab.get_symbol(&use_symidx).with_instr_context(instr,&instr_slab)?.has_const_symidx();
                         // let &is_temp = symtab.get_symbol(&use_symidx)?.get_is_temp()?;
                         if !is_const {
                             update_reaching_def(instr, use_symidx, symtab, cfg_graph, dj_graph, instr_slab)?;
@@ -132,7 +132,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                 // for any instr i
                 for def_symidx in instr_struct.get_mut_def_symidx_vec(){
                     // symtab.get_mut_symbol(def_symidx)?.get_instr()
-                    let &is_const = symtab.get_symbol(&def_symidx)?.get_is_const()?;
+                    let is_const = symtab.get_symbol(&def_symidx)?.has_const_symidx();
                     // let &is_temp = symtab.get_symbol(&def_symidx)?.get_is_temp()?;
                     if !is_const {
                         let new_ssa_symidx = symtab.get_symbol(def_symidx)?.get_ssa_max_ssa_idx()?.get_next_ssa_symidx();
@@ -151,7 +151,6 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                             // with field REACHING_DEF:{symtab.get_symbol(src_symidx)?.get_type()?.clone()}
                             with_field SSA_DEF_INSTR:{instr}
                             with_field SSA_REACHING_DEF:{None}
-                            with_field IS_CONST:{false}
                         to symtab);
 
                         let src_symidx  = def_symidx.clone();

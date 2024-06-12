@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{anyhow, Context, Result};
 use strum_macros::EnumIs;
 use std::fmt::Debug;
 use std::{mem, u32};
@@ -14,7 +14,7 @@ pub type EtTree = StableDiGraph<EtNode, (), u32>;
 
 #[derive(Clone)]
 pub enum DeclOrDefOrUse {
-    DeclDef { type_ast_node:u32 },
+    DeclDef { type_ast_node:u32 ,is_const:bool },
     Use,
     Def 
 }
@@ -26,7 +26,7 @@ pub enum EtNodeType {
     // 在这里 constant 也是一个 Symbol ，到时候在 SymbolField 里面加上 Constant 标记 就可以了
     Constant { const_sym_idx:SymIdx, ast_node:u32, text:String },
     // Def_Or_Use 是一个枚举类型，要么是 Def 要么是 Use
-    Symbol { sym_idx:SymIdx, ast_node:u32, text:String, def_or_use:DeclOrDefOrUse },
+    Symbol { sym_idx:SymIdx, ast_node:u32, text:String, decldef_def_or_use:DeclOrDefOrUse },
     // array symbol 一个 array 是 array symbol
     // ArraySym{sym_idx:SymbolIndex,ast_node:u32,text:String,def_or_use:Def_Or_Use},
     // // 考虑到 可能出现  a=3,b=2; 这样的语句，因此需要规定一个Separator
@@ -82,50 +82,39 @@ pub enum ExprOp {
 }
 impl ExprOp {
     /// 传入的vec的内部是节点在et_tree里的节点序号
-    /// 作用是
-    pub fn eval_sub_et_nodes(&self, _et_tree:&mut EtTree, vec:&Vec<SymIdx>) -> SymIdx {
-        let sym_idx = match &self {
-            ExprOp::Mul => eval(&format!("{}{}{}", &vec[0].symbol_name, "*", &vec[1].symbol_name)).unwrap(),
-            ExprOp::Add => eval(&format!("{}{}{}", &vec[0].symbol_name, "+", &vec[1].symbol_name)).unwrap(),
-            ExprOp::Sub => eval(&format!("{}{}{}", &vec[0].symbol_name, "-", &vec[1].symbol_name)).unwrap(),
-            ExprOp::Div => eval(&format!("{}{}{}", &vec[0].symbol_name, "/", &vec[1].symbol_name)).unwrap(),
-            ExprOp::Assign => eval(&format!("{}{}{}", &vec[0].symbol_name, "=", &vec[1].symbol_name)).unwrap(),
-            ExprOp::LogicalOr => eval(&format!("{}{}{}", &vec[0].symbol_name, "||", &vec[1].symbol_name)).unwrap(),
-            ExprOp::LogicalAnd => eval(&format!("{}{}{}", &vec[0].symbol_name, "&&", &vec[1].symbol_name)).unwrap(),
-            ExprOp::LogicalNot => eval(&format!("{}{}{}", &vec[0].symbol_name, "!", &vec[1].symbol_name)).unwrap(),
-            ExprOp::BitwiseOr => eval(&format!("{}{}{}", &vec[0].symbol_name, "|", &vec[1].symbol_name)).unwrap(),
-            ExprOp::BitwiseAnd => eval(&format!("{}{}{}", &vec[0].symbol_name, "&", &vec[1].symbol_name)).unwrap(),
-            ExprOp::BitwiseXor => eval(&format!("{}{}{}", &vec[0].symbol_name, "^", &vec[1].symbol_name)).unwrap(),
-            ExprOp::BitwiseNot => eval(&format!("{}{}", &vec[0].symbol_name, "!")).unwrap(), //一元运算符
-            ExprOp::Eq => eval(&format!("{}{}{}", &vec[0].symbol_name, "==", &vec[1].symbol_name)).unwrap(),
-            ExprOp::NEq => eval(&format!("{}{}{}", &vec[0].symbol_name, "!=", &vec[1].symbol_name)).unwrap(),
-            ExprOp::Less => eval(&format!("{}{}{}", &vec[0].symbol_name, "<", &vec[1].symbol_name)).unwrap(),
-            ExprOp::Greater => eval(&format!("{}{}{}", &vec[0].symbol_name, ">", &vec[1].symbol_name)).unwrap(),
-            ExprOp::LEq => eval(&format!("{}{}{}", &vec[0].symbol_name, "<=", &vec[1].symbol_name)).unwrap(),
-            ExprOp::GEq => eval(&format!("{}{}{}", &vec[0].symbol_name, ">=", &vec[1].symbol_name)).unwrap(),
-            ExprOp::LShift => eval(&format!("{}{}{}", &vec[0].symbol_name, "<<", &vec[1].symbol_name)).unwrap(),
-            ExprOp::RShift => eval(&format!("{}{}{}", &vec[0].symbol_name, ">>", &vec[1].symbol_name)).unwrap(),
-            ExprOp::Mod => eval(&format!("{}{}{}", &vec[0].symbol_name, "%", &vec[1].symbol_name)).unwrap(),
-            ExprOp::Cast => eval(&format!("({}){}", &vec[0].symbol_name, &vec[1].symbol_name)).unwrap(),
-            ExprOp::Call => eval(&format!("{}({})", &vec[0].symbol_name, &vec[1].symbol_name)).unwrap(),
-            ExprOp::Negative => eval(&format!("-{}", &vec[0].symbol_name)).unwrap(),
-            ExprOp::Positive => eval(&format!("+{}", &vec[0].symbol_name)).unwrap(),
-            ExprOp::AddrOf => eval(&format!("&{}", &vec[0].symbol_name)).unwrap(),
-            ExprOp::Deref => eval(&format!("*{}", &vec[0].symbol_name)).unwrap(),
-            ExprOp::DotMember => eval(&format!("{}.{}", &vec[0].symbol_name, &vec[1].symbol_name)).unwrap(),
-            ExprOp::ArrowMember => eval(&format!("{}->{}", &vec[0].symbol_name, &vec[1].symbol_name)).unwrap(),
-            ExprOp::LPlusPlus => eval(&format!("{}{}{}", &vec[0].symbol_name, "++", &vec[1].symbol_name)).unwrap(),
-            ExprOp::RPlusPlus => eval(&format!("{}{}{}", &vec[0].symbol_name, "--", &vec[1].symbol_name)).unwrap(),
-            ExprOp::LMinusMinus => eval(&format!("{}{}{}", &vec[0].symbol_name, "--", &vec[1].symbol_name)).unwrap(),
-            ExprOp::RMinusMinus => eval(&format!("{}{}{}", &vec[0].symbol_name, "--", &vec[1].symbol_name)).unwrap(),
-            ExprOp::MulAssign => eval(&format!("{}{}{}", &vec[0].symbol_name, "*=", &vec[1].symbol_name)).unwrap(),
-            ExprOp::DivAssign => eval(&format!("{}{}{}", &vec[0].symbol_name, "/=", &vec[1].symbol_name)).unwrap(),
-            ExprOp::PlusAssign => eval(&format!("{}{}{}", &vec[0].symbol_name, "+=", &vec[1].symbol_name)).unwrap(),
-            ExprOp::MinusAssign => eval(&format!("{}{}{}", &vec[0].symbol_name, "-=", &vec[1].symbol_name)).unwrap(),
-            ExprOp::ArrayIndex => eval(&format!("{}[{}]", &vec[0].symbol_name, &vec[1].symbol_name)).unwrap(),
-            _ => panic!("错误的 Oprator !"),
+    pub fn eval_sub_et_nodes(&self, _et_tree:&mut EtTree, vec:&Vec<SymIdx>) -> Result<SymIdx> {
+        let value = match &self {
+            ExprOp::Mul => eval(&format!("{}{}{}", &vec[0].symbol_name, "*", &vec[1].symbol_name)),
+            ExprOp::Add => eval(&format!("{}{}{}", &vec[0].symbol_name, "+", &vec[1].symbol_name)),
+            ExprOp::Sub => eval(&format!("{}{}{}", &vec[0].symbol_name, "-", &vec[1].symbol_name)),
+            ExprOp::Div => eval(&format!("{}{}{}", &vec[0].symbol_name, "/", &vec[1].symbol_name)),
+            ExprOp::LogicalOr => eval(&format!("{}{}{}", &vec[0].symbol_name, "||", &vec[1].symbol_name)),
+            ExprOp::LogicalAnd => eval(&format!("{}{}{}", &vec[0].symbol_name, "&&", &vec[1].symbol_name)),
+            ExprOp::LogicalNot => eval(&format!("{}{}{}", &vec[0].symbol_name, "!", &vec[1].symbol_name)),
+            ExprOp::BitwiseOr => eval(&format!("{}{}{}", &vec[0].symbol_name, "|", &vec[1].symbol_name)),
+            ExprOp::BitwiseAnd => eval(&format!("{}{}{}", &vec[0].symbol_name, "&", &vec[1].symbol_name)),
+            ExprOp::BitwiseXor => eval(&format!("{}{}{}", &vec[0].symbol_name, "^", &vec[1].symbol_name)),
+            ExprOp::BitwiseNot => eval(&format!("{}{}", &vec[0].symbol_name, "!")), //一元运算符
+            ExprOp::Eq => eval(&format!("{}{}{}", &vec[0].symbol_name, "==", &vec[1].symbol_name)),
+            ExprOp::NEq => eval(&format!("{}{}{}", &vec[0].symbol_name, "!=", &vec[1].symbol_name)),
+            ExprOp::Less => eval(&format!("{}{}{}", &vec[0].symbol_name, "<", &vec[1].symbol_name)),
+            ExprOp::Greater => eval(&format!("{}{}{}", &vec[0].symbol_name, ">", &vec[1].symbol_name)),
+            ExprOp::LEq => eval(&format!("{}{}{}", &vec[0].symbol_name, "<=", &vec[1].symbol_name)),
+            ExprOp::GEq => eval(&format!("{}{}{}", &vec[0].symbol_name, ">=", &vec[1].symbol_name)),
+            ExprOp::LShift => eval(&format!("{}{}{}", &vec[0].symbol_name, "<<", &vec[1].symbol_name)),
+            ExprOp::RShift => eval(&format!("{}{}{}", &vec[0].symbol_name, ">>", &vec[1].symbol_name)),
+            ExprOp::Mod => eval(&format!("{}{}{}", &vec[0].symbol_name, "%", &vec[1].symbol_name)),
+            ExprOp::Cast => eval(&format!("({}){}", &vec[0].symbol_name, &vec[1].symbol_name)),
+            ExprOp::Call => eval(&format!("{}({})", &vec[0].symbol_name, &vec[1].symbol_name)),
+            ExprOp::Negative => eval(&format!("-{}", &vec[0].symbol_name)),
+            ExprOp::Positive => eval(&format!("+{}", &vec[0].symbol_name)),
+            ExprOp::AddrOf => eval(&format!("&{}", &vec[0].symbol_name)),
+            ExprOp::Deref => eval(&format!("*{}", &vec[0].symbol_name)),
+            ExprOp::DotMember => eval(&format!("{}.{}", &vec[0].symbol_name, &vec[1].symbol_name)),
+            ExprOp::ArrowMember => eval(&format!("{}->{}", &vec[0].symbol_name, &vec[1].symbol_name)),
+            _ => {Err(eval::Error::Custom(format!("unsupported operator {:?}",self)))},
         };
-        SymIdx::new(0, sym_idx.to_string())
+        Ok(SymIdx::new(0, value.with_context( || "eval_sub_et_nodes failed")?.to_string()))
     }
 }
 impl Debug for ExprOp {
@@ -197,7 +186,7 @@ impl EtNodeType {
     pub fn new_op_plus_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::PlusAssign, ast_node, text:String::new() } }
     //你必须确保这个symbol 是一个 constant
     pub fn new_constant(ast_node:u32, const_symidx:SymIdx) -> Self { EtNodeType::Constant { const_sym_idx:const_symidx, ast_node, text:String::new() } }
-    pub fn new_symbol(ast_node:u32, sym_idx:SymIdx, def_or_use:DeclOrDefOrUse) -> Self { EtNodeType::Symbol { sym_idx, ast_node, text:String::new(), def_or_use:def_or_use } }
+    pub fn new_symbol(ast_node:u32, sym_idx:SymIdx, def_or_use:DeclOrDefOrUse) -> Self { EtNodeType::Symbol { sym_idx, ast_node, text:String::new(), decldef_def_or_use:def_or_use } }
     // pub fn new_array_symbol(ast_node:u32,sym_idx:SymbolIndex ,def_or_use:Def_Or_Use)->Self{
     //     EtNakedNode::ArraySym  {sym_idx,ast_node,text:String::new(), def_or_use:def_or_use  }
     // }
@@ -226,14 +215,14 @@ impl EtNodeType {
         let _et_node = match self {
             EtNodeType::Operator { op: _, ast_node, text: _ } => ast_node,
             EtNodeType::Constant { const_sym_idx: _, ast_node, text: _ } => ast_node,
-            EtNodeType::Symbol { sym_idx: _, ast_node, text: _, def_or_use: _ } => ast_node,
+            EtNodeType::Symbol { sym_idx: _, ast_node, text: _, decldef_def_or_use: _ } => ast_node,
             // EtNakedNode::ArraySym { sym_idx, ast_node, text ,def_or_use} => ast_node,
             EtNodeType::Separator { ast_node, text: _ } => ast_node,
         };
         let new_str = match self {
             EtNodeType::Operator { op: _, ast_node: _, text } => text.clone(),
             EtNodeType::Constant { const_sym_idx: _, ast_node: _, text } => text.clone(),
-            EtNodeType::Symbol { sym_idx: _, ast_node: _, text, def_or_use: _ } => text.clone(),
+            EtNodeType::Symbol { sym_idx: _, ast_node: _, text, decldef_def_or_use: _ } => text.clone(),
             // EtNakedNode::ArraySym { sym_idx, ast_node, text,def_or_use } => text.clone(),
             EtNodeType::Separator { ast_node: _, text } => text.clone(),
         };
@@ -241,7 +230,7 @@ impl EtNodeType {
             match self {
                 EtNodeType::Operator { op: _, ast_node: _, text } => text,
                 EtNodeType::Constant { const_sym_idx: _, ast_node: _, text } => text,
-                EtNodeType::Symbol { sym_idx: _, ast_node: _, text, def_or_use: _ } => text,
+                EtNodeType::Symbol { sym_idx: _, ast_node: _, text, decldef_def_or_use: _ } => text,
                 // EtNakedNode::ArraySym { sym_idx, ast_node, text,def_or_use } => text,
                 EtNodeType::Separator { ast_node: _, text } => text,
             },
@@ -252,8 +241,8 @@ impl EtNodeType {
         if let EtNodeType::Separator { ast_node, text } = self {
             let ast_node = *ast_node;
             let _ = mem::replace(text, node!(at ast_node in ast_tree).text.clone());
-        } else if let EtNodeType::Symbol { sym_idx: _, ast_node: _, text, def_or_use } = self {
-            if let DeclOrDefOrUse::DeclDef { type_ast_node } = def_or_use {
+        } else if let EtNodeType::Symbol { sym_idx: _, ast_node: _, text, decldef_def_or_use: def_or_use } = self {
+            if let DeclOrDefOrUse::DeclDef { type_ast_node, is_const } = def_or_use {
                 let type_ast_node = *type_ast_node;
                 let _ = mem::replace(text, node!(at type_ast_node in ast_tree).text.clone());
             }
@@ -268,8 +257,8 @@ impl Debug for EtNodeType {
             EtNodeType::Constant { const_sym_idx, ast_node: _, text: _ } => {
                 write!(f, "const {}", const_sym_idx.symbol_name)
             }
-            EtNodeType::Symbol { sym_idx, ast_node: _, text, def_or_use } => {
-                write!(f, "{:?} {} {}", def_or_use, text, sym_idx.symbol_name)
+            EtNodeType::Symbol { sym_idx, ast_node: _, text, decldef_def_or_use: def_or_use } => {
+                write!(f, "{:?} symbol {} {}", def_or_use, text, sym_idx.symbol_name)
             }
             // EtNakedNode::ArraySym { sym_idx, ast_node, text, def_or_use } =>
             // write!(f,"{:?} {} {}",def_or_use,text,sym_idx.symbol_name),
@@ -283,7 +272,9 @@ impl Debug for EtNodeType {
 impl Debug for DeclOrDefOrUse {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            DeclOrDefOrUse::DeclDef { type_ast_node: _ } => write!(f, "decl"),
+            &DeclOrDefOrUse::DeclDef { type_ast_node: _, is_const } => {
+                write!(f, "decl {}",if is_const{"const"}else {""})
+            },
             DeclOrDefOrUse::Use => write!(f, "use"),
             DeclOrDefOrUse::Def => write!(f, "def"),
         }
@@ -297,4 +288,16 @@ impl Debug for EtNode {
 impl EtNode {
     pub fn new(et_naked_node:EtNodeType) -> EtNode { EtNode { et_node_type:et_naked_node, info:Fields::new() } }
     pub fn load_ast_node_text(&mut self, ast_tree:&AstTree) -> Result<()> { self.et_node_type.load_ast_node_text(ast_tree) }
+    pub fn name_text(&self) -> String{
+        match &self.et_node_type{
+            EtNodeType::Operator { op, ast_node, text } => todo!(),
+            EtNodeType::Constant { const_sym_idx, ast_node, text } => {
+                const_sym_idx.symbol_name.clone()
+            },
+            EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => {
+                sym_idx.symbol_name.clone()
+            },
+            EtNodeType::Separator { ast_node, text } => todo!(),
+        }
+    }
 }

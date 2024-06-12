@@ -64,6 +64,7 @@ pub enum Value {
     I32(Option<i32>),
     F32(Option<f32>),
     I1(Option<bool>),
+    Ref{symidx:SymIdx, ty:Type},
     Void,
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
     Ptr64{pointed_ty:Box<Type>,op_pointed_symidx:Option<SymIdx>,offset:Box<Value>},
@@ -164,6 +165,9 @@ impl Clone for Box<dyn Field> {
 }
 
 impl Value {
+    pub fn new_ref(symidx:SymIdx, ty:Type) -> Self{
+        Self::Ref { symidx, ty }
+    }
     pub fn new_i32(value:i32) -> Self { Value::I32(Some(value)) }
     pub fn new_f32(value:f32) -> Self { Value::F32(Some(value)) }
     pub fn new_unsure_from_specific_type(specified_ty:&Type) -> Self {
@@ -246,6 +250,7 @@ impl Value {
             Value::Fn { arg_syms, ret_sym } => Type::Fn { arg_syms: arg_syms.clone(), ret_sym: ret_sym.clone() },
             Value::Array { value_map: _, dims , ele_ty: ele_type } => Type::Array { dims: dims.clone().into_iter().map(|x| Some(x)).collect_vec(), ele_ty:Box::new(ele_type.clone())  },
             Value::Ptr64 { pointed_ty: ty, op_pointed_symidx: _, offset: _  } => Type::Ptr64 { ty: Box::new(*ty.clone()) },
+            Value::Ref{ symidx, ty } => todo!(),
             // Value::Unsure {  } => Type::Unsure {  },
         }
     }
