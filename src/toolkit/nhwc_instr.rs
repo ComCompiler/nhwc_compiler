@@ -213,7 +213,7 @@ impl NhwcInstr {
                 vec![var_symidx]
             },
             NhwcInstrType::Arith { lhs, rhs:_ } => { vec![lhs] },
-            NhwcInstrType::SimpleAssign { lhs, rhs:_, vartype } => {
+            NhwcInstrType::SimpleAssign { lhs, rhs:_, vartype: _ } => {
                  vec![lhs] 
             },
             NhwcInstrType::Call { op_assigned_symidx: assigned, func_op:_} => if let  Some(symidx)= assigned{
@@ -261,7 +261,7 @@ impl NhwcInstr {
                 ArithOp::LogicOr { a, b, vartype:_ } => vec![a,b],
                 ArithOp::LogicNot { a, vartype:_ } => vec![a],
             }},
-            NhwcInstrType::SimpleAssign { lhs:_, rhs, vartype } => {
+            NhwcInstrType::SimpleAssign { lhs:_, rhs, vartype: _ } => {
                  vec![rhs] 
             },
             NhwcInstrType::Call { op_assigned_symidx: _assigned, func_op } => {
@@ -311,7 +311,7 @@ impl NhwcInstr {
                 vec![var_symidx]
             },
             NhwcInstrType::Arith { lhs, rhs:_ } => { vec![lhs] },
-            NhwcInstrType::SimpleAssign { lhs, rhs:_, vartype } => {
+            NhwcInstrType::SimpleAssign { lhs, rhs:_, vartype: _ } => {
                  vec![lhs] 
             },
             NhwcInstrType::Call { op_assigned_symidx: assigned, func_op:_ } => if let  Some(symidx)= assigned{
@@ -357,7 +357,7 @@ impl NhwcInstr {
                 ArithOp::LogicOr { a, b, vartype:_ } => vec![a,b],
                 ArithOp::LogicNot { a, vartype :_} => vec![a],
             }},
-            NhwcInstrType::SimpleAssign { lhs:_, rhs, vartype } => {
+            NhwcInstrType::SimpleAssign { lhs:_, rhs, vartype: _ } => {
                  vec![rhs] 
             },
             NhwcInstrType::Call { op_assigned_symidx: _assigned, func_op } => {
@@ -570,7 +570,7 @@ impl NhwcInstrType {
     pub fn get_lhs(&self)->Option<SymIdx>{
         match self{
             NhwcInstrType::Arith { lhs, rhs: _ } => Some(lhs.clone()),
-            NhwcInstrType::SimpleAssign { lhs, rhs: _, vartype } => Some(lhs.clone()),
+            NhwcInstrType::SimpleAssign { lhs, rhs: _, vartype: _ } => Some(lhs.clone()),
             NhwcInstrType::Phi { lhs, rhs: _ } => Some(lhs.clone()),
             _=>None
         }

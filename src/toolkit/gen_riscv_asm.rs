@@ -3,7 +3,7 @@
 use crate::{direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, toolkit::rv64_instr::{Arithmetic}};
 use anyhow::*;
 
-use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Type, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, rv64_instr::{BaseIntInstr, Compare, Imm, Loads, Logical, PseudoInstr, RV64Instr, Register, Shifts, Stores, Trans}, simulator::Simulator, symtab::{SymIdx, SymTab}};
+use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Type, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, rv64_instr::{Compare, Imm, Loads, Logical, PseudoInstr, RV64Instr, Register, Shifts, Stores, Trans}, simulator::Simulator, symtab::{SymIdx, SymTab}};
 
 /// convert nhwc ir into riscv
 pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RV64Instr>, asm_structure:&mut AsmStructure, src_symtab:&SymTab)->Result<()>{
@@ -115,7 +115,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         
                         let mut fpu_args = vec![];
                         let mut gpr_args = vec![];
-                        for (idx,arg) in args.iter().enumerate(){
+                        for (_idx,arg) in args.iter().enumerate(){
                             match src_symtab.get_symbol(arg)?.get_type()?{
                                 Type::F32 => {
                                     fpu_args.push(arg)
@@ -154,7 +154,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         let val_reg = load_from_ptr(&mut asm_sect, ptr_symidx, Register::new_s(1), Register::new_s(2), src_symtab)?;
                         store_sym(&mut asm_sect, lhs, val_reg, src_symtab)?;
                     },
-                    NhwcInstrType::Store { value_symidx, value_ty, ptr_symidx, ptr_ty: _ } => {
+                    NhwcInstrType::Store { value_symidx, value_ty: _, ptr_symidx, ptr_ty: _ } => {
                         let val_reg = Register::new_s(2);
                         load_sym_or_imm(&mut asm_sect, value_symidx,val_reg.clone() , src_symtab)?;
                         store_from_ptr(&mut asm_sect, ptr_symidx, Register::new_s(1), val_reg, src_symtab)?;
@@ -405,7 +405,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 }
                                 store_sym(&mut asm_sect, lhs, rst_reg, src_symtab)?;
                             },
-                            super::nhwc_instr::ArithOp::LogicAnd { a, b, vartype } => {
+                            super::nhwc_instr::ArithOp::LogicAnd { a, b, vartype: _ } => {
                                 let (val_reg1,val_reg2 ,rst_reg)= (Register::new_s(1),Register::new_s(2),Register::new_s(3));
 
                                 load_sym_or_imm(&mut asm_sect, a, val_reg1.clone(), src_symtab)?;
@@ -413,7 +413,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 asm_sect.asm({Logical::new_and } (rst_reg.clone(),val_reg1,val_reg2).into());
                                 store_sym(&mut asm_sect, lhs, rst_reg, src_symtab)?;
                             },
-                            super::nhwc_instr::ArithOp::LogicOr { a, b, vartype} => {
+                            super::nhwc_instr::ArithOp::LogicOr { a, b, vartype: _} => {
                                 let (val_reg1,val_reg2 ,rst_reg)= (Register::new_s(1),Register::new_s(2),Register::new_s(3));
                                 load_sym_or_imm(&mut asm_sect, a, val_reg1.clone(), src_symtab)?;
                                 load_sym_or_imm(&mut asm_sect, b, val_reg2.clone(), src_symtab)?;
@@ -446,7 +446,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     NhwcInstrType::Call { op_assigned_symidx: _, func_op } => {
                         let mut fpu_args = vec![];
                         let mut gpr_args = vec![];
-                        for (idx,arg) in func_op.actual_arg_symidx_vec.iter().enumerate(){
+                        for (_idx,arg) in func_op.actual_arg_symidx_vec.iter().enumerate(){
                             match src_symtab.get_symbol(arg)?.get_type()?{
                                 Type::F32 => {
                                     fpu_args.push(arg)
@@ -522,7 +522,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 asm_sect.asm(Logical::new_andi(rst_reg.clone(),val_reg.clone(),Imm::from_offset(1)).into());
                                 store_sym(&mut asm_sect, lhs, rst_reg.clone(), src_symtab)?;
                             },
-                            super::nhwc_instr::Trans::Bitcast { rptr_symidx, rptr_type, lptr_type } => {
+                            super::nhwc_instr::Trans::Bitcast { rptr_symidx: _, rptr_type: _, lptr_type: _ } => {
                                 //p->p
                                 todo!();
                             },

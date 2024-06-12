@@ -531,8 +531,6 @@ translationUnit
 externalDeclaration
     :   functionDefinition
     |   declaration
-    |   BlockComment
-    |   LineComment
     |   ';' // stray ;
     ;
 

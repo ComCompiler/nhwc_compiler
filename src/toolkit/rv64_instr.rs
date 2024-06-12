@@ -380,15 +380,15 @@ impl Register{
     }
     pub fn is_fpu(&self) -> bool{
         match self{
-            Register::FArg { reg_idx } => true,
-            Register::FSaved { reg_idx } => true,
+            Register::FArg { reg_idx: _ } => true,
+            Register::FSaved { reg_idx: _ } => true,
             _ => {false}
         }
     }
     pub fn is_gpr(&self) -> bool{
         match self{
-            Register::FArg { reg_idx } => false,
-            Register::FSaved { reg_idx } => false,
+            Register::FArg { reg_idx: _ } => false,
+            Register::FSaved { reg_idx: _ } => false,
             _ => {true}
         }
     }

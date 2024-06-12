@@ -2,7 +2,7 @@ use std::fmt::Debug;
 use anyhow::*;
 use itertools::Itertools;
 
-use super::{field::Value, rv64_instr::{Imm, RV64Instr}, symtab::SymIdx};
+use super::{field::Value, rv64_instr::{Imm, RV64Instr}};
 
 /// a asm file contains several sections
 pub struct AsmStructure{
