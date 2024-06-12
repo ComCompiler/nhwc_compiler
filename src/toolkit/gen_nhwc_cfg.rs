@@ -1153,8 +1153,44 @@ fn process_et(
                     }
                 }
                 //正负号
-                super::et_node::ExprOp::Negative => todo!(),
-                super::et_node::ExprOp::Positive => todo!(),
+                super::et_node::ExprOp::Negative => {
+                    if let Some(abs_symbol) = direct_child_node!(at et_node in et_tree ret option){
+                        if let Some(symbol_symidx) = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, abs_symbol, scope_node, cfg_bb, instr_slab, symtab_graph)?{
+                            let symbol_type = symtab.get_symbol(&symbol_symidx)?.get_type()?.clone();
+                            let neg_tmp_symidx = process_temp_symbol(cfg_graph, symtab, &symbol_type, scope_node, cfg_bb, instr_slab, symtab_graph, Some(et_node), et_tree)?;
+                            let zero_symidx = 
+                            match symbol_type{
+                                Type::I32 => {
+                                    process_literal(symtab, &"0".to_string(), symtab_graph)?
+                                },
+                                Type::F32 => {
+                                    process_literal(symtab, &"0.0".to_string(), symtab_graph)?
+                                },
+                                _ =>{
+                                    return Err(anyhow!("错误的操作数类型"));
+                                }
+                            };
+                            let neg_instr:NhwcInstr = NhwcInstrType::new_sub(neg_tmp_symidx.clone(), zero_symidx, symbol_symidx, symbol_type).into();
+                            node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(neg_instr, instr_slab)?;
+                            Ok(Some(neg_tmp_symidx))
+                        }else{
+                            return Err(anyhow!("操作符{}下缺少符号", et_node));
+                        }
+                    }else{
+                        return Err(anyhow!("操作符{}下缺少符号", et_node));
+                    }
+                },
+                super::et_node::ExprOp::Positive => {
+                    if let Some(abs_symbol) = direct_child_node!(at et_node in et_tree ret option){
+                        if let Some(symbol_symidx) = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, abs_symbol, scope_node, cfg_bb, instr_slab, symtab_graph)?{
+                            Ok(Some(symbol_symidx))
+                        }else{
+                            return Err(anyhow!("操作符{}下缺少符号", et_node));
+                        }
+                    }else{
+                        return Err(anyhow!("操作符{}下缺少符号", et_node));
+                    }
+                },
                 //引用与解引用
                 super::et_node::ExprOp::AddrOf => todo!(),
                 super::et_node::ExprOp::Deref => todo!(),
