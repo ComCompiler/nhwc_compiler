@@ -63,7 +63,7 @@ impl MemLayout{
     pub fn insert_data(&mut self, align:usize,data_len:usize, symidx:&SymIdx)-> usize{
         let symidx_rc = Rc::new(symidx.clone());
         loop{
-            debug_info_blue!("align:{} data_len:{}",align,data_len);
+            // debug_info_blue!("align:{} data_len:{}",align,data_len);
             let rst = self.find_available(align,data_len);
             if rst.is_none(){
                 let tail_remained_mem_size = {
@@ -76,7 +76,7 @@ impl MemLayout{
                     }
                     i
                 };
-                debug_info_blue!("tail_remained:{}",tail_remained_mem_size);
+                // debug_info_blue!("tail_remained:{}",tail_remained_mem_size);
                 for _ in tail_remained_mem_size..data_len{
                     self.mem.push(None)
                 }

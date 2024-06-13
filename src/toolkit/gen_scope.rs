@@ -176,7 +176,6 @@ pub fn process_compound(scope_tree:&mut ScopeTree, ast_tree:&AstTree, scope_pare
     //处理函数体的declaration和statement
     let ast_block_nodes:Vec<u32> = find_nodes!(rule RULE_blockItemList finally RULE_blockItem at current_compound_node in ast_tree);
     for ast_block_node in ast_block_nodes {
-        println!("{}",ast_block_node);
         let block_nextnode = direct_child_node!(at ast_block_node in ast_tree);
 
         //处理declaration或statement

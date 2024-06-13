@@ -114,7 +114,7 @@ fn process_declaration(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Scope
         finally RULE_initDeclarator
         at decl_node in ast_tree
     );
-    debug_info_red!("is_const:{is_const} at decl_ndoe:{decl_node}");
+    // debug_info_red!("is_const:{is_const} at decl_ndoe:{decl_node}");
     for init_decl_node in declarator_node {
         process_init_declarator(et_tree, ast_tree, scope_tree, init_decl_node, op_type_ast_node.unwrap(), is_const,scope_node, parent_et_node);
     }

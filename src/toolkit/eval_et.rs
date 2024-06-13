@@ -9,7 +9,7 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
     // let mut value = SymIdx::new(0, 0.to_string());
     // println!("输入的operator_et_node: {:?}", node!(at any_et_node in et_tree).clone().et_naked_node);
     // 每个节点分两种情况,constant 或者 operator
-    debug_info_green!("eval et {}",et_node);
+    // debug_info_green!("eval et {}",et_node);
     let value_symidx = match node!(at et_node in et_tree).clone().et_node_type {
         // let value = match node!(at Operator_node in et_tree){
         EtNodeType::Constant { const_sym_idx, ast_node: _, text: _ } => Some(const_sym_idx),
@@ -69,7 +69,7 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
 fn recursive_replace_const_symbol(et_tree:&mut EtTree,et_node:u32,symtab:&SymTab,mut scope_node:u32, scope_tree:&ScopeTree) -> Result<()>{
     let dfs_et_nodes = dfs(et_tree, et_node);
     for et_node in dfs_et_nodes{
-        debug_info_green!("visit {}",et_node);
+        // debug_info_green!("visit {}",et_node);
         match &mut node_mut!(at et_node in et_tree).et_node_type{
             EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => {
                 if let DeclOrDefOrUse::Use {} = decldef_def_or_use{
@@ -84,8 +84,9 @@ fn recursive_replace_const_symbol(et_tree:&mut EtTree,et_node:u32,symtab:&SymTab
 
                     sym_idx.scope_node = scope_node;
 
-                    debug_info_green!("replace symidx {}",sym_idx);
-                    if !symtab.get_symbol(&sym_idx)?.get_type()?.is_array(){
+                    // debug_info_green!("replace symidx {}",sym_idx);
+                    // if the symidx have its corresponding const symidx
+                    if !symtab.get_symbol(&sym_idx)?.get_type()?.is_array() && symtab.get_symbol(&sym_idx)?.has_const_symidx() {
                         let const_symidx = symtab.get_symbol(&sym_idx)?.get_const_symidx()?.clone();
                         debug_info_green!("with {}",sym_idx);
                         node_mut!(at et_node in et_tree).et_node_type = EtNodeType::new_constant(*ast_node, const_symidx)

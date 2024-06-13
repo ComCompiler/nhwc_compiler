@@ -12,7 +12,6 @@ pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSla
     asm_structure.sects.push(static_init_sect);
     let func_entry_sect = parse_funcs2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab)?;
     asm_structure.sects.push(func_entry_sect);
-    println!("{:?}",asm_structure);
     Ok(())
 }
 /// convert `cfg_root_node` into riscv  

@@ -1338,7 +1338,7 @@ fn process_et(
                     let array_ty = node!(at et_assign_node in et_tree).get_type()?.clone();
                     match &array_ty{
                         Type::Array { dims, ele_ty } => {
-                            debug_info_red!("{:?}",dims);
+                            // debug_info_red!("{:?}",dims);
                             
                             // because symidx maybe const symbol so you should match the parsing error 
                             let mut reversed_remained_dims = vec![];
