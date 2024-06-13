@@ -14,7 +14,6 @@ pub static ST_ROOT:u32 = 0;
 pub struct ScopeNode {
     pub ast_node:u32,
     pub text:String,
-    pub parent:Option<u32>,
     pub scope_type:ScopeType,
 }
 impl ScopeNode {

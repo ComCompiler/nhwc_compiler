@@ -8,15 +8,17 @@ use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_n
 /// convert nhwc ir into riscv
 pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RV64Instr>, asm_structure:&mut AsmStructure, src_symtab:&SymTab)->Result<()>{
     // firstly process root which contains global vars 
-    let static_init_sect = parse_root2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab)?;
-    asm_structure.sects.push(static_init_sect);
+    let op_static_init_sect = parse_root2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab)?;
+    if let Some(s) = op_static_init_sect{
+        asm_structure.sects.push(s);
+    }
     let func_entry_sect = parse_funcs2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab)?;
     asm_structure.sects.push(func_entry_sect);
     Ok(())
 }
 /// convert `cfg_root_node` into riscv  
 /// assumes that there are only global and some calculating instrs so that `simulator` can run directly
-fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, _riscv_instr_slab:&mut InstrSlab<RV64Instr>, src_symtab:&SymTab)->Result<AsmSection>{
+fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, _riscv_instr_slab:&mut InstrSlab<RV64Instr>, src_symtab:&SymTab)->Result<Option<AsmSection>>{
     let root_node = node_mut!(at CFG_ROOT in cfg_graph);
     let mut simulator = Simulator::new(root_node.instrs.clone(), false);
     simulator.instr_list.push(nhwc_instr_slab.insert_instr(NhwcInstrType::new_exit_breakpoint( vec![]).into()));
@@ -52,8 +54,12 @@ fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhwc
             }
         }
     }
+    if asm_sect.attrs.len() != 1{
+        Ok(Some(asm_sect))
+    }else{
+        Ok(None)
+    }
        
-    Ok(asm_sect)
 }
 
 
@@ -63,6 +69,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
     let entries = direct_child_nodes!(at CFG_ROOT in cfg_graph);
     let mut asm_sect = AsmSection::new();
     asm_sect.text() ;
+    asm_sect.align(4);
     for cfg_entry_node in entries{
         // 
         // if entry_node.instrs.len()> 0{
@@ -367,7 +374,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                     Type::F32 => {
                                         (Register::new_fs(1),Register::new_fs(2),Register::new_s(3))
                                     },
-                                    _ => {panic!("not support arithmetic operation on types except i32 or f32")}
+                                    _ => {panic!("not support arithmetic operation on types except i32 or f32 {:?}",instr_struct)}
                                 };
 
                                 load_sym_or_imm(&mut asm_sect, a, val_reg1.clone(), src_symtab)?;
@@ -479,7 +486,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                     },
                                 }
                                 let stack_size = node!(at cfg_entry_node in cfg_graph).get_mem_layout()?.get_mem_len();
-                                asm_sect.asm(Arithmetic::new_addi(Register::new_sp(), Register::new_sp(), Imm::from_offset(-(stack_size as isize))).into());
+                                asm_sect.asm(Arithmetic::new_addi(Register::new_sp(), Register::new_sp(), Imm::from_offset(stack_size as isize)).into());
                                 asm_sect.asm(PseudoInstr::new_ret().into());
                             },
                             super::nhwc_instr::JumpOp::Br { cond, t1, t2 } => {

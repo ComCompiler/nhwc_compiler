@@ -13,13 +13,13 @@ impl Pass for Ast2CfgPass {
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> {
         parse_ast_to_cfg(&ctx.ast_tree, &mut ctx.cfg_graph, &mut ctx.symtab)?;
         // 1.1 生成对应的png
-        for cfg_node in ctx.cfg_graph.node_weights_mut() {
-            cfg_node.load_ast_node_text(&ctx.ast_tree)?;
-        }
-        for cfg_edge in ctx.cfg_graph.edge_weights_mut() {
-            cfg_edge.load_ast_node_text(&ctx.ast_tree)?;
-        }
         if self.is_gen_png {
+            for cfg_node in ctx.cfg_graph.node_weights_mut() {
+                cfg_node.load_ast_node_text(&ctx.ast_tree)?;
+            }
+            for cfg_edge in ctx.cfg_graph.edge_weights_mut() {
+                cfg_edge.load_ast_node_text(&ctx.ast_tree)?;
+            }
             generate_png_by_graph_multi_tasks(&ctx.cfg_graph.clone(), "cfg_graph".to_string(), &[Config::Record, Config::Rounded,Config::CfgBlock, Config::Title("cfg_graph".to_string()), Config::NodeIndexLabel],&mut ctx.io_task_list)?;
         }
         Ok(())

@@ -1,5 +1,5 @@
 use super::{et_node::{DeclOrDefOrUse, EtNodeType, EtTree}, etc::{self, dfs}, scope_node::ScopeTree, symtab::SymTab};
-use crate::{add_node_with_edge, debug_info_green, debug_info_red, direct_child_node, direct_child_nodes, node, node_mut, toolkit::symtab::SymIdx};
+use crate::{add_node_with_edge, debug_info_blue, debug_info_green, debug_info_red, direct_child_node, direct_child_nodes, direct_parent_node, node, node_mut, toolkit::{scope_node::ST_ROOT, symtab::SymIdx}};
 use anyhow::Result;
 use anyhow::anyhow;
 use itertools::Itertools;
@@ -45,7 +45,7 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
                         Some(symidx)
                     },
                     Err(e) => {
-                        debug_info_red!("{}",e);
+                        // debug_info_red!("{}",e);
                         None
                     },
                 }
@@ -70,25 +70,25 @@ fn recursive_replace_const_symbol(et_tree:&mut EtTree,et_node:u32,symtab:&SymTab
     let dfs_et_nodes = dfs(et_tree, et_node);
     for et_node in dfs_et_nodes{
         // debug_info_green!("visit {}",et_node);
-        match &mut node_mut!(at et_node in et_tree).et_node_type{
-            EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => {
+        match &node_mut!(at et_node in et_tree).et_node_type{
+            EtNodeType::Symbol { sym_idx: init_sym_idx, ast_node, text, decldef_def_or_use } => {
+                // debug_info_blue!("cur scope {}",scope_node);
                 if let DeclOrDefOrUse::Use {} = decldef_def_or_use{
+                    let initial_scope = scope_node.clone();
 
-                    while let Err(_) = symtab.get_symbol_verbose(sym_idx.symbol_name.clone(),scope_node) {
-                        if let Some(parent_scope)  = node!(at scope_node in scope_tree).parent{
-                            scope_node = parent_scope;
+                    let mut symidx =  init_sym_idx.clone();
+                    while let Err(_) = symtab.get_symbol(&symidx) {
+                        let scope_node = symidx.scope_node;
+                        if scope_node != ST_ROOT{
+                            symidx.scope_node = direct_parent_node!(at scope_node in scope_tree);
                         }else{
-                            return Err(anyhow!("scope为{}符号表中未找到{:?}", scope_node, sym_idx.symbol_name.clone()));
+                            return Err(anyhow!("scope为{}符号表中未找到{:?}", initial_scope, init_sym_idx.symbol_name.clone()));
                         }
                     }
-
-                    sym_idx.scope_node = scope_node;
-
                     // debug_info_green!("replace symidx {}",sym_idx);
                     // if the symidx have its corresponding const symidx
-                    if !symtab.get_symbol(&sym_idx)?.get_type()?.is_array() && symtab.get_symbol(&sym_idx)?.has_const_symidx() {
-                        let const_symidx = symtab.get_symbol(&sym_idx)?.get_const_symidx()?.clone();
-                        debug_info_green!("with {}",sym_idx);
+                    if !symtab.get_symbol(&symidx)?.get_type()?.is_array() && symtab.get_symbol(&symidx)?.has_const_symidx() {
+                        let const_symidx = symtab.get_symbol(&symidx)?.get_const_symidx()?.clone();
                         node_mut!(at et_node in et_tree).et_node_type = EtNodeType::new_constant(*ast_node, const_symidx)
                     }
                 }

@@ -90,7 +90,7 @@ impl ExprOp {
             ExprOp::Div => eval(&format!("{}{}{}", &vec[0].symbol_name, "/", &vec[1].symbol_name)),
             ExprOp::LogicalOr => eval(&format!("{}{}{}", &vec[0].symbol_name, "||", &vec[1].symbol_name)),
             ExprOp::LogicalAnd => eval(&format!("{}{}{}", &vec[0].symbol_name, "&&", &vec[1].symbol_name)),
-            ExprOp::LogicalNot => eval(&format!("{}{}{}", &vec[0].symbol_name, "!", &vec[1].symbol_name)),
+            ExprOp::LogicalNot => eval(&format!("{}{}", &vec[0].symbol_name, "!") ),
             ExprOp::BitwiseOr => eval(&format!("{}{}{}", &vec[0].symbol_name, "|", &vec[1].symbol_name)),
             ExprOp::BitwiseAnd => eval(&format!("{}{}{}", &vec[0].symbol_name, "&", &vec[1].symbol_name)),
             ExprOp::BitwiseXor => eval(&format!("{}{}{}", &vec[0].symbol_name, "^", &vec[1].symbol_name)),
@@ -277,6 +277,7 @@ impl Debug for DeclOrDefOrUse {
             },
             DeclOrDefOrUse::Use => write!(f, "use"),
             DeclOrDefOrUse::Def => write!(f, "def"),
+            
         }
     }
 }

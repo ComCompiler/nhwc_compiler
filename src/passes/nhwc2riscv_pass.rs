@@ -17,21 +17,10 @@ impl Pass for Nhwc2RiscvDebugPass {
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> {
         // 拿到一个nhwc的vec,转化成汇编语言
         let _built_in_part = "# Built-in library\n
-    .text\n
-    .align 4\n
-    .globl starttime\n
-    .type starttime, @function\n
-starttime:\n
-    mv a0, zero\n
-    tail _sysy_starttime\n
-\n
-    .text\n
-    .align 4\n
-    .globl stoptime\n
-    .type stoptime, @function\n
-stoptime:\n
-    mv a0, zero\n
-    tail _sysy_stoptime";
+\t.text\n\t.align 4\n\t.globl starttime\n\t.type starttime, @function\n
+starttime:\n\tmv a0, zero\n\ttail _sysy_starttime\n
+\n\t.text\n\t.align 4\n\t.globl stoptime\n\t.type stoptime, @function\n
+stoptime:\n\tmv a0, zero\n\ttail _sysy_stoptime\n\n\n";
 
         let (cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab, asm_structure) = (&mut ctx.cfg_graph, &mut ctx.nhwc_instr_slab, &mut ctx.riscv_instr_slab, &mut ctx.symtab, &mut ctx.asm_structure);
         parse_nhwcir2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, asm_structure, src_symtab)?;

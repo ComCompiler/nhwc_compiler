@@ -609,7 +609,7 @@ impl Debug for ArithOp {
                 write!(f, "icmp {:?} {:?} {:?}, {:?}", vartype, plan, a, b)
             }
             Self::Fcmp { plan, a, b, vartype } => {
-                write!(f, "ucmp {:?} {:?} {:?}, {:?}", vartype, plan, a, b)
+                write!(f, "fcmp {:?} {:?} {:?}, {:?}", vartype, plan, a, b)
             }
             Self::LogicAnd { a, b, vartype } => write!(f, "And {:?} {:?}, {:?}", vartype, a, b),
             Self::LogicOr { a, b, vartype } => write!(f, "Or {:?} {:?}, {:?}", vartype, a, b),

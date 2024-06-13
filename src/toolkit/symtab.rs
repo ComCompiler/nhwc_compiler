@@ -4,8 +4,9 @@ use core::fmt::Debug;
 use ahash::{AHashMap};
 use anyhow::{anyhow,Result};
 use delegate::delegate;
+use itertools::Itertools;
 use petgraph::stable_graph::StableDiGraph;
-use std::{collections::{hash_map::{Iter, IterMut}}, fmt::{Display, Formatter}};
+use std::{collections::hash_map::{Iter, IterMut}, fmt::{Display, Formatter}, hash::Hash};
 
 pub type SymTabGraph = StableDiGraph<SymTab, SymTabEdge, u32>;
 
@@ -180,7 +181,7 @@ impl SymTab {
             }
         }else{
             let mut s = "#sym_name@fields$".to_string();
-            for (symidx,sym) in self.iter(){
+            for (symidx,sym) in self.iter().sorted_by_key(|( k,v )| k.symbol_name.as_str()){
                 s += format!("@ # {:?} @ {:#?} $", symidx, sym.fields).as_str();
             }
             self.text += s.as_str();

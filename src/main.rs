@@ -83,8 +83,8 @@ fn main() {
         then nhwc_collect_pass
         // then simulator_debug_pass
         then ast2et_debug_pass
-        then nhwc2riscv_pass
         then symtab_debug_pass
+        then nhwc2riscv_pass
         to pass_manager
         
     );

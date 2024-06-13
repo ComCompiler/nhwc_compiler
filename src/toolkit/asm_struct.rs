@@ -2,7 +2,7 @@ use std::fmt::Debug;
 use anyhow::*;
 use itertools::Itertools;
 
-use super::{field::Value, rv64_instr::{Imm, RV64Instr}};
+use super::{field::Value, rv64_instr::{Imm, RV64Instr}, symtab::SymIdx};
 
 /// a asm file contains several sections
 pub struct AsmStructure{
@@ -102,10 +102,10 @@ impl AsmSection{
             },
             _ => {
                 match val.get_ele_size()?{
-                    8 => { self.double(Imm::new_literal(val.to_symidx()?)) }
-                    4 => { self.word(Imm::new_literal(val.to_symidx()?)) }
-                    2 => { self.half(Imm::new_literal(val.to_symidx()?)) }
-                    1 => { self.byte(Imm::new_literal(val.to_symidx()?)) }
+                    8 => { self.double(Imm::new_literal(val.to_symidx().unwrap_or(SymIdx::new_verbose(0, "0".to_string(), None)))) }
+                    4 => { self.word(Imm::new_literal(val.to_symidx().unwrap_or(SymIdx::new_verbose(0, "0".to_string(), None)))) }
+                    2 => { self.half(Imm::new_literal(val.to_symidx().unwrap_or(SymIdx::new_verbose(0, "0".to_string(), None)))) }
+                    1 => { self.byte(Imm::new_literal(val.to_symidx().unwrap_or(SymIdx::new_verbose(0, "0".to_string(), None)))) }
                     _ => { return Err(anyhow!("unexpected ele size")) }
                 }
                 Ok(())
@@ -136,7 +136,7 @@ impl Debug for Asm{
                         writeln!(f,"    .align {}",align)
                     },
                     AsmAttr::Global { label} => {
-                        writeln!(f,"    .global {:?}",label)
+                        writeln!(f,"    .globa {:?}",label)
                     },
                     AsmAttr::Data {  } => {
                         writeln!(f,"    .data")
@@ -166,7 +166,7 @@ impl Debug for Asm{
                         writeln!(f,"    .type {:?} {:?}",symidx, attr_ty)
                     },
                     AsmAttr::Annotation { annotation } => {
-                        writeln!(f,"                    ;{}",annotation, )
+                        writeln!(f,"                    #{}",annotation, )
                     },
                 }
             },

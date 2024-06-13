@@ -281,7 +281,7 @@ impl Value {
             },
             Value::Ref { symidx, ty } => {
                 Ok(symidx.clone())
-            }
+            },
             _ => Err(anyhow!("{:?}无法转化为 symidx",self))
         }
     }
