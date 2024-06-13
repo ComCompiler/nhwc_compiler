@@ -1894,7 +1894,7 @@ pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph)
 
 // return the corresponding while block's while node of the cfg_node 
 pub fn get_while_or_for_node_of_cfg_node(cfg_node:u32, cfg_graph:&mut CfgGraph) -> Result<u32>{
-    let dfs_nodes = etc::reverse_dfs(cfg_graph, cfg_node);
+    let dfs_nodes = etc::reverse_dfs_with_predicate(cfg_graph, cfg_node,|e| e.weight().cfg_edge_type.is_body_head());
     for cfg_node in dfs_nodes{
         if node!(at cfg_node in cfg_graph).cfg_node_type.is_for_loop() || 
         node!(at cfg_node in cfg_graph).cfg_node_type.is_while_loop(){
