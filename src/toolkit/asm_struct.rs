@@ -8,72 +8,70 @@ use super::{field::Value, rv64_instr::{Imm, RV64Instr}, symtab::SymIdx};
 pub struct AsmStructure{
     pub sects:Vec<AsmSection>
 }
-impl Debug for AsmStructure{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let built_in_part = "# Built-in library\n .section\n.text\n .align 4\n .globl starttime\n .type starttime, @function\n starttime:\n mv a0, zero\n tail _sysy_starttime\n \n .text\n .align 4\n .globl stoptime\n .type stoptime, @function\n stoptime:\n mv a0, zero\n tail _sysy_stoptime\n\n";
-        // let built_in_part = "";
-        let mut s = String::new();
-        for sect in &self.sects{
-            s += format!("{:?}",sect).as_str();
-        }
-        write!(f,"{}{}",built_in_part,s)
-    }
-}
 impl AsmStructure{
     pub fn new() -> Self{
         Self { sects: vec![] }
+    }
+    pub fn dump(&self,enable_annotation:bool) -> String{
+        let built_in_part = "# Built-in library\n .section\n.text\n .align 4\n .globl starttime\n .type starttime, @function\n starttime:\n mv a0, zero\n tail _sysy_starttime\n \n .text\n .align 4\n .globl stoptime\n .type stoptime, @function\n stoptime:\n mv a0, zero\n tail _sysy_stoptime\n\n\n";
+        // let built_in_part = "";
+        let mut s = String::new();
+        for sect in &self.sects{
+            s += format!("{}",sect.dump(enable_annotation)).as_str();
+        }
+        format!("{}{}",built_in_part,s)
     }
 }
 impl AsmSection{
     pub fn new() -> Self{
         Self{
-            attrs: vec![],
+            stmts: vec![],
         }
     }
     pub fn annotation(&mut self, mut annotation:String){
         annotation = annotation.replace("\n", "");
-        self.attrs.push(AsmAttr::Annotation { annotation }.into())
+        self.stmts.push(AsmAttr::Annotation { annotation }.into())
     }
     pub fn global(&mut self, imm:Imm){
-        self.attrs.push(AsmAttr::Global { label: imm }.into())
+        self.stmts.push(AsmAttr::Global { label: imm }.into())
     }
     pub fn obj_type(&mut self, imm:Imm, ){
-        self.attrs.push(AsmAttr::DataType { attr_ty:DataType::Object,  imm } .into())
+        self.stmts.push(AsmAttr::DataType { attr_ty:DataType::Object,  imm } .into())
     }
     pub fn func_type(&mut self, imm:Imm){
-        self.attrs.push(AsmAttr::DataType { attr_ty:DataType::Function,  imm} .into())
+        self.stmts.push(AsmAttr::DataType { attr_ty:DataType::Function,  imm} .into())
     }
     pub fn label(&mut self, imm:Imm){
-        self.attrs.push(AsmAttr::Label  { imm }.into())
+        self.stmts.push(AsmAttr::Label  { imm }.into())
     }
     pub fn double(&mut self, imm:Imm){
-        self.attrs.push(AsmAttr::Double { imm: imm }.into())
+        self.stmts.push(AsmAttr::Double { imm: imm }.into())
     }
     pub fn word(&mut self, imm:Imm){
-        self.attrs.push(AsmAttr::Word { imm: imm }.into())
+        self.stmts.push(AsmAttr::Word { imm: imm }.into())
     }
     pub fn half(&mut self, imm:Imm){
-        self.attrs.push(AsmAttr::Half { imm: imm }.into())
+        self.stmts.push(AsmAttr::Half { imm: imm }.into())
     }
     pub fn byte(&mut self, imm:Imm){
-        self.attrs.push(AsmAttr::Byte { imm: imm }.into())
+        self.stmts.push(AsmAttr::Byte { imm: imm }.into())
     }
     pub fn zero(&mut self, len:usize){
         if len >0 {
-            self.attrs.push(AsmAttr::Zero { len }.into())
+            self.stmts.push(AsmAttr::Zero { len }.into())
         }
     }
     pub fn align(&mut self, align:usize){
-        self.attrs.push(AsmAttr::Align { align } .into())
+        self.stmts.push(AsmAttr::Align { align } .into())
     }
     pub fn data(&mut self){
-        self.attrs.push(AsmAttr::Data {  } .into())
+        self.stmts.push(AsmAttr::Data {  } .into())
     }
     pub fn text(&mut self){
-        self.attrs.push(AsmAttr::Text {  } .into())
+        self.stmts.push(AsmAttr::Text {  } .into())
     }
     pub fn asm(&mut self, riscv_instr:RV64Instr){
-        self.attrs.push(Asm::Riscv { instr: riscv_instr })
+        self.stmts.push(Asm::Riscv { instr: riscv_instr })
     }
 
     /// generate asm that initialize the value 
@@ -117,7 +115,7 @@ impl AsmSection{
 
 /// a section contains several attributes and then asm instrs
 pub struct AsmSection{
-    pub attrs:Vec<Asm>
+    pub stmts:Vec<Asm>
 }
 
 /// all kinds of Attr 
@@ -163,7 +161,7 @@ impl Debug for Asm{
                         writeln!(f,"{:?}:",imm)
                     },
                     AsmAttr::DataType { attr_ty, imm: symidx } => {
-                        writeln!(f,"    .type {:?} {:?}",symidx, attr_ty)
+                        writeln!(f,"    .type {:?},{:?}",symidx, attr_ty)
                     },
                     AsmAttr::Annotation { annotation } => {
                         writeln!(f,"                    #{}",annotation, )
@@ -233,12 +231,23 @@ impl Into<Asm> for RV64Instr{
         Asm::Riscv { instr: self } 
     }
 }
-impl Debug for AsmSection{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl AsmSection{
+    pub fn dump(&self, enable_annotation:bool) -> String{
         let mut s = String::new();
-        for asm_attr in &self.attrs{
-            s += format!("{:?}",asm_attr).as_str();
+        for asm_attr in &self.stmts{
+            if !enable_annotation{
+                match asm_attr{
+                    Asm::Attr { attr:AsmAttr::Annotation { annotation } } => {
+
+                    },
+                    _ => {
+                        s += format!("{:?}",asm_attr).as_str();
+                    }
+                }
+            }else{
+                s += format!("{:?}",asm_attr).as_str();
+            }
         }
-        write!(f,".section\n{}",s)
+        format!(".section    {}",s)
     }
 }

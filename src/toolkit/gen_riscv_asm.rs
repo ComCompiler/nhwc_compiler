@@ -8,12 +8,13 @@ use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_n
 /// convert nhwc ir into riscv
 pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RV64Instr>, asm_structure:&mut AsmStructure, src_symtab:&SymTab)->Result<()>{
     // firstly process root which contains global vars 
+    let func_entry_sect = parse_funcs2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab)?;
+    asm_structure.sects.push(func_entry_sect);
+
     let op_static_init_sect = parse_root2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab)?;
     if let Some(s) = op_static_init_sect{
         asm_structure.sects.push(s);
     }
-    let func_entry_sect = parse_funcs2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab)?;
-    asm_structure.sects.push(func_entry_sect);
     Ok(())
 }
 /// convert `cfg_root_node` into riscv  
@@ -54,7 +55,7 @@ fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhwc
             }
         }
     }
-    if asm_sect.attrs.len() != 1{
+    if asm_sect.stmts.len() != 1{
         Ok(Some(asm_sect))
     }else{
         Ok(None)

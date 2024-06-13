@@ -68,7 +68,7 @@ fn main() {
     let symtab_debug_pass = SymtabDebugPass::new(true && is_gen_png_global);
     let _simulator_debug_pass = SimulatorDebugPass::new(true && is_gen_png_global,false);
     let nhwc_collect_pass = NhwcDumpPass::new(true && is_gen_png_global);
-    let nhwc2riscv_pass = Nhwc2RiscvDebugPass::new(true && is_gen_png_global, true);
+    let nhwc2riscv_pass = Nhwc2RiscvDebugPass::new(true && is_gen_png_global, true, false);
     let mem_alloc_pass = MemAllocPass::new();
     add_passes!(
         code2ast_pass

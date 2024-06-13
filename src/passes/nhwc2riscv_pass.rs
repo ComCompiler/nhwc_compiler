@@ -7,9 +7,10 @@ use anyhow::Result;
 pub struct Nhwc2RiscvDebugPass {
     is_gen_png:bool,
     is_write_s_file:bool,
+    enable_annotation:bool,
 }
 impl Nhwc2RiscvDebugPass {
-    pub fn new(is_gen_png:bool,is_write_s_file:bool) -> Self { Nhwc2RiscvDebugPass { is_gen_png, is_write_s_file } }
+    pub fn new(is_gen_png:bool,is_write_s_file:bool, enable_annotation:bool) -> Self { Nhwc2RiscvDebugPass { is_gen_png, is_write_s_file ,enable_annotation} }
 }
 
 impl Pass for Nhwc2RiscvDebugPass {
@@ -26,7 +27,7 @@ stoptime:\n\tmv a0, zero\n\ttail _sysy_stoptime\n\n\n";
         parse_nhwcir2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, asm_structure, src_symtab)?;
         if self.is_write_s_file{
             let mut f = fs::File::create(ctx.args.output.clone())?;
-            writeln!(f,"{:?}",ctx.asm_structure)?;
+            writeln!(f,"{}",ctx.asm_structure.dump(self.enable_annotation))?;
         }
         Ok(())
     }
