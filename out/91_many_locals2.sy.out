@@ -1,0 +1,172 @@
+Pass Code2AstPass run successfully
+29
+41
+53
+65
+77
+89
+101
+113
+125
+137
+149
+161
+173
+185
+197
+209
+221
+233
+245
+257
+269
+281
+293
+305
+317
+329
+341
+353
+365
+377
+389
+401
+434
+473
+510
+539
+575
+611
+647
+683
+719
+755
+791
+827
+863
+899
+935
+971
+1007
+1043
+1079
+1115
+1151
+1187
+1223
+1259
+1295
+1331
+1367
+1403
+1439
+1475
+1511
+1547
+1583
+1595
+1638
+1681
+1724
+1767
+1810
+1853
+1896
+1939
+1982
+2025
+2068
+2111
+2154
+2197
+2240
+2283
+2326
+2369
+2412
+2455
+2498
+2541
+2584
+2627
+2670
+2713
+2756
+2799
+2842
+2885
+2897
+2926
+2969
+3012
+3055
+Pass Ast2ScopeTree run successfully
+Pass Ast2CfgPass run successfully
+[31m debuginfo is_const:false at decl_ndoe:3[0m
+[32m debuginfo visit 0[0m
+[32m debuginfo visit 1[0m
+[32m debuginfo eval et 0[0m
+[32m debuginfo eval et 1[0m
+Error occurred when running Pass Cfg2NhwcCfgPass
+
+Caused by:
+    这个cfg node:0 没有对应的entry节点
+Pass Ncfg2DjgPass run successfully
+Error occurred when running Pass MemAllocPass
+
+Caused by:
+    0: CfgNode  #Entry
+        15 
+        intmain(){inta0;inta1;inta2;inta3;inta4;inta5;inta6;inta7;inta8;inta9;inta10;inta11;inta12;inta13;inta14;inta15;inta16;inta17;inta18;inta19;inta20;inta21;inta22;inta23;inta24;inta25;inta26;inta27;inta28;inta29;intb;b=getint();while(b==5){b=b+1;}a0=0;a1=a0+1;a2=a1+1;a3=a2+1;a4=a3+1;a5=a4+1;a6=a5+1;a7=a6+1;a8=a7+1;a9=a8+1;a10=a9+1;a11=a10+1;a12=a11+1;a13=a12+1;a14=a13+1;a15=a14+1;a16=a15+1;a17=a16+1;a18=a17+1;a19=a18+1;a20=a19+1;a21=a20+1;a22=a21+1;a23=a22+1;a24=a23+1;a25=a24+1;a26=a25+1;a27=a26+1;a28=a27+1;a29=a28+1;intt;putint(a0);putint(a1);putint(a2);putint(a3);putint(a4);putint(a5);putint(a6);putint(a7);putint(a8);putint(a9);putint(a10);putint(a11);putint(a12);putint(a13);putint(a14);putint(a15);putint(a16);putint(a17);putint(a18);putint(a19);putint(a20);putint(a21);putint(a22);putint(a23);putint(a24);putint(a25);putint(a26);putint(a27);putint(a28);putint(a29);intnewline;newline=10;putch(newline);putint(b);putch(newline);returna25;}
+       
+        $ @ # Fields 
+        {
+           "cor_dj_node": 1,
+           "domiance_frontier_cfg_nodes": [],
+       } $   downcast_op_any 失败 field_name:FUNC_COR_SYMIDX:func_cor_symidx src/toolkit/gen_nhwc_cfg.rs 75
+    1: can't find field SymIdx type:op_field
+Pass CfgDebugPass run successfully
+Pass NhwcCollectPass run successfully
+Pass Ast2EtDebugPass run successfully
+breakpoint: exit_0
+         breakpoint exit_0([]) ! 
+
+dot write finished Ok("/home/mineral/Compiler2024-nhwc")
+Successfully Transform to png debug_root_simu.png Output { status: ExitStatus(unix_wait_status(0)), stdout: "", stderr: "" }
+# Built-in library
+ .text
+ .align 4
+ .globl starttime
+ .type starttime, @function
+ starttime:
+ mv a0, zero
+ tail _sysy_starttime
+ 
+ .text
+ .align 4
+ .globl stoptime
+ .type stoptime, @function
+ stoptime:
+ mv a0, zero
+ tail _sysy_stoptime
+.section
+    .data
+.section
+    .text
+                    ;      label L0_0: 
+L0_0:
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L1_0: 
+L1_0:
+                    ;      label L2_0: 
+L2_0:
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L3_0: 
+L3_0:
+
+Pass Nhwc2RiscvDebugPass run successfully
+Pass SymtabDebugPass run successfully
+all passed finish 耗时: 437.729767ms
+all io tasks finish 耗时: 1.802µs

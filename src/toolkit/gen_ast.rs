@@ -39,7 +39,6 @@ pub fn parse_as_ast_tree(context:&mut NhwcCtx) {
                     g.add_edge(NodeIndex::from(father_id as u32), NodeIndex::from(node_id as u32), ());
                     // {   println!("{:?}",ASTNode::new(ctx.get_rule_index(),ctx.get_text()));}
                     // save_dot_and_generate_png(&*g.borrow(),format!("{}",node_id));
-                    // debug 专用
                     // println!("father {:?}",father_id);
                     // print!("  son {:?}",node_id);
                 }

@@ -1,0 +1,206 @@
+Pass Code2AstPass run successfully
+27
+84
+141
+214
+14836
+14876
+14911
+14963
+15001
+15032
+15070
+15101
+15139
+15214
+15251
+15288
+15338
+15381
+15424
+15467
+15516
+15559
+15602
+15645
+15689
+15726
+Pass Ast2ScopeTree run successfully
+Pass Ast2CfgPass run successfully
+[32m debuginfo visit 34[0m
+[32m debuginfo visit 35[0m
+[32m debuginfo replace symidx a[0m
+Error occurred when running Pass Cfg2NhwcCfgPass
+
+Caused by:
+    0: Symbol {"a" fields:{"def_cfg_node_vec": [1], "def_instrs_vec": [], "is_global": false, "is_temp": false, "is_literal": false, "type": i32}} downcast_op_any 失败 field_name:CONST_SYMIDX:const_symidx src/toolkit/gen_nhwc_cfg.rs 54
+    1: can't find field SymIdx type:op_field
+Pass Ncfg2DjgPass run successfully
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+Pass MemAllocPass run successfully
+Pass CfgDebugPass run successfully
+Pass NhwcCollectPass run successfully
+Pass Ast2EtDebugPass run successfully
+breakpoint: exit_0
+         global Fn[]->starttime_ret_0 starttime_0 
+         global Fn[]->stoptime_ret_0 stoptime_0 
+         global Fn[s_14, c_14, n_14]->memset_ret_0 memset_0 
+         global Fn[dest_15, src_15, n_15]->memcpy_ret_0 memcpy_0 
+         breakpoint exit_0([]) ! 
+
+dot write finished Ok("/home/mineral/Compiler2024-nhwc")
+Successfully Transform to png debug_root_simu.png Output { status: ExitStatus(unix_wait_status(0)), stdout: "", stderr: "" }
+# Built-in library
+ .text
+ .align 4
+ .globl starttime
+ .type starttime, @function
+ starttime:
+ mv a0, zero
+ tail _sysy_starttime
+ 
+ .text
+ .align 4
+ .globl stoptime
+ .type stoptime, @function
+ stoptime:
+ mv a0, zero
+ tail _sysy_stoptime
+.section
+    .data
+.section
+    .text
+                    ;      Define relu_reg_0 [a_16] -> relu_reg_ret_0 
+    .global relu_reg
+    .type relu_reg @function
+relu_reg:
+                    ;mem layout:|ra_relu_reg:8|s0_relu_reg:8|a:4|none:4
+    addi    sp,sp,-24
+    sd      ra,16(sp)
+    sd      s0,8(sp)
+    addi    s0,sp,24
+    sw      a0,4(sp)
+                    ;      label L18_0: 
+L18_0:
+                    ;      label L19_0: 
+L19_0:
+                    ;      jump label: L20_0 
+    j       L20_0
+                    ;      label L20_0: 
+L20_0:
+                    ;      label L21_0: 
+L21_0:
+                    ;      label L22_0: 
+L22_0:
+                    ;      jump label: L23_0 
+    j       L23_0
+                    ;      label L23_0: 
+L23_0:
+                    ;      label L24_0: 
+L24_0:
+                    ;      ret 
+    ld      ra,16(sp)
+    ld      s0,8(sp)
+    addi    sp,sp,-24
+    ret
+                    ;      Define model_0 [a[][5]_26] -> model_ret_0 
+    .global model
+    .type model @function
+model:
+                    ;mem layout:|ra_model:8|s0_model:8|a[][5]:4|none:4
+    addi    sp,sp,-24
+    sd      ra,16(sp)
+    sd      s0,8(sp)
+    addi    s0,sp,24
+    sw      a0,4(sp)
+                    ;      label L14_0: 
+L14_0:
+                    ;      label L15_0: 
+L15_0:
+                    ;      jump label: L16_0 
+    j       L16_0
+                    ;      label L16_0: 
+L16_0:
+                    ;      label L17_0: 
+L17_0:
+                    ;      Define main_0 [] -> main_ret_0 
+    .global main
+    .type main @function
+main:
+                    ;mem layout:|ra_main:8|s0_main:8
+    addi    sp,sp,-16
+    sd      ra,8(sp)
+    sd      s0,0(sp)
+    addi    s0,sp,16
+                    ;      label L0_0: 
+L0_0:
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L1_0: 
+L1_0:
+                    ;      label L2_0: 
+L2_0:
+                    ;      jump label: L3_0 
+    j       L3_0
+                    ;      label L3_0: 
+L3_0:
+                    ;      label L4_0: 
+L4_0:
+                    ;      jump label: L5_0 
+    j       L5_0
+                    ;      label L5_0: 
+L5_0:
+                    ;      label L6_0: 
+L6_0:
+                    ;      jump label: L5_0 
+    j       L5_0
+                    ;      label L7_0: 
+L7_0:
+                    ;      jump label: L3_0 
+    j       L3_0
+                    ;      label L8_0: 
+L8_0:
+                    ;      label L9_0: 
+L9_0:
+                    ;      jump label: L11_0 
+    j       L11_0
+                    ;      label L10_0: 
+L10_0:
+                    ;      jump label: L11_0 
+    j       L11_0
+                    ;      label L11_0: 
+L11_0:
+                    ;      label L12_0: 
+L12_0:
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L13_0: 
+L13_0:
+
+Pass Nhwc2RiscvDebugPass run successfully
+Pass SymtabDebugPass run successfully
+all passed finish 耗时: 1.092027742s
+all io tasks finish 耗时: 1.838µs

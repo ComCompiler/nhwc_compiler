@@ -1,0 +1,155 @@
+Pass Code2AstPass run successfully
+17
+44
+73
+102
+131
+160
+Pass Ast2ScopeTree run successfully
+Pass Ast2CfgPass run successfully
+[31m debuginfo is_const:false at decl_ndoe:18[0m
+[32m debuginfo visit 34[0m
+[32m debuginfo visit 38[0m
+[32m debuginfo visit 37[0m
+[32m debuginfo visit 36[0m
+[32m debuginfo visit 35[0m
+[32m debuginfo eval et 34[0m
+[32m debuginfo eval et 35[0m
+[32m debuginfo eval et 36[0m
+[32m debuginfo eval et 37[0m
+[32m debuginfo eval et 38[0m
+[32m debuginfo visit 39[0m
+[32m debuginfo visit 40[0m
+[32m debuginfo visit 42[0m
+[32m debuginfo visit 41[0m
+[32m debuginfo eval et 39[0m
+[32m debuginfo eval et 40[0m
+[32m debuginfo eval et 41[0m
+[32m debuginfo eval et 42[0m
+[32m debuginfo visit 44[0m
+[32m debuginfo visit 45[0m
+[32m debuginfo visit 47[0m
+[32m debuginfo visit 46[0m
+[32m debuginfo eval et 44[0m
+[32m debuginfo eval et 45[0m
+[32m debuginfo eval et 46[0m
+[32m debuginfo eval et 47[0m
+[32m debuginfo visit 49[0m
+[32m debuginfo visit 50[0m
+[32m debuginfo visit 52[0m
+[32m debuginfo visit 51[0m
+[32m debuginfo eval et 49[0m
+[32m debuginfo eval et 50[0m
+[32m debuginfo eval et 51[0m
+[32m debuginfo eval et 52[0m
+[32m debuginfo visit 54[0m
+[32m debuginfo visit 55[0m
+[32m debuginfo visit 57[0m
+[32m debuginfo visit 56[0m
+[32m debuginfo eval et 54[0m
+[32m debuginfo eval et 55[0m
+[32m debuginfo eval et 56[0m
+[32m debuginfo eval et 57[0m
+[32m debuginfo visit 59[0m
+[32m debuginfo visit 60[0m
+[32m debuginfo visit 64[0m
+[32m debuginfo visit 66[0m
+[32m debuginfo replace symidx d[0m
+Error occurred when running Pass Cfg2NhwcCfgPass
+
+Caused by:
+    0: Symbol {"d" fields:{"def_instrs_vec": [], "is_literal": false, "def_cfg_node_vec": [3], "is_global": false, "is_temp": false, "type": i32}} downcast_op_any 失败 field_name:CONST_SYMIDX:const_symidx src/toolkit/gen_nhwc_cfg.rs 54
+    1: can't find field SymIdx type:op_field
+Pass Ncfg2DjgPass run successfully
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+Pass MemAllocPass run successfully
+Pass CfgDebugPass run successfully
+Pass NhwcCollectPass run successfully
+Pass Ast2EtDebugPass run successfully
+breakpoint: exit_0
+         global Fn[]->starttime_ret_0 starttime_0 
+         global Fn[]->stoptime_ret_0 stoptime_0 
+         global Fn[s_14, c_14, n_14]->memset_ret_0 memset_0 
+         global Fn[dest_15, src_15, n_15]->memcpy_ret_0 memcpy_0 
+         breakpoint exit_0([]) ! 
+
+dot write finished Ok("/home/mineral/Compiler2024-nhwc")
+Successfully Transform to png debug_root_simu.png Output { status: ExitStatus(unix_wait_status(0)), stdout: "", stderr: "" }
+# Built-in library
+ .text
+ .align 4
+ .globl starttime
+ .type starttime, @function
+ starttime:
+ mv a0, zero
+ tail _sysy_starttime
+ 
+ .text
+ .align 4
+ .globl stoptime
+ .type stoptime, @function
+ stoptime:
+ mv a0, zero
+ tail _sysy_stoptime
+.section
+    .data
+.section
+    .text
+                    ;      Define main_0 [] -> main_ret_0 
+    .global main
+    .type main @function
+main:
+                    ;mem layout:|ra_main:8|s0_main:8|a:4|b:4|c:4|d:4
+    addi    sp,sp,-32
+    sd      ra,24(sp)
+    sd      s0,16(sp)
+    addi    s0,sp,32
+                    ;      alloc i32 a_17 
+                    ;      alloc i32 b_17 
+                    ;      alloc i32 c_17 
+                    ;      alloc i32 d_17 
+                    ;      label L0_0: 
+L0_0:
+                    ;      new_var a_17:i32 
+                    ;      new_var b_17:i32 
+                    ;      new_var c_17:i32 
+                    ;      new_var d_17:i32 
+                    ;      a_17 = i32 10_0 
+    li      s1, 10
+    sw      s1,12(sp)
+                    ;      b_17 = i32 4_0 
+    li      s1, 4
+    sw      s1,8(sp)
+                    ;      c_17 = i32 2_0 
+    li      s1, 2
+    sw      s1,4(sp)
+                    ;      d_17 = i32 2_0 
+    li      s1, 2
+    sw      s1,0(sp)
+                    ;      ret 
+    ld      ra,24(sp)
+    ld      s0,16(sp)
+    addi    sp,sp,-32
+    ret
+
+Pass Nhwc2RiscvDebugPass run successfully
+Pass SymtabDebugPass run successfully
+all passed finish 耗时: 337.537978ms
+all io tasks finish 耗时: 1.479µs

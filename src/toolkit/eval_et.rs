@@ -9,6 +9,7 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
     // let mut value = SymIdx::new(0, 0.to_string());
     // println!("输入的operator_et_node: {:?}", node!(at any_et_node in et_tree).clone().et_naked_node);
     // 每个节点分两种情况,constant 或者 operator
+    debug_info_green!("eval et {}",et_node);
     let value_symidx = match node!(at et_node in et_tree).clone().et_node_type {
         // let value = match node!(at Operator_node in et_tree){
         EtNodeType::Constant { const_sym_idx, ast_node: _, text: _ } => Some(const_sym_idx),
@@ -51,8 +52,9 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
             }
         },
         EtNodeType::Separator { ast_node: _, text: _ } => {
-            let sub_node = direct_child_node!(at et_node in et_tree);
-            let rst = eval_et(et_tree, sub_node)?;
+            for et_node in direct_child_nodes!(at et_node in et_tree){
+                eval_et(et_tree, et_node);
+            }
             None
         }
         EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => {

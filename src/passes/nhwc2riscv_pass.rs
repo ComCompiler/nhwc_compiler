@@ -36,7 +36,7 @@ stoptime:\n
         let (cfg_graph, nhwc_instr_slab, riscv_instr_slab, src_symtab, asm_structure) = (&mut ctx.cfg_graph, &mut ctx.nhwc_instr_slab, &mut ctx.riscv_instr_slab, &mut ctx.symtab, &mut ctx.asm_structure);
         parse_nhwcir2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, asm_structure, src_symtab)?;
         if self.is_write_s_file{
-            let mut f = fs::File::create(ctx.args.output.file_stem().unwrap().to_string_lossy().to_string() + ".s")?;
+            let mut f = fs::File::create(ctx.args.output.clone())?;
             writeln!(f,"{:?}",ctx.asm_structure)?;
         }
         Ok(())

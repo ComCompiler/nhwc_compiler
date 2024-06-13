@@ -1,5 +1,5 @@
 use std::rc::Rc;
-use crate::toolkit::symtab::*;
+use crate::{debug_info_blue, toolkit::symtab::*};
 
 use std::fmt::Debug;
 use anyhow::*;
@@ -63,9 +63,24 @@ impl MemLayout{
     pub fn insert_data(&mut self, align:usize,data_len:usize, symidx:&SymIdx)-> usize{
         let symidx_rc = Rc::new(symidx.clone());
         loop{
+            debug_info_blue!("align:{} data_len:{}",align,data_len);
             let rst = self.find_available(align,data_len);
             if rst.is_none(){
-                self.mem.push(None)
+                let tail_remained_mem_size = {
+                    let mut i =0 ;
+                    for b in self.mem.iter().rev(){
+                        if b.is_some(){
+                            break;
+                        }
+                        i+=1;
+                    }
+                    i
+                };
+                debug_info_blue!("tail_remained:{}",tail_remained_mem_size);
+                for _ in tail_remained_mem_size..data_len{
+                    self.mem.push(None)
+                }
+                self.align_mem_with_blank(align);
             }else if let Some(idx) = rst{
                 for i in idx..idx+data_len{
                     self.mem[i]=Some(symidx_rc.clone())

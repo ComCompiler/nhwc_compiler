@@ -1,0 +1,180 @@
+Pass Code2AstPass run successfully
+65
+77
+106
+118
+130
+159
+188
+200
+229
+267
+303
+341
+377
+416
+452
+490
+526
+564
+600
+638
+674
+712
+748
+786
+823
+860
+897
+934
+971
+1008
+1045
+1082
+1228
+1257
+1286
+1315
+1344
+Pass Ast2ScopeTree run successfully
+Pass Ast2CfgPass run successfully
+[31m debuginfo is_const:false at decl_ndoe:3[0m
+[32m debuginfo visit 0[0m
+[32m debuginfo visit 1[0m
+[32m debuginfo eval et 0[0m
+[32m debuginfo eval et 1[0m
+Error occurred when running Pass Cfg2NhwcCfgPass
+
+Caused by:
+    这个cfg node:0 没有对应的entry节点
+Pass Ncfg2DjgPass run successfully
+Error occurred when running Pass MemAllocPass
+
+Caused by:
+    0: CfgNode  #Entry
+        51 
+        intEightWhile(){inta;a=5;intb;intc;b=6;c=7;intd;d=10;while(a<20){a=a+3;while(b<10){b=b+1;while(c==7){c=c-1;while(d<20){d=d+3;while(e>1){e=e-1;while(f>2){f=f-2;while(g<3){g=g+10;while(h<10){h=h+8;}h=h-1;}g=g-8;}f=f+1;}e=e+1;}d=d-1;}c=c+1;}b=b-2;}return(a+(b+d)+c)-(e+d-g+h);}
+       
+        $ @ # Fields 
+        {
+           "domiance_frontier_cfg_nodes": [],
+           "cor_dj_node": 1,
+       } $   downcast_op_any 失败 field_name:FUNC_COR_SYMIDX:func_cor_symidx src/toolkit/gen_nhwc_cfg.rs 75
+    1: can't find field SymIdx type:op_field
+Pass CfgDebugPass run successfully
+Pass NhwcCollectPass run successfully
+Pass Ast2EtDebugPass run successfully
+breakpoint: exit_0
+         breakpoint exit_0([]) ! 
+
+dot write finished Ok("/home/mineral/Compiler2024-nhwc")
+Successfully Transform to png debug_root_simu.png Output { status: ExitStatus(unix_wait_status(0)), stdout: "", stderr: "" }
+# Built-in library
+ .text
+ .align 4
+ .globl starttime
+ .type starttime, @function
+ starttime:
+ mv a0, zero
+ tail _sysy_starttime
+ 
+ .text
+ .align 4
+ .globl stoptime
+ .type stoptime, @function
+ stoptime:
+ mv a0, zero
+ tail _sysy_stoptime
+.section
+    .data
+.section
+    .text
+                    ;      label L1_0: 
+L1_0:
+                    ;      jump label: L2_0 
+    j       L2_0
+                    ;      label L2_0: 
+L2_0:
+                    ;      label L3_0: 
+L3_0:
+                    ;      jump label: L4_0 
+    j       L4_0
+                    ;      label L4_0: 
+L4_0:
+                    ;      label L5_0: 
+L5_0:
+                    ;      jump label: L6_0 
+    j       L6_0
+                    ;      label L6_0: 
+L6_0:
+                    ;      label L7_0: 
+L7_0:
+                    ;      jump label: L8_0 
+    j       L8_0
+                    ;      label L8_0: 
+L8_0:
+                    ;      label L9_0: 
+L9_0:
+                    ;      jump label: L10_0 
+    j       L10_0
+                    ;      label L10_0: 
+L10_0:
+                    ;      label L11_0: 
+L11_0:
+                    ;      jump label: L12_0 
+    j       L12_0
+                    ;      label L12_0: 
+L12_0:
+                    ;      label L13_0: 
+L13_0:
+                    ;      jump label: L14_0 
+    j       L14_0
+                    ;      label L14_0: 
+L14_0:
+                    ;      label L15_0: 
+L15_0:
+                    ;      jump label: L16_0 
+    j       L16_0
+                    ;      label L16_0: 
+L16_0:
+                    ;      label L17_0: 
+L17_0:
+                    ;      jump label: L16_0 
+    j       L16_0
+                    ;      label L18_0: 
+L18_0:
+                    ;      jump label: L14_0 
+    j       L14_0
+                    ;      label L19_0: 
+L19_0:
+                    ;      jump label: L12_0 
+    j       L12_0
+                    ;      label L20_0: 
+L20_0:
+                    ;      jump label: L10_0 
+    j       L10_0
+                    ;      label L21_0: 
+L21_0:
+                    ;      jump label: L8_0 
+    j       L8_0
+                    ;      label L22_0: 
+L22_0:
+                    ;      jump label: L6_0 
+    j       L6_0
+                    ;      label L23_0: 
+L23_0:
+                    ;      jump label: L4_0 
+    j       L4_0
+                    ;      label L24_0: 
+L24_0:
+                    ;      jump label: L2_0 
+    j       L2_0
+                    ;      label L25_0: 
+L25_0:
+                    ;      label L0_0: 
+L0_0:
+
+Pass Nhwc2RiscvDebugPass run successfully
+Pass SymtabDebugPass run successfully
+all passed finish 耗时: 175.396112ms
+all io tasks finish 耗时: 2.704µs

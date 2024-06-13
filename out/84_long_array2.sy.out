@@ -1,0 +1,264 @@
+Pass Code2AstPass run successfully
+62
+112
+162
+212
+311
+393
+580
+720
+805
+848
+Pass Ast2ScopeTree run successfully
+Pass Ast2CfgPass run successfully
+[31m debuginfo is_const:false at decl_ndoe:3[0m
+[32m debuginfo visit 0[0m
+[32m debuginfo visit 1[0m
+[32m debuginfo visit 3[0m
+[32m debuginfo visit 2[0m
+[32m debuginfo eval et 0[0m
+[32m debuginfo eval et 1[0m
+[32m debuginfo eval et 2[0m
+[32m debuginfo eval et 3[0m
+[32m debuginfo visit 39[0m
+[32m debuginfo visit 40[0m
+[32m debuginfo visit 44[0m
+[32m debuginfo visit 41[0m
+[32m debuginfo visit 43[0m
+[32m debuginfo visit 42[0m
+[32m debuginfo eval et 39[0m
+[32m debuginfo eval et 40[0m
+[32m debuginfo eval et 41[0m
+[32m debuginfo eval et 42[0m
+[32m debuginfo eval et 43[0m
+[32m debuginfo eval et 44[0m
+[32m debuginfo visit 47[0m
+[32m debuginfo visit 48[0m
+[32m debuginfo visit 52[0m
+[32m debuginfo visit 49[0m
+[32m debuginfo visit 51[0m
+[32m debuginfo visit 50[0m
+[32m debuginfo eval et 47[0m
+[32m debuginfo eval et 48[0m
+[32m debuginfo eval et 49[0m
+[32m debuginfo eval et 50[0m
+[32m debuginfo eval et 51[0m
+[32m debuginfo eval et 52[0m
+[32m debuginfo visit 55[0m
+[32m debuginfo visit 56[0m
+[32m debuginfo visit 60[0m
+[32m debuginfo visit 57[0m
+[32m debuginfo visit 59[0m
+[32m debuginfo visit 58[0m
+[32m debuginfo eval et 55[0m
+[32m debuginfo eval et 56[0m
+[32m debuginfo eval et 57[0m
+[32m debuginfo eval et 58[0m
+[32m debuginfo eval et 59[0m
+[32m debuginfo eval et 60[0m
+[32m debuginfo visit 63[0m
+[32m debuginfo visit 64[0m
+[32m debuginfo visit 70[0m
+[32m debuginfo visit 74[0m
+[32m debuginfo visit 71[0m
+[32m debuginfo visit 73[0m
+[32m debuginfo visit 72[0m
+[32m debuginfo replace symidx a[0m
+[32m debuginfo visit 65[0m
+[32m debuginfo visit 67[0m
+[32m debuginfo visit 69[0m
+[32m debuginfo visit 68[0m
+[32m debuginfo replace symidx a[0m
+[32m debuginfo visit 66[0m
+[32m debuginfo eval et 63[0m
+[32m debuginfo eval et 64[0m
+[32m debuginfo eval et 65[0m
+[32m debuginfo eval et 66[0m
+[32m debuginfo eval et 67[0m
+[32m debuginfo eval et 68[0m
+[32m debuginfo eval et 69[0m
+[32m debuginfo eval et 70[0m
+[32m debuginfo eval et 71[0m
+[32m debuginfo eval et 72[0m
+[32m debuginfo eval et 73[0m
+[32m debuginfo eval et 74[0m
+Error occurred when running Pass Cfg2NhwcCfgPass
+
+Caused by:
+    scope为0符号表中未找到"b"
+Pass Ncfg2DjgPass run successfully
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:16384[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:16384[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+Pass MemAllocPass run successfully
+Pass CfgDebugPass run successfully
+Pass NhwcCollectPass run successfully
+Pass Ast2EtDebugPass run successfully
+breakpoint: exit_0
+         global Fn[]->starttime_ret_0 starttime_0 
+         global Fn[]->stoptime_ret_0 stoptime_0 
+         global Fn[s_15, c_15, n_15]->memset_ret_0 memset_0 
+         global Fn[dest_16, src_16, n_16]->memcpy_ret_0 memcpy_0 
+         breakpoint exit_0([]) ! 
+
+dot write finished Ok("/home/mineral/Compiler2024-nhwc")
+Successfully Transform to png debug_root_simu.png Output { status: ExitStatus(unix_wait_status(0)), stdout: "", stderr: "" }
+[34m debuginfo weight vec calcuated is [1_0][0m
+[34m debuginfo weight vec calcuated is [1_0][0m
+[34m debuginfo weight vec calcuated is [1_0][0m
+[34m debuginfo weight vec calcuated is [1_0][0m
+# Built-in library
+ .text
+ .align 4
+ .globl starttime
+ .type starttime, @function
+ starttime:
+ mv a0, zero
+ tail _sysy_starttime
+ 
+ .text
+ .align 4
+ .globl stoptime
+ .type stoptime, @function
+ stoptime:
+ mv a0, zero
+ tail _sysy_stoptime
+.section
+    .data
+.section
+    .text
+                    ;      Define f1_0 [b[]_17] -> f1_ret_0 
+    .global f1
+    .type f1 @function
+f1:
+                    ;mem layout:|ra_f1:8|s0_f1:8|b[]:4|temp_5:4|temp_0:8|temp_1:8|temp_2:8|temp_3:16384|temp_4:8
+    addi    sp,sp,-16440
+    sd      ra,16432(sp)
+    sd      s0,16424(sp)
+    addi    s0,sp,16440
+    sw      a0,16420(sp)
+                    ;      alloc ptr->i32 temp_0_19 
+                    ;      alloc ptr->i32 temp_1_19 
+                    ;      alloc ptr->i32 temp_2_19 
+                    ;      alloc Array:i32:[Some(4096_0)] temp_3_19 
+                    ;      alloc ptr->i32 temp_4_19 
+                    ;      alloc i32 temp_5_19 
+                    ;      label L1_0: 
+L1_0:
+                    ;      new_var temp_0_19:ptr->i32 
+                    ;      temp_0_19 = getelementptr a_0:Array:i32:[Some(4096_0)] [5_0] 
+    mv      s3, zero
+    li      s1, 1
+    li      s2, 5
+    mul     s4,s1,s2
+    add     s3,s3,s4
+    slli s3,s3,2
+    la      s5, a_0
+    add     s3,s3,s5
+    sd      s3,16408(sp)
+                    ;      store 4000_0:i32 temp_0_19:ptr->i32 
+    li      s2, 4000
+    ld      s1,16408(sp)
+    sd      s2,0(s1)
+                    ;      mu a_0:22 
+                    ;      a_0 = chi a_0:22 
+                    ;      new_var temp_1_19:ptr->i32 
+                    ;      temp_1_19 = getelementptr a_0:Array:i32:[Some(4096_0)] [4000_0] 
+    mv      s3, zero
+    li      s1, 1
+    li      s2, 4000
+    mul     s4,s1,s2
+    add     s3,s3,s4
+    slli s3,s3,2
+    la      s5, a_0
+    add     s3,s3,s5
+    sd      s3,16400(sp)
+                    ;      store 3_0:i32 temp_1_19:ptr->i32 
+    li      s2, 3
+    ld      s1,16400(sp)
+    sd      s2,0(s1)
+                    ;      mu a_0:28 
+                    ;      a_0 = chi a_0:28 
+                    ;      new_var temp_2_19:ptr->i32 
+                    ;      temp_2_19 = getelementptr a_0:Array:i32:[Some(4096_0)] [4095_0] 
+    mv      s3, zero
+    li      s1, 1
+    li      s2, 4095
+    mul     s4,s1,s2
+    add     s3,s3,s4
+    slli s3,s3,2
+    la      s5, a_0
+    add     s3,s3,s5
+    sd      s3,16392(sp)
+                    ;      store 7_0:i32 temp_2_19:ptr->i32 
+    li      s2, 7
+    ld      s1,16392(sp)
+    sd      s2,0(s1)
+                    ;      mu a_0:34 
+                    ;      a_0 = chi a_0:34 
+                    ;      new_var temp_3_19:Array:i32:[Some(4096_0)] 
+                    ;      temp_3_19 = load *a_0:ptr->Array:i32:[] 
+                    ;   load label a as ptr to reg
+    la      s1, a_0
+    lw      s2,0(s1)
+    sw      s2,16388(sp)
+                    ;      new_var temp_4_19:ptr->i32 
+                    ;      new_var temp_5_19:i32 
+                    ;      temp_4_19 = getelementptr temp_3_19:Array:i32:[Some(4096_0)] [4095_0] 
+    mv      s3, zero
+    li      s1, 1
+    li      s2, 4095
+    mul     s4,s1,s2
+    add     s3,s3,s4
+    slli s3,s3,2
+    li      s5, 16388
+    add     s3,s3,s5
+    sd      s3,0(sp)
+                    ;      temp_5_19 = load temp_4_19:ptr->i32 
+    ld      s1,0(sp)
+    lw      s2,0(s1)
+    sw      s2,16416(sp)
+                    ;      Define main_0 [] -> main_ret_0 
+    .global main
+    .type main @function
+main:
+                    ;mem layout:|ra_main:8|s0_main:8
+    addi    sp,sp,-16
+    sd      ra,8(sp)
+    sd      s0,0(sp)
+    addi    s0,sp,16
+                    ;      label L0_0: 
+L0_0:
+
+Pass Nhwc2RiscvDebugPass run successfully
+Pass SymtabDebugPass run successfully
+all passed finish 耗时: 303.802157ms
+all io tasks finish 耗时: 2.038µs

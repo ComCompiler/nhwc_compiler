@@ -1,0 +1,230 @@
+Pass Code2AstPass run successfully
+302
+333
+371
+421
+502
+594
+686
+799
+891
+983
+1096
+1174
+1296
+1354
+1404
+1435
+1494
+1586
+1622
+1629
+1709
+1745
+1752
+1764
+1939
+2069
+2107
+2227
+2515
+2540
+2577
+2636
+2667
+2696
+2775
+2863
+2921
+2974
+2991
+3024
+3057
+3136
+3174
+3191
+3224
+3257
+3292
+3371
+3408
+3490
+3533
+Pass Ast2ScopeTree run successfully
+Pass Ast2CfgPass run successfully
+[31m debuginfo is_const:true at decl_ndoe:3[0m
+[32m debuginfo visit 0[0m
+[32m debuginfo visit 1[0m
+[32m debuginfo visit 3[0m
+[32m debuginfo visit 2[0m
+[32m debuginfo eval et 0[0m
+[32m debuginfo eval et 1[0m
+[32m debuginfo eval et 2[0m
+[32m debuginfo eval et 3[0m
+[31m debuginfo is_const:false at decl_ndoe:37[0m
+[32m debuginfo visit 5[0m
+[32m debuginfo visit 6[0m
+[32m debuginfo visit 8[0m
+[32m debuginfo visit 7[0m
+[32m debuginfo eval et 5[0m
+[32m debuginfo eval et 6[0m
+[32m debuginfo eval et 7[0m
+[32m debuginfo eval et 8[0m
+[31m debuginfo is_const:false at decl_ndoe:69[0m
+[32m debuginfo visit 10[0m
+[32m debuginfo visit 11[0m
+[32m debuginfo visit 15[0m
+[32m debuginfo visit 12[0m
+[32m debuginfo visit 14[0m
+[32m debuginfo visit 13[0m
+[32m debuginfo eval et 10[0m
+[32m debuginfo eval et 11[0m
+[32m debuginfo eval et 12[0m
+[32m debuginfo eval et 13[0m
+[32m debuginfo eval et 14[0m
+[32m debuginfo eval et 15[0m
+[31m debuginfo is_const:false at decl_ndoe:121[0m
+[32m debuginfo visit 18[0m
+[32m debuginfo visit 19[0m
+[32m debuginfo visit 23[0m
+[32m debuginfo visit 20[0m
+[32m debuginfo visit 22[0m
+[32m debuginfo visit 21[0m
+[32m debuginfo eval et 18[0m
+[32m debuginfo eval et 19[0m
+[32m debuginfo eval et 20[0m
+[32m debuginfo eval et 21[0m
+[32m debuginfo eval et 22[0m
+[32m debuginfo eval et 23[0m
+[31m debuginfo is_const:false at decl_ndoe:173[0m
+[32m debuginfo visit 26[0m
+[32m debuginfo visit 27[0m
+[32m debuginfo visit 31[0m
+[32m debuginfo visit 28[0m
+[32m debuginfo visit 30[0m
+[32m debuginfo visit 29[0m
+[32m debuginfo eval et 26[0m
+[32m debuginfo eval et 27[0m
+[32m debuginfo eval et 28[0m
+[32m debuginfo eval et 29[0m
+[32m debuginfo eval et 30[0m
+[32m debuginfo eval et 31[0m
+[31m debuginfo is_const:false at decl_ndoe:225[0m
+[32m debuginfo visit 34[0m
+[32m debuginfo visit 35[0m
+[32m debuginfo visit 37[0m
+[32m debuginfo visit 36[0m
+[32m debuginfo eval et 34[0m
+[32m debuginfo eval et 35[0m
+[32m debuginfo eval et 36[0m
+[32m debuginfo eval et 37[0m
+[31m debuginfo is_const:false at decl_ndoe:303[0m
+[32m debuginfo visit 73[0m
+[32m debuginfo visit 74[0m
+[32m debuginfo visit 76[0m
+[32m debuginfo visit 75[0m
+[32m debuginfo eval et 73[0m
+[32m debuginfo eval et 74[0m
+[32m debuginfo eval et 75[0m
+[32m debuginfo eval et 76[0m
+[32m debuginfo visit 78[0m
+[32m debuginfo visit 79[0m
+[32m debuginfo visit 83[0m
+[32m debuginfo replace symidx val[0m
+Error occurred when running Pass Cfg2NhwcCfgPass
+
+Caused by:
+    0: Symbol {"val" fields:{"is_temp": false, "def_cfg_node_vec": [1], "def_instrs_vec": [], "is_literal": false, "type": i32, "is_global": false}} downcast_op_any 失败 field_name:CONST_SYMIDX:const_symidx src/toolkit/gen_nhwc_cfg.rs 54
+    1: can't find field SymIdx type:op_field
+Pass Ncfg2DjgPass run successfully
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+Pass MemAllocPass run successfully
+Pass CfgDebugPass run successfully
+Pass NhwcCollectPass run successfully
+Pass Ast2EtDebugPass run successfully
+[31m debuginfo Err when running this instr[0m
+[33m debuginfo          global i32 INF_0 
+-->      store 0x70000000_0:i32 *INF_0:ptr->i32 
+         new_var size_0:Array:i32:[Some(10_0)] 
+         alloc Array:i32:[Some(10_0)] size_0 
+         new_var to_0:Array:i32:[Some(10_0), Some(10_0)] 
+[0m
+[31m debuginfo 运行instr       store 0x70000000_0:i32 *INF_0:ptr->i32  失败
+
+Caused by:
+    0: when parsing 0x70000000
+    1: invalid digit found in string[0m
+dot write finished Ok("/home/mineral/Compiler2024-nhwc")
+Successfully Transform to png debug_root_simu.png Output { status: ExitStatus(unix_wait_status(0)), stdout: "", stderr: "" }
+Error occurred when running Pass Nhwc2RiscvDebugPass
+
+Caused by:
+    i32 I32(None) unsure 无法转化为 symidx
+Pass SymtabDebugPass run successfully
+all passed finish 耗时: 382.956359ms
+all io tasks finish 耗时: 1.498µs

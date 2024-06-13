@@ -1,0 +1,102 @@
+Pass Code2AstPass run successfully
+51
+Pass Ast2ScopeTree run successfully
+Pass Ast2CfgPass run successfully
+[31m debuginfo is_const:true at decl_ndoe:3[0m
+[32m debuginfo visit 0[0m
+[32m debuginfo visit 1[0m
+[32m debuginfo visit 3[0m
+[32m debuginfo visit 2[0m
+[32m debuginfo eval et 0[0m
+[32m debuginfo eval et 1[0m
+[32m debuginfo eval et 2[0m
+[32m debuginfo eval et 3[0m
+[32m debuginfo visit 39[0m
+[32m debuginfo visit 40[0m
+[32m debuginfo visit 42[0m
+[32m debuginfo visit 41[0m
+[32m debuginfo replace symidx a[0m
+[32m debuginfo with a[0m
+[32m debuginfo eval et 39[0m
+[32m debuginfo eval et 40[0m
+[32m debuginfo eval et 41[0m
+[32m debuginfo eval et 42[0m
+Pass Cfg2NhwcCfgPass run successfully
+Pass Ncfg2DjgPass run successfully
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+Pass MemAllocPass run successfully
+Pass CfgDebugPass run successfully
+Pass NhwcCollectPass run successfully
+Pass Ast2EtDebugPass run successfully
+breakpoint: exit_0
+         global Fn[]->starttime_ret_0 starttime_0 
+         global Fn[]->stoptime_ret_0 stoptime_0 
+         global Fn[s_15, c_15, n_15]->memset_ret_0 memset_0 
+         global Fn[dest_16, src_16, n_16]->memcpy_ret_0 memcpy_0 
+         breakpoint exit_0([]) ! 
+
+dot write finished Ok("/home/mineral/Compiler2024-nhwc")
+Successfully Transform to png debug_root_simu.png Output { status: ExitStatus(unix_wait_status(0)), stdout: "", stderr: "" }
+# Built-in library
+ .text
+ .align 4
+ .globl starttime
+ .type starttime, @function
+ starttime:
+ mv a0, zero
+ tail _sysy_starttime
+ 
+ .text
+ .align 4
+ .globl stoptime
+ .type stoptime, @function
+ stoptime:
+ mv a0, zero
+ tail _sysy_stoptime
+.section
+    .data
+    .align 4
+    .global a_0
+                    ;      global i32 a_0 
+    .type a_0 @object
+a_0:
+    .word 10
+.section
+    .text
+                    ;      Define main_0 [] -> main_ret_0 
+    .global main
+    .type main @function
+main:
+                    ;mem layout:|ra_main:8|s0_main:8|temp_0:4|none:4
+    addi    sp,sp,-24
+    sd      ra,16(sp)
+    sd      s0,8(sp)
+    addi    s0,sp,24
+                    ;      alloc i32 temp_0_18 
+                    ;      label L0_0: 
+L0_0:
+                    ;      new_var temp_0_18:i32 
+                    ;      temp_0_18 = Add i32 10_0, 5_0 
+    li      s1, 10
+    li      s2, 5
+    add     s3,s1,s2
+    sw      s3,4(sp)
+                    ;      ret temp_0_18 
+    ld      ra,16(sp)
+    ld      s0,8(sp)
+    lw      a0,4(sp)
+    addi    sp,sp,-24
+    ret
+
+Pass Nhwc2RiscvDebugPass run successfully
+Pass SymtabDebugPass run successfully
+all passed finish 耗时: 282.51028ms
+all io tasks finish 耗时: 3.22µs

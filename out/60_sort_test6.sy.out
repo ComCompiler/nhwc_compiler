@@ -1,0 +1,156 @@
+Pass Code2AstPass run successfully
+63
+95
+107
+119
+131
+160
+189
+218
+256
+306
+343
+381
+501
+538
+567
+605
+711
+748
+777
+815
+949
+1076
+1113
+1153
+1182
+1214
+1264
+1314
+1364
+1414
+1464
+1514
+1564
+1614
+1664
+1714
+1726
+1755
+1787
+1873
+1911
+1923
+1973
+2016
+2045
+2088
+2125
+Pass Ast2ScopeTree run successfully
+Pass Ast2CfgPass run successfully
+[31m debuginfo is_const:false at decl_ndoe:3[0m
+[32m debuginfo visit 0[0m
+[32m debuginfo visit 1[0m
+[32m debuginfo eval et 0[0m
+[32m debuginfo eval et 1[0m
+Error occurred when running Pass Cfg2NhwcCfgPass
+
+Caused by:
+    这个cfg node:0 没有对应的entry节点
+Pass Ncfg2DjgPass run successfully
+Error occurred when running Pass MemAllocPass
+
+Caused by:
+    0: CfgNode  #Entry
+        15 
+        intcounting_sort(intini_arr[],intsorted_arr[],intn){intcount_arr[10];inti;intj;intk;k=0;i=0;j=0;while(k<10){count_arr[k]=0;k=k+1;}while(i<n){count_arr[ini_arr[i]]=count_arr[ini_arr[i]]+1;i=i+1;}k=1;while(k<10){count_arr[k]=count_arr[k]+count_arr[k-1];k=k+1;}j=n;while(j>0){count_arr[ini_arr[j-1]]=count_arr[ini_arr[j-1]]-1;sorted_arr[count_arr[ini_arr[j-1]]]=ini_arr[j-1];j=j-1;}return0;}
+       
+        $ @ # Fields 
+        {
+           "cor_dj_node": 1,
+           "domiance_frontier_cfg_nodes": [],
+       } $   downcast_op_any 失败 field_name:FUNC_COR_SYMIDX:func_cor_symidx src/toolkit/gen_nhwc_cfg.rs 75
+    1: can't find field SymIdx type:op_field
+Pass CfgDebugPass run successfully
+Pass NhwcCollectPass run successfully
+Pass Ast2EtDebugPass run successfully
+breakpoint: exit_0
+         breakpoint exit_0([]) ! 
+
+dot write finished Ok("/home/mineral/Compiler2024-nhwc")
+Successfully Transform to png debug_root_simu.png Output { status: ExitStatus(unix_wait_status(0)), stdout: "", stderr: "" }
+# Built-in library
+ .text
+ .align 4
+ .globl starttime
+ .type starttime, @function
+ starttime:
+ mv a0, zero
+ tail _sysy_starttime
+ 
+ .text
+ .align 4
+ .globl stoptime
+ .type stoptime, @function
+ stoptime:
+ mv a0, zero
+ tail _sysy_stoptime
+.section
+    .data
+.section
+    .text
+                    ;      label L4_0: 
+L4_0:
+                    ;      jump label: L5_0 
+    j       L5_0
+                    ;      label L5_0: 
+L5_0:
+                    ;      label L6_0: 
+L6_0:
+                    ;      jump label: L5_0 
+    j       L5_0
+                    ;      label L7_0: 
+L7_0:
+                    ;      label L8_0: 
+L8_0:
+                    ;      jump label: L7_0 
+    j       L7_0
+                    ;      label L9_0: 
+L9_0:
+                    ;      jump label: L10_0 
+    j       L10_0
+                    ;      label L10_0: 
+L10_0:
+                    ;      label L11_0: 
+L11_0:
+                    ;      jump label: L10_0 
+    j       L10_0
+                    ;      label L12_0: 
+L12_0:
+                    ;      jump label: L13_0 
+    j       L13_0
+                    ;      label L13_0: 
+L13_0:
+                    ;      label L14_0: 
+L14_0:
+                    ;      jump label: L13_0 
+    j       L13_0
+                    ;      label L15_0: 
+L15_0:
+                    ;      label L0_0: 
+L0_0:
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L1_0: 
+L1_0:
+                    ;      label L2_0: 
+L2_0:
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L3_0: 
+L3_0:
+
+Pass Nhwc2RiscvDebugPass run successfully
+Pass SymtabDebugPass run successfully
+all passed finish 耗时: 236.843832ms
+all io tasks finish 耗时: 1.643µs

@@ -1,0 +1,157 @@
+Pass Code2AstPass run successfully
+48
+79
+110
+149
+185
+250
+281
+312
+350
+424
+461
+580
+Pass Ast2ScopeTree run successfully
+Pass Ast2CfgPass run successfully
+[31m debuginfo is_const:false at decl_ndoe:3[0m
+[32m debuginfo visit 0[0m
+[32m debuginfo visit 1[0m
+[32m debuginfo visit 3[0m
+[32m debuginfo visit 2[0m
+[32m debuginfo eval et 0[0m
+[32m debuginfo eval et 1[0m
+[32m debuginfo eval et 2[0m
+[32m debuginfo eval et 3[0m
+[31m debuginfo is_const:false at decl_ndoe:49[0m
+[32m debuginfo visit 39[0m
+[32m debuginfo visit 40[0m
+[32m debuginfo visit 42[0m
+[32m debuginfo replace symidx a[0m
+Error occurred when running Pass Cfg2NhwcCfgPass
+
+Caused by:
+    0: Symbol {"a" fields:{"def_cfg_node_vec": [0], "is_global": true, "is_literal": false, "def_instrs_vec": [], "is_temp": false, "type": i32}} downcast_op_any 失败 field_name:CONST_SYMIDX:const_symidx src/toolkit/gen_nhwc_cfg.rs 54
+    1: can't find field SymIdx type:op_field
+Pass Ncfg2DjgPass run successfully
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+Pass MemAllocPass run successfully
+Pass CfgDebugPass run successfully
+Pass NhwcCollectPass run successfully
+Pass Ast2EtDebugPass run successfully
+breakpoint: exit_0
+         global Fn[]->starttime_ret_0 starttime_0 
+         global Fn[]->stoptime_ret_0 stoptime_0 
+         global Fn[s_15, c_15, n_15]->memset_ret_0 memset_0 
+         global Fn[dest_16, src_16, n_16]->memcpy_ret_0 memcpy_0 
+         breakpoint exit_0([]) ! 
+
+dot write finished Ok("/home/mineral/Compiler2024-nhwc")
+Successfully Transform to png debug_root_simu.png Output { status: ExitStatus(unix_wait_status(0)), stdout: "", stderr: "" }
+# Built-in library
+ .text
+ .align 4
+ .globl starttime
+ .type starttime, @function
+ starttime:
+ mv a0, zero
+ tail _sysy_starttime
+ 
+ .text
+ .align 4
+ .globl stoptime
+ .type stoptime, @function
+ stoptime:
+ mv a0, zero
+ tail _sysy_stoptime
+.section
+    .data
+    .align 4
+    .global a_0
+                    ;      global i32 a_0 
+    .type a_0 @object
+a_0:
+    .word 7
+.section
+    .text
+                    ;      Define func_0 [] -> func_ret_0 
+    .global func
+    .type func @function
+func:
+                    ;mem layout:|ra_func:8|s0_func:8
+    addi    sp,sp,-16
+    sd      ra,8(sp)
+    sd      s0,0(sp)
+    addi    s0,sp,16
+                    ;      label L11_0: 
+L11_0:
+                    ;      jump label: L12_0 
+    j       L12_0
+                    ;      label L12_0: 
+L12_0:
+                    ;      label L13_0: 
+L13_0:
+                    ;      jump label: L15_0 
+    j       L15_0
+                    ;      label L14_0: 
+L14_0:
+                    ;      jump label: L15_0 
+    j       L15_0
+                    ;      label L15_0: 
+L15_0:
+                    ;      Define main_0 [] -> main_ret_0 
+    .global main
+    .type main @function
+main:
+                    ;mem layout:|ra_main:8|s0_main:8
+    addi    sp,sp,-16
+    sd      ra,8(sp)
+    sd      s0,0(sp)
+    addi    s0,sp,16
+                    ;      label L0_0: 
+L0_0:
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L1_0: 
+L1_0:
+                    ;      label L2_0: 
+L2_0:
+                    ;      label L3_0: 
+L3_0:
+                    ;      jump label: L4_0 
+    j       L4_0
+                    ;      label L4_0: 
+L4_0:
+                    ;      label L5_0: 
+L5_0:
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L6_0: 
+L6_0:
+                    ;      label L7_0: 
+L7_0:
+                    ;      jump label: L9_0 
+    j       L9_0
+                    ;      label L8_0: 
+L8_0:
+                    ;      jump label: L9_0 
+    j       L9_0
+                    ;      label L9_0: 
+L9_0:
+                    ;      label L10_0: 
+L10_0:
+
+Pass Nhwc2RiscvDebugPass run successfully
+Pass SymtabDebugPass run successfully
+all passed finish 耗时: 293.825964ms
+all io tasks finish 耗时: 1.615µs

@@ -22,23 +22,21 @@
               alloc ptr->i32 temp_16_2 
               alloc ptr->i32 temp_17_2 
               alloc ptr->i32 temp_18_2 
-              alloc ptr->i32 temp_19_2 
-              alloc Array:i32:[Some(4_0), Some(2_0)] d_2 
           label L0_0: 
               new_var a_2:Array:i32:[Some(4_0), Some(2_0)] 
               new_var temp_0_2:ptr->i32 
-              temp_0_2 = getelementptr a_2:Array:i32:[Some(4_0), Some(2_0)] [0_0, 0_0] 
-              store 1_0:i32 temp_0_2:ptr->Array:i32:[Some(2_0)] 
+              temp_0_2 = getelementptr a_2:Array:i32:[Some(4_0), Some(2_0)] [2_0, 0_0] 
+              store 7_0:i32 temp_0_2:ptr->Array:i32:[Some(2_0)] 
               mu a_2:5 
               a_2 = chi a_2:5 
               new_var temp_1_2:ptr->i32 
-              temp_1_2 = getelementptr a_2:Array:i32:[Some(4_0), Some(2_0)] [1_0, 1_0] 
-              store 4_0:i32 temp_1_2:ptr->Array:i32:[Some(2_0)] 
+              temp_1_2 = getelementptr a_2:Array:i32:[Some(4_0), Some(2_0)] [0_0, 0_0] 
+              store 1_0:i32 temp_1_2:ptr->Array:i32:[Some(2_0)] 
               mu a_2:11 
               a_2 = chi a_2:11 
               new_var temp_2_2:ptr->i32 
-              temp_2_2 = getelementptr a_2:Array:i32:[Some(4_0), Some(2_0)] [2_0, 0_0] 
-              store 7_0:i32 temp_2_2:ptr->Array:i32:[Some(2_0)] 
+              temp_2_2 = getelementptr a_2:Array:i32:[Some(4_0), Some(2_0)] [0_0, 1_0] 
+              store 2_0:i32 temp_2_2:ptr->Array:i32:[Some(2_0)] 
               mu a_2:17 
               a_2 = chi a_2:17 
               new_var temp_3_2:ptr->i32 
@@ -47,21 +45,21 @@
               mu a_2:23 
               a_2 = chi a_2:23 
               new_var temp_4_2:ptr->i32 
-              temp_4_2 = getelementptr a_2:Array:i32:[Some(4_0), Some(2_0)] [0_0, 1_0] 
-              store 2_0:i32 temp_4_2:ptr->Array:i32:[Some(2_0)] 
+              temp_4_2 = getelementptr a_2:Array:i32:[Some(4_0), Some(2_0)] [1_0, 1_0] 
+              store 4_0:i32 temp_4_2:ptr->Array:i32:[Some(2_0)] 
               mu a_2:29 
               a_2 = chi a_2:29 
               N_2 = i32 3_0 
               new_var b_2:Array:i32:[Some(4_0), Some(2_0)] 
               new_var c_2:Array:i32:[Some(4_0), Some(2_0)] 
               new_var temp_5_2:ptr->i32 
-              temp_5_2 = getelementptr c_2:Array:i32:[Some(4_0), Some(2_0)] [1_0, 0_0] 
-              store 3_0:i32 temp_5_2:ptr->Array:i32:[Some(2_0)] 
+              temp_5_2 = getelementptr c_2:Array:i32:[Some(4_0), Some(2_0)] [0_0, 1_0] 
+              store 2_0:i32 temp_5_2:ptr->Array:i32:[Some(2_0)] 
               mu c_2:41 
               c_2 = chi c_2:41 
               new_var temp_6_2:ptr->i32 
-              temp_6_2 = getelementptr c_2:Array:i32:[Some(4_0), Some(2_0)] [3_0, 0_0] 
-              store 7_0:i32 temp_6_2:ptr->Array:i32:[Some(2_0)] 
+              temp_6_2 = getelementptr c_2:Array:i32:[Some(4_0), Some(2_0)] [2_0, 0_0] 
+              store 5_0:i32 temp_6_2:ptr->Array:i32:[Some(2_0)] 
               mu c_2:47 
               c_2 = chi c_2:47 
               new_var temp_7_2:ptr->i32 
@@ -70,28 +68,28 @@
               mu c_2:53 
               c_2 = chi c_2:53 
               new_var temp_8_2:ptr->i32 
-              temp_8_2 = getelementptr c_2:Array:i32:[Some(4_0), Some(2_0)] [1_0, 1_0] 
-              store 4_0:i32 temp_8_2:ptr->Array:i32:[Some(2_0)] 
+              temp_8_2 = getelementptr c_2:Array:i32:[Some(4_0), Some(2_0)] [3_0, 0_0] 
+              store 7_0:i32 temp_8_2:ptr->Array:i32:[Some(2_0)] 
               mu c_2:59 
               c_2 = chi c_2:59 
               new_var temp_9_2:ptr->i32 
-              temp_9_2 = getelementptr c_2:Array:i32:[Some(4_0), Some(2_0)] [0_0, 1_0] 
-              store 2_0:i32 temp_9_2:ptr->Array:i32:[Some(2_0)] 
+              temp_9_2 = getelementptr c_2:Array:i32:[Some(4_0), Some(2_0)] [3_0, 1_0] 
+              store 8_0:i32 temp_9_2:ptr->Array:i32:[Some(2_0)] 
               mu c_2:65 
               c_2 = chi c_2:65 
               new_var temp_10_2:ptr->i32 
-              temp_10_2 = getelementptr c_2:Array:i32:[Some(4_0), Some(2_0)] [2_0, 0_0] 
-              store 5_0:i32 temp_10_2:ptr->Array:i32:[Some(2_0)] 
+              temp_10_2 = getelementptr c_2:Array:i32:[Some(4_0), Some(2_0)] [0_0, 0_0] 
+              store 1_0:i32 temp_10_2:ptr->Array:i32:[Some(2_0)] 
               mu c_2:71 
               c_2 = chi c_2:71 
               new_var temp_11_2:ptr->i32 
-              temp_11_2 = getelementptr c_2:Array:i32:[Some(4_0), Some(2_0)] [3_0, 1_0] 
-              store 8_0:i32 temp_11_2:ptr->Array:i32:[Some(2_0)] 
+              temp_11_2 = getelementptr c_2:Array:i32:[Some(4_0), Some(2_0)] [1_0, 1_0] 
+              store 4_0:i32 temp_11_2:ptr->Array:i32:[Some(2_0)] 
               mu c_2:77 
               c_2 = chi c_2:77 
               new_var temp_12_2:ptr->i32 
-              temp_12_2 = getelementptr c_2:Array:i32:[Some(4_0), Some(2_0)] [0_0, 0_0] 
-              store 1_0:i32 temp_12_2:ptr->Array:i32:[Some(2_0)] 
+              temp_12_2 = getelementptr c_2:Array:i32:[Some(4_0), Some(2_0)] [1_0, 0_0] 
+              store 3_0:i32 temp_12_2:ptr->Array:i32:[Some(2_0)] 
               mu c_2:83 
               c_2 = chi c_2:83 
               new_var d_2:Array:i32:[Some(4_0), Some(2_0)] 
@@ -105,23 +103,17 @@
               mu d_2:97 
               d_2 = chi d_2:97 
               new_var temp_16_2:ptr->i32 
-              temp_16_2 = getelementptr d_2:Array:i32:[Some(4_0), Some(2_0)] [2_0, 0_0] 
-              store 1_0:i32 temp_16_2:ptr->Array:i32:[Some(2_0)] 
+              temp_16_2 = getelementptr d_2:Array:i32:[Some(4_0), Some(2_0)] [3_0, 0_0] 
+              store 2_0:i32 temp_16_2:ptr->Array:i32:[Some(2_0)] 
               mu d_2:103 
               d_2 = chi d_2:103 
               new_var temp_17_2:ptr->i32 
-              temp_17_2 = getelementptr d_2:Array:i32:[Some(4_0), Some(2_0)] [2_0, 1_0] 
-              store 2_0:i32 temp_17_2:ptr->Array:i32:[Some(2_0)] 
+              temp_17_2 = getelementptr d_2:Array:i32:[Some(4_0), Some(2_0)] [1_0, 0_0] 
+              store 5_0:i32 temp_17_2:ptr->Array:i32:[Some(2_0)] 
               mu d_2:109 
               d_2 = chi d_2:109 
               new_var temp_18_2:ptr->i32 
-              temp_18_2 = getelementptr d_2:Array:i32:[Some(4_0), Some(2_0)] [1_0, 0_0] 
-              store 5_0:i32 temp_18_2:ptr->Array:i32:[Some(2_0)] 
+              temp_18_2 = getelementptr d_2:Array:i32:[Some(4_0), Some(2_0)] [3_0, 1_0] 
+              store 8_0:i32 temp_18_2:ptr->Array:i32:[Some(2_0)] 
               mu d_2:115 
               d_2 = chi d_2:115 
-              new_var temp_19_2:ptr->i32 
-              temp_19_2 = getelementptr d_2:Array:i32:[Some(4_0), Some(2_0)] [3_0, 0_0] 
-              store 8_0:i32 temp_19_2:ptr->Array:i32:[Some(2_0)] 
-              mu d_2:121 
-              d_2 = chi d_2:121 
-              ret 3_0 

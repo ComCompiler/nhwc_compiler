@@ -1,0 +1,44 @@
+# Built-in library
+ .text
+ .align 4
+ .globl starttime
+ .type starttime, @function
+ starttime:
+ mv a0, zero
+ tail _sysy_starttime
+ 
+ .text
+ .align 4
+ .globl stoptime
+ .type stoptime, @function
+ stoptime:
+ mv a0, zero
+ tail _sysy_stoptime
+.section
+    .data
+.section
+    .text
+                    ;      Define main_0 [] -> main_ret_0 
+    .global main
+    .type main @function
+main:
+                    ;mem layout:|ra_main:8|s0_main:8|a:4|none:4
+    addi    sp,sp,-24
+    sd      ra,16(sp)
+    sd      s0,8(sp)
+    addi    s0,sp,24
+                    ;      alloc i32 a_2 
+                    ;      label L0_0: 
+L0_0:
+                    ;      a_2 = i32 1_0 
+    li      s1, 1
+    sw      s1,4(sp)
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L1_0: 
+L1_0:
+                    ;      label L2_0: 
+L2_0:
+                    ;      jump label: L1_0 
+    j       L1_0
+

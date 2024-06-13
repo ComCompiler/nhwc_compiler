@@ -1,0 +1,417 @@
+Pass Code2AstPass run successfully
+268
+326
+421
+735
+821
+852
+1126
+1407
+1688
+1969
+2185
+2346
+2544
+2579
+2610
+2648
+2679
+2717
+2748
+2786
+2817
+2855
+2886
+2924
+2955
+2993
+3152
+3189
+3226
+3263
+3300
+3337
+3374
+3403
+3441
+3495
+3615
+3652
+3899
+3942
+Pass Ast2ScopeTree run successfully
+Pass Ast2CfgPass run successfully
+[31m debuginfo is_const:true at decl_ndoe:3[0m
+[32m debuginfo visit 0[0m
+[32m debuginfo visit 1[0m
+[32m debuginfo visit 3[0m
+[32m debuginfo visit 2[0m
+[32m debuginfo eval et 0[0m
+[32m debuginfo eval et 1[0m
+[32m debuginfo eval et 2[0m
+[32m debuginfo eval et 3[0m
+[31m debuginfo is_const:true at decl_ndoe:37[0m
+[32m debuginfo visit 5[0m
+[32m debuginfo visit 6[0m
+[32m debuginfo visit 8[0m
+[32m debuginfo visit 7[0m
+[32m debuginfo eval et 5[0m
+[32m debuginfo eval et 6[0m
+[32m debuginfo eval et 7[0m
+[32m debuginfo eval et 8[0m
+[31m debuginfo is_const:false at decl_ndoe:71[0m
+[32m debuginfo visit 10[0m
+[32m debuginfo visit 11[0m
+[32m debuginfo visit 23[0m
+[32m debuginfo visit 12[0m
+[32m debuginfo visit 22[0m
+[32m debuginfo replace symidx maxn[0m
+[32m debuginfo with maxn[0m
+[32m debuginfo visit 13[0m
+[32m debuginfo visit 21[0m
+[32m debuginfo replace symidx maxn[0m
+[32m debuginfo with maxn[0m
+[32m debuginfo visit 14[0m
+[32m debuginfo visit 20[0m
+[32m debuginfo replace symidx maxn[0m
+[32m debuginfo with maxn[0m
+[32m debuginfo visit 15[0m
+[32m debuginfo visit 19[0m
+[32m debuginfo replace symidx maxn[0m
+[32m debuginfo with maxn[0m
+[32m debuginfo visit 16[0m
+[32m debuginfo visit 18[0m
+[32m debuginfo replace symidx maxn[0m
+[32m debuginfo with maxn[0m
+[32m debuginfo visit 17[0m
+[32m debuginfo eval et 10[0m
+[32m debuginfo eval et 11[0m
+[32m debuginfo eval et 12[0m
+[32m debuginfo eval et 13[0m
+[32m debuginfo eval et 14[0m
+[32m debuginfo eval et 15[0m
+[32m debuginfo eval et 16[0m
+[32m debuginfo eval et 17[0m
+[32m debuginfo eval et 18[0m
+[32m debuginfo eval et 19[0m
+[32m debuginfo eval et 20[0m
+[32m debuginfo eval et 21[0m
+[32m debuginfo eval et 22[0m
+[32m debuginfo eval et 23[0m
+[31m debuginfo is_const:false at decl_ndoe:203[0m
+[32m debuginfo visit 30[0m
+[32m debuginfo visit 31[0m
+[32m debuginfo visit 33[0m
+[32m debuginfo visit 32[0m
+[32m debuginfo eval et 30[0m
+[32m debuginfo eval et 31[0m
+[32m debuginfo eval et 32[0m
+[32m debuginfo eval et 33[0m
+[31m debuginfo is_const:false at decl_ndoe:2498[0m
+[32m debuginfo visit 35[0m
+[32m debuginfo visit 36[0m
+[32m debuginfo visit 38[0m
+[32m debuginfo visit 37[0m
+[32m debuginfo eval et 35[0m
+[32m debuginfo eval et 36[0m
+[32m debuginfo eval et 37[0m
+[32m debuginfo eval et 38[0m
+[32m debuginfo visit 74[0m
+[32m debuginfo visit 75[0m
+[32m debuginfo eval et 74[0m
+[32m debuginfo eval et 75[0m
+[32m debuginfo visit 76[0m
+[32m debuginfo visit 77[0m
+[32m debuginfo eval et 76[0m
+[32m debuginfo eval et 77[0m
+[32m debuginfo visit 78[0m
+[32m debuginfo visit 79[0m
+[32m debuginfo visit 81[0m
+[32m debuginfo replace symidx b[0m
+Error occurred when running Pass Cfg2NhwcCfgPass
+
+Caused by:
+    0: Symbol {"b" fields:{"def_instrs_vec": [], "type": i32, "is_temp": false, "is_literal": false, "def_cfg_node_vec": [1], "is_global": false}} downcast_op_any 失败 field_name:CONST_SYMIDX:const_symidx src/toolkit/gen_nhwc_cfg.rs 54
+    1: can't find field SymIdx type:op_field
+Pass Ncfg2DjgPass run successfully
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+Pass MemAllocPass run successfully
+Pass CfgDebugPass run successfully
+Pass NhwcCollectPass run successfully
+Pass Ast2EtDebugPass run successfully
+breakpoint: exit_0
+         global Fn[]->starttime_ret_0 starttime_0 
+         global Fn[]->stoptime_ret_0 stoptime_0 
+         global Fn[s_19, c_19, n_19]->memset_ret_0 memset_0 
+         global Fn[dest_20, src_20, n_20]->memcpy_ret_0 memcpy_0 
+         breakpoint exit_0([]) ! 
+
+dot write finished Ok("/home/mineral/Compiler2024-nhwc")
+Successfully Transform to png debug_root_simu.png Output { status: ExitStatus(unix_wait_status(0)), stdout: "", stderr: "" }
+# Built-in library
+ .text
+ .align 4
+ .globl starttime
+ .type starttime, @function
+ starttime:
+ mv a0, zero
+ tail _sysy_starttime
+ 
+ .text
+ .align 4
+ .globl stoptime
+ .type stoptime, @function
+ stoptime:
+ mv a0, zero
+ tail _sysy_stoptime
+.section
+    .data
+    .align 4
+    .global mod_0
+                    ;      global i32 mod_0 
+    .type mod_0 @object
+mod_0:
+    .word 1000000007
+    .align 4
+    .global maxn_0
+                    ;      global i32 maxn_0 
+    .type maxn_0 @object
+maxn_0:
+    .word 18
+.section
+    .text
+                    ;      Define equal_0 [a_21, b_21] -> equal_ret_0 
+    .global equal
+    .type equal @function
+equal:
+                    ;mem layout:|ra_equal:8|s0_equal:8|a:4|b:4
+    addi    sp,sp,-24
+    sd      ra,16(sp)
+    sd      s0,8(sp)
+    addi    s0,sp,24
+    sw      a0,4(sp)
+    sw      a1,0(sp)
+                    ;      label L45_0: 
+L45_0:
+                    ;      label branch_true_25: 
+branch_true_25:
+                    ;      ret 1_0 
+    ld      ra,16(sp)
+    ld      s0,8(sp)
+    li      a0, 1
+    addi    sp,sp,-24
+    ret
+                    ;      label branch_false_25: 
+branch_false_25:
+                    ;      label L46_0: 
+L46_0:
+                    ;      ret 0_0 
+    ld      ra,16(sp)
+    ld      s0,8(sp)
+    li      a0, 0
+    addi    sp,sp,-24
+    ret
+                    ;      Define dfs_0 [a_28, b_28, c_28, d_28, e_28, last_28] -> dfs_ret_0 
+    .global dfs
+    .type dfs @function
+dfs:
+                    ;mem layout:|ra_dfs:8|s0_dfs:8|a:4|b:4|c:4|d:4|e:4|last:4
+    addi    sp,sp,-40
+    sd      ra,32(sp)
+    sd      s0,24(sp)
+    addi    s0,sp,40
+    sw      a0,20(sp)
+    sw      a1,16(sp)
+    sw      a2,12(sp)
+    sw      a3,8(sp)
+    sw      a4,4(sp)
+    sw      a5,0(sp)
+                    ;      label L22_0: 
+L22_0:
+                    ;      label L23_0: 
+L23_0:
+                    ;      jump label: L24_0 
+    j       L24_0
+                    ;      label L24_0: 
+L24_0:
+                    ;      label L25_0: 
+L25_0:
+                    ;      label L26_0: 
+L26_0:
+                    ;      jump label: L27_0 
+    j       L27_0
+                    ;      label L27_0: 
+L27_0:
+                    ;      label L28_0: 
+L28_0:
+                    ;      jump label: L29_0 
+    j       L29_0
+                    ;      label L29_0: 
+L29_0:
+                    ;      label L30_0: 
+L30_0:
+                    ;      jump label: L31_0 
+    j       L31_0
+                    ;      label L31_0: 
+L31_0:
+                    ;      label L32_0: 
+L32_0:
+                    ;      label L33_0: 
+L33_0:
+                    ;      jump label: L34_0 
+    j       L34_0
+                    ;      label L34_0: 
+L34_0:
+                    ;      label L35_0: 
+L35_0:
+                    ;      label L36_0: 
+L36_0:
+                    ;      jump label: L37_0 
+    j       L37_0
+                    ;      label L37_0: 
+L37_0:
+                    ;      label L38_0: 
+L38_0:
+                    ;      label L39_0: 
+L39_0:
+                    ;      jump label: L40_0 
+    j       L40_0
+                    ;      label L40_0: 
+L40_0:
+                    ;      label L41_0: 
+L41_0:
+                    ;      label L42_0: 
+L42_0:
+                    ;      jump label: L43_0 
+    j       L43_0
+                    ;      label L43_0: 
+L43_0:
+                    ;      label L44_0: 
+L44_0:
+                    ;      Define main_0 [] -> main_ret_0 
+    .global main
+    .type main @function
+main:
+                    ;mem layout:|ra_main:8|s0_main:8
+    addi    sp,sp,-16
+    sd      ra,8(sp)
+    sd      s0,0(sp)
+    addi    s0,sp,16
+                    ;      label L0_0: 
+L0_0:
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L1_0: 
+L1_0:
+                    ;      label L2_0: 
+L2_0:
+                    ;      jump label: L3_0 
+    j       L3_0
+                    ;      label L3_0: 
+L3_0:
+                    ;      label L4_0: 
+L4_0:
+                    ;      jump label: L5_0 
+    j       L5_0
+                    ;      label L5_0: 
+L5_0:
+                    ;      label L6_0: 
+L6_0:
+                    ;      jump label: L7_0 
+    j       L7_0
+                    ;      label L7_0: 
+L7_0:
+                    ;      label L8_0: 
+L8_0:
+                    ;      jump label: L9_0 
+    j       L9_0
+                    ;      label L9_0: 
+L9_0:
+                    ;      label L10_0: 
+L10_0:
+                    ;      jump label: L11_0 
+    j       L11_0
+                    ;      label L11_0: 
+L11_0:
+                    ;      label L12_0: 
+L12_0:
+                    ;      jump label: L11_0 
+    j       L11_0
+                    ;      label L13_0: 
+L13_0:
+                    ;      jump label: L9_0 
+    j       L9_0
+                    ;      label L14_0: 
+L14_0:
+                    ;      jump label: L7_0 
+    j       L7_0
+                    ;      label L15_0: 
+L15_0:
+                    ;      jump label: L5_0 
+    j       L5_0
+                    ;      label L16_0: 
+L16_0:
+                    ;      jump label: L3_0 
+    j       L3_0
+                    ;      label L17_0: 
+L17_0:
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L18_0: 
+L18_0:
+                    ;      jump label: L19_0 
+    j       L19_0
+                    ;      label L19_0: 
+L19_0:
+                    ;      label L20_0: 
+L20_0:
+                    ;      jump label: L19_0 
+    j       L19_0
+                    ;      label L21_0: 
+L21_0:
+
+Pass Nhwc2RiscvDebugPass run successfully
+Pass SymtabDebugPass run successfully
+all passed finish 耗时: 610.334535ms
+all io tasks finish 耗时: 1.583µs

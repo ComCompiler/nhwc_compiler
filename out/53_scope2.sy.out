@@ -1,0 +1,108 @@
+Pass Code2AstPass run successfully
+29
+58
+96
+132
+163
+201
+237
+275
+306
+311
+342
+347
+376
+412
+443
+490
+534
+Pass Ast2ScopeTree run successfully
+Pass Ast2CfgPass run successfully
+[31m debuginfo is_const:false at decl_ndoe:3[0m
+[32m debuginfo visit 0[0m
+[32m debuginfo visit 1[0m
+[32m debuginfo eval et 0[0m
+[32m debuginfo eval et 1[0m
+Error occurred when running Pass Cfg2NhwcCfgPass
+
+Caused by:
+    这个cfg node:0 没有对应的entry节点
+Pass Ncfg2DjgPass run successfully
+Error occurred when running Pass MemAllocPass
+
+Caused by:
+    0: CfgNode  #Entry
+        15 
+        intmain(){k=3389;if(k<10000){k=k+1;intk=112;while(k>10){k=k-88;if(k<1000){intg=9;{intl=11;{g=10;k=k-g;intg=11;k=k+g+l;}}}}putint(k);}returnk;}
+       
+        $ @ # Fields 
+        {
+           "domiance_frontier_cfg_nodes": [],
+           "cor_dj_node": 1,
+       } $   downcast_op_any 失败 field_name:FUNC_COR_SYMIDX:func_cor_symidx src/toolkit/gen_nhwc_cfg.rs 75
+    1: can't find field SymIdx type:op_field
+Pass CfgDebugPass run successfully
+Pass NhwcCollectPass run successfully
+Pass Ast2EtDebugPass run successfully
+breakpoint: exit_0
+         breakpoint exit_0([]) ! 
+
+dot write finished Ok("/home/mineral/Compiler2024-nhwc")
+Successfully Transform to png debug_root_simu.png Output { status: ExitStatus(unix_wait_status(0)), stdout: "", stderr: "" }
+# Built-in library
+ .text
+ .align 4
+ .globl starttime
+ .type starttime, @function
+ starttime:
+ mv a0, zero
+ tail _sysy_starttime
+ 
+ .text
+ .align 4
+ .globl stoptime
+ .type stoptime, @function
+ stoptime:
+ mv a0, zero
+ tail _sysy_stoptime
+.section
+    .data
+.section
+    .text
+                    ;      label L0_0: 
+L0_0:
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L1_0: 
+L1_0:
+                    ;      label L2_0: 
+L2_0:
+                    ;      jump label: L3_0 
+    j       L3_0
+                    ;      label L3_0: 
+L3_0:
+                    ;      label L4_0: 
+L4_0:
+                    ;      jump label: L5_0 
+    j       L5_0
+                    ;      label L5_0: 
+L5_0:
+                    ;      label L6_0: 
+L6_0:
+                    ;      jump label: L7_0 
+    j       L7_0
+                    ;      label L7_0: 
+L7_0:
+                    ;      label L8_0: 
+L8_0:
+                    ;      jump label: L9_0 
+    j       L9_0
+                    ;      label L9_0: 
+L9_0:
+                    ;      label L10_0: 
+L10_0:
+
+Pass Nhwc2RiscvDebugPass run successfully
+Pass SymtabDebugPass run successfully
+all passed finish 耗时: 102.636053ms
+all io tasks finish 耗时: 2.785µs

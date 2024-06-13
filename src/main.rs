@@ -32,6 +32,9 @@ pub struct Args {
     // gen_png : bool
     #[arg(short, value_name = "debug", default_value = "false")]
     pub debug: bool,
+
+    #[arg(short, value_name = "with_header", default_value = "false")]
+    pub no_header:bool,
 }
 
 // 这是一个计时宏
@@ -80,7 +83,7 @@ fn main() {
         then nhwc_collect_pass
         // then simulator_debug_pass
         then ast2et_debug_pass
-        // then nhwc2riscv_pass
+        then nhwc2riscv_pass
         then symtab_debug_pass
         to pass_manager
         

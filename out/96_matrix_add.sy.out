@@ -1,0 +1,158 @@
+Pass Code2AstPass run successfully
+162
+174
+203
+241
+340
+439
+538
+575
+615
+644
+673
+702
+934
+946
+975
+1013
+1063
+1113
+1163
+1213
+1263
+1313
+1350
+1544
+1556
+1594
+1644
+1687
+1724
+1753
+1796
+1825
+1863
+1913
+1956
+1993
+2022
+2065
+2094
+2132
+2182
+2225
+2262
+2291
+2334
+Pass Ast2ScopeTree run successfully
+Pass Ast2CfgPass run successfully
+[31m debuginfo is_const:false at decl_ndoe:3[0m
+[32m debuginfo visit 0[0m
+[32m debuginfo visit 1[0m
+[32m debuginfo eval et 0[0m
+[32m debuginfo eval et 1[0m
+Error occurred when running Pass Cfg2NhwcCfgPass
+
+Caused by:
+    这个cfg node:0 没有对应的entry节点
+Pass Ncfg2DjgPass run successfully
+Error occurred when running Pass MemAllocPass
+
+Caused by:
+    0: CfgNode  #Entry
+        39 
+        intadd(floata0[],floata1[],floata2[],floatb0[],floatb1[],floatb2[],floatc0[],floatc1[],floatc2[]){inti;i=0;while(i<M){c0[i]=a0[i]+b0[i];c1[i]=a1[i]+b1[i];c2[i]=a2[i]+b2[i];i=i+1;}return0;}
+       
+        $ @ # Fields 
+        {
+           "cor_dj_node": 1,
+           "domiance_frontier_cfg_nodes": [],
+       } $   downcast_op_any 失败 field_name:FUNC_COR_SYMIDX:func_cor_symidx src/toolkit/gen_nhwc_cfg.rs 75
+    1: can't find field SymIdx type:op_field
+Pass CfgDebugPass run successfully
+Pass NhwcCollectPass run successfully
+Pass Ast2EtDebugPass run successfully
+breakpoint: exit_0
+         breakpoint exit_0([]) ! 
+
+dot write finished Ok("/home/mineral/Compiler2024-nhwc")
+Successfully Transform to png debug_root_simu.png Output { status: ExitStatus(unix_wait_status(0)), stdout: "", stderr: "" }
+# Built-in library
+ .text
+ .align 4
+ .globl starttime
+ .type starttime, @function
+ starttime:
+ mv a0, zero
+ tail _sysy_starttime
+ 
+ .text
+ .align 4
+ .globl stoptime
+ .type stoptime, @function
+ stoptime:
+ mv a0, zero
+ tail _sysy_stoptime
+.section
+    .data
+.section
+    .text
+                    ;      label L13_0: 
+L13_0:
+                    ;      jump label: L14_0 
+    j       L14_0
+                    ;      label L14_0: 
+L14_0:
+                    ;      label L15_0: 
+L15_0:
+                    ;      jump label: L14_0 
+    j       L14_0
+                    ;      label L16_0: 
+L16_0:
+                    ;      label L0_0: 
+L0_0:
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L1_0: 
+L1_0:
+                    ;      label L2_0: 
+L2_0:
+                    ;      jump label: L1_0 
+    j       L1_0
+                    ;      label L3_0: 
+L3_0:
+                    ;      jump label: L4_0 
+    j       L4_0
+                    ;      label L4_0: 
+L4_0:
+                    ;      label L5_0: 
+L5_0:
+                    ;      jump label: L4_0 
+    j       L4_0
+                    ;      label L6_0: 
+L6_0:
+                    ;      jump label: L7_0 
+    j       L7_0
+                    ;      label L7_0: 
+L7_0:
+                    ;      label L8_0: 
+L8_0:
+                    ;      jump label: L7_0 
+    j       L7_0
+                    ;      label L9_0: 
+L9_0:
+                    ;      jump label: L10_0 
+    j       L10_0
+                    ;      label L10_0: 
+L10_0:
+                    ;      label L11_0: 
+L11_0:
+                    ;      jump label: L10_0 
+    j       L10_0
+                    ;      label L12_0: 
+L12_0:
+
+Pass Nhwc2RiscvDebugPass run successfully
+Pass SymtabDebugPass run successfully
+all passed finish 耗时: 275.887044ms
+all io tasks finish 耗时: 1.886µs

@@ -37,7 +37,9 @@ impl Pass for Code2AstPass {
 
             void memset(void *s, int c, int n);
             void memcpy(void *dest, void *src, int n);";
-        // ctx.code += defs;
+        if !ctx.args.no_header{
+            ctx.code += defs;
+        }
 
         parse_as_ast_tree(ctx);
         // 生成对应的png

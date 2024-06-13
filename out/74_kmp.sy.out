@@ -1,0 +1,255 @@
+Pass Code2AstPass run successfully
+42
+96
+155
+205
+315
+351
+387
+530
+562
+623
+678
+728
+809
+845
+881
+935
+966
+1016
+1059
+1095
+1134
+1191
+1222
+1251
+1305
+1366
+1403
+1453
+1493
+1550
+1593
+1636
+1718
+1761
+Pass Ast2ScopeTree run successfully
+Pass Ast2CfgPass run successfully
+[32m debuginfo visit 34[0m
+[32m debuginfo visit 35[0m
+[32m debuginfo visit 39[0m
+[32m debuginfo visit 40[0m
+[32m debuginfo visit 36[0m
+[32m debuginfo visit 38[0m
+[32m debuginfo visit 37[0m
+[32m debuginfo eval et 34[0m
+[32m debuginfo eval et 35[0m
+[32m debuginfo eval et 36[0m
+[32m debuginfo eval et 37[0m
+[32m debuginfo eval et 38[0m
+[32m debuginfo eval et 39[0m
+[32m debuginfo eval et 40[0m
+[31m debuginfo eval_sub_et_nodes failed[0m
+Error occurred when running Pass Cfg2NhwcCfgPass
+
+Caused by:
+    scope为0符号表中未找到"next"
+Pass Ncfg2DjgPass run successfully
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:4 data_len:4[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo align:8 data_len:8[0m
+[34m debuginfo tail_remained:0[0m
+[34m debuginfo align:8 data_len:8[0m
+Pass MemAllocPass run successfully
+Pass CfgDebugPass run successfully
+Pass NhwcCollectPass run successfully
+Pass Ast2EtDebugPass run successfully
+breakpoint: exit_0
+         global Fn[]->starttime_ret_0 starttime_0 
+         global Fn[]->stoptime_ret_0 stoptime_0 
+         global Fn[s_14, c_14, n_14]->memset_ret_0 memset_0 
+         global Fn[dest_15, src_15, n_15]->memcpy_ret_0 memcpy_0 
+         breakpoint exit_0([]) ! 
+
+dot write finished Ok("/home/mineral/Compiler2024-nhwc")
+Successfully Transform to png debug_root_simu.png Output { status: ExitStatus(unix_wait_status(0)), stdout: "", stderr: "" }
+# Built-in library
+ .text
+ .align 4
+ .globl starttime
+ .type starttime, @function
+ starttime:
+ mv a0, zero
+ tail _sysy_starttime
+ 
+ .text
+ .align 4
+ .globl stoptime
+ .type stoptime, @function
+ stoptime:
+ mv a0, zero
+ tail _sysy_stoptime
+.section
+    .data
+.section
+    .text
+                    ;      Define get_next_0 [str[]_16, next[]_16] -> get_next_ret_0 
+    .global get_next
+    .type get_next @function
+get_next:
+                    ;mem layout:|ra_get_next:8|s0_get_next:8|str[]:4|next[]:4
+    addi    sp,sp,-24
+    sd      ra,16(sp)
+    sd      s0,8(sp)
+    addi    s0,sp,24
+    sw      a0,4(sp)
+    sw      a1,0(sp)
+                    ;      label L22_0: 
+L22_0:
+                    ;      jump label: L23_0 
+    j       L23_0
+                    ;      label L23_0: 
+L23_0:
+                    ;      label L24_0: 
+L24_0:
+                    ;      label L25_0: 
+L25_0:
+                    ;      jump label: L27_0 
+    j       L27_0
+                    ;      label L26_0: 
+L26_0:
+                    ;      jump label: L27_0 
+    j       L27_0
+                    ;      label L27_0: 
+L27_0:
+                    ;      Define KMP_0 [dst[]_31, src[]_31] -> KMP_ret_0 
+    .global KMP
+    .type KMP @function
+KMP:
+                    ;mem layout:|ra_KMP:8|s0_KMP:8|dst[]:4|src[]:4
+    addi    sp,sp,-24
+    sd      ra,16(sp)
+    sd      s0,8(sp)
+    addi    s0,sp,24
+    sw      a0,4(sp)
+    sw      a1,0(sp)
+                    ;      label L9_0: 
+L9_0:
+                    ;      jump label: L10_0 
+    j       L10_0
+                    ;      label L10_0: 
+L10_0:
+                    ;      label L11_0: 
+L11_0:
+                    ;      label L12_0: 
+L12_0:
+                    ;      jump label: L13_0 
+    j       L13_0
+                    ;      label L13_0: 
+L13_0:
+                    ;      label L14_0: 
+L14_0:
+                    ;      jump label: L15_0 
+    j       L15_0
+                    ;      label L15_0: 
+L15_0:
+                    ;      label L16_0: 
+L16_0:
+                    ;      jump label: L17_0 
+    j       L17_0
+                    ;      label L17_0: 
+L17_0:
+                    ;      label L18_0: 
+L18_0:
+                    ;      jump label: L19_0 
+    j       L19_0
+                    ;      label L19_0: 
+L19_0:
+                    ;      label L20_0: 
+L20_0:
+                    ;      label L21_0: 
+L21_0:
+                    ;      Define read_str_0 [buf[]_57] -> read_str_ret_0 
+    .global read_str
+    .type read_str @function
+read_str:
+                    ;mem layout:|ra_read_str:8|s0_read_str:8|buf[]:4|none:4
+    addi    sp,sp,-24
+    sd      ra,16(sp)
+    sd      s0,8(sp)
+    addi    s0,sp,24
+    sw      a0,4(sp)
+                    ;      label L1_0: 
+L1_0:
+                    ;      jump label: L2_0 
+    j       L2_0
+                    ;      label L2_0: 
+L2_0:
+                    ;      label L3_0: 
+L3_0:
+                    ;      jump label: L4_0 
+    j       L4_0
+                    ;      label L4_0: 
+L4_0:
+                    ;      label L5_0: 
+L5_0:
+                    ;      jump label: L6_0 
+    j       L6_0
+                    ;      label L6_0: 
+L6_0:
+                    ;      label L7_0: 
+L7_0:
+                    ;      jump label: L2_0 
+    j       L2_0
+                    ;      label L8_0: 
+L8_0:
+                    ;      Define main_0 [] -> main_ret_0 
+    .global main
+    .type main @function
+main:
+                    ;mem layout:|ra_main:8|s0_main:8
+    addi    sp,sp,-16
+    sd      ra,8(sp)
+    sd      s0,0(sp)
+    addi    s0,sp,16
+                    ;      label L0_0: 
+L0_0:
+
+Pass Nhwc2RiscvDebugPass run successfully
+Pass SymtabDebugPass run successfully
+all passed finish 耗时: 463.881543ms
+all io tasks finish 耗时: 1.725µs

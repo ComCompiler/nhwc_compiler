@@ -258,7 +258,6 @@ impl Value {
         Type::arith_adapt(&self.to_type() ,&value2.to_type())
     }
 
-    /// 当且仅当它为整数时可以转化为symidx
     pub fn to_symidx(&self)->Result<SymIdx>{
         match self{
             Value::I32(op_i32) => {
@@ -280,6 +279,9 @@ impl Value {
                 }
 
             },
+            Value::Ref { symidx, ty } => {
+                Ok(symidx.clone())
+            }
             _ => Err(anyhow!("{:?}无法转化为 symidx",self))
         }
     }

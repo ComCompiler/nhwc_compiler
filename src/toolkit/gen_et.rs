@@ -9,7 +9,7 @@ use crate::antlr_parser::cparser::{
 };
 
 use crate::toolkit::symtab::SymIdx;
-use crate::{add_node, add_node_with_edge, debug_info_red, direct_child_node, find, find_nodes, node, rule_id, term_id};
+use crate::{add_node, add_node_with_edge, debug_info_red, debug_info_yellow, direct_child_node, find, find_nodes, node, rule_id, term_id};
 
 use super::et_node::{DeclOrDefOrUse, EtNodeType, EtTree};
 use super::eval_et::{compress_et};
