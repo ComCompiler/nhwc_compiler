@@ -136,7 +136,7 @@ impl Debug for Asm{
                         writeln!(f,"    .align {}",align)
                     },
                     AsmAttr::Global { label} => {
-                        writeln!(f,"    .globa {:?}",label)
+                        writeln!(f,"    .globl {:?}",label)
                     },
                     AsmAttr::Data {  } => {
                         writeln!(f,"    .data")
