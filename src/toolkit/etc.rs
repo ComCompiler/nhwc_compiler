@@ -3,7 +3,7 @@ use std::{
 };
 
 use colored::Colorize;
-use crate::instr;
+use crate::{direct_parent_nodes, instr};
 
 use crate::{
     direct_child_nodes, toolkit::dot::{Config, Dot}
@@ -81,6 +81,12 @@ where
 {
     dfs_with_predicate(graph, start_node, |_e |true)
 }   
+pub fn reverse_dfs<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32) -> Vec<u32>
+where
+    Ty: EdgeType,
+{
+    reverse_dfs_with_predicate(graph, start_node, |_e |true)
+}   
 /// dfs,但是添加了对边的判定
 pub fn dfs_with_predicate<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, mut predicate:impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->bool)-> Vec<u32>
 where
@@ -92,6 +98,31 @@ where
     // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
     _dfs_with_predicate(graph, start_node, &mut visited, &mut dfs_vec, &mut predicate);
     dfs_vec
+}
+pub fn reverse_dfs_with_predicate<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, mut predicate:impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->bool)-> Vec<u32>
+where
+    Ty: EdgeType,
+{
+    let mut visited:Vec<bool> = vec![false; graph.node_count()];
+    let mut dfs_vec:Vec<u32> = vec![];
+    visited[start_node as usize] = true;
+    // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
+    _reverse_dfs_with_predicate(graph, start_node, &mut visited, &mut dfs_vec, &mut predicate);
+    dfs_vec
+}
+fn _reverse_dfs_with_predicate<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, dfs_vec:&mut Vec<u32>, predicate:&mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->bool)
+where
+    Ty: EdgeType,
+{
+    dfs_vec.push(start_node);
+    visited[start_node as usize] = true;
+    let nodes = direct_parent_nodes!(at start_node in graph with_predicate {|e|predicate(e)});
+    // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
+    for node in nodes {
+        if !visited[node as usize] {
+            _reverse_dfs_with_predicate(graph, node, visited, dfs_vec, predicate);
+        }
+    }
 }
 fn _dfs_with_predicate<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, dfs_vec:&mut Vec<u32>, predicate:&mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->bool)
 where

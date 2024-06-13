@@ -1892,6 +1892,17 @@ pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph)
     head.zip(tail).ok_or(anyhow!("while 或 loop {} 里面在cfg中没有对应的head 或tail", cfg_node))
 }
 
+// return the corresponding while block's while node of the cfg_node 
+pub fn get_while_or_for_node_of_cfg_node(cfg_node:u32, cfg_graph:&mut CfgGraph) -> Result<u32>{
+    let dfs_nodes = etc::reverse_dfs(cfg_graph, cfg_node);
+    for cfg_node in dfs_nodes{
+        if node!(at cfg_node in cfg_graph).cfg_node_type.is_for_loop() || 
+        node!(at cfg_node in cfg_graph).cfg_node_type.is_while_loop(){
+            return Ok(cfg_node)
+        }
+    }
+    Err(anyhow!("can't find corresponding while block's while node of the cfg_node"))
+}
 
 pub fn find_gather_of_branch_downward(cfg_branch_node:u32,cfg_graph:&CfgGraph)-> Result<u32>{
     let cur_branch_layer_count = 0;
