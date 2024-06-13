@@ -3,7 +3,7 @@
 use crate::{direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, toolkit::rv64_instr::{Arithmetic}};
 use anyhow::*;
 
-use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Type, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType}, rv64_instr::{Compare, Imm, Loads, Logical, PseudoInstr, RV64Instr, Register, Shifts, Stores, Trans}, simulator::Simulator, symtab::{SymIdx, SymTab}};
+use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Type, nhwc_instr::{FuncOp, InstrSlab, NhwcInstr, NhwcInstrType}, rv64_instr::{Compare, Imm, Loads, Logical, PseudoInstr, RV64Instr, Register, Shifts, Stores, Trans}, simulator::Simulator, symtab::{self, SymIdx, SymTab}};
 
 /// convert nhwc ir into riscv
 pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RV64Instr>, asm_structure:&mut AsmStructure, src_symtab:&SymTab)->Result<()>{
@@ -42,10 +42,10 @@ fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhwc
                     },
                     _ => {
                         asm_sect.align(vartype.get_align()?);
-                        asm_sect.global(Imm::new_jump_label(var_symidx.clone()));
+                        asm_sect.global(Imm::new_global_label(var_symidx.clone()));
                         asm_sect.annotation(format!("{:?}",&instr!(at instr in nhwc_instr_slab)?));
-                        asm_sect.obj_type(Imm::new_jump_label(var_symidx.clone()));
-                        asm_sect.label(Imm::new_jump_label(var_symidx.clone()));
+                        asm_sect.obj_type(Imm::new_global_label(var_symidx.clone()));
+                        asm_sect.label(Imm::new_global_label(var_symidx.clone()));
                         asm_sect.apply_value(simulator.simu_symtab.get_symbol(&var_symidx.to_src_symidx())?.get_simu_val()?)?;
                     }
                 }
@@ -104,12 +104,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                 asm_sect.annotation(format!("{:?}",instr_struct));
                 match &instr_struct.instr_type{
                     NhwcInstrType::Label { label_symidx } => {
-                        asm_sect.label(Imm::new_jump_label(label_symidx.clone()));
+                        asm_sect.label(Imm::new_local_label(label_symidx.clone()));
                     },
                     NhwcInstrType::DefineFunc { func_symidx, ret_symidx: _, args } => {
-                        asm_sect.global(Imm::new_func_label(func_symidx.clone()));
-                        asm_sect.func_type(Imm::new_func_label(func_symidx.clone()));
-                        asm_sect.label(Imm::new_func_label(func_symidx.clone()));
+                        asm_sect.global(Imm::new_global_label(func_symidx.clone()));
+                        asm_sect.func_type(Imm::new_global_label(func_symidx.clone()));
+                        asm_sect.label(Imm::new_global_label(func_symidx.clone()));
                         let mem_layout = node!(at cfg_entry_node in cfg_graph).get_mem_layout()?;
                         asm_sect.annotation(format!("mem layout:{:?}",mem_layout));
                         // apply for stack mem
@@ -450,7 +450,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         load_sym_or_imm(&mut asm_sect, rhs, val_reg1.clone(), src_symtab)?;
                         store_sym(&mut asm_sect, lhs,val_reg1, src_symtab)?;
                     },
-                    NhwcInstrType::Call { op_assigned_symidx: _, func_op } => {
+                    NhwcInstrType::Call { op_assigned_symidx, func_op } => {
                         let mut fpu_args = vec![];
                         let mut gpr_args = vec![];
                         for (_idx,arg) in func_op.actual_arg_symidx_vec.iter().enumerate(){
@@ -469,7 +469,27 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         for (idx,arg) in gpr_args.iter().enumerate(){
                             load_sym_or_imm(&mut asm_sect, arg, Register::new_a(idx as u8), src_symtab)?;
                         }   
-                        asm_sect.asm(PseudoInstr::new_call(Imm::new_func_label(func_op.func_symidx.clone())).into());
+                        asm_sect.asm(PseudoInstr::new_call(Imm::new_global_label(func_op.func_symidx.clone())).into());
+                        match op_assigned_symidx{
+                            Some(assigned_symidx) => {
+                                match src_symtab.get_symbol(assigned_symidx)?.get_type()?{
+                                    Type::I32 => {
+                                        store_sym(&mut asm_sect, assigned_symidx, Register::new_a(0), src_symtab)?;
+                                    },
+                                    Type::F32 => {
+                                        store_sym(&mut asm_sect, assigned_symidx, Register::new_fa(0), src_symtab)?;
+                                    },
+                                    _ => {
+                                        return Err(anyhow!("ret type is not supported: {:?}",instr_struct))
+                                    }
+                                }
+                            },
+                            None => {
+
+                            },
+                        }
+                        
+                        
                     },
                     NhwcInstrType::Jump { jump_op } => {
                         match jump_op{
@@ -493,12 +513,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                             super::nhwc_instr::JumpOp::Br { cond, t1, t2 } => {
                                 let val_reg = Register::new_s(1);
                                 load_sym_or_imm(&mut asm_sect, cond, val_reg.clone(), src_symtab)?;
-                                asm_sect.asm(PseudoInstr::new_bnez(val_reg.clone(),Imm::new_jump_label(t1.clone())).into());
-                                asm_sect.asm(PseudoInstr::new_j(Imm::new_jump_label(t2.clone())).into());
+                                asm_sect.asm(PseudoInstr::new_bnez(val_reg.clone(),Imm::new_local_label(t1.clone())).into());
+                                asm_sect.asm(PseudoInstr::new_j(Imm::new_local_label(t2.clone())).into());
                             },
                             super::nhwc_instr::JumpOp::Switch { cond: _, default: _, compared: _ } => todo!(),
                             super::nhwc_instr::JumpOp::DirectJump { label_symidx } => {
-                                asm_sect.asm(PseudoInstr::new_j(Imm::new_jump_label(label_symidx.clone())).into())
+                                asm_sect.asm(PseudoInstr::new_j(Imm::new_local_label(label_symidx.clone())).into())
                             },
                         }
                     },

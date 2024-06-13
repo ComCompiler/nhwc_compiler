@@ -18,10 +18,10 @@ use super::symtab::SymIdx;
 
 #[derive(Clone)]
 pub enum Imm{
-    FuncLabel{
+    GlobalLabel{
         symidx:SymIdx,
     },
-    JumpLabel{
+    LocalLabel{
         symidx:SymIdx,
     },
     Literal{
@@ -29,11 +29,11 @@ pub enum Imm{
     }
 }
 impl Imm{
-    pub fn new_jump_label(label:SymIdx) -> Self{
-        Self::JumpLabel { symidx:label } 
+    pub fn new_local_label(label:SymIdx) -> Self{
+        Self::LocalLabel { symidx:label } 
     }
-    pub fn new_func_label(label:SymIdx) -> Self{
-        Self::FuncLabel  { symidx:label } 
+    pub fn new_global_label(label:SymIdx) -> Self{
+        Self::GlobalLabel  { symidx:label } 
     }
     pub fn new_literal(symidx:SymIdx) -> Self{
         Self::Literal { symidx }
@@ -46,7 +46,7 @@ impl Imm{
 impl Debug for Imm{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::FuncLabel {symidx} =>{
+            Self::GlobalLabel {symidx} =>{
                 write!(f,"{}",symidx.symbol_name)
             },
             Self::Literal { symidx } => {
@@ -63,8 +63,8 @@ impl Debug for Imm{
                     }
                 }
             }
-            Self::JumpLabel { symidx } => {
-                write!(f,"{:?}",symidx)
+            Self::LocalLabel { symidx } => {
+                write!(f,".{:?}",symidx)
             },
         }
     }
