@@ -23,7 +23,7 @@ pub struct Args {
     #[arg(short='S', value_name = "assemble", default_value = "true")]
     pub assembly:bool,
     // output file path
-    #[clap(short, long, default_value = "-")]
+    #[clap(short, long, default_value = "./testcase.s")]
     pub output: PathBuf,
     /// Optimization level
     #[arg(short='O', value_name = "optimize", default_value = "")]
