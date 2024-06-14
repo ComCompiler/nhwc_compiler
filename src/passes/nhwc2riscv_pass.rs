@@ -2,7 +2,7 @@ use std::fs;
 use std::io::Write;
 
 use crate::toolkit::{context::NhwcCtx, gen_riscv_asm::parse_nhwcir2riscv, pass_manager::Pass};
-use anyhow::Result;
+use anyhow::*;
 #[derive(Debug)]
 pub struct Nhwc2RiscvPass {
     is_gen_png:bool,
@@ -27,6 +27,7 @@ stoptime:\n\tmv a0, zero\n\ttail _sysy_stoptime\n\n\n";
         parse_nhwcir2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, asm_structure, src_symtab)?;
         // if self.is_write_s_file{
         std::fs::write(&ctx.args.output, format!("{}",ctx.asm_structure.dump(self.enable_annotation))).unwrap();
+        return Err(anyhow!("write ?????? {}",ctx.args.output.to_str().unwrap()));
         Ok(())
     }
     // 返回pass的描述，具体作用
