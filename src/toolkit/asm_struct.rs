@@ -13,7 +13,7 @@ impl AsmStructure{
         Self { sects: vec![] }
     }
     pub fn dump(&self,enable_annotation:bool) -> String{
-        let built_in_part = "# Built-in library\n .section\n.text\n .align 4\n .globl starttime\n .type starttime, @function\n starttime:\n mv a0, zero\n tail _sysy_starttime\n \n .text\n .align 4\n .globl stoptime\n .type stoptime, @function\n stoptime:\n mv a0, zero\n tail _sysy_stoptime\n\n\n";
+        let built_in_part = "# Built-in library\n .text\n .align 4\n .globl starttime\n .type starttime, @function\n starttime:\n mv a0, zero\n tail _sysy_starttime\n \n .text\n .align 4\n .globl stoptime\n .type stoptime, @function\n stoptime:\n mv a0, zero\n tail _sysy_stoptime\n\n\n";
         // let built_in_part = "";
         let mut s = String::new();
         for sect in &self.sects{
