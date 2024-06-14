@@ -1,0 +1,49 @@
+      global Fn[]->getint_ret_0 getint_0 
+      global Fn[]->getch_ret_0 getch_0 
+      global Fn[a_3]->getarray_ret_0 getarray_0 
+      global Fn[]->getfloat_ret_0 getfloat_0 
+      global Fn[a_5]->getfarray_ret_0 getfarray_0 
+      global Fn[x_6]->putint_ret_0 putint_0 
+      global Fn[x_7]->putch_ret_0 putch_0 
+      global Fn[x_8, a_8]->putarray_ret_0 putarray_0 
+      global Fn[x_9]->putfloat_ret_0 putfloat_0 
+      global Fn[x_10, a_10]->putfarray_ret_0 putfarray_0 
+      global Fn[]->putf_ret_0 putf_0 
+      global Fn[]->starttime_ret_0 starttime_0 
+      global Fn[]->stoptime_ret_0 stoptime_0 
+      global Fn[s_14, c_14, n_14]->memset_ret_0 memset_0 
+      global Fn[dest_15, src_15, n_15]->memcpy_ret_0 memcpy_0 
+      Define main_0 [] -> main_ret_0 
+              alloc i32 i_17 
+              alloc i32 sum_17 
+              alloc i1 temp_0_22 
+              alloc i1 temp_1_25 
+              alloc i32 temp_2_24 
+              alloc i32 temp_3_24 
+          label L0_0: 
+              new_var i_17:i32 
+              i_17 = i32 0_0 
+              new_var sum_17:i32 
+              sum_17 = i32 0_0 
+              jump label: while.head_23 
+          label while.head_23: 
+              new_var temp_0_22:i1 
+              temp_0_22 = icmp i32 Slt i_17, 100_0 
+              br i1 temp_0_22, label while.body_23, label while.exit_23 
+          label while.body_23: 
+              new_var temp_1_25:i1 
+              temp_1_25 = icmp i32 Eq i_17, 50_0 
+              br i1 temp_1_25, label branch_true_26, label branch_false_26 
+          label branch_true_26: 
+              jump label: while.body_23 
+          label branch_false_26: 
+          label L1_0: 
+              new_var temp_2_24:i32 
+              temp_2_24 = Add i32 sum_17, i_17 
+              sum_17 = i32 temp_2_24 
+              new_var temp_3_24:i32 
+              temp_3_24 = Add i32 i_17, 1_0 
+              i_17 = i32 temp_3_24 
+              jump label: while.head_23 
+          label while.exit_23: 
+              ret sum_17 

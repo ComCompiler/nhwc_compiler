@@ -1,0 +1,361 @@
+      global i32 d_0 
+      global i32 b_0 
+      global i32 a_0 
+      global Fn[]->getint_ret_0 getint_0 
+      global Fn[]->getch_ret_0 getch_0 
+      global Fn[a_4]->getarray_ret_0 getarray_0 
+      global Fn[]->getfloat_ret_0 getfloat_0 
+      global Fn[a_6]->getfarray_ret_0 getfarray_0 
+      global Fn[x_7]->putint_ret_0 putint_0 
+      global Fn[x_8]->putch_ret_0 putch_0 
+      global Fn[x_9, a_9]->putarray_ret_0 putarray_0 
+      global Fn[x_10]->putfloat_ret_0 putfloat_0 
+      global Fn[x_11, a_11]->putfarray_ret_0 putfarray_0 
+      global Fn[]->putf_ret_0 putf_0 
+      global Fn[]->starttime_ret_0 starttime_0 
+      global Fn[]->stoptime_ret_0 stoptime_0 
+      global Fn[s_15, c_15, n_15]->memset_ret_0 memset_0 
+      global Fn[dest_16, src_16, n_16]->memcpy_ret_0 memcpy_0 
+      Define main_0 [] -> main_ret_0 
+              alloc i32 temp_3_33 
+              alloc i32 temp_4_33 
+              alloc i32 temp_5_33 
+              alloc i32 temp_6_33 
+              alloc i32 c_33 
+              alloc i32 temp_7_33 
+              alloc i32 temp_8_33 
+              alloc i32 i0_33 
+              alloc i32 i1_33 
+              alloc i32 i2_33 
+              alloc i32 i3_33 
+              alloc i32 i4_33 
+              alloc i32 temp_9_36 
+              alloc i32 temp_10_36 
+              alloc i1 temp_11_36 
+              alloc i1 temp_12_36 
+              alloc i1 temp_13_36 
+              alloc i32 temp_14_45 
+              alloc i32 temp_15_45 
+              alloc i1 temp_16_45 
+              alloc i1 temp_17_45 
+              alloc i1 temp_18_45 
+              alloc i32 temp_19_54 
+              alloc i1 temp_20_54 
+              alloc i1 temp_21_54 
+              alloc i1 temp_22_54 
+              alloc i32 temp_23_59 
+              alloc i1 temp_24_59 
+              alloc i1 temp_25_59 
+              alloc i1 temp_26_59 
+              alloc i1 temp_27_64 
+              alloc i1 temp_28_68 
+              alloc i1 temp_29_71 
+              alloc i32 temp_30_71 
+              alloc i1 temp_31_71 
+              alloc i1 temp_32_75 
+              alloc i32 temp_33_75 
+              alloc i1 temp_34_75 
+              alloc i1 temp_35_79 
+              alloc i32 temp_36_82 
+              alloc i1 temp_37_82 
+              alloc i1 temp_38_87 
+              alloc i1 temp_39_87 
+              alloc i1 temp_40_87 
+              alloc i1 temp_41_90 
+              alloc i1 temp_42_90 
+              alloc i1 temp_43_90 
+              alloc i1 temp_44_93 
+              alloc i1 temp_45_93 
+              alloc i1 temp_46_93 
+              alloc i1 temp_47_96 
+              alloc i1 temp_48_96 
+              alloc i1 temp_49_96 
+              alloc i1 temp_50_100 
+              alloc i1 temp_51_100 
+              alloc i1 temp_52_100 
+              alloc i1 temp_53_100 
+              alloc i32 temp_54_100 
+              alloc i1 temp_55_100 
+              alloc i1 temp_56_100 
+              alloc i1 temp_57_100 
+              alloc i1 temp_58_104 
+              alloc i1 temp_59_104 
+              alloc i1 temp_60_104 
+              alloc i1 temp_61_104 
+              alloc i1 temp_62_104 
+              alloc i32 temp_63_104 
+              alloc i1 temp_64_104 
+              alloc i1 temp_65_104 
+          label L0_0: 
+              store 2_0:i32 *a_0:ptr->i32 
+              store 3_0:i32 *b_0:ptr->i32 
+              jump label: L1_0 
+          label L1_0: 
+              new_var temp_9_36:i32 
+              temp_9_36 =  Call i32 set_b_0(1_0) 
+              new_var temp_10_36:i32 
+              temp_10_36 =  Call i32 set_a_0(0_0) 
+              new_var temp_11_36:i1 
+              temp_11_36 = icmp i1 Ne temp_10_36, 0_0 
+              new_var temp_12_36:i1 
+              temp_11_36 = icmp i1 Ne temp_9_36, 0_0 
+              new_var temp_13_36:i1 
+              temp_13_36 = And i1 temp_11_36, temp_12_36 
+              br i1 temp_13_36, label branch_true_37, label branch_false_37 
+          label branch_false_37: 
+          label L2_0: 
+              new_var temp_3_33:i32 
+              temp_3_33 = load *a_0:ptr->i32 
+               Call void putint_0(temp_3_33) 
+               Call void putch_0(32_0) 
+              new_var temp_4_33:i32 
+              temp_4_33 = load *b_0:ptr->i32 
+               Call void putint_0(temp_4_33) 
+               Call void putch_0(32_0) 
+              store 2_0:i32 *a_0:ptr->i32 
+              store 3_0:i32 *b_0:ptr->i32 
+              jump label: L3_0 
+          label L3_0: 
+              new_var temp_14_45:i32 
+              temp_14_45 =  Call i32 set_b_0(1_0) 
+              new_var temp_15_45:i32 
+              temp_15_45 =  Call i32 set_a_0(0_0) 
+              new_var temp_16_45:i1 
+              temp_16_45 = icmp i1 Ne temp_15_45, 0_0 
+              new_var temp_17_45:i1 
+              temp_16_45 = icmp i1 Ne temp_14_45, 0_0 
+              new_var temp_18_45:i1 
+              temp_18_45 = And i1 temp_16_45, temp_17_45 
+              br i1 temp_18_45, label branch_true_46, label branch_false_46 
+          label branch_true_46: 
+              jump label: branch_false_46 
+          label branch_false_46: 
+          label L4_0: 
+              new_var temp_5_33:i32 
+              temp_5_33 = load *a_0:ptr->i32 
+               Call void putint_0(temp_5_33) 
+               Call void putch_0(32_0) 
+              new_var temp_6_33:i32 
+              temp_6_33 = load *b_0:ptr->i32 
+               Call void putint_0(temp_6_33) 
+               Call void putch_0(10_0) 
+              c_33 = i32 1_0 
+              store 2_0:i32 *d_0:ptr->i32 
+              jump label: L5_0 
+          label L5_0: 
+              new_var temp_19_54:i32 
+              temp_19_54 =  Call i32 set_d_0(3_0) 
+              new_var temp_20_54:i1 
+              temp_20_54 = icmp i1 Ne temp_19_54, 0_0 
+              new_var temp_21_54:i1 
+              temp_20_54 = icmp i1 Ne true_0, 0_0 
+              new_var temp_22_54:i1 
+              temp_22_54 = And i1 temp_20_54, temp_21_54 
+              br i1 temp_22_54, label branch_true_55, label branch_false_55 
+          label branch_true_55: 
+              jump label: branch_false_55 
+          label branch_false_55: 
+          label L6_0: 
+              new_var temp_7_33:i32 
+              temp_7_33 = load *d_0:ptr->i32 
+               Call void putint_0(temp_7_33) 
+               Call void putch_0(32_0) 
+              jump label: L7_0 
+          label L7_0: 
+              new_var temp_23_59:i32 
+              temp_23_59 =  Call i32 set_d_0(4_0) 
+              new_var temp_24_59:i1 
+              temp_24_59 = icmp i1 Ne temp_23_59, 0_0 
+              new_var temp_25_59:i1 
+              temp_24_59 = icmp i1 Ne true_0, 0_0 
+              new_var temp_26_59:i1 
+              temp_26_59 = Or i1 temp_24_59, temp_25_59 
+              br i1 temp_26_59, label branch_true_60, label branch_false_60 
+          label branch_false_60: 
+          label L8_0: 
+              new_var temp_8_33:i32 
+              temp_8_33 = load *d_0:ptr->i32 
+               Call void putint_0(temp_8_33) 
+               Call void putch_0(10_0) 
+              jump label: L9_0 
+          label L9_0: 
+              new_var temp_27_64:i1 
+              temp_27_64 = icmp i1 Sge 16_0, 0_0 
+              br i1 temp_27_64, label branch_true_65, label branch_false_65 
+          label branch_true_65: 
+               Call void putch_0(65_0) 
+              jump label: branch_false_65 
+          label branch_false_65: 
+          label L10_0: 
+              new_var temp_28_68:i1 
+              temp_28_68 = icmp i1 Ne 18_0, 18_0 
+              br i1 temp_28_68, label branch_true_69, label branch_false_69 
+          label branch_true_69: 
+               Call void putch_0(66_0) 
+              jump label: branch_false_69 
+          label branch_false_69: 
+          label L11_0: 
+              new_var temp_29_71:i1 
+              temp_29_71 = icmp i1 Slt 1_0, 8_0 
+              new_var temp_30_71:i32 
+              temp_30_71 = zext i1 temp_29_71 to i32 
+              new_var temp_31_71:i1 
+              temp_31_71 = icmp i1 Ne temp_30_71, 1_0 
+              br i1 temp_31_71, label branch_true_72, label branch_false_72 
+          label branch_true_72: 
+               Call void putch_0(67_0) 
+              jump label: branch_false_72 
+          label branch_false_72: 
+          label L12_0: 
+              new_var temp_32_75:i1 
+              temp_32_75 = icmp i1 Sgt 3_0, 4_0 
+              new_var temp_33_75:i32 
+              temp_33_75 = zext i1 temp_32_75 to i32 
+              new_var temp_34_75:i1 
+              temp_34_75 = icmp i1 Eq temp_33_75, 0_0 
+              br i1 temp_34_75, label branch_true_76, label branch_false_76 
+          label branch_true_76: 
+               Call void putch_0(68_0) 
+              jump label: branch_false_76 
+          label branch_false_76: 
+          label L13_0: 
+              new_var temp_35_79:i1 
+              temp_35_79 = icmp i1 Eq 1_0, false_0 
+              br i1 temp_35_79, label branch_true_80, label branch_false_80 
+          label branch_true_80: 
+               Call void putch_0(69_0) 
+              jump label: branch_false_80 
+          label branch_false_80: 
+          label L14_0: 
+              new_var temp_36_82:i32 
+              temp_36_82 = Sub i32 0_0, 0_0 
+              new_var temp_37_82:i1 
+              temp_37_82 = icmp i1 Eq temp_36_82, -1_0 
+              br i1 temp_37_82, label branch_true_83, label branch_false_83 
+          label branch_true_83: 
+               Call void putch_0(70_0) 
+              jump label: branch_false_83 
+          label branch_false_83: 
+          label L15_0: 
+               Call void putch_0(10_0) 
+              i0_33 = i32 0_0 
+              i1_33 = i32 1_0 
+              i2_33 = i32 2_0 
+              i3_33 = i32 3_0 
+              i4_33 = i32 4_0 
+              jump label: while.head_88 
+          label while.head_88: 
+              new_var temp_38_87:i1 
+              temp_38_87 = icmp i1 Ne i0_33, 0_0 
+              new_var temp_39_87:i1 
+              temp_38_87 = icmp i1 Ne i1_33, 0_0 
+              new_var temp_40_87:i1 
+              temp_40_87 = And i1 temp_38_87, temp_39_87 
+              br i1 temp_40_87, label while.body_88, label while.exit_88 
+          label while.body_88: 
+               Call void putch_0(32_0) 
+              jump label: while.head_88 
+          label while.exit_88: 
+              new_var temp_41_90:i1 
+              temp_41_90 = icmp i1 Ne i0_33, 0_0 
+              new_var temp_42_90:i1 
+              temp_41_90 = icmp i1 Ne i1_33, 0_0 
+              new_var temp_43_90:i1 
+              temp_43_90 = Or i1 temp_41_90, temp_42_90 
+              br i1 temp_43_90, label branch_true_91, label branch_false_91 
+          label branch_true_91: 
+               Call void putch_0(67_0) 
+              jump label: branch_false_91 
+          label branch_false_91: 
+          label L16_0: 
+              new_var temp_44_93:i1 
+              temp_44_93 = icmp i1 Sle i1_33, i0_33 
+              new_var temp_45_93:i1 
+              temp_45_93 = icmp i1 Sge i0_33, i1_33 
+              new_var temp_46_93:i1 
+              temp_46_93 = Or i1 temp_45_93, temp_44_93 
+              br i1 temp_46_93, label branch_true_94, label branch_false_94 
+          label branch_true_94: 
+               Call void putch_0(72_0) 
+              jump label: branch_false_94 
+          label branch_false_94: 
+          label L17_0: 
+              new_var temp_47_96:i1 
+              temp_47_96 = icmp i1 Ne i4_33, i3_33 
+              new_var temp_48_96:i1 
+              temp_48_96 = icmp i1 Sge i2_33, i1_33 
+              new_var temp_49_96:i1 
+              temp_49_96 = And i1 temp_48_96, temp_47_96 
+              br i1 temp_49_96, label branch_true_97, label branch_false_97 
+          label branch_true_97: 
+               Call void putch_0(73_0) 
+              jump label: branch_false_97 
+          label branch_false_97: 
+          label L18_0: 
+              new_var temp_50_100:i1 
+              temp_50_100 = icmp i1 Sge i4_33, i4_33 
+              new_var temp_51_100:i1 
+              temp_51_100 = icmp i1 Slt i3_33, i3_33 
+              new_var temp_52_100:i1 
+              temp_52_100 = icmp i1 Ne i1_33, 0_0 
+              new_var temp_53_100:i1 
+              temp_53_100 = xor i1 temp_52_100, true 
+              new_var temp_54_100:i32 
+              temp_54_100 = zext i1 temp_53_100 to i32 
+              new_var temp_55_100:i1 
+              temp_55_100 = icmp i1 Eq i0_33, temp_54_100 
+              new_var temp_56_100:i1 
+              temp_56_100 = And i1 temp_55_100, temp_51_100 
+              new_var temp_57_100:i1 
+              temp_57_100 = Or i1 temp_56_100, temp_50_100 
+              br i1 temp_57_100, label branch_true_101, label branch_false_101 
+          label branch_true_101: 
+               Call void putch_0(74_0) 
+              jump label: branch_false_101 
+          label branch_false_101: 
+          label L19_0: 
+              new_var temp_58_104:i1 
+              temp_58_104 = icmp i1 Sge i4_33, i4_33 
+              new_var temp_59_104:i1 
+              temp_59_104 = icmp i1 Slt i3_33, i3_33 
+              new_var temp_60_104:i1 
+              temp_60_104 = And i1 temp_59_104, temp_58_104 
+              new_var temp_61_104:i1 
+              temp_61_104 = icmp i1 Ne i1_33, 0_0 
+              new_var temp_62_104:i1 
+              temp_62_104 = xor i1 temp_61_104, true 
+              new_var temp_63_104:i32 
+              temp_63_104 = zext i1 temp_62_104 to i32 
+              new_var temp_64_104:i1 
+              temp_64_104 = icmp i1 Eq i0_33, temp_63_104 
+              new_var temp_65_104:i1 
+              temp_65_104 = Or i1 temp_64_104, temp_60_104 
+              br i1 temp_65_104, label branch_true_105, label branch_false_105 
+          label branch_true_105: 
+               Call void putch_0(75_0) 
+              jump label: branch_false_105 
+          label branch_false_105: 
+          label L20_0: 
+               Call void putch_0(10_0) 
+              ret 0_0 
+      Define set_d_0 [val_27] -> set_d_ret_0 
+              alloc i32 temp_2_29 
+          label L21_0: 
+              store val_27:i32 *d_0:ptr->i32 
+              new_var temp_2_29:i32 
+              temp_2_29 = load *d_0:ptr->i32 
+              ret temp_2_29 
+      Define set_b_0 [val_22] -> set_b_ret_0 
+              alloc i32 temp_1_24 
+          label L22_0: 
+              store val_22:i32 *b_0:ptr->i32 
+              new_var temp_1_24:i32 
+              temp_1_24 = load *b_0:ptr->i32 
+              ret temp_1_24 
+      Define set_a_0 [val_17] -> set_a_ret_0 
+              alloc i32 temp_0_19 
+          label L23_0: 
+              store val_17:i32 *a_0:ptr->i32 
+              new_var temp_0_19:i32 
+              temp_0_19 = load *a_0:ptr->i32 
+              ret temp_0_19 

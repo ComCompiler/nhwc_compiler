@@ -1,0 +1,16 @@
+      Define kill_0 [] -> kill_ret_0 
+          label L0_0: 
+              ret 0_0 
+      Define main_0 [] -> main_ret_0 
+              alloc i32 a_2 
+              alloc i32 temp_0_2 
+              alloc i32 temp_1_2 
+              alloc i32 b_2 
+          label L1_0: 
+              a_2 = i32 3_0 
+              new_var temp_0_2:i32 
+              temp_0_2 = Mul i32 a_2, 2_0 
+              new_var temp_1_2:i32 
+              temp_1_2 = Add i32 temp_0_2, 8_0 
+              b_2 = i32 temp_1_2 
+              ret 0_0 

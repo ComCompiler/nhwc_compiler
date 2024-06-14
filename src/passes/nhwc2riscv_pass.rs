@@ -27,7 +27,7 @@ stoptime:\n\tmv a0, zero\n\ttail _sysy_stoptime\n\n\n";
         parse_nhwcir2riscv(cfg_graph, nhwc_instr_slab, riscv_instr_slab, asm_structure, src_symtab)?;
         // if self.is_write_s_file{
         std::fs::write(&ctx.args.output, format!("{}",ctx.asm_structure.dump(self.enable_annotation))).unwrap();
-        return Err(anyhow!("write ?????? {}",ctx.args.output.to_str().unwrap()));
+        panic!("write ?????? {}",ctx.args.output.to_str().unwrap());
         Ok(())
     }
     // 返回pass的描述，具体作用
