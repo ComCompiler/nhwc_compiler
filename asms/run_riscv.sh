@@ -29,8 +29,8 @@ executable="./asms"
 
 # 汇编 .s 文件
 echo "----汇编.s文件----" 
-# riscv32-unknown-elf-gcc -o  "$ofile_folder/$filename.o" "$input_file"
-riscv32-unknown-elf-as -o "$ofile_folder/$filename.o" "$input_file" 
+# riscv64-unknown-elf-gcc -o  "$ofile_folder/$filename.o" "$input_file"
+riscv64-unknown-elf-as -o "$ofile_folder/$filename.o" "$input_file" 
 
 # 检查是否生成了中间文件
 if [ ! -f "$ofile_folder/$filename.o" ]; then
@@ -40,8 +40,8 @@ fi
 
 # 链接 .o 文件
 echo "----链接.o文件----"
-riscv32-unknown-elf-ld -o "$executable/$filename" "$ofile_folder/$filename.o"
-# riscv32-unknown-elf-ld "$ofile_folder/$filename.o" -o "$executable/$filename"
+riscv64-unknown-elf-ld -o "$executable/$filename" "$ofile_folder/$filename.o"
+# riscv64-unknown-elf-ld "$ofile_folder/$filename.o" -o "$executable/$filename"
 
 if [ ! -f "$executable/$filename" ]; then
     echo "错误: 无法生成可执行文件$filename."
@@ -50,11 +50,11 @@ fi
 
 # 显示可执行文件的机器码
 echo "----可执行文件的机器码----"
-riscv32-unknown-elf-objdump -d "$ofile_folder/$filename.o"
+riscv64-unknown-elf-objdump -d "$ofile_folder/$filename.o"
 
 # 运行可执行文件
 echo "----执行可执行文件----"
-qemu-riscv32-static "$ofile_folder/$filename"
+qemu-riscv64-static "$ofile_folder/$filename"
 
 # 输出成功信息
 echo "可执行文件 $filename 已生成并移动到 $executable 文件夹中"

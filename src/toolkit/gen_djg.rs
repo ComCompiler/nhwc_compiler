@@ -1,10 +1,10 @@
 use std::vec;
 
-use petgraph::{adj::NodeIndex, algo::dominators::simple_fast};
+use petgraph::{adj::NodeIndex, algo::dominators::simple_fast, graph::node_index};
 
-use crate::{add_edge, add_node, direct_child_nodes, direct_parent_nodes, reg_field_for_struct, node, node_mut, toolkit::{dj_edge::DjEdge, dj_node::DjNode}};
+use crate::{add_edge, add_node, debug_info_red, direct_child_nodes, direct_parent_nodes, node, node_mut, reg_field_for_struct, toolkit::{dj_edge::DjEdge, dj_node::DjNode}};
 
-use super::{cfg_node::{CfgGraph, CfgNode}, context::DjGraph, etc::dfs_with_priority};
+use super::{cfg_node::{CfgGraph, CfgNode, CFG_ROOT}, context::DjGraph, etc::{dfs, dfs_with_priority, remove_isolate_nodes_from_dfs}};
 use super::symtab::{SymTab,SymTabEdge,SymTabGraph};
 use anyhow::{Result,Context};
 
@@ -17,10 +17,10 @@ reg_field_for_struct!(DjNode { DEPTH:u32, } with_fields info);
 reg_field_for_struct!(CfgNode { DOMIANCE_FRONTIER_CFG_NODES:Vec<u32>,  } with_fields info);
 reg_field_for_struct!(DjNode { DOMIANCE_FRONTIER_DJ_NODES:Vec<u32>,  } with_fields info);
 
+
 pub fn parse_ncfg2dj_graph(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph)->Result<()>{
-    let root =  NodeIndex::from(0);
-    let dominators = simple_fast(&*cfg_graph, root);
-    let cfg_nodes:Vec<_> = cfg_graph.node_indices().into_iter().map(|idx|idx.index() as u32).collect();
+    remove_isolate_nodes_from_dfs(cfg_graph, CFG_ROOT);
+    let cfg_nodes = dfs(cfg_graph, CFG_ROOT);
     for &cfg_node in cfg_nodes.iter() {
         let dj_node = add_node!({DjNode::new(cfg_node) } to dj_graph);
         node_mut!(at cfg_node in cfg_graph).add_cor_dj_node(dj_node);
@@ -28,12 +28,14 @@ pub fn parse_ncfg2dj_graph(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph)->Resul
         node_mut!(at cfg_node in cfg_graph).add_domiance_frontier_cfg_nodes(vec![]);
         node_mut!(at dj_node in dj_graph).add_domiance_frontier_dj_nodes(vec![]);
     }
-    let dj_node_indices:Vec<_> = dj_graph.node_indices().collect();
-    for dj_node_idx in dj_node_indices{
-        let dj_node = dj_node_idx.index() as u32;
-        match dominators.immediate_dominator(dj_node_idx){
+    let dominators = simple_fast(&*cfg_graph, node_index(CFG_ROOT as usize));
+    for &cfg_node in &cfg_nodes{
+        let &dj_node = node!(at cfg_node in cfg_graph).get_cor_dj_node()?;
+        match dominators.immediate_dominator(node_index(cfg_node as usize)){
             Some(parent) => {
-                let dj_parent_node = parent.index() as u32;
+                // debug_info_red!("{:?}",parent);
+                let cfg_parent = parent.index() as u32;
+                let &dj_parent_node = node!(at cfg_parent in cfg_graph).get_cor_dj_node()?;
                 add_edge!({DjEdge::new_dom()} from dj_parent_node to dj_node in dj_graph);
             },
             None => {

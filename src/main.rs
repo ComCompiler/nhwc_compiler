@@ -63,24 +63,26 @@ fn main() {
     let ast2st_pass = Ast2StPass::new(true && is_gen_png_global);
     let ncfg2djg_pass = Ncfg2DjgPass::new(true && is_gen_png_global);
     let ssa_pass = SsaPass::new(true && is_gen_png_global, true && is_gen_png_global);
-    let cfg_debug_pass = CfgDebugPass::new(true && is_gen_png_global);
+    let cfg_debug_pass1 = CfgDebugPass::new(true && is_gen_png_global);
+    let cfg_debug_pass2 = CfgDebugPass::new(true && is_gen_png_global);
     let def_use_chain_debug_pass: DefUseChainDebugPass = DefUseChainDebugPass::new(true && is_gen_png_global);
     let symtab_debug_pass = SymtabDebugPass::new(true && is_gen_png_global);
     let _simulator_debug_pass = SimulatorDebugPass::new(true && is_gen_png_global,false);
-    let nhwc_collect_pass = NhwcDumpPass::new(true && is_gen_png_global);
+    let nhwc_dump_pass = NhwcDumpPass::new(true && is_gen_png_global);
     let nhwc2riscv_pass = Nhwc2RiscvDebugPass::new(true && is_gen_png_global, true, false);
     let mem_alloc_pass = MemAllocPass::new();
     add_passes!(
         code2ast_pass
         then ast2st_pass
         then ast2cfg_pass
+        then cfg_debug_pass1
         then cfg2ncfg_pass
         then ncfg2djg_pass
         then mem_alloc_pass
         // then ssa_pass
-        then cfg_debug_pass
+        // then cfg_debug_pass2
         // then def_use_chain_debug_pass
-        then nhwc_collect_pass
+        // then nhwc_collect_pass
         // then simulator_debug_pass
         then ast2et_debug_pass
         then symtab_debug_pass

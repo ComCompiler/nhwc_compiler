@@ -206,13 +206,20 @@ pub fn process_switch(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut Sy
 
 /// 首先确保这两个节点直接相连,如果合并成功，返回合并后的 node ，如果合并失败，返回None
 /// 需要注意的是 一个gather 和一个空的 BasicBlock 不可以合并，其次我们需要保留边的属性
-pub fn try_unite(opt_node1:Option<u32>, opt_node2:Option<u32>, cfg_graph:&mut CfgGraph) -> Result<Option<u32>> {
+/// 两个BaiscBlock 如果 前者的最后一个 ast_stmt 是 jumpStatement 那么也不可以合并
+pub fn try_unite(opt_node1:Option<u32>, opt_node2:Option<u32>, cfg_graph:&mut CfgGraph, ast_tree:&AstTree) -> Result<Option<u32>> {
     // return Ok(None);
     match (opt_node1, opt_node2) {
         (Some(node1), Some(node2)) => {
             let (node_struct1, node_struct2) = cfg_graph.index_twice_mut(NodeIndex::from(node1), NodeIndex::from(node2));
             match ( &mut node_struct1.cfg_node_type,&mut node_struct2.cfg_node_type) {
                 (CfgNodeType::BasicBlock { ast_nodes: ast_nodes1 }, CfgNodeType::BasicBlock { ast_nodes: ast_nodes2 }) => {
+                    if let Some(&ast_node) = ast_nodes1.last(){
+                        if rule_id!(at ast_node in ast_tree) == RULE_jumpStatement{
+                            // jump stmt can't merge 
+                            return Ok(None)
+                        }
+                    }
                     ast_nodes1.extend_from_slice(&ast_nodes2);
                     let edges:Vec<_> = cfg_graph.edges(NodeIndex::from(node2)).map(|x| (x.id().index() as u32, x.weight().clone())).collect();
                     for (edge, weight) in edges {
@@ -268,7 +275,7 @@ pub fn process_compound(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut 
                 opt_current_cfg_head_and_tail = {
                     let (opt_stmt_head, opt_stmt_tail) = process_stmt(cfg_graph, ast_tree, symtab, stmt_node)?.unzip();
                     let (opt_current_cfg_head, opt_current_cfg_tail) = opt_current_cfg_head_and_tail.unzip();
-                    let opt_unite_bb_node = try_unite(opt_current_cfg_tail, opt_stmt_head, cfg_graph)?;
+                    let opt_unite_bb_node = try_unite(opt_current_cfg_tail, opt_stmt_head, cfg_graph, ast_tree)?;
                     match (opt_unite_bb_node, opt_stmt_head, opt_current_cfg_tail) {
                         (None, Some(stmt_head), Some(current_cfg_tail)) => {
                             add_edge!({CfgEdge::new_direct()} from current_cfg_tail to stmt_head in cfg_graph);
@@ -286,7 +293,7 @@ pub fn process_compound(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut 
                 opt_current_cfg_head_and_tail = {
                     let (opt_declare_head, opt_declare_tail) = process_declartion(cfg_graph, ast_tree, symtab, declare_node)?.unzip();
                     let (opt_current_cfg_head, opt_current_cfg_tail) = opt_current_cfg_head_and_tail.unzip();
-                    let opt_unite_bb_node = try_unite(opt_current_cfg_tail, opt_declare_head, cfg_graph)?;
+                    let opt_unite_bb_node = try_unite(opt_current_cfg_tail, opt_declare_head, cfg_graph, ast_tree)?;
                     match (opt_unite_bb_node, opt_declare_head, opt_current_cfg_tail) {
                         (None, Some(declare_head), Some(current_cfg_tail)) => {
                             add_edge!({CfgEdge::new_direct()} from current_cfg_tail to declare_head in cfg_graph);

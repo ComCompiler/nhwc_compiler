@@ -8,7 +8,7 @@ use crate::{direct_parent_nodes, instr};
 use crate::{
     direct_child_nodes, toolkit::dot::{Config, Dot}
 };
-use petgraph::{stable_graph::StableGraph, EdgeType};
+use petgraph::{ graph::{node_index, NodeIndex}, stable_graph::StableGraph, visit::Dfs, EdgeType};
 use anyhow::*;
 use anyhow::Context;
 
@@ -92,7 +92,7 @@ pub fn dfs_with_predicate<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_nod
 where
     Ty: EdgeType,
 {
-    let mut visited:Vec<bool> = vec![false; graph.node_count()];
+    let mut visited:Vec<bool> = vec![false; graph.node_count()*3];
     let mut dfs_vec:Vec<u32> = vec![];
     visited[start_node as usize] = true;
     // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
@@ -103,7 +103,7 @@ pub fn reverse_dfs_with_predicate<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, s
 where
     Ty: EdgeType,
 {
-    let mut visited:Vec<bool> = vec![false; graph.node_count()];
+    let mut visited:Vec<bool> = vec![false; graph.node_count()*3];
     let mut dfs_vec:Vec<u32> = vec![];
     visited[start_node as usize] = true;
     // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
@@ -142,7 +142,7 @@ pub fn dfs_with_priority<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node
 where
     Ty: EdgeType,
 {
-    let mut visited:Vec<bool> = vec![false; graph.node_count()];
+    let mut visited:Vec<bool> = vec![false; graph.node_count()*3];
     let mut dfs_vec:Vec<u32> = vec![];
     visited[start_node as usize] = true;
     // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
@@ -179,5 +179,24 @@ pub trait InstrAnyhow<T>:Context<T,anyhow::Error>{
 impl<T> InstrAnyhow<T> for anyhow::Result<T,anyhow::Error> {
     fn with_instr_context(self,instr:usize,instr_slab:&InstrSlab<NhwcInstr>) -> Result<T,anyhow::Error>{
         self.with_context(||format!("{:?}",instr!(at instr in instr_slab).unwrap()))
+    }
+}
+
+pub fn remove_isolate_nodes_from_dfs<N, E, Ty>(graph:&mut StableGraph<N, E, Ty, u32>, start_node:u32)
+where
+    Ty: EdgeType,{
+    let mut dfs = Dfs::new(&*graph, node_index(start_node as usize));
+    let mut visited = Vec::new();
+    while let Some(nx) = dfs.next(&*graph) {
+        visited.push(nx);
+    }
+
+    // 找出所有未访问的节点
+    let all_nodes:Vec<NodeIndex> = graph.node_indices().collect();
+    let unvisited:Vec<NodeIndex>  = all_nodes.into_iter().filter(|n| !visited.contains(n)).collect();
+
+    // 删除未访问的节点
+    for node in unvisited {
+        graph.remove_node(node);
     }
 }

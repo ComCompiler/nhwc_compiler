@@ -203,11 +203,15 @@ fn parse_bb2nhwc(
                                 let ret_instr = NhwcInstrType::new_ret(None).into();
                                 node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
                             }
+                            //// we should remove the edge 
+                            // let cfg_child_node = direct_child_node!(at cfg_bb in cfg_graph);
+                            // let cfg_edge_to_removed = cfg_graph.find_edge(node_index(cfg_bb as usize), node_index(cfg_child_node as usize)).unwrap();
+                            // cfg_graph.remove_edge(cfg_edge_to_removed);
                         },
                         (RULE_breakStatement,break_ast) => {
-                            let cycle_head_node = get_while_or_for_node_of_cfg_node(cfg_bb, cfg_graph)?;
-                            let cycle_head_node = direct_child_node!(at cycle_head_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_head()});
-                            let jump_label = node!(at cycle_head_node in cfg_graph).op_label_instr.unwrap();
+                            let while_or_for_node = get_while_or_for_node_of_cfg_node(cfg_bb, cfg_graph)?;
+                            let body_exit_node = get_exit_node_of_while_or_for_node(while_or_for_node, cfg_graph)?;
+                            let jump_label = node!(at body_exit_node in cfg_graph).op_label_instr.unwrap();
                             let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
                             let jump_label = match jump_nhwctype{
                                 NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
@@ -218,11 +222,18 @@ fn parse_bb2nhwc(
 
                             let jump_instr = NhwcInstrType::new_jump(jump_label).into();
                             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(jump_instr, instr_slab)?;
+
+                            // we should remove the edge 
+                            let cfg_child_node = direct_child_node!(at cfg_bb in cfg_graph);
+                            let cfg_edge_to_removed = cfg_graph.find_edge(node_index(cfg_bb as usize), node_index(cfg_child_node as usize)).unwrap();
+                            cfg_graph.remove_edge(cfg_edge_to_removed);
+                            // than add a edge to while_exit or for_exit 
+                            add_edge!({CfgEdge::new_direct()} from cfg_bb to body_exit_node in cfg_graph);
                         },
                         (RULE_continueStatement,ctn_ast) => {
-                            let cycle_head_node = get_while_or_for_node_of_cfg_node(cfg_bb, cfg_graph)?;
-                            let cycle_head_node = direct_child_node!(at cycle_head_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_direct()});
-                            let jump_label = node!(at cycle_head_node in cfg_graph).op_label_instr.unwrap();
+                            let while_or_for_node = get_while_or_for_node_of_cfg_node(cfg_bb, cfg_graph)?;
+                            let body_exit_node = get_exit_node_of_while_or_for_node(while_or_for_node, cfg_graph)?;
+                            let jump_label = node!(at body_exit_node in cfg_graph).op_label_instr.unwrap();
                             let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
                             let jump_label = match jump_nhwctype{
                                 NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
@@ -233,15 +244,17 @@ fn parse_bb2nhwc(
 
                             let jump_instr = NhwcInstrType::new_jump(jump_label).into();
                             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(jump_instr, instr_slab)?;
+
+                            // we should remove the edge 
+                            let cfg_child_node = direct_child_node!(at cfg_bb in cfg_graph);
+                            let cfg_edge_to_removed = cfg_graph.find_edge(node_index(cfg_bb as usize), node_index(cfg_child_node as usize)).unwrap();
+                            cfg_graph.remove_edge(cfg_edge_to_removed);
+                            // than add a edge to while_head or for_head
+                            add_edge!({CfgEdge::new_direct()} from cfg_bb to while_or_for_node in cfg_graph);
                         },
                         (_,_) => {
                             return Err(anyhow!("错位的无条件跳转类型"));
                         }
-                    }
-                    if let Some(ret_stmt_ast) = find!(rule RULE_returnStatement at jump_node in ast_tree){
-                        
-                    }else{
-                        todo!()
                     }
                 }
             }
@@ -261,8 +274,8 @@ fn parse_whileloop2nhwc(
             let while_exit_symidx = SymIdx::new(*ast2scope.get(&ast_expr_node).unwrap(), "while.exit".to_string());
 
             let cfg_body_head_node = direct_child_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_head() });
+            let cfg_exit_node = get_exit_node_of_while_or_for_node(cfg_whileloop, cfg_graph)?;
             let cfg_body_tail_node = direct_parent_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_tail() });
-            let cfg_exit_node = direct_child_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_direct() });
 
             let label_body_instr_struct = NhwcInstrType::new_label(while_body_symidx.clone()).into();
             node_mut!(at cfg_body_head_node in cfg_graph).push_nhwc_instr(label_body_instr_struct, instr_slab)?;
@@ -1025,7 +1038,7 @@ fn process_et(
         EtNodeType::Operator { op, ast_node: _, text: _ } => {
             match op {
                 super::et_node::ExprOp::Mul => {
-                    if let Some(_) = direct_child_node!(at et_node in et_tree ret option) {
+                    if let Some(_) = direct_child_node!(at et_node in et_tree ret_option) {
                         let (tmp_var_symidx, l_symidx, r_symidx, var_type, _) =
                             process_arithop(ast_tree, cfg_graph, et_tree,et_node, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
                         let mul_instr = NhwcInstrType::new_mul(tmp_var_symidx.clone(), l_symidx, r_symidx, var_type).into();
@@ -1036,7 +1049,7 @@ fn process_et(
                     }
                 }
                 super::et_node::ExprOp::Add => {
-                    if let Some(_) = direct_child_node!(at et_node in et_tree ret option) {
+                    if let Some(_) = direct_child_node!(at et_node in et_tree ret_option) {
                         let (tmp_var_symidx, l_symidx, r_symidx, var_type, _) =
                             process_arithop(ast_tree, cfg_graph, et_tree, et_node,scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
 
@@ -1049,7 +1062,7 @@ fn process_et(
                     }
                 }
                 super::et_node::ExprOp::Sub => {
-                    if let Some(_) = direct_child_node!(at et_node in et_tree ret option) {
+                    if let Some(_) = direct_child_node!(at et_node in et_tree ret_option) {
                         let (tmp_var_symidx, l_symidx, r_symidx, var_type, _) =
                             process_arithop(ast_tree, cfg_graph, et_tree,et_node, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
                         let sub_instr = NhwcInstrType::new_sub(tmp_var_symidx.clone(), l_symidx, r_symidx, var_type).into();
@@ -1061,7 +1074,7 @@ fn process_et(
                     }
                 }
                 super::et_node::ExprOp::Div => {
-                    if let Some(_) = direct_child_node!(at et_node in et_tree ret option) {
+                    if let Some(_) = direct_child_node!(at et_node in et_tree ret_option) {
                         let (tmp_var_symidx, l_symidx, r_symidx, var_type, _) =
                             process_arithop(ast_tree, cfg_graph, et_tree,et_node, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
                         let div_instr = NhwcInstrType::new_div(tmp_var_symidx.clone(), l_symidx, r_symidx, var_type).into();
@@ -1073,7 +1086,7 @@ fn process_et(
                     }
                 }
                 super::et_node::ExprOp::Mod => {
-                    if let Some(_) = direct_child_node!(at et_node in et_tree ret option) {
+                    if let Some(_) = direct_child_node!(at et_node in et_tree ret_option) {
                         let (tmp_var_symidx, l_symidx, r_symidx, var_type, _) =
                             process_arithop(ast_tree, cfg_graph, et_tree,et_node, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
 
@@ -1087,7 +1100,7 @@ fn process_et(
                 }
                 //逻辑运算符
                 super::et_node::ExprOp::LogicalOr => {
-                    if let Some(_) = direct_child_node!(at et_node in et_tree ret option) {
+                    if let Some(_) = direct_child_node!(at et_node in et_tree ret_option) {
                         let (tmp_var_symidx, l_symidx, r_symidx) = process_logicop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
 
                         let logicor_instr = NhwcInstrType::new_logic_or(tmp_var_symidx.clone(), l_symidx, r_symidx, Type::I1).into();
@@ -1099,7 +1112,7 @@ fn process_et(
                     }
                 }
                 super::et_node::ExprOp::LogicalAnd => {
-                    if let Some(_) = direct_child_node!(at et_node in et_tree ret option) {
+                    if let Some(_) = direct_child_node!(at et_node in et_tree ret_option) {
                         let (tmp_var_symidx, l_symidx, r_symidx) = process_logicop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
 
                         let logicand_instr = NhwcInstrType::new_logic_and(tmp_var_symidx.clone(), l_symidx, r_symidx, Type::I1).into();
@@ -1111,7 +1124,7 @@ fn process_et(
                     }
                 }
                 super::et_node::ExprOp::LogicalNot => {
-                    if let Some(next_node) = direct_child_node!(at et_node in et_tree ret option) {
+                    if let Some(next_node) = direct_child_node!(at et_node in et_tree ret_option) {
                         //取操作数的symidx和type
                         let symbol_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_node, scope_node, cfg_bb, instr_slab, symtab_graph)?.unwrap();
                         let symbol_type = symtab.get_symbol(&symbol_symidx)?.get_type()?.clone();
@@ -1196,7 +1209,7 @@ fn process_et(
                 }
                 //正负号
                 super::et_node::ExprOp::Negative => {
-                    if let Some(abs_symbol) = direct_child_node!(at et_node in et_tree ret option){
+                    if let Some(abs_symbol) = direct_child_node!(at et_node in et_tree ret_option){
                         if let Some(symbol_symidx) = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, abs_symbol, scope_node, cfg_bb, instr_slab, symtab_graph)?{
                             let symbol_type = symtab.get_symbol(&symbol_symidx)?.get_type()?.clone();
                             let neg_tmp_symidx = process_temp_symbol(cfg_graph, symtab, &symbol_type, scope_node, cfg_bb, instr_slab, symtab_graph, Some(et_node), et_tree)?;
@@ -1223,7 +1236,7 @@ fn process_et(
                     }
                 },
                 super::et_node::ExprOp::Positive => {
-                    if let Some(abs_symbol) = direct_child_node!(at et_node in et_tree ret option){
+                    if let Some(abs_symbol) = direct_child_node!(at et_node in et_tree ret_option){
                         if let Some(symbol_symidx) = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, abs_symbol, scope_node, cfg_bb, instr_slab, symtab_graph)?{
                             Ok(Some(symbol_symidx))
                         }else{
@@ -1240,7 +1253,7 @@ fn process_et(
                 super::et_node::ExprOp::ArrowMember => todo!(),
                 //单目运算符
                 super::et_node::ExprOp::LPlusPlus => {
-                    if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option) {
+                    if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret_option) {
                         let (tmp_addvar_symidx, _) =
                             process_self_increment(ast_tree, cfg_graph, et_tree, scope_tree, symtab, symbol_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
                         Ok(Some(tmp_addvar_symidx))
@@ -1249,7 +1262,7 @@ fn process_et(
                     }
                 }
                 super::et_node::ExprOp::RPlusPlus => {
-                    if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option) {
+                    if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret_option) {
                         let (_, tmp_loadvar_symidx) =
                             process_self_increment(ast_tree, cfg_graph, et_tree, scope_tree, symtab, symbol_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
                         Ok(Some(tmp_loadvar_symidx))
@@ -1258,7 +1271,7 @@ fn process_et(
                     }
                 }
                 super::et_node::ExprOp::LMinusMinus => {
-                    if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option) {
+                    if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret_option) {
                         let (tmp_subvar_symidx, _) =
                             process_self_attennuation(ast_tree, cfg_graph, et_tree, scope_tree, symtab, symbol_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
                         Ok(Some(tmp_subvar_symidx))
@@ -1267,7 +1280,7 @@ fn process_et(
                     }
                 }
                 super::et_node::ExprOp::RMinusMinus => {
-                    if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret option) {
+                    if let Some(symbol_node) = direct_child_node!(at et_node in et_tree ret_option) {
                         let (_, tmp_loadvar_symidx) =
                             process_self_attennuation(ast_tree, cfg_graph, et_tree, scope_tree, symtab, symbol_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
                         Ok(Some(tmp_loadvar_symidx))
@@ -1807,14 +1820,6 @@ pub fn parse_cfg_into_nhwc_cfg(
         // dfs_vec.sort_by(|node| )
         // dfs_vec.reverse();
         for &cfg_node in dfs_vec.iter() {
-            match &node!(at cfg_node in cfg_graph).cfg_node_type{
-                CfgNodeType::BasicBlock { ast_nodes } => {
-                    parse_bb2nhwc(ast_tree, cfg_graph, scope_tree, et_tree, symtab, ast2scope, ast_nodes.clone(), cfg_node,  instr_slab, symtab_graph)?;
-                },
-                _ => {},
-            }
-        }
-        for &cfg_node in dfs_vec.iter() {
             // debug_info_yellow!("dfs current is {:?}", cfg_node);
             let cfgnode = node!(at cfg_node in cfg_graph);
             match &cfgnode.cfg_node_type {
@@ -1843,7 +1848,10 @@ pub fn parse_cfg_into_nhwc_cfg(
                 CfgNodeType::WhileLoop { ast_expr_node } => {
                     parse_whileloop2nhwc(ast_tree, cfg_graph, scope_tree, et_tree, symtab, ast2scope, *ast_expr_node, cfg_node, instr_slab, symtab_graph)?
                 }
-                _ => {}
+                CfgNodeType::BasicBlock { ast_nodes } => {
+                    parse_bb2nhwc(ast_tree, cfg_graph, scope_tree, et_tree, symtab, ast2scope, ast_nodes.clone(), cfg_node,  instr_slab, symtab_graph)?;
+                },
+                _ =>{}
             }
         }
     }
@@ -1903,6 +1911,9 @@ pub fn insert_bb_between(cfg_node1:u32, cfg_node2:u32, cfg_graph:&mut CfgGraph) 
 }
 
 
+pub fn get_exit_node_of_while_or_for_node(cfg_while_or_for_node:u32, cfg_graph:&mut CfgGraph) -> Result<u32>{
+    Ok(direct_child_node!(at cfg_while_or_for_node in cfg_graph with_predicate {|e| !e.weight().cfg_edge_type.is_body_head()}))
+}
 /// return head and tail of `cfg_while_node` or `cfg_for_node` 
 pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph) -> Result<(u32, u32)> {
     let head = {
@@ -1932,8 +1943,9 @@ pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph)
 
 // return the corresponding while block's while node of the cfg_node 
 pub fn get_while_or_for_node_of_cfg_node(cfg_node:u32, cfg_graph:&mut CfgGraph) -> Result<u32>{
-    let dfs_nodes = etc::reverse_dfs_with_predicate(cfg_graph, cfg_node,|e| {let parent_node = e.target().index() as u32; node!(at parent_node in cfg_graph).cfg_node_type.is_root()});
+    let dfs_nodes = etc::reverse_dfs_with_predicate(cfg_graph, cfg_node,|e| {let parent_node = e.target().index() as u32; !node!(at parent_node in cfg_graph).cfg_node_type.is_root()});
     for cfg_node in dfs_nodes{
+        // debug_info_red!("cur cfg_node:{}",cfg_node);
         if node!(at cfg_node in cfg_graph).cfg_node_type.is_for_loop() || 
         node!(at cfg_node in cfg_graph).cfg_node_type.is_while_loop(){
             return Ok(cfg_node)

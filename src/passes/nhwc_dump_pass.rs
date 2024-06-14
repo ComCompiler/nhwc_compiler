@@ -59,16 +59,17 @@ impl Pass for NhwcDumpPass {
         }
         for &cfg_node in dfs_node_vec.iter(){
             if node!(at cfg_node in cfg_graph).cfg_node_type.is_basic_block() {
-                let cfg_node_to_jump =direct_child_node!(at cfg_node in cfg_graph); 
-                if let Some(label_instr_to_jump) =node!(at cfg_node_to_jump in cfg_graph).op_label_instr{
-                    match &instr!(at label_instr_to_jump in instr_slab)?.instr_type{
-                        NhwcInstrType::Label { label_symidx } => {
-                            let jump_instr_struct = NhwcInstrType::new_jump(label_symidx.clone()).into();
-                            if let None = node!(at cfg_node in cfg_graph).op_jump_instr{
-                                node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(jump_instr_struct, instr_slab)?;
-                            }
-                        },
-                        _=>{return Err(anyhow!("cfg_node 的 label_instr 不可能为 除了label 以外的类型"))}
+                if let Some(cfg_node_to_jump) =direct_child_node!(at cfg_node in cfg_graph ret_option){
+                    if let Some(label_instr_to_jump) =node!(at cfg_node_to_jump in cfg_graph).op_label_instr{
+                        match &instr!(at label_instr_to_jump in instr_slab)?.instr_type{
+                            NhwcInstrType::Label { label_symidx } => {
+                                let jump_instr_struct = NhwcInstrType::new_jump(label_symidx.clone()).into();
+                                if let None = node!(at cfg_node in cfg_graph).op_jump_instr{
+                                    node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(jump_instr_struct, instr_slab)?;
+                                }
+                            },
+                            _=>{return Err(anyhow!("cfg_node 的 label_instr 不可能为 除了label 以外的类型"))}
+                        }
                     }
                 }
             }

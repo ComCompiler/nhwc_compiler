@@ -126,12 +126,14 @@ macro_rules! direct_child_node {
     (at $node:ident in $graph:ident with_predicate $f:block )=> {{
         let v = $crate::direct_child_nodes!(at $node in $graph with_predicate $f);
         if v.len() >1 {
-            return Err(anyhow::anyhow!("此节点 direct_child_node 不止一个,无法使用这个宏"));
-        } else {
+            return Err(anyhow::anyhow!("node {} have more than one direct_child_node", $node))
+        } else if v.len() ==1 {
             v[0]
+        }else {
+            return Err(anyhow::anyhow!("node {} have no direct_child_node", $node))
         }
     }};
-    (at $node:ident in $graph:ident ret option) => {{
+    (at $node:ident in $graph:ident ret_option) => {{
         let node_index_option = $graph.neighbors(petgraph::matrix_graph::NodeIndex::from($node)).next();
         node_index_option.map(|node_index| node_index.index() as u32)
     }};
