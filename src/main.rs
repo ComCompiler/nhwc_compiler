@@ -13,7 +13,7 @@ use clap::Parser;
 use passes::{ast2cfg_pass::Ast2CfgPass, ast2et_debug_pass::Ast2EtDebugPass, ast2st_pass::Ast2StPass, cfg2ncfg_pass::Cfg2NcfgPass, code2ast_pass::Code2AstPass, nhwc2riscv_pass::Nhwc2RiscvPass, nhwc_dump_pass::NhwcDumpPass, symtab_debug_pass::SymtabDebugPass};
 
 use crate::{passes::{cfg_debug_pass::CfgDebugPass, def_use_chain_debug_pass::DefUseChainDebugPass, mem_alloc_pass::MemAllocPass, ncfg2djg_pass::Ncfg2DjgPass, simulator_debug_pass::SimulatorDebugPass, ssa_pass::SsaPass}, toolkit::{pass_manager::PassManager}};
-#[derive(Parser, Clone, Default)]
+#[derive(Parser, Clone, Default, Debug)]
 #[command(author, version, about)]
 pub struct Args {
     ///设置文件地址
@@ -53,6 +53,7 @@ fn main() {
     // 你也可以通过运行 cargo run -- --help 来查看所有可用选项
 
     let args = Args::parse();
+    panic!("{:?}",args);
     let is_gen_png_global = args.debug;
     // args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
     let mut pass_manager = PassManager::new(args);
