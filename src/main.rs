@@ -10,7 +10,7 @@ use std::{path::PathBuf, time::Instant};
 use antlr_parser::cparser::{RULE_compoundStatement, RULE_functionDefinition};
 use clap::Parser;
 
-use passes::{ast2cfg_pass::Ast2CfgPass, ast2et_debug_pass::Ast2EtDebugPass, ast2st_pass::Ast2StPass, cfg2ncfg_pass::Cfg2NcfgPass, code2ast_pass::Code2AstPass, nhwc2riscv_pass::Nhwc2RiscvDebugPass, nhwc_dump_pass::NhwcDumpPass, symtab_debug_pass::SymtabDebugPass};
+use passes::{ast2cfg_pass::Ast2CfgPass, ast2et_debug_pass::Ast2EtDebugPass, ast2st_pass::Ast2StPass, cfg2ncfg_pass::Cfg2NcfgPass, code2ast_pass::Code2AstPass, nhwc2riscv_pass::Nhwc2RiscvPass, nhwc_dump_pass::NhwcDumpPass, symtab_debug_pass::SymtabDebugPass};
 
 use crate::{passes::{cfg_debug_pass::CfgDebugPass, def_use_chain_debug_pass::DefUseChainDebugPass, mem_alloc_pass::MemAllocPass, ncfg2djg_pass::Ncfg2DjgPass, simulator_debug_pass::SimulatorDebugPass, ssa_pass::SsaPass}, toolkit::{pass_manager::PassManager}};
 #[derive(Parser, Clone, Default)]
@@ -69,7 +69,7 @@ fn main() {
     let symtab_debug_pass = SymtabDebugPass::new(true && is_gen_png_global);
     let _simulator_debug_pass = SimulatorDebugPass::new(true && is_gen_png_global,false);
     let nhwc_dump_pass = NhwcDumpPass::new(true && is_gen_png_global);
-    let nhwc2riscv_pass = Nhwc2RiscvDebugPass::new(true && is_gen_png_global, true, false);
+    let nhwc2riscv_pass = Nhwc2RiscvPass::new(true && is_gen_png_global, true, false);
     let mem_alloc_pass = MemAllocPass::new();
     add_passes!(
         code2ast_pass
