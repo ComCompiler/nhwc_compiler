@@ -53,7 +53,6 @@ fn main() {
     // 你也可以通过运行 cargo run -- --help 来查看所有可用选项
 
     let args = Args::parse();
-    panic!("{:?}",args);
     let is_gen_png_global = args.debug;
     // args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
     let mut pass_manager = PassManager::new(args);
