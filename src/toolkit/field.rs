@@ -258,6 +258,9 @@ impl Value {
         Type::arith_adapt(&self.to_type() ,&value2.to_type())
     }
 
+    pub fn from_symidx(symidx:&SymIdx) -> Result<Value>{
+        Ok(Self::from_string_with_specific_type(&symidx.symbol_name, &Type::new_from_const_str(&symidx.symbol_name))?)
+    }
     pub fn to_symidx(&self)->Result<SymIdx>{
         match self{
             Value::I32(op_i32) => {
@@ -426,7 +429,7 @@ impl Type {
 
     }
 
-    pub fn new_from_const(const_str:&String) -> Self {
+    pub fn new_from_const_str(const_str:&String) -> Self {
         if const_str.contains(".") {
             Type::F32
         } else {

@@ -1,4 +1,4 @@
-use super::{et_node::{DeclOrDefOrUse, EtNodeType, EtTree}, etc::{self, dfs}, scope_node::ScopeTree, symtab::SymTab};
+use super::{et_node::{DeclOrDefOrUse, EtNodeType, EtTree, ExprOp}, etc::{self, dfs}, field::Value, scope_node::ScopeTree, symtab::SymTab};
 use crate::{add_node_with_edge, debug_info_blue, debug_info_green, debug_info_red, direct_child_node, direct_child_nodes, direct_parent_node, node, node_mut, toolkit::{scope_node::ST_ROOT, symtab::SymIdx}};
 use anyhow::Result;
 use anyhow::anyhow;
@@ -16,19 +16,17 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
 
         EtNodeType::Operator { ast_node: _, text: _, op } => {
             let et_nodes = direct_child_nodes!(at et_node in et_tree); //里面的u32是节点编号
-            let mut et_node_op_sym_idx_tuple= Vec::new();
-            for et_node in et_nodes {
-                et_node_op_sym_idx_tuple.push((et_node,eval_et(et_tree, et_node)));
-            }
             let mut ret_flag = false;
-            for (et_child_node,op_symidx) in et_node_op_sym_idx_tuple.iter(){
-                let et_child_node = *et_child_node;
+            let mut et_ret_symidx_vec = vec![];
+            for et_child_node in et_nodes{
+                let op_symidx = eval_et(et_tree, et_child_node);
                 match op_symidx{
                     Some(const_symidx) => {
                         let et_node_added = EtNodeType::new_constant(0, const_symidx.clone()).as_et_node();
                         let et_node_edge_removed = et_tree.find_edge(NodeIndex::new(et_node as usize), NodeIndex::new(et_child_node as usize)).unwrap();
                         et_tree.remove_edge(et_node_edge_removed);
                         add_node_with_edge!(et_node_added from et_node in et_tree);
+                        et_ret_symidx_vec.push(const_symidx);
                     },
                     None => {
                         ret_flag = true;
@@ -39,13 +37,12 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
             if ret_flag{
                 None
             }else {
-                let sub_nodes_sym_idx = et_node_op_sym_idx_tuple.into_iter().map(|(a,x)|x.unwrap()).collect_vec();
-                match op.eval_sub_et_nodes(et_tree, &sub_nodes_sym_idx){
+                match op.eval_sub_et_nodes(et_tree, &et_ret_symidx_vec){
                     Ok(symidx) => {
                         Some(symidx)
                     },
                     Err(e) => {
-                        // debug_info_red!("{}",e);
+                        debug_info_red!("{}",e);
                         None
                     },
                 }
@@ -107,3 +104,31 @@ pub fn compress_et(et_tree:&mut EtTree, et_node:u32, symtab:&SymTab, scope_node:
     Ok(())
 }
 
+
+// pub fn eval(op:ExprOp, vec:Vec<SymIdx>) -> Result<Value>{
+//     Ok(match op{
+//         ExprOp::Mul => (Value::from_symidx( &vec[0])?*Value::from_symidx( &vec[1])?)?,
+//         ExprOp::Add => (Value::from_symidx( &vec[0])?+Value::from_symidx( &vec[1])?)?,
+//         ExprOp::Sub => (Value::from_symidx( &vec[0])?-Value::from_symidx( &vec[1])?)?,
+//         ExprOp::Div => (Value::from_symidx( &vec[0])?/Value::from_symidx( &vec[1])?)?,
+//         ExprOp::LogicalOr => (Value::from_symidx( &vec[0])?||Value::from_symidx( &vec[1])?)?,
+//         ExprOp::LogicalAnd => (Value::from_symidx( &vec[0])?&&Value::from_symidx( &vec[1])?)?,
+//         ExprOp::LogicalNot => (!Value::from_symidx( &vec[0])?)?, 
+//         ExprOp::BitwiseOr => (Value::from_symidx( &vec[0])?|Value::from_symidx( &vec[1])?)?,
+//         ExprOp::BitwiseAnd => (Value::from_symidx( &vec[0])?&Value::from_symidx( &vec[1])?)?,
+//         ExprOp::BitwiseXor => (Value::from_symidx( &vec[0])?^Value::from_symidx( &vec[1])?)?,
+//         ExprOp::BitwiseNot => (!Value::from_symidx( &vec[0])?)?, //一元运算符
+//         ExprOp::Eq => (Value::from_symidx( &vec[0])??==Value::from_symidx( &vec[1])?)?,
+//         ExprOp::NEq => (Value::from_symidx( &vec[0])?!=Value::from_symidx( &vec[1])?)?,
+//         ExprOp::Less => (Value::from_symidx( &vec[0])?<Value::from_symidx( &vec[1])?)?,
+//         ExprOp::Greater => (Value::from_symidx( &vec[0])?>Value::from_symidx( &vec[1])?)?,
+//         ExprOp::LEq => (Value::from_symidx( &vec[0])?<=Value::from_symidx( &vec[1])?)?,
+//         ExprOp::GEq => (Value::from_symidx( &vec[0])?>=Value::from_symidx( &vec[1])?)?,
+//         ExprOp::LShift => (Value::from_symidx( &vec[0])?<<Value::from_symidx( &vec[1])?)?,
+//         ExprOp::RShift => (Value::from_symidx( &vec[0])?>>Value::from_symidx( &vec[1])?)?,
+//         ExprOp::Mod => (Value::from_symidx( &vec[0])?%Value::from_symidx( &vec[1])?)?,
+//         ExprOp::Negative => (-Value::from_symidx( &vec[0])?)?
+//         ExprOp::Positive => (+Value::from_symidx( &vec[0])?)?
+//         _ => {Err(anyhow!(format!("unsupported operator {:?}",self)))},
+//     })
+// }

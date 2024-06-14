@@ -21,7 +21,8 @@ impl Debug for Symbol {
 /* 引用计数 */
 /* 符号的类型 */
 /* 常量符号的值 */
-reg_field_for_struct! {Symbol { USE_COUNTER:UseCounter,
+reg_field_for_struct! {Symbol { 
+    // USE_COUNTER:UseCounter,
     TYPE:Type, 
     VALUE:Value,
 } with_fields fields}

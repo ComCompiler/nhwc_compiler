@@ -50,7 +50,7 @@ impl Debug for Imm{
                 write!(f,"{}",symidx.symbol_name)
             },
             Self::Literal { symidx } => {
-                match &Type::new_from_const(&symidx.symbol_name){
+                match &Type::new_from_const_str(&symidx.symbol_name){
                     Type::I32 => {
                         write!(f,"{}", symidx)
                     },

@@ -106,7 +106,7 @@ impl ExprOp {
             ExprOp::Mod => eval(&format!("{}{}{}", &vec[0].symbol_name, "%", &vec[1].symbol_name)),
             ExprOp::Cast => eval(&format!("({}){}", &vec[0].symbol_name, &vec[1].symbol_name)),
             ExprOp::Call => eval(&format!("{}({})", &vec[0].symbol_name, &vec[1].symbol_name)),
-            ExprOp::Negative => eval(&format!("-{}", &vec[0].symbol_name)),
+            ExprOp::Negative => eval(&format!("0-{}", &vec[0].symbol_name)),
             ExprOp::Positive => eval(&format!("+{}", &vec[0].symbol_name)),
             ExprOp::AddrOf => eval(&format!("&{}", &vec[0].symbol_name)),
             ExprOp::Deref => eval(&format!("*{}", &vec[0].symbol_name)),
@@ -114,7 +114,7 @@ impl ExprOp {
             ExprOp::ArrowMember => eval(&format!("{}->{}", &vec[0].symbol_name, &vec[1].symbol_name)),
             _ => {Err(eval::Error::Custom(format!("unsupported operator {:?}",self)))},
         };
-        Ok(SymIdx::new(0, value.with_context( || "eval_sub_et_nodes failed")?.to_string()))
+        Ok(SymIdx::new(0, value.with_context( || format!("eval_sub_et_nodes failed with {self:?} {vec:?}"))?.to_string()))
     }
 }
 impl Debug for ExprOp {

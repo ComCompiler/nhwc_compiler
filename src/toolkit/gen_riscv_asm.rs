@@ -578,7 +578,7 @@ pub fn load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,src_
         match !(src_symtab.has_symbol(symidx) && !*src_symtab.get_symbol(symidx)?.get_is_literal()?){
             true => {
                 // as imm 
-                match Type::new_from_const(&symidx.symbol_name) {
+                match Type::new_from_const_str(&symidx.symbol_name) {
                     Type::F32 => {
                         // f32 
                         assert!(reg.is_fpu());

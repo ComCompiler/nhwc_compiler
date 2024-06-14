@@ -27,7 +27,7 @@ use crate::{
     add_edge, add_node_with_edge, add_symbol, antlr_parser::cparser::{
         RULE_declaration, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forMidExpression, RULE_jumpStatement, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList
     }, direct_child_node, direct_child_nodes, direct_parent_nodes, find, find_nodes, incoming_edges, make_field_trait_for_struct, node, node_mut, outgoing_edges, reg_field_for_struct, rule_id, toolkit::{
-        cfg_node::{CfgInstrIdx, CfgNode}, etc, field::{Type, UseCounter}, nhwc_instr::{IcmpPlan, FcmpPlan}, symbol::Symbol, symtab::SymTabEdge
+        cfg_node::{CfgInstrIdx, CfgNode}, etc, field::{Type}, nhwc_instr::{IcmpPlan, FcmpPlan}, symbol::Symbol, symtab::SymTabEdge
     }
 };
 
@@ -39,7 +39,7 @@ make_field_trait_for_struct!(
     SymIdx,
     usize,
     u32,
-    UseCounter,
+    // UseCounter,
     bool,
     Type,
     CfgInstrIdx,
@@ -451,13 +451,11 @@ fn process_literal(symtab:&mut SymTab, const_literal:&String, symtab_graph:&mut 
         Result::Ok(const_sym) => {
             // do nothing 找到了同样的常量
             // let use_counter = find!(field mut USE_COUNTER:UseCounter in const_sym).unwrap();
-            let use_counter = const_sym.get_mut_use_counter()?;
-            use_counter.use_count += 1;
         }
         Err(_) => {
             add_symbol!({Symbol::new(0, const_literal.clone())} 
-                with_field USE_COUNTER:{UseCounter{ use_count: 1}} 
-                with_field TYPE:{Type::new_from_const(const_literal)} 
+                // with_field USE_COUNTER:{UseCounter{ use_count: 1}} 
+                with_field TYPE:{Type::new_from_const_str(const_literal)} 
                 with_field IS_TEMP:{false}
                 with_field IS_LITERAL:{true}
             to symtab debug symtab_graph);
