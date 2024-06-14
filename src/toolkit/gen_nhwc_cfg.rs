@@ -19,7 +19,7 @@ use super::{
 };
 use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_instr::InstrSlab};
 use crate::antlr_parser::clexer::{Identifier, LeftParen};
-use crate::antlr_parser::cparser::{RULE_breakpointArg, RULE_breakpointStatement, RULE_initDeclarator, RULE_initDeclaratorList, RULE_returnStatement};
+use crate::antlr_parser::cparser::{RULE_breakStatement, RULE_breakpointArg, RULE_breakpointStatement, RULE_continueStatement, RULE_initDeclarator, RULE_initDeclaratorList, RULE_returnStatement};
 use crate::toolkit::nhwc_instr::BreakpointArg;
 use crate::toolkit::scope_node::ST_ROOT;
 use crate::{debug_info_blue, debug_info_red, direct_parent_node};
@@ -177,31 +177,69 @@ fn parse_bb2nhwc(
                 // debug_info_blue!("visit jumpstmt at {jump_node}");
                 if let Some(&jump_scope) = ast2scope.get(&jump_node){
                     let jump_parent_scope = direct_parent_node!(at jump_scope in scope_tree);
-                    if let Some(ret_stmt_ast) = find!(rule RULE_returnStatement at jump_node in ast_tree){
-                        let ret_instr = NhwcInstrType::new_ret(None).into();
-                        node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
-                        if let  Some(ret_expr_ast)= find!(rule RULE_expression at ret_stmt_ast in ast_tree){
-
-                            let ret_et_sep = process_any_stmt(et_tree, ast_tree, scope_tree, ret_expr_ast, jump_parent_scope);
-                            eval_et::compress_et(et_tree, ret_et_sep, &symtab,jump_parent_scope ,scope_tree)?;
-
-                            let ret_sep_child_nodes = direct_child_nodes!(at ret_et_sep in et_tree);
-                            // debug_info_blue!("jump child nodes of {} is {:?}",ret_et_sep , ret_sep_child_nodes);
-                            // check_child_nodes(&jump_stmt, 1)?;
-                            match ret_sep_child_nodes.len(){
-                                x if x ==1 =>{
-                                    let ret_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ret_sep_child_nodes[0], jump_parent_scope, cfg_bb,  instr_slab, symtab_g)?.unwrap();
-                                    let ret_instr = NhwcInstrType::new_ret(Some(ret_symidx)).into();
-                                    node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
-                                }
-                                _=>{
-                                    return Err(anyhow!("ret语句下参数数量不正确 et_node:{ret_et_sep}"))
-                                }
-                            }
-                        }else{
+                    let jump_type_ast = direct_child_node!(at jump_node in ast_tree);
+                    match (rule_id!(at jump_type_ast in ast_tree),jump_type_ast){
+                        (RULE_returnStatement,ret_ast) => {
                             let ret_instr = NhwcInstrType::new_ret(None).into();
                             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
+                            if let  Some(ret_expr_ast)= find!(rule RULE_expression at ret_ast in ast_tree){
+                                let ret_et_sep = process_any_stmt(et_tree, ast_tree, scope_tree, ret_expr_ast, jump_parent_scope);
+                                eval_et::compress_et(et_tree, ret_et_sep, &symtab,jump_parent_scope ,scope_tree)?;
+
+                                let ret_sep_child_nodes = direct_child_nodes!(at ret_et_sep in et_tree);
+                                // debug_info_blue!("jump child nodes of {} is {:?}",ret_et_sep , ret_sep_child_nodes);
+                                // check_child_nodes(&jump_stmt, 1)?;
+                                match ret_sep_child_nodes.len(){
+                                    x if x ==1 =>{
+                                        let ret_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ret_sep_child_nodes[0], jump_parent_scope, cfg_bb,  instr_slab, symtab_g)?.unwrap();
+                                        let ret_instr = NhwcInstrType::new_ret(Some(ret_symidx)).into();
+                                        node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
+                                    }
+                                    _=>{
+                                        return Err(anyhow!("ret语句下参数数量不正确 et_node:{ret_et_sep}"))
+                                    }
+                                }
+                            }else{
+                                let ret_instr = NhwcInstrType::new_ret(None).into();
+                                node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
+                            }
+                        },
+                        (RULE_breakStatement,break_ast) => {
+                            let cycle_head_node = get_while_or_for_node_of_cfg_node(cfg_bb, cfg_graph)?;
+                            let cycle_head_node = direct_child_node!(at cycle_head_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_head()});
+                            let jump_label = node!(at cycle_head_node in cfg_graph).op_label_instr.unwrap();
+                            let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
+                            let jump_label = match jump_nhwctype{
+                                NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
+                                _ =>{
+                                    return Err(anyhow!("this instr should be a label {:?}", jump_nhwctype))
+                                }
+                            };
+
+                            let jump_instr = NhwcInstrType::new_jump(jump_label).into();
+                            node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(jump_instr, instr_slab)?;
+                        },
+                        (RULE_continueStatement,ctn_ast) => {
+                            let cycle_head_node = get_while_or_for_node_of_cfg_node(cfg_bb, cfg_graph)?;
+                            let cycle_head_node = direct_child_node!(at cycle_head_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_direct()});
+                            let jump_label = node!(at cycle_head_node in cfg_graph).op_label_instr.unwrap();
+                            let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
+                            let jump_label = match jump_nhwctype{
+                                NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
+                                _ =>{
+                                    return Err(anyhow!("this instr should be a label {:?}", jump_nhwctype))
+                                }
+                            };
+
+                            let jump_instr = NhwcInstrType::new_jump(jump_label).into();
+                            node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(jump_instr, instr_slab)?;
+                        },
+                        (_,_) => {
+                            return Err(anyhow!("错位的无条件跳转类型"));
                         }
+                    }
+                    if let Some(ret_stmt_ast) = find!(rule RULE_returnStatement at jump_node in ast_tree){
+                        
                     }else{
                         todo!()
                     }
@@ -1894,7 +1932,7 @@ pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph)
 
 // return the corresponding while block's while node of the cfg_node 
 pub fn get_while_or_for_node_of_cfg_node(cfg_node:u32, cfg_graph:&mut CfgGraph) -> Result<u32>{
-    let dfs_nodes = etc::reverse_dfs_with_predicate(cfg_graph, cfg_node,|e| e.weight().cfg_edge_type.is_body_head());
+    let dfs_nodes = etc::reverse_dfs_with_predicate(cfg_graph, cfg_node,|e| {let parent_node = e.target().index() as u32; node!(at parent_node in cfg_graph).cfg_node_type.is_root()});
     for cfg_node in dfs_nodes{
         if node!(at cfg_node in cfg_graph).cfg_node_type.is_for_loop() || 
         node!(at cfg_node in cfg_graph).cfg_node_type.is_while_loop(){
