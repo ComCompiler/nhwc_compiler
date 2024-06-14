@@ -1636,16 +1636,16 @@ fn parse_declvar2nhwc(
     eval_et::compress_et(et_tree, et_sep_node, symtab, decl_parent_scope, scope_tree)?;
     //如果该节点有子树
     let detail_et_nodes = direct_child_nodes!(at et_sep_node in et_tree);
-    for et_sep_item_node in detail_et_nodes {
-        let et_node_type = &node!(at et_sep_item_node in et_tree).et_node_type.clone();
+    for et_item_node in detail_et_nodes {
+        let et_node_type = &node!(at et_item_node in et_tree).et_node_type.clone();
         match et_node_type {
             // 先考虑这个语句存在 = 的情况
             EtNodeType::Operator { op: ExprOp::Assign, ast_node: _, text: _ } => {
-                let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_sep_item_node, decl_parent_scope, cfg_node,  instr_slab, symtab_g)?.unwrap();
+                let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_item_node, decl_parent_scope, cfg_node,  instr_slab, symtab_g)?.unwrap();
                 let var_type = symtab.get_symbol(&var_symidx)?.get_type()?.clone();
 
                 // 加入 alloc 指令 分配内存
-                if !&node!(at cfg_node in cfg_graph).cfg_node_type.is_root(){
+                if decl_parent_scope != ST_ROOT{
                     // 是 局部变量(在函数内定义的变量)
                     let cfg_entry = get_cfg_entry_by_cfg_node(cfg_graph, symtab, cfg_node)?.with_context(||format!("这个cfg node:{} 没有对应的entry节点",cfg_node))?;
                     let alloc_instr = NhwcInstrType::new_alloc(var_type.clone(), var_symidx.clone()).into();
@@ -1661,10 +1661,10 @@ fn parse_declvar2nhwc(
                 // node_mut!(at cfg_node in cfg_graph ).push_nhwc_instr(defvar_instr, instr_slab)??;
             }
             // 考虑这个语句的 et_sep_item_node 不是 = 的情况
-            EtNodeType::Operator { op: _, ast_node: _, text: _ } => {
+            EtNodeType::Operator { op: ExprOp::ArrayIndex , ast_node: _, text: _ } => {
                 // debug_info_red!("no =  as start ");
-                let _op_values = direct_child_nodes!(at et_sep_item_node in et_tree);
-                let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_sep_item_node, decl_parent_scope, cfg_node,  instr_slab, symtab_g)?.unwrap();
+                let _op_values = direct_child_nodes!(at et_item_node in et_tree);
+                let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_item_node, decl_parent_scope, cfg_node,  instr_slab, symtab_g)?.unwrap();
                 let var_type = symtab.get_symbol(&var_symidx)?.get_type()?.clone();
                 //大纲：
                 //将var_symidx处理看是普通变量还是数组变量，如果是数组，则将value_symidx的内容和var_symidx进行比对整合
@@ -1672,14 +1672,15 @@ fn parse_declvar2nhwc(
                 // let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
 
                 // 加入 alloc 指令 分配内存
-                let alloc_instr = NhwcInstrType::new_alloc(var_type, var_symidx).into();
-                if !&node!(at cfg_node in cfg_graph).cfg_node_type.is_root(){
-                    // 是 局部变量(在函数内定义的变量)
+                if decl_parent_scope != ST_ROOT{
+                    // local variable
+                    let alloc_instr = NhwcInstrType::new_alloc(var_type, var_symidx).into();
                     let cfg_entry = get_cfg_entry_by_cfg_node(cfg_graph, symtab, cfg_node)?.with_context(||format!("这个cfg node:{} 没有对应的entry节点",cfg_node))?;
                     node_mut!(at cfg_entry in cfg_graph ).push_nhwc_instr(alloc_instr, instr_slab)?;
                 }else{
-                    // 说明这个 cfg_node 就是root 理论上 这个应该被 eval_et 换成 constant 所以不存在这个情况
-                    return Err(anyhow!("there should not be operator at {}",cfg_node))
+                    // global variable
+                    let global_instr = NhwcInstrType::new_global(var_type.clone(), var_symidx.clone()).into();
+                    node_mut!(at cfg_node in cfg_graph ).insert_nhwc_instr(global_instr, 0,instr_slab)?;
                 }
 
                 // 加入 defvar 指令 给变量赋值
@@ -1693,10 +1694,10 @@ fn parse_declvar2nhwc(
                 let type_ast_node = find!(rule RULE_declarationSpecifiers at ast_decl_node in ast_tree).unwrap();
                 let var_type = Type::new(type_ast_node, ast_tree);
                 let var_str = &sym_idx.symbol_name;
-                let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab, &decldef_def_or_use, symtab_g, decl_parent_scope,var_str ,cfg_node,cfg_graph,Some(et_sep_item_node),et_tree)?;
+                let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab, &decldef_def_or_use, symtab_g, decl_parent_scope,var_str ,cfg_node,cfg_graph,Some(et_item_node),et_tree)?;
                 let def_instr = NhwcInstrType::new_def_var(var_type.clone(), symbol_symidx.clone(), None).into();
                 let alloc_instr = NhwcInstrType::new_alloc(var_type.clone(), symbol_symidx.clone().clone()).into();
-                if !&node!(at cfg_node in cfg_graph).cfg_node_type.is_root(){
+                if decl_parent_scope != ST_ROOT{
                     // function local variables 
                     let cfg_entry =get_cfg_entry_by_cfg_node(cfg_graph, symtab, cfg_node)?.with_context(||format!("这个cfg node:{} 没有对应的entry节点",cfg_node))?;
                     // 注意，这里def_instr 需要放到 cfg_entry 中，不能放到这个basic block，它可能是在一个循环中
@@ -1709,7 +1710,7 @@ fn parse_declvar2nhwc(
                     node_mut!(at cfg_node in cfg_graph ).insert_nhwc_instr(global_instr, 0,instr_slab)?;
                 }
             }
-            _ => return Err(anyhow!("{}这里不应该为sep类型", et_sep_item_node)),
+            _ => return Err(anyhow!("{}这里不应该为sep类型", et_item_node)),
         }
     }
     Ok(())

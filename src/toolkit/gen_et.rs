@@ -19,6 +19,7 @@ use super::{ast_node::AstTree, scope_node::ScopeTree};
 // 这个函数 返回 separator node
 // 只能处理三类  expr_stmt & declaration & expr
 pub fn process_any_stmt(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, any_stmt_node:u32, scope_node:u32) -> u32 {
+    // debug_info_red!("process any_stmt: {}",any_stmt_node);
     let sep_node = match node!(at any_stmt_node in ast_tree).rule_id {
         RULE_expressionStatement => {
             let sep_node = add_node!({EtNodeType::new_sep(any_stmt_node).as_et_node()} to et_tree);

@@ -177,7 +177,7 @@ impl Value {
             Type::I1 => Value::I1(None),
             Type::Void => Value::Void,
             Type::Label => todo!(),
-            Type::Array { dims: _, ele_ty } => Value::Array { value_map: ArrayEleMap::new(), dims: vec![], ele_ty: *ele_ty.clone()},
+            Type::Array { dims, ele_ty } => Value::Array { value_map: ArrayEleMap::new(), dims:unwrap_vec(dims), ele_ty: *ele_ty.clone()},
             Type::Fn { arg_syms, ret_sym } => {
                 Value::Fn { arg_syms: arg_syms.clone(), ret_sym: ret_sym.clone() }
             },
@@ -237,7 +237,7 @@ impl Value {
             Type::Label => Err(anyhow!("不能从string 转化为 Label 类型的value"))?,
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("不能从string 转化为 Fn 类型的value"))?,
             // Type::Unsure {  } => Err(anyhow!("不能从string 转化为 Unsure 类型的value"))?,
-            Type::Array { dims, ele_ty} => Value::new_array(ArrayEleMap::new(), dims.clone().into_iter().map(|x| x.unwrap()).collect_vec(), *ele_ty.clone()),
+            Type::Array { dims, ele_ty} => Value::new_array(ArrayEleMap::new(), unwrap_vec(dims), *ele_ty.clone()),
             Type::Ptr64 { ty: _ } => todo!(),
         })
     }
@@ -459,6 +459,7 @@ impl Type {
             }
         }
     }
+    /// return the length of ty if it's an array or else 1
     pub fn get_ele_len(&self) -> Result<usize>{
         match self{
             Type::Array { dims, ele_ty: _ } => {
@@ -479,7 +480,7 @@ impl Type {
             Type::I1 => Ok(1),
             Type::Void => todo!(),
             Type::Label => todo!(),
-            Type::Array { dims: _, ele_ty: ty } => Ok(self.get_ele_len()?*ty.get_ele_size()?),
+            Type::Array { dims: _, ele_ty: ty } => Ok(self.get_ele_len()?*self.get_ele_size()?),
             Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
             Type::Ptr64 { ty: _ } => Ok(TARGET_POINTER_MEM_LEN),
         }
@@ -701,4 +702,8 @@ pub struct UseCounter {
 
 impl Debug for UseCounter {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{}", self.use_count) }
+}
+
+pub fn unwrap_vec<T:Clone>(v:&Vec<Option<T>>)  -> Vec<T>{
+    v.clone().into_iter().map(|x| x.unwrap()).collect_vec()
 }

@@ -53,23 +53,23 @@ fn main() {
     // 你也可以通过运行 cargo run -- --help 来查看所有可用选项
 
     let args = Args::parse();
-    let is_gen_png_global = args.debug;
+    let debug = args.debug;
     // args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
     let mut pass_manager = PassManager::new(args);
-    let code2ast_pass = Code2AstPass::new(true && is_gen_png_global);
-    let ast2cfg_pass = Ast2CfgPass::new(true && is_gen_png_global);
-    let ast2et_debug_pass = Ast2EtDebugPass::new(true && is_gen_png_global);
-    let cfg2ncfg_pass = Cfg2NcfgPass::new(true && is_gen_png_global, true && is_gen_png_global);
-    let ast2st_pass = Ast2StPass::new(true && is_gen_png_global);
-    let ncfg2djg_pass = Ncfg2DjgPass::new(true && is_gen_png_global);
-    let ssa_pass = SsaPass::new(true && is_gen_png_global, true && is_gen_png_global);
-    let cfg_debug_pass1 = CfgDebugPass::new(true && is_gen_png_global);
-    let cfg_debug_pass2 = CfgDebugPass::new(true && is_gen_png_global);
-    let def_use_chain_debug_pass: DefUseChainDebugPass = DefUseChainDebugPass::new(true && is_gen_png_global);
-    let symtab_debug_pass = SymtabDebugPass::new(true && is_gen_png_global);
-    let _simulator_debug_pass = SimulatorDebugPass::new(true && is_gen_png_global,false);
-    let nhwc_dump_pass = NhwcDumpPass::new(true && is_gen_png_global);
-    let nhwc2riscv_pass = Nhwc2RiscvPass::new(true && is_gen_png_global, true, false);
+    let code2ast_pass = Code2AstPass::new(debug);
+    let ast2cfg_pass = Ast2CfgPass::new(debug);
+    let ast2et_debug_pass = Ast2EtDebugPass::new(debug);
+    let cfg2ncfg_pass = Cfg2NcfgPass::new(debug,debug);
+    let ast2st_pass = Ast2StPass::new(debug);
+    let ncfg2djg_pass = Ncfg2DjgPass::new(debug);
+    let ssa_pass = SsaPass::new(debug, debug);
+    let cfg_debug_pass1 = CfgDebugPass::new(debug);
+    let cfg_debug_pass2 = CfgDebugPass::new(debug);
+    let def_use_chain_debug_pass: DefUseChainDebugPass = DefUseChainDebugPass::new(debug);
+    let symtab_debug_pass = SymtabDebugPass::new(debug);
+    let _simulator_debug_pass = SimulatorDebugPass::new(debug,debug);
+    let nhwc_dump_pass = NhwcDumpPass::new(debug);
+    let nhwc2riscv_pass = Nhwc2RiscvPass::new(debug, true ,debug);
     let mem_alloc_pass = MemAllocPass::new();
     add_passes!(
         code2ast_pass

@@ -16,15 +16,15 @@ impl Pass for Code2AstPass {
         ctx.code = read_file_content(ctx.args.input.to_string_lossy().into_owned());
         let defs = "int getint();
             int getch();
-            int getarray(int a[]);
+            int getarray(int zz_array[]);
             float getfloat();
-            int getfarray(float a[]);
+            int getfarray(float zz_array[]);
 
-            void putint(int x );
-            void putch(int x );
-            void putarray(int x, int a[]);
-            void putfloat(float x);
-            void putfarray(int x, float a[]);
+            void putint(int zz_int );
+            void putch(int zz_ch );
+            void putarray(int x, int zz_array[]);
+            void putfloat(float zz_float);
+            void putfarray(int zz_len, float zz_farray[]);
 
             // putf(char *s, ...)
             void putf();
@@ -35,8 +35,8 @@ impl Pass for Code2AstPass {
             void starttime();
             void stoptime();
 
-            void memset(void *s, int c, int n);
-            void memcpy(void *dest, void *src, int n);";
+            void memset(void *zz_ptr, int zz_len, int zz_val);
+            void memcpy(void *zz_dest, void *zz_ptr, int zz_len);";
         if !ctx.args.no_header{
             ctx.code += defs;
         }
