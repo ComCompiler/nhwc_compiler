@@ -371,6 +371,20 @@ impl Value {
             Value::Ref { symidx, ty } => {
                 Ok(symidx.clone())
             },
+            Value::I1(op_i1) => {
+                if let Some(i1_value) = op_i1{
+                    match i1_value{
+                        true => {
+                            Ok(SymIdx::new(ST_ROOT, "true".to_string()))
+                        },
+                        false => {
+                            Ok(SymIdx::new(ST_ROOT,"false".to_string()))
+                        },
+                    }
+                }else{
+                    Err(anyhow!("f1 {:?} unsure 无法转化为 symidx",self))
+                }
+            }
             _ => Err(anyhow!("{:?}无法转化为 symidx",self))
         }
     }
@@ -516,7 +530,9 @@ impl Type {
     }
 
     pub fn new_from_const_str(const_str:&String) -> Self {
-        if const_str.contains(".") {
+        if const_str.contains("true") || const_str.contains("false"){
+            Type::I1
+        }else if const_str.contains(".") {
             Type::F32
         } else {
             Type::I32

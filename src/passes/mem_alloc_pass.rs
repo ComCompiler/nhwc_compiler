@@ -101,7 +101,7 @@ impl Pass for MemAllocPass {
 }
 pub fn calculate_mem_offset2sp(cfg_graph:&mut CfgGraph,cfg_entry:u32,symtab:&mut SymTab,symidx:&SymIdx) -> Result<()>{
     let mem_layout = node!(at cfg_entry in cfg_graph).get_mem_layout()?;
-    let mem_offset2sp = mem_layout.get_mem_len() - symtab.get_symbol(symidx)?.get_mem_offset2s0()? - symtab.get_symbol(symidx)?.get_type()?.get_ele_size()?;
+    let mem_offset2sp = (mem_layout.get_mem_len() - *symtab.get_symbol(symidx)?.get_mem_offset2s0()? as usize - symtab.get_symbol(symidx)?.get_type()?.get_ele_size()?) as isize;
     symtab.get_mut_symbol(symidx)?.add_mem_offset2sp(mem_offset2sp);
     Ok(())
 }
@@ -115,7 +115,7 @@ pub fn alloc_stack_mem_for_cfg_entry(cfg_graph:&mut CfgGraph,cfg_entry:u32,symta
         cfg_node_struct.add_mem_layout(MemLayout::new())
     }
     let sym_type =symbol_struct.get_type()?;
-    let mem_offset = cfg_node_struct.get_mut_mem_layout()?.insert_data(sym_type.get_align()?,sym_type.get_mem_len()?,symidx);
+    let mem_offset = cfg_node_struct.get_mut_mem_layout()?.insert_data(sym_type.get_align()?,sym_type.get_mem_len()?,symidx) as isize;
     symbol_struct.add_mem_offset2s0(mem_offset);
     Ok(())
 }

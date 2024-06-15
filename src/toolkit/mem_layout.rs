@@ -1,5 +1,5 @@
 use std::rc::Rc;
-use crate::{debug_info_blue, debug_info_red, toolkit::symtab::*};
+use crate::{debug_info_blue, debug_info_red, make_field_trait_for_struct, toolkit::symtab::*};
 
 use std::fmt::Debug;
 use anyhow::*;
@@ -10,8 +10,8 @@ use itertools::{self, Itertools};
 
 //  mem offset is the offset to s0 (so you should divide stack_size by mem_offset to get offset to sp)
 reg_field_for_struct!(Symbol {
-        MEM_OFFSET2S0:usize,
-        MEM_OFFSET2SP:usize,
+        MEM_OFFSET2S0:isize,
+        MEM_OFFSET2SP:isize,
         FUNC_COR_RA_SYMIDX:SymIdx,
         FUNC_COR_S0_SYMIDX:SymIdx,
     } with_fields fields);
@@ -19,6 +19,10 @@ reg_field_for_struct!(CfgNode {
     MEM_LAYOUT:MemLayout,
 } with_fields info);
 
+use crate::toolkit::field::Field;
+make_field_trait_for_struct!{
+    isize
+}
 
 pub type SymIdxRc = Rc<SymIdx>;
 /// 用于进行 栈内存对齐计算

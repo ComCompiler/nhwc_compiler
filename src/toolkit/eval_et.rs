@@ -12,15 +12,15 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
     // debug_info_green!("eval et {}",et_node);
     let value_symidx = match node!(at et_node in et_tree).clone().et_node_type {
         // let value = match node!(at Operator_node in et_tree){
-        EtNodeType::Constant { const_sym_idx, ast_node: _, text: _ } => Some(const_sym_idx),
+        EtNodeType::Literal { const_sym_idx, ast_node: _, text: _ } => Some(const_sym_idx),
 
-        EtNodeType::Operator { ast_node: _, text: _, op } => {
+        EtNodeType::Operator { ast_node: _, text: _, op, op_symidx } => {
             let et_nodes = direct_child_nodes!(at et_node in et_tree); //里面的u32是节点编号
             let mut ret_flag = false;
             let mut et_ret_symidx_vec = vec![];
             for et_child_node in et_nodes{
                 match &node!(at et_child_node in et_tree).et_node_type {
-                    EtNodeType::Operator { op, ast_node, text } => {
+                    EtNodeType::Operator { op, ast_node, text, op_symidx } => {
                         let op_symidx = eval_et(et_tree, et_child_node);
                         match op_symidx{
                             Some(const_symidx) => {
@@ -41,7 +41,7 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
                     EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => {
                         ret_flag = true;
                     }
-                    EtNodeType::Constant { const_sym_idx, ast_node, text } => {
+                    EtNodeType::Literal { const_sym_idx, ast_node, text } => {
                         et_ret_symidx_vec.push(const_sym_idx.clone());
 
                     },

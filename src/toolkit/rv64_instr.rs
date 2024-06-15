@@ -16,6 +16,19 @@ use super::symtab::SymIdx;
 //     pub text:String,
 // }
 
+pub trait RiscvOffsetLimit{
+    fn is_legal_offset(&self) ->bool;
+}
+
+impl RiscvOffsetLimit for isize{
+    fn is_legal_offset(&self) ->bool {
+        if *self>2000 || *self< -2000{
+            false           
+        }else{
+            true
+        }
+    }
+}
 #[derive(Clone)]
 pub enum Imm{
     /// global label is for global symbol
@@ -40,7 +53,13 @@ impl Imm{
     pub fn new_literal(symidx:SymIdx) -> Self{
         Self::Literal { symidx }
     }
+    pub fn new_literal_isize(li:isize) -> Self{
+        Self::Literal { symidx : li.into()}
+    }
     pub fn from_offset(offset:isize)-> Self{
+        if !offset.is_legal_offset(){
+            panic!("you can't use an offset from ")
+        }
         Self::Literal { symidx:SymIdx::from(offset) }
     }
 }
@@ -359,12 +378,6 @@ impl Debug for Register {
     }
 }
 impl Register{
-    pub fn new_ra()->Self{
-        Self::RA {  }
-    }
-    pub fn new_sp()->Self{
-        Self::SP {  }
-    }
     pub fn new_s0()->Self{
         Self::Saved { reg_idx: 0 }
     }
@@ -751,25 +764,25 @@ impl Stores{
     pub fn new(size:usize,reg1:Register,reg2:Register, offset:isize, is_f32:bool) -> Result<Self>{
         Ok(match (size,is_f32){
             (8,false)=> {
-                Stores::new_sd(reg1, reg2, Imm::from_offset(offset))
+                Stores::new_sd(reg1, reg2, Imm::new_literal_isize(offset))
             },
             (4,false)=> {
-                Stores::new_sw(reg1, reg2, Imm::from_offset(offset))
+                Stores::new_sw(reg1, reg2, Imm::new_literal_isize(offset))
             },
             (2,false)=> {
-                Stores::new_sh(reg1, reg2, Imm::from_offset(offset))
+                Stores::new_sh(reg1, reg2, Imm::new_literal_isize(offset))
             },
             (1,false)=> {
-                Stores::new_sb(reg1, reg2, Imm::from_offset(offset))
+                Stores::new_sb(reg1, reg2, Imm::new_literal_isize(offset))
             },
             (_,false)=> {
                 return Err(anyhow!("unexpected store size"))
             },
             (8,true)=> {
-                Stores::new_fsd(reg1, reg2, Imm::from_offset(offset))
+                Stores::new_fsd(reg1, reg2, Imm::new_literal_isize(offset))
             },
             (4,true)=> {
-                Stores::new_fsw(reg1, reg2, Imm::from_offset(offset))
+                Stores::new_fsw(reg1, reg2, Imm::new_literal_isize(offset))
             },
             (_,true)=> {
                 return Err(anyhow!("unexpected store size"))

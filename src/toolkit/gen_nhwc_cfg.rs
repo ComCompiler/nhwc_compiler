@@ -1033,7 +1033,7 @@ fn process_et(
 ) -> Result<Option<SymIdx>> {
     let nake_et = &node!(at et_node in et_tree).et_node_type.clone();
     match &nake_et {
-        EtNodeType::Operator { op, ast_node: _, text: _ } => {
+        EtNodeType::Operator { op, ast_node: _, text: _, op_symidx } => {
             match op {
                 super::et_node::ExprOp::Mul => {
                     if let Some(_) = direct_child_node!(at et_node in et_tree ret_option) {
@@ -1516,7 +1516,7 @@ fn process_et(
                }
             }
         }
-        EtNodeType::Constant { const_sym_idx, ast_node, text: _ } => {
+        EtNodeType::Literal { const_sym_idx, ast_node, text: _} => {
             let ast_node = *ast_node;
             let constant_literal = &const_sym_idx.symbol_name;
             // debug_info_blue!("add constant {}",constant_literal);
@@ -1568,7 +1568,7 @@ fn parse_extern_declfunc2nhwc(
                     let ast_sym_name_node;
                     loop{
                         let child_et_node =  direct_child_node!(at cur_et_node in et_tree);
-                        if let EtNodeType::Operator {  ast_node: _, text: _, op } = &node!(at child_et_node in et_tree).et_node_type{
+                        if let EtNodeType::Operator {  ast_node: _, text: _, op, op_symidx } = &node!(at child_et_node in et_tree).et_node_type{
                             if let ExprOp::ArrayIndex = op{
                                 if node!(at cur_et_node in et_tree).has_dims(){
                                     let mut cur_dims = node_mut!(at cur_et_node in et_tree).get_dims()?.clone();
@@ -1638,7 +1638,7 @@ fn parse_declvar2nhwc(
         let et_node_type = &node!(at et_item_node in et_tree).et_node_type.clone();
         match et_node_type {
             // 先考虑这个语句存在 = 的情况
-            EtNodeType::Operator { op: ExprOp::Assign, ast_node: _, text: _ } => {
+            EtNodeType::Operator { op: ExprOp::Assign, ast_node: _, text: _, op_symidx } => {
                 let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_item_node, decl_parent_scope, cfg_node,  instr_slab, symtab_g)?.unwrap();
                 let var_type = symtab.get_symbol(&var_symidx)?.get_type()?.clone();
 
@@ -1659,7 +1659,7 @@ fn parse_declvar2nhwc(
                 // node_mut!(at cfg_node in cfg_graph ).push_nhwc_instr(defvar_instr, instr_slab)??;
             }
             // 考虑这个语句的 et_sep_item_node 不是 = 的情况
-            EtNodeType::Operator { op: ExprOp::ArrayIndex , ast_node: _, text: _ } => {
+            EtNodeType::Operator { op: ExprOp::ArrayIndex , ast_node: _, text: _, op_symidx } => {
                 // debug_info_red!("no =  as start ");
                 let _op_values = direct_child_nodes!(at et_item_node in et_tree);
                 let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_item_node, decl_parent_scope, cfg_node,  instr_slab, symtab_g)?.unwrap();
@@ -1686,7 +1686,7 @@ fn parse_declvar2nhwc(
                 // node_mut!(at cfg_node in cfg_graph ).push_nhwc_instr(defvar_instr, instr_slab)?;
             }
             // 首个 operator 不是 = assign 的情况
-            EtNodeType::Constant { const_sym_idx: _, ast_node: _, text: _ } => todo!(),
+            EtNodeType::Literal { const_sym_idx: _, ast_node: _, text: _ } => todo!(),
             EtNodeType::Symbol { sym_idx, ast_node, text:_, decldef_def_or_use } => {
                 //获得变量类型，做成symidx
                 let type_ast_node = find!(rule RULE_declarationSpecifiers at ast_decl_node in ast_tree).unwrap();
@@ -2024,7 +2024,7 @@ pub fn array_initialize(et_node_vec:Vec<u32>, et_tree:&mut EtTree, array_ele_map
     while i < et_node_vec.len(){
         let et_node = et_node_vec[i];
         match &node!(at et_node in et_tree).et_node_type {
-            EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _ } => {
+            EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _, op_symidx } => {
                 let ele_and_sub_array_vec = direct_child_nodes!(at et_node in et_tree);
                 // let last_dim = reversed_remained_dims.pop().unwrap();
                 array_initialize(ele_and_sub_array_vec, et_tree, array_ele_map, ele_type,reversed_remained_dims, array_offset,ast_tree, cfg_graph, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
@@ -2045,10 +2045,10 @@ pub fn array_initialize(et_node_vec:Vec<u32>, et_tree:&mut EtTree, array_ele_map
                     }
                     let et_node = et_node_vec[i];
                     match &node!(at et_node in et_tree).et_node_type{
-                        EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _ }=>{
+                        EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _, op_symidx }=>{
                             return Err(anyhow!("expect a constant but meet a array wrapper {}",et_node))
                         },
-                        EtNodeType::Constant { const_sym_idx, ast_node: _, text: _ } => {
+                        EtNodeType::Literal { const_sym_idx, ast_node: _, text: _ } => {
                             array_ele_map.insert_ele(*array_offset, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?)?;
                             // debug_info_blue!("add array ele with offset {},{:?}",i, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?);
                             *array_offset +=1;
