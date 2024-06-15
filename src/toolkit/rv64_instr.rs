@@ -18,9 +18,11 @@ use super::symtab::SymIdx;
 
 #[derive(Clone)]
 pub enum Imm{
+    /// global label is for global symbol
     GlobalLabel{
         symidx:SymIdx,
     },
+    /// local label is for function jump label 
     LocalLabel{
         symidx:SymIdx,
     },
@@ -129,17 +131,17 @@ pub enum PseudoInstr {
     Rdtimeh {rd:Register },
 
     //内存访问load
-    Lla {rd:Register ,symbol:SymIdx},//加载指定加载局部或相对地址到一个寄存器rd中。
-    La {rd:Register ,symbol:SymIdx},//加载一个全局或绝对地址到寄存器rd中
-    Lb {rd:Register ,symbol:SymIdx},//加载符号位置的字节到寄存器rd中
-    Lh {rd:Register ,symbol:SymIdx},//加载符号位置的半字到寄存器rd中
-    Lw {rd:Register ,symbol:SymIdx},//加载符号位置的字到寄存器rd中
-    Ld {rd:Register ,symbol:SymIdx},//加载符号双字到寄存器rd中
+    Lla {rd:Register ,symbol:Imm},//加载指定加载局部或相对地址到一个寄存器rd中。
+    La {rd:Register ,symbol:Imm},//加载一个全局或绝对地址到寄存器rd中
+    Lb {rd:Register ,symbol:Imm},//加载符号位置的字节到寄存器rd中
+    Lh {rd:Register ,symbol:Imm},//加载符号位置的半字到寄存器rd中
+    Lw {rd:Register ,symbol:Imm},//加载符号位置的字到寄存器rd中
+    Ld {rd:Register ,symbol:Imm},//加载符号双字到寄存器rd中
     //内存访问store
-    Sb {rd:Register ,symbol:SymIdx ,rt:Register},//将寄存器rt的字节字存储到指定地址或符号位置
-    Sh {rd:Register ,symbol:SymIdx ,rt:Register},//将寄存器rt的半字存储到指定地址或符号位置
-    Sw {rd:Register ,symbol:SymIdx ,rt:Register},//将寄存器rt的字存储到指定地址或符号位置
-    Sd {rd:Register ,symbol:SymIdx ,rt:Register},//将寄存器rt的双字存储到指定地址或符号位置
+    Sb {rd:Register ,symbol:Imm ,rt:Register},//将寄存器rt的字节字存储到指定地址或符号位置
+    Sh {rd:Register ,symbol:Imm ,rt:Register},//将寄存器rt的半字存储到指定地址或符号位置
+    Sw {rd:Register ,symbol:Imm ,rt:Register},//将寄存器rt的字存储到指定地址或符号位置
+    Sd {rd:Register ,symbol:Imm ,rt:Register},//将寄存器rt的双字存储到指定地址或符号位置
 
     Fmv_s {rd:Register ,rs:Register},//单精度符点移动
     Fabs_s {rd:Register ,rs:Register},//单精度取绝对值

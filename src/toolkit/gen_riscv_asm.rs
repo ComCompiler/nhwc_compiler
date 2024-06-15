@@ -188,7 +188,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         match src_symtab.get_symbol(array_symidx)?.has_is_global() 
                             &&*src_symtab.get_symbol(array_symidx)?.get_is_global()?{
                             true => {
-                                asm_sect.asm(PseudoInstr::new_la(Register::new_s(5), array_symidx.clone()).into());
+                                asm_sect.asm(PseudoInstr::new_la(Register::new_s(5), Imm::new_global_label(array_symidx.to_deglobal_ptr()?)).into());
                             },
                             false => {
                                 let &array_offset2sp = src_symtab.get_symbol(array_symidx)?.get_mem_offset2sp()?;
@@ -609,7 +609,7 @@ pub fn load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,src_
         }
     }else{
         asm_sect.annotation(format!("   load label {} as ptr to reg",symidx.to_deglobal_ptr()?));
-        asm_sect.asm(PseudoInstr::new_la(reg.clone(), symidx.to_deglobal_ptr()?).into());
+        asm_sect.asm(PseudoInstr::new_la(reg.clone(), Imm::new_global_label(symidx.to_deglobal_ptr()?)).into());
     }
     Ok(())
 }
