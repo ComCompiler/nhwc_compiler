@@ -1,4 +1,6 @@
 use anyhow::{anyhow, Context, Result};
+use petgraph::EdgeType;
+use rand::{thread_rng, Rng};
 use strum_macros::EnumIs;
 use std::fmt::Debug;
 use std::{mem, u32};
@@ -6,17 +8,45 @@ use std::{mem, u32};
 use super::ast_node::AstTree;
 use super::field::Fields;
 use super::symtab::SymIdx;
-use crate::node;
-use eval::eval;
+use crate::{direct_child_nodes, node, node_mut};
 use petgraph::stable_graph::StableDiGraph;
 
-pub type EtTree = StableDiGraph<EtNode, (), u32>;
+pub type EtTree = StableDiGraph<EtNode, EtEdge, u32>;
+
+#[derive(Clone)]
+pub struct EtEdge{
+    et_edge_type: EtEdgeType
+}
+#[derive(Clone,EnumIs)]
+pub enum EtEdgeType{
+    Direct,
+    Deleted
+}
+
+impl Debug for EtEdgeType{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Direct => write!(f, ""),
+            Self::Deleted => write!(f, "Deleted"),
+        }
+    }
+}
+impl Debug for EtEdge{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}",self.et_edge_type)
+    }
+}
 
 #[derive(Clone)]
 pub enum DeclOrDefOrUse {
     DeclDef { type_ast_node:u32 ,is_const:bool },
     Use,
     Def 
+}
+impl From<EtEdgeType> for EtEdge{
+    fn from(et_edge_type: EtEdgeType) -> Self {
+        Self { et_edge_type }
+    }
 }
 #[derive(Clone,EnumIs)]
 pub enum EtNodeType {
@@ -37,7 +67,200 @@ pub enum EtNodeType {
 pub struct EtNode {
     pub et_node_type:EtNodeType,
     pub info:Fields,
+    pub hash:Option<isize>
 }
+pub trait EtHash{
+    fn update_hash(&mut self,et_node:u32) ;
+}
+const ET_HASH_MODULUS:isize =  10000000;
+impl EtHash for EtTree{
+    fn update_hash(&mut self,et_node:u32) {
+        let child_nodes = direct_child_nodes!(at et_node in self with_predicate {|e| !e.weight().et_edge_type.is_deleted()});
+        for &child_node in &child_nodes{
+            self.update_hash(child_node);
+        }
+        match &node!(at et_node in self).et_node_type{
+            EtNodeType::Operator { op, ast_node, text } => {
+                match op{
+                    ExprOp::Mul => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1*h2) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::Add => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1+h2) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::Sub => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1-h2) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::Div => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1*2+h2/2) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::Assign => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1%h2) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::LogicalOr => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1|h2 + 10000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::LogicalAnd => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1&h2+10000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::LogicalNot => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^10000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::BitwiseOr => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1|h2+20000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::BitwiseAnd => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1&h2+10000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::BitwiseXor => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1+h2+10000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::BitwiseNot => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1+h2+1) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::Eq => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^h2+10000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::NEq => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^h2-20000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::Less => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^h2+30000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::Greater => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^h2+40000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::LEq => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^h2+50000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::GEq => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^h2+60000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::LShift => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^h2+70000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::RShift => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^h2+80000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::Mod => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^h2+9000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::Call => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some({
+                            let rnd:isize = thread_rng().gen();rnd % ET_HASH_MODULUS
+                        });
+                    },
+                    ExprOp::Negative => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^11000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::Positive => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^12000) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::ArrayIndex => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^h2+100) % ET_HASH_MODULUS);
+                    },
+                    ExprOp::ArrayWrapper => {
+                        assert!(child_nodes.len() == 2);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some({
+                            let rnd:isize = thread_rng().gen();
+                            rnd % ET_HASH_MODULUS
+                        });
+                    },
+                    ExprOp::Cast => todo!(),
+                    ExprOp::AddrOf => todo!(),
+                    ExprOp::Deref => todo!(),
+                    ExprOp::DotMember => todo!(),
+                    ExprOp::ArrowMember => todo!(),
+                    ExprOp::LPlusPlus => todo!(),
+                    ExprOp::RPlusPlus => todo!(),
+                    ExprOp::LMinusMinus => todo!(),
+                    ExprOp::RMinusMinus => todo!(),
+                    _ => {
+                        panic!()
+                    }
+                }
+            },
+            EtNodeType::Constant { const_sym_idx, ast_node, text } => todo!(),
+            EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => todo!(),
+            EtNodeType::Separator { ast_node, text } => todo!(),
+        }
+    }
+}
+
 #[derive(Clone)]
 pub enum ExprOp {
     Mul,
@@ -81,41 +304,41 @@ pub enum ExprOp {
     ArrayWrapper,
 }
 impl ExprOp {
-    /// 传入的vec的内部是节点在et_tree里的节点序号
-    pub fn eval_sub_et_nodes(&self, _et_tree:&mut EtTree, vec:&Vec<SymIdx>) -> Result<SymIdx> {
-        let value = match &self {
-            ExprOp::Mul => eval(&format!("{}{}{}", &vec[0].symbol_name, "*", &vec[1].symbol_name)),
-            ExprOp::Add => eval(&format!("{}{}{}", &vec[0].symbol_name, "+", &vec[1].symbol_name)),
-            ExprOp::Sub => eval(&format!("{}{}{}", &vec[0].symbol_name, "-", &vec[1].symbol_name)),
-            ExprOp::Div => eval(&format!("{}{}{}", &vec[0].symbol_name, "/", &vec[1].symbol_name)),
-            ExprOp::LogicalOr => eval(&format!("{}{}{}", &vec[0].symbol_name, "||", &vec[1].symbol_name)),
-            ExprOp::LogicalAnd => eval(&format!("{}{}{}", &vec[0].symbol_name, "&&", &vec[1].symbol_name)),
-            ExprOp::LogicalNot => eval(&format!("{}{}", &vec[0].symbol_name, "!") ),
-            ExprOp::BitwiseOr => eval(&format!("{}{}{}", &vec[0].symbol_name, "|", &vec[1].symbol_name)),
-            ExprOp::BitwiseAnd => eval(&format!("{}{}{}", &vec[0].symbol_name, "&", &vec[1].symbol_name)),
-            ExprOp::BitwiseXor => eval(&format!("{}{}{}", &vec[0].symbol_name, "^", &vec[1].symbol_name)),
-            ExprOp::BitwiseNot => eval(&format!("{}{}", &vec[0].symbol_name, "!")), //一元运算符
-            ExprOp::Eq => eval(&format!("{}{}{}", &vec[0].symbol_name, "==", &vec[1].symbol_name)),
-            ExprOp::NEq => eval(&format!("{}{}{}", &vec[0].symbol_name, "!=", &vec[1].symbol_name)),
-            ExprOp::Less => eval(&format!("{}{}{}", &vec[0].symbol_name, "<", &vec[1].symbol_name)),
-            ExprOp::Greater => eval(&format!("{}{}{}", &vec[0].symbol_name, ">", &vec[1].symbol_name)),
-            ExprOp::LEq => eval(&format!("{}{}{}", &vec[0].symbol_name, "<=", &vec[1].symbol_name)),
-            ExprOp::GEq => eval(&format!("{}{}{}", &vec[0].symbol_name, ">=", &vec[1].symbol_name)),
-            ExprOp::LShift => eval(&format!("{}{}{}", &vec[0].symbol_name, "<<", &vec[1].symbol_name)),
-            ExprOp::RShift => eval(&format!("{}{}{}", &vec[0].symbol_name, ">>", &vec[1].symbol_name)),
-            ExprOp::Mod => eval(&format!("{}{}{}", &vec[0].symbol_name, "%", &vec[1].symbol_name)),
-            ExprOp::Cast => eval(&format!("({}){}", &vec[0].symbol_name, &vec[1].symbol_name)),
-            ExprOp::Call => eval(&format!("{}({})", &vec[0].symbol_name, &vec[1].symbol_name)),
-            ExprOp::Negative => eval(&format!("0-{}", &vec[0].symbol_name)),
-            ExprOp::Positive => eval(&format!("+{}", &vec[0].symbol_name)),
-            ExprOp::AddrOf => eval(&format!("&{}", &vec[0].symbol_name)),
-            ExprOp::Deref => eval(&format!("*{}", &vec[0].symbol_name)),
-            ExprOp::DotMember => eval(&format!("{}.{}", &vec[0].symbol_name, &vec[1].symbol_name)),
-            ExprOp::ArrowMember => eval(&format!("{}->{}", &vec[0].symbol_name, &vec[1].symbol_name)),
-            _ => {Err(eval::Error::Custom(format!("unsupported operator {:?}",self)))},
-        };
-        Ok(SymIdx::new(0, value.with_context( || format!("eval_sub_et_nodes failed with {self:?} {vec:?}"))?.to_string()))
-    }
+    // 传入的vec的内部是节点在et_tree里的节点序号
+    // pub fn eval_sub_et_nodes(&self, _et_tree:&mut EtTree, vec:&Vec<SymIdx>) -> Result<SymIdx> {
+    //     let value = match &self {
+    //         ExprOp::Mul => eval(&format!("{}{}{}", &vec[0].symbol_name, "*", &vec[1].symbol_name)),
+    //         ExprOp::Add => eval(&format!("{}{}{}", &vec[0].symbol_name, "+", &vec[1].symbol_name)),
+    //         ExprOp::Sub => eval(&format!("{}{}{}", &vec[0].symbol_name, "-", &vec[1].symbol_name)),
+    //         ExprOp::Div => eval(&format!("{}{}{}", &vec[0].symbol_name, "/", &vec[1].symbol_name)),
+    //         ExprOp::LogicalOr => eval(&format!("{}{}{}", &vec[0].symbol_name, "||", &vec[1].symbol_name)),
+    //         ExprOp::LogicalAnd => eval(&format!("{}{}{}", &vec[0].symbol_name, "&&", &vec[1].symbol_name)),
+    //         ExprOp::LogicalNot => eval(&format!("{}{}", &vec[0].symbol_name, "!") ),
+    //         ExprOp::BitwiseOr => eval(&format!("{}{}{}", &vec[0].symbol_name, "|", &vec[1].symbol_name)),
+    //         ExprOp::BitwiseAnd => eval(&format!("{}{}{}", &vec[0].symbol_name, "&", &vec[1].symbol_name)),
+    //         ExprOp::BitwiseXor => eval(&format!("{}{}{}", &vec[0].symbol_name, "^", &vec[1].symbol_name)),
+    //         ExprOp::BitwiseNot => eval(&format!("{}{}", &vec[0].symbol_name, "!")), //一元运算符
+    //         ExprOp::Eq => eval(&format!("{}{}{}", &vec[0].symbol_name, "==", &vec[1].symbol_name)),
+    //         ExprOp::NEq => eval(&format!("{}{}{}", &vec[0].symbol_name, "!=", &vec[1].symbol_name)),
+    //         ExprOp::Less => eval(&format!("{}{}{}", &vec[0].symbol_name, "<", &vec[1].symbol_name)),
+    //         ExprOp::Greater => eval(&format!("{}{}{}", &vec[0].symbol_name, ">", &vec[1].symbol_name)),
+    //         ExprOp::LEq => eval(&format!("{}{}{}", &vec[0].symbol_name, "<=", &vec[1].symbol_name)),
+    //         ExprOp::GEq => eval(&format!("{}{}{}", &vec[0].symbol_name, ">=", &vec[1].symbol_name)),
+    //         ExprOp::LShift => eval(&format!("{}{}{}", &vec[0].symbol_name, "<<", &vec[1].symbol_name)),
+    //         ExprOp::RShift => eval(&format!("{}{}{}", &vec[0].symbol_name, ">>", &vec[1].symbol_name)),
+    //         ExprOp::Mod => eval(&format!("{}{}{}", &vec[0].symbol_name, "%", &vec[1].symbol_name)),
+    //         ExprOp::Cast => eval(&format!("({}){}", &vec[0].symbol_name, &vec[1].symbol_name)),
+    //         ExprOp::Call => eval(&format!("{}({})", &vec[0].symbol_name, &vec[1].symbol_name)),
+    //         ExprOp::Negative => eval(&format!("0-{}", &vec[0].symbol_name)),
+    //         ExprOp::Positive => eval(&format!("+{}", &vec[0].symbol_name)),
+    //         ExprOp::AddrOf => eval(&format!("&{}", &vec[0].symbol_name)),
+    //         ExprOp::Deref => eval(&format!("*{}", &vec[0].symbol_name)),
+    //         ExprOp::DotMember => eval(&format!("{}.{}", &vec[0].symbol_name, &vec[1].symbol_name)),
+    //         ExprOp::ArrowMember => eval(&format!("{}->{}", &vec[0].symbol_name, &vec[1].symbol_name)),
+    //         _ => {Err(eval::Error::Custom(format!("unsupported operator {:?}",self)))},
+    //     };
+    //     Ok(SymIdx::new(0, value.with_context( || format!("eval_sub_et_nodes failed with {self:?} {vec:?}"))?.to_string()))
+    // }
 }
 impl Debug for ExprOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -162,9 +385,13 @@ impl Debug for ExprOp {
         }
     }
 }
+impl From<EtNodeType> for EtNode{
+    fn from(et_node_type: EtNodeType) -> Self {
+        Self { et_node_type, info: Fields::new(), hash: None }
+    }
+}
 
 impl EtNodeType {
-    pub fn as_et_node(self) -> EtNode { EtNode::new(self) }
     pub fn new_op_array_idx(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::ArrayIndex, ast_node, text:String::new() } }
     pub fn new_op_array_wrapper(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node, text:String::new() } }
     pub fn new_op_add(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Add, ast_node, text:String::new() } }
@@ -287,7 +514,6 @@ impl Debug for EtNode {
 }
 
 impl EtNode {
-    pub fn new(et_naked_node:EtNodeType) -> EtNode { EtNode { et_node_type:et_naked_node, info:Fields::new() } }
     pub fn load_ast_node_text(&mut self, ast_tree:&AstTree) -> Result<()> { self.et_node_type.load_ast_node_text(ast_tree) }
     pub fn name_text(&self) -> String{
         match &self.et_node_type{

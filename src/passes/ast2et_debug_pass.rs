@@ -34,7 +34,7 @@ impl Pass for Ast2EtDebugPass {
         // }
         // 1.1 生成对应的png
         if self.is_gen_png {
-            generate_png_by_graph_multi_tasks(&ctx.et_tree.clone(), "et_tree".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("et_tree".to_string()),Config::NodeIndexLabel],&mut ctx.io_task_list)?;
+            generate_png_by_graph_multi_tasks(&ctx.et_tree.clone(), "et_tree".to_string(), &[Config::Record, Config::Title("et_tree".to_string()),Config::NodeIndexLabel],&mut ctx.io_task_list)?;
         }
 
         Ok(())

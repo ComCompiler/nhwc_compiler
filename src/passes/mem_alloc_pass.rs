@@ -1,4 +1,4 @@
-use crate::{add_symbol, direct_child_nodes, node, node_mut, toolkit::{cfg_node::{CfgGraph, CFG_ROOT}, context::NhwcCtx, mem_layout::MemLayout, pass_manager::Pass, scope_node::ST_ROOT, symbol::Symbol, symtab::{SymIdx, SymTab}}};
+use crate::{add_symbol, debug_info_red, direct_child_nodes, node, node_mut, toolkit::{cfg_node::{CfgGraph, CFG_ROOT}, context::NhwcCtx, mem_layout::{self, MemLayout}, pass_manager::Pass, scope_node::ST_ROOT, symbol::Symbol, symtab::{SymIdx, SymTab}}};
 use anyhow::*;
 use crate::toolkit::field::Type;
 use lazy_static::lazy_static;
@@ -30,6 +30,7 @@ impl Pass for MemAllocPass {
         let (cfg_graph ,instr_slab, symtab)= (&mut ctx.cfg_graph,&ctx.nhwc_instr_slab,&mut ctx.symtab);
         let cfg_entries = direct_child_nodes!(at CFG_ROOT in cfg_graph);
         for &cfg_entry in &cfg_entries{
+            debug_info_red!("alloc started {}",cfg_entry);
             let s0_symidx = add_symbol!({
                 let mut s0_for_cfg_entry = S0.clone();
                 s0_for_cfg_entry.symbol_name = format!("{}_{}",s0_for_cfg_entry.symbol_name,node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?.symbol_name);
@@ -70,6 +71,7 @@ impl Pass for MemAllocPass {
                     _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 之外的 instr"));},
                 }
             }
+            // align the mem by RISCV_STACK_MEM_ALIGN
             node_mut!(at cfg_entry in cfg_graph).get_mut_mem_layout()?.align_mem_with_blank(RISCV_STACK_MEM_ALIGN);
             // we now can calculate offset2sp after mem_layout is calculated.
             calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &ra_symidx)?;
@@ -87,6 +89,7 @@ impl Pass for MemAllocPass {
                     _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 之外的 instr"));},
                 }
             }
+            debug_info_red!("alloc ended");
         }
         Ok(()) 
     }

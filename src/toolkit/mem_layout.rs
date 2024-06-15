@@ -1,5 +1,5 @@
 use std::rc::Rc;
-use crate::{debug_info_blue, toolkit::symtab::*};
+use crate::{debug_info_blue, debug_info_red, toolkit::symtab::*};
 
 use std::fmt::Debug;
 use anyhow::*;
@@ -31,7 +31,36 @@ pub type SymIdxRc = Rc<SymIdx>;
 /// ```
 #[derive(Clone)]
 pub struct MemLayout{
-    pub mem:Vec<Option<SymIdxRc>>
+    pub mem:Vec<MemSegment>
+}
+#[derive(Clone,Debug)]
+pub struct MemSegment{
+    pub op_symidx:Option<SymIdx>,
+    pub len:usize,
+}
+impl MemSegment{
+    pub fn split(self,first_seg_len:usize,op_symidx1:Option<SymIdx>,op_symidx2:Option<SymIdx>) -> Result<(MemSegment,MemSegment)>{
+        if first_seg_len > self.len{
+            return Err(anyhow!("can't split {} mem into {} mem",self.len,first_seg_len))
+        }
+        Ok((MemSegment{
+            op_symidx: op_symidx1,
+            len: first_seg_len,
+        },MemSegment{
+            op_symidx: op_symidx2,
+            len: self.len - first_seg_len,
+        }))
+    }
+    pub fn split_into_may_3_parts(self,first_seg_len:usize,op_symidx1:Option<SymIdx>,second_seg_len:usize,op_symidx2:Option<SymIdx>,op_symidx3:Option<SymIdx>) 
+    -> Result<(MemSegment,MemSegment,Option<MemSegment>)>{
+        let (a,b) = self.split(first_seg_len, op_symidx1, None)?;
+        let (b,c) = b.split(second_seg_len,op_symidx2,op_symidx3)?;
+        if c.len != 0{
+            Ok((a,b,Some(c)))
+        }else {
+            Ok((a,b,None))
+        }
+    }
 }
 impl MemLayout{
     pub fn new()->Self{
@@ -39,76 +68,74 @@ impl MemLayout{
             mem: Vec::new(),
         }
     }
-    pub fn find_available(&mut self, align:usize,data_len:usize) -> Option<usize>{
+    // return the idx of the mem_seg then the mem_start_pos of the mem_seg
+    pub fn find_available(&mut self, align:usize,data_len:usize) -> Option<(usize,usize)>{
         // debug_info_blue!("{:?}",self);
-        for (idx,_byte) in self.mem.iter()
-            .enumerate().step_by(align){
-            if let Some(mem_range)=self.mem.get(idx..idx+data_len){
-                let mut available = true;
-                for mem_byte in mem_range{
-                    if let Some(_) = mem_byte{
-                        available = false;
-                    }
+        let mut cur_mem_pos = 0;
+        for (idx,mem_seg) in self.mem.iter().enumerate(){
+            if let None = mem_seg.op_symidx{
+                let avail_len = data_len - cur_mem_pos % align;
+                if avail_len > data_len{
+                    return Some((idx,mem_seg.len-avail_len))
                 }
-                if !available{
-                    continue;
-                }
-                // 说明idx..idx+byte_len 区间内都没有被分配
-                return Some(idx);
             }
+            cur_mem_pos += mem_seg.len;
         }
         None
     }
     /// 返回这个 新插入data 的起始位置
     pub fn insert_data(&mut self, align:usize,data_len:usize, symidx:&SymIdx)-> usize{
+        debug_info_red!("insert data_len {} for symidx {:?}",data_len,symidx);
         let symidx_rc = Rc::new(symidx.clone());
-        loop{
             // debug_info_blue!("align:{} data_len:{}",align,data_len);
-            let rst = self.find_available(align,data_len);
-            if rst.is_none(){
-                let tail_remained_mem_size = {
-                    let mut i =0 ;
-                    for b in self.mem.iter().rev(){
-                        if b.is_some(){
-                            break;
-                        }
-                        i+=1;
-                    }
-                    i
-                };
-                // debug_info_blue!("tail_remained:{}",tail_remained_mem_size);
-                for _ in tail_remained_mem_size..data_len{
-                    self.mem.push(None)
-                }
+        let rst = self.find_available(align,data_len);
+        match rst {
+            None => {
                 self.align_mem_with_blank(align);
-            }else if let Some(idx) = rst{
-                for i in idx..idx+data_len{
-                    self.mem[i]=Some(symidx_rc.clone())
-                }
+                let mem_len = self.get_mem_len();
+                // debug_info_blue!("tail_remained:{}",tail_remained_mem_size);
+                self.mem.push(MemSegment { op_symidx: Some(symidx.clone()), len: data_len });
+                return mem_len;
+            }
+            Some((idx,mem_start_pos_in_seg)) =>{
+                let mem_seg = self.mem.remove(idx);
+                let (a,b,op_c) = mem_seg.split_into_may_3_parts(mem_start_pos_in_seg, None, data_len, Some(symidx.clone()), None).unwrap();
+                if op_c.is_some(){self.mem.insert(idx, op_c.unwrap())}
+                self.mem.insert(idx, b);
+                self.mem.insert(idx, a);
                 return idx
             }
-        } 
-        
+        }         
     }
     /// 获取目前mem layout的总长度
     pub fn get_mem_len(&self)->usize{
-        self.mem.len()
+        let mut cur_mem_pos = 0;
+        for mem_seg in self.mem.iter(){
+            cur_mem_pos += mem_seg.len;
+        }
+        cur_mem_pos
     }
     /// 会在末尾填充足够的空内存以对齐给定align
     pub fn align_mem_with_blank(&mut self,align:usize){
-        while self.mem.len()%align !=0{
-            self.mem.push(None)
+        if self.mem.len()%align !=0{
+            if self.mem.last().unwrap().op_symidx.is_none(){
+                let mem_len = self.get_mem_len();
+                let last_seg_len = &mut self.mem.last_mut().unwrap().len;
+                *last_seg_len += align -  mem_len % align;
+            }else{
+                self.mem.push(MemSegment { op_symidx: None, len: align - self.get_mem_len() % align })
+            }
         }
     }
 }
 impl Debug for MemLayout{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        for (op_symidx_rc,symidx_rc_group) in &self.mem.iter().group_by(|&x| x){
-            s += format!("|{}:{}\n",{match &op_symidx_rc{
+        for mem_seg in self.mem.iter(){
+            s += format!("|{}:{}\n",{match &mem_seg.op_symidx{
                 Some(symidx) => symidx.to_string(),
                 None => "none".to_string(),
-            }},symidx_rc_group.count()).as_str();
+            }},mem_seg.len).as_str();
         }
         write!(f,"{}",s)
     }

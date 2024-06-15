@@ -1,4 +1,4 @@
-use std::{any::Any, collections::{hash_map::Iter, HashMap}, fmt::Debug, ops::{Add, BitAnd, BitOr, Div, Mul, Not, Rem, Sub}};
+use std::{any::Any, collections::{hash_map::Iter, HashMap}, fmt::Debug, ops::{Add, BitAnd, BitOr, Div, Mul, Neg, Not, Rem, Sub}};
 
 use ahash::AHashMap;
 use itertools::Itertools;
@@ -167,6 +167,92 @@ impl Clone for Box<dyn Field> {
 impl Value {
     pub fn new_ref(symidx:SymIdx, ty:Type) -> Self{
         Self::Ref { symidx, ty }
+    }
+    pub fn logical_or(&self,val:&Value) -> Result<Value>{
+        Ok(match (self,val){
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1((*v1!=0)||(*v2!=0)),
+            (Value::I32(Some(v1)), Value::I1(Some(v2))) => Value::new_i1((*v1!=0)||*v2),
+            (Value::I1(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1||(*v2!=0)),
+            (Value::I1(Some(v1)), Value::I1(Some(v2))) => Value::new_i1(*v1||*v2),
+            _ => {
+                return Err(anyhow!("can't logical or {self:?} with {val:?}"))
+            }
+        })
+    }
+    pub fn logical_and(&self,val:&Value) -> Result<Value>{
+        Ok(match (self,val){
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1((*v1!=0)&&(*v2!=0)),
+            (Value::I32(Some(v1)), Value::I1(Some(v2))) => Value::new_i1((*v1!=0)&&*v2),
+            (Value::I1(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1&&(*v2!=0)),
+            (Value::I1(Some(v1)), Value::I1(Some(v2))) => Value::new_i1(*v1&&*v2),
+            _ => {
+                return Err(anyhow!("can't logical and {self:?} with {val:?}"))
+            }
+        })
+    }
+    pub fn logical_eq(&self, val:&Value) -> Result<Value>{
+        Ok(match (self,val){
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1==*v2),
+            (Value::I1(Some(v1)), Value::I1(Some(v2))) => Value::new_i1(*v1==*v2),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_i1(*v1==*v2),
+            _ => {
+                return Err(anyhow!("can't logical eq {self:?} with {val:?}"))
+            }
+        })
+    }
+    pub fn logical_neq(&self, val:&Value) -> Result<Value>{
+        Ok(match (self,val){
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1!=*v2),
+            (Value::I1(Some(v1)), Value::I1(Some(v2))) => Value::new_i1(*v1!=*v2),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_i1(*v1!=*v2),
+            _ => {
+                return Err(anyhow!("can't logical neq {self:?} with {val:?}"))
+            }
+        })
+    }
+    pub fn less_than(&self,val:&Value) -> Result<Value>{
+        Ok(match (self,val){
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1<*v2),
+            (Value::I32(Some(v1)), Value::F32(Some(v2))) => Value::new_i1((*v1 as f32)<*v2),
+            (Value::F32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1<(*v2 as f32)),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_i1(*v1<*v2),
+            _ => {
+                return Err(anyhow!("can't lessthan {self:?} with {val:?}"))
+            }
+        })
+    }
+    pub fn greater_than(&self,val:&Value) -> Result<Value>{
+        Ok(match (self,val){
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1>*v2),
+            (Value::I32(Some(v1)), Value::F32(Some(v2))) => Value::new_i1((*v1 as f32)>*v2),
+            (Value::F32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1>(*v2 as f32)),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_i1(*v1>*v2),
+            _ => {
+                return Err(anyhow!("can't lessthan {self:?} with {val:?}"))
+            }
+        })
+    }
+    pub fn less_than_or_equal(&self,val:&Value) -> Result<Value>{
+        Ok(match (self,val){
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1<=*v2),
+            (Value::I32(Some(v1)), Value::F32(Some(v2))) => Value::new_i1((*v1 as f32)<=*v2),
+            (Value::F32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1<=(*v2 as f32)),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_i1(*v1<=*v2),
+            _ => {
+                return Err(anyhow!("can't lessthan {self:?} with {val:?}"))
+            }
+        })
+    }
+    pub fn greater_than_or_equal(&self,val:&Value) -> Result<Value>{
+        Ok(match (self,val){
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1>=*v2),
+            (Value::I32(Some(v1)), Value::F32(Some(v2))) => Value::new_i1((*v1 as f32)>=*v2),
+            (Value::F32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1>=(*v2 as f32)),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_i1(*v1>=*v2),
+            _ => {
+                return Err(anyhow!("can't lessthan {self:?} with {val:?}"))
+            }
+        })
     }
     pub fn new_i32(value:i32) -> Self { Value::I32(Some(value)) }
     pub fn new_f32(value:f32) -> Self { Value::F32(Some(value)) }
@@ -584,9 +670,11 @@ impl Add for Value{
         match (l_val,r_val) {
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1+v2)),
             (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1+v2)),
-            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 类型进行相加")),
-            (Value::Void, Value::Void) => Err(anyhow!("Void 类型进行相加")),
-            (_,_) => Err(anyhow!("不同类型相加")),
+            (Value::F32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_f32(v1 + (v2 as f32))),
+            (Value::I32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32((v1 as f32) + v2)),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 can't add")),
+            (Value::Void, Value::Void) => Err(anyhow!("Void can't add")),
+            (_,_) => Err(anyhow!("can't add")),
         }
     }
 }
@@ -600,9 +688,11 @@ impl Sub for Value{
         match (l_val,r_val) {
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 - v2)),
             (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1 - v2)),
-            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 类型进行相减")),
-            (Value::Void, Value::Void) => Err(anyhow!("Void 类型进行相减")),
-            (_,_) => Err(anyhow!("不同类型相减")),
+            (Value::F32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_f32(v1 - (v2 as f32))),
+            (Value::I32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32((v1 as f32) - v2)),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 can't sub")),
+            (Value::Void, Value::Void) => Err(anyhow!("Void can't sub")),
+            (_,_) => Err(anyhow!("can't sub")),
         }
     }
 }
@@ -616,9 +706,11 @@ impl Mul for Value{
         match (l_val,r_val) {
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 * v2)),
             (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1 * v2)),
-            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 类型进行相乘")),
-            (Value::Void, Value::Void) => Err(anyhow!("Void 类型进行相乘")),
-            (_,_) => Err(anyhow!("不同类型相乘")),
+            (Value::F32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_f32(v1 * (v2 as f32))),
+            (Value::I32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32((v1 as f32) * v2)),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 can't mul")),
+            (Value::Void, Value::Void) => Err(anyhow!("Void can't mul")),
+            (_,_) => Err(anyhow!("can't mul")),
         }
     }
 }
@@ -632,9 +724,11 @@ impl Div for Value{
         match (l_val,r_val) {
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 / v2)),
             (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1 / v2)),
-            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 类型进行相除")),
-            (Value::Void, Value::Void) => Err(anyhow!("Void 类型进行相除")),
-            (_,_) => Err(anyhow!("不同类型相除")),
+            (Value::F32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_f32(v1 / (v2 as f32))),
+            (Value::I32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32((v1 as f32) / v2)),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 can't div")),
+            (Value::Void, Value::Void) => Err(anyhow!("Void can't div")),
+            (_,_) => Err(anyhow!("can't div")),
         }
     }
 }
@@ -648,9 +742,9 @@ impl Rem for Value{
         match (l_val,r_val) {
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 % v2)),
             (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1 % v2)),
-            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 类型进行取模运算")),
-            (Value::Void, Value::Void) => Err(anyhow!("Void 类型进行取模运算")),
-            (_,_) => Err(anyhow!("不同类型进行取模运算")),
+            (Value::I1(Some(_v1)), Value::I1(Some(_v2))) => Err(anyhow!("I1 can't Rem")),
+            (Value::Void, Value::Void) => Err(anyhow!("Void can't Rem")),
+            (_,_) => Err(anyhow!("can't rem")),
         }
     }
 }
@@ -662,10 +756,10 @@ impl BitAnd for Value{
         let r_val=rhs.to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 & v2)),
-            (Value::F32(Some(_v1)), Value::F32(Some(_v2))) => Err(anyhow!("F32 类型无法进行按位与运算")),
+            (Value::F32(Some(_v1)), Value::F32(Some(_v2))) => Err(anyhow!("F32 can't bitand")),
             (Value::I1(Some(v1)), Value::I1(Some(v2))) => Ok(Value::new_i1(v1 & v2)),
-            (Value::Void, Value::Void) => Err(anyhow!("Void 类型无法进行按位与运算")),
-            (_,_) => Err(anyhow!("不同类型无法进行按位与运算")),
+            (Value::Void, Value::Void) => Err(anyhow!("Void can't bitand")),
+            (_,_) => Err(anyhow!("can't bitand")),
         }
     }
 }
@@ -677,10 +771,10 @@ impl BitOr for Value{
         let r_val=rhs.to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 | v2)),
-            (Value::F32(Some(_v1)), Value::F32(Some(_v2))) => Err(anyhow!("F32 类型无法进行按位或运算")),
+            (Value::F32(Some(_v1)), Value::F32(Some(_v2))) => Err(anyhow!("F32 can't bitor")),
             (Value::I1(Some(v1)), Value::I1(Some(v2))) => Ok(Value::new_i1(v1 | v2)),
-            (Value::Void, Value::Void) => Err(anyhow!("Void 类型无法进行按位或运算")),
-            (_,_) => Err(anyhow!("不同类型无法进行按位或运算")),
+            (Value::Void, Value::Void) => Err(anyhow!("Void can't bitor")),
+            (_,_) => Err(anyhow!("can't bitor ")),
         }
     }
 }
@@ -691,13 +785,27 @@ impl Not for Value{
         // let l_val=self.to_specific_type(&pub_ty)?;
         match &self {
             Value::I32(Some(v1)) => Ok(Value::new_i32(!v1)),
-            Value::F32(Some(_v1)) => Err(anyhow!("F32 类型无法进行按位非运算")),
+            Value::F32(Some(_v1)) => Err(anyhow!("F32 can't logical not")),
             Value::I1(Some(v1)) => Ok(Value::new_i1(!v1)),
+            Value::Void => Err(anyhow!("Void can't logical not")),
+            _ => Err(anyhow!("can't logical not")),
+        }
+    }
+}
+impl Neg for Value{
+    type Output = Result<Value>;
+    
+    fn neg(self) -> Self::Output {
+        match &self {
+            Value::I32(Some(v1)) => Ok(Value::new_i32(-v1)),
+            Value::F32(Some(v1)) => Ok(Value::new_f32(-v1)),
+            Value::I1(Some(v1)) => Err(anyhow!("I1 can't neg")),
             Value::Void => Err(anyhow!("Void 类型无法进行按位非运算")),
             _ => Err(anyhow!("其他类型无法进行按位非运算")),
         }
     }
 }
+
 #[derive(Clone)]
 pub struct UseCounter {
     pub use_count:u32,
