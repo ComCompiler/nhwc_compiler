@@ -1,4 +1,4 @@
-use super::{context::COMPILATION_UNIT, symbol::Symbol};
+use super::{context::COMPILATION_UNIT, field::Type, symbol::Symbol};
 use crate::{add_node, add_node_with_edge };
 use core::fmt::Debug;
 use ahash::{AHashMap};
@@ -46,6 +46,9 @@ impl From<isize> for SymIdx{
 impl SymIdx {
     pub fn new(scope_node:u32, symbol_name:String) -> Self { SymIdx { scope_node, symbol_name, index_ssa:None } }
     pub fn new_verbose(scope_node:u32, symbol_name:String, index_ssa:Option<u32>) -> Self { SymIdx { scope_node, symbol_name, index_ssa } }
+    pub fn from_str(s:&str) -> Self{
+        Self::new(0, s.to_string())
+    }
     pub fn as_global_ptr(mut self) -> Result<Self>{
         if self.symbol_name.starts_with('*'){
             return Err(anyhow!("can't transform symbol_name to be global ptr twice"))
@@ -56,6 +59,9 @@ impl SymIdx {
     /// check if this symidx is ptr to global variables
     pub fn is_global_ptr(&self) -> bool{
         self.symbol_name.starts_with('*')
+    }
+    pub fn is_literal(&self) -> bool{
+        !Type::new_from_const_str(&self.symbol_name).is_unknown()
     }
     pub fn as_deglobal_ptr(mut self) -> Result<Self>{
         if !self.is_global_ptr(){
@@ -70,7 +76,7 @@ impl SymIdx {
         if self.is_global_ptr(){
             cloned.symbol_name.remove(0);
         }else{
-            return Err(anyhow!("can't transform deglobal a symbol_name that is not global ptr twice"))
+            return Err(anyhow!("can't deglobal a symbol_name or deglobal global ptr twice"))
         }
         Ok(cloned)
     }
@@ -135,9 +141,9 @@ impl SymTab {
 
     // 查找符号
     pub fn get_symbol_verbose(&self, symbol_name:String, scope_node:u32) -> Result<&Symbol> {let symidx = SymIdx { scope_node, symbol_name, index_ssa:None}; self.map.get(&symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx)) }
-    pub fn get_symbol(&self, symidx:&SymIdx) -> Result<&Symbol> { self.map.get(symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx)) }
+    pub fn get(&self, symidx:&SymIdx) -> Result<&Symbol> { self.map.get(symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx)) }
     pub fn get_mut_symbol_verbose(&mut self, symbol_name:String, scope_node:u32) -> Result<&mut Symbol> { let symidx = SymIdx { scope_node, symbol_name, index_ssa:None }; self.map.get_mut(&symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx )) }
-    pub fn get_mut_symbol(&mut self, symidx:&SymIdx) -> Result<&mut Symbol> { self.map.get_mut(symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx)) }
+    pub fn get_mut(&mut self, symidx:&SymIdx) -> Result<&mut Symbol> { self.map.get_mut(symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx)) }
 
     delegate!{
         to self.map {
@@ -176,7 +182,7 @@ impl SymTab {
         if symidx_vec.len()!=0{
             self.text+= "#sym_name@fields$";
             for symidx in &symidx_vec{
-                let sym = self.get_symbol(symidx)?;
+                let sym = self.get(symidx)?;
                 self.text += format!("@ # {:?} @ {:#?} $", symidx, sym.fields).as_str();
             }
         }else{

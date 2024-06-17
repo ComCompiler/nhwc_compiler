@@ -45,7 +45,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::BreakPoint { symidx: _, breakpoint_args: _ } => continue,
                     NhwcInstrType::Global { var_symidx: _, vartype: _ } => {},
                     NhwcInstrType::Load { lhs: _, ptr_symidx: _ptr_symdix, ptr_ty: _ } => {},
-                    NhwcInstrType::Store { value_symidx: _value, value_ty: _, ptr_symidx: _, ptr_ty: _ } => {},
+                    NhwcInstrType::Store { val_symidx: _value, value_ty: _, ptr_symidx: _, ptr_ty: _ } => {},
                     NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx: _, idx_vec: _ } => {},
                     NhwcInstrType::Nope {  } => {continue;},
                     NhwcInstrType::Mu { may_use_symidx: _, may_use_instr: _ } => {},
@@ -70,7 +70,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                 // let &br_cor_def_use_node = instr_slab.get_instr(br_instr)?.get_dug_cor_def_use_node()?;
                 let &phi_instr_cor_def_use_node = instr_slab.get_instr(phi_instr)?.get_dug_cor_def_use_node()?;
                 let use_symidx = instr!(at br_instr in instr_slab)?.get_use_symidx_vec()[0];
-                let &det_instr = symtab.get_symbol(use_symidx)?.get_ssa_def_instr()?;
+                let &det_instr = symtab.get(use_symidx)?.get_ssa_def_instr()?;
                 let &det_instr_cor_def_use_node = instr!(at det_instr in instr_slab)?.get_dug_cor_def_use_node()?;
                 node_mut!(at det_instr_cor_def_use_node in def_use_graph).is_det = true;
                 add_edge!({DefUseEdge::new_phi_dep(use_symidx.clone())} from det_instr_cor_def_use_node to phi_instr_cor_def_use_node in def_use_graph);
@@ -81,7 +81,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::Label { label_symidx: _ } => continue,
                     NhwcInstrType::DefineFunc { func_symidx: _, ret_symidx: _, args: _ } => {},
                     NhwcInstrType::DefineVar { var_symidx, vartype: _, op_value: _ } => {
-                        let &alloc_or_global_instr = symtab.get_symbol(&var_symidx.to_src_symidx())?.get_mem_instr()?;
+                        let &alloc_or_global_instr = symtab.get(&var_symidx.to_src_symidx())?.get_mem_instr()?;
                         let &alloc_or_global_instr_cor_dug_node = instr!(at alloc_or_global_instr in instr_slab)?.get_dug_cor_def_use_node()?;
                         let &dug_cor_node = instr!(at instr in instr_slab)?.get_dug_cor_def_use_node()?;
                         match &instr!(at alloc_or_global_instr in instr_slab)?.instr_type{
@@ -112,7 +112,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::BreakPoint { symidx: _, breakpoint_args: _ } => continue,
                     NhwcInstrType::Global { var_symidx: _, vartype: _ } => continue,
                     NhwcInstrType::Load { lhs: _, ptr_symidx: _ptr_symdix, ptr_ty: _ } => {},
-                    NhwcInstrType::Store { value_symidx: _value, value_ty: _, ptr_symidx: _, ptr_ty: _ } => {},
+                    NhwcInstrType::Store { val_symidx: _value, value_ty: _, ptr_symidx: _, ptr_ty: _ } => {},
                     NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx: _, idx_vec: _ } => {},
                     NhwcInstrType::Nope {  } => continue,
                     NhwcInstrType::Mu { may_use_symidx: _, may_use_instr: _ } => {},
@@ -139,7 +139,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     //         continue;
                     //     },
                     // };
-                    let symbol = symtab.get_symbol(use_symidx)?;
+                    let symbol = symtab.get(use_symidx)?;
                     let &def_instr = if symbol.has_ssa_def_instr(){
                         symbol.get_ssa_def_instr()?
                     }else{
@@ -205,10 +205,10 @@ pub fn update_src_symdix_alloc_global_instr_info(symtab:&mut SymTab, cfg_graph:&
         for &instr in node!(at cfg_entry in cfg_graph).instrs.iter(){
             match &instr!(at instr in instr_slab)?.instr_type {
                 NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
-                    symtab.get_mut_symbol(&var_symidx.to_src_symidx())?.add_mem_instr(instr);
+                    symtab.get_mut(&var_symidx.to_src_symidx())?.add_mem_instr(instr);
                 },
                 NhwcInstrType::Global { var_symidx, vartype: _ } => {
-                    symtab.get_mut_symbol(&var_symidx.to_src_symidx())?.add_mem_instr(instr);
+                    symtab.get_mut(&var_symidx.to_src_symidx())?.add_mem_instr(instr);
                 },
                 _ => {}
             }

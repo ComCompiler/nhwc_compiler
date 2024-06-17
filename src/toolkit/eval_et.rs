@@ -88,7 +88,7 @@ fn recursive_replace_const_symbol(et_tree:&mut EtTree,et_node:u32,symtab:&SymTab
                     let initial_scope = scope_node.clone();
 
                     let mut symidx =  init_sym_idx.clone();
-                    while let Err(_) = symtab.get_symbol(&symidx) {
+                    while let Err(_) = symtab.get(&symidx) {
                         let scope_node = symidx.scope_node;
                         if scope_node != ST_ROOT{
                             symidx.scope_node = direct_parent_node!(at scope_node in scope_tree);
@@ -98,8 +98,8 @@ fn recursive_replace_const_symbol(et_tree:&mut EtTree,et_node:u32,symtab:&SymTab
                     }
                     // debug_info_green!("replace symidx {}",sym_idx);
                     // if the symidx have its corresponding const symidx
-                    if !symtab.get_symbol(&symidx)?.get_type()?.is_array() && symtab.get_symbol(&symidx)?.has_const_symidx() {
-                        let const_symidx = symtab.get_symbol(&symidx)?.get_const_symidx()?.clone();
+                    if !symtab.get(&symidx)?.get_type()?.is_array() && symtab.get(&symidx)?.has_const_symidx() {
+                        let const_symidx = symtab.get(&symidx)?.get_const_symidx()?.clone();
                         node_mut!(at et_node in et_tree).et_node_type = EtNodeType::new_constant(*ast_node, const_symidx)
                     }
                 }

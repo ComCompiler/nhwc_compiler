@@ -165,9 +165,9 @@ pub enum NhwcInstrType {
     Alloc { var_symidx:SymIdx, vartype:Type },
     Global { var_symidx:SymIdx, vartype:Type },
     Load { lhs:SymIdx ,ptr_symidx:SymIdx ,ptr_ty:Type},
-    Store { value_symidx:SymIdx, value_ty:Type, ptr_symidx:SymIdx , ptr_ty:Type},
+    Store { val_symidx:SymIdx, value_ty:Type, ptr_symidx:SymIdx , ptr_ty:Type},
     /// 注意getelementptr 的 ty 必须是一个 数组
-    GetElementPtr { lhs:SymIdx  ,array_symidx:SymIdx,array_ty:Type, idx_vec:Vec<SymIdx>},
+    GetElementPtr { lhs:SymIdx  ,array_symidx:SymIdx,array_ty:Type, idx_vec:Vec<Option<SymIdx>>},
     // 算数运算符 + - * / etc.
     Arith { lhs:SymIdx, rhs:ArithOp },
     SimpleAssign { lhs:SymIdx, rhs:SymIdx ,vartype:Type},
@@ -230,7 +230,7 @@ impl NhwcInstr {
             /// 这几个都认为是没有ssa 层面上的def 
             NhwcInstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
             NhwcInstrType::Load { ptr_symidx: _ptr_symdix, lhs, ptr_ty: _ } => vec![lhs],
-            NhwcInstrType::Store { value_symidx: _value, ptr_symidx: _, ptr_ty: _, value_ty: _ } => vec![],
+            NhwcInstrType::Store { val_symidx: _value, ptr_symidx: _, ptr_ty: _, value_ty: _ } => vec![],
             NhwcInstrType::Nope {  } => vec![],
             NhwcInstrType::Mu { may_use_symidx: _ , may_use_instr:_usize} => vec![],
             NhwcInstrType::Chi { lhs, rhs: _ ,may_def_instr:_usize} => vec![lhs],
@@ -288,8 +288,8 @@ impl NhwcInstr {
             NhwcInstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
             NhwcInstrType::Global { var_symidx: _, vartype: _ } => vec![],
             NhwcInstrType::Load { lhs: _, ptr_symidx: ptr_symdix, ptr_ty: _ } => vec![ptr_symdix],
-            NhwcInstrType::Store { value_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
-            NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx, idx_vec } => idx_vec.iter().chain(vec![array_symidx].into_iter()).collect_vec(),
+            NhwcInstrType::Store { val_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
+            NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx, idx_vec } => idx_vec.iter().filter(|idx|idx.is_some()).map(|idx|idx.as_ref().unwrap()).chain(vec![array_symidx].into_iter()).collect_vec(),
             NhwcInstrType::Nope {  } => vec![],
             NhwcInstrType::Mu { may_use_symidx, may_use_instr: _ } => vec![may_use_symidx],
             NhwcInstrType::Chi { lhs: _, rhs , may_def_instr: _} => vec![rhs],
@@ -326,7 +326,7 @@ impl NhwcInstr {
             NhwcInstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
             NhwcInstrType::Global { var_symidx: _, vartype: _ } => vec![],
             NhwcInstrType::Load { lhs, ptr_symidx: _ptr_symdix, ptr_ty: _ } => vec![lhs],
-            NhwcInstrType::Store { value_symidx: _value, ptr_symidx: _, ptr_ty: _, value_ty: _ } => vec![],
+            NhwcInstrType::Store { val_symidx: _value, ptr_symidx: _, ptr_ty: _, value_ty: _ } => vec![],
             NhwcInstrType::GetElementPtr { lhs, array_ty: _ty, array_symidx: _, idx_vec: _ } => vec![lhs],
             NhwcInstrType::Nope {  } => vec![],
             NhwcInstrType::Mu { may_use_symidx: _ , may_use_instr:_usize} => vec![],
@@ -384,8 +384,8 @@ impl NhwcInstr {
             NhwcInstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
             NhwcInstrType::Global { var_symidx: _, vartype: _ } => vec![],
             NhwcInstrType::Load { lhs: _, ptr_symidx: ptr_symdix, ptr_ty: _ } => vec![ptr_symdix],
-            NhwcInstrType::Store { value_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
-            NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx, idx_vec } => idx_vec.iter_mut().chain(vec![array_symidx].into_iter()).collect_vec(),
+            NhwcInstrType::Store { val_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
+            NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx, idx_vec } => idx_vec.iter_mut().filter(|idx|idx.is_some()).map(|idx|idx.as_mut().unwrap()).chain(vec![array_symidx].into_iter()).collect_vec(),
             NhwcInstrType::Nope {  } => vec![],
             NhwcInstrType::Mu { may_use_symidx, may_use_instr: _ } => vec![may_use_symidx],
             NhwcInstrType::Chi { lhs: _, rhs , may_def_instr: _} => vec![rhs],
@@ -533,9 +533,9 @@ impl NhwcInstrType {
     
     pub fn new_assign(lhs:SymIdx, rhs:SymIdx, vartype:Type) -> Self { Self::SimpleAssign { lhs, rhs, vartype } }
 
-    pub fn new_get_element_ptr(lhs:SymIdx, array_symidx:SymIdx, array_ty:Type, idx_vec:Vec<SymIdx> ) -> Self { Self::GetElementPtr { lhs, array_symidx, array_ty, idx_vec }}
+    pub fn new_get_element_ptr(lhs:SymIdx, array_symidx:SymIdx, array_ty:Type, idx_vec:Vec<Option<SymIdx>> ) -> Self { Self::GetElementPtr { lhs, array_symidx, array_ty, idx_vec }}
     pub fn new_load(lhs:SymIdx, ptr_symidx:SymIdx, ptr_ty:Type) -> Self { Self::Load { lhs, ptr_symidx, ptr_ty}}
-    pub fn new_store(ptr_symidx:SymIdx, ptr_ty:Type, value_symidx:SymIdx, value_ty:Type,) -> Self { Self::Store { value_symidx, value_ty, ptr_symidx, ptr_ty } }
+    pub fn new_store(ptr_symidx:SymIdx, ptr_ty:Type, value_symidx:SymIdx, value_ty:Type,) -> Self { Self::Store { val_symidx: value_symidx, value_ty, ptr_symidx, ptr_ty } }
 
     // Instruction -> Call -> FuncOp
     pub fn new_func_call(assigned:Option<SymIdx>, func:SymIdx, args:Vec<SymIdx>,ret_type:Type) -> Self {
@@ -681,7 +681,7 @@ impl Debug for NhwcInstrType {
             NhwcInstrType::Alloc { var_symidx, vartype, } => write!(f,"alloc {:?} {:?}",vartype,var_symidx),
             NhwcInstrType::Global { var_symidx, vartype } => write!(f,"global {:?} {:?}",vartype,var_symidx),
             NhwcInstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => write!(f,"{:?} = load {:?}:{:?}",lhs,ptr_symdix,ptr_ty),
-            NhwcInstrType::Store { value_symidx: value, ptr_symidx, ptr_ty, value_ty } => write!(f,"store {:?}:{:?} {:?}:{:?}",value,value_ty,ptr_symidx,ptr_ty),
+            NhwcInstrType::Store { val_symidx: value, ptr_symidx, ptr_ty, value_ty } => write!(f,"store {:?}:{:?} {:?}:{:?}",value,value_ty,ptr_symidx,ptr_ty),
             NhwcInstrType::GetElementPtr { lhs, array_ty: ty, array_symidx, idx_vec } => write!(f,"{:?} = getelementptr {:?}:{:?} {:?}",lhs,array_symidx,ty,idx_vec,),
             NhwcInstrType::Nope {  } => {write!(f,"(nop)")},
             NhwcInstrType::Mu { may_use_symidx, may_use_instr } => write!(f,"mu {:?}:{}",may_use_symidx, may_use_instr),

@@ -52,8 +52,8 @@ impl Pass for MemAllocPass {
                 to symtab
             );
             // tell func symbol its ra_symidx & s0_symidx
-            symtab.get_mut_symbol(node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?)?.add_func_cor_ra_symidx(ra_symidx.clone());
-            symtab.get_mut_symbol(node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?)?.add_func_cor_s0_symidx(s0_symidx.clone());
+            symtab.get_mut(node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?)?.add_func_cor_ra_symidx(ra_symidx.clone());
+            symtab.get_mut(node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?)?.add_func_cor_s0_symidx(s0_symidx.clone());
 
             node_mut!(at cfg_entry in cfg_graph).add_mem_layout(MemLayout::new());
             alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &ra_symidx)?;
@@ -68,7 +68,9 @@ impl Pass for MemAllocPass {
                     crate::toolkit::nhwc_instr::NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
                         alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &var_symidx.to_src_symidx())?;
                     },
-                    _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 之外的 instr"));},
+                    crate::toolkit::nhwc_instr::NhwcInstrType::DefineVar { var_symidx, vartype, op_value } => {
+                    },
+                    _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 和 new_var 之外的 instr {:?}",instr!(at instr in instr_slab)));},
                 }
             }
             // align the mem by RISCV_STACK_MEM_ALIGN
@@ -86,7 +88,9 @@ impl Pass for MemAllocPass {
                     crate::toolkit::nhwc_instr::NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
                         calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &var_symidx.to_src_symidx())?;
                     },
-                    _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 之外的 instr"));},
+                    crate::toolkit::nhwc_instr::NhwcInstrType::DefineVar { var_symidx, vartype, op_value } => {
+                    },
+                    _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 以及 definevar之外的 instr"));},
                 }
             }
             debug_info_red!("alloc ended");
@@ -101,8 +105,8 @@ impl Pass for MemAllocPass {
 }
 pub fn calculate_mem_offset2sp(cfg_graph:&mut CfgGraph,cfg_entry:u32,symtab:&mut SymTab,symidx:&SymIdx) -> Result<()>{
     let mem_layout = node!(at cfg_entry in cfg_graph).get_mem_layout()?;
-    let mem_offset2sp = (mem_layout.get_mem_len() - *symtab.get_symbol(symidx)?.get_mem_offset2s0()? as usize - symtab.get_symbol(symidx)?.get_type()?.get_ele_size()?) as isize;
-    symtab.get_mut_symbol(symidx)?.add_mem_offset2sp(mem_offset2sp);
+    let mem_offset2sp = (mem_layout.get_mem_len() - *symtab.get(symidx)?.get_mem_offset2s0()? as usize - symtab.get(symidx)?.get_type()?.get_ele_size()?) as isize;
+    symtab.get_mut(symidx)?.add_mem_offset2sp(mem_offset2sp);
     Ok(())
 }
 
@@ -110,7 +114,7 @@ pub fn calculate_mem_offset2sp(cfg_graph:&mut CfgGraph,cfg_entry:u32,symtab:&mut
 /// 接受一个symidx 以索引 symtab 中的符号，获取这个符号的类型然后加入到 cfg_entry 的mem_layout 中
 pub fn alloc_stack_mem_for_cfg_entry(cfg_graph:&mut CfgGraph,cfg_entry:u32,symtab:&mut SymTab,symidx:&SymIdx)->Result<()>{
     let cfg_node_struct = node_mut!(at cfg_entry in cfg_graph);
-    let symbol_struct = symtab.get_mut_symbol(symidx)?;
+    let symbol_struct = symtab.get_mut(symidx)?;
     if !cfg_node_struct.has_mem_layout(){
         cfg_node_struct.add_mem_layout(MemLayout::new())
     }

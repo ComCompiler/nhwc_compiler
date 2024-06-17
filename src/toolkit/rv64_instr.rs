@@ -1,10 +1,10 @@
-use std::fmt::{Debug, Formatter};
+use std::{ fmt::{Debug, Formatter}, ops::Range};
 use anyhow::*;
 
 
 use derive_new::new;
 
-use crate::toolkit::field::Type;
+use crate::{passes::ast2st_pass::Ast2StPass, toolkit::field::Type};
 
 use super::symtab::SymIdx;
 
@@ -71,7 +71,7 @@ impl Debug for Imm{
                 write!(f,"{}",symidx.symbol_name)
             },
             Self::Literal { symidx } => {
-                match &Type::new_from_const_str(&symidx.symbol_name){
+                match &Type::new_from_const_str(&symidx.symbol_name) {
                     Type::I32 => {
                         write!(f,"{}", symidx)
                     },
@@ -180,6 +180,23 @@ pub enum PseudoInstr {
     Call {offset:Imm},
 
     Fence {},
+}
+impl PseudoInstr{
+    pub fn new_reg_mv(rd:Register,rs:Register,vartype:&Type) -> PseudoInstr{
+        match &vartype.get_ele_ty(){
+            Type::I32 |
+            Type::I1 => {
+                Self::new_mv(rd, rs)
+            },
+            Type::Ptr64 { ty } => {
+                Self::new_mv(rd, rs)
+            },
+            Type::F32 => {
+                Self::new_fmv_s(rd, rs)
+            },
+            _ => panic!("can't parse ty {:?}",vartype)
+        }
+    }
 }
 impl Debug for PseudoInstr {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
@@ -335,6 +352,11 @@ impl_from_indirectly!(Stores,BaseIntInstr,RV64Instr);
 impl_from_indirectly!(Trans,BaseIntInstr,RV64Instr);
 
 
+pub static REG_A_RANGE:Range<u8> = 0..8;
+pub static REG_FA_RANGE:Range<u8> = 0..8;
+pub static REG_S_RANGE:Range<u8> = 1..12;
+pub static REG_FS_RANGE:Range<u8> = 0..16;
+pub static REG_T_RANGE:Range<u8> = 0..7;
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum  Register {
     Zero,
@@ -360,6 +382,7 @@ pub enum  Register {
     /// ranging from f0 to f9 and f18 to f31
     FSaved{
         reg_idx:u8,
+
     }
 }
 impl Debug for Register {
@@ -382,16 +405,33 @@ impl Register{
         Self::Saved { reg_idx: 0 }
     }
     pub fn new_s(idx:u8)->Self{
+        assert!(REG_S_RANGE.contains(&idx));
         Self::Saved { reg_idx: idx }
     }
     pub fn new_a(idx:u8)->Self{
+        assert!(REG_A_RANGE.contains(&idx));
         Self::Arg { reg_idx: idx } 
     }
+    pub fn new_t(idx:u8)->Self{
+        assert!(REG_T_RANGE.contains(&idx));
+        Self::Temp { reg_idx: idx } 
+    }
     pub fn new_fa(idx:u8)->Self{
+        assert!(REG_FA_RANGE.contains(&idx));
         Self::FArg { reg_idx: idx }
     }
     pub fn new_fs(idx:u8)->Self{
-        Self::FSaved { reg_idx: idx }
+        // 16 fs regs in all 
+        assert!(REG_FS_RANGE.contains(&idx));
+        match idx{
+            idx if idx<=1 => {
+                Self::FSaved { reg_idx: idx+8 }
+            },
+            idx if idx>=2 && idx<=15 => {
+                Self::FSaved { reg_idx: idx+18-2 }
+            },
+            _ => panic!()
+        }
     }
     pub fn is_fpu(&self) -> bool{
         match self{

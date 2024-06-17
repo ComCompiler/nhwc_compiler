@@ -1,4 +1,4 @@
-use std::{any::Any, collections::{hash_map::Iter, HashMap}, fmt::Debug, ops::{Add, BitAnd, BitOr, Div, Mul, Neg, Not, Rem, Sub}};
+use std::{any::Any, collections::{hash_map::Iter, HashMap}, fmt::Debug, ops::{Add, BitAnd, BitOr, Div, Mul, Neg, Not, Rem, Sub}, };
 
 use ahash::AHashMap;
 use itertools::Itertools;
@@ -9,7 +9,7 @@ use regex::{self, Regex};
 
 use super::{ast_node::AstTree, scope_node::ST_ROOT};
 use super::symtab::SymIdx;
-use crate::{debug_info_blue, node};
+use crate::{debug_info_blue, debug_info_red, node};
 
 pub type Fields = HashMap<&'static str, Box<dyn Field>>;
 pub static TARGET_POINTER_MEM_LEN:usize = 8;
@@ -72,7 +72,8 @@ pub enum Value {
         value_map:ArrayEleMap,
         dims:Vec<SymIdx>,
         ele_ty:Type,
-    }
+    },
+    Unknown,
     // // 这个类型用来表示不确定的值或其代数表达式
     // // 例如 int a = getint() 由于 a取决于用户输入，那么我们不能直接使用 a的值，只能用一个代数符号表示
     // // Unsure {},
@@ -151,6 +152,7 @@ pub enum Type {
     I1,
     Void,
     Label,
+    Ref,
     Ptr64{
         ty:Box<Type>,
     },
@@ -159,6 +161,7 @@ pub enum Type {
         ele_ty:Box<Type>,
     },
     Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
+    Unknown,
 }
 impl Clone for Box<dyn Field> {
     fn clone(&self) -> Box<dyn Field> { self.clone_box() }
@@ -270,6 +273,12 @@ impl Value {
             Type::Ptr64 { ty: _ } => {
                  Value::Ptr64 { op_pointed_symidx: None, offset: Box::new(Value::new_unsure_from_specific_type(&Type::I32)), pointed_ty: Box::new(specified_ty.clone()) }
             },
+            Type::Unknown => {
+                Value::Unknown
+            },
+            Type::Ref => {
+                Value::Unknown
+            },
         }
     }
     pub fn new_ptr64_from_array_with_offset(array_symidx:SymIdx,pointed_ty:Type,offset:Value) -> Self{
@@ -324,7 +333,9 @@ impl Value {
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("不能从string 转化为 Fn 类型的value"))?,
             // Type::Unsure {  } => Err(anyhow!("不能从string 转化为 Unsure 类型的value"))?,
             Type::Array { dims, ele_ty} => Value::new_array(ArrayEleMap::new(), unwrap_vec(dims), *ele_ty.clone()),
-            Type::Ptr64 { ty: _ } => todo!(),
+            Type::Ptr64 { ty: _ } => Err(anyhow!("不能从string 转化为 Ptr64 类型的value"))?,
+            Type::Ref => Err(anyhow!("不能从string 转化为 Ref 类型的value"))?,
+            Type::Unknown => Err(anyhow!("不能从string 转化为 Unknown 类型的value"))?,
         })
     }
     pub fn to_type(&self)->Type{
@@ -336,7 +347,8 @@ impl Value {
             Value::Fn { arg_syms, ret_sym } => Type::Fn { arg_syms: arg_syms.clone(), ret_sym: ret_sym.clone() },
             Value::Array { value_map: _, dims , ele_ty: ele_type } => Type::Array { dims: dims.clone().into_iter().map(|x| Some(x)).collect_vec(), ele_ty:Box::new(ele_type.clone())  },
             Value::Ptr64 { pointed_ty: ty, op_pointed_symidx: _, offset: _  } => Type::Ptr64 { ty: Box::new(*ty.clone()) },
-            Value::Ref{ symidx, ty } => todo!(),
+            Value::Ref{ symidx, ty } => Type::Ref,
+            Value::Unknown => Type::Unknown,
             // Value::Unsure {  } => Type::Unsure {  },
         }
     }
@@ -442,6 +454,17 @@ impl Type {
             (Type::Array { dims, ele_ty },Type::Array { dims:dims2, ele_ty:ele_ty2 }) => {
                 dims.len() == dims2.len() && ele_ty == ele_ty2
             },
+            (Type::Array { dims, ele_ty },Type::Ptr64 { ty }) if !ty.is_array() => {
+                ele_ty == ty && dims.len()==1
+            },
+            (Type::Array { dims, ele_ty },Type::Ptr64 { ty }) if ty.is_array() => {
+                match ty.as_ref(){
+                    Type::Array { dims: another_dims, ele_ty } => {
+                        ele_ty.as_ref() == &ty.get_ele_ty() && another_dims.len()==  dims.len() -1
+                    },
+                    _ =>panic!()
+                }
+            },
             _ => {
                 self == another_type
             }
@@ -458,6 +481,8 @@ impl Type {
             Type::Array { dims: _, ele_ty: ty } => Ok(ty.get_align()?),
             Type::Fn { arg_syms: _, ret_sym: _ } =>Err(anyhow!("can't get alignment of func type {:?}",self)),
             Type::Ptr64 { ty: _ } => Ok(8),
+            Type::Ref => Err(anyhow!("can't get align of Ref ty")),
+            Type::Unknown => Err(anyhow!("can't get align of unknown")),
         }
     }
 
@@ -471,6 +496,17 @@ impl Type {
                 self.get_mem_len()
             }
         }
+    }
+    pub fn get_ele_ty(&self) -> Type{
+        match &self{
+            Type::Array { dims: _, ele_ty } => {
+                *ele_ty.clone()
+            },
+            _ => {
+                self.clone()
+            }
+        }
+
     }
 
     pub fn push_dim(&mut self,dim_symidx:SymIdx)->Result<()>{
@@ -487,17 +523,23 @@ impl Type {
             Type::Ptr64 { ty } => {
                 ty.push_dim(dim_symidx)?;
             }
+            Type::Ref => todo!(),
+            Type::Unknown => todo!(),
         }
         Ok(())
     }
 
     pub fn pop_dim(&mut self)->Result<()>{
+        if self.is_ptr_64(){
+            *self = self.ptr2arr()?
+        };
         match self{
             Type::Array { dims, ele_ty: ty } => {
-                if dims.len()>=1{
+                if dims.len()>1{
                     dims.remove(0);
                 }else{
                     *self = *ty.clone();
+                    // debug_info_red!("after popped dim : {:?}",self)
                 }
             },
             Type::Ptr64 { ty } => {
@@ -507,10 +549,37 @@ impl Type {
         }
         Ok(())
     }
-
-    /// 首先这一定得是一个 array 然后
-    pub fn get_array_dim_weight_vec(&self)->Result<Vec<SymIdx>>{
+    pub fn ptr2arr(&self) -> Result<Type>{
         match self{
+            Type::Ptr64 { ty } => {
+                Ok(Type::Array { dims: 
+                    match self{
+                        Type::Array { dims, ele_ty } => {
+                            let mut dims = dims.clone();
+                            dims.insert(0, None);
+                            dims
+                        },
+                        _=>{
+                            vec![None]
+                        }
+                    }
+                    , ele_ty: Box::new(ty.get_ele_ty())
+                    })
+            },
+            _ => {
+                Err(anyhow!(("you can only transform a ptr 2 arr")))
+            }
+        }
+    }
+
+    /// self could be an array or ptr
+    pub fn get_array_dim_weight_vec(&self)->Result<Vec<SymIdx>>{
+        let ty = if self.is_ptr_64(){
+            self.ptr2arr()?
+        }else {
+            self.clone()
+        };
+        match ty{
             Self::Array { dims, ele_ty: _ty }=>{
                 let mut v1 = Value::new_i32(1);
                 let mut weighted_dims = vec![v1.to_symidx()?];
@@ -532,11 +601,15 @@ impl Type {
     pub fn new_from_const_str(const_str:&String) -> Self {
         if const_str.contains("true") || const_str.contains("false"){
             Type::I1
-        }else if const_str.contains(".") {
+        }else if const_str.contains(".") && (const_str.chars().next().map_or(false, |x|x.is_numeric()|| x=='-')) {
             Type::F32
-        } else {
+        } else if const_str.chars().next().map_or(false, |x|x.is_numeric() || x=='-'){
             Type::I32
-        }
+        }else if const_str.starts_with("{"){
+            Type::Array { dims: vec!(), ele_ty: Box::new(Type::Unknown) }
+        }else{
+            Type::Unknown
+        } 
     }
 
     pub fn new_from_string(ty_str:&str) -> Result<Self>{
@@ -588,18 +661,8 @@ impl Type {
             Type::Array { dims: _, ele_ty: ty } => Ok(self.get_ele_len()?*self.get_ele_size()?),
             Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
             Type::Ptr64 { ty: _ } => Ok(TARGET_POINTER_MEM_LEN),
-        }
-    }
-    pub fn can_implicit_trans_to(another_type:&Type) -> bool {
-        match another_type {
-            Type::I32 => todo!(),
-            Type::F32 => todo!(),
-            Type::I1 => todo!(),
-            Type::Void => todo!(),
-            Type::Label => todo!(),
-            Type::Fn { arg_syms: _, ret_sym: _ } => todo!(),
-            Type::Array { dims: _, ele_ty: _ } => todo!(),
-            Type::Ptr64 { ty: _ } => todo!(),
+            Type::Ref => Err(anyhow!("can't get mem_len of Ref")),
+            Type::Unknown =>Err(anyhow!("can't get mem_len of Unknown")),
         }
     }
     pub fn arith_adapt(ty1:&Type, ty2:&Type) -> Result<Self> {
@@ -621,7 +684,7 @@ impl Type {
             }
         }
     }
-    pub fn to_ref_type(&self) -> Result<Self>{
+    pub fn to_ref_ptr_type(&self) -> Result<Self>{
         match self{
             Type::I32 => Ok(Type::Ptr64 { ty: Box::new(Type::I32)}),
             Type::F32 => Ok(Type::Ptr64 { ty: Box::new(Type::F32)}),
@@ -631,9 +694,11 @@ impl Type {
             Type::Ptr64 { ty: _ } => Ok(Type::Ptr64 { ty: Box::new(self.clone())}),
             Type::Array { dims: _, ele_ty: _ty } => Ok({let mut poped_array = self.clone();poped_array.pop_dim()?;Type::Ptr64 { ty: Box::new(poped_array)}}),
             Type::Fn { arg_syms: _, ret_sym: _ } => Ok(Type::Ptr64 { ty: Box::new(self.clone())}),
+            Type::Ref => Err(anyhow!("ref type can't trans to ptr type")),
+            Type::Unknown => todo!(),
         }
     }
-    pub fn to_deref_type(&self) -> Result<Self>{
+    pub fn to_deref_ptr_type(&self) -> Result<Self>{
         match self{
             Type::I32 => return Err(anyhow!("{:?}无法被deref_type",self)),
             Type::F32 => return Err(anyhow!("{:?}无法被deref_type",self)),
@@ -643,6 +708,9 @@ impl Type {
             Type::Ptr64 { ty } => Ok(*ty.clone()),
             Type::Array { dims: _, ele_ty: _ty } => return Err(anyhow!("{:?}无法被deref_type",self)),
             Type::Fn { arg_syms: _, ret_sym: _ } => return Err(anyhow!("{:?}无法被deref_type",self)),
+            _ => {
+                Err(anyhow!("can't trans to ref"))
+            }
         }
     }
     // pub fn type_when_use(&self) -> Self{
@@ -673,6 +741,8 @@ impl Debug for Type {
             // Type::Unsure {  } => write!(f, "unsure"),
             Type::Array { dims, ele_ty: ty } => write!(f,"Array:{:?}:{:?}",ty,dims),
             Type::Ptr64 { ty } => write!(f,"ptr->{:?}",ty),
+            Type::Ref => write!(f,"ref"),
+            Type::Unknown => write!(f,"unknown"),
         }
     }
 }

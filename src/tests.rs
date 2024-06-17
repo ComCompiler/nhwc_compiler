@@ -152,7 +152,7 @@ mod tests {
         let x = symtab.add_symbol(Symbol::new(0, "x".to_string())).unwrap();
         let _y = symtab.add_symbol(Symbol::new(0, "y".to_string())).unwrap();
 
-        match symtab.get_symbol(&x) {
+        match symtab.get(&x) {
             Ok(_) => {
                 println!("找到了符号 x")
             }

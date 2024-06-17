@@ -82,7 +82,7 @@ fn main() {
         // then ssa_pass
         // then cfg_debug_pass2
         // then def_use_chain_debug_pass
-        // then nhwc_collect_pass
+        then nhwc_dump_pass
         // then simulator_debug_pass
         then ast2et_debug_pass
         then symtab_debug_pass
@@ -90,7 +90,10 @@ fn main() {
         to pass_manager
         
     );
-    timeit!({ pass_manager.execute_passes() }, "all passed finish");
+    let err_flag;
+    timeit!({ err_flag = pass_manager.execute_passes(); }, "all passed finish");
     timeit!({ pass_manager.await_all_io_tasks() }, "all io tasks finish");
-
+    if err_flag {
+        panic!()
+    }
 }

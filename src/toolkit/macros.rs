@@ -381,7 +381,7 @@ macro_rules! add_symbol {
             let symidx = $symtab.add_symbol($sym)?;
             $(
             $(if $if_block )? {
-                let sym =  $symtab.get_mut_symbol(&symidx).unwrap();
+                let sym =  $symtab.get_mut(&symidx).unwrap();
                 paste::paste!{
                     sym.[<add_ $field_name:lower>]($field_value);
                 };
@@ -449,7 +449,7 @@ macro_rules! add_field {
             None => {},
         })?
         paste::paste!{
-            $symtab.get_mut_symbol(&$symidx)?.[<add_ $field_name:lower>]($field);
+            $symtab.get_mut(&$symidx)?.[<add_ $field_name:lower>]($field);
         };
     };
     ($(with_field $field_name:ident:{$field:expr})+ to $symidx:ident in $symtab:ident $(debug $symtab_graph:ident)?) => {
