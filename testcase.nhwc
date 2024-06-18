@@ -1,0 +1,29 @@
+      global Fn[]->getint_ret_0 getint_0 
+      global Fn[]->getch_ret_0 getch_0 
+      global Fn[zz_array_3]->getarray_ret_0 getarray_0 
+      global Fn[]->getfloat_ret_0 getfloat_0 
+      global Fn[zz_array_5]->getfarray_ret_0 getfarray_0 
+      global Fn[zz_int_6]->putint_ret_0 putint_0 
+      global Fn[zz_ch_7]->putch_ret_0 putch_0 
+      global Fn[x_8, zz_array_8]->putarray_ret_0 putarray_0 
+      global Fn[zz_float_9]->putfloat_ret_0 putfloat_0 
+      global Fn[zz_len_10, zz_farray_10]->putfarray_ret_0 putfarray_0 
+      global Fn[]->putf_ret_0 putf_0 
+      global Fn[]->starttime_ret_0 starttime_0 
+      global Fn[]->stoptime_ret_0 stoptime_0 
+      global Fn[zz_ptr_14, zz_len_14, zz_val_14]->memset_ret_0 memset_0 
+      global Fn[zz_dest_15, zz_ptr_15, zz_len_15]->memcpy_ret_0 memcpy_0 
+      Define main_0 [] -> main_ret_0 
+              alloc i32 a_17 
+              alloc i1 temp_0_19 
+          label L0_0: 
+              a_17 = i32 0x7fff_0 
+              jump label: L1_0 
+          label L1_0: 
+              new_var temp_0_19:i1 
+              temp_0_19 = icmp i32 Sgt a_17, 0x6fff_0 
+              br i1 temp_0_19, label branch_true_20, label branch_false_20 
+          label branch_true_20: 
+              a_17 = i32 3_0 
+              jump label: branch_false_20 
+          label branch_false_20: 

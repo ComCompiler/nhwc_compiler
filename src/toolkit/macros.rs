@@ -758,24 +758,32 @@ macro_rules! create_lower_string_from_two_ident {
 #[macro_export]
 macro_rules! debug_info_blue{
     ($($t:tt)*) => {{
-        println!("\x1B[34m debuginfo {}\x1B[0m",format!($($t)*))
+        use log::trace;
+        // println!("\x1B[34m debuginfo {}\x1B[0m",format!($($t)*))
+        trace!("\x1B[34m debuginfo {}\x1B[0m",format!($($t)*))
     }};
 }
 #[macro_export]
 macro_rules! debug_info_yellow{
     ($($t:tt)*) => {{
-        println!("\x1B[33m debuginfo {}\x1B[0m",format!($($t)*))
+        use log::info;
+        // println!("\x1B[33m debuginfo {}\x1B[0m",format!($($t)*))
+        info!("\x1B[33m debuginfo {}\x1B[0m",format!($($t)*))
     }};
 }
 #[macro_export]
 macro_rules! debug_info_green{
     ($($t:tt)*) => {{
-        println!("\x1B[32m debuginfo {}\x1B[0m",format!($($t)*))
+        use log::debug;
+        // println!("\x1B[32m debuginfo {}\x1B[0m",format!($($t)*))
+        debug!("\x1B[32m debuginfo {}\x1B[0m",format!($($t)*))
     }};
 }
 #[macro_export]
 macro_rules! debug_info_red{
     ($($t:tt)*) => {{
-        println!("\x1B[31m debuginfo {}\x1B[0m",format!($($t)*))
+        use log::warn;
+        // println!("\x1B[31m debuginfo {}\x1B[0m",format!($($t)*))
+        warn!("\x1B[31m debuginfo {}\x1B[0m",format!($($t)*))
     }};
 }

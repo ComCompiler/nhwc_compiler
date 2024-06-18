@@ -10,6 +10,7 @@ use crate::{direct_child_node, instr, node_mut};
 
 use crate::{node, toolkit::{cfg_edge::CfgEdgeType, context::NhwcCtx, etc::dfs_with_priority, pass_manager::Pass}};
 use anyhow::*;
+use log::error;
 /// 定义额外的信息，这样我们就可以把 add_field 宏加入到符号表或者任何实现了 Fields trait 的地方
 /// 任何一个Pass 都有一个pass_run函数 来进行这个pass 相关的工作，比如说对于 SSAPass 我们要对 一个BasicBlock 中的ExprTree做出转换。
 /// 因为实际上 一个 ExprTree 最终会对应一个BasicBlock。
@@ -68,7 +69,8 @@ impl Pass for NhwcDumpPass {
                                     node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(jump_instr_struct, instr_slab)?;
                                 }
                             },
-                            _=>{return Err(anyhow!("cfg_node 的 label_instr 不可能为 除了label 以外的类型"))}
+                            _=>{
+                                return Err(anyhow!("cfg_node 的 label_instr 不可能为 除了label 以外的类型"))}
                         }
                     }
                 }

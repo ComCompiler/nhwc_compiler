@@ -120,15 +120,18 @@ mod tests {
 
         match symtab.get_symbol_verbose("x".to_string(), 0) {
             Ok(_) => {
-                println!("找到了符号 x")
+                info!("找到了符号 x")
+                // println!("找到了符号 x")
             }
             Err(_) => {
+
                 panic!("没有找到符号 x ");
             }
         }
         match symtab.get_symbol_verbose("y".to_string(), 0) {
             Ok(_) => {
-                println!("找到了符号 y")
+                info!("找到了符号 x")
+                // println!("找到了符号 y")
             }
             Err(_) => {
                 panic!("没有找到符号 y ");

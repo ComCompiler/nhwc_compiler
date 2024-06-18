@@ -1,5 +1,5 @@
 use std::vec;
-
+use log::trace;
 use crate::{ debug_info_red, debug_info_yellow, toolkit::{ context::NhwcCtx, nhwc_instr::{InstrSlab, NhwcInstr}, pass_manager::Pass, simulator::Simulator, symtab::{SymTab, SymTabGraph}}};
 use itertools::Itertools;
 use crate::toolkit::dot::Config;
@@ -111,7 +111,8 @@ pub fn debug_simu_run(simu:&mut Simulator, instr_slab:&InstrSlab<NhwcInstr>, src
     loop{
         let rst = simu.exec_till_breakpoint(&instr_slab,&src_symtab);
         if let Ok(Some((bp_symidx,field_vec))) =  rst{
-            println!("breakpoint: {:?}", bp_symidx);
+            // println!("breakpoint: {:?}", bp_symidx);
+            trace!("breakpoint: {:?}", bp_symidx);
             simu.simu_symtab.debug_symtab_graph(format!("{:?} fields:{:?}",bp_symidx,field_vec), &mut simulator_g,
                 if is_detailed_info{
                     vec![]
@@ -121,7 +122,8 @@ pub fn debug_simu_run(simu:&mut Simulator, instr_slab:&InstrSlab<NhwcInstr>, src
             simu.clear_text();
             simu.load_instr_text(Some(6),instr_slab,)?;
             simu.load_stack_text()?;
-            println!("{:?}",simu);
+            trace!("{:?}",simu);
+            // println!("{:?}",simu);
             if bp_symidx.symbol_name == "exit"{
                 break;
             }

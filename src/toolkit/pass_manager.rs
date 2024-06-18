@@ -2,6 +2,7 @@ use crate::Args;
 
 use anyhow::Result;
 use colored::Colorize;
+use log::{debug, error};
 
 pub trait Pass {
     fn run(&mut self, ctx:&mut super::context::NhwcCtx) -> Result<()>;
@@ -23,11 +24,13 @@ impl PassManager {
             // match pass.run(&mut self.ctx).with_context(|| format!("Error occurred when running Pass {}",pass.get_pass_name())){
             match anyhow::Context::with_context(pass.run(&mut self.ctx), || format!("Error occurred when running Pass {}", pass.get_pass_name())) {
                 Ok(_) => {
-                    println!("{}", format!("Pass {} run successfully", pass.get_pass_name()).green());
+                    debug!("{}", format!("Pass {} run successfully", pass.get_pass_name()).green());
+                    //println!("{}", format!("Pass {} run successfully", pass.get_pass_name()).green());
                 }
                 Err(e) => {
                     err_flag =true;
-                    println!("{}", format!("{:?}", e).red());
+                    error!("{}", format!("{:?}", e).red())
+                    // println!("{}", format!("{:?}", e).red());
                 }
             }
         }
@@ -39,7 +42,8 @@ impl PassManager {
                 Ok(_) => {
                 }
                 Err(e) => {
-                    println!("{}", format!("{:?}", e).red());
+                    // println!("{}", format!("{:?}", e).red());
+                    error!("{}", format!("{:?}", e).red())
                 }
             }
         }
