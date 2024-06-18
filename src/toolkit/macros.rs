@@ -760,7 +760,7 @@ macro_rules! debug_info_blue{
     ($($t:tt)*) => {{
         use log::trace;
         // println!("\x1B[34m debuginfo {}\x1B[0m",format!($($t)*))
-        trace!("\x1B[34m debuginfo {}\x1B[0m",format!($($t)*))
+        trace!("{}",format!($($t)*))
     }};
 }
 #[macro_export]
@@ -768,7 +768,7 @@ macro_rules! debug_info_yellow{
     ($($t:tt)*) => {{
         use log::info;
         // println!("\x1B[33m debuginfo {}\x1B[0m",format!($($t)*))
-        info!("\x1B[33m debuginfo {}\x1B[0m",format!($($t)*))
+        info!("{}",format!($($t)*))
     }};
 }
 #[macro_export]
@@ -776,7 +776,7 @@ macro_rules! debug_info_green{
     ($($t:tt)*) => {{
         use log::debug;
         // println!("\x1B[32m debuginfo {}\x1B[0m",format!($($t)*))
-        debug!("\x1B[32m debuginfo {}\x1B[0m",format!($($t)*))
+        debug!("{}",format!($($t)*))
     }};
 }
 #[macro_export]
@@ -784,6 +784,6 @@ macro_rules! debug_info_red{
     ($($t:tt)*) => {{
         use log::warn;
         // println!("\x1B[31m debuginfo {}\x1B[0m",format!($($t)*))
-        warn!("\x1B[31m debuginfo {}\x1B[0m",format!($($t)*))
+        warn!("{}",format!($($t)*))
     }};
 }
