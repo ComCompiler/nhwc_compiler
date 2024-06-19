@@ -10,7 +10,7 @@ use crate::antlr_parser::cparser::{
 };
 
 use crate::toolkit::symtab::SymIdx;
-use crate::{add_node, add_node_with_edge, debug_info_red, debug_info_yellow, direct_child_node, find, find_nodes, node, rule_id, term_id};
+use crate::{add_edge, add_node, add_node_with_edge, debug_info_red, debug_info_yellow, direct_child_node, find, find_nodes, node, rule_id, term_id};
 
 use super::et_node::{DeclOrDefOrUse, EtEdgeType, EtNodeType, EtTree};
 use super::eval_et::{compress_et};
@@ -528,11 +528,13 @@ fn process_additive_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Sco
 }
 
 fn process_multiplicative_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, multiplicative_expr_node:u32, scope_node:u32, parent_et_node:u32) {
+
     let cast_expr_nodes = find_nodes!(rule RULE_castExpression at multiplicative_expr_node in ast_tree);
-    let op_nodes = find_nodes!(term at multiplicative_expr_node in ast_tree);
-    let get_expr_node_of_op_node = |op_node_index| {
-        let op_node = op_nodes[op_node_index];
-        match term_id!(at op_node in ast_tree) {
+    let nodes = find_nodes!(term at multiplicative_expr_node in ast_tree);
+
+    let get_expr_node_of_op_node = |node_idx| {
+        let node = nodes[node_idx];
+        match term_id!(at node in ast_tree) {
             Star => EtNodeType::new_op_mul(multiplicative_expr_node).into(),
             Div => EtNodeType::new_op_div(multiplicative_expr_node).into(),
             Mod => EtNodeType::new_op_mod(multiplicative_expr_node).into(),
@@ -543,21 +545,26 @@ fn process_multiplicative_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tre
     let mut op_last_ep_cast_node = None;
     if cast_expr_nodes.len() > 1 {
         for (index, &cast_node) in cast_expr_nodes.iter().enumerate() {
-            if index != cast_expr_nodes.len() - 1 {
-                if op_last_ep_cast_node.is_none() {
-                    // 第一个 castExpression，基于第一个操作符创建节点
-                    op_last_ep_cast_node = Some(add_node_with_edge!({get_expr_node_of_op_node(0)} with_edge {EtEdgeType::Direct.into()} from parent_et_node in et_tree));
-                } else {
-                    let last_ep_cast_node = op_last_ep_cast_node.unwrap();
-                    // 注意：每个操作符对应一个操作节点，索引应调整为基于操作符的实际位置
-                    op_last_ep_cast_node = Some(add_node_with_edge!({get_expr_node_of_op_node(index)} with_edge {EtEdgeType::Direct.into()} from last_ep_cast_node in et_tree));
-                }
+            if index == 0 {
+                // first et_node should 
+                op_last_ep_cast_node = Some(add_node!({get_expr_node_of_op_node(0)} to et_tree));
                 process_cast_expr(et_tree, ast_tree, scope_tree, cast_node, scope_node, op_last_ep_cast_node.unwrap());
             } else {
-                // 最后一个节点使用同样的方法连接
+                // 第一个 castExpression，基于第一个操作符创建节点
+                // op_last_ep_cast_node = Some(add_node!({get_expr_node_of_op_node(0)} with_edge {EtEdgeType::Direct.into()} from parent_et_node in et_tree));
                 process_cast_expr(et_tree, ast_tree, scope_tree, cast_node, scope_node, op_last_ep_cast_node.unwrap());
+                let last_ep_cast_node = op_last_ep_cast_node.unwrap();
+                // 注意：每个操作符对应一个操作节点，索引应调整为基于操作符的实际位置
+                if index != cast_expr_nodes.len()-1{
+                    let added_cast_node = add_node!({get_expr_node_of_op_node(index)} to et_tree);
+                    // op_last_ep_cast_node = Some(add_node_with_edge!({get_expr_node_of_op_node(index)} with_edge {EtEdgeType::Direct.into()} from last_ep_cast_node in et_tree));
+                    add_edge!({EtEdgeType::Direct.into()} from  added_cast_node to last_ep_cast_node in et_tree);
+                    op_last_ep_cast_node =Some(added_cast_node);
+                }
             }
         }
+        let last_ep_cast_node = op_last_ep_cast_node.unwrap();
+        add_edge!({EtEdgeType::Direct.into()} from parent_et_node to last_ep_cast_node in et_tree);
     } else if cast_expr_nodes.len() == 1 {
         // 只有一个 castExpression，直接处理这个表达式，不需要创建操作符节点
         process_cast_expr(et_tree, ast_tree, scope_tree, cast_expr_nodes[0], scope_node, parent_et_node);
@@ -571,13 +578,13 @@ fn process_cast_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTr
     if let Some(type_name_node) = find!(rule RULE_typeName at cast_expr_node in ast_tree) {
         // 如果存在 typeName，说明是类型转换的情况
         let type_sym = SymIdx::new(scope_node, node!(at type_name_node in ast_tree).text.clone());
-        let cast_node = add_node_with_edge!({EtNodeType::new_op_cast( cast_expr_node).into()} with_edge {EtEdgeType::Direct.into()} from parent_et_node in et_tree);
+        // let cast_node = add_node_with_edge!({EtNodeType::new_op_cast( cast_expr_node).into()} with_edge {EtEdgeType::Direct.into()} from parent_et_node in et_tree);
         // 添加 cast op 节点的左节点，这是个 type symbol
-        add_node_with_edge!({EtNodeType::new_symbol(scope_node,type_sym,DeclOrDefOrUse::Use).into()} with_edge {EtEdgeType::Direct.into()} from cast_node in et_tree);
+        // add_node_with_edge!({EtNodeType::new_symbol(scope_node,type_sym,DeclOrDefOrUse::Use).into()} with_edge {EtEdgeType::Direct.into()} from cast_node in et_tree);
 
         // 递归处理 castExpression
         let child_cast_expr_node = find!(rule RULE_castExpression at cast_expr_node in ast_tree).expect(format!("在 节点 {} 下找不到 castExpr", type_name_node).as_str());
-        process_cast_expr(et_tree, ast_tree, scope_tree, child_cast_expr_node, scope_node, cast_node);
+        process_cast_expr(et_tree, ast_tree, scope_tree, child_cast_expr_node, scope_node, parent_et_node);
     } else if let Some(unary_expr_node) = find!(rule RULE_unaryExpression at cast_expr_node in ast_tree) {
         // 如果是 unaryExpression，直接处理
         process_unary_expr(et_tree, ast_tree, scope_tree, unary_expr_node, scope_node, parent_et_node,DeclOrDefOrUse::Use);

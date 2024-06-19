@@ -650,7 +650,7 @@ fn force_trans_type(
         }
         (Type::F32, Type::I32) => {
             //创建i32类型的临时变量
-            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
             let f2i_instr = NhwcInstrType::new_float2int(symidx.clone(), itmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(f2i_instr, instr_slab)?;
             return Ok(itmp_type_symidx);

@@ -115,10 +115,10 @@ fn match_x_mul_1(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree)->bool{
     let (l,r) = if let (Some(l),Some(r)) = (&et_symidx_vec[0],&et_symidx_vec[1]){ (l,r) }else { return false };
     // ensure r is 1
     let (sym_node,unit_node) = match (l,r){
-        (l,r)if *r==SymIdx::from_str("1") => {
+        (l,r)if r.symbol_name=="1" => {
             (et_nodes[0],et_nodes[1])
         }
-        (l,r)if *l==SymIdx::from_str("1") => {
+        (l,r)if l.symbol_name=="1" => {
             (et_nodes[1],et_nodes[0])
         }
         _ => return false
@@ -127,7 +127,7 @@ fn match_x_mul_1(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree)->bool{
     // delete parent to cur et_node
     let et_node_edge_parent2cur = et_tree.find_edge(NodeIndex::new(et_parent_node as usize), NodeIndex::new(et_node as usize)).unwrap();
     et_tree.edge_weight_mut(et_node_edge_parent2cur).unwrap().et_edge_type = EtEdgeType::Deleted;
-    add_edge!({EtEdgeType::Direct.into()} from et_node to sym_node in et_tree);
+    add_edge!({EtEdgeType::Direct.into()} from et_parent_node to sym_node in et_tree);
     true
 }
 fn match_x_mul_0(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree) -> bool{
@@ -142,13 +142,13 @@ fn match_x_mul_0(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree) -> bool{
         let (l,r) = (&et_ret_symidx_vec[0],&et_ret_symidx_vec[1]);
         // ensure r is 0
         let (sym_node,zero_node) = match (l,r){
-            (l,r)if *r==SymIdx::from_str("1") => {
+            (l,r)if r.symbol_name=="0" => {
                 (et_nodes[0],et_nodes[1])
             }
-            (l,r)if *l==SymIdx::from_str("1") => {
+            (l,r)if l.symbol_name=="0" => {
                 (et_nodes[1],et_nodes[0])
             }
-            _ => panic!()
+            _ => return false
         };
         let et_parent_node = direct_et_parent_node!(at et_node in et_tree );
         // delete parent to cur et_node
@@ -292,10 +292,10 @@ fn match_x_sub_0(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree)->bool{
 
     // ensure r is 0
     let (sym_node,zero_node) = match (l,r){
-        (l,r)if *r==SymIdx::from_str("0") => {
+        (l,r)if r.symbol_name=="0" => {
             (et_nodes[0],et_nodes[1])
         }
-        _ => panic!()
+        _ => return false
     };
     let et_parent_node = direct_et_parent_node!(at et_node in et_tree );
     // delete parent to cur et_node
@@ -304,8 +304,11 @@ fn match_x_sub_0(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree)->bool{
     add_edge!({EtEdgeType::Direct.into()} from et_node to sym_node in et_tree);
     true
 }
-fn match_x_div_1(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree) -> bool{
+fn match_x_div_1(et_node:u32,et_tree:&mut EtTree) -> bool{
+    let et_nodes = direct_et_child_nodes!(at et_node in et_tree);
     let et_symidx_vec = get_symidx_vec(et_node, et_tree);
+    if node!(at et_node in et_tree).common_eliminated{return false}
+    debug_info_blue!("match_x_div_1 at {} with_et_nodes {:?}",et_node,et_nodes);
     let (l,r) = if let (Some(l),Some(r)) = (&et_symidx_vec[0],&et_symidx_vec[1]){ (l,r) }else { return false };
     // ensure r is 1
     let (sym_node,unit_node) = match (l,r){
@@ -317,8 +320,8 @@ fn match_x_div_1(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree) -> bool{
     let et_parent_node = direct_et_parent_node!(at et_node in et_tree );
     // delete parent to cur et_node
     let et_node_edge_parent2cur = et_tree.find_edge(NodeIndex::new(et_parent_node as usize), NodeIndex::new(et_node as usize)).unwrap();
-    et_tree.edge_weight_mut(et_node_edge_parent2cur).unwrap().et_edge_type = EtEdgeType::Deleted;
     add_edge!({EtEdgeType::Direct.into()} from et_parent_node to sym_node in et_tree);
+    et_tree.edge_weight_mut(et_node_edge_parent2cur).unwrap().et_edge_type = EtEdgeType::Deleted;
     true
 }
 /// replace all the const symbol with its cont value in symtab
@@ -425,6 +428,7 @@ pub fn reducation(et_node:u32,et_tree:&mut EtTree){
     debug_info_blue!("reducation et_node {}",et_node);
     let et_parent_node = if et_parent_node.is_none(){return}else {et_parent_node.unwrap()};
     let et_nodes = direct_et_child_nodes!(at et_node in et_tree); //里面的u32是节点编号
+    // generate_png_by_graph(et_tree,"et_tree".to_string(),&[Config::NodeIndexLabel,Config::Record]);
     match &node!(at et_node in et_tree).et_node_type{
         EtNodeType::Operator { op, ast_node, text, op_symidx } => {
             debug_info_blue!("access {}",et_node);
@@ -472,7 +476,7 @@ pub fn reducation(et_node:u32,et_tree:&mut EtTree){
                     }
                 },
                 ExprOp::Div => {
-                    if match_x_div_1( &et_nodes, et_node, et_tree){
+                    if match_x_div_1(et_node, et_tree){
                         node_mut!(at et_node in et_tree).common_eliminated=true;
                         debug_info_blue!("match_x_div_0_at {}",et_node);
                         et_tree.deprecate_hash(et_parent_node);

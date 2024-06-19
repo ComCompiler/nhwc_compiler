@@ -643,7 +643,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         match op{
                             super::nhwc_instr::Trans::Fptosi { float_symidx } => {
                                 let val_reg =regtab.find_and_occupy_reg(float_symidx, &Type::F32, symtab, asm_sect, default_store, default_load)?;
-                                let rst_reg = regtab.find_and_occupy_reg(float_symidx, &Type::F32, symtab, asm_sect, default_store, 
+                                let rst_reg = regtab.find_and_occupy_reg(float_symidx, &Type::I32, symtab, asm_sect, default_store, 
                                     |symidx,rst_reg,symtab,asm_sect,regtab|{
                                         asm_sect.asm(Trans::new_fcvt_w_s(rst_reg.clone(),val_reg.clone()).into());
                                         Ok(())
@@ -654,7 +654,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                             },
                             super::nhwc_instr::Trans::Sitofp { int_symidx } => {
                                 let val_reg =regtab.find_and_occupy_reg(int_symidx, &Type::I32, symtab, asm_sect, default_store, default_load)?;
-                                let rst_reg = regtab.find_and_occupy_reg(int_symidx, &Type::I32, symtab, asm_sect, default_store, 
+                                let rst_reg = regtab.find_and_occupy_reg(int_symidx, &Type::F32, symtab, asm_sect, default_store, 
                                     |symidx,rst_reg,symtab,asm_sect,regtab|{
                                         asm_sect.asm(Trans::new_fcvt_s_w(rst_reg.clone(),val_reg.clone()).into());
                                         Ok(())

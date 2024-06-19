@@ -79,8 +79,8 @@ unaryOperator
     ;
 
 castExpression
-    :   '__extension__'? '(' typeName ')' castExpression
-    |   unaryExpression
+       //'__extension__'? '(' typeName ')' castExpression
+    :   unaryExpression
     // |   DigitSequence // for       这段不知道是什么，不要了
     ;
 
