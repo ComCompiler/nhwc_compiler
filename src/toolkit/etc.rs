@@ -3,6 +3,7 @@ use std::{
 };
 
 use colored::Colorize;
+use log::info;
 use crate::{direct_parent_nodes, instr};
 
 use crate::{
@@ -34,13 +35,15 @@ pub fn generate_png_by_graph<N:Debug, E:Debug, Ty:EdgeType>(g:&StableGraph<N, E,
     let mut f = File::create(dot_name.clone()).with_context(||"无法写入文件")?;
     let dot_string = format!("{:?}", Dot::with_config(&g, &graph_config));
     f.write_all(dot_string.as_bytes()).expect("写入失败");
-    println!("dot write finished {:?}", env::current_dir());
+    info!("dot write finished {:?}", env::current_dir());
+    // println!("dot write finished {:?}", env::current_dir());
     let output = Command::new("dot").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().with_context(||"执行失败")?;
     // let output = Command::new("twopi").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().with_context(||"执行失败")?;
     // let output = Command::new("neato").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().with_context(||"执行失败")?;
     // let output = Command::new("fdp").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().with_context(||"执行失败")?;
 
-    println!("Successfully Transform to png {}.png {:?}", name.green(),output);
+    info!("Successfully Transform to png {}.png {:?}", name.green(),output);
+    // println!("Successfully Transform to png {}.png {:?}", name.green(),output);
     Ok(())
 }
 /// 生成树(可以是任何树)对应的png ，将此png 放在命令行*当前*目录下
@@ -54,13 +57,15 @@ pub fn generate_png_by_graph_multi_tasks<N:Debug, E:Debug, Ty:EdgeType>(g:&Stabl
     io_task_list.push(
         spawn(move ||->Result<()> {
             f.write_all(dot_string.as_bytes()).expect("写入失败");
-            println!("dot write finished {:?}", env::current_dir());
+            info!("dot write finished {:?}", env::current_dir());
+            // println!("dot write finished {:?}", env::current_dir());
             let output = Command::new("dot").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().with_context(||"执行失败")?;
             // let output = Command::new("twopi").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().with_context(||"执行失败")?;
             // let output = Command::new("neato").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().with_context(||"执行失败")?;
             // let output = Command::new("fdp").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().with_context(||"执行失败")?;
 
-            println!("Successfully Transform to png {}.png {:?}", name.green(),output);
+            // println!("Successfully Transform to png {}.png {:?}", name.green(),output);
+            info!("Successfully Transform to png {}.png {:?}", name.green(),output);
             Ok(())
         })
     );

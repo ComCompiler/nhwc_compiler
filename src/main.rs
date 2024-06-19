@@ -40,9 +40,11 @@ pub struct Args {
 // 这是一个计时宏
 macro_rules! timeit {
     ($a:block , $word:expr) => {{
+        use log::info;
         let start_time = Instant::now();
         let a = $a;
         let duration = Instant::now() - start_time;
+        info!("{} 耗时: {:?}", $word, duration);
         println!("{} 耗时: {:?}", $word, duration);
         a
     }};
@@ -51,15 +53,15 @@ macro_rules! timeit {
 fn main() {
     // 读取命令选项，诸如 -c 表示代码文件地址
     // 你也可以通过运行 cargo run -- --help 来查看所有可用选项
-
+    env_logger::init();
     let args = Args::parse();
     let debug = args.debug;
     // args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
     let mut pass_manager = PassManager::new(args);
     let code2ast_pass = Code2AstPass::new(debug);
     let ast2cfg_pass = Ast2CfgPass::new(debug);
-    let ast2et_debug_pass = Ast2EtDebugPass::new(debug);
     let cfg2ncfg_pass = Cfg2NcfgPass::new(debug,debug);
+    let ast2et_debug_pass = Ast2EtDebugPass::new(debug);
     let ast2st_pass = Ast2StPass::new(debug);
     let ncfg2djg_pass = Ncfg2DjgPass::new(debug);
     let ssa_pass = SsaPass::new(debug, debug);
