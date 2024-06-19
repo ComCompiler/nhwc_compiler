@@ -79,16 +79,16 @@ fn main() {
         then ast2cfg_pass
         // then cfg_debug_pass1
         then cfg2ncfg_pass
-        // then ncfg2djg_pass
-        // then mem_alloc_pass
-        // // then ssa_pass
-        // // then cfg_debug_pass2
-        // // then def_use_chain_debug_pass
-        // then nhwc_dump_pass
-        // // then simulator_debug_pass
-        then ast2et_debug_pass
+        then ncfg2djg_pass
+        then mem_alloc_pass
+        // then ssa_pass
+        // then cfg_debug_pass2
+        // then def_use_chain_debug_pass
+        then nhwc_dump_pass
+        // then simulator_debug_pass
+        // then ast2et_debug_pass
         // then symtab_debug_pass
-        // then nhwc2riscv_pass
+        then nhwc2riscv_pass
         to pass_manager
         
     );
