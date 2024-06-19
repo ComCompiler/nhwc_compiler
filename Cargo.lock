@@ -219,10 +219,7 @@ dependencies = [
  "delegate",
  "derive-new",
  "derive_builder",
-<<<<<<< HEAD
-=======
  "env_logger",
->>>>>>> refs/remotes/origin/master
  "itertools",
  "lazy_static",
  "log",
