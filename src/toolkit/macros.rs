@@ -145,7 +145,7 @@ macro_rules! direct_parent_node {
         if nodes.len() ==1 {
             nodes[0]
         }else{
-            panic!("该节点 有多个parent_node,无法使用 direct_parent_node")
+            panic!("this node have multiple or zero parent_node, direct_parent_node failed")
         }
     }};
     (at $node:ident in $graph:ident with_predicate $f:block ) => {{
@@ -153,7 +153,15 @@ macro_rules! direct_parent_node {
         if nodes.len() ==1 {
             nodes[0]
         }else{
-            panic!("该节点 有多个parent_node,无法使用 direct_parent_node")
+            panic!("this node have multiple or zero parent_node, direct_parent_node failed {}",$node)
+        }
+    }};
+    (at $node:ident in $graph:ident with_predicate $f:block ret_option) => {{
+        let nodes = $crate::direct_parent_nodes!(at $node in $graph with_predicate $f);
+        if nodes.len() ==1 {
+            Some(nodes[0])
+        }else{
+            None
         }
     }};
 }
@@ -256,16 +264,18 @@ macro_rules! direct_child_nodes {
     }};
     (at $node:ident in $graph:ident with_predicate $f:block )=> {{
         use petgraph::visit::EdgeRef;
-        let edges_vec:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing)
+        let mut edges_vec:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing)
             .filter($f)
             .map(|e|e.target().index() as u32).collect();
+        edges_vec.reverse();
         edges_vec
     }};
     (at $node:ident in $graph:ident with_predicate $f:ident )=> {{
         use petgraph::visit::EdgeRef;
-        let edges_vec:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing)
+        let mut edges_vec:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing)
             .filter($f)
             .map(|e|e.target().index() as u32).collect();
+        edges_vec.reverse();
         edges_vec
     }};
     (at $node:ident in $graph:ident with_priority $f:block )=> {{
@@ -611,10 +621,16 @@ macro_rules! reg_field_for_struct {
                     $crate::downcast_op_any!(ref $field_type,op_field).with_context(|| format!("{} {:?} downcast_op_any 失败 field_name:{}:{} {} {}",stringify!($struct_name),self,stringify!($upper_field_name),$upper_field_name,file!(),line!()))
                 }
                 pub fn [<get_mut_ $upper_field_name:lower>](&mut self) -> anyhow::Result<&mut $field_type>{
+                    // if stringify!($upper_field_name) == "CUR_REG" {
+                    //     println!("mut acess cur_reg of {:?}",self);
+                    // }
                     let op_field_mut = self.$fields.get_mut($upper_field_name);
                     $crate::downcast_op_any!(mut $field_type,op_field_mut).with_context(|| format!("{} downcast_op_any 失败 field_name:{} {} {} {}",stringify!($struct_name),stringify!($upper_field_name),$upper_field_name,file!(),line!()))
                 }
                 pub fn [<add_ $upper_field_name:lower>](&mut self, field:$field_type) {
+                    // if stringify!($upper_field_name) == "CUR_REG" {
+                    //     println!("add mut acess cur_reg of {:?}",self);
+                    // }
                     let _op_field = self.$fields.insert($upper_field_name,Box::new(field));
                     // let op_field_ref = op_field.as_ref();
                     // $crate::downcast_op_any!($field_type,op_field)

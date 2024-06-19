@@ -9,7 +9,7 @@ pub type AstTree = StableDiGraph<AstNode, (), u32>;
 
 #[derive(Clone)]
 pub struct AstNode {
-    pub rule_id:usize,
+    pub rule_id:usize, // grammar id
     pub node_index:u32,
     pub text:String,
     pub is_terminal:bool,

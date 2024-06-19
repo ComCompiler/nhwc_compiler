@@ -9,14 +9,16 @@ use std::{mem, u32};
 use super::ast_node::AstTree;
 use super::field::Fields;
 use super::symtab::SymIdx;
-use crate::{direct_child_nodes, node, node_mut};
+use crate::toolkit::dot::Config;
+use crate::toolkit::etc::generate_png_by_graph;
+use crate::{debug_info_red, direct_child_nodes, node, node_mut};
 use petgraph::stable_graph::StableDiGraph;
 
 pub type EtTree = StableDiGraph<EtNode, EtEdge, u32>;
 
 #[derive(Clone)]
 pub struct EtEdge{
-    et_edge_type: EtEdgeType
+    pub et_edge_type: EtEdgeType
 }
 #[derive(Clone,EnumIs)]
 pub enum EtEdgeType{
@@ -38,7 +40,7 @@ impl Debug for EtEdge{
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone,Hash)]
 pub enum DeclOrDefOrUse {
     DeclDef { type_ast_node:u32 ,is_const:bool },
     Use,
@@ -55,7 +57,7 @@ pub enum EtNodeType {
     // 而 et 树的 non-terminal node 要么是 root 要么是一个 op
     Operator { op:ExprOp, ast_node:u32, text:String ,op_symidx:Option<SymIdx> },
     // 在这里 literal 也是一个 Symbol ，到时候在 SymbolField 里面加上 literal 标记 就可以了
-    Literal { const_sym_idx:SymIdx, ast_node:u32, text:String },
+    Literal { literal_symidx:SymIdx, ast_node:u32, text:String },
     // Def_Or_Use 是一个枚举类型，要么是 Def 要么是 Use
     Symbol { sym_idx:SymIdx, ast_node:u32, text:String, decldef_def_or_use:DeclOrDefOrUse },
     // array symbol 一个 array 是 array symbol
@@ -71,8 +73,8 @@ impl EtNode{
             EtNodeType::Operator { op, ast_node, text, op_symidx } => {
                 *op_symidx = Some(symidx);
             },
-            EtNodeType::Literal { const_sym_idx, ast_node, text } => {
-                *const_sym_idx = symidx;
+            EtNodeType::Literal { literal_symidx, ast_node, text } => {
+                *literal_symidx = symidx;
             },
             EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => {
                 *sym_idx  = symidx;
@@ -88,14 +90,29 @@ impl EtNode{
 pub struct EtNode {
     pub et_node_type:EtNodeType,
     pub info:Fields,
-    pub hash:Option<isize>
+    pub hash:Option<isize>,
+    pub calculated_symidx: Option<Option<SymIdx>>,
+    pub et_ret_symidx_vec: Option<Vec<SymIdx>>,
+    pub common_eliminated:bool,
 }
 pub trait EtHash{
     fn update_hash(&mut self,et_node:u32) ;
+    fn deprecate_hash(&mut self,et_node:u32);
+    fn lazy_delete(&mut self,et_node:u32);
 }
 const ET_HASH_MODULUS:isize =  10000000;
 impl EtHash for EtTree{
+    fn deprecate_hash(&mut self,et_node:u32){
+        node_mut!(at et_node in self).hash = None;
+    }
+    fn lazy_delete(&mut self,et_node:u32) {
+        node_mut!(at et_node in self).common_eliminated = true;
+    }
+    /// you should deprecate hash if you want to update it at second time
     fn update_hash(&mut self,et_node:u32) {
+        // if node!(at et_node in self).hash.is_some() || node!(at et_node in self).common_eliminated{
+        //     return 
+        // }
         let child_nodes = direct_child_nodes!(at et_node in self with_predicate {|e| !e.weight().et_edge_type.is_deleted()});
         for &child_node in &child_nodes{
             self.update_hash(child_node);
@@ -111,8 +128,9 @@ impl EtHash for EtTree{
                     },
                     ExprOp::Add => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                        // generate_png_by_graph(self,"et_tree".to_string(),&[Config::NodeIndexLabel,Config::Record]);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.with_context(||format!("et_node {} child has no hash",et_node)).unwrap();
+                        let h2 = node!(at {child_nodes[1]} in self).hash.with_context(||format!("et_node {} child has no hash",et_node)).unwrap();
                         node_mut!(at et_node in self).hash = Some((h1+h2) % ET_HASH_MODULUS);
                     },
                     ExprOp::Sub => {
@@ -131,7 +149,7 @@ impl EtHash for EtTree{
                         assert!(child_nodes.len() == 2);
                         let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
                         let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1%h2) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash = Some(((h1*9+h2 + 3)% ET_HASH_MODULUS ) % ET_HASH_MODULUS);
                     },
                     ExprOp::LogicalOr => {
                         assert!(child_nodes.len() == 2);
@@ -146,9 +164,9 @@ impl EtHash for EtTree{
                         node_mut!(at et_node in self).hash = Some((h1&h2+10000) % ET_HASH_MODULUS);
                     },
                     ExprOp::LogicalNot => {
-                        assert!(child_nodes.len() == 2);
+                        assert!(child_nodes.len() == 1);
                         let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^10000) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash = Some(((h1-3243)^10000 + 128311) % ET_HASH_MODULUS);
                     },
                     ExprOp::BitwiseOr => {
                         assert!(child_nodes.len() == 2);
@@ -169,10 +187,10 @@ impl EtHash for EtTree{
                         node_mut!(at et_node in self).hash = Some((h1+h2+10000) % ET_HASH_MODULUS);
                     },
                     ExprOp::BitwiseNot => {
-                        assert!(child_nodes.len() == 2);
+                        assert!(child_nodes.len() == 1);
                         let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
                         let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1+h2+1) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash = Some((h1+h2+93910) % ET_HASH_MODULUS);
                     },
                     ExprOp::Eq => {
                         assert!(child_nodes.len() == 2);
@@ -229,41 +247,54 @@ impl EtHash for EtTree{
                         node_mut!(at et_node in self).hash = Some((h1^h2+9000) % ET_HASH_MODULUS);
                     },
                     ExprOp::Call => {
-                        assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
                         node_mut!(at et_node in self).hash = Some({
                             let rnd:isize = thread_rng().gen();rnd % ET_HASH_MODULUS
                         });
                     },
                     ExprOp::Negative => {
-                        assert!(child_nodes.len() == 2);
+                        assert!(child_nodes.len() == 1);
                         let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
                         node_mut!(at et_node in self).hash = Some((h1^11000) % ET_HASH_MODULUS);
                     },
                     ExprOp::Positive => {
-                        assert!(child_nodes.len() == 2);
+                        assert!(child_nodes.len() == 1);
                         let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
                         node_mut!(at et_node in self).hash = Some((h1^12000) % ET_HASH_MODULUS);
                     },
                     ExprOp::ArrayIndex => {
-                        assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^h2+100) % ET_HASH_MODULUS);
+                        // 2 situations 1. array decl in func parameter can be only one 
+                        match child_nodes.len(){
+                            1 => {
+                                let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                                node_mut!(at et_node in self).hash = Some((h1+100) % ET_HASH_MODULUS);
+                            }
+                            2 => {
+                                let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                                let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
+                                node_mut!(at et_node in self).hash = Some((h1^h2+100) % ET_HASH_MODULUS);
+                            }
+                            _ => {
+                                panic!()
+                            }
+                        }
                     },
                     ExprOp::ArrayWrapper => {
-                        assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
                         node_mut!(at et_node in self).hash = Some({
                             let rnd:isize = thread_rng().gen();
                             rnd % ET_HASH_MODULUS
                         });
                     },
-                    ExprOp::Cast => todo!(),
+                    ExprOp::Cast => {
+                        debug_info_red!("find cast? {}",et_node);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^283249) % ET_HASH_MODULUS);
+                    }
                     ExprOp::AddrOf => todo!(),
-                    ExprOp::Deref => todo!(),
+                    ExprOp::Deref => {
+                        debug_info_red!("find deref? {}",et_node);
+                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
+                        node_mut!(at et_node in self).hash = Some((h1^1823849) % ET_HASH_MODULUS);
+                    },
                     ExprOp::DotMember => todo!(),
                     ExprOp::ArrowMember => todo!(),
                     ExprOp::LPlusPlus => todo!(),
@@ -275,15 +306,16 @@ impl EtHash for EtTree{
                     }
                 }
             },
-            EtNodeType::Literal { const_sym_idx, ast_node, text } => {
+            EtNodeType::Literal { literal_symidx: const_sym_idx, ast_node, text } => {
                 let mut hasher = DefaultHasher::new();
-                text.hash(&mut hasher);
+                const_sym_idx.hash(&mut hasher);
                 let hash_val = hasher.finish() as isize;
                 node_mut!(at et_node in self).hash = Some(hash_val % ET_HASH_MODULUS);
             },
             EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => {
                 let mut hasher = DefaultHasher::new();
                 sym_idx.hash(&mut hasher);
+                decldef_def_or_use.hash(&mut hasher);
                 let hash_val = hasher.finish() as isize;
                 node_mut!(at et_node in self).hash = Some(hash_val % ET_HASH_MODULUS);
             },
@@ -294,7 +326,7 @@ impl EtHash for EtTree{
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone,EnumIs)]
 pub enum ExprOp {
     Mul,
     Add,
@@ -383,7 +415,7 @@ impl Debug for ExprOp {
 }
 impl From<EtNodeType> for EtNode{
     fn from(et_node_type: EtNodeType) -> Self {
-        Self { et_node_type, info: Fields::new(), hash: None }
+        Self { et_node_type, info: Fields::new(), hash: None, calculated_symidx: None, et_ret_symidx_vec: None ,common_eliminated:false}
     }
 }
 
@@ -408,7 +440,7 @@ impl EtNodeType {
     pub fn new_op_div_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::DivAssign, ast_node, text:String::new() ,op_symidx:None} }
     pub fn new_op_plus_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::PlusAssign, ast_node, text:String::new() ,op_symidx:None} }
     //你必须确保这个symbol 是一个 constant
-    pub fn new_constant(ast_node:u32, const_symidx:SymIdx) -> Self { EtNodeType::Literal { const_sym_idx:const_symidx, ast_node, text:String::new() } }
+    pub fn new_literal(ast_node:u32, const_symidx:SymIdx) -> Self { EtNodeType::Literal { literal_symidx:const_symidx, ast_node, text:String::new() } }
     pub fn new_symbol(ast_node:u32, sym_idx:SymIdx, def_or_use:DeclOrDefOrUse) -> Self { EtNodeType::Symbol { sym_idx, ast_node, text:String::new(), decldef_def_or_use:def_or_use } }
     // pub fn new_array_symbol(ast_node:u32,sym_idx:SymbolIndex ,def_or_use:Def_Or_Use)->Self{
     //     EtNakedNode::ArraySym  {sym_idx,ast_node,text:String::new(), def_or_use:def_or_use  }
@@ -437,14 +469,14 @@ impl EtNodeType {
     fn load_et_node_text(&mut self) {
         let _et_node = match self {
             EtNodeType::Operator { op: _, ast_node, text: _, op_symidx } => ast_node,
-            EtNodeType::Literal { const_sym_idx: _, ast_node, text: _, } => ast_node,
+            EtNodeType::Literal { literal_symidx: _, ast_node, text: _, } => ast_node,
             EtNodeType::Symbol { sym_idx: _, ast_node, text: _, decldef_def_or_use: _ } => ast_node,
             // EtNakedNode::ArraySym { sym_idx, ast_node, text ,def_or_use} => ast_node,
             EtNodeType::Separator { ast_node, text: _ } => ast_node,
         };
         let new_str = match self {
             EtNodeType::Operator { op: _, ast_node: _, text, op_symidx } => text.clone(),
-            EtNodeType::Literal { const_sym_idx: _, ast_node: _, text, } => text.clone(),
+            EtNodeType::Literal { literal_symidx: _, ast_node: _, text, } => text.clone(),
             EtNodeType::Symbol { sym_idx: _, ast_node: _, text, decldef_def_or_use: _ } => text.clone(),
             // EtNakedNode::ArraySym { sym_idx, ast_node, text,def_or_use } => text.clone(),
             EtNodeType::Separator { ast_node: _, text } => text.clone(),
@@ -452,7 +484,7 @@ impl EtNodeType {
         let _ = mem::replace(
             match self {
                 EtNodeType::Operator { op: _, ast_node: _, text, op_symidx } => text,
-                EtNodeType::Literal { const_sym_idx: _, ast_node: _, text, } => text,
+                EtNodeType::Literal { literal_symidx: _, ast_node: _, text, } => text,
                 EtNodeType::Symbol { sym_idx: _, ast_node: _, text, decldef_def_or_use: _ } => text,
                 // EtNakedNode::ArraySym { sym_idx, ast_node, text,def_or_use } => text,
                 EtNodeType::Separator { ast_node: _, text } => text,
@@ -477,7 +509,7 @@ impl Debug for EtNodeType {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             EtNodeType::Operator { op, ast_node: _, text: _, op_symidx } => write!(f, "{:?}", op),
-            EtNodeType::Literal { const_sym_idx, ast_node: _, text: _, } => {
+            EtNodeType::Literal { literal_symidx: const_sym_idx, ast_node: _, text: _, } => {
                 write!(f, "literal {}", const_sym_idx.symbol_name)
             }
             EtNodeType::Symbol { sym_idx, ast_node: _, text, decldef_def_or_use: def_or_use } => {
@@ -506,7 +538,7 @@ impl Debug for DeclOrDefOrUse {
 }
 
 impl Debug for EtNode {
-    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{:?} {:?}", self.et_node_type, self.info) }
+    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{:?} {:?} hash:{:?} {}", self.et_node_type, self.info, self.hash, if self.common_eliminated{"eliminated"}else{""}) }
 }
 
 impl EtNode {
@@ -514,7 +546,7 @@ impl EtNode {
     pub fn name_text(&self) -> String{
         match &self.et_node_type{
             EtNodeType::Operator { op, ast_node, text, op_symidx } => todo!(),
-            EtNodeType::Literal { const_sym_idx, ast_node, text } => {
+            EtNodeType::Literal { literal_symidx: const_sym_idx, ast_node, text } => {
                 const_sym_idx.symbol_name.clone()
             },
             EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => {

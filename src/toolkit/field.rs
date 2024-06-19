@@ -530,9 +530,6 @@ impl Type {
     }
 
     pub fn pop_dim(&mut self)->Result<()>{
-        if self.is_ptr_64(){
-            *self = self.ptr2arr()?
-        };
         match self{
             Type::Array { dims, ele_ty: ty } => {
                 if dims.len()>1{
@@ -543,7 +540,11 @@ impl Type {
                 }
             },
             Type::Ptr64 { ty } => {
-                ty.pop_dim()?;
+                if ty.is_array(){
+                    ty.pop_dim()?;
+                }else {
+                    *self = *ty.clone()
+                }
             },
             _ => {return Err(anyhow!("{:?} 无法 pop_dim ",self))}
         }

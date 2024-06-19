@@ -1,4 +1,4 @@
-use crate::{add_symbol, debug_info_red, direct_child_nodes, node, node_mut, toolkit::{cfg_node::{CfgGraph, CFG_ROOT}, context::NhwcCtx, mem_layout::{self, MemLayout}, pass_manager::Pass, scope_node::ST_ROOT, symbol::Symbol, symtab::{SymIdx, SymTab}}};
+use crate::{add_symbol, debug_info_red, direct_child_nodes, node, node_mut, toolkit::{cfg_node::{CfgGraph, CFG_ROOT}, context::NhwcCtx, mem_layout::{self, MemLayout}, nhwc_instr::{InstrSlab, NhwcInstr}, pass_manager::Pass, scope_node::ST_ROOT, symbol::Symbol, symtab::{SymIdx, SymTab}}};
 use anyhow::*;
 use crate::toolkit::field::Type;
 use lazy_static::lazy_static;
@@ -31,40 +31,49 @@ impl Pass for MemAllocPass {
         let cfg_entries = direct_child_nodes!(at CFG_ROOT in cfg_graph);
         for &cfg_entry in &cfg_entries{
             debug_info_red!("alloc started {}",cfg_entry);
-            let s0_symidx = add_symbol!({
-                let mut s0_for_cfg_entry = S0.clone();
-                s0_for_cfg_entry.symbol_name = format!("{}_{}",s0_for_cfg_entry.symbol_name,node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?.symbol_name);
-                Symbol::new_from_symidx(&s0_for_cfg_entry)
-            }
-                with_field TYPE:{Type::Ptr64 { ty: Box::new(Type::Void) }}
-                with_field IS_LITERAL:{false}
-                with_field IS_GLOBAL:{false}
-                to symtab
-            );
-            let ra_symidx = add_symbol!({
-                let mut ra_for_cfg_entry = RA.clone();
-                ra_for_cfg_entry.symbol_name = format!("{}_{}",ra_for_cfg_entry.symbol_name,node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?.symbol_name);
-                Symbol::new_from_symidx(&ra_for_cfg_entry)
-            }
-                with_field TYPE:{Type::Ptr64 { ty: Box::new(Type::Void) }}
-                with_field IS_LITERAL:{false}
-                with_field IS_GLOBAL:{false}
-                to symtab
-            );
-            // tell func symbol its ra_symidx & s0_symidx
-            symtab.get_mut(node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?)?.add_func_cor_ra_symidx(ra_symidx.clone());
-            symtab.get_mut(node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?)?.add_func_cor_s0_symidx(s0_symidx.clone());
 
+            let (ra_symidx,s0_symidx) = add_ra_s0_of_func_to_symtab(cfg_entry, cfg_graph, instr_slab, symtab)?;
+            let func_def_instr = get_func_instr_of_cfg_entry(cfg_entry, cfg_graph);
+            let arg_symidx_vec = get_arg_symidx_vec_of_func_define_instr(func_def_instr, instr_slab)?;
+            let (reg_args,overflowed_args) = {
+                let mut gpr_cnt = 0 ; let mut fpu_cnt = 0 ;
+                let mut reg_args = vec![]; let mut overflowed_args = vec![];
+                for symidx in &arg_symidx_vec{
+                    if symtab.get(symidx)?.get_type()?.is_f_32(){
+                        if fpu_cnt >= 8{
+                            overflowed_args.push(symidx);
+                        }else{
+                            reg_args.push(symidx)
+                        }
+                        fpu_cnt +=1;
+                    }else {
+                        if gpr_cnt >= 8{
+                            overflowed_args.push(symidx);
+                        }else{
+                            reg_args.push(symidx)
+                        }
+                        gpr_cnt +=1;
+                    }
+                }
+                (reg_args,overflowed_args)
+            };
+            
             node_mut!(at cfg_entry in cfg_graph).add_mem_layout(MemLayout::new());
+            for arg in overflowed_args{
+                alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &arg.to_src_symidx())?;
+            }
             alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &ra_symidx)?;
             alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &s0_symidx)?;
+            for arg in reg_args{
+                alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &arg.to_src_symidx())?;
+            }
             for &instr in node!(at cfg_entry in cfg_graph).instrs.clone().iter(){
                 match &instr!(at instr in instr_slab)?.instr_type{
                     crate::toolkit::nhwc_instr::NhwcInstrType::DefineFunc { func_symidx: _, ret_symidx: _, args } => {
                         for arg in args{
-                            alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &arg.to_src_symidx())?;
+                            
                         }
-                    },
+                    }
                     crate::toolkit::nhwc_instr::NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
                         alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &var_symidx.to_src_symidx())?;
                     },
@@ -122,4 +131,47 @@ pub fn alloc_stack_mem_for_cfg_entry(cfg_graph:&mut CfgGraph,cfg_entry:u32,symta
     let mem_offset = cfg_node_struct.get_mut_mem_layout()?.insert_data(sym_type.get_align()?,sym_type.get_mem_len()?,symidx) as isize;
     symbol_struct.add_mem_offset2s0(mem_offset);
     Ok(())
+}
+
+pub fn get_func_instr_of_cfg_entry(cfg_entry:u32,cfg_graph:&CfgGraph) -> usize{
+    assert!(node!(at cfg_entry in cfg_graph).cfg_node_type.is_entry());
+    node!(at cfg_entry in cfg_graph).instrs[0]
+}
+pub fn get_arg_symidx_vec_of_func_define_instr(func_def_instr:usize, instr_slab:&InstrSlab<NhwcInstr>)-> Result<Vec<SymIdx>>{
+    let instr_struct = instr!(at func_def_instr in instr_slab)?;
+    match &instr_struct.instr_type{
+        crate::toolkit::nhwc_instr::NhwcInstrType::DefineFunc { func_symidx, ret_symidx, args } => {
+            Ok(args.clone())
+        },
+        _ => {
+            return Err(anyhow!("you can't read args from {:?}",instr_struct))
+        }
+    }
+
+}
+pub fn add_ra_s0_of_func_to_symtab(cfg_entry:u32,cfg_graph:&CfgGraph,instr_slab:&InstrSlab<NhwcInstr>, symtab:&mut SymTab) -> Result<(SymIdx,SymIdx)>{
+    let s0_symidx = add_symbol!({
+        let mut s0_for_cfg_entry = S0.clone();
+        s0_for_cfg_entry.symbol_name = format!("{}_{}",s0_for_cfg_entry.symbol_name,node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?.symbol_name);
+        Symbol::new_from_symidx(&s0_for_cfg_entry)
+    }
+        with_field TYPE:{Type::Ptr64 { ty: Box::new(Type::Void) }}
+        with_field IS_LITERAL:{false}
+        with_field IS_GLOBAL:{false}
+        to symtab
+    );
+    let ra_symidx = add_symbol!({
+        let mut ra_for_cfg_entry = RA.clone();
+        ra_for_cfg_entry.symbol_name = format!("{}_{}",ra_for_cfg_entry.symbol_name,node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?.symbol_name);
+        Symbol::new_from_symidx(&ra_for_cfg_entry)
+    }
+        with_field TYPE:{Type::Ptr64 { ty: Box::new(Type::Void) }}
+        with_field IS_LITERAL:{false}
+        with_field IS_GLOBAL:{false}
+        to symtab
+    );
+    // tell func symbol its ra_symidx & s0_symidx
+    symtab.get_mut(node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?)?.add_func_cor_ra_symidx(ra_symidx.clone());
+    symtab.get_mut(node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?)?.add_func_cor_s0_symidx(s0_symidx.clone());
+    Ok((ra_symidx,s0_symidx))
 }

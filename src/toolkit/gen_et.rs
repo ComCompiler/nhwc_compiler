@@ -710,7 +710,7 @@ fn process_constant(et_tree:&mut EtTree, ast_tree:&AstTree, _scope_tree:&ScopeTr
 
     let const_symidx = SymIdx::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
-    add_node_with_edge!({EtNodeType::new_constant(const_node, const_symidx).into()} with_edge {EtEdgeType::Direct.into()} from parent_et_node in et_tree);
+    add_node_with_edge!({EtNodeType::new_literal(const_node, const_symidx).into()} with_edge {EtEdgeType::Direct.into()} from parent_et_node in et_tree);
 }
 
 // fn symbol_def_use_order_check(et_tree:&mut EtTree)->u32{
