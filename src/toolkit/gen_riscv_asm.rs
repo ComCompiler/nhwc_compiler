@@ -180,12 +180,11 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         // default_store,|symidx,temp_reg,symtab,asm_sect,regtab|{
                         add_literal_to_reg(asm_sect, Register::SP, Register::SP, regtab,symtab,-(stack_size as isize))?;
                         // })?;
-                        add_literal_to_reg(asm_sect, Register::new_s0(),  Register::SP,regtab, symtab,stack_size as isize)?;
-
                         let ra_symidx= symtab.get(func_symidx)?.get_func_cor_ra_symidx()?.clone();
                         let s0_symidx = symtab.get(func_symidx)?.get_func_cor_s0_symidx()?.clone();
                         _store_sym(asm_sect, &ra_symidx, Register::RA, symtab)?;
                         _store_sym(asm_sect, &s0_symidx, Register::new_s0(), symtab)?;
+                        add_literal_to_reg(asm_sect, Register::new_s0(),  Register::SP,regtab, symtab,stack_size as isize)?;
 
                         
                     },
@@ -547,6 +546,9 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 }
                             }
                         }   
+                        if fpu_args.len() > 8{
+                            
+                        }
                         for (idx,arg) in fpu_args.iter().enumerate(){
                             if REG_FS_RANGE.contains(&(idx as u8)){
                                 let reg =Register::new_fa(idx as u8);
@@ -813,12 +815,18 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                         asm_sect.asm(PseudoInstr::new_fmv_s(reg, temp_reg.clone()).into());
                         Ok(())
                     },
-                    _ => {
-                        // i32 ...
+                    Type::I32 => {
+                        // i32 ... since riscv li instr has ensured the bitwidth will be ext from 32 to 64 
+                        // no need sext.w
                         assert!(!reg.is_fpu());
                         asm_sect.asm(PseudoInstr::new_li(reg, Imm::new_literal(symidx.clone())).into());
                         Ok(())
                     }
+                    _ => {
+                        assert!(!reg.is_fpu());
+                        asm_sect.asm(PseudoInstr::new_li(reg, Imm::new_literal(symidx.clone())).into());
+                        Ok(())
+                    },
                 }
             },
             false => {
@@ -847,6 +855,26 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                         }
                         Ok(())
                     },
+                    Type::I32 => {
+                        // you should ext it by sext.w
+                        assert!(!reg.is_fpu());
+                        if let Some(reg_in_regtab) = symtab.reg_of_symidx(symidx)?{
+                            asm_sect.asm(PseudoInstr::new_reg_mv(reg, reg_in_regtab, ty).into());
+                            return Ok(())
+                        }
+                        if symidx_offset2sp.is_legal_offset(){
+                            asm_sect.asm(Loads::new(size,reg.clone(), Register::SP, symidx_offset2sp, false)?.into());
+                        }else{
+                            let temp_reg = regtab.find_and_occupy_reg(symidx, &Type::I32, symtab, asm_sect, default_store, |symidx,temp_reg,symtab,asm_sect,regtab|{
+                                asm_sect.asm(PseudoInstr::new_li(temp_reg.clone(), Imm::new_literal_isize(symidx_offset2sp)).into());
+                                Ok(())
+                            })?;
+                            asm_sect.asm(Arithmetic::new_add(temp_reg.clone(), Register::SP,temp_reg.clone()).into());
+                            asm_sect.asm(Loads::new(size, reg.clone(), temp_reg.clone(), 0, false)?.into());
+                            regtab.free_reg(temp_reg)?;
+                        }
+                        Ok(())
+                    }
                     _ => {
                         assert!(!reg.is_fpu());
                         if let Some(reg_in_regtab) = symtab.reg_of_symidx(symidx)?{
