@@ -21,40 +21,37 @@
     .globl func
     .type func,@function
 func:
-    addi    sp,sp,-48
-    sd      ra,40(sp)
-    sd      s0,24(sp)
-    addi    s0,sp,48
+    addi    sp,sp,-24
+    sd      ra,16(sp)
+    sd      s0,8(sp)
+    addi    s0,sp,24
 .L1_0:
     li      a1, 1
     sub     a2,a0,a1
-    ld      ra,40(sp)
-    ld      s0,24(sp)
-    mv      a0, a0
-    addi    sp,sp,48
+    ld      ra,16(sp)
+    ld      s0,8(sp)
+    addi    sp,sp,24
     ret
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-56
-    sd      ra,48(sp)
-    sd      s0,32(sp)
-    addi    s0,sp,56
+    addi    sp,sp,-32
+    sd      ra,24(sp)
+    sd      s0,16(sp)
+    addi    s0,sp,32
 .L0_0:
-    la      a3, a
-    li      a4, 10
-    sd      a4,0(a3)
-    la      a5, a
-    lw      a6,0(a5)
-    sw      a0,16(sp)
-    mv      a0, a0
+    la      a0, a
+    li      a1, 10
+    sd      a1,0(a0)
+    la      a2, a
+    lw      a3,0(a2)
     call    func
-    sw      a0,8(sp)
-    mv      a7, a0
-    ld      ra,48(sp)
-    ld      s0,32(sp)
-    mv      a0, a7
-    addi    sp,sp,56
+    sw      a0,4(sp)
+    mv      a4, a0
+    ld      ra,24(sp)
+    ld      s0,16(sp)
+    mv      a0, a4
+    addi    sp,sp,32
     ret
 .section        .data
     .align 4

@@ -21,86 +21,75 @@
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-184
-    sd      ra,176(sp)
-    sd      s0,160(sp)
-    addi    s0,sp,184
+    addi    sp,sp,-112
+    sd      ra,104(sp)
+    sd      s0,96(sp)
+    addi    s0,sp,112
 .L0_0:
     call    getint
-    sw      a0,152(sp)
+    sw      a0,92(sp)
     la      a1, a
     sd      a0,0(a1)
     call    getint
-    sw      a0,152(sp)
-    sw      a0,144(sp)
+    sw      a0,92(sp)
+    sw      a0,88(sp)
     la      a2, b
     sd      a0,0(a2)
     call    getint
-    sw      a0,144(sp)
-    sw      a0,136(sp)
+    sw      a0,88(sp)
+    sw      a0,84(sp)
     la      a3, c
     sd      a0,0(a3)
     call    getint
-    sw      a0,136(sp)
-    sw      a0,128(sp)
+    sw      a0,84(sp)
+    sw      a0,80(sp)
     la      a4, d
     sd      a0,0(a4)
     call    getint
-    sw      a0,128(sp)
-    sw      a0,120(sp)
+    sw      a0,80(sp)
+    sw      a0,76(sp)
     la      a5, e
     sd      a0,0(a5)
     li      a6, 0
-    mv      a7, a6
     j       .L1_0
 .L1_0:
-    la      s1, d
-    lw      s2,0(s1)
-    la      s3, e
-    lw      s4,0(s3)
-    mv      s5, s5
-    mv      s6, s6
-    add     s7,s5,s6
-    la      s8, a
-    lw      s9,0(s8)
-    la      s10, c
-    lw      s11,0(s10)
-    la      a1, b
-    lw      a2,0(a1)
-    mv      a1, a1
-    mv      a2, a2
+    la      a7, d
+    lw      s1,0(a7)
+    la      s2, e
+    lw      s3,0(s2)
+    add     s6,s4,s5
+    la      s7, a
+    lw      s8,0(s7)
+    la      s9, c
+    lw      s10,0(s9)
+    la      s11, b
+    lw      a1,0(s11)
     add     a3,a1,a2
-    mv      a4, a4
     add     a5,a3,a4
-    xor     a6,a5,s7
-    sltiu   a6,a6,1
+    xor     a7,a5,s6
+    seqz    a7, a7
     mul     s1,a4,a1
     div     s2,s1,a2
-    xor     s3,s2,s7
-    sltiu   s3,s3,1
-    div     s4,a4,a2
-    sub     s8,s6,s4
+    xor     s3,s2,s6
+    seqz    s3, s3
+    div     s7,a4,a2
+    sub     s8,s5,s7
     mul     s9,a1,a2
     sub     s10,a4,s9
     xor     s11,s10,s8
-    sltiu   s11,s11,1
-    xori    s11,s11,1
-    sw      a0,120(sp)
-    mv      a0, a0
-    sb      a0,34(sp)
-    mv      a0, a0
+    snez    s11, s11
+    sw      a0,76(sp)
+    sb      a0,26(sp)
     bnez    a0, .branch_true_30
     j       .branch_false_30
 .branch_true_30:
-    sb      a0,2(sp)
-    li      a0, 1
     j       .branch_false_30
 .branch_false_30:
 .L2_0:
-    ld      ra,176(sp)
-    ld      s0,160(sp)
-    mv      a0, a7
-    addi    sp,sp,184
+    ld      ra,104(sp)
+    ld      s0,96(sp)
+    mv      a0, a6
+    addi    sp,sp,112
     ret
 .section        .data
     .align 4

@@ -21,29 +21,29 @@
     .globl defn
     .type defn,@function
 defn:
-    addi    sp,sp,-32
-    sd      ra,24(sp)
-    sd      s0,8(sp)
-    addi    s0,sp,32
+    addi    sp,sp,-16
+    sd      ra,8(sp)
+    sd      s0,0(sp)
+    addi    s0,sp,16
 .L1_0:
-    ld      ra,24(sp)
-    ld      s0,8(sp)
+    ld      ra,8(sp)
+    ld      s0,0(sp)
     li      a0, 4
-    addi    sp,sp,32
+    addi    sp,sp,16
     ret
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-48
-    sd      ra,40(sp)
-    sd      s0,24(sp)
-    addi    s0,sp,48
+    addi    sp,sp,-24
+    sd      ra,16(sp)
+    sd      s0,8(sp)
+    addi    s0,sp,24
 .L0_0:
     call    defn
-    sw      a0,16(sp)
+    sw      a0,4(sp)
     mv      a1, a0
-    ld      ra,40(sp)
-    ld      s0,24(sp)
+    ld      ra,16(sp)
+    ld      s0,8(sp)
     mv      a0, a1
-    addi    sp,sp,48
+    addi    sp,sp,24
     ret

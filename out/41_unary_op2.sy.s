@@ -21,53 +21,44 @@
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-72
-    sd      ra,64(sp)
-    sd      s0,48(sp)
-    addi    s0,sp,72
+    addi    sp,sp,-48
+    sd      ra,40(sp)
+    sd      s0,32(sp)
+    addi    s0,sp,48
 .L0_0:
     li      a0, 070
-    mv      a1, a0
-    li      a2, 0x4
-    mv      a3, a2
-    li      a4, -4
-    add     a5,a3,a4
-    sub     a6,a1,a5
+    li      a1, 0x4
+    li      a2, -4
+    add     a3,a1,a2
+    sub     a4,a0,a3
     j       .L1_0
 .L1_0:
-    li      a7, 0
-    xor     s1,a1,a7
-    sltiu   s1,s1,1
-    xori    s1,s1,1
+    li      a5, 0
+    xor     a6,a0,a5
+    snez    a6, a6
+    xori    a7,a6,-1
     xori    s2,s1,-1
-    mv      s3, s3
     xori    s4,s3,-1
-    mv      s5, s5
-    xori    s6,s5,-1
-    sub     s7,a7,s6
-    bnez    s7, .branch_true_23
+    sub     s5,a5,s4
+    bnez    s5, .branch_true_23
     j       .branch_false_23
 .branch_true_23:
-    li      s8, -1
     j       .L2_0
 .branch_false_23:
-    add     s9,a7,a3
+    add     s6,a5,a1
     j       .L2_0
 .L2_0:
 .L3_0:
-    sb      s1,15(sp)
-    sb      s2,14(sp)
-    sb      s3,13(sp)
-    sb      s4,12(sp)
-    sb      s5,11(sp)
-    sb      s6,10(sp)
-    sb      s7,9(sp)
-    sw      s9,4(sp)
-    sw      a1,40(sp)
-    mv      a0, a0
+    sb      s1,13(sp)
+    sb      s2,12(sp)
+    sb      s3,11(sp)
+    sb      s4,10(sp)
+    sb      s5,9(sp)
+    sw      s6,4(sp)
+    sw      a0,28(sp)
     call    putint
-    ld      ra,64(sp)
-    ld      s0,48(sp)
+    ld      ra,40(sp)
+    ld      s0,32(sp)
     li      a0, 0
-    addi    sp,sp,72
+    addi    sp,sp,48
     ret

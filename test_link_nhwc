@@ -17,7 +17,9 @@ if [ $# -eq 0 ]; then
             # 执行编译命令，输出到同一目录
             riscv64-linux-gnu-as "$filename" -o "./out/${base_name}.o" 
             riscv64-linux-gnu-gcc --static "./out/${base_name}.o" -lsysy -L./compiler2022/公开样例与运行时库 -o "./out/${base_name}.elf" -lc
-            qemu-riscv64-static "./out/${base_name}.elf"
+            riscv64-linux-gnu-objcopy -O binary "./out/${base_name}.elf" "./out/${base_name}.bin"
+            xxd -p -c 4 "./out/${base_name}.bin" "./out/${base_name}.hex"
+            # qemu-riscv64-static "./out/${base_name}.elf"
         fi
     done
 else
@@ -32,6 +34,8 @@ else
             # 执行编译命令，输出到同一目录
             riscv64-linux-gnu-as "$filename" -o "./out/${base_name}.o" # > ./out/${base_name}.out
             riscv64-linux-gnu-gcc --static "./out/${base_name}.o" -lsysy -L./compiler2022/公开样例与运行时库 -o "./out/${base_name}.elf" -lc
+            riscv64-linux-gnu-objcopy -O binary "./out/${base_name}.elf" "./out/${base_name}.bin"
+            xxd -p -c 4 "./out/${base_name}.bin" "./out/${base_name}.hex"
             qemu-riscv64-static "./out/${base_name}.elf"
         fi
     done

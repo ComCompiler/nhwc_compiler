@@ -21,14 +21,13 @@
     .globl inc_a
     .type inc_a,@function
 inc_a:
-    addi    sp,sp,-64
-    sd      ra,56(sp)
-    sd      s0,40(sp)
-    addi    s0,sp,64
+    addi    sp,sp,-32
+    sd      ra,24(sp)
+    sd      s0,16(sp)
+    addi    s0,sp,32
 .L4_0:
     la      a0, a
     lw      a1,0(a0)
-    mv      a2, a2
     mv      a3, a2
     li      a4, 1
     add     a5,a3,a4
@@ -36,72 +35,55 @@ inc_a:
     sd      a3,0(a6)
     la      a7, a
     lw      s1,0(a7)
-    ld      ra,56(sp)
-    ld      s0,40(sp)
-    lw      a0,8(sp)
-    addi    sp,sp,64
+    ld      ra,24(sp)
+    ld      s0,16(sp)
+    lw      a0,0(sp)
+    addi    sp,sp,32
     ret
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-184
-    sd      ra,176(sp)
-    sd      s0,160(sp)
-    addi    s0,sp,184
+    addi    sp,sp,-120
+    sd      ra,112(sp)
+    sd      s0,104(sp)
+    addi    s0,sp,120
 .L0_0:
-    li      s2, 5
-    mv      s3, s2
+    li      a0, 5
     j       .while.head_27
 .while.head_27:
-    li      s4, 0
-    slt     s5,s4,s3
-    xori    s5,s5,1
-    bnez    s5, .while.body_27
+    li      a1, 0
+    slt     a2,a0,a1
+    xori    a2,a2,1
+    bnez    a2, .while.body_27
     j       .while.exit_27
 .while.body_27:
-    sw      s3,152(sp)
-    sb      s5,151(sp)
     call    inc_a
-    sw      a0,144(sp)
+    sw      a0,100(sp)
+    sw      a0,92(sp)
     call    inc_a
-    sw      a0,144(sp)
-    sw      a0,140(sp)
-    li      s1, 0
-    xor     s2,a0,s1
-    sltiu   s2,s2,1
-    xori    s2,s2,1
-    mv      s3, s3
-    mv      s4, s4
-    and     s5,s2,s4
-    sb      s2,139(sp)
-    sw      s3,144(sp)
-    sb      s4,138(sp)
-    sb      s5,137(sp)
+    sw      a0,92(sp)
+    sw      a0,88(sp)
+    xor     a3,a0,a1
+    snez    a3, a3
+    and     a6,a3,a5
     call    inc_a
-    sw      a0,140(sp)
-    sw      a0,133(sp)
-    li      s1, 0
-    xor     s2,a0,s1
-    sltiu   s2,s2,1
-    xori    s2,s2,1
-    mv      s3, s3
-    and     s4,s2,s3
-    bnez    s4, .branch_true_30
+    sw      a0,88(sp)
+    sw      a0,80(sp)
+    xor     a7,a0,a1
+    snez    a7, a7
+    and     s1,a7,a6
+    bnez    s1, .branch_true_30
     j       .branch_false_30
 .branch_true_30:
-    la      s5, a
-    lw      s6,0(s5)
-    sb      s2,132(sp)
-    sb      s3,137(sp)
-    sb      s4,131(sp)
-    sw      a0,133(sp)
-    mv      a0, a0
+    la      s2, a
+    lw      s3,0(s2)
+    sb      s1,78(sp)
+    sw      a0,80(sp)
     call    putint
     li      a0, 32
     call    putch
     la      a0, b
     lw      s1,0(a0)
-    mv      a0, a0
     call    putint
     li      a0, 10
     call    putch
@@ -109,91 +91,81 @@ main:
 .branch_false_30:
 .L1_0:
     call    inc_a
-    sw      a0,108(sp)
-    add     s1,a0,a4
-    sw      s1,100(sp)
+    sw      a0,64(sp)
+    li      s1, 1
+    add     s2,a0,s1
+    sw      s2,60(sp)
     call    inc_a
-    sw      a0,108(sp)
-    sw      a0,92(sp)
-    mv      s1, s1
+    sw      a0,64(sp)
+    sw      a0,56(sp)
     sub     s2,a0,s1
-    sw      s1,100(sp)
-    sw      s2,84(sp)
+    sw      s1,60(sp)
+    sw      s2,52(sp)
     call    inc_a
-    sw      a0,92(sp)
-    sw      a0,76(sp)
-    li      s1, 0
-    xor     s2,a0,s1
-    sltiu   s2,s2,1
-    xori    s2,s2,1
-    mv      s3, s3
-    mv      s4, s4
-    and     s5,s2,s4
-    sb      s2,75(sp)
-    sw      s3,84(sp)
-    sb      s4,74(sp)
-    sb      s5,73(sp)
+    sw      a0,56(sp)
+    sw      a0,48(sp)
+    xor     s1,a0,a1
+    snez    s1, s1
+    and     s4,s1,s3
+    sb      s1,47(sp)
+    sw      s2,52(sp)
+    sb      s3,46(sp)
+    sb      s4,45(sp)
     call    inc_a
-    sw      a0,76(sp)
-    sw      a0,69(sp)
+    sw      a0,48(sp)
+    sw      a0,40(sp)
     li      s1, 14
     slt     s2,a0,s1
-    mv      s3, s3
-    mv      s4, s4
     bnez    s4, .branch_true_37
     j       .branch_false_37
 .branch_true_37:
     la      s5, a
     lw      s6,0(s5)
-    sb      s2,68(sp)
-    sb      s3,73(sp)
-    sb      s4,67(sp)
-    sw      a0,69(sp)
-    mv      a0, a0
+    sb      s2,39(sp)
+    sb      s3,45(sp)
+    sb      s4,38(sp)
+    sw      a0,40(sp)
     call    putint
     li      a0, 10
     call    putch
     la      a0, b
     lw      s1,0(a0)
-    mv      s2, s2
     li      s3, 2
     mul     s4,s2,s3
     la      s5, b
     sd      s4,0(s5)
     j       .L2_0
 .branch_false_37:
-    sw      s2,52(sp)
-    sw      s4,44(sp)
+    sw      s2,28(sp)
+    sw      s4,24(sp)
     call    inc_a
-    sw      a0,28(sp)
+    sw      a0,16(sp)
     j       .L2_0
 .L2_0:
 .L3_0:
-    mv      s1, s1
-    sub     s2,s1,a4
+    li      s2, 1
+    sub     s3,s1,s2
     j       .while.head_27
 .while.exit_27:
-    la      s3, a
-    lw      s4,0(s3)
-    sw      s1,152(sp)
-    sw      s2,36(sp)
-    sw      a0,28(sp)
-    mv      a0, a0
+    la      s4, a
+    lw      s5,0(s4)
+    sw      s1,100(sp)
+    sw      s3,20(sp)
+    sw      a0,16(sp)
     call    putint
     li      a0, 32
     call    putch
     la      a0, b
     lw      s1,0(a0)
-    mv      a0, a0
     call    putint
     li      a0, 10
     call    putch
     la      a0, a
     lw      s1,0(a0)
-    ld      ra,176(sp)
-    ld      s0,160(sp)
+    ld      ra,112(sp)
+    ld      s0,104(sp)
     lw      a0,4(sp)
-    addi    sp,sp,184
+    addi    sp,sp,120
     ret
 .section        .data
     .align 4

@@ -21,10 +21,10 @@
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-80
-    sd      ra,72(sp)
-    sd      s0,56(sp)
-    addi    s0,sp,80
+    addi    sp,sp,-56
+    sd      ra,48(sp)
+    sd      s0,40(sp)
+    addi    s0,sp,56
 .L0_0:
     la      a0, a
     lw      a1,0(a0)
@@ -36,10 +36,10 @@ main:
     slli a2,a2,2
     add     a2,a2,sp
     add     a2,a2,a2
-    ld      ra,72(sp)
-    ld      s0,56(sp)
-    lw      a0,8(sp)
-    addi    sp,sp,80
+    ld      ra,48(sp)
+    ld      s0,40(sp)
+    lw      a0,4(sp)
+    addi    sp,sp,56
     ret
 .section        .data
     .align 4

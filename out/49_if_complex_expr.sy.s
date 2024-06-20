@@ -21,97 +21,82 @@
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-136
-    sd      ra,128(sp)
-    sd      s0,112(sp)
-    addi    s0,sp,136
+    addi    sp,sp,-96
+    sd      ra,88(sp)
+    sd      s0,80(sp)
+    addi    s0,sp,96
 .L0_0:
     li      a0, 5
-    mv      a1, a0
-    mv      a2, a0
-    li      a3, 1
-    mv      a4, a3
-    li      a5, -2
-    mv      a6, a5
-    li      a7, 2
-    mv      s1, a7
+    li      a1, 5
+    li      a2, 1
+    li      a3, -2
+    li      a4, 2
     j       .L1_0
 .L1_0:
-    li      s2, 3
-    add     s3,a4,s2
-    mv      s4, s4
-    rem     s4,s3,a7
-    li      s5, 0
-    xor     s6,s4,s5
-    sltiu   s6,s6,1
-    xori    s6,s6,1
-    sub     s7,a1,a2
-    xor     s8,s7,s5
-    sltiu   s8,s8,1
-    xori    s8,s8,1
-    and     s9,s8,s6
-    div     s10,a7,a6
-    slt     s11,s10,s5
-    mv      a0, a0
-    bnez    a0, .branch_true_29
+    li      a5, 3
+    add     a6,a2,a5
+    li      a7, 2
+    rem     s1,a6,a7
+    li      s2, 0
+    xor     s3,s1,s2
+    snez    s3, s3
+    sub     s4,a0,a1
+    xor     s5,s4,s2
+    snez    s5, s5
+    and     s6,s5,s3
+    div     s7,a7,a3
+    slt     s8,s7,s2
+    bnez    s9, .branch_true_29
     j       .branch_false_29
 .branch_true_29:
-    sw      s1,72(sp)
-    sw      s3,64(sp)
-    sw      s4,56(sp)
-    sb      s6,55(sp)
-    sw      s7,48(sp)
-    sb      s8,47(sp)
-    sb      s9,46(sp)
-    sw      s10,40(sp)
-    sb      s11,39(sp)
-    sb      a0,38(sp)
-    mv      a0, a0
+    sw      s1,52(sp)
+    sb      s3,51(sp)
+    sw      s4,44(sp)
+    sb      s5,43(sp)
+    sb      s6,42(sp)
+    sw      s7,36(sp)
+    sb      s8,35(sp)
+    sb      s9,34(sp)
+    sw      a4,60(sp)
+    sw      a0,76(sp)
     call    putint
     j       .branch_false_29
 .branch_false_29:
 .L2_0:
-    add     a0,a4,a7
-    mv      s1, s1
-    rem     s1,a0,a7
-    li      s2, 0
-    xor     s3,s1,s2
-    sltiu   s3,s3,1
-    xori    s3,s3,1
-    sub     s4,a1,a2
-    xor     s5,s4,s2
-    sltiu   s5,s5,1
-    xori    s5,s5,1
-    and     s6,s5,s3
-    mv      s7, s7
-    rem     s7,a6,a7
+    add     a0,a2,a7
+    rem     a4,a0,a7
+    li      s1, 0
+    xor     s2,a4,s1
+    snez    s2, s2
+    sub     s4,s3,a1
+    xor     s5,s4,s1
+    snez    s5, s5
+    and     s6,s5,s2
+    rem     s7,a3,a7
     li      s8, 67
     add     s9,s7,s8
-    slt     s10,s9,s2
-    mv      s11, s11
+    slt     s10,s9,s1
     bnez    s11, .branch_true_33
     j       .branch_false_33
 .branch_true_33:
-    li      a3, 4
-    mv      a5, a3
-    sw      s1,28(sp)
-    sb      s3,27(sp)
-    sw      s4,20(sp)
-    sb      s5,19(sp)
-    sb      s6,18(sp)
-    sw      s7,12(sp)
-    sw      s9,8(sp)
-    sb      s10,7(sp)
-    sb      s11,6(sp)
-    sw      a5,72(sp)
-    sw      a0,32(sp)
-    mv      a0, a0
+    li      a5, 4
+    sb      s2,23(sp)
+    sw      s3,76(sp)
+    sw      s4,16(sp)
+    sb      s5,15(sp)
+    sb      s6,14(sp)
+    sw      s7,8(sp)
+    sw      s9,4(sp)
+    sb      s10,3(sp)
+    sb      s11,2(sp)
+    sw      a5,60(sp)
+    sw      a0,28(sp)
     call    putint
     j       .branch_false_33
 .branch_false_33:
 .L3_0:
-    ld      ra,128(sp)
-    ld      s0,112(sp)
+    ld      ra,88(sp)
+    ld      s0,80(sp)
     li      a0, 0
-    addi    sp,sp,136
+    addi    sp,sp,96
     ret

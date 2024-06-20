@@ -21,39 +21,37 @@
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-112
-    sd      ra,104(sp)
-    sd      s0,88(sp)
-    addi    s0,sp,112
+    addi    sp,sp,-80
+    sd      ra,72(sp)
+    sd      s0,64(sp)
+    addi    s0,sp,80
 .L0_0:
     li      a0, 0
-    mv      a1, a0
-    mv      a2, a0
+    li      a1, 0
     j       .while.head_22
 .while.head_22:
-    li      a3, 6
-    slt     a4,a1,a3
-    bnez    a4, .while.body_22
+    li      a2, 6
+    slt     a3,a0,a2
+    bnez    a3, .while.body_22
     j       .while.exit_22
 .while.body_22:
-    la      a5, arr
-    lw      a6,0(a5)
-    li      a7, 0
-    li      s1, 1
-    mul     s2,s1,a1
-    add     a7,a7,s2
-    slli a7,a7,2
-    add     a7,a7,sp
-    add     a7,a7,a7
-    mv      s3, s3
-    add     s4,a2,s3
-    add     s5,a1,s1
+    la      a4, arr
+    lw      a5,0(a4)
+    li      a6, 0
+    li      a7, 1
+    mul     s1,a7,a0
+    add     a6,a6,s1
+    slli a6,a6,2
+    add     a6,a6,sp
+    add     a6,a6,a6
+    add     s3,a1,s2
+    add     s4,a0,a7
     j       .while.head_22
 .while.exit_22:
-    ld      ra,104(sp)
-    ld      s0,88(sp)
-    mv      a0, a2
-    addi    sp,sp,112
+    ld      ra,72(sp)
+    ld      s0,64(sp)
+    mv      a0, a1
+    addi    sp,sp,80
     ret
 .section        .data
     .align 4

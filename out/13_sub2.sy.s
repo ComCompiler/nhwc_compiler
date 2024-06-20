@@ -21,19 +21,18 @@
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-48
-    sd      ra,40(sp)
-    sd      s0,24(sp)
-    addi    s0,sp,48
+    addi    sp,sp,-24
+    sd      ra,16(sp)
+    sd      s0,8(sp)
+    addi    s0,sp,24
 .L0_0:
     li      a0, 2
-    mv      a1, a0
-    li      a2, 10
-    sub     a3,a1,a2
-    ld      ra,40(sp)
-    ld      s0,24(sp)
-    mv      a0, a3
-    addi    sp,sp,48
+    li      a1, 10
+    sub     a2,a0,a1
+    ld      ra,16(sp)
+    ld      s0,8(sp)
+    mv      a0, a2
+    addi    sp,sp,24
     ret
 .section        .data
     .align 4

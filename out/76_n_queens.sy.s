@@ -21,25 +21,23 @@
     .globl printans
     .type printans,@function
 printans:
-    addi    sp,sp,-296
-    sd      ra,288(sp)
-    sd      s0,272(sp)
-    addi    s0,sp,296
+    addi    sp,sp,-264
+    sd      ra,256(sp)
+    sd      s0,248(sp)
+    addi    s0,sp,264
 .L5_0:
     la      a0, sum
     lw      a1,0(a0)
-    mv      a2, a2
     li      a3, 1
     add     a4,a2,a3
     la      a5, sum
     sd      a4,0(a5)
-    mv      a6, a3
+    li      a6, 1
     j       .while.head_23
 .while.head_23:
     la      a7, n
     lw      s1,0(a7)
-    mv      s2, s2
-    slt     s3,a6,s2
+    slt     s3,s2,a6
     xori    s3,s3,1
     bnez    s3, .while.body_23
     j       .while.exit_23
@@ -52,19 +50,17 @@ printans:
     slli s6,s6,2
     add     s6,s6,sp
     add     s6,s6,s6
-    sw      s2,240(sp)
-    sb      s3,239(sp)
-    sd      s6,24(sp)
-    sw      s7,235(sp)
-    mv      a0, a0
+    sw      s2,232(sp)
+    sb      s3,231(sp)
+    sd      s6,16(sp)
+    sw      s7,224(sp)
     call    putint
     j       .L6_0
 .L6_0:
     la      a0, n
     lw      s1,0(a0)
-    mv      s2, s2
     xor     s3,a6,s2
-    sltiu   s3,s3,1
+    seqz    s3, s3
     bnez    s3, .branch_true_27
     j       .branch_false_27
 .branch_true_27:
@@ -72,9 +68,9 @@ printans:
     sb      s3,7(sp)
     li      a0, 10
     call    putch
-    ld      ra,288(sp)
-    ld      s0,272(sp)
-    addi    sp,sp,296
+    ld      ra,256(sp)
+    ld      s0,248(sp)
+    addi    sp,sp,264
     ret
 .branch_false_27:
     li      a0, 32
@@ -88,244 +84,212 @@ printans:
     .globl f
     .type f,@function
 f:
-    addi    sp,sp,-1152
-    sd      ra,1144(sp)
-    sd      s0,1128(sp)
-    addi    s0,sp,1152
+    addi    sp,sp,-1032
+    sd      ra,1024(sp)
+    sd      s0,1016(sp)
+    addi    s0,sp,1032
 .L1_0:
-    mv      s1, a3
+    li      a1, 1
     j       .while.head_38
 .while.head_38:
-    la      s2, n
-    lw      s3,0(s2)
-    mv      s4, s4
-    slt     s5,s1,s4
-    xori    s5,s5,1
-    bnez    s5, .while.body_38
+    la      a2, n
+    lw      a3,0(a2)
+    slt     a5,a4,a1
+    xori    a5,a5,1
+    bnez    a5, .while.body_38
     j       .while.exit_38
 .while.body_38:
-    sub     s6,a0,s1
-    la      s7, n
-    lw      s8,0(s7)
-    mv      s9, s9
-    add     s10,s9,s6
-    la      s11, line2
-    lw      a1,0(s11)
-    li      a1, 0
-    mul     a5,a3,s10
-    add     a1,a1,a5
-    slli a1,a1,2
-    add     a1,a1,sp
-    add     a1,a1,a1
-    mv      a3, a3
+    sub     a6,a0,a1
+    la      a7, n
+    lw      s1,0(a7)
+    add     s3,s2,a6
+    la      s4, line2
+    lw      s5,0(s4)
+    li      s6, 0
+    li      s7, 1
+    mul     s8,s7,s3
+    add     s6,s6,s8
+    slli s6,s6,2
+    add     s6,s6,sp
+    add     s6,s6,s6
+    li      s10, 0
+    xor     s11,s9,s10
+    snez    s11, s11
+    xori    a2,s11,-1
+    add     a3,a0,a1
+    la      a7, line1
+    lw      s1,0(a7)
     li      a7, 0
-    xor     s2,a3,a7
-    sltiu   s2,s2,1
-    xori    s2,s2,1
-    xori    a7,s2,-1
-    add     s3,a0,s1
-    la      s7, line1
-    lw      s8,0(s7)
-    li      s7, 0
-    li      s8, 1
-    mul     s11,s8,s3
-    add     s7,s7,s11
-    slli s7,s7,2
-    add     s7,s7,sp
-    add     s7,s7,s7
-    mv      s8, s8
-    sw      a0,1120(sp)
+    mul     s1,s7,a3
+    add     a7,a7,s1
+    slli a7,a7,2
+    add     a7,a7,sp
+    add     a7,a7,a7
+    xor     s5,s4,s10
+    seqz    s5, s5
+    and     s7,s5,a2
+    la      s10, row
+    sw      a0,1012(sp)
+    lw      a0,0(s10)
     li      a0, 0
-    sd      a1,664(sp)
-    xor     a1,s8,a0
-    sltiu   a1,a1,1
-    and     a0,a1,a7
-    sb      a0,422(sp)
-    la      a0, row
-    sb      a1,423(sp)
-    lw      a1,0(a0)
-    li      a0, 0
-    li      a1, 1
-    sw      a2,264(sp)
-    mul     a2,a1,s1
+    li      s10, 1
+    sb      a2,570(sp)
+    mul     a2,s10,a1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
-    mv      a1, a1
-    sd      a0,208(sp)
+    sd      a0,136(sp)
     li      a0, 1
-    sw      a2,416(sp)
-    xor     a2,a1,a0
-    sltiu   a2,a2,1
-    xori    a2,a2,1
-    mv      a0, a0
-    sw      a1,200(sp)
-    and     a1,a2,a0
-    bnez    a1, .branch_true_41
+    sw      a1,1008(sp)
+    xor     a1,s10,a0
+    snez    a1, a1
+    and     a0,a1,s7
+    bnez    a0, .branch_true_41
     j       .branch_false_41
 .branch_true_41:
-    sb      a0,422(sp)
+    sb      a0,130(sp)
     li      a0, 0
-    sb      a1,198(sp)
+    sb      a1,131(sp)
     li      a1, 1
-    sb      a2,199(sp)
-    mv      a2, a2
-    sw      a3,656(sp)
+    sw      a2,340(sp)
+    sw      a3,564(sp)
     mul     a3,a1,a2
     add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,a0
-    sd      s1,0(a0)
+    sd      a1,0(a0)
     j       .L2_0
 .L2_0:
-    la      a1, n
-    lw      a3,0(a1)
-    mv      a1, a1
-    xor     a3,a2,a1
-    sltiu   a3,a3,1
+    la      a3, n
+    sd      a0,120(sp)
+    lw      a0,0(a3)
+    xor     a3,a2,a0
+    seqz    a3, a3
     bnez    a3, .branch_true_45
     j       .branch_false_45
 .branch_true_45:
-    sw      s1,1112(sp)
-    sb      s2,655(sp)
-    sw      s3,648(sp)
-    sw      s4,1104(sp)
-    sb      s5,1103(sp)
-    sw      s6,1096(sp)
-    sd      s7,432(sp)
-    sw      s8,424(sp)
-    sw      s9,1092(sp)
-    sw      s10,1084(sp)
-    sw      s11,640(sp)
+    sw      s1,560(sp)
+    sw      s2,992(sp)
+    sw      s3,988(sp)
+    sw      s4,348(sp)
+    sb      s5,347(sp)
+    sd      s6,576(sp)
+    sb      s7,346(sp)
+    sw      s8,984(sp)
+    sw      s9,572(sp)
+    sw      s10,132(sp)
+    sb      s11,571(sp)
     call    printans
     j       .branch_false_45
 .branch_false_45:
 .L3_0:
     li      s1, 0
     li      s2, 1
-    mv      s3, s3
-    mul     s4,s2,s3
-    add     s1,s1,s4
+    mul     s3,s2,a1
+    add     s1,s1,s3
     slli s1,s1,2
     add     s1,s1,s1
     sd      s2,0(s1)
-    add     s5,a2,s3
-    li      s6, 0
-    mul     s7,s2,s5
-    add     s6,s6,s7
-    slli s6,s6,2
-    add     s6,s6,s6
-    sd      s2,0(s6)
-    sub     s8,a2,s3
-    la      s9, n
-    lw      s10,0(s9)
-    mv      s11, s11
-    add     s2,s11,s8
-    li      s4, 0
-    li      s7, 1
-    mul     s9,s7,s2
-    add     s4,s4,s9
-    slli s4,s4,2
-    add     s4,s4,s4
-    sd      s7,0(s4)
-    add     s9,a2,s7
-    sd      s1,160(sp)
-    sw      s2,120(sp)
-    sw      s3,1112(sp)
-    sd      s4,104(sp)
-    sw      s5,156(sp)
-    sd      s6,144(sp)
-    sw      s8,136(sp)
-    sw      s9,96(sp)
-    sw      s11,128(sp)
-    sd      a0,184(sp)
-    mv      a0, a0
+    add     s4,a2,a1
+    li      s5, 0
+    mul     s6,s2,s4
+    add     s5,s5,s6
+    slli s5,s5,2
+    add     s5,s5,s5
+    sd      s2,0(s5)
+    sub     s7,a2,a1
+    la      s8, n
+    lw      s9,0(s8)
+    add     s11,s10,s7
+    li      s2, 0
+    li      s3, 1
+    mul     s6,s3,s11
+    add     s2,s2,s6
+    slli s2,s2,2
+    add     s2,s2,s2
+    sd      s3,0(s2)
+    add     s6,a2,s3
+    sd      s1,104(sp)
+    sd      s2,64(sp)
+    sw      s4,100(sp)
+    sd      s5,88(sp)
+    sw      s6,60(sp)
+    sw      s7,84(sp)
+    sw      s10,80(sp)
+    sw      s11,76(sp)
+    sw      a0,116(sp)
     call    f
     li      a0, 0
     li      s1, 1
-    mv      s2, s2
-    mul     s3,s1,s2
-    add     a0,a0,s3
+    mul     s2,s1,a1
+    add     a0,a0,s2
     slli a0,a0,2
     add     a0,a0,a0
-    li      s4, 0
-    sd      s4,0(a0)
-    add     s5,a2,s2
-    li      s6, 0
-    mul     s7,s1,s5
-    add     s6,s6,s7
-    slli s6,s6,2
-    add     s6,s6,s6
-    sd      s4,0(s6)
-    sub     s8,a2,s2
-    la      s9, n
-    lw      s10,0(s9)
-    mv      s11, s11
-    add     s1,s11,s8
     li      s3, 0
-    li      s4, 1
-    mul     s7,s4,s1
-    add     s3,s3,s7
-    slli s3,s3,2
-    add     s3,s3,s3
-    li      s4, 0
-    sd      s4,0(s3)
+    sd      s3,0(a0)
+    add     s4,a2,a1
+    li      s5, 0
+    mul     s6,s1,s4
+    add     s5,s5,s6
+    slli s5,s5,2
+    add     s5,s5,s5
+    sd      s3,0(s5)
+    sub     s7,a2,a1
+    la      s8, n
+    lw      s9,0(s8)
+    add     s11,s10,s7
+    li      s1, 0
+    li      s2, 1
+    mul     s3,s2,s11
+    add     s1,s1,s3
+    slli s1,s1,2
+    add     s1,s1,s1
+    li      s2, 0
+    sd      s2,0(s1)
     j       .branch_false_41
 .branch_false_41:
 .L4_0:
-    li      s4, 1
-    add     s7,s2,s4
+    li      s2, 1
+    add     s3,a1,s2
     j       .while.head_38
 .while.exit_38:
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-64
-    sd      ra,56(sp)
-    sd      s0,40(sp)
-    addi    s0,sp,64
+    addi    sp,sp,-40
+    sd      ra,32(sp)
+    sd      s0,24(sp)
+    addi    s0,sp,40
 .L0_0:
-    sw      s1,32(sp)
-    sw      s2,1112(sp)
-    sd      s3,16(sp)
-    sw      s5,72(sp)
-    sd      s6,56(sp)
-    sw      s7,8(sp)
-    sw      s8,48(sp)
-    sw      s11,40(sp)
     call    getint
-    sd      a0,80(sp)
-    sw      a0,32(sp)
-    mv      s1, a0
+    sw      a0,20(sp)
+    mv      a1, a0
     j       .while.head_59
 .while.head_59:
-    li      s2, 0
-    slt     s3,s2,s1
-    bnez    s3, .while.body_59
+    li      a2, 0
+    slt     a3,a2,a1
+    bnez    a3, .while.body_59
     j       .while.exit_59
 .while.body_59:
-    sw      s1,24(sp)
-    sb      s3,23(sp)
     call    getint
-    sw      a0,32(sp)
-    sw      a0,19(sp)
-    la      s1, n
-    sd      a0,0(s1)
-    sw      a0,19(sp)
+    sw      a0,20(sp)
+    sw      a0,8(sp)
+    la      a4, n
+    sd      a0,0(a4)
+    sw      a0,8(sp)
     li      a0, 1
     call    f
-    mv      a0, a0
-    li      s1, 1
-    sub     s2,a0,s1
+    li      a0, 1
+    sub     a5,a1,a0
     j       .while.head_59
 .while.exit_59:
-    la      s3, sum
-    lw      s4,0(s3)
-    ld      ra,56(sp)
-    ld      s0,40(sp)
-    lw      a0,4(sp)
-    addi    sp,sp,64
+    la      a6, sum
+    lw      a7,0(a6)
+    ld      ra,32(sp)
+    ld      s0,24(sp)
+    lw      a0,0(sp)
+    addi    sp,sp,40
     ret
 .section        .data
     .align 4

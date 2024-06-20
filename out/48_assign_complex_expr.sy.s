@@ -21,70 +21,61 @@
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-208
-    sd      ra,200(sp)
-    sd      s0,184(sp)
-    addi    s0,sp,208
+    addi    sp,sp,-104
+    sd      ra,96(sp)
+    sd      s0,88(sp)
+    addi    s0,sp,104
 .L0_0:
     li      a0, 5
-    mv      a1, a0
-    mv      a2, a0
-    li      a3, 1
-    mv      a4, a3
-    li      a5, -2
-    mv      a6, a5
-    li      a7, 3
-    add     s1,a4,a7
-    li      s2, 0
-    sub     s3,s2,s1
-    li      s4, 2
-    mv      s5, s5
-    rem     s5,s3,s4
-    sub     s6,a1,a2
-    sub     s7,s6,s5
-    div     s8,s4,a6
-    add     s9,s8,s7
-    mv      s10, s9
-    sw      s1,136(sp)
-    sw      s3,128(sp)
-    sw      s5,120(sp)
-    sw      s6,112(sp)
-    sw      s7,104(sp)
-    sw      s8,96(sp)
-    sw      s9,88(sp)
-    sw      s10,144(sp)
-    mv      a0, a0
+    li      a1, 5
+    li      a2, 1
+    li      a3, -2
+    li      a4, 3
+    add     a5,a2,a4
+    li      a6, 0
+    sub     a7,a6,a5
+    li      s1, 2
+    rem     s2,a7,s1
+    sub     s3,a0,a1
+    sub     s4,s3,s2
+    div     s5,s1,a3
+    add     s6,s5,s4
+    mv      s7, s6
+    sw      s2,56(sp)
+    sw      s3,52(sp)
+    sw      s4,48(sp)
+    sw      s5,44(sp)
+    sw      s6,40(sp)
+    sw      s7,68(sp)
+    sw      a0,84(sp)
     call    putint
     li      a0, 2
-    add     s1,a4,a0
-    mv      s2, s2
+    add     s1,a2,a0
     rem     s2,s1,a0
-    li      s3, 0
-    sub     s4,s3,s2
-    sub     s5,a1,a2
-    sub     s6,s3,s5
-    sub     s7,s6,s4
-    mv      s8, s8
-    rem     s8,a6,a0
+    sub     s3,a6,s2
+    sub     s5,s4,a1
+    sub     s6,a6,s5
+    sub     s7,s6,s3
+    rem     s8,a3,a0
     li      s9, 67
     add     s10,s8,s9
     add     s11,s10,s7
     mv      a0, s11
-    add     a3,a0,a7
-    sw      s1,80(sp)
-    sw      s2,72(sp)
-    sw      s4,64(sp)
-    sw      s5,56(sp)
-    sw      s6,48(sp)
-    sw      s7,40(sp)
-    sw      s8,32(sp)
-    sw      s10,24(sp)
-    sw      s11,16(sp)
-    sw      a0,144(sp)
-    mv      a0, a0
+    add     a6,a0,a4
+    sw      s1,36(sp)
+    sw      s2,32(sp)
+    sw      s3,28(sp)
+    sw      s4,84(sp)
+    sw      s5,24(sp)
+    sw      s6,20(sp)
+    sw      s7,16(sp)
+    sw      s8,12(sp)
+    sw      s10,8(sp)
+    sw      s11,4(sp)
+    sw      a0,68(sp)
     call    putint
-    ld      ra,200(sp)
-    ld      s0,184(sp)
+    ld      ra,96(sp)
+    ld      s0,88(sp)
     li      a0, 0
-    addi    sp,sp,208
+    addi    sp,sp,104
     ret

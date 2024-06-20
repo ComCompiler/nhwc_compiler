@@ -21,25 +21,23 @@
     .globl putstr
     .type putstr,@function
 putstr:
-    addi    sp,sp,-104
-    sd      ra,96(sp)
-    sd      s0,80(sp)
-    addi    s0,sp,104
+    addi    sp,sp,-64
+    sd      ra,56(sp)
+    sd      s0,48(sp)
+    addi    s0,sp,64
 .L4_0:
     li      a1, 0
-    mv      a2, a1
     j       .while.head_26
 .while.head_26:
-    li      a3, 0
-    li      a4, 1
-    add     a3,a3,a0
-    slli a3,a3,3
-    add     a3,a3,sp
-    add     a3,a3,a3
-    mv      a5, a5
-    xor     a6,a5,a1
-    sltiu   a6,a6,1
-    xori    a6,a6,1
+    li      a2, 0
+    li      a3, 1
+    add     a2,a2,a0
+    slli a2,a2,3
+    add     a2,a2,sp
+    add     a2,a2,a2
+    li      a5, 0
+    xor     a6,a4,a5
+    snez    a6, a6
     bnez    a6, .while.body_26
     j       .while.exit_26
 .while.body_26:
@@ -48,137 +46,124 @@ putstr:
     slli a7,a7,3
     add     a7,a7,sp
     add     a7,a7,a7
-    sd      a0,64(sp)
-    mv      a0, a0
+    sd      a0,40(sp)
     call    putch
-    add     a0,a2,a4
+    add     a0,a1,a3
     j       .while.head_26
 .while.exit_26:
-    ld      ra,96(sp)
-    ld      s0,80(sp)
-    mv      a0, a2
-    addi    sp,sp,104
+    ld      ra,56(sp)
+    ld      s0,48(sp)
+    mv      a0, a1
+    addi    sp,sp,64
     ret
     .globl main
     .type main,@function
 main:
-    li      s1, -3557
-    li      s1, -3557
-    add     sp,s1,sp
-    sd      ra,3549(sp)
-    sd      s0,3533(sp)
-    li      s2, 3557
-    li      s2, 3557
-    add     s0,s2,sp
+    li      a0, -3480
+    li      a0, -3480
+    add     sp,a0,sp
+    sd      ra,3472(sp)
+    sd      s0,3464(sp)
+    li      a1, 3480
+    li      a1, 3480
+    add     s0,a1,sp
 .L0_0:
-    la      s3, __HELLO
-    lw      s4,0(s3)
-    sw      a0,4(sp)
-    mv      a0, a0
+    la      a2, __HELLO
+    lw      a3,0(a2)
     call    putstr
-    sw      a0,3121(sp)
-    mv      s1, a1
+    sw      a0,3060(sp)
+    li      a4, 0
     j       .while.head_36
 .while.head_36:
-    xor     s2,a4,a1
-    sltiu   s2,s2,1
-    xori    s2,s2,1
-    bnez    s2, .while.body_36
+    li      a5, 1
+    li      a6, 0
+    xor     a7,a5,a6
+    snez    a7, a7
+    bnez    a7, .while.body_36
     j       .while.exit_36
 .while.body_36:
-    li      s3, 6
-    div     s4,s1,s3
+    li      s1, 6
+    div     s2,a4,s1
+    mv      s3, s2
+    rem     s4,a4,s1
     mv      s5, s4
-    mv      s6, s6
-    rem     s6,s1,s3
-    mv      s7, s6
     j       .L1_0
 .L1_0:
-    xor     s8,s5,s7
-    sltiu   s8,s8,1
-    xori    s8,s8,1
-    bnez    s8, .branch_true_41
+    xor     s6,s3,s5
+    snez    s6, s6
+    bnez    s6, .branch_true_41
     j       .branch_false_41
 .branch_true_41:
-    la      s9, N4__mE___
-    lw      s10,0(s9)
-    li      s11, 0
-    li      a1, 50
-    mul     a4,a1,s5
-    add     s11,s11,a4
-    slli s11,s11,2
-    add     s11,s11,sp
-    add     s11,s11,s11
-    sw      s1,3113(sp)
-    sb      s2,3112(sp)
-    sw      s4,3105(sp)
-    sw      s5,3101(sp)
-    sw      s6,3093(sp)
-    sw      s7,3085(sp)
-    sb      s8,3084(sp)
-    sd      s11,1869(sp)
-    sw      a0,3121(sp)
-    mv      a0, a0
+    la      s7, N4__mE___
+    lw      s8,0(s7)
+    li      s9, 0
+    li      s10, 50
+    mul     s11,s10,s3
+    add     s9,s9,s11
+    slli s9,s9,2
+    add     s9,s9,sp
+    add     s9,s9,s9
+    sw      s2,3048(sp)
+    sw      s3,3044(sp)
+    sw      s4,3040(sp)
+    sw      s5,3036(sp)
+    sb      s6,3035(sp)
+    sd      s9,1824(sp)
+    sw      s11,3028(sp)
+    sw      a0,3060(sp)
     call    putstr
-    sw      a0,1661(sp)
+    sw      a0,1620(sp)
     la      s1, saY_HeI10_To
     lw      s2,0(s1)
-    sw      a0,1661(sp)
-    mv      a0, a0
+    sw      a0,1620(sp)
     call    putstr
-    sw      a0,1489(sp)
+    sw      a0,1456(sp)
     la      s1, N4__mE___
     lw      s2,0(s1)
     li      s3, 0
-    mv      s4, s4
-    mul     s5,a1,s4
-    add     s3,s3,s5
+    li      s4, 50
+    mul     s6,s4,s5
+    add     s3,s3,s6
     slli s3,s3,2
     add     s3,s3,sp
     add     s3,s3,s3
-    sd      s3,269(sp)
-    sw      s4,3085(sp)
-    sw      s5,1481(sp)
-    sw      a0,1489(sp)
-    mv      a0, a0
+    sd      s3,248(sp)
+    sw      s5,3036(sp)
+    sw      s6,1452(sp)
+    sw      a0,1456(sp)
     call    putstr
-    sw      a0,57(sp)
+    sw      a0,44(sp)
     la      s1, RET
     lw      s2,0(s1)
-    sw      a0,57(sp)
-    mv      a0, a0
+    sw      a0,44(sp)
     call    putstr
-    sw      a0,25(sp)
+    sw      a0,20(sp)
     j       .branch_false_41
 .branch_false_41:
 .L2_0:
-    mv      s1, s1
-    li      s2, 17
-    mul     s3,s1,s2
-    li      s4, 23
-    add     s5,s3,s4
-    li      s6, 32
-    mv      s7, s7
-    rem     s7,s5,s6
+    li      s1, 17
+    mul     s2,a4,s1
+    li      s3, 23
+    add     s4,s2,s3
+    li      s5, 32
+    rem     s6,s4,s5
     j       .L3_0
 .L3_0:
-    li      s8, 0
-    xor     s9,s1,s8
-    sltiu   s9,s9,1
-    bnez    s9, .branch_true_49
+    xor     s7,a4,a6
+    seqz    s7, s7
+    bnez    s7, .branch_true_49
     j       .branch_false_49
 .branch_true_49:
     j       .while.exit_36
 .while.exit_36:
-    li      s10, 3549
-    add     s10,sp,s10
-    ld      ra,0(s10)
-    li      s11, 3533
-    add     s11,sp,s11
-    ld      s0,0(s11)
+    li      s8, 3472
+    add     s8,sp,s8
+    ld      ra,0(s8)
+    li      s9, 3464
+    add     s9,sp,s9
+    ld      s0,0(s9)
     li      a0, 0
-    li      a1, 3557
-    li      a1, 3557
+    li      a1, 3480
     add     sp,a1,sp
     ret
 .branch_false_49:

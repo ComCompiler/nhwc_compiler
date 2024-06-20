@@ -21,257 +21,236 @@
     .globl Dijkstra
     .type Dijkstra,@function
 Dijkstra:
-    li      a0, -4952
-    li      a0, -4952
+    li      a0, -4776
+    li      a0, -4776
     add     sp,a0,sp
-    sd      ra,4944(sp)
-    sd      s0,4928(sp)
-    li      a1, 4952
-    li      a1, 4952
+    sd      ra,4768(sp)
+    sd      s0,4760(sp)
+    li      a1, 4776
+    li      a1, 4776
     add     s0,a1,sp
 .L3_0:
     li      a2, 1
-    mv      a3, a2
     j       .while.head_27
 .while.head_27:
-    la      a4, n
-    lw      a5,0(a4)
-    mv      a6, a6
-    slt     a7,a3,a6
-    xori    a7,a7,1
-    bnez    a7, .while.body_27
+    la      a3, n
+    lw      a4,0(a3)
+    slt     a6,a5,a2
+    xori    a6,a6,1
+    bnez    a6, .while.body_27
     j       .while.exit_27
 .while.body_27:
-    li      s1, 0
-    mul     s2,a2,a3
-    add     s1,s1,s2
-    slli s1,s1,2
-    add     s1,s1,s1
+    li      a7, 0
+    li      s1, 1
+    mul     s2,s1,a2
+    add     a7,a7,s2
+    slli a7,a7,2
+    add     a7,a7,a7
     la      s3, e
     lw      s4,0(s3)
     li      s5, 0
     li      s6, 16
-    mul     s7,s6,a2
+    mul     s7,s6,s1
     add     s5,s5,s7
     add     s5,s5,s7
     slli s5,s5,2
     add     s5,s5,sp
     add     s5,s5,s5
-    mv      s8, s8
-    sd      s8,0(s1)
+    sd      s8,0(a7)
     li      s9, 0
-    mul     s10,a2,a3
+    mul     s10,s1,a2
     add     s9,s9,s10
     slli s9,s9,2
     add     s9,s9,s9
     li      s11, 0
     sd      s11,0(s9)
-    add     a0,a3,a2
+    add     a0,a2,s1
     j       .while.head_27
 .while.exit_27:
     li      a1, 0
-    li      a4, 1
-    mul     a5,a2,a4
-    add     a1,a1,a5
+    li      a3, 1
+    mul     a4,s1,a3
+    add     a1,a1,a4
     slli a1,a1,2
     add     a1,a1,a1
-    sd      a2,0(a1)
+    sd      a3,0(a1)
     j       .while.head_35
 .while.head_35:
-    la      a2, n
-    lw      a4,0(a2)
-    mv      a2, a2
-    li      a4, 1
-    sub     a5,a2,a4
-    slt     a4,a3,a5
-    xori    a4,a4,1
-    bnez    a4, .while.body_35
+    la      a3, n
+    lw      a4,0(a3)
+    sub     a4,a3,s1
+    slt     s1,a4,a2
+    xori    s1,s1,1
+    bnez    s1, .while.body_35
     j       .while.exit_35
 .while.body_35:
     li      s2, 65535
-    mv      s3, s2
-    mv      s2, s11
+    li      s3, 0
     li      s4, 1
-    mv      s6, s4
     j       .while.head_41
 .while.head_41:
-    la      s4, n
-    lw      s10,0(s4)
-    mv      s4, s4
+    la      s6, n
+    lw      s10,0(s6)
     slt     s10,s6,s4
     xori    s10,s10,1
     bnez    s10, .while.body_41
     j       .while.exit_41
 .while.body_41:
     la      s11, book
-    sw      a0,3816(sp)
+    sw      a0,3684(sp)
     lw      a0,0(s11)
     li      a0, 0
     li      s11, 1
-    sd      a1,3800(sp)
-    mul     a1,s11,s6
+    sd      a1,3672(sp)
+    mul     a1,s11,s4
     add     a0,a0,a1
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
-    mv      s11, s11
-    sd      a0,3680(sp)
+    sd      a0,3568(sp)
     li      a0, 0
-    sw      a1,3751(sp)
+    sw      a1,3636(sp)
     xor     a1,s11,a0
-    sltiu   a1,a1,1
+    seqz    a1, a1
     la      a0, dis
-    sb      a1,3671(sp)
+    sb      a1,3563(sp)
     lw      a1,0(a0)
     li      a0, 0
     li      a1, 1
-    sw      a2,3792(sp)
-    mul     a2,a1,s6
+    sw      a2,4756(sp)
+    mul     a2,a1,s4
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
-    mv      a1, a1
-    sd      a0,3592(sp)
-    slt     a0,a1,s3
-    sw      a1,3584(sp)
-    mv      a1, a1
-    sw      a2,3664(sp)
+    sd      a0,3488(sp)
+    slt     a0,a1,s2
+    sw      a1,3484(sp)
+    sw      a2,3556(sp)
     and     a2,a0,a1
     bnez    a2, .branch_true_44
     j       .branch_false_44
 .branch_true_44:
-    sb      a0,3583(sp)
+    sb      a0,3483(sp)
     la      a0, dis
-    sb      a1,3671(sp)
+    sb      a1,3563(sp)
     lw      a1,0(a0)
     li      a0, 0
     li      a1, 1
-    sb      a2,3582(sp)
-    mul     a2,a1,s6
+    sb      a2,3482(sp)
+    mul     a2,a1,s4
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
-    mv      a1, a1
     j       .branch_false_44
 .branch_false_44:
 .L4_0:
-    sd      a0,3504(sp)
+    sd      a0,3408(sp)
     li      a0, 1
-    sw      a1,3496(sp)
-    add     a1,s6,a0
+    sw      a1,3404(sp)
+    add     a1,s4,a0
     j       .while.head_41
 .while.exit_41:
     li      a0, 0
-    sw      a1,3492(sp)
+    sw      a1,3400(sp)
     li      a1, 1
-    sw      a2,3576(sp)
-    mul     a2,a1,s2
+    sw      a2,3476(sp)
+    mul     a2,a1,s3
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,a0
     sd      a1,0(a0)
-    mv      a2, a1
+    li      a1, 1
     j       .while.head_52
 .while.head_52:
-    la      a1, n
-    sd      a0,3480(sp)
-    lw      a0,0(a1)
-    mv      a0, a0
-    slt     a1,a2,a0
-    xori    a1,a1,1
-    bnez    a1, .while.body_52
+    la      a2, n
+    sd      a0,3392(sp)
+    lw      a0,0(a2)
+    slt     a2,a0,a1
+    xori    a2,a2,1
+    bnez    a2, .while.body_52
     j       .while.exit_52
 .while.body_52:
-    sw      a0,3464(sp)
+    sw      a0,3384(sp)
     la      a0, e
-    sb      a1,3463(sp)
+    sw      a1,3388(sp)
     lw      a1,0(a0)
     li      a0, 0
     li      a1, 16
-    sw      a2,3472(sp)
-    mul     a2,a1,s2
+    sb      a2,3383(sp)
+    mul     a2,a1,s3
     add     a0,a0,a2
     li      a1, 1
-    sw      a2,3459(sp)
-    mv      a2, a2
-    sw      a3,4920(sp)
+    sw      a2,3376(sp)
+    sw      a3,3668(sp)
     mul     a3,a1,a2
     add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
-    mv      a1, a1
-    sd      a0,2424(sp)
+    sd      a0,2344(sp)
     li      a0, 65535
-    sw      a2,3472(sp)
+    sw      a2,3388(sp)
     slt     a2,a1,a0
     bnez    a2, .branch_true_55
     j       .branch_false_55
 .branch_true_55:
     la      a0, e
-    sw      a1,2416(sp)
+    sw      a1,2340(sp)
     lw      a1,0(a0)
     li      a0, 0
     li      a1, 16
-    sb      a2,2415(sp)
-    mul     a2,a1,s2
+    sb      a2,2339(sp)
+    mul     a2,a1,s3
     add     a0,a0,a2
     li      a1, 1
-    sw      a2,2408(sp)
-    mv      a2, a2
-    sw      a3,3459(sp)
+    sw      a2,2332(sp)
+    sw      a3,3376(sp)
     mul     a3,a1,a2
     add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
     la      a1, dis
-    sd      a0,1380(sp)
+    sd      a0,1304(sp)
     lw      a0,0(a1)
     li      a0, 0
     li      a1, 1
-    sw      a2,3472(sp)
-    mul     a2,a1,s2
+    sw      a2,3388(sp)
+    mul     a2,a1,s3
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
-    mv      a1, a1
-    sd      a0,1288(sp)
-    mv      a0, a0
-    sw      a2,1364(sp)
+    sd      a0,1224(sp)
+    sw      a2,1296(sp)
     add     a2,a1,a0
-    sw      a0,1372(sp)
+    sw      a0,1300(sp)
     la      a0, dis
-    sw      a1,1280(sp)
+    sw      a1,1220(sp)
     lw      a1,0(a0)
     li      a0, 0
     li      a1, 1
-    sw      a2,1272(sp)
-    mv      a2, a2
-    sw      a3,2408(sp)
+    sw      a2,1216(sp)
+    sw      a3,2332(sp)
     mul     a3,a1,a2
     add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
-    mv      a1, a1
-    sd      a0,1192(sp)
-    mv      a0, a0
-    sw      a2,3472(sp)
+    sd      a0,1144(sp)
+    sw      a2,3388(sp)
     slt     a2,a0,a1
     bnez    a2, .branch_true_58
     j       .branch_false_58
 .branch_true_58:
-    sw      a0,1272(sp)
+    sw      a0,1216(sp)
     li      a0, 0
-    sw      a1,1184(sp)
+    sw      a1,1140(sp)
     li      a1, 1
-    sb      a2,1183(sp)
-    mv      a2, a2
-    sw      a3,1264(sp)
+    sb      a2,1139(sp)
+    sw      a3,1212(sp)
     mul     a3,a1,a2
     add     a0,a0,a3
     slli a0,a0,2
@@ -280,8 +259,8 @@ Dijkstra:
     lw      a3,0(a1)
     li      a1, 0
     li      a3, 16
-    sd      a0,1168(sp)
-    mul     a0,a3,s2
+    sd      a0,1128(sp)
+    mul     a0,a3,s3
     add     a1,a1,a0
     li      a3, 1
     add     a1,a1,a0
@@ -289,165 +268,136 @@ Dijkstra:
     add     a1,a1,sp
     add     a1,a1,a1
     la      a3, dis
-    sw      a0,1164(sp)
+    sw      a0,1124(sp)
     lw      a0,0(a3)
     li      a0, 0
     li      a3, 1
-    sd      a1,128(sp)
-    mul     a1,a3,s2
+    sd      a1,96(sp)
+    mul     a1,a3,s3
     add     a0,a0,a1
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
-    mv      a3, a3
-    sd      a0,40(sp)
-    mv      a0, a0
-    sw      a1,112(sp)
+    sd      a0,16(sp)
+    sw      a1,88(sp)
     add     a1,a3,a0
-    sw      a0,120(sp)
-    mv      a0, a0
+    sw      a0,92(sp)
     sd      a1,0(a0)
     j       .branch_false_58
 .branch_false_58:
 .branch_false_55:
 .L5_0:
-    sd      a0,1168(sp)
+    sd      a0,1128(sp)
     li      a0, 1
-    sw      a1,24(sp)
+    sw      a1,8(sp)
     add     a1,a2,a0
     j       .while.head_52
 .while.exit_52:
-    mv      a0, a0
-    sw      a1,16(sp)
+    sw      a1,4(sp)
     li      a1, 1
-    sw      a2,3472(sp)
+    sw      a2,3388(sp)
     add     a2,a0,a1
     j       .while.head_35
 .while.exit_35:
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-288
-    sd      ra,280(sp)
-    sd      s0,264(sp)
-    addi    s0,sp,288
+    addi    sp,sp,-208
+    sd      ra,200(sp)
+    sd      s0,192(sp)
+    addi    s0,sp,208
 .L0_0:
-    sd      s1,4888(sp)
-    sw      s2,3772(sp)
-    sw      s3,3779(sp)
-    sw      s4,3756(sp)
-    sd      s5,3848(sp)
-    sw      s6,3764(sp)
-    sw      s7,4884(sp)
-    sw      s8,3840(sp)
-    sd      s9,3824(sp)
-    sb      s10,3755(sp)
-    sw      s11,3672(sp)
     call    getint
-    sw      a0,4920(sp)
-    sw      a0,248(sp)
-    la      s1, n
-    sd      a0,0(s1)
+    sw      a0,184(sp)
+    la      a1, n
+    sd      a0,0(a1)
     call    getint
-    sw      a0,248(sp)
-    sw      a0,240(sp)
-    la      s1, m
-    sd      a0,0(s1)
-    mv      s2, a1
+    sw      a0,184(sp)
+    sw      a0,180(sp)
+    la      a2, m
+    sd      a0,0(a2)
+    li      a3, 1
     j       .while.head_70
 .while.head_70:
-    la      s3, n
-    lw      s4,0(s3)
-    mv      s5, s5
-    slt     s6,s2,s5
-    xori    s6,s6,1
-    bnez    s6, .while.body_70
+    la      a4, n
+    lw      a5,0(a4)
+    slt     a7,a6,a3
+    xori    a7,a7,1
+    bnez    a7, .while.body_70
     j       .while.exit_70
 .while.body_70:
-    mv      s7, a1
+    li      s1, 1
     j       .while.head_74
 .while.head_74:
-    la      s8, n
-    lw      s9,0(s8)
-    mv      s10, s10
-    slt     s11,s7,s10
-    xori    s11,s11,1
-    bnez    s11, .while.body_74
+    la      s2, n
+    lw      s3,0(s2)
+    slt     s5,s4,s1
+    xori    s5,s5,1
+    bnez    s5, .while.body_74
     j       .while.exit_74
 .while.body_74:
-    xor     a1,s2,s7
-    sltiu   a1,a1,1
-    bnez    a1, .branch_true_77
+    xor     s6,a3,s1
+    seqz    s6, s6
+    bnez    s6, .branch_true_77
     j       .branch_false_77
 .branch_true_77:
-    li      s1, 0
-    li      s3, 16
-    mul     s4,s3,s2
-    add     s1,s1,s4
-    li      s3, 1
-    mul     s4,s3,s7
-    add     s1,s1,s4
-    slli s1,s1,2
-    add     s1,s1,s1
-    li      s3, 0
-    sd      s3,0(s1)
+    li      s7, 0
+    li      s8, 16
+    mul     s9,s8,a3
+    add     s7,s7,s9
+    li      s10, 1
+    mul     s11,s10,s1
+    add     s7,s7,s11
+    slli s7,s7,2
+    add     s7,s7,s7
+    li      a1, 0
+    sd      a1,0(s7)
     j       .L1_0
 .branch_false_77:
-    li      s3, 0
-    li      s4, 16
-    mul     s8,s4,s2
-    add     s3,s3,s8
-    li      s4, 1
-    mul     s8,s4,s7
-    add     s3,s3,s8
-    slli s3,s3,2
-    add     s3,s3,s3
-    li      s4, 65535
-    sd      s4,0(s3)
+    li      a1, 0
+    mul     a2,s8,a3
+    add     a1,a1,a2
+    mul     a2,s10,s1
+    add     a1,a1,a2
+    slli a1,a1,2
+    add     a1,a1,a1
+    li      a2, 65535
+    sd      a2,0(a1)
     j       .L1_0
 .L1_0:
 .L2_0:
-    li      s4, 1
-    add     s8,s7,s4
+    add     a2,s1,s10
     j       .while.head_74
 .while.exit_74:
-    add     s9,s2,s4
+    add     a4,a3,s10
     j       .while.head_70
 .while.exit_70:
     j       .while.head_84
 .while.head_84:
-    la      s4, m
-    sw      a0,240(sp)
-    lw      a0,0(s4)
-    mv      a0, a0
-    slt     s4,s2,a0
-    xori    s4,s4,1
-    bnez    s4, .while.body_84
+    la      a5, m
+    lw      s2,0(a5)
+    slt     s2,a5,a3
+    xori    s2,s2,1
+    bnez    s2, .while.body_84
     j       .while.exit_84
 .while.body_84:
-    sd      s1,208(sp)
-    sw      s2,256(sp)
-    sd      s3,184(sp)
-    sb      s4,167(sp)
-    sw      s5,232(sp)
-    sb      s6,231(sp)
-    sw      s7,227(sp)
-    sw      s8,200(sp)
-    sw      s9,176(sp)
-    sw      s10,220(sp)
-    sb      s11,219(sp)
+    sw      s1,168(sp)
+    sb      s2,127(sp)
+    sw      s4,164(sp)
+    sb      s5,163(sp)
+    sb      s6,162(sp)
+    sd      s7,152(sp)
     call    getint
-    sw      a0,168(sp)
-    sw      a0,163(sp)
+    sw      a0,180(sp)
+    sw      a0,120(sp)
     mv      s1, a0
-    sw      s1,156(sp)
+    sw      s1,116(sp)
     call    getint
-    sw      a0,163(sp)
-    sw      a0,148(sp)
+    sw      a0,120(sp)
+    sw      a0,112(sp)
     mv      s1, a0
     li      s2, 0
     li      s3, 16
-    mv      s4, s4
     mul     s5,s3,s4
     add     s2,s2,s5
     li      s6, 1
@@ -455,66 +405,57 @@ main:
     add     s2,s2,s7
     slli s2,s2,2
     add     s2,s2,s2
-    sw      s1,140(sp)
-    sd      s2,128(sp)
-    sw      s4,156(sp)
+    sw      s1,108(sp)
+    sd      s2,96(sp)
+    sw      s4,116(sp)
     call    getint
-    sw      a0,148(sp)
-    sw      a0,120(sp)
-    mv      s1, s1
+    sw      a0,112(sp)
+    sw      a0,92(sp)
     sd      a0,0(s1)
-    mv      s2, s2
-    li      s3, 1
-    add     s4,s2,s3
+    li      s2, 1
+    add     s3,a3,s2
     j       .while.head_84
 .while.exit_84:
-    sd      s1,128(sp)
-    sw      s2,256(sp)
-    sw      s4,112(sp)
+    sd      s1,96(sp)
+    sw      s3,88(sp)
     call    Dijkstra
-    li      s1, 1
-    mv      s2, s1
     j       .while.head_92
 .while.head_92:
-    la      s3, n
-    lw      s4,0(s3)
-    mv      s5, s5
-    slt     s6,s2,s5
-    xori    s6,s6,1
-    bnez    s6, .while.body_92
+    la      s1, n
+    lw      s2,0(s1)
+    slt     s4,s3,a3
+    xori    s4,s4,1
+    bnez    s4, .while.body_92
     j       .while.exit_92
 .while.body_92:
-    la      s7, dis
-    lw      s8,0(s7)
-    li      s9, 0
-    mul     s10,s1,s2
-    add     s9,s9,s10
-    slli s9,s9,2
-    add     s9,s9,sp
-    add     s9,s9,s9
-    sw      s2,256(sp)
-    sw      s5,104(sp)
-    sb      s6,103(sp)
-    sd      s9,24(sp)
-    sw      s10,99(sp)
-    sw      a0,120(sp)
-    mv      a0, a0
+    la      s5, dis
+    lw      s6,0(s5)
+    li      s7, 0
+    li      s8, 1
+    mul     s9,s8,a3
+    add     s7,s7,s9
+    slli s7,s7,2
+    add     s7,s7,sp
+    add     s7,s7,s7
+    sw      s3,84(sp)
+    sb      s4,83(sp)
+    sd      s7,8(sp)
+    sw      s9,76(sp)
+    sw      a0,92(sp)
     call    putint
     li      a0, 32
     call    putch
-    mv      a0, a0
-    li      s1, 1
-    add     s2,a0,s1
+    li      a0, 1
+    add     s1,a3,a0
     j       .while.head_92
 .while.exit_92:
-    sw      s2,8(sp)
-    sw      a0,256(sp)
+    sw      s1,0(sp)
     li      a0, 10
     call    putch
-    ld      ra,280(sp)
-    ld      s0,264(sp)
+    ld      ra,200(sp)
+    ld      s0,192(sp)
     li      a0, 0
-    addi    sp,sp,288
+    addi    sp,sp,208
     ret
 .section        .data
     .align 4

@@ -21,93 +21,79 @@
     .globl ifElseIf
     .type ifElseIf,@function
 ifElseIf:
-    addi    sp,sp,-64
-    sd      ra,56(sp)
-    sd      s0,40(sp)
-    addi    s0,sp,64
+    addi    sp,sp,-48
+    sd      ra,40(sp)
+    sd      s0,32(sp)
+    addi    s0,sp,48
 .L1_0:
     li      a0, 5
-    mv      a1, a0
-    li      a2, 10
-    mv      a3, a2
+    li      a1, 10
     j       .L2_0
 .L2_0:
-    li      a4, 0xb
-    xor     a5,a3,a4
-    sltiu   a5,a5,1
-    li      a6, 6
-    xor     a7,a1,a6
-    sltiu   a7,a7,1
-    mv      s1, s1
-    bnez    s1, .branch_true_23
+    li      a2, 0xb
+    xor     a3,a1,a2
+    seqz    a3, a3
+    li      a4, 6
+    xor     a5,a0,a4
+    seqz    a5, a5
+    bnez    a6, .branch_true_23
     j       .branch_false_23
 .branch_true_23:
-    ld      ra,56(sp)
-    ld      s0,40(sp)
-    mv      a0, a1
-    addi    sp,sp,64
+    ld      ra,40(sp)
+    ld      s0,32(sp)
+    addi    sp,sp,48
     ret
 .branch_false_23:
-    li      s2, 1
+    li      a7, 1
+    xor     s1,a0,a7
+    seqz    s1, s1
+    li      s2, 10
     xor     s3,a1,s2
-    sltiu   s3,s3,1
-    xor     s4,a3,a2
-    sltiu   s4,s4,1
-    and     s5,s4,s3
-    bnez    s5, .branch_true_28
+    seqz    s3, s3
+    and     s4,s3,s1
+    bnez    s4, .branch_true_28
     j       .branch_false_28
 .branch_true_28:
-    li      s6, 25
     j       .L4_0
 .branch_false_28:
-    li      s7, -5
-    xor     s8,a1,s7
-    sltiu   s8,s8,1
-    xor     s9,a3,a2
-    sltiu   s9,s9,1
-    and     s10,s9,s8
-    bnez    s10, .branch_true_31
+    li      s5, -5
+    xor     s6,a0,s5
+    seqz    s6, s6
+    xor     s7,a1,s2
+    seqz    s7, s7
+    and     s8,s7,s6
+    bnez    s8, .branch_true_31
     j       .branch_false_31
 .branch_true_31:
-    li      s11, 15
-    add     a0,a1,s11
+    li      s9, 15
+    add     s10,a0,s9
     j       .L3_0
 .branch_false_31:
-    li      a2, 0
-    sub     a4,a2,a1
+    li      s11, 0
+    sub     a2,s11,a0
     j       .L3_0
 .L3_0:
 .L4_0:
 .L5_0:
 .L6_0:
-    ld      ra,56(sp)
-    ld      s0,40(sp)
-    mv      a0, a1
-    addi    sp,sp,64
+    ld      ra,40(sp)
+    ld      s0,32(sp)
+    addi    sp,sp,48
     ret
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-40
-    sd      ra,32(sp)
-    sd      s0,16(sp)
-    addi    s0,sp,40
+    addi    sp,sp,-24
+    sd      ra,16(sp)
+    sd      s0,8(sp)
+    addi    s0,sp,24
 .L0_0:
-    sb      s1,21(sp)
-    sb      s3,20(sp)
-    sb      s4,19(sp)
-    sb      s5,18(sp)
-    sb      s8,17(sp)
-    sb      s9,16(sp)
-    sb      s10,15(sp)
     call    ifElseIf
-    sw      a0,11(sp)
-    sw      a0,8(sp)
-    sw      a0,8(sp)
-    mv      a0, a0
+    sw      a0,4(sp)
+    sw      a0,4(sp)
     call    putint
-    ld      ra,32(sp)
-    ld      s0,16(sp)
+    ld      ra,16(sp)
+    ld      s0,8(sp)
     li      a0, 0
-    addi    sp,sp,40
+    addi    sp,sp,24
     ret

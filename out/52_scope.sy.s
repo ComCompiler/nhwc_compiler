@@ -21,86 +21,76 @@
     .globl func
     .type func,@function
 func:
-    addi    sp,sp,-64
-    sd      ra,56(sp)
-    sd      s0,40(sp)
-    addi    s0,sp,64
+    addi    sp,sp,-40
+    sd      ra,32(sp)
+    sd      s0,24(sp)
+    addi    s0,sp,40
 .L4_0:
     la      a0, a
     lw      a1,0(a0)
-    mv      a2, a2
     mv      a3, a2
     li      a4, 1
-    mv      a5, a4
     j       .L5_0
 .L5_0:
-    xor     a6,a5,a3
-    sltiu   a6,a6,1
-    bnez    a6, .branch_true_22
+    xor     a5,a4,a3
+    seqz    a5, a5
+    bnez    a5, .branch_true_22
     j       .branch_false_22
 .branch_true_22:
-    add     a7,a5,a4
-    ld      ra,56(sp)
-    ld      s0,40(sp)
+    li      a6, 1
+    add     a7,a4,a6
+    ld      ra,32(sp)
+    ld      s0,24(sp)
     li      a0, 1
-    addi    sp,sp,64
+    addi    sp,sp,40
     ret
 .branch_false_22:
-    ld      ra,56(sp)
-    ld      s0,40(sp)
+    ld      ra,32(sp)
+    ld      s0,24(sp)
     li      a0, 0
-    addi    sp,sp,64
+    addi    sp,sp,40
     ret
 .L6_0:
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-64
-    sd      ra,56(sp)
-    sd      s0,40(sp)
-    addi    s0,sp,64
+    addi    sp,sp,-48
+    sd      ra,40(sp)
+    sd      s0,32(sp)
+    addi    s0,sp,48
 .L0_0:
-    li      s1, 0
-    mv      s2, s1
-    mv      s3, s1
+    li      a0, 0
+    li      a1, 0
     j       .while.head_32
 .while.head_32:
-    li      s4, 100
-    slt     s5,s3,s4
-    bnez    s5, .while.body_32
+    li      a2, 100
+    slt     a3,a1,a2
+    bnez    a3, .while.body_32
     j       .while.exit_32
 .while.body_32:
-    sw      s2,32(sp)
-    sw      s3,24(sp)
-    sb      s5,23(sp)
     call    func
-    sw      a0,19(sp)
-    xor     s1,a0,a4
-    sltiu   s1,s1,1
-    bnez    s1, .branch_true_35
+    sw      a0,28(sp)
+    sw      a0,16(sp)
+    li      a4, 1
+    xor     a5,a0,a4
+    seqz    a5, a5
+    bnez    a5, .branch_true_35
     j       .branch_false_35
 .branch_true_35:
-    mv      s2, s2
-    add     s3,s2,a4
+    add     a7,a6,a4
     j       .branch_false_35
 .branch_false_35:
 .L1_0:
-    mv      s4, s4
-    add     s5,s4,a4
+    add     s1,a1,a4
     j       .while.head_32
 .while.exit_32:
-    li      s6, 100
-    slt     s7,s2,s6
-    bnez    s7, .branch_true_39
+    slt     s2,a6,a2
+    bnez    s2, .branch_true_39
     j       .branch_false_39
 .branch_true_39:
-    sb      s1,18(sp)
-    sw      s2,32(sp)
-    sw      s3,12(sp)
-    sw      s4,24(sp)
-    sw      s5,8(sp)
-    sb      s7,7(sp)
-    sw      a0,19(sp)
+    sw      s1,4(sp)
+    sb      s2,3(sp)
+    sw      a0,16(sp)
     li      a0, 1
     call    putint
     j       .L2_0
@@ -110,10 +100,10 @@ main:
     j       .L2_0
 .L2_0:
 .L3_0:
-    ld      ra,56(sp)
-    ld      s0,40(sp)
+    ld      ra,40(sp)
+    ld      s0,32(sp)
     li      a0, 0
-    addi    sp,sp,64
+    addi    sp,sp,48
     ret
 .section        .data
     .align 4

@@ -21,262 +21,231 @@
     .globl EightWhile
     .type EightWhile,@function
 EightWhile:
-    addi    sp,sp,-336
-    sd      ra,328(sp)
-    sd      s0,312(sp)
-    addi    s0,sp,336
+    addi    sp,sp,-216
+    sd      ra,208(sp)
+    sd      s0,200(sp)
+    addi    s0,sp,216
 .L1_0:
     li      a0, 5
-    mv      a1, a0
-    li      a2, 6
-    mv      a3, a2
-    li      a4, 7
-    mv      a5, a4
-    li      a6, 10
-    mv      a7, a6
+    li      a1, 6
+    li      a2, 7
+    li      a3, 10
     j       .while.head_31
 .while.head_31:
-    li      s1, 20
-    slt     s2,a1,s1
-    bnez    s2, .while.body_31
+    li      a4, 20
+    slt     a5,a0,a4
+    bnez    a5, .while.body_31
     j       .while.exit_31
 .while.body_31:
-    li      s3, 3
-    add     s4,a1,s3
+    li      a6, 3
+    add     a7,a0,a6
     j       .while.head_35
 .while.head_35:
-    slt     s5,a3,a6
-    bnez    s5, .while.body_35
+    li      s1, 10
+    slt     s2,a1,s1
+    bnez    s2, .while.body_35
     j       .while.exit_35
 .while.body_35:
-    li      s6, 1
-    add     s7,a3,s6
+    li      s3, 1
+    add     s4,a1,s3
     j       .while.head_39
 .while.head_39:
-    xor     s8,a5,a4
-    sltiu   s8,s8,1
-    bnez    s8, .while.body_39
+    li      s5, 7
+    xor     s6,a2,s5
+    seqz    s6, s6
+    bnez    s6, .while.body_39
     j       .while.exit_39
 .while.body_39:
-    sub     s9,a5,s6
+    sub     s7,a2,s3
     j       .while.head_43
 .while.head_43:
-    slt     s10,a7,s1
-    bnez    s10, .while.body_43
+    slt     s8,a3,a4
+    bnez    s8, .while.body_43
     j       .while.exit_43
 .while.body_43:
-    add     s11,a7,s3
+    add     s9,a3,a6
     j       .while.head_47
 .while.head_47:
-    la      a0, e
-    lw      a2,0(a0)
-    mv      a0, a0
-    slt     a2,s6,a0
-    bnez    a2, .while.body_47
+    la      s10, e
+    lw      s11,0(s10)
+    slt     a6,s3,a4
+    bnez    a6, .while.body_47
     j       .while.exit_47
 .while.body_47:
-    la      a4, e
-    lw      a6,0(a4)
-    mv      a4, a4
-    sub     a6,a4,s6
     la      s1, e
-    sd      a6,0(s1)
+    lw      s3,0(s1)
+    li      s3, 1
+    sub     s5,s1,s3
+    la      s3, e
+    sd      s5,0(s3)
     j       .while.head_51
 .while.head_51:
-    la      s1, f
-    lw      s3,0(s1)
-    mv      s1, s1
-    li      s3, 2
-    slt     s6,s3,s1
-    bnez    s6, .while.body_51
+    la      s3, f
+    lw      s10,0(s3)
+    li      s10, 2
+    slt     s11,s10,s3
+    bnez    s11, .while.body_51
     j       .while.exit_51
 .while.body_51:
-    la      s3, f
-    sw      a0,248(sp)
-    lw      a0,0(s3)
-    mv      a0, a0
-    li      s3, 2
-    sw      a1,304(sp)
-    sub     a1,a0,s3
-    la      s3, f
-    sd      a1,0(s3)
+    la      s10, f
+    sw      a0,196(sp)
+    lw      a0,0(s10)
+    li      s10, 2
+    sw      a1,192(sp)
+    sub     a1,a0,s10
+    la      s10, f
+    sd      a1,0(s10)
     j       .while.head_55
 .while.head_55:
-    la      s3, g
-    sw      a0,220(sp)
-    lw      a0,0(s3)
-    mv      a0, a0
-    li      s3, 3
-    sw      a1,216(sp)
-    slt     a1,a0,s3
+    la      s10, g
+    sw      a0,124(sp)
+    lw      a0,0(s10)
+    li      s10, 3
+    sw      a1,120(sp)
+    slt     a1,a0,s10
     bnez    a1, .while.body_55
     j       .while.exit_55
 .while.body_55:
-    la      s3, g
-    sw      a0,208(sp)
-    lw      a0,0(s3)
-    mv      a0, a0
-    li      s3, 10
-    sb      a1,207(sp)
-    add     a1,a0,s3
-    la      s3, g
-    sd      a1,0(s3)
+    la      s10, g
+    sw      a0,116(sp)
+    lw      a0,0(s10)
+    li      s10, 10
+    sb      a1,115(sp)
+    add     a1,a0,s10
+    la      s10, g
+    sd      a1,0(s10)
     j       .while.head_59
 .while.head_59:
-    la      s3, h
-    sw      a0,203(sp)
-    lw      a0,0(s3)
-    mv      a0, a0
-    li      s3, 10
-    sw      a1,196(sp)
-    slt     a1,a0,s3
+    la      s10, h
+    sw      a0,108(sp)
+    lw      a0,0(s10)
+    li      s10, 10
+    sw      a1,104(sp)
+    slt     a1,a0,s10
     bnez    a1, .while.body_59
     j       .while.exit_59
 .while.body_59:
-    la      s3, h
-    sw      a0,188(sp)
-    lw      a0,0(s3)
-    mv      a0, a0
-    li      s3, 8
-    sb      a1,187(sp)
-    add     a1,a0,s3
-    la      s3, h
-    sd      a1,0(s3)
+    la      s10, h
+    sw      a0,100(sp)
+    lw      a0,0(s10)
+    li      s10, 8
+    sb      a1,99(sp)
+    add     a1,a0,s10
+    la      s10, h
+    sd      a1,0(s10)
     j       .while.head_59
 .while.exit_59:
-    la      s3, h
-    sw      a0,180(sp)
-    lw      a0,0(s3)
-    mv      a0, a0
-    li      s3, 1
-    sw      a1,176(sp)
-    sub     a1,a0,s3
-    la      s3, h
-    sd      a1,0(s3)
+    la      s10, h
+    sw      a0,92(sp)
+    lw      a0,0(s10)
+    li      s10, 1
+    sw      a1,88(sp)
+    sub     a1,a0,s10
+    la      s10, h
+    sd      a1,0(s10)
     j       .while.head_55
 .while.exit_55:
-    la      s3, g
-    sw      a0,168(sp)
-    lw      a0,0(s3)
-    mv      a0, a0
-    li      s3, 8
-    sw      a1,160(sp)
-    sub     a1,a0,s3
-    la      s3, g
-    sd      a1,0(s3)
+    la      s10, g
+    sw      a0,84(sp)
+    lw      a0,0(s10)
+    li      s10, 8
+    sw      a1,80(sp)
+    sub     a1,a0,s10
+    la      s10, g
+    sd      a1,0(s10)
     j       .while.head_51
 .while.exit_51:
-    la      s3, f
-    sw      a0,152(sp)
-    lw      a0,0(s3)
-    mv      a0, a0
-    li      s3, 1
-    sw      a1,144(sp)
-    add     a1,a0,s3
-    la      s3, f
-    sd      a1,0(s3)
+    la      s10, f
+    sw      a0,76(sp)
+    lw      a0,0(s10)
+    li      s10, 1
+    sw      a1,72(sp)
+    add     a1,a0,s10
+    la      s10, f
+    sd      a1,0(s10)
     j       .while.head_47
 .while.exit_47:
-    la      s3, e
-    sw      a0,136(sp)
-    lw      a0,0(s3)
-    mv      a0, a0
-    li      s3, 1
-    sw      a1,128(sp)
-    add     a1,a0,s3
-    la      s3, e
-    sd      a1,0(s3)
+    la      s10, e
+    sw      a0,68(sp)
+    lw      a0,0(s10)
+    li      s10, 1
+    sw      a1,64(sp)
+    add     a1,a0,s10
+    la      s10, e
+    sd      a1,0(s10)
     j       .while.head_43
 .while.exit_43:
-    li      s3, 1
-    sw      a0,120(sp)
-    sub     a0,a7,s3
+    li      s10, 1
+    sw      a0,60(sp)
+    sub     a0,a3,s10
     j       .while.head_39
 .while.exit_39:
-    sw      a0,104(sp)
-    add     a0,a5,s3
+    sw      a0,52(sp)
+    add     a0,a2,s10
     j       .while.head_35
 .while.exit_35:
-    li      s3, 2
-    sw      a0,96(sp)
-    sub     a0,a3,s3
+    sw      a0,48(sp)
+    li      a0, 2
+    sw      a1,56(sp)
+    sub     a1,s10,a0
     j       .while.head_31
 .while.exit_31:
-    la      s3, h
-    sw      a0,88(sp)
-    lw      a0,0(s3)
-    la      a0, g
-    lw      s3,0(a0)
-    mv      a0, a0
-    mv      s3, s3
-    sw      a1,112(sp)
-    add     a1,a0,s3
-    sw      a0,72(sp)
-    sub     a0,a1,a7
-    sw      a0,56(sp)
-    la      a0, e
-    sw      a1,64(sp)
+    la      a0, h
+    sw      a1,44(sp)
     lw      a1,0(a0)
-    mv      a0, a0
-    mv      a1, a1
-    sb      a2,247(sp)
+    la      a0, g
+    lw      a1,0(a0)
+    sw      a2,188(sp)
     add     a2,a0,a1
-    sw      a0,48(sp)
-    add     a0,a3,a7
-    sw      a1,56(sp)
-    add     a1,a0,a5
-    sw      a0,32(sp)
-    mv      a0, a0
-    sw      a2,40(sp)
+    sw      a0,36(sp)
+    sub     a0,a2,a3
+    sw      a0,28(sp)
+    la      a0, e
+    sw      a1,40(sp)
+    lw      a1,0(a0)
+    sw      a2,32(sp)
     add     a2,a0,a1
-    sw      a0,304(sp)
-    mv      a0, a0
-    sw      a1,24(sp)
-    sub     a1,a2,a0
-    ld      ra,328(sp)
-    ld      s0,312(sp)
-    mv      a0, a1
-    addi    sp,sp,336
+    sw      a0,24(sp)
+    add     a0,s10,a3
+    sw      a1,28(sp)
+    sw      a2,20(sp)
+    add     a2,a0,a1
+    sw      a0,16(sp)
+    sw      a1,188(sp)
+    add     a1,a0,a2
+    sw      a0,196(sp)
+    sw      a2,12(sp)
+    sub     a2,a1,a0
+    ld      ra,208(sp)
+    ld      s0,200(sp)
+    mv      a0, a2
+    addi    sp,sp,216
     ret
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-40
-    sd      ra,32(sp)
-    sd      s0,16(sp)
-    addi    s0,sp,40
+    addi    sp,sp,-24
+    sd      ra,16(sp)
+    sd      s0,8(sp)
+    addi    s0,sp,24
 .L0_0:
-    sw      a0,40(sp)
     la      a0, g
-    sw      a1,8(sp)
     li      a1, 1
     sd      a1,0(a0)
-    la      a0, h
-    li      a1, 2
-    sd      a1,0(a0)
-    la      a0, e
-    li      a1, 4
-    sd      a1,0(a0)
-    la      a0, f
-    li      a1, 6
-    sd      a1,0(a0)
-    sw      s1,228(sp)
-    sb      s2,279(sp)
-    sw      s3,80(sp)
-    sw      s4,275(sp)
-    sb      s5,274(sp)
-    sb      s6,227(sp)
-    sw      s7,268(sp)
-    sb      s8,267(sp)
-    sw      s9,260(sp)
-    sb      s10,259(sp)
-    sw      s11,255(sp)
+    la      a2, h
+    li      a3, 2
+    sd      a3,0(a2)
+    la      a4, e
+    li      a5, 4
+    sd      a5,0(a4)
+    la      a6, f
+    li      a7, 6
+    sd      a7,0(a6)
     call    EightWhile
-    sw      a0,8(sp)
-    ld      ra,32(sp)
-    ld      s0,16(sp)
-    mv      a0, a0
-    addi    sp,sp,40
+    sw      a0,4(sp)
+    ld      ra,16(sp)
+    ld      s0,8(sp)
+    addi    sp,sp,24
     ret
 .section        .data
     .align 4

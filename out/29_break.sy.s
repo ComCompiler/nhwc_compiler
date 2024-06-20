@@ -21,37 +21,36 @@
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-64
-    sd      ra,56(sp)
-    sd      s0,40(sp)
-    addi    s0,sp,64
+    addi    sp,sp,-40
+    sd      ra,32(sp)
+    sd      s0,24(sp)
+    addi    s0,sp,40
 .L0_0:
     li      a0, 0
-    mv      a1, a0
-    mv      a2, a0
+    li      a1, 0
     j       .while.head_23
 .while.head_23:
-    li      a3, 100
-    slt     a4,a1,a3
-    bnez    a4, .while.body_23
+    li      a2, 100
+    slt     a3,a0,a2
+    bnez    a3, .while.body_23
     j       .while.exit_23
 .while.body_23:
-    li      a5, 50
-    xor     a6,a1,a5
-    sltiu   a6,a6,1
-    bnez    a6, .branch_true_26
+    li      a4, 50
+    xor     a5,a0,a4
+    seqz    a5, a5
+    bnez    a5, .branch_true_26
     j       .branch_false_26
 .branch_true_26:
     j       .while.exit_23
 .while.exit_23:
-    ld      ra,56(sp)
-    ld      s0,40(sp)
-    mv      a0, a2
-    addi    sp,sp,64
+    ld      ra,32(sp)
+    ld      s0,24(sp)
+    mv      a0, a1
+    addi    sp,sp,40
     ret
 .branch_false_26:
 .L1_0:
-    add     a7,a2,a1
-    li      s1, 1
-    add     s2,a1,s1
+    add     a6,a1,a0
+    li      a7, 1
+    add     s1,a0,a7
     j       .while.head_23

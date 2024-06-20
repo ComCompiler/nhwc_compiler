@@ -21,50 +21,43 @@
     .globl main
     .type main,@function
 main:
-    addi    sp,sp,-152
-    sd      ra,144(sp)
-    sd      s0,128(sp)
-    addi    s0,sp,152
+    addi    sp,sp,-96
+    sd      ra,88(sp)
+    sd      s0,80(sp)
+    addi    s0,sp,96
 .L0_0:
     li      a0, 0
-    mv      a1, a0
     j       .L1_0
 .L1_0:
-    la      a2, d
-    lw      a3,0(a2)
-    la      a4, c
-    lw      a5,0(a4)
-    la      a6, a
-    lw      a7,0(a6)
-    mv      s1, s1
-    mv      s2, s2
-    div     s3,s1,s2
-    mv      s4, s4
-    sub     s5,s3,s4
-    la      s6, b
-    lw      s7,0(s6)
-    mv      s8, s8
-    mul     s9,s8,s2
-    sub     s10,s9,s1
-    xor     s11,s10,s5
-    sltiu   s11,s11,1
-    la      a0, e
-    lw      a2,0(a0)
-    mv      a0, a0
-    add     a2,a0,s4
-    add     a3,s1,s8
-    mul     a4,a3,s1
-    add     a5,a4,s2
-    slt     a6,a5,a2
+    la      a1, d
+    lw      a2,0(a1)
+    la      a3, c
+    lw      a4,0(a3)
+    la      a5, a
+    lw      a6,0(a5)
+    div     s2,a7,s1
+    sub     s4,s2,s3
+    la      s5, b
+    lw      s6,0(s5)
+    mul     s8,s7,s1
+    sub     s9,s8,a7
+    xor     s10,s9,s4
+    seqz    s10, s10
+    la      s11, e
+    lw      a1,0(s11)
+    add     a2,a1,s3
+    add     a3,a7,s7
+    mul     a4,a3,a7
+    add     a5,a4,s1
+    slt     a6,a2,a5
     xori    a6,a6,1
-    mul     a7,s1,s8
-    div     s6,a7,s2
-    xor     s7,s6,a2
-    sltiu   s7,s7,1
-    sw      a0,48(sp)
-    and     a0,s7,a6
+    mul     s5,a7,s7
+    div     s6,s5,s1
+    xor     s11,s6,a2
+    seqz    s11, s11
+    sw      a0,76(sp)
+    and     a0,s11,a6
     sb      a0,6(sp)
-    mv      a0, a0
     bnez    a0, .branch_true_25
     j       .branch_false_25
 .branch_true_25:
@@ -73,24 +66,23 @@ main:
     j       .branch_false_25
 .branch_false_25:
 .L2_0:
-    sw      s1,96(sp)
-    sw      s2,104(sp)
-    sw      s3,88(sp)
-    sw      s4,112(sp)
-    sw      s5,80(sp)
+    sw      s1,68(sp)
+    sw      s2,60(sp)
+    sw      s3,72(sp)
+    sw      s4,56(sp)
+    sw      s5,12(sp)
     sw      s6,8(sp)
-    sb      s7,7(sp)
-    sw      s8,72(sp)
-    sw      s9,64(sp)
-    sw      s10,56(sp)
-    sb      s11,55(sp)
-    sw      a1,120(sp)
-    mv      a0, a0
+    sw      s7,52(sp)
+    sw      s8,48(sp)
+    sw      s9,44(sp)
+    sb      s10,43(sp)
+    sb      s11,7(sp)
+    sw      a0,76(sp)
     call    putint
-    ld      ra,144(sp)
-    ld      s0,128(sp)
-    lw      a0,120(sp)
-    addi    sp,sp,152
+    ld      ra,88(sp)
+    ld      s0,80(sp)
+    lw      a0,76(sp)
+    addi    sp,sp,96
     ret
 .section        .data
     .align 4
