@@ -517,12 +517,21 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         // store reg to lhs
                     },
                     NhwcInstrType::SimpleAssign { lhs, rhs, vartype } => {
-                        let val_reg1= regtab.find_and_occupy_reg(rhs, vartype, symtab, asm_sect, default_store, default_load)?;
-                        let val_reg2= regtab.find_and_occupy_reg(lhs, vartype, symtab, asm_sect, default_store, 
-                            |symidx,reg,symtab,asm_sect,regtab|{asm_sect.asm(PseudoInstr::new_reg_mv(reg, val_reg1.clone(), vartype).into()); Ok(())}
-                        )?;
-                        regtab.free_reg(val_reg1)?;
-                        regtab.free_reg(val_reg2)?;
+                        if rhs.is_literal(){
+                            let rst_reg= regtab.find_and_occupy_reg(lhs, vartype, symtab, asm_sect, default_store, 
+                                |symidx,reg,symtab,asm_sect,regtab|{
+                                    _load_sym_or_imm(asm_sect, &rhs, reg, regtab, symtab)
+                                }
+                            )?;
+                            regtab.free_reg(rst_reg)?;
+                        }else{
+                            let val_reg1= regtab.find_and_occupy_reg(rhs, vartype, symtab, asm_sect, default_store, default_load)?;
+                            let val_reg2= regtab.find_and_occupy_reg(lhs, vartype, symtab, asm_sect, default_store, 
+                                |symidx,reg,symtab,asm_sect,regtab|{asm_sect.asm(PseudoInstr::new_reg_mv(reg, val_reg1.clone(), vartype).into()); Ok(())}
+                            )?;
+                            regtab.free_reg(val_reg1)?;
+                            regtab.free_reg(val_reg2)?;
+                        }
                     },
                     NhwcInstrType::Call { op_assigned_symidx, func_op } => {
                         let mut fpu_args = vec![];
@@ -838,8 +847,12 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                     Type::F32 => {
                         assert!(reg.is_fpu());
                         if let Some(reg_in_regtab) = symtab.reg_of_symidx(symidx)?{
-                            asm_sect.asm(PseudoInstr::new_reg_mv(reg, reg_in_regtab, ty).into());
-                            return Ok(())
+                            if reg_in_regtab == reg{
+                                return Ok(())
+                            }else {
+                                asm_sect.asm(PseudoInstr::new_reg_mv(reg, reg_in_regtab, ty).into());
+                                return Ok(())
+                            }
                         }
 
                         if symidx_offset2sp.is_legal_offset(){
@@ -859,8 +872,12 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                         // you should ext it by sext.w
                         assert!(!reg.is_fpu());
                         if let Some(reg_in_regtab) = symtab.reg_of_symidx(symidx)?{
-                            asm_sect.asm(PseudoInstr::new_reg_mv(reg, reg_in_regtab, ty).into());
-                            return Ok(())
+                            if reg_in_regtab == reg{
+                                return Ok(())
+                            }else {
+                                asm_sect.asm(PseudoInstr::new_reg_mv(reg, reg_in_regtab, ty).into());
+                                return Ok(())
+                            }
                         }
                         if symidx_offset2sp.is_legal_offset(){
                             asm_sect.asm(Loads::new(size,reg.clone(), Register::SP, symidx_offset2sp, false)?.into());
@@ -878,8 +895,12 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                     _ => {
                         assert!(!reg.is_fpu());
                         if let Some(reg_in_regtab) = symtab.reg_of_symidx(symidx)?{
-                            asm_sect.asm(PseudoInstr::new_reg_mv(reg, reg_in_regtab, ty).into());
-                            return Ok(())
+                            if reg_in_regtab == reg{
+                                return Ok(())
+                            }else {
+                                asm_sect.asm(PseudoInstr::new_reg_mv(reg, reg_in_regtab, ty).into());
+                                return Ok(())
+                            }
                         }
                         if symidx_offset2sp.is_legal_offset(){
                             asm_sect.asm(Loads::new(size,reg.clone(), Register::SP, symidx_offset2sp, false)?.into());
