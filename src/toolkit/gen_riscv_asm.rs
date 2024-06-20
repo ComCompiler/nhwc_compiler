@@ -506,7 +506,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 let val_reg1= regtab.find_and_occupy_reg(a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
                                 let rst_reg= regtab.find_and_occupy_reg(lhs, vartype, symtab, asm_sect, &mut default_store, 
                                     &mut |symidx,rst_reg,symtab,asm_sect,regtab|{
-                                        asm_sect.asm(Logical::new_xori(rst_reg.clone(), val_reg1.clone(), Imm::from_offset(-1)).into());
+                                        asm_sect.asm(PseudoInstr::new_seqz(rst_reg.clone(), val_reg1.clone()).into());
                                         Ok(())
                                     }
                                 )?;

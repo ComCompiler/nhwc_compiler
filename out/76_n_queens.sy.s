@@ -269,7 +269,7 @@ f:
     snez    s8, s8
                     #      new_var temp_19_40:i1 
                     #      temp_19_40 = xor i1 temp_18_40, true 
-    xori    s9,s8,-1
+    seqz    s9, s8
                     #      new_var temp_20_40:i32 
                     #      temp_20_40 = Add i32 step_33, i_35 
     add     s10,a0,a1

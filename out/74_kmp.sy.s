@@ -328,7 +328,7 @@ KMP:
     snez    a5, a5
                     #      new_var temp_29_45:i1 
                     #      temp_29_45 = xor i1 temp_28_45, true 
-    xori    s1,a5,-1
+    seqz    s1, a5
                     #      br i1 temp_29_45, label branch_true_46, label branch_false_46 
     bnez    s1, .branch_true_46
     j       .branch_false_46

@@ -531,7 +531,7 @@ main:
     snez    s5, s5
                     #      new_var temp_31_64:i1 
                     #      temp_31_64 = xor i1 temp_30_64, true 
-    xori    s6,s5,-1
+    seqz    s6, s5
                     #      br i1 temp_31_64, label branch_true_65, label branch_false_65 
     bnez    s6, .branch_true_65
     j       .branch_false_65
@@ -1164,7 +1164,7 @@ main:
     snez    s4, s4
                     #      new_var temp_95_103:i1 
                     #      temp_95_103 = xor i1 temp_94_103, true 
-    xori    s5,s4,-1
+    seqz    s5, s4
                     #      br i1 temp_95_103, label branch_true_104, label branch_false_104 
     bnez    s5, .branch_true_104
     j       .branch_false_104

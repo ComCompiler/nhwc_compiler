@@ -1120,7 +1120,7 @@ eval:
     snez    s1, s1
                     #      new_var temp_78_130:i1 
                     #      temp_78_130 = xor i1 temp_77_130, true 
-    xori    s2,s1,-1
+    seqz    s2, s1
                     #      br i1 temp_78_130, label branch_true_131, label branch_false_131 
     bnez    s2, .branch_true_131
     j       .branch_false_131

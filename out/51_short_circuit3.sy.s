@@ -842,7 +842,7 @@ main:
     snez    s5, s5
                     #      new_var temp_50_100:i1 
                     #      temp_50_100 = xor i1 temp_49_100, true 
-    xori    s6,s5,-1
+    seqz    s6, s5
                     #      new_var temp_51_100:i32 
                     #      temp_51_100 = zext i1 temp_50_100 to i32 
                     #      new_var temp_52_100:i1 
@@ -901,7 +901,7 @@ main:
     snez    s6, s6
                     #      new_var temp_59_104:i1 
                     #      temp_59_104 = xor i1 temp_58_104, true 
-    xori    s7,s6,-1
+    seqz    s7, s6
                     #      new_var temp_60_104:i32 
                     #      temp_60_104 = zext i1 temp_59_104 to i32 
                     #      new_var temp_61_104:i1 

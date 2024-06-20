@@ -70,110 +70,111 @@ bubblesort:
     la      a2, n
                     #occupy reg a2 with *n_0
     lw      a3,0(a2)
-                    #occupy reg a3 with n_0
                     #      new_var temp_1_23:i32 
                     #      temp_1_23 = Sub i32 temp_0_23, 1_0 
-    li      a5, 1
-    sub     a6,a4,a5
+    li      a4, 1
+    sub     a5,a3,a4
                     #      new_var temp_2_23:i1 
                     #      temp_2_23 = icmp i32 Slt i_19, temp_1_23 
-    slt     a7,a1,a6
+    slt     a6,a1,a5
                     #      br i1 temp_2_23, label while.body_24, label while.exit_24 
-    bnez    a7, .while.body_24
+    bnez    a6, .while.body_24
     j       .while.exit_24
                     #      label while.body_24: 
 .while.body_24:
                     #      j_19 = i32 0_0 
-    li      s1, 0
+    li      a7, 0
                     #      jump label: while.head_28 
     j       .while.head_28
                     #      label while.head_28: 
 .while.head_28:
                     #      new_var temp_3_27:i32 
                     #      temp_3_27 = Sub i32 i_19, 1_0 
-                    #found literal reg Some(a5) already exist with 1_0
-    sub     s2,a1,a5
+                    #found literal reg Some(a4) already exist with 1_0
+    sub     s1,a1,a4
                     #      new_var temp_4_27:i32 
                     #      temp_4_27 = load *n_0:ptr->i32 
                     #   load label n as ptr to reg
-    la      s3, n
-                    #occupy reg s3 with *n_0
-    lw      s4,0(s3)
-                    #occupy reg s4 with n_0
+    la      s2, n
+                    #occupy reg s2 with *n_0
+    lw      s3,0(s2)
                     #      new_var temp_5_27:i32 
                     #      temp_5_27 = Sub i32 temp_4_27, temp_3_27 
-    sub     s6,s5,s2
+    sub     s4,s3,s1
                     #      new_var temp_6_27:i1 
                     #      temp_6_27 = icmp i32 Slt j_19, temp_5_27 
-    slt     s7,s1,s6
+    slt     s5,a7,s4
                     #      br i1 temp_6_27, label while.body_28, label while.exit_28 
-    bnez    s7, .while.body_28
+    bnez    s5, .while.body_28
     j       .while.exit_28
                     #      label while.body_28: 
 .while.body_28:
                     #      new_var temp_7_30:i32 
                     #      temp_7_30 = Add i32 j_19, 1_0 
-                    #found literal reg Some(a5) already exist with 1_0
-    add     s8,s1,a5
+                    #found literal reg Some(a4) already exist with 1_0
+    add     s6,a7,a4
                     #      new_var temp_8_30:ptr->i32 
                     #      new_var temp_9_30:i32 
                     #      temp_8_30 = getelementptr arr_17:ptr->i32 [Some(temp_7_30)] 
+    li      s7, 0
+                    #found literal reg Some(a4) already exist with 1_0
+    add     s7,s7,a0
+    slli s7,s7,3
+    add     s7,s7,sp
+    add     s7,s7,s7
+                    #      temp_9_30 = load temp_8_30:ptr->i32 
+    lw      s8,0(s7)
+                    #      new_var temp_10_30:ptr->i32 
+                    #      new_var temp_11_30:i32 
+                    #      temp_10_30 = getelementptr arr_17:ptr->i32 [Some(j_19)] 
     li      s9, 0
-                    #found literal reg Some(a5) already exist with 1_0
+                    #found literal reg Some(a4) already exist with 1_0
     add     s9,s9,a0
     slli s9,s9,3
     add     s9,s9,sp
     add     s9,s9,s9
-                    #      temp_9_30 = load temp_8_30:ptr->i32 
-                    #      new_var temp_10_30:ptr->i32 
-                    #      new_var temp_11_30:i32 
-                    #      temp_10_30 = getelementptr arr_17:ptr->i32 [Some(j_19)] 
-    li      s10, 0
-                    #found literal reg Some(a5) already exist with 1_0
-    add     s10,s10,a0
-    slli s10,s10,3
-    add     s10,s10,sp
-    add     s10,s10,s10
                     #      temp_11_30 = load temp_10_30:ptr->i32 
+    lw      s10,0(s9)
                     #      new_var temp_12_30:i1 
                     #      temp_12_30 = icmp i32 Sgt temp_11_30, temp_9_30 
-    slt     a3,a2,s11
+    slt     s11,s8,s10
                     #      br i1 temp_12_30, label branch_true_31, label branch_false_31 
-    bnez    a3, .branch_true_31
+    bnez    s11, .branch_true_31
     j       .branch_false_31
                     #      label branch_true_31: 
 .branch_true_31:
                     #      new_var tmp_32:i32 
                     #      new_var temp_13_32:i32 
                     #      temp_13_32 = Add i32 j_19, 1_0 
-                    #found literal reg Some(a5) already exist with 1_0
-    add     s3,s1,a5
+                    #found literal reg Some(a4) already exist with 1_0
+    add     a2,a7,a4
                     #      new_var temp_14_32:ptr->i32 
                     #      new_var temp_15_32:i32 
                     #      temp_14_32 = getelementptr arr_17:ptr->i32 [Some(temp_13_32)] 
-    li      a5, 0
-    li      s4, 1
-    add     a5,a5,a0
-    slli a5,a5,3
-    add     a5,a5,sp
-    add     a5,a5,a5
+    li      a4, 0
+    li      s2, 1
+    add     a4,a4,a0
+    slli a4,a4,3
+    add     a4,a4,sp
+    add     a4,a4,a4
                     #      temp_15_32 = load temp_14_32:ptr->i32 
+    lw      s2,0(a4)
                     #      tmp_32 = i32 temp_15_32 
     sd      a0,136(sp)
-    mv      a0, s4
+    mv      a0, s2
                     #      new_var temp_16_32:i32 
                     #      temp_16_32 = Add i32 j_19, 1_0 
     sw      a0,60(sp)
     li      a0, 1
     sw      a1,132(sp)
-    add     a1,s1,a0
+    add     a1,a7,a0
                     #      new_var temp_17_32:ptr->i32 
                     #      temp_17_32 = getelementptr arr_17:ptr->i32 [Some(temp_16_32)] 
     li      a0, 0
     sw      a1,40(sp)
     li      a1, 1
-    sw      a2,84(sp)
-    sb      a3,67(sp)
+    sw      a2,56(sp)
+    sw      a3,124(sp)
     mul     a3,a1,a2
     add     a0,a0,a3
     slli a0,a0,3
@@ -190,7 +191,9 @@ bubblesort:
     add     a1,a1,sp
     add     a1,a1,a1
                     #      temp_19_32 = load temp_18_32:ptr->i32 
+    lw      a0,0(a1)
                     #      store temp_19_32:i32 temp_17_32:ptr->i32 
+    sw      a0,20(sp)
     sd      a1,24(sp)
     sd      a1,0(a0)
                     #      mu arr_17:118 
@@ -220,7 +223,7 @@ bubblesort:
     sd      a0,8(sp)
     li      a0, 1
     sw      a1,60(sp)
-    add     a1,s1,a0
+    add     a1,a7,a0
                     #      j_19 = i32 temp_21_29 
                     #      jump label: while.head_28 
     j       .while.head_28
@@ -290,12 +293,11 @@ insertsort:
     la      a2, n
                     #occupy reg a2 with *n_0
     lw      a3,0(a2)
-                    #occupy reg a3 with n_0
                     #      new_var temp_24_45:i1 
                     #      temp_24_45 = icmp i32 Slt i_42, temp_23_45 
-    slt     a5,a1,a4
+    slt     a4,a1,a3
                     #      br i1 temp_24_45, label while.body_46, label while.exit_46 
-    bnez    a5, .while.body_46
+    bnez    a4, .while.body_46
     j       .while.exit_46
                     #      label while.body_46: 
 .while.body_46:
@@ -303,22 +305,23 @@ insertsort:
                     #      new_var temp_25_47:ptr->i32 
                     #      new_var temp_26_47:i32 
                     #      temp_25_47 = getelementptr a_40:ptr->i32 [Some(i_42)] 
-    li      a6, 0
-    li      a7, 1
-    add     a6,a6,a0
-    slli a6,a6,3
-    add     a6,a6,sp
-    add     a6,a6,a6
+    li      a5, 0
+    li      a6, 1
+    add     a5,a5,a0
+    slli a5,a5,3
+    add     a5,a5,sp
+    add     a5,a5,a5
                     #      temp_26_47 = load temp_25_47:ptr->i32 
+    lw      a7,0(a5)
                     #      temp_47 = i32 temp_26_47 
-    mv      s2, s1
+    mv      s1, a7
                     #      new_var j_47:i32 
                     #      new_var temp_27_47:i32 
                     #      temp_27_47 = Sub i32 i_42, 1_0 
-                    #found literal reg Some(a7) already exist with 1_0
-    sub     s3,a1,a7
+                    #found literal reg Some(a6) already exist with 1_0
+    sub     s2,a1,a6
                     #      j_47 = i32 temp_27_47 
-    mv      s4, s3
+    mv      s3, s2
                     #      jump label: while.head_53 
     j       .while.head_53
                     #      label while.head_53: 
@@ -326,59 +329,61 @@ insertsort:
                     #      new_var temp_28_52:ptr->i32 
                     #      new_var temp_29_52:i32 
                     #      temp_28_52 = getelementptr a_40:ptr->i32 [Some(j_47)] 
-    li      s5, 0
-                    #found literal reg Some(a7) already exist with 1_0
-    add     s5,s5,a0
-    slli s5,s5,3
-    add     s5,s5,sp
-    add     s5,s5,s5
+    li      s4, 0
+                    #found literal reg Some(a6) already exist with 1_0
+    add     s4,s4,a0
+    slli s4,s4,3
+    add     s4,s4,sp
+    add     s4,s4,s4
                     #      temp_29_52 = load temp_28_52:ptr->i32 
+    lw      s5,0(s4)
                     #      new_var temp_30_52:i1 
                     #      temp_30_52 = icmp i32 Slt temp_47, temp_29_52 
-    slt     s7,s2,s6
+    slt     s6,s1,s5
                     #      new_var temp_31_52:i1 
                     #      temp_31_52 = icmp i32 Sgt j_47, -1_0 
-    li      s8, -1
-    slt     s9,s8,s4
+    li      s7, -1
+    slt     s8,s7,s3
                     #      new_var temp_32_52:i1 
                     #      temp_32_52 = And i1 temp_31_52, temp_30_52 
-    and     s10,s9,s7
+    and     s9,s8,s6
                     #      br i1 temp_32_52, label while.body_53, label while.exit_53 
-    bnez    s10, .while.body_53
+    bnez    s9, .while.body_53
     j       .while.exit_53
                     #      label while.body_53: 
 .while.body_53:
                     #      new_var temp_33_54:i32 
                     #      temp_33_54 = Add i32 j_47, 1_0 
-                    #found literal reg Some(a7) already exist with 1_0
-    add     s11,s4,a7
+                    #found literal reg Some(a6) already exist with 1_0
+    add     s10,s3,a6
                     #      new_var temp_34_54:ptr->i32 
                     #      temp_34_54 = getelementptr a_40:ptr->i32 [Some(temp_33_54)] 
+    li      s11, 0
+                    #found literal reg Some(a6) already exist with 1_0
+    add     s11,s11,a0
+    slli s11,s11,3
+    add     s11,s11,sp
+    add     s11,s11,s11
+                    #      new_var temp_35_54:ptr->i32 
+                    #      new_var temp_36_54:i32 
+                    #      temp_35_54 = getelementptr a_40:ptr->i32 [Some(j_47)] 
     li      a2, 0
-                    #found literal reg Some(a7) already exist with 1_0
+                    #found literal reg Some(a6) already exist with 1_0
     add     a2,a2,a0
     slli a2,a2,3
     add     a2,a2,sp
     add     a2,a2,a2
-                    #      new_var temp_35_54:ptr->i32 
-                    #      new_var temp_36_54:i32 
-                    #      temp_35_54 = getelementptr a_40:ptr->i32 [Some(j_47)] 
-    li      a3, 0
-                    #found literal reg Some(a7) already exist with 1_0
-    add     a3,a3,a0
-    slli a3,a3,3
-    add     a3,a3,sp
-    add     a3,a3,a3
                     #      temp_36_54 = load temp_35_54:ptr->i32 
+    lw      a6,0(a2)
                     #      store temp_36_54:i32 temp_34_54:ptr->i32 
-    sd      a7,0(a2)
+    sd      a6,0(s11)
                     #      mu a_40:198 
                     #      a_40 = chi a_40:198 
                     #      new_var temp_37_54:i32 
                     #      temp_37_54 = Sub i32 j_47, 1_0 
-    li      s8, 1
+    li      s7, 1
     sd      a0,112(sp)
-    sub     a0,s4,s8
+    sub     a0,s3,s7
                     #      j_47 = i32 temp_37_54 
                     #      jump label: while.head_53 
     j       .while.head_53
@@ -386,23 +391,23 @@ insertsort:
 .while.exit_53:
                     #      new_var temp_38_47:i32 
                     #      temp_38_47 = Add i32 j_47, 1_0 
-                    #found literal reg Some(s8) already exist with 1_0
+                    #found literal reg Some(s7) already exist with 1_0
     sw      a0,24(sp)
-    add     a0,s4,s8
+    add     a0,s3,s7
                     #      new_var temp_39_47:ptr->i32 
                     #      temp_39_47 = getelementptr a_40:ptr->i32 [Some(temp_38_47)] 
-    li      s8, 0
+    li      s7, 0
     sw      a0,20(sp)
     li      a0, 1
     sw      a1,108(sp)
-    sd      a2,40(sp)
+    sd      a2,32(sp)
     mul     a2,a0,a1
-    add     s8,s8,a2
-    slli s8,s8,3
-    add     s8,s8,sp
-    add     s8,s8,s8
+    add     s7,s7,a2
+    slli s7,s7,3
+    add     s7,s7,sp
+    add     s7,s7,s7
                     #      store temp_47:i32 temp_39_47:ptr->i32 
-    sd      s2,0(s8)
+    sd      s1,0(s7)
                     #      mu a_40:211 
                     #      a_40 = chi a_40:211 
                     #      new_var temp_40_47:i32 
@@ -496,6 +501,7 @@ QuickSort:
     add     a6,a6,sp
     add     a6,a6,a6
                     #      temp_43_65 = load temp_42_65:ptr->i32 
+    lw      s1,0(a6)
                     #      k_65 = i32 temp_43_65 
     mv      s2, s1
                     #      jump label: while.head_73 
@@ -524,6 +530,7 @@ QuickSort:
     add     s5,s5,sp
     add     s5,s5,s5
                     #      temp_47_75 = load temp_46_75:ptr->i32 
+    lw      s6,0(s5)
                     #      new_var temp_48_75:i1 
                     #      temp_48_75 = icmp i32 Sgt temp_47_75, temp_45_75 
     slt     s7,s4,s6
@@ -579,6 +586,7 @@ QuickSort:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_55_81 = load temp_54_81:ptr->i32 
+    lw      a1,0(a0)
                     #      store temp_55_81:i32 temp_53_81:ptr->i32 
     sd      a1,0(a7)
                     #      mu arr_60:291 
@@ -607,6 +615,7 @@ QuickSort:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_58_84 = load temp_57_84:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_59_84:i1 
                     #      temp_59_84 = icmp i32 Slt temp_58_84, k_65 
     sd      a0,72(sp)
@@ -667,7 +676,9 @@ QuickSort:
     add     a1,a1,sp
     add     a1,a1,a1
                     #      temp_66_90 = load temp_65_90:ptr->i32 
+    lw      a0,0(a1)
                     #      store temp_66_90:i32 temp_64_90:ptr->i32 
+    sw      a0,36(sp)
     sd      a1,40(sp)
     sd      a1,0(a0)
                     #      mu arr_60:337 
@@ -803,69 +814,69 @@ getMid:
     la      a1, n
                     #occupy reg a1 with *n_0
     lw      a2,0(a1)
-                    #occupy reg a2 with n_0
                     #      new_var temp_74_104:i32 
                     #      temp_74_104 = Mod i32 temp_73_104, 2_0 
-    li      a4, 2
-    rem     a5,a3,a4
+    li      a3, 2
+    rem     a4,a2,a3
                     #      new_var temp_75_104:i1 
                     #      temp_75_104 = icmp i32 Eq temp_74_104, 0_0 
-    li      a6, 0
-    xor     a7,a5,a6
-    seqz    a7, a7
+    li      a5, 0
+    xor     a6,a4,a5
+    seqz    a6, a6
                     #      br i1 temp_75_104, label branch_true_105, label branch_false_105 
-    bnez    a7, .branch_true_105
+    bnez    a6, .branch_true_105
     j       .branch_false_105
                     #      label branch_true_105: 
 .branch_true_105:
                     #      new_var temp_76_106:i32 
                     #      temp_76_106 = load *n_0:ptr->i32 
                     #   load label n as ptr to reg
-    la      s1, n
-                    #occupy reg s1 with *n_0
-    lw      s2,0(s1)
-                    #occupy reg s2 with n_0
+    la      a7, n
+                    #occupy reg a7 with *n_0
+    lw      s1,0(a7)
                     #      new_var temp_77_106:i32 
                     #      temp_77_106 = Div i32 temp_76_106, 2_0 
-                    #found literal reg Some(a4) already exist with 2_0
-    div     s4,s3,a4
+                    #found literal reg Some(a3) already exist with 2_0
+    div     s2,s1,a3
                     #      mid_102 = i32 temp_77_106 
-    mv      s5, s4
+    mv      s3, s2
                     #      new_var temp_78_106:i32 
                     #      temp_78_106 = Sub i32 mid_102, 1_0 
-    li      s6, 1
-    sub     s7,s5,s6
+    li      s4, 1
+    sub     s5,s3,s4
                     #      new_var temp_79_106:ptr->i32 
                     #      new_var temp_80_106:i32 
                     #      temp_79_106 = getelementptr arr_100:ptr->i32 [Some(temp_78_106)] 
+    li      s6, 0
+                    #found literal reg Some(s4) already exist with 1_0
+    add     s6,s6,a0
+    slli s6,s6,3
+    add     s6,s6,sp
+    add     s6,s6,s6
+                    #      temp_80_106 = load temp_79_106:ptr->i32 
+    lw      s7,0(s6)
+                    #      new_var temp_81_106:ptr->i32 
+                    #      new_var temp_82_106:i32 
+                    #      temp_81_106 = getelementptr arr_100:ptr->i32 [Some(mid_102)] 
     li      s8, 0
-                    #found literal reg Some(s6) already exist with 1_0
+                    #found literal reg Some(s4) already exist with 1_0
     add     s8,s8,a0
     slli s8,s8,3
     add     s8,s8,sp
     add     s8,s8,s8
-                    #      temp_80_106 = load temp_79_106:ptr->i32 
-                    #      new_var temp_81_106:ptr->i32 
-                    #      new_var temp_82_106:i32 
-                    #      temp_81_106 = getelementptr arr_100:ptr->i32 [Some(mid_102)] 
-    li      s9, 0
-                    #found literal reg Some(s6) already exist with 1_0
-    add     s9,s9,a0
-    slli s9,s9,3
-    add     s9,s9,sp
-    add     s9,s9,s9
                     #      temp_82_106 = load temp_81_106:ptr->i32 
+    lw      s9,0(s8)
                     #      new_var temp_83_106:i32 
                     #      temp_83_106 = Add i32 temp_82_106, temp_80_106 
-    add     a1,s10,s11
+    add     s10,s9,s7
                     #      new_var temp_84_106:i32 
                     #      temp_84_106 = Div i32 temp_83_106, 2_0 
-                    #found literal reg Some(a4) already exist with 2_0
-    div     a2,a1,a4
+                    #found literal reg Some(a3) already exist with 2_0
+    div     s11,s10,a3
                     #      ret temp_84_106 
     ld      ra,112(sp)
     ld      s0,104(sp)
-    sw      a2,28(sp)
+    sw      s11,28(sp)
     sd      a0,96(sp)
     addi    sp,sp,120
     ret
@@ -874,29 +885,30 @@ getMid:
                     #      new_var temp_85_109:i32 
                     #      temp_85_109 = load *n_0:ptr->i32 
                     #   load label n as ptr to reg
-    la      a2, n
-                    #occupy reg a2 with *n_0
-    lw      a4,0(a2)
-                    #occupy reg a4 with n_0
+    la      s11, n
+                    #occupy reg s11 with *n_0
+    lw      a1,0(s11)
                     #      new_var temp_86_109:i32 
                     #      temp_86_109 = Div i32 temp_85_109, 2_0 
-    li      a4, 2
-    div     a6,a2,a4
+                    #found literal reg Some(a3) already exist with 2_0
+    div     a5,a1,a3
                     #      mid_102 = i32 temp_86_109 
                     #      new_var temp_87_109:ptr->i32 
                     #      new_var temp_88_109:i32 
                     #      temp_87_109 = getelementptr arr_100:ptr->i32 [Some(mid_102)] 
-    li      a4, 0
-                    #found literal reg Some(s6) already exist with 1_0
-    mul     s1,s6,s5
-    add     a4,a4,s1
-    slli a4,a4,3
-    add     a4,a4,sp
-    add     a4,a4,a4
+    li      a3, 0
+                    #found literal reg Some(s4) already exist with 1_0
+    mul     a7,s4,s3
+    add     a3,a3,a7
+    slli a3,a3,3
+    add     a3,a3,sp
+    add     a3,a3,a3
                     #      temp_88_109 = load temp_87_109:ptr->i32 
+    lw      s4,0(a3)
                     #      ret temp_88_109 
     ld      ra,112(sp)
     ld      s0,104(sp)
+    sw      s4,4(sp)
     sw      a0,28(sp)
     addi    sp,sp,120
     ret
@@ -999,12 +1011,11 @@ getMost:
     la      s7, n
                     #occupy reg s7 with *n_0
     lw      s8,0(s7)
-                    #occupy reg s8 with n_0
                     #      new_var temp_93_127:i1 
                     #      temp_93_127 = icmp i32 Slt i_114, temp_92_127 
-    slt     s10,a5,s9
+    slt     s9,a5,s8
                     #      br i1 temp_93_127, label while.body_128, label while.exit_128 
-    bnez    s10, .while.body_128
+    bnez    s9, .while.body_128
     j       .while.exit_128
                     #      label while.body_128: 
 .while.body_128:
@@ -1012,39 +1023,41 @@ getMost:
                     #      new_var temp_94_129:ptr->i32 
                     #      new_var temp_95_129:i32 
                     #      temp_94_129 = getelementptr arr_112:ptr->i32 [Some(i_114)] 
-    li      s11, 0
+    li      s10, 0
                     #found literal reg Some(s2) already exist with 1_0
-    add     s11,s11,a0
-    slli s11,s11,3
-    add     s11,s11,sp
-    add     s11,s11,s11
+    add     s10,s10,a0
+    slli s10,s10,3
+    add     s10,s10,sp
+    add     s10,s10,s10
                     #      temp_95_129 = load temp_94_129:ptr->i32 
+    lw      s11,0(s10)
                     #      num_129 = i32 temp_95_129 
-    mv      a2, a1
+    mv      a1, s11
                     #      new_var temp_96_129:ptr->i32 
                     #      temp_96_129 = getelementptr count_114:Array:i32:[Some(1000_0)] [Some(num_129)] 
+    li      a2, 0
+                    #found literal reg Some(s2) already exist with 1_0
+    add     a2,a2,s3
+    slli a2,a2,2
+    add     a2,a2,sp
+    add     a2,a2,a2
+                    #      new_var temp_97_129:ptr->i32 
+                    #      new_var temp_98_129:i32 
+                    #      temp_97_129 = getelementptr count_114:Array:i32:[Some(1000_0)] [Some(num_129)] 
     li      a3, 0
                     #found literal reg Some(s2) already exist with 1_0
     add     a3,a3,s3
     slli a3,a3,2
     add     a3,a3,sp
     add     a3,a3,a3
-                    #      new_var temp_97_129:ptr->i32 
-                    #      new_var temp_98_129:i32 
-                    #      temp_97_129 = getelementptr count_114:Array:i32:[Some(1000_0)] [Some(num_129)] 
-    li      a4, 0
-                    #found literal reg Some(s2) already exist with 1_0
-    add     a4,a4,s3
-    slli a4,a4,2
-    add     a4,a4,sp
-    add     a4,a4,a4
                     #      temp_98_129 = load temp_97_129:ptr->i32 
+    lw      a4,0(a3)
                     #      new_var temp_99_129:i32 
                     #      temp_99_129 = Add i32 temp_98_129, 1_0 
                     #found literal reg Some(s2) already exist with 1_0
-    add     s4,a6,s2
+    add     a6,a4,s2
                     #      store temp_99_129:i32 temp_96_129:ptr->i32 
-    sd      s4,0(a3)
+    sd      a6,0(a2)
                     #      mu count_114:490 
                     #      count_114 = chi count_114:490 
                     #      jump label: L12_0 
@@ -1055,17 +1068,18 @@ getMost:
                     #      new_var temp_101_133:i32 
                     #      temp_100_133 = getelementptr count_114:Array:i32:[Some(1000_0)] [Some(num_129)] 
     li      s2, 0
-    li      s7, 1
+    li      s4, 1
     add     s2,s2,s3
     slli s2,s2,2
     add     s2,s2,sp
     add     s2,s2,s2
                     #      temp_101_133 = load temp_100_133:ptr->i32 
+    lw      s4,0(s2)
                     #      new_var temp_102_133:i1 
                     #      temp_102_133 = icmp i32 Sgt temp_101_133, max_114 
-    slt     s8,s6,s7
+    slt     s7,s6,s4
                     #      br i1 temp_102_133, label branch_true_134, label branch_false_134 
-    bnez    s8, .branch_true_134
+    bnez    s7, .branch_true_134
     j       .branch_false_134
                     #      label branch_true_134: 
 .branch_true_134:
@@ -1076,13 +1090,15 @@ getMost:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 0
-    sw      a1,60(sp)
+    sw      a1,72(sp)
     li      a1, 1
+    sd      a2,48(sp)
     add     a0,a0,s3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_104_135 = load temp_103_135:ptr->i32 
+    lw      a1,0(a0)
                     #      max_114 = i32 temp_104_135 
                     #      number_114 = i32 num_129 
     sd      a0,8(sp)
@@ -1175,6 +1191,7 @@ revert:
     add     a4,a4,sp
     add     a4,a4,a4
                     #      temp_108_150 = load temp_107_150:ptr->i32 
+    lw      a6,0(a4)
                     #      temp_142 = i32 temp_108_150 
     mv      a7, a6
                     #      new_var temp_109_150:ptr->i32 
@@ -1195,6 +1212,7 @@ revert:
     add     s2,s2,sp
     add     s2,s2,s2
                     #      temp_111_150 = load temp_110_150:ptr->i32 
+    lw      s3,0(s2)
                     #      store temp_111_150:i32 temp_109_150:ptr->i32 
     sd      s3,0(s1)
                     #      mu arr_140:551 
@@ -1265,41 +1283,41 @@ arrCopy:
     la      a3, n
                     #occupy reg a3 with *n_0
     lw      a4,0(a3)
-                    #occupy reg a4 with n_0
                     #      new_var temp_116_162:i1 
                     #      temp_116_162 = icmp i32 Slt i_159, temp_115_162 
-    slt     a6,a2,a5
+    slt     a5,a2,a4
                     #      br i1 temp_116_162, label while.body_163, label while.exit_163 
-    bnez    a6, .while.body_163
+    bnez    a5, .while.body_163
     j       .while.exit_163
                     #      label while.body_163: 
 .while.body_163:
                     #      new_var temp_117_164:ptr->i32 
                     #      temp_117_164 = getelementptr target_157:ptr->i32 [Some(i_159)] 
-    li      a7, 0
-    li      s1, 1
-    add     a7,a7,a1
-    slli a7,a7,3
-    add     a7,a7,sp
-    add     a7,a7,a7
+    li      a6, 0
+    li      a7, 1
+    add     a6,a6,a1
+    slli a6,a6,3
+    add     a6,a6,sp
+    add     a6,a6,a6
                     #      new_var temp_118_164:ptr->i32 
                     #      new_var temp_119_164:i32 
                     #      temp_118_164 = getelementptr src_157:ptr->i32 [Some(i_159)] 
-    li      s2, 0
-                    #found literal reg Some(s1) already exist with 1_0
-    add     s2,s2,a0
-    slli s2,s2,3
-    add     s2,s2,sp
-    add     s2,s2,s2
+    li      s1, 0
+                    #found literal reg Some(a7) already exist with 1_0
+    add     s1,s1,a0
+    slli s1,s1,3
+    add     s1,s1,sp
+    add     s1,s1,s1
                     #      temp_119_164 = load temp_118_164:ptr->i32 
+    lw      s2,0(s1)
                     #      store temp_119_164:i32 temp_117_164:ptr->i32 
-    sd      s3,0(a7)
+    sd      s2,0(a6)
                     #      mu target_157:593 
                     #      target_157 = chi target_157:593 
                     #      new_var temp_120_164:i32 
                     #      temp_120_164 = Add i32 i_159, 1_0 
-                    #found literal reg Some(s1) already exist with 1_0
-    add     s4,a2,s1
+                    #found literal reg Some(a7) already exist with 1_0
+    add     s3,a2,a7
                     #      i_159 = i32 temp_120_164 
                     #      jump label: while.head_163 
     j       .while.head_163
@@ -1353,28 +1371,28 @@ calSum:
     la      a4, n
                     #occupy reg a4 with *n_0
     lw      a5,0(a4)
-                    #occupy reg a5 with n_0
                     #      new_var temp_122_175:i1 
                     #      temp_122_175 = icmp i32 Slt i_170, temp_121_175 
-    slt     a7,a3,a6
+    slt     a6,a3,a5
                     #      br i1 temp_122_175, label while.body_176, label while.exit_176 
-    bnez    a7, .while.body_176
+    bnez    a6, .while.body_176
     j       .while.exit_176
                     #      label while.body_176: 
 .while.body_176:
                     #      new_var temp_123_177:ptr->i32 
                     #      new_var temp_124_177:i32 
                     #      temp_123_177 = getelementptr arr_168:ptr->i32 [Some(i_170)] 
-    li      s1, 0
-    li      s2, 1
-    add     s1,s1,a0
-    slli s1,s1,3
-    add     s1,s1,sp
-    add     s1,s1,s1
+    li      a7, 0
+    li      s1, 1
+    add     a7,a7,a0
+    slli a7,a7,3
+    add     a7,a7,sp
+    add     a7,a7,a7
                     #      temp_124_177 = load temp_123_177:ptr->i32 
+    lw      s2,0(a7)
                     #      new_var temp_125_177:i32 
                     #      temp_125_177 = Add i32 sum_170, temp_124_177 
-    add     s4,a2,s3
+    add     s3,a2,s2
                     #      sum_170 = i32 temp_125_177 
                     #      jump label: L6_0 
     j       .L6_0
@@ -1382,31 +1400,31 @@ calSum:
 .L6_0:
                     #      new_var temp_126_179:i32 
                     #      temp_126_179 = Sub i32 1_0, stride_168 
-                    #found literal reg Some(s2) already exist with 1_0
-    sub     s5,s2,a1
+                    #found literal reg Some(s1) already exist with 1_0
+    sub     s4,s1,a1
                     #      new_var temp_127_179:i32 
                     #      temp_127_179 = Mod i32 i_170, stride_168 
-    rem     s6,a3,a1
+    rem     s5,a3,a1
                     #      new_var temp_128_179:i1 
                     #      temp_128_179 = icmp i32 Ne temp_127_179, temp_126_179 
-    xor     s7,s6,s5
-    snez    s7, s7
+    xor     s6,s5,s4
+    snez    s6, s6
                     #      br i1 temp_128_179, label branch_true_180, label branch_false_180 
-    bnez    s7, .branch_true_180
+    bnez    s6, .branch_true_180
     j       .branch_false_180
                     #      label branch_true_180: 
 .branch_true_180:
                     #      new_var temp_129_181:ptr->i32 
                     #      temp_129_181 = getelementptr arr_168:ptr->i32 [Some(i_170)] 
-    li      s8, 0
-                    #found literal reg Some(s2) already exist with 1_0
-    add     s8,s8,a0
-    slli s8,s8,3
-    add     s8,s8,sp
-    add     s8,s8,s8
+    li      s7, 0
+                    #found literal reg Some(s1) already exist with 1_0
+    add     s7,s7,a0
+    slli s7,s7,3
+    add     s7,s7,sp
+    add     s7,s7,s7
                     #      store 0_0:i32 temp_129_181:ptr->i32 
-    li      s9, 0
-    sd      s9,0(s8)
+    li      s8, 0
+    sd      s8,0(s7)
                     #      mu arr_168:644 
                     #      arr_168 = chi arr_168:644 
                     #      jump label: L7_0 
@@ -1415,14 +1433,14 @@ calSum:
 .branch_false_180:
                     #      new_var temp_131_183:ptr->i32 
                     #      temp_131_183 = getelementptr arr_168:ptr->i32 [Some(i_170)] 
-    li      s10, 0
-                    #found literal reg Some(s2) already exist with 1_0
-    add     s10,s10,a0
-    slli s10,s10,3
-    add     s10,s10,sp
-    add     s10,s10,s10
+    li      s9, 0
+                    #found literal reg Some(s1) already exist with 1_0
+    add     s9,s9,a0
+    slli s9,s9,3
+    add     s9,s9,sp
+    add     s9,s9,s9
                     #      store sum_170:i32 temp_131_183:ptr->i32 
-    sd      a2,0(s10)
+    sd      a2,0(s9)
                     #      mu arr_168:654 
                     #      arr_168 = chi arr_168:654 
                     #      sum_170 = i32 0_0 
@@ -1434,8 +1452,8 @@ calSum:
 .L8_0:
                     #      new_var temp_130_177:i32 
                     #      temp_130_177 = Add i32 i_170, 1_0 
-                    #found literal reg Some(s2) already exist with 1_0
-    add     s11,a3,s2
+                    #found literal reg Some(s1) already exist with 1_0
+    add     s10,a3,s1
                     #      i_170 = i32 temp_130_177 
                     #      jump label: while.head_176 
     j       .while.head_176
@@ -1513,40 +1531,40 @@ avgPooling:
     la      a4, n
                     #occupy reg a4 with *n_0
     lw      a5,0(a4)
-                    #occupy reg a5 with n_0
                     #      new_var temp_133_196:i1 
                     #      temp_133_196 = icmp i32 Slt i_190, temp_132_196 
-    slt     a7,a2,a6
+    slt     a6,a2,a5
                     #      br i1 temp_133_196, label while.body_197, label while.exit_197 
-    bnez    a7, .while.body_197
+    bnez    a6, .while.body_197
     j       .while.exit_197
                     #      label while.body_197: 
 .while.body_197:
                     #      new_var temp_134_199:i32 
                     #      temp_134_199 = Sub i32 stride_188, 1_0 
-    li      s1, 1
-    sub     s2,a1,s1
+    li      a7, 1
+    sub     s1,a1,a7
                     #      new_var temp_135_199:i1 
                     #      temp_135_199 = icmp i32 Slt i_190, temp_134_199 
-    slt     s3,a2,s2
+    slt     s2,a2,s1
                     #      br i1 temp_135_199, label branch_true_200, label branch_false_200 
-    bnez    s3, .branch_true_200
+    bnez    s2, .branch_true_200
     j       .branch_false_200
                     #      label branch_true_200: 
 .branch_true_200:
                     #      new_var temp_136_201:ptr->i32 
                     #      new_var temp_137_201:i32 
                     #      temp_136_201 = getelementptr arr_188:ptr->i32 [Some(i_190)] 
-    li      s4, 0
-                    #found literal reg Some(s1) already exist with 1_0
-    add     s4,s4,a0
-    slli s4,s4,3
-    add     s4,s4,sp
-    add     s4,s4,s4
+    li      s3, 0
+                    #found literal reg Some(a7) already exist with 1_0
+    add     s3,s3,a0
+    slli s3,s3,3
+    add     s3,s3,sp
+    add     s3,s3,s3
                     #      temp_137_201 = load temp_136_201:ptr->i32 
+    lw      s4,0(s3)
                     #      new_var temp_138_201:i32 
                     #      temp_138_201 = Add i32 sum_190, temp_137_201 
-    add     s6,a3,s5
+    add     s5,a3,s4
                     #      sum_190 = i32 temp_138_201 
                     #      jump label: L3_0 
     j       .L3_0
@@ -1554,44 +1572,45 @@ avgPooling:
 .branch_false_200:
                     #      new_var temp_140_203:i32 
                     #      temp_140_203 = Sub i32 stride_188, 1_0 
-                    #found literal reg Some(s1) already exist with 1_0
-    sub     s7,a1,s1
+                    #found literal reg Some(a7) already exist with 1_0
+    sub     s6,a1,a7
                     #      new_var temp_141_203:i1 
                     #      temp_141_203 = icmp i32 Eq i_190, temp_140_203 
-    xor     s8,a2,s7
-    seqz    s8, s8
+    xor     s7,a2,s6
+    seqz    s7, s7
                     #      br i1 temp_141_203, label branch_true_204, label branch_false_204 
-    bnez    s8, .branch_true_204
+    bnez    s7, .branch_true_204
     j       .branch_false_204
                     #      label branch_true_204: 
 .branch_true_204:
                     #      new_var temp_142_205:ptr->i32 
                     #      new_var temp_143_205:i32 
                     #      temp_142_205 = getelementptr arr_188:ptr->i32 [Some(0_0)] 
+    li      s8, 0
+                    #found literal reg Some(a7) already exist with 1_0
     li      s9, 0
-                    #found literal reg Some(s1) already exist with 1_0
-    li      s10, 0
-    add     s9,s9,a0
-    slli s9,s9,3
-    add     s9,s9,sp
-    add     s9,s9,s9
+    add     s8,s8,a0
+    slli s8,s8,3
+    add     s8,s8,sp
+    add     s8,s8,s8
                     #      temp_143_205 = load temp_142_205:ptr->i32 
+    lw      s10,0(s8)
                     #      lastnum_190 = i32 temp_143_205 
-    mv      a4, s11
+    mv      s11, s10
                     #      new_var temp_144_205:ptr->i32 
                     #      temp_144_205 = getelementptr arr_188:ptr->i32 [Some(0_0)] 
-    li      a5, 0
-                    #found literal reg Some(s1) already exist with 1_0
-                    #found literal reg Some(s10) already exist with 0_0
-    add     a5,a5,a0
-    slli a5,a5,3
-    add     a5,a5,sp
-    add     a5,a5,a5
+    li      a4, 0
+                    #found literal reg Some(a7) already exist with 1_0
+                    #found literal reg Some(s9) already exist with 0_0
+    add     a4,a4,a0
+    slli a4,a4,3
+    add     a4,a4,sp
+    add     a4,a4,a4
                     #      new_var temp_145_205:i32 
                     #      temp_145_205 = Div i32 sum_190, stride_188 
-    div     s1,a3,a1
+    div     a7,a3,a1
                     #      store temp_145_205:i32 temp_144_205:ptr->i32 
-    sd      s1,0(a5)
+    sd      a7,0(a4)
                     #      mu arr_188:724 
                     #      arr_188 = chi arr_188:724 
                     #      jump label: L2_0 
@@ -1601,20 +1620,21 @@ avgPooling:
                     #      new_var temp_146_208:ptr->i32 
                     #      new_var temp_147_208:i32 
                     #      temp_146_208 = getelementptr arr_188:ptr->i32 [Some(i_190)] 
-    li      s10, 0
+    li      s9, 0
     sd      a0,200(sp)
     li      a0, 1
     sw      a1,196(sp)
     mul     a1,a0,a2
-    add     s10,s10,a1
-    slli s10,s10,3
-    add     s10,s10,sp
-    add     s10,s10,s10
+    add     s9,s9,a1
+    slli s9,s9,3
+    add     s9,s9,sp
+    add     s9,s9,s9
                     #      temp_147_208 = load temp_146_208:ptr->i32 
+    lw      a0,0(s9)
                     #      new_var temp_148_208:i32 
                     #      temp_148_208 = Sub i32 temp_147_208, lastnum_190 
     sd      a1,200(sp)
-    sub     a1,a0,a4
+    sub     a1,a0,s11
                     #      new_var temp_149_208:i32 
                     #      temp_149_208 = Add i32 sum_190, temp_148_208 
     sw      a0,92(sp)
@@ -1646,6 +1666,7 @@ avgPooling:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_153_208 = load temp_152_208:ptr->i32 
+    lw      a1,0(a0)
                     #      lastnum_190 = i32 temp_153_208 
                     #      new_var temp_154_208:i32 
                     #      temp_154_208 = Add i32 stride_188, 1_0 
@@ -1712,26 +1733,24 @@ avgPooling:
                     #occupy reg a0 with *n_0
     sw      a1,196(sp)
     lw      a1,0(a0)
-                    #occupy reg a1 with n_0
                     #      new_var temp_160_190:i32 
                     #      temp_160_190 = Sub i32 temp_159_190, temp_158_190 
-    sub     a1,a0,a2
+    sub     a0,a1,a2
                     #      i_190 = i32 temp_160_190 
-    sw      a0,28(sp)
-    mv      a0, a1
+    sw      a1,28(sp)
+    mv      a1, a0
                     #      jump label: while.head_215 
     j       .while.head_215
                     #      label while.head_215: 
 .while.head_215:
                     #      new_var temp_161_214:i32 
                     #      temp_161_214 = load *n_0:ptr->i32 
-    sw      a0,188(sp)
+    sw      a0,24(sp)
                     #   load label n as ptr to reg
     la      a0, n
                     #occupy reg a0 with *n_0
-    sw      a1,24(sp)
+    sw      a1,188(sp)
     lw      a1,0(a0)
-                    #occupy reg a1 with n_0
                     #      new_var temp_162_214:i1 
                     #      temp_162_214 = icmp i32 Slt i_190, temp_161_214 
     sw      a2,32(sp)
@@ -1904,7 +1923,7 @@ main:
                     #      new_var temp_167_221:ptr->i32 
                     #      temp_167_221 = getelementptr arr_221:Array:i32:[Some(32_0)] [Some(2_0)] 
     li      s3, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
     li      s4, 2
     add     s3,s3,a5
     slli s3,s3,2
@@ -1918,7 +1937,7 @@ main:
                     #      new_var temp_168_221:ptr->i32 
                     #      temp_168_221 = getelementptr arr_221:Array:i32:[Some(32_0)] [Some(3_0)] 
     li      s6, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
     li      s7, 3
     add     s6,s6,a5
     slli s6,s6,2
@@ -1932,7 +1951,7 @@ main:
                     #      new_var temp_169_221:ptr->i32 
                     #      temp_169_221 = getelementptr arr_221:Array:i32:[Some(32_0)] [Some(4_0)] 
     li      s9, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
     li      s10, 4
     add     s9,s9,a5
     slli s9,s9,2
@@ -1946,7 +1965,7 @@ main:
                     #      new_var temp_170_221:ptr->i32 
                     #      temp_170_221 = getelementptr arr_221:Array:i32:[Some(32_0)] [Some(5_0)] 
     li      a0, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
     li      a1, 5
     add     a0,a0,a5
     slli a0,a0,2
@@ -1960,8 +1979,8 @@ main:
                     #      new_var temp_171_221:ptr->i32 
                     #      temp_171_221 = getelementptr arr_221:Array:i32:[Some(32_0)] [Some(6_0)] 
     li      a1, 0
-                    #found literal reg Some(s1) already exist with 1_0
-    li      a3, 6
+                    #found literal reg Some(a3) already exist with 1_0
+    li      a4, 6
     add     a1,a1,a5
     slli a1,a1,2
     add     a1,a1,sp
@@ -2397,6 +2416,7 @@ main:
     add     s3,s3,sp
     add     s3,s3,s3
                     #      temp_201_264 = load temp_200_264:ptr->i32 
+    lw      s6,0(s3)
                     #      t_221 = i32 temp_201_264 
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
@@ -2454,6 +2474,7 @@ main:
     add     s4,s4,sp
     add     s4,s4,s4
                     #      temp_206_272 = load temp_205_272:ptr->i32 
+    lw      s7,0(s4)
                     #      t_221 = i32 temp_206_272 
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
@@ -2559,6 +2580,7 @@ main:
     add     s3,s3,sp
     add     s3,s3,s3
                     #      temp_214_285 = load temp_213_285:ptr->i32 
+    lw      s6,0(s3)
                     #      t_221 = i32 temp_214_285 
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
@@ -2627,6 +2649,7 @@ main:
     add     s3,s3,sp
     add     s3,s3,s3
                     #      temp_220_294 = load temp_219_294:ptr->i32 
+    lw      s6,0(s3)
                     #      t_221 = i32 temp_220_294 
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
@@ -2700,6 +2723,7 @@ main:
     add     s2,s2,sp
     add     s2,s2,s2
                     #      temp_226_304 = load temp_225_304:ptr->i32 
+    lw      s5,0(s2)
                     #      t_221 = i32 temp_226_304 
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
@@ -2771,6 +2795,7 @@ main:
     add     s2,s2,sp
     add     s2,s2,s2
                     #      temp_232_313 = load temp_231_313:ptr->i32 
+    lw      s5,0(s2)
                     #      t_221 = i32 temp_232_313 
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
@@ -2842,6 +2867,7 @@ main:
     add     s2,s2,sp
     add     s2,s2,s2
                     #      temp_238_322 = load temp_237_322:ptr->i32 
+    lw      s5,0(s2)
                     #      t_221 = i32 temp_238_322 
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem

@@ -360,7 +360,7 @@ main:
     snez    s1, s1
                     #      new_var temp_27_46:i1 
                     #      temp_27_46 = xor i1 temp_26_46, true 
-    xori    s2,s1,-1
+    seqz    s2, s1
                     #      new_var temp_28_46:i1 
                     #      temp_28_46 = icmp i32 Ne temp_24_46, 0_0 
                     #found literal reg Some(a4) already exist with 0_0

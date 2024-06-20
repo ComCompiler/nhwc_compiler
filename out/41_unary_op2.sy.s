@@ -66,15 +66,15 @@ main:
     snez    a6, a6
                     #      new_var temp_3_22:i1 
                     #      temp_3_22 = xor i1 temp_2_22, true 
-    xori    a7,a6,-1
+    seqz    a7, a6
                     #      new_var temp_4_22:i1 
                     #      new_var temp_5_22:i1 
                     #      temp_5_22 = xor i1 temp_4_22, true 
-    xori    s2,s1,-1
+    seqz    s2, s1
                     #      new_var temp_6_22:i1 
                     #      new_var temp_7_22:i1 
                     #      temp_7_22 = xor i1 temp_6_22, true 
-    xori    s4,s3,-1
+    seqz    s4, s3
                     #      new_var temp_8_22:i1 
                     #      temp_8_22 = Sub i1 0_0, temp_7_22 
                     #found literal reg Some(a5) already exist with 0_0
