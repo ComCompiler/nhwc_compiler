@@ -75,33 +75,31 @@ main:
     la      a3, a
                     #occupy reg a3 with *a_0
     lw      a4,0(a3)
-                    #occupy reg a4 with a_0
                     #      new_var temp_3_23:i1 
                     #      temp_3_23 = icmp i32 Ne 3_0, temp_2_23 
     li      a5, 3
-    xor     a7,a5,a6
-    snez    a7, a7
+    xor     a6,a5,a4
+    snez    a6, a6
                     #      new_var temp_4_23:i32 
                     #      temp_4_23 = load *b_0:ptr->i32 
                     #   load label b as ptr to reg
-    la      s1, b
-                    #occupy reg s1 with *b_0
-    lw      s2,0(s1)
-                    #occupy reg s2 with b_0
+    la      a7, b
+                    #occupy reg a7 with *b_0
+    lw      s1,0(a7)
                     #      new_var temp_5_23:i1 
                     #      temp_5_23 = icmp i32 Eq temp_2_23, temp_4_23 
-    xor     s4,a6,s3
-    seqz    s4, s4
+    xor     s2,a4,s1
+    seqz    s2, s2
                     #      new_var temp_6_23:i1 
                     #      temp_6_23 = And i1 temp_5_23, temp_3_23 
-    and     s5,s4,a7
+    and     s3,s2,a6
                     #      br i1 temp_6_23, label branch_true_24, label branch_false_24 
-    bnez    s5, .branch_true_24
+    bnez    s3, .branch_true_24
     j       .branch_false_24
                     #      label branch_true_24: 
 .branch_true_24:
                     #      c_19 = i32 1_0 
-    li      s6, 1
+    li      s4, 1
                     #      jump label: L2_0 
     j       .L2_0
                     #      label branch_false_24: 
@@ -116,7 +114,7 @@ main:
                     #      ret c_19 
     ld      ra,40(sp)
     ld      s0,32(sp)
-    sw      s6,20(sp)
+    sw      s4,20(sp)
     sw      a0,24(sp)
     addi    sp,sp,48
     ret

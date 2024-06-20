@@ -40,14 +40,13 @@ main:
     la      a1, b
                     #occupy reg a1 with *b_0
     lw      a2,0(a1)
-                    #occupy reg a2 with b_0
                     #      new_var temp_1_19:i32 
                     #      temp_1_19 = Add i32 a_19, temp_0_19 
-    add     a4,a0,a3
+    add     a3,a0,a2
                     #      ret temp_1_19 
     ld      ra,24(sp)
     ld      s0,16(sp)
-    sw      a4,4(sp)
+    sw      a3,4(sp)
     sw      a0,12(sp)
     addi    sp,sp,32
     ret

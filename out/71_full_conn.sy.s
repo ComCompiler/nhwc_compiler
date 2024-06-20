@@ -669,10 +669,11 @@ model:
     add     a5,a5,sp
     add     a5,a5,a5
                     #      temp_3_29 = load temp_2_29:ptr->i32 
+    lw      s1,0(a5)
                     #      new_var temp_4_29:i32 
                     #      temp_4_29 = Mul i32 -7_0, temp_3_29 
-    li      s1, -7
-    mul     s3,s1,s2
+    li      s2, -7
+    mul     s3,s2,s1
                     #      new_var temp_5_29:ptr->i32 
                     #      new_var temp_6_29:i32 
                     #      temp_5_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(4_0), Some(4_0)] 
@@ -684,6 +685,7 @@ model:
     add     s4,s4,sp
     add     s4,s4,s4
                     #      temp_6_29 = load temp_5_29:ptr->i32 
+    lw      s6,0(s4)
                     #      new_var temp_7_29:i32 
                     #      temp_7_29 = Mul i32 temp_6_29, 85_0 
     li      s7, 85
@@ -699,10 +701,11 @@ model:
     add     s9,s9,sp
     add     s9,s9,s9
                     #      temp_9_29 = load temp_8_29:ptr->i32 
+    lw      s10,0(s9)
                     #      new_var temp_10_29:i32 
                     #      temp_10_29 = Mul i32 -49_0, temp_9_29 
-    li      s10, -49
-    mul     a1,s10,s11
+    li      s11, -49
+    mul     a1,s11,s10
                     #      new_var temp_11_29:i32 
                     #      temp_11_29 = Add i32 temp_10_29, temp_7_29 
     add     a2,a1,s8
@@ -717,6 +720,7 @@ model:
     add     a3,a3,sp
     add     a3,a3,a3
                     #      temp_13_29 = load temp_12_29:ptr->i32 
+    lw      a4,0(a3)
                     #      new_var temp_14_29:i32 
                     #      temp_14_29 = Mul i32 temp_13_29, 36_0 
     li      a6, 36
@@ -727,21 +731,22 @@ model:
                     #      new_var temp_16_29:ptr->i32 
                     #      new_var temp_17_29:i32 
                     #      temp_16_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(4_0), Some(1_0)] 
-    li      s1, 0
+    li      s2, 0
     li      s5, 1
     li      s7, 4
-    add     s1,s1,a0
-    slli s1,s1,3
-    add     s1,s1,sp
-    add     s1,s1,s1
+    add     s2,s2,a0
+    slli s2,s2,3
+    add     s2,s2,sp
+    add     s2,s2,s2
                     #      temp_17_29 = load temp_16_29:ptr->i32 
+    lw      s5,0(s2)
                     #      new_var temp_18_29:i32 
                     #      temp_18_29 = Mul i32 temp_17_29, -121_0 
     li      s7, -121
-    mul     s10,s5,s7
+    mul     s11,s5,s7
                     #      new_var temp_19_29:i32 
                     #      temp_19_29 = Add i32 temp_18_29, temp_15_29 
-    add     s7,s10,a6
+    add     s7,s11,a6
                     #      new_var temp_20_29:ptr->i32 
                     #      new_var temp_21_29:i32 
                     #      temp_20_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(4_0), Some(0_0)] 
@@ -766,16 +771,17 @@ model:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_21_29 = load temp_20_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_22_29:i32 
                     #      temp_22_29 = Mul i32 115_0, temp_21_29 
-    li      a1, 115
+    li      a2, 115
     li      a0, 2320
     add     a0,sp,a0
     sd      a0,0(a0)
-    mul     a0,a1,a2
+    mul     a0,a2,a1
                     #      new_var temp_23_29:i32 
                     #      temp_23_29 = Add i32 temp_22_29, temp_19_29 
-    add     a1,a0,s7
+    add     a2,a0,s7
                     #      new_var temp_24_29:ptr->i32 
                     #      new_var temp_25_29:i32 
                     #      temp_24_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(3_0), Some(4_0)] 
@@ -783,11 +789,11 @@ model:
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 0
-    li      a1, 2308
+    li      a1, 2316
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 2316
+    li      a2, 2308
     add     a2,sp,a2
     sw      a2,0(a2)
     li      a2, 3
@@ -796,6 +802,7 @@ model:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_25_29 = load temp_24_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_26_29:i32 
                     #      temp_26_29 = Mul i32 temp_25_29, 29_0 
     li      a2, 29
@@ -829,6 +836,7 @@ model:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_29_29 = load temp_28_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_30_29:i32 
                     #      temp_30_29 = Mul i32 temp_29_29, 38_0 
     li      a2, 38
@@ -862,6 +870,7 @@ model:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_33_29 = load temp_32_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_34_29:i32 
                     #      temp_34_29 = Mul i32 temp_33_29, -68_0 
     li      a2, -68
@@ -895,19 +904,20 @@ model:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_37_29 = load temp_36_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_38_29:i32 
                     #      temp_38_29 = Mul i32 22_0, temp_37_29 
-    li      a1, 22
+    li      a2, 22
     li      a0, 2224
     add     a0,sp,a0
     sd      a0,0(a0)
-    mul     a0,a1,a2
+    mul     a0,a2,a1
                     #      new_var temp_39_29:i32 
                     #      temp_39_29 = Add i32 temp_38_29, temp_35_29 
-    li      a2, 2220
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    add     a2,a0,a1
+    li      a1, 2220
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      new_var temp_40_29:ptr->i32 
                     #      new_var temp_41_29:i32 
                     #      temp_40_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(3_0), Some(0_0)] 
@@ -915,11 +925,11 @@ model:
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 0
-    li      a1, 2236
+    li      a1, 2212
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 2212
+    li      a2, 2236
     add     a2,sp,a2
     sw      a2,0(a2)
     li      a2, 3
@@ -928,6 +938,7 @@ model:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_41_29 = load temp_40_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_42_29:i32 
                     #      temp_42_29 = Mul i32 temp_41_29, 47_0 
     li      a2, 47
@@ -961,6 +972,7 @@ model:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_45_29 = load temp_44_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_46_29:i32 
                     #      temp_46_29 = Mul i32 temp_45_29, 67_0 
     li      a2, 67
@@ -994,25 +1006,26 @@ model:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_49_29 = load temp_48_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_50_29:i32 
                     #      temp_50_29 = Mul i32 -122_0, temp_49_29 
-    li      a1, -122
+    li      a2, -122
     li      a0, 2152
     add     a0,sp,a0
     sd      a0,0(a0)
-    mul     a0,a1,a2
+    mul     a0,a2,a1
                     #      new_var temp_51_29:i32 
                     #      temp_51_29 = Add i32 temp_50_29, temp_47_29 
-    li      a2, 2148
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    add     a2,a0,a1
+    li      a1, 2148
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      new_var temp_52_29:i32 
                     #      temp_52_29 = Add i32 temp_51_29, temp_4_29 
     li      a0, 2144
     add     a0,sp,a0
     sw      a0,0(a0)
-    add     a0,a2,s3
+    add     a0,a1,s3
                     #      new_var temp_53_29:ptr->i32 
                     #      new_var temp_54_29:i32 
                     #      temp_53_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(2_0), Some(1_0)] 
@@ -1020,11 +1033,11 @@ model:
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 0
-    li      a1, 2164
+    li      a1, 2140
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 2140
+    li      a2, 2164
     add     a2,sp,a2
     sw      a2,0(a2)
     li      a2, 2
@@ -1033,6 +1046,7 @@ model:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_54_29 = load temp_53_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_55_29:i32 
                     #      temp_55_29 = Mul i32 temp_54_29, -74_0 
     li      a2, -74
@@ -1066,19 +1080,20 @@ model:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_58_29 = load temp_57_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_59_29:i32 
                     #      temp_59_29 = Mul i32 109_0, temp_58_29 
-    li      a1, 109
+    li      a2, 109
     li      a0, 2104
     add     a0,sp,a0
     sd      a0,0(a0)
-    mul     a0,a1,a2
+    mul     a0,a2,a1
                     #      new_var temp_60_29:i32 
                     #      temp_60_29 = Add i32 temp_59_29, temp_56_29 
-    li      a2, 2100
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    add     a2,a0,a1
+    li      a1, 2100
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      new_var temp_61_29:ptr->i32 
                     #      new_var temp_62_29:i32 
                     #      temp_61_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(1_0), Some(4_0)] 
@@ -1086,7 +1101,41 @@ model:
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 0
-    li      a1, 2116
+    li      a1, 2092
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 1
+    li      a2, 2116
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a2, 1
+    add     a0,a0,a3
+    slli a0,a0,3
+    add     a0,a0,sp
+    add     a0,a0,a0
+                    #      temp_62_29 = load temp_61_29:ptr->i32 
+    lw      a1,0(a0)
+                    #      new_var temp_63_29:i32 
+                    #      temp_63_29 = Mul i32 -51_0, temp_62_29 
+    li      a2, -51
+    li      a0, 2080
+    add     a0,sp,a0
+    sd      a0,0(a0)
+    mul     a0,a2,a1
+                    #      new_var temp_64_29:i32 
+                    #      temp_64_29 = Add i32 temp_63_29, temp_60_29 
+    li      a1, 2076
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
+                    #      new_var temp_65_29:ptr->i32 
+                    #      new_var temp_66_29:i32 
+                    #      temp_65_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(1_0), Some(3_0)] 
+    li      a0, 2072
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 0
+    li      a1, 2068
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
@@ -1098,40 +1147,8 @@ model:
     slli a0,a0,3
     add     a0,a0,sp
     add     a0,a0,a0
-                    #      temp_62_29 = load temp_61_29:ptr->i32 
-                    #      new_var temp_63_29:i32 
-                    #      temp_63_29 = Mul i32 -51_0, temp_62_29 
-    li      a1, -51
-    li      a0, 2080
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a1,a2
-                    #      new_var temp_64_29:i32 
-                    #      temp_64_29 = Add i32 temp_63_29, temp_60_29 
-    li      a2, 2076
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    add     a2,a0,a1
-                    #      new_var temp_65_29:ptr->i32 
-                    #      new_var temp_66_29:i32 
-                    #      temp_65_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(1_0), Some(3_0)] 
-    li      a0, 2072
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-    li      a1, 2092
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
-    li      a2, 2068
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    li      a2, 1
-    add     a0,a0,a3
-    slli a0,a0,3
-    add     a0,a0,sp
-    add     a0,a0,a0
                     #      temp_66_29 = load temp_65_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_67_29:i32 
                     #      temp_67_29 = Mul i32 temp_66_29, 96_0 
     li      a2, 96
@@ -1165,6 +1182,7 @@ model:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_70_29 = load temp_69_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_71_29:i32 
                     #      temp_71_29 = Mul i32 temp_70_29, 75_0 
     li      a2, 75
@@ -1198,6 +1216,7 @@ model:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_74_29 = load temp_73_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_75_29:i32 
                     #      temp_75_29 = Mul i32 temp_74_29, -77_0 
     li      a2, -77
@@ -1227,21 +1246,46 @@ model:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_78_29 = load temp_77_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_79_29:i32 
                     #      temp_79_29 = Mul i32 10_0, temp_78_29 
-    li      a1, 10
+    li      a2, 10
     sd      a0,1984(sp)
-    mul     a0,a1,a2
+    mul     a0,a2,a1
                     #      new_var temp_80_29:i32 
                     #      temp_80_29 = Add i32 temp_79_29, temp_76_29 
-    sw      a2,1980(sp)
-    add     a2,a0,a1
+    sw      a1,1980(sp)
+    add     a1,a0,a2
                     #      new_var temp_81_29:ptr->i32 
                     #      new_var temp_82_29:i32 
                     #      temp_81_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(0_0), Some(4_0)] 
     sw      a0,1976(sp)
     li      a0, 0
-    sw      a1,1996(sp)
+    sw      a1,1972(sp)
+    li      a1, 1
+    sw      a2,1996(sp)
+    li      a2, 0
+    add     a0,a0,a3
+    slli a0,a0,3
+    add     a0,a0,sp
+    add     a0,a0,a0
+                    #      temp_82_29 = load temp_81_29:ptr->i32 
+    lw      a1,0(a0)
+                    #      new_var temp_83_29:i32 
+                    #      temp_83_29 = Mul i32 -92_0, temp_82_29 
+    li      a2, -92
+    sd      a0,1960(sp)
+    mul     a0,a2,a1
+                    #      new_var temp_84_29:i32 
+                    #      temp_84_29 = Add i32 temp_83_29, temp_80_29 
+    sw      a1,1956(sp)
+    add     a1,a0,a2
+                    #      new_var temp_85_29:ptr->i32 
+                    #      new_var temp_86_29:i32 
+                    #      temp_85_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(0_0), Some(3_0)] 
+    sw      a0,1952(sp)
+    li      a0, 0
+    sw      a1,1948(sp)
     li      a1, 1
     sw      a2,1972(sp)
     li      a2, 0
@@ -1249,30 +1293,8 @@ model:
     slli a0,a0,3
     add     a0,a0,sp
     add     a0,a0,a0
-                    #      temp_82_29 = load temp_81_29:ptr->i32 
-                    #      new_var temp_83_29:i32 
-                    #      temp_83_29 = Mul i32 -92_0, temp_82_29 
-    li      a1, -92
-    sd      a0,1960(sp)
-    mul     a0,a1,a2
-                    #      new_var temp_84_29:i32 
-                    #      temp_84_29 = Add i32 temp_83_29, temp_80_29 
-    sw      a2,1956(sp)
-    add     a2,a0,a1
-                    #      new_var temp_85_29:ptr->i32 
-                    #      new_var temp_86_29:i32 
-                    #      temp_85_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(0_0), Some(3_0)] 
-    sw      a0,1952(sp)
-    li      a0, 0
-    sw      a1,1972(sp)
-    li      a1, 1
-    sw      a2,1948(sp)
-    li      a2, 0
-    add     a0,a0,a3
-    slli a0,a0,3
-    add     a0,a0,sp
-    add     a0,a0,a0
                     #      temp_86_29 = load temp_85_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_87_29:i32 
                     #      temp_87_29 = Mul i32 temp_86_29, -123_0 
     li      a2, -123
@@ -1296,21 +1318,46 @@ model:
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_90_29 = load temp_89_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_91_29:i32 
                     #      temp_91_29 = Mul i32 41_0, temp_90_29 
-    li      a1, 41
+    li      a2, 41
     sd      a0,1912(sp)
-    mul     a0,a1,a2
+    mul     a0,a2,a1
                     #      new_var temp_92_29:i32 
                     #      temp_92_29 = Add i32 temp_91_29, temp_88_29 
-    sw      a2,1908(sp)
-    add     a2,a0,a1
+    sw      a1,1908(sp)
+    add     a1,a0,a2
                     #      new_var temp_93_29:ptr->i32 
                     #      new_var temp_94_29:i32 
                     #      temp_93_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(0_0), Some(1_0)] 
     sw      a0,1904(sp)
     li      a0, 0
-    sw      a1,1924(sp)
+    sw      a1,1900(sp)
+    li      a1, 1
+    sw      a2,1924(sp)
+    li      a2, 0
+    add     a0,a0,a3
+    slli a0,a0,3
+    add     a0,a0,sp
+    add     a0,a0,a0
+                    #      temp_94_29 = load temp_93_29:ptr->i32 
+    lw      a1,0(a0)
+                    #      new_var temp_95_29:i32 
+                    #      temp_95_29 = Mul i32 42_0, temp_94_29 
+    li      a2, 42
+    sd      a0,1888(sp)
+    mul     a0,a2,a1
+                    #      new_var temp_96_29:i32 
+                    #      temp_96_29 = Add i32 temp_95_29, temp_92_29 
+    sw      a1,1884(sp)
+    add     a1,a0,a2
+                    #      new_var temp_97_29:ptr->i32 
+                    #      new_var temp_98_29:i32 
+                    #      temp_97_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(0_0), Some(0_0)] 
+    sw      a0,1880(sp)
+    li      a0, 0
+    sw      a1,1876(sp)
     li      a1, 1
     sw      a2,1900(sp)
     li      a2, 0
@@ -1318,30 +1365,8 @@ model:
     slli a0,a0,3
     add     a0,a0,sp
     add     a0,a0,a0
-                    #      temp_94_29 = load temp_93_29:ptr->i32 
-                    #      new_var temp_95_29:i32 
-                    #      temp_95_29 = Mul i32 42_0, temp_94_29 
-    li      a1, 42
-    sd      a0,1888(sp)
-    mul     a0,a1,a2
-                    #      new_var temp_96_29:i32 
-                    #      temp_96_29 = Add i32 temp_95_29, temp_92_29 
-    sw      a2,1884(sp)
-    add     a2,a0,a1
-                    #      new_var temp_97_29:ptr->i32 
-                    #      new_var temp_98_29:i32 
-                    #      temp_97_29 = getelementptr a_26:ptr->Array:i32:[Some(5_0)] [Some(0_0), Some(0_0)] 
-    sw      a0,1880(sp)
-    li      a0, 0
-    sw      a1,1900(sp)
-    li      a1, 1
-    sw      a2,1876(sp)
-    li      a2, 0
-    add     a0,a0,a3
-    slli a0,a0,3
-    add     a0,a0,sp
-    add     a0,a0,a0
                     #      temp_98_29 = load temp_97_29:ptr->i32 
+    lw      a1,0(a0)
                     #      new_var temp_99_29:i32 
                     #      temp_99_29 = Mul i32 temp_98_29, 67_0 
     li      a2, 67
@@ -1354,12 +1379,12 @@ model:
                     #      new_var temp_101_29:i32 
                     #      temp_101_29 =  Call i32 relu_reg_0(temp_100_29) 
                     #saved register dumping to mem
-    li      s1, 2344
+    li      s1, 2420
     add     s1,sp,s1
-    sd      s1,0(s1)
-    li      s2, 2420
+    sw      s1,0(s1)
+    li      s2, 2344
     add     s2,sp,s2
-    sw      s2,0(s2)
+    sd      s2,0(s2)
     li      s3, 2416
     add     s3,sp,s3
     sw      s3,0(s3)
@@ -1381,10 +1406,10 @@ model:
     li      s9, 2392
     add     s9,sp,s9
     sd      s9,0(s9)
-    li      s10, 2336
+    li      s10, 2388
     add     s10,sp,s10
     sw      s10,0(s10)
-    li      s11, 2388
+    li      s11, 2336
     add     s11,sp,s11
     sw      s11,0(s11)
                     #saved register dumped to mem

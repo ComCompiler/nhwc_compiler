@@ -109,24 +109,23 @@ findfa:
     la      a1, array
                     #occupy reg a1 with *array_0
     lw      a2,0(a1)
-                    #occupy reg a2 with array_0
                     #      new_var temp_6_30:ptr->i32 
                     #      new_var temp_7_30:i32 
                     #      temp_6_30 = getelementptr temp_5_30:Array:i32:[Some(110_0)] [Some(a_27)] 
     li      a3, 0
     li      a4, 1
-    mul     a5,a4,a0
-    add     a3,a3,a5
+    add     a3,a3,a2
     slli a3,a3,2
     add     a3,a3,sp
     add     a3,a3,a3
                     #      temp_7_30 = load temp_6_30:ptr->i32 
+    lw      a5,0(a3)
                     #      new_var temp_8_30:i1 
                     #      temp_8_30 = icmp i32 Eq temp_7_30, a_27 
-    xor     a7,a6,a0
-    seqz    a7, a7
+    xor     a6,a5,a0
+    seqz    a6, a6
                     #      br i1 temp_8_30, label branch_true_31, label branch_false_31 
-    bnez    a7, .branch_true_31
+    bnez    a6, .branch_true_31
     j       .branch_false_31
                     #      label branch_true_31: 
 .branch_true_31:
@@ -140,37 +139,36 @@ findfa:
 .branch_false_31:
                     #      new_var temp_9_33:ptr->i32 
                     #      temp_9_33 = getelementptr array_0:Array:i32:[Some(110_0)] [Some(a_27)] 
-    li      s1, 0
+    li      a7, 0
                     #found literal reg Some(a4) already exist with 1_0
-    mul     s2,a4,a0
-                    #occupy reg s2 with array_0
-    add     s1,s1,s2
-    slli s1,s1,2
-    add     s1,s1,s1
+    mul     s1,a4,a0
+                    #occupy reg s1 with array_0
+    add     a7,a7,s1
+    slli a7,a7,2
+    add     a7,a7,a7
                     #      new_var temp_10_33:Array:i32:[Some(110_0)] 
                     #      temp_10_33 = load *array_0:ptr->i32 
                     #   load label array as ptr to reg
-    la      s3, array
-                    #occupy reg s3 with *array_0
-    lw      s4,0(s3)
-                    #occupy reg s4 with array_0
+    la      s2, array
+                    #occupy reg s2 with *array_0
+    lw      s3,0(s2)
                     #      new_var temp_11_33:ptr->i32 
                     #      new_var temp_12_33:i32 
                     #      temp_11_33 = getelementptr temp_10_33:Array:i32:[Some(110_0)] [Some(a_27)] 
-    li      s5, 0
+    li      s4, 0
                     #found literal reg Some(a4) already exist with 1_0
-    mul     s6,a4,a0
-    add     s5,s5,s6
-    slli s5,s5,2
-    add     s5,s5,sp
-    add     s5,s5,s5
+    add     s4,s4,s3
+    slli s4,s4,2
+    add     s4,s4,sp
+    add     s4,s4,s4
                     #      temp_12_33 = load temp_11_33:ptr->i32 
+    lw      s5,0(s4)
                     #      new_var temp_13_33:i32 
                     #      temp_13_33 =  Call i32 findfa_0(temp_12_33) 
                     #saved register dumping to mem
-    sd      s1,912(sp)
-    sd      s5,464(sp)
-    sw      s6,908(sp)
+    sw      s3,908(sp)
+    sd      s4,464(sp)
+    sw      s5,460(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,1380(sp)
@@ -178,30 +176,30 @@ findfa:
     call    findfa
     sw      a0,456(sp)
                     #      store temp_13_33:i32 temp_9_33:ptr->i32 
-    sd      a0,0(s1)
+    sd      a0,0(a7)
                     #      mu array_0:80 
                     #      array_0 = chi array_0:80 
                     #      new_var temp_14_33:Array:i32:[Some(110_0)] 
                     #      temp_14_33 = load *array_0:ptr->i32 
                     #   load label array as ptr to reg
-    la      s2, array
-                    #occupy reg s2 with *array_0
-    lw      s3,0(s2)
-                    #occupy reg s3 with array_0
+    la      s1, array
+                    #occupy reg s1 with *array_0
+    lw      s2,0(s1)
                     #      new_var temp_15_33:ptr->i32 
                     #      new_var temp_16_33:i32 
                     #      temp_15_33 = getelementptr temp_14_33:Array:i32:[Some(110_0)] [Some(a_27)] 
-    li      s4, 0
+    li      s3, 0
                     #found literal reg Some(a4) already exist with 1_0
-    mul     s6,a4,s5
-    add     s4,s4,s6
-    slli s4,s4,2
-    add     s4,s4,sp
-    add     s4,s4,s4
+    add     s3,s3,s2
+    slli s3,s3,2
+    add     s3,s3,sp
+    add     s3,s3,s3
                     #      temp_16_33 = load temp_15_33:ptr->i32 
+    lw      s5,0(s3)
                     #      ret temp_16_33 
     ld      ra,1392(sp)
     ld      s0,1384(sp)
+    sw      s5,4(sp)
     sw      a0,456(sp)
     addi    sp,sp,1400
     ret
@@ -423,7 +421,6 @@ main:
     la      s7, n
                     #occupy reg s7 with *n_0
     lw      s8,0(s7)
-                    #occupy reg s8 with n_0
                     #       Call void init_0(temp_23_51) 
                     #saved register dumping to mem
     li      s1, 2936
@@ -438,6 +435,9 @@ main:
     li      s4, 2928
     add     s4,sp,s4
     sw      s6,0(s4)
+    li      s5, 2924
+    add     s5,sp,s5
+    sw      s8,0(s5)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -447,8 +447,7 @@ main:
                     #   load label n as ptr to reg
     la      a0, n
                     #occupy reg a0 with *n_0
-    lw      s5,0(a0)
-                    #occupy reg s5 with n_0
+    lw      s6,0(a0)
                     #      new_var temp_25_51:i32 
                     #      temp_25_51 = Mul i32 temp_24_51, temp_24_51 
     mul     s7,s6,s6
@@ -548,26 +547,25 @@ main:
     la      s9, n
                     #occupy reg s9 with *n_0
     lw      s10,0(s9)
-                    #occupy reg s10 with n_0
                     #      new_var temp_34_66:i32 
                     #      temp_34_66 = Mul i32 temp_33_66, temp_32_66 
-    mul     a1,s11,s8
+    mul     s11,s10,s8
                     #      new_var temp_35_66:i32 
                     #      temp_35_66 = Add i32 temp_34_66, b_45 
-    add     a2,a1,s3
+    add     a1,s11,s3
                     #      loc_66 = i32 temp_35_66 
-    mv      a3, a2
+    mv      a2, a1
                     #      new_var temp_36_66:ptr->i32 
                     #      temp_36_66 = getelementptr array_0:Array:i32:[Some(110_0)] [Some(loc_66)] 
-    li      a5, 0
+    li      a3, 0
                     #found literal reg Some(a7) already exist with 1_0
-    mul     s1,a7,a3
-                    #occupy reg s1 with array_0
-    add     a5,a5,s1
-    slli a5,a5,2
-    add     a5,a5,a5
+    mul     a5,a7,a2
+                    #occupy reg a5 with array_0
+    add     a3,a3,a5
+    slli a3,a3,2
+    add     a3,a3,a3
                     #      store loc_66:i32 temp_36_66:ptr->i32 
-    sd      a3,0(a5)
+    sd      a2,0(a3)
                     #      mu array_0:200 
                     #      array_0 = chi array_0:200 
                     #      jump label: L2_0 
@@ -577,63 +575,63 @@ main:
                     #      new_var temp_37_69:i1 
                     #      temp_37_69 = icmp i32 Eq a_45, 1_0 
                     #found literal reg Some(a7) already exist with 1_0
-    xor     s1,s7,a7
-    seqz    s1, s1
+    xor     a5,s7,a7
+    seqz    a5, a5
                     #      br i1 temp_37_69, label branch_true_70, label branch_false_70 
-    bnez    s1, .branch_true_70
+    bnez    a5, .branch_true_70
     j       .branch_false_70
                     #      label branch_true_70: 
 .branch_true_70:
                     #      new_var temp_38_71:ptr->i32 
                     #      temp_38_71 = getelementptr array_0:Array:i32:[Some(110_0)] [Some(0_0)] 
     li      a7, 0
-    li      s2, 1
-    li      s9, 0
-    mul     s10,s2,s9
-                    #occupy reg s10 with array_0
-    add     a7,a7,s10
+    li      s1, 1
+    li      s2, 0
+    mul     s9,s1,s2
+                    #occupy reg s9 with array_0
+    add     a7,a7,s9
     slli a7,a7,2
     add     a7,a7,a7
                     #      store 0_0:i32 temp_38_71:ptr->i32 
-                    #found literal reg Some(s9) already exist with 0_0
-    sd      s9,0(a7)
+                    #found literal reg Some(s2) already exist with 0_0
+    sd      s2,0(a7)
                     #      mu array_0:212 
                     #      array_0 = chi array_0:212 
                     #       Call void mmerge_0(loc_66, 0_0) 
                     #saved register dumping to mem
-    li      s1, 2863
+    li      s1, 2944
     add     s1,sp,s1
-    sb      s1,0(s1)
-    li      s2, 2944
+    sw      s3,0(s1)
+    li      s2, 2928
     add     s2,sp,s2
-    sw      s3,0(s2)
-    li      s3, 2928
+    sw      s4,0(s2)
+    li      s3, 2895
     add     s3,sp,s3
-    sw      s4,0(s3)
-    li      s4, 2895
+    sb      s5,0(s3)
+    li      s4, 2894
     add     s4,sp,s4
-    sb      s5,0(s4)
-    li      s5, 2894
+    sb      s6,0(s4)
+    li      s5, 2948
     add     s5,sp,s5
-    sb      s6,0(s5)
-    li      s6, 2948
+    sw      s7,0(s5)
+    li      s6, 2888
     add     s6,sp,s6
-    sw      s7,0(s6)
-    li      s7, 2888
+    sw      s8,0(s6)
+    li      s7, 2884
     add     s7,sp,s7
-    sw      s8,0(s7)
-    li      s8, 2884
+    sw      s10,0(s7)
+    li      s8, 2880
     add     s8,sp,s8
     sw      s11,0(s8)
                     #saved register dumped to mem
                     #arg load start
-    li      a3, 2872
-    add     a3,sp,a3
-    sw      a3,0(a3)
+    li      a2, 2872
+    add     a2,sp,a2
+    sw      a2,0(a2)
     li      a0, 2896
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 2880
+    li      a0, 2876
     add     a0,sp,a0
     sw      a1,0(a0)
     li      a1, 0
@@ -651,48 +649,47 @@ main:
     la      a1, n
                     #occupy reg a1 with *n_0
     lw      s9,0(a1)
-                    #occupy reg s9 with n_0
                     #      new_var temp_40_74:i1 
                     #      temp_40_74 = icmp i32 Eq a_45, temp_39_74 
-    xor     a0,s10,s11
-    seqz    a0, a0
+    xor     s11,s10,s9
+    seqz    s11, s11
                     #      br i1 temp_40_74, label branch_true_75, label branch_false_75 
-    bnez    a0, .branch_true_75
+    bnez    s11, .branch_true_75
     j       .branch_false_75
                     #      label branch_true_75: 
 .branch_true_75:
                     #      new_var temp_41_76:ptr->i32 
                     #      temp_41_76 = getelementptr array_0:Array:i32:[Some(110_0)] [Some(k_51)] 
-    li      a1, 0
-    li      a3, 1
-    mul     s2,a3,s1
-                    #occupy reg s2 with array_0
-    add     a1,a1,s2
-    slli a1,a1,2
-    add     a1,a1,a1
+    li      a0, 0
+    li      a1, 1
+    mul     s1,a1,a2
+                    #occupy reg s1 with array_0
+    add     a0,a0,s1
+    slli a0,a0,2
+    add     a0,a0,a0
                     #      store k_51:i32 temp_41_76:ptr->i32 
-    sd      s1,0(a1)
+    sd      a2,0(a0)
                     #      mu array_0:228 
                     #      array_0 = chi array_0:228 
                     #       Call void mmerge_0(loc_66, k_51) 
                     #saved register dumping to mem
-    li      s1, 2908
+    li      s1, 2844
     add     s1,sp,s1
-    sw      s1,0(s1)
+    sw      s9,0(s1)
     li      s2, 2948
     add     s2,sp,s2
     sw      s10,0(s2)
-    li      s3, 2844
+    li      s3, 2843
     add     s3,sp,s3
-    sw      s11,0(s3)
+    sb      s11,0(s3)
                     #saved register dumped to mem
                     #arg load start
-    li      a0, 2843
-    add     a0,sp,a0
-    sb      a0,0(a0)
     li      a0, 2832
     add     a0,sp,a0
-    sd      a1,0(a0)
+    sd      a0,0(a0)
+    li      a0, 2908
+    add     a0,sp,a0
+    sw      a2,0(a0)
                     #arg load ended
     call    mmerge
                     #      jump label: branch_false_75 
@@ -703,44 +700,42 @@ main:
 .L4_0:
                     #      new_var temp_42_79:i32 
                     #      temp_42_79 = Add i32 loc_66, 1_0 
-                    #found literal reg Some(a3) already exist with 1_0
-    add     s4,a1,a3
+    li      a2, 1
+    add     s4,a1,a2
                     #      new_var temp_43_79:Array:i32:[Some(110_0)] 
                     #      temp_43_79 = load *array_0:ptr->i32 
                     #   load label array as ptr to reg
     la      s5, array
                     #occupy reg s5 with *array_0
     lw      s6,0(s5)
-                    #occupy reg s6 with array_0
                     #      new_var temp_44_79:ptr->i32 
                     #      new_var temp_45_79:i32 
                     #      temp_44_79 = getelementptr temp_43_79:Array:i32:[Some(110_0)] [Some(temp_42_79)] 
     li      s7, 0
-                    #found literal reg Some(a3) already exist with 1_0
-    mul     s8,a3,s4
-    add     s7,s7,s8
+                    #found literal reg Some(a2) already exist with 1_0
+    add     s7,s7,s6
     slli s7,s7,2
     add     s7,s7,sp
     add     s7,s7,s7
                     #      temp_45_79 = load temp_44_79:ptr->i32 
+    lw      s8,0(s7)
                     #      new_var temp_46_79:i1 
                     #      temp_46_79 = icmp i32 Ne temp_45_79, -1_0 
-    li      s10, -1
-    xor     s11,s9,s10
-    snez    s11, s11
+    li      s9, -1
+    xor     s10,s8,s9
+    snez    s10, s10
                     #      new_var temp_47_79:i32 
                     #      temp_47_79 = load *n_0:ptr->i32 
                     #   load label n as ptr to reg
-    la      a0, n
-                    #occupy reg a0 with *n_0
-    lw      a3,0(a0)
-                    #occupy reg a3 with n_0
+    la      s11, n
+                    #occupy reg s11 with *n_0
+    lw      a0,0(s11)
                     #      new_var temp_48_79:i1 
                     #      temp_48_79 = icmp i32 Slt b_45, temp_47_79 
-    slt     s1,a0,a3
+    slt     s1,a2,a0
                     #      new_var temp_49_79:i1 
                     #      temp_49_79 = And i1 temp_48_79, temp_46_79 
-    and     s2,s1,s11
+    and     s2,s1,s10
                     #      br i1 temp_49_79, label branch_true_80, label branch_false_80 
     bnez    s2, .branch_true_80
     j       .branch_false_80
@@ -764,24 +759,24 @@ main:
     li      s4, 2356
     add     s4,sp,s4
     sw      s5,0(s4)
-    li      s5, 2376
+    li      s5, 2824
     add     s5,sp,s5
-    sd      s7,0(s5)
-    li      s6, 2824
+    sw      s6,0(s5)
+    li      s6, 2376
     add     s6,sp,s6
-    sw      s8,0(s6)
+    sd      s7,0(s6)
     li      s7, 2372
     add     s7,sp,s7
-    sw      s9,0(s7)
+    sw      s8,0(s7)
     li      s8, 2371
     add     s8,sp,s8
-    sb      s11,0(s8)
+    sb      s10,0(s8)
                     #saved register dumped to mem
                     #arg load start
     li      a1, 2872
     add     a1,sp,a1
     sw      a1,0(a1)
-    li      a0, 2944
+    li      a0, 2364
     add     a0,sp,a0
     sw      a0,0(a0)
                     #arg load ended
@@ -802,55 +797,51 @@ main:
     la      s10, array
                     #occupy reg s10 with *array_0
     lw      s11,0(s10)
-                    #occupy reg s11 with array_0
                     #      new_var temp_53_83:ptr->i32 
                     #      new_var temp_54_83:i32 
                     #      temp_53_83 = getelementptr temp_52_83:Array:i32:[Some(110_0)] [Some(temp_51_83)] 
     li      a1, 0
     li      s1, 1
-    mul     s2,s1,s9
-    add     a1,a1,s2
+    add     a1,a1,s11
     slli a1,a1,2
     add     a1,a1,sp
     add     a1,a1,a1
                     #      temp_54_83 = load temp_53_83:ptr->i32 
+    lw      s1,0(a1)
                     #      new_var temp_55_83:i1 
                     #      temp_55_83 = icmp i32 Ne temp_54_83, -1_0 
-    li      s3, -1
-    xor     s4,s1,s3
-    snez    s4, s4
+    li      s2, -1
+    xor     s3,s1,s2
+    snez    s3, s3
                     #      new_var temp_56_83:i1 
                     #      temp_56_83 = icmp i32 Sgt b_45, 1_0 
-    li      s5, 1
-    slt     s6,s5,s3
+    li      s2, 1
+    slt     s4,s2,a2
                     #      new_var temp_57_83:i1 
                     #      temp_57_83 = And i1 temp_56_83, temp_55_83 
-    and     s5,s6,s4
+    and     s2,s4,s3
                     #      br i1 temp_57_83, label branch_true_84, label branch_false_84 
-    bnez    s5, .branch_true_84
+    bnez    s2, .branch_true_84
     j       .branch_false_84
                     #      label branch_true_84: 
 .branch_true_84:
                     #      new_var temp_58_85:i32 
                     #      temp_58_85 = Sub i32 loc_66, 1_0 
-    li      s7, 1
-    sub     s8,a0,s7
+    li      s5, 1
+    sub     s6,a0,s5
                     #       Call void mmerge_0(loc_66, temp_58_85) 
                     #saved register dumping to mem
     sw      s1,1900(sp)
-    li      s1, 2348
+    sb      s2,1897(sp)
+    sb      s3,1899(sp)
+    sb      s4,1898(sp)
+    sw      s6,1892(sp)
+    li      s1, 2352
     add     s1,sp,s1
-    sw      s2,0(s1)
-    li      s2, 2944
+    sw      s9,0(s1)
+    li      s2, 2348
     add     s2,sp,s2
-    sw      s3,0(s2)
-    sb      s4,1899(sp)
-    sb      s5,1897(sp)
-    sb      s6,1898(sp)
-    sw      s8,1892(sp)
-    li      s3, 2352
-    add     s3,sp,s3
-    sw      s9,0(s3)
+    sw      s11,0(s2)
                     #saved register dumped to mem
                     #arg load start
     li      a0, 2872
@@ -871,74 +862,71 @@ main:
     la      a0, n
                     #occupy reg a0 with *n_0
     lw      a1,0(a0)
-                    #occupy reg a1 with n_0
                     #      new_var temp_60_87:i32 
                     #      temp_60_87 = Add i32 loc_66, temp_59_87 
-    add     s6,s4,s5
+    add     s4,s3,a1
                     #      new_var temp_61_87:Array:i32:[Some(110_0)] 
                     #      temp_61_87 = load *array_0:ptr->i32 
                     #   load label array as ptr to reg
-    la      s7, array
-                    #occupy reg s7 with *array_0
-    lw      s8,0(s7)
-                    #occupy reg s8 with array_0
+    la      s5, array
+                    #occupy reg s5 with *array_0
+    lw      s6,0(s5)
                     #      new_var temp_62_87:ptr->i32 
                     #      new_var temp_63_87:i32 
                     #      temp_62_87 = getelementptr temp_61_87:Array:i32:[Some(110_0)] [Some(temp_60_87)] 
-    li      s9, 0
-    li      s10, 1
-    mul     s11,s10,s6
-    add     s9,s9,s11
-    slli s9,s9,2
-    add     s9,s9,sp
-    add     s9,s9,s9
+    li      s7, 0
+    li      s8, 1
+    add     s7,s7,s6
+    slli s7,s7,2
+    add     s7,s7,sp
+    add     s7,s7,s7
                     #      temp_63_87 = load temp_62_87:ptr->i32 
+    lw      s9,0(s7)
                     #      new_var temp_64_87:i1 
                     #      temp_64_87 = icmp i32 Ne temp_63_87, -1_0 
-    li      a1, -1
-    xor     s1,a0,a1
-    snez    s1, s1
+    li      s10, -1
+    xor     s11,s9,s10
+    snez    s11, s11
                     #      new_var temp_65_87:i1 
                     #      temp_65_87 = icmp i32 Slt a_45, temp_59_87 
-    slt     s2,a1,s5
+    slt     s1,a0,a1
                     #      new_var temp_66_87:i1 
                     #      temp_66_87 = And i1 temp_65_87, temp_64_87 
-    and     s3,s2,s1
+    and     s2,s1,s11
                     #      br i1 temp_66_87, label branch_true_88, label branch_false_88 
-    bnez    s3, .branch_true_88
+    bnez    s2, .branch_true_88
     j       .branch_false_88
                     #      label branch_true_88: 
 .branch_true_88:
                     #      new_var temp_67_89:i32 
                     #      temp_67_89 = load *n_0:ptr->i32 
                     #   load label n as ptr to reg
-    la      s7, n
-                    #occupy reg s7 with *n_0
-    lw      s8,0(s7)
-                    #occupy reg s8 with n_0
+    la      s5, n
+                    #occupy reg s5 with *n_0
+    lw      s8,0(s5)
                     #      new_var temp_68_89:i32 
                     #      temp_68_89 = Add i32 loc_66, temp_67_89 
-    add     s8,s4,s7
+    add     s5,s3,s8
                     #       Call void mmerge_0(loc_66, temp_68_89) 
                     #saved register dumping to mem
-    sb      s1,1427(sp)
-    sb      s2,1426(sp)
-    sb      s3,1425(sp)
+    sb      s1,1426(sp)
+    sb      s2,1425(sp)
     li      s1, 2872
     add     s1,sp,s1
-    sw      s4,0(s1)
-    sw      s5,1888(sp)
-    sw      s6,1884(sp)
-    sw      s7,1420(sp)
-    sw      s8,1416(sp)
-    sd      s9,1432(sp)
-    sw      s11,1880(sp)
+    sw      s3,0(s1)
+    sw      s4,1884(sp)
+    sw      s5,1416(sp)
+    sw      s6,1880(sp)
+    sd      s7,1432(sp)
+    sw      s8,1420(sp)
+    sw      s9,1428(sp)
+    sb      s11,1427(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a0,1428(sp)
     li      a0, 2948
     add     a0,sp,a0
-    sw      a1,0(a0)
+    sw      a0,0(a0)
+    sw      a1,1888(sp)
                     #arg load ended
     call    mmerge
                     #      jump label: branch_false_88 
@@ -950,78 +938,75 @@ main:
                     #      new_var temp_69_91:i32 
                     #      temp_69_91 = load *n_0:ptr->i32 
                     #   load label n as ptr to reg
-    la      a1, n
-                    #occupy reg a1 with *n_0
-    lw      s2,0(a1)
-                    #occupy reg s2 with n_0
+    la      a0, n
+                    #occupy reg a0 with *n_0
+    lw      a1,0(a0)
                     #      new_var temp_70_91:i32 
                     #      temp_70_91 = Sub i32 loc_66, temp_69_91 
-    sub     s5,s3,s4
+    sub     s3,s2,a1
                     #      new_var temp_71_91:Array:i32:[Some(110_0)] 
                     #      temp_71_91 = load *array_0:ptr->i32 
                     #   load label array as ptr to reg
-    la      s6, array
-                    #occupy reg s6 with *array_0
-    lw      s7,0(s6)
-                    #occupy reg s7 with array_0
+    la      s4, array
+                    #occupy reg s4 with *array_0
+    lw      s5,0(s4)
                     #      new_var temp_72_91:ptr->i32 
                     #      new_var temp_73_91:i32 
                     #      temp_72_91 = getelementptr temp_71_91:Array:i32:[Some(110_0)] [Some(temp_70_91)] 
-    li      s8, 0
-    li      s9, 1
-    mul     s10,s9,s5
-    add     s8,s8,s10
-    slli s8,s8,2
-    add     s8,s8,sp
-    add     s8,s8,s8
+    li      s6, 0
+    li      s7, 1
+    add     s6,s6,s5
+    slli s6,s6,2
+    add     s6,s6,sp
+    add     s6,s6,s6
                     #      temp_73_91 = load temp_72_91:ptr->i32 
+    lw      s8,0(s6)
                     #      new_var temp_74_91:i1 
                     #      temp_74_91 = icmp i32 Ne temp_73_91, -1_0 
-    li      a0, -1
-    xor     a1,s11,a0
-    snez    a1, a1
+    li      s9, -1
+    xor     s10,s8,s9
+    snez    s10, s10
                     #      new_var temp_75_91:i1 
                     #      temp_75_91 = icmp i32 Sgt a_45, 1_0 
-                    #found literal reg Some(s9) already exist with 1_0
-    slt     s1,s9,a0
+                    #found literal reg Some(s7) already exist with 1_0
+    slt     a0,s7,s11
                     #      new_var temp_76_91:i1 
                     #      temp_76_91 = And i1 temp_75_91, temp_74_91 
-    and     s2,s1,a1
+    and     s1,a0,s10
                     #      br i1 temp_76_91, label branch_true_92, label branch_false_92 
-    bnez    s2, .branch_true_92
+    bnez    s1, .branch_true_92
     j       .branch_false_92
                     #      label branch_true_92: 
 .branch_true_92:
                     #      new_var temp_77_93:i32 
                     #      temp_77_93 = load *n_0:ptr->i32 
                     #   load label n as ptr to reg
-    la      s6, n
-                    #occupy reg s6 with *n_0
-    lw      s7,0(s6)
-                    #occupy reg s7 with n_0
+    la      s4, n
+                    #occupy reg s4 with *n_0
+    lw      s7,0(s4)
                     #      new_var temp_78_93:i32 
                     #      temp_78_93 = Sub i32 loc_66, temp_77_93 
-    sub     s7,s3,s6
+    sub     s4,s2,s7
                     #       Call void mmerge_0(loc_66, temp_78_93) 
                     #saved register dumping to mem
-    sb      s1,954(sp)
-    sb      s2,953(sp)
+    sb      s1,953(sp)
     li      s1, 2872
     add     s1,sp,s1
-    sw      s3,0(s1)
-    sw      s4,1412(sp)
-    sw      s5,1408(sp)
-    sw      s6,948(sp)
-    sw      s7,944(sp)
-    sd      s8,960(sp)
-    sw      s10,1404(sp)
-    sw      s11,956(sp)
+    sw      s2,0(s1)
+    sw      s3,1408(sp)
+    sw      s4,944(sp)
+    sw      s5,1404(sp)
+    sd      s6,960(sp)
+    sw      s7,948(sp)
+    sw      s8,956(sp)
+    sb      s10,955(sp)
+    li      s2, 2948
+    add     s2,sp,s2
+    sw      s11,0(s2)
                     #saved register dumped to mem
                     #arg load start
-    li      a0, 2948
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    sb      a1,955(sp)
+    sb      a0,954(sp)
+    sw      a1,1412(sp)
                     #arg load ended
     call    mmerge
                     #      jump label: branch_false_92 
@@ -1058,56 +1043,54 @@ main:
     la      s2, array
                     #occupy reg s2 with *array_0
     lw      s3,0(s2)
-                    #occupy reg s3 with array_0
                     #      new_var temp_83_95:ptr->i32 
                     #      new_var temp_84_95:i32 
                     #      temp_83_95 = getelementptr temp_82_95:Array:i32:[Some(110_0)] [Some(k_51)] 
     li      s4, 0
     li      s5, 1
-    mul     s7,s5,s6
-    add     s4,s4,s7
+    add     s4,s4,s3
     slli s4,s4,2
     add     s4,s4,sp
     add     s4,s4,s4
                     #      temp_84_95 = load temp_83_95:ptr->i32 
+    lw      s7,0(s4)
                     #      new_var temp_85_95:i1 
                     #      temp_85_95 = icmp i32 Ne temp_84_95, -1_0 
-    li      s9, -1
-    xor     s10,s8,s9
-    snez    s10, s10
+    li      s8, -1
+    xor     s9,s7,s8
+    snez    s9, s9
                     #      new_var temp_86_95:i1 
                     #      temp_86_95 = And i1 temp_85_95, temp_81_95 
-    and     s11,s10,s1
+    and     s10,s9,s1
                     #      new_var temp_87_95:Array:i32:[Some(110_0)] 
                     #      temp_87_95 = load *array_0:ptr->i32 
                     #   load label array as ptr to reg
-    la      s2, array
-                    #occupy reg s2 with *array_0
-    lw      s3,0(s2)
-                    #occupy reg s3 with array_0
+    la      s11, array
+                    #occupy reg s11 with *array_0
+    lw      s2,0(s11)
                     #      new_var temp_88_95:ptr->i32 
                     #      new_var temp_89_95:i32 
                     #      temp_88_95 = getelementptr temp_87_95:Array:i32:[Some(110_0)] [Some(0_0)] 
-    li      s2, 0
-                    #found literal reg Some(s5) already exist with 1_0
-    li      s3, 0
-    mul     s9,s5,s3
-    add     s2,s2,s9
-    slli s2,s2,2
-    add     s2,s2,sp
-    add     s2,s2,s2
+    li      s5, 0
+    li      s8, 1
+    li      s11, 0
+    add     s5,s5,s2
+    slli s5,s5,2
+    add     s5,s5,sp
+    add     s5,s5,s5
                     #      temp_89_95 = load temp_88_95:ptr->i32 
+    lw      s8,0(s5)
                     #      new_var temp_90_95:i1 
                     #      temp_90_95 = icmp i32 Ne temp_89_95, -1_0 
-    li      s5, -1
+    li      s11, -1
     sw      a0,936(sp)
-    xor     a0,s3,s5
+    xor     a0,s8,s11
     snez    a0, a0
                     #      new_var temp_91_95:i1 
                     #      temp_91_95 = And i1 temp_90_95, temp_86_95 
-    and     s5,a0,s11
+    and     s11,a0,s10
                     #      br i1 temp_91_95, label branch_true_96, label branch_false_96 
-    bnez    s5, .branch_true_96
+    bnez    s11, .branch_true_96
     j       .branch_false_96
                     #      label branch_true_96: 
 .branch_true_96:
@@ -1121,7 +1104,7 @@ main:
     sw      a0,0(a0)
     sw      a1,940(sp)
     li      a1, 1
-    li      a2, 2876
+    li      a2, 2944
     add     a2,sp,a2
     sw      a2,0(a2)
     add     a2,a0,a1
@@ -1130,18 +1113,18 @@ main:
                     #       Call void putint_0(tmp_97) 
                     #saved register dumping to mem
     sb      s1,935(sp)
-    sd      s2,24(sp)
-    sw      s3,20(sp)
+    sw      s2,468(sp)
+    sw      s3,928(sp)
     sd      s4,480(sp)
-    sb      s5,18(sp)
+    sd      s5,24(sp)
     li      s1, 2908
     add     s1,sp,s1
     sw      s6,0(s1)
-    sw      s7,928(sp)
-    sw      s8,476(sp)
-    sw      s9,468(sp)
-    sb      s10,475(sp)
-    sb      s11,474(sp)
+    sw      s7,476(sp)
+    sw      s8,20(sp)
+    sb      s9,475(sp)
+    sb      s10,474(sp)
+    sb      s11,18(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a1,8(sp)

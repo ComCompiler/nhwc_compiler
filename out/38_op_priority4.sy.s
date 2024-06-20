@@ -135,76 +135,71 @@ main:
     la      a7, d
                     #occupy reg a7 with *d_0
     lw      s1,0(a7)
-                    #occupy reg s1 with d_0
                     #      new_var temp_6_29:i32 
                     #      temp_6_29 = load *e_0:ptr->i32 
                     #   load label e as ptr to reg
     la      s2, e
                     #occupy reg s2 with *e_0
     lw      s3,0(s2)
-                    #occupy reg s3 with e_0
                     #      new_var temp_7_29:i32 
                     #      temp_7_29 = Add i32 temp_6_29, temp_5_29 
-    add     s6,s4,s5
+    add     s4,s3,s1
                     #      new_var temp_8_29:i32 
                     #      temp_8_29 = load *a_0:ptr->i32 
                     #   load label a as ptr to reg
-    la      s7, a
-                    #occupy reg s7 with *a_0
-    lw      s8,0(s7)
-                    #occupy reg s8 with a_0
+    la      s5, a
+                    #occupy reg s5 with *a_0
+    lw      s6,0(s5)
                     #      new_var temp_9_29:i32 
                     #      temp_9_29 = load *c_0:ptr->i32 
                     #   load label c as ptr to reg
-    la      s9, c
-                    #occupy reg s9 with *c_0
-    lw      s10,0(s9)
-                    #occupy reg s10 with c_0
+    la      s7, c
+                    #occupy reg s7 with *c_0
+    lw      s8,0(s7)
                     #      new_var temp_10_29:i32 
                     #      temp_10_29 = load *b_0:ptr->i32 
                     #   load label b as ptr to reg
-    la      s11, b
-                    #occupy reg s11 with *b_0
-    lw      a1,0(s11)
-                    #occupy reg a1 with b_0
+    la      s9, b
+                    #occupy reg s9 with *b_0
+    lw      s10,0(s9)
                     #      new_var temp_11_29:i32 
                     #      temp_11_29 = Add i32 temp_10_29, temp_9_29 
-    add     a3,a1,a2
+    add     s11,s10,s8
                     #      new_var temp_12_29:i32 
                     #      temp_12_29 = Add i32 temp_11_29, temp_8_29 
-    add     a5,a3,a4
+    add     a1,s11,s6
                     #      new_var temp_13_29:i1 
                     #      temp_13_29 = icmp i32 Eq temp_12_29, temp_7_29 
-    xor     a7,a5,s6
-    seqz    a7, a7
+    xor     a2,a1,s4
+    seqz    a2, a2
                     #      new_var temp_14_29:i32 
                     #      temp_14_29 = Mul i32 temp_8_29, temp_10_29 
-    mul     s1,a4,a1
+    mul     a3,s6,s10
                     #      new_var temp_15_29:i32 
                     #      temp_15_29 = Div i32 temp_14_29, temp_9_29 
-    div     s2,s1,a2
+    div     a4,a3,s8
                     #      new_var temp_16_29:i1 
                     #      temp_16_29 = icmp i32 Eq temp_15_29, temp_7_29 
-    xor     s3,s2,s6
-    seqz    s3, s3
+    xor     a5,a4,s4
+    seqz    a5, a5
                     #      new_var temp_17_29:i1 
                     #      temp_17_29 = Or i1 temp_16_29, temp_13_29 
                     #      new_var temp_18_29:i32 
                     #      temp_18_29 = Div i32 temp_8_29, temp_9_29 
-    div     s7,a4,a2
+    div     a7,s6,s8
                     #      new_var temp_19_29:i32 
                     #      temp_19_29 = Sub i32 temp_5_29, temp_18_29 
-    sub     s8,s5,s7
+    sub     s2,s1,a7
                     #      new_var temp_20_29:i32 
                     #      temp_20_29 = Mul i32 temp_10_29, temp_9_29 
-    mul     s9,a1,a2
+    mul     s5,s10,s8
                     #      new_var temp_21_29:i32 
                     #      temp_21_29 = Sub i32 temp_8_29, temp_20_29 
-    sub     s10,a4,s9
+    sub     s7,s6,s5
                     #      new_var temp_22_29:i1 
                     #      temp_22_29 = icmp i32 Ne temp_21_29, temp_19_29 
-    xor     s11,s10,s8
-    snez    s11, s11
+    xor     s9,s7,s2
+    snez    s9, s9
                     #      new_var temp_23_29:i1 
                     #      temp_23_29 = Or i1 temp_22_29, temp_17_29 
     sw      a0,76(sp)

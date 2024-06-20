@@ -126,6 +126,7 @@ exgcd:
     add     a2,a2,sp
     add     a2,a2,a2
                     #      temp_6_25 = load temp_5_25:ptr->i32 
+    lw      s1,0(a2)
                     #      t_25 = i32 temp_6_25 
     mv      s2, s1
                     #      new_var temp_7_25:ptr->i32 
@@ -149,6 +150,7 @@ exgcd:
     add     s4,s4,sp
     add     s4,s4,s4
                     #      temp_9_25 = load temp_8_25:ptr->i32 
+    lw      s6,0(s4)
                     #      store temp_9_25:i32 temp_7_25:ptr->i32 
     sd      s6,0(s3)
                     #      mu x_16:64 
@@ -173,12 +175,13 @@ exgcd:
     add     s8,s8,sp
     add     s8,s8,s8
                     #      temp_12_25 = load temp_11_25:ptr->i32 
+    lw      s9,0(s8)
                     #      new_var temp_13_25:i32 
                     #      temp_13_25 = Div i32 a_16, b_16 
-    div     s11,s9,s10
+    div     a4,s10,s11
                     #      new_var temp_14_25:i32 
                     #      temp_14_25 = Mul i32 temp_13_25, temp_12_25 
-    mul     a7,s11,a4
+    mul     a7,a4,s9
                     #      new_var temp_15_25:i32 
                     #      temp_15_25 = Sub i32 t_25, temp_14_25 
     sw      a0,80(sp)
@@ -292,6 +295,7 @@ main:
     add     a5,a5,sp
     add     a5,a5,a5
                     #      temp_21_32 = load temp_20_32:ptr->i32 
+    lw      a7,0(a5)
                     #      new_var temp_22_32:i32 
                     #      temp_22_32 = Mod i32 temp_21_32, b_32 
     rem     s2,a7,s1
@@ -316,6 +320,7 @@ main:
     add     s5,s5,sp
     add     s5,s5,s5
                     #      temp_26_32 = load temp_25_32:ptr->i32 
+    lw      s6,0(s5)
                     #       Call void putint_0(temp_26_32) 
                     #saved register dumping to mem
     sw      s1,80(sp)
@@ -323,6 +328,7 @@ main:
     sw      s3,20(sp)
     sw      s4,16(sp)
     sd      s5,8(sp)
+    sw      s6,4(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,48(sp)

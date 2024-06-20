@@ -81,6 +81,7 @@ get_next:
     add     s1,s1,sp
     add     s1,s1,s1
                     #      temp_2_21 = load temp_1_21:ptr->i32 
+    lw      s2,0(s1)
                     #      new_var temp_3_161:i1 
                     #      temp_3_161 = icmp i32 Ne temp_2_21, 0_0 
                     #found literal reg Some(a4) already exist with 0_0
@@ -101,19 +102,21 @@ get_next:
     add     s4,s4,sp
     add     s4,s4,s4
                     #      temp_5_24 = load temp_4_24:ptr->i32 
+    lw      s5,0(s4)
                     #      new_var temp_6_24:ptr->i32 
                     #      new_var temp_7_24:i32 
                     #      temp_6_24 = getelementptr str_16:ptr->i32 [Some(i_18)] 
-    li      s5, 0
+    li      s6, 0
                     #found literal reg Some(a3) already exist with 1_0
-    add     s5,s5,a0
-    slli s5,s5,3
-    add     s5,s5,sp
-    add     s5,s5,s5
+    add     s6,s6,a0
+    slli s6,s6,3
+    add     s6,s6,sp
+    add     s6,s6,s6
                     #      temp_7_24 = load temp_6_24:ptr->i32 
+    lw      s7,0(s6)
                     #      new_var temp_8_24:i1 
                     #      temp_8_24 = icmp i32 Eq temp_7_24, temp_5_24 
-    xor     s8,s6,s7
+    xor     s8,s7,s5
     seqz    s8, s8
                     #      new_var temp_9_24:i1 
                     #      temp_9_24 = icmp i32 Eq j_18, -1_0 
@@ -164,6 +167,7 @@ get_next:
     add     a5,a5,sp
     add     a5,a5,a5
                     #      temp_15_24 = load temp_14_24:ptr->i32 
+    lw      a0,0(a5)
                     #      j_18 = i32 temp_15_24 
                     #      jump label: L9_0 
     j       .L9_0
@@ -249,6 +253,7 @@ KMP:
     add     a7,a7,sp
     add     a7,a7,a7
                     #      temp_17_37 = load temp_16_37:ptr->i32 
+    lw      s3,0(a7)
                     #      new_var temp_18_684:i1 
                     #      temp_18_684 = icmp i32 Ne temp_17_37, 0_0 
     li      s4, 0
@@ -269,20 +274,22 @@ KMP:
     add     s6,s6,sp
     add     s6,s6,s6
                     #      temp_20_40 = load temp_19_40:ptr->i32 
+    lw      s7,0(s6)
                     #      new_var temp_21_40:ptr->i32 
                     #      new_var temp_22_40:i32 
                     #      temp_21_40 = getelementptr dst_31:ptr->i32 [Some(i_33)] 
-    li      s7, 0
+    li      s8, 0
                     #found literal reg Some(s1) already exist with 1_0
-    mul     s8,s1,a1
-    add     s7,s7,s8
-    slli s7,s7,3
-    add     s7,s7,sp
-    add     s7,s7,s7
+    mul     s9,s1,a1
+    add     s8,s8,s9
+    slli s8,s8,3
+    add     s8,s8,sp
+    add     s8,s8,s8
                     #      temp_22_40 = load temp_21_40:ptr->i32 
+    lw      s10,0(s8)
                     #      new_var temp_23_40:i1 
                     #      temp_23_40 = icmp i32 Eq temp_22_40, temp_20_40 
-    xor     s11,s9,s10
+    xor     s11,s10,s7
     seqz    s11, s11
                     #      br i1 temp_23_40, label branch_true_41, label branch_false_41 
     bnez    s11, .branch_true_41
@@ -308,11 +315,12 @@ KMP:
                     #      temp_26_45 = getelementptr dst_31:ptr->i32 [Some(i_33)] 
     li      a3, 0
                     #found literal reg Some(s1) already exist with 1_0
-    add     a3,a3,s8
+    add     a3,a3,s9
     slli a3,a3,3
     add     a3,a3,sp
     add     a3,a3,a3
                     #      temp_27_45 = load temp_26_45:ptr->i32 
+    lw      a4,0(a3)
                     #      new_var temp_28_45:i1 
                     #      temp_28_45 = icmp i1 Ne temp_27_45, 0_0 
                     #found literal reg Some(s4) already exist with 0_0
@@ -359,6 +367,7 @@ KMP:
     add     a6,a6,sp
     add     a6,a6,a6
                     #      temp_31_49 = load temp_30_49:ptr->i32 
+    lw      a0,0(a6)
                     #      i_33 = i32 temp_31_49 
                     #      jump label: L6_0 
     j       .L6_0
@@ -495,6 +504,7 @@ read_str:
     add     a6,a6,sp
     add     a6,a6,a6
                     #      temp_40_65 = load temp_39_65:ptr->i32 
+    lw      s1,0(a6)
                     #      new_var temp_41_65:i1 
                     #      temp_41_65 = icmp i32 Eq temp_40_65, 10_0 
     li      s2, 10

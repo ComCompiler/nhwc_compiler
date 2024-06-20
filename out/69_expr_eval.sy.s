@@ -50,10 +50,10 @@ next_char:
     la      a2, last_char
                     #occupy reg a2 with *last_char_0
     lw      a3,0(a2)
-                    #occupy reg a3 with last_char_0
                     #      ret temp_1_20 
     ld      ra,16(sp)
     ld      s0,8(sp)
+    sw      a3,0(sp)
     sw      a0,4(sp)
     addi    sp,sp,24
     ret
@@ -191,22 +191,22 @@ next_token:
     la      a0, last_char
                     #occupy reg a0 with *last_char_0
     lw      a1,0(a0)
-                    #occupy reg a1 with last_char_0
                     #      new_var temp_9_43:i32 
                     #      temp_9_43 =  Call i32 is_space_0(temp_8_43) 
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
+    sw      a1,76(sp)
                     #arg load ended
     call    is_space
     sw      a0,72(sp)
                     #      new_var temp_10_494:i1 
                     #      temp_10_494 = icmp i32 Ne temp_9_43, 0_0 
-    li      a2, 0
-    xor     a3,a0,a2
-    snez    a3, a3
+    li      a1, 0
+    xor     a2,a0,a1
+    snez    a2, a2
                     #      br i1 temp_10_494, label while.body_44, label while.exit_44 
-    bnez    a3, .while.body_44
+    bnez    a2, .while.body_44
     j       .while.exit_44
                     #      label while.body_44: 
 .while.body_44:
@@ -226,45 +226,44 @@ next_token:
                     #      new_var temp_12_46:i32 
                     #      temp_12_46 = load *last_char_0:ptr->i32 
                     #   load label last_char as ptr to reg
-    la      a4, last_char
-                    #occupy reg a4 with *last_char_0
-    lw      a5,0(a4)
-                    #occupy reg a5 with last_char_0
+    la      a3, last_char
+                    #occupy reg a3 with *last_char_0
+    lw      a4,0(a3)
                     #      new_var temp_13_46:i32 
                     #      temp_13_46 =  Call i32 is_num_0(temp_12_46) 
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
+    sw      a4,60(sp)
     sw      a0,64(sp)
                     #arg load ended
     call    is_num
     sw      a0,56(sp)
                     #      new_var temp_14_565:i1 
                     #      temp_14_565 = icmp i32 Ne temp_13_46, 0_0 
-                    #found literal reg Some(a2) already exist with 0_0
-    xor     a6,a0,a2
-    snez    a6, a6
+                    #found literal reg Some(a1) already exist with 0_0
+    xor     a4,a0,a1
+    snez    a4, a4
                     #      br i1 temp_14_565, label branch_true_47, label branch_false_47 
-    bnez    a6, .branch_true_47
+    bnez    a4, .branch_true_47
     j       .branch_false_47
                     #      label branch_true_47: 
 .branch_true_47:
                     #      new_var temp_15_48:i32 
                     #      temp_15_48 = load *last_char_0:ptr->i32 
                     #   load label last_char as ptr to reg
-    la      a7, last_char
-                    #occupy reg a7 with *last_char_0
-    lw      s1,0(a7)
-                    #occupy reg s1 with last_char_0
+    la      a5, last_char
+                    #occupy reg a5 with *last_char_0
+    lw      a6,0(a5)
                     #      new_var temp_16_48:i32 
                     #      temp_16_48 = Sub i32 temp_15_48, 48_0 
-    li      s3, 48
-    sub     s4,s2,s3
+    li      a7, 48
+    sub     s1,a6,a7
                     #      store temp_16_48:i32 *num_0:ptr->i32 
                     #   load label num as ptr to reg
-    la      s5, num
-                    #occupy reg s5 with *num_0
-    sd      s4,0(s5)
+    la      s2, num
+                    #occupy reg s2 with *num_0
+    sd      s1,0(s2)
                     #      jump label: while.head_51 
     j       .while.head_51
                     #      label while.head_51: 
@@ -272,8 +271,7 @@ next_token:
                     #      new_var temp_17_50:i32 
                     #      temp_17_50 =  Call i32 next_char_0() 
                     #saved register dumping to mem
-    sw      s2,48(sp)
-    sw      s4,44(sp)
+    sw      s1,44(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -291,8 +289,8 @@ next_token:
     sw      a0,36(sp)
                     #      new_var temp_19_651:i1 
                     #      temp_19_651 = icmp i32 Ne temp_18_50, 0_0 
-                    #found literal reg Some(a2) already exist with 0_0
-    xor     s1,a0,a2
+                    #found literal reg Some(a1) already exist with 0_0
+    xor     s1,a0,a1
     snez    s1, s1
                     #      br i1 temp_19_651, label while.body_51, label while.exit_51 
     bnez    s1, .while.body_51
@@ -305,40 +303,38 @@ next_token:
     la      s2, last_char
                     #occupy reg s2 with *last_char_0
     lw      s3,0(s2)
-                    #occupy reg s3 with last_char_0
                     #      new_var temp_21_52:i32 
                     #      temp_21_52 = Sub i32 temp_20_52, 48_0 
-    li      s5, 48
-    sub     s6,s4,s5
+                    #found literal reg Some(a7) already exist with 48_0
+    sub     s4,s3,a7
                     #      new_var temp_22_52:i32 
                     #      temp_22_52 = load *num_0:ptr->i32 
                     #   load label num as ptr to reg
-    la      s7, num
-                    #occupy reg s7 with *num_0
-    lw      s8,0(s7)
-                    #occupy reg s8 with num_0
+    la      s5, num
+                    #occupy reg s5 with *num_0
+    lw      s6,0(s5)
                     #      new_var temp_23_52:i32 
                     #      temp_23_52 = Mul i32 temp_22_52, 10_0 
-    li      s10, 10
-    mul     s11,s9,s10
+    li      s7, 10
+    mul     s8,s6,s7
                     #      new_var temp_24_52:i32 
                     #      temp_24_52 = Add i32 temp_23_52, temp_21_52 
-    add     a1,s11,s6
+    add     s9,s8,s4
                     #      store temp_24_52:i32 *num_0:ptr->i32 
                     #   load label num as ptr to reg
-    la      a2, num
-                    #occupy reg a2 with *num_0
-    sd      a1,0(a2)
+    la      s10, num
+                    #occupy reg s10 with *num_0
+    sd      s9,0(s10)
                     #      jump label: while.head_51 
     j       .while.head_51
                     #      label while.exit_51: 
 .while.exit_51:
                     #      store 0_0:i32 *cur_token_0:ptr->i32 
                     #   load label cur_token as ptr to reg
-    la      a2, cur_token
-                    #occupy reg a2 with *cur_token_0
-    li      a4, 0
-    sd      a4,0(a2)
+    la      s11, cur_token
+                    #occupy reg s11 with *cur_token_0
+                    #found literal reg Some(a1) already exist with 0_0
+    sd      a1,0(s11)
                     #      jump label: L22_0 
     j       .L22_0
                     #      label branch_false_47: 
@@ -346,23 +342,23 @@ next_token:
                     #      new_var temp_26_55:i32 
                     #      temp_26_55 = load *last_char_0:ptr->i32 
                     #   load label last_char as ptr to reg
-    la      a2, last_char
-                    #occupy reg a2 with *last_char_0
-    lw      a4,0(a2)
-                    #occupy reg a4 with last_char_0
+    la      a1, last_char
+                    #occupy reg a1 with *last_char_0
+    lw      a3,0(a1)
                     #      store temp_26_55:i32 *other_0:ptr->i32 
                     #   load label other as ptr to reg
-    la      a2, other
-                    #occupy reg a2 with *other_0
-    sd      a4,0(a2)
+    la      a1, other
+                    #occupy reg a1 with *other_0
+    sd      a3,0(a1)
                     #      new_var temp_27_55:i32 
                     #      temp_27_55 =  Call i32 next_char_0() 
                     #saved register dumping to mem
     sb      s1,35(sp)
-    sw      s4,28(sp)
-    sw      s6,24(sp)
-    sw      s9,20(sp)
-    sw      s11,16(sp)
+    sw      s3,28(sp)
+    sw      s4,24(sp)
+    sw      s6,20(sp)
+    sw      s8,16(sp)
+    sw      s9,12(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -387,10 +383,10 @@ next_token:
     la      s3, cur_token
                     #occupy reg s3 with *cur_token_0
     lw      s4,0(s3)
-                    #occupy reg s4 with cur_token_0
                     #      ret temp_25_42 
     ld      ra,88(sp)
     ld      s0,80(sp)
+    sw      s4,8(sp)
     sw      a0,0(sp)
     addi    sp,sp,96
     ret
@@ -592,6 +588,7 @@ stack_push:
     add     a5,a5,sp
     add     a5,a5,a5
                     #      temp_39_82 = load temp_38_82:ptr->i32 
+    lw      a6,0(a5)
                     #      new_var temp_40_82:i32 
                     #      temp_40_82 = Add i32 temp_39_82, 1_0 
                     #found literal reg Some(a3) already exist with 1_0
@@ -611,16 +608,17 @@ stack_push:
     add     s1,s1,sp
     add     s1,s1,s1
                     #      temp_42_82 = load temp_41_82:ptr->i32 
+    lw      s2,0(s1)
                     #      new_var temp_43_82:ptr->i32 
                     #      temp_43_82 = getelementptr s_80:ptr->i32 [Some(temp_42_82)] 
-    li      s2, 0
+    li      s3, 0
                     #found literal reg Some(a3) already exist with 1_0
-    add     s2,s2,a0
-    slli s2,s2,3
-    add     s2,s2,sp
-    add     s2,s2,s2
+    add     s3,s3,a0
+    slli s3,s3,3
+    add     s3,s3,sp
+    add     s3,s3,s3
                     #      store v_80:i32 temp_43_82:ptr->i32 
-    sd      a1,0(s2)
+    sd      a1,0(s3)
                     #      mu s_80:234 
                     #      s_80 = chi s_80:234 
                     #      Define stack_pop_0 [s_85] -> stack_pop_ret_0 
@@ -655,16 +653,18 @@ stack_pop:
     add     a1,a1,sp
     add     a1,a1,a1
                     #      temp_45_87 = load temp_44_87:ptr->i32 
+    lw      a4,0(a1)
                     #      new_var temp_46_87:ptr->i32 
                     #      new_var temp_47_87:i32 
                     #      temp_46_87 = getelementptr s_85:ptr->i32 [Some(temp_45_87)] 
-    li      a4, 0
+    li      a5, 0
                     #found literal reg Some(a2) already exist with 1_0
-    add     a4,a4,a0
-    slli a4,a4,3
-    add     a4,a4,sp
-    add     a4,a4,a4
+    add     a5,a5,a0
+    slli a5,a5,3
+    add     a5,a5,sp
+    add     a5,a5,a5
                     #      temp_47_87 = load temp_46_87:ptr->i32 
+    lw      a6,0(a5)
                     #      last_87 = i32 temp_47_87 
     mv      a7, a6
                     #      new_var temp_48_87:ptr->i32 
@@ -687,6 +687,7 @@ stack_pop:
     add     s2,s2,sp
     add     s2,s2,s2
                     #      temp_50_87 = load temp_49_87:ptr->i32 
+    lw      s3,0(s2)
                     #      new_var temp_51_87:i32 
                     #      temp_51_87 = Sub i32 temp_50_87, 1_0 
                     #found literal reg Some(a2) already exist with 1_0
@@ -729,19 +730,22 @@ stack_peek:
     add     a1,a1,sp
     add     a1,a1,a1
                     #      temp_53_93 = load temp_52_93:ptr->i32 
+    lw      a4,0(a1)
                     #      new_var temp_54_93:ptr->i32 
                     #      new_var temp_55_93:i32 
                     #      temp_54_93 = getelementptr s_91:ptr->i32 [Some(temp_53_93)] 
-    li      a4, 0
+    li      a5, 0
                     #found literal reg Some(a2) already exist with 1_0
-    add     a4,a4,a0
-    slli a4,a4,3
-    add     a4,a4,sp
-    add     a4,a4,a4
+    add     a5,a5,a0
+    slli a5,a5,3
+    add     a5,a5,sp
+    add     a5,a5,a5
                     #      temp_55_93 = load temp_54_93:ptr->i32 
+    lw      a6,0(a5)
                     #      ret temp_55_93 
     ld      ra,48(sp)
     ld      s0,40(sp)
+    sw      a6,4(sp)
     sd      a0,32(sp)
     addi    sp,sp,56
     ret
@@ -770,9 +774,11 @@ stack_size:
     add     a1,a1,sp
     add     a1,a1,a1
                     #      temp_57_97 = load temp_56_97:ptr->i32 
+    lw      a4,0(a1)
                     #      ret temp_57_97 
     ld      ra,32(sp)
     ld      s0,24(sp)
+    sw      a4,4(sp)
     sd      a0,16(sp)
     addi    sp,sp,40
     ret
@@ -1000,21 +1006,19 @@ eval:
     la      a4, cur_token
                     #occupy reg a4 with *cur_token_0
     lw      a5,0(a4)
-                    #occupy reg a5 with cur_token_0
                     #      new_var temp_69_121:i1 
                     #      temp_69_121 = icmp i32 Ne temp_68_121, 0_0 
-    li      a7, 0
-    xor     s1,a6,a7
-    snez    s1, s1
+    li      a6, 0
+    xor     a7,a5,a6
+    snez    a7, a7
                     #      br i1 temp_69_121, label branch_true_122, label branch_false_122 
-    bnez    s1, .branch_true_122
+    bnez    a7, .branch_true_122
     j       .branch_false_122
                     #      label branch_true_122: 
 .branch_true_122:
                     #      new_var temp_70_121:i32 
                     #      temp_70_121 =  Call i32 panic_0() 
                     #saved register dumping to mem
-    sb      s1,163(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -1042,7 +1046,6 @@ eval:
     la      s3, num
                     #occupy reg s3 with *num_0
     lw      s4,0(s3)
-                    #occupy reg s4 with num_0
                     #       Call void stack_push_0(oprs_119, temp_71_119) 
                     #saved register dumping to mem
                     #found literal reg Some(a1) already exist with 2224_0
@@ -1051,6 +1054,7 @@ eval:
                     #found literal reg Some(a2) already exist with 2216_0
     add     a2,sp,a2
     sd      s2,0(a2)
+    sw      s4,152(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,156(sp)
@@ -1074,26 +1078,24 @@ eval:
     la      a1, cur_token
                     #occupy reg a1 with *cur_token_0
     lw      s1,0(a1)
-                    #occupy reg s1 with cur_token_0
                     #      new_var temp_74_126:i1 
                     #      temp_74_126 = icmp i32 Eq temp_73_126, 1_0 
-    li      s3, 1
-    xor     s4,s2,s3
-    seqz    s4, s4
+    li      s2, 1
+    xor     s3,s1,s2
+    seqz    s3, s3
                     #      br i1 temp_74_126, label while.body_127, label while.exit_127 
-    bnez    s4, .while.body_127
+    bnez    s3, .while.body_127
     j       .while.exit_127
                     #      label while.body_127: 
 .while.body_127:
                     #      new_var temp_75_128:i32 
                     #      temp_75_128 = load *other_0:ptr->i32 
                     #   load label other as ptr to reg
-    la      s5, other
-                    #occupy reg s5 with *other_0
-    lw      s6,0(s5)
-                    #occupy reg s6 with other_0
+    la      s4, other
+                    #occupy reg s4 with *other_0
+    lw      s5,0(s4)
                     #      op_128 = i32 temp_75_128 
-    mv      s8, s7
+    mv      s6, s5
                     #      jump label: L4_0 
     j       .L4_0
                     #      label L4_0: 
@@ -1101,10 +1103,10 @@ eval:
                     #      new_var temp_76_130:i32 
                     #      temp_76_130 =  Call i32 get_op_prec_0(op_128) 
                     #saved register dumping to mem
-    sw      s2,144(sp)
-    sb      s4,143(sp)
-    sw      s7,136(sp)
-    sw      s8,132(sp)
+    sw      s1,144(sp)
+    sb      s3,143(sp)
+    sw      s5,136(sp)
+    sw      s6,132(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,148(sp)
@@ -1113,8 +1115,8 @@ eval:
     sw      a0,128(sp)
                     #      new_var temp_77_130:i1 
                     #      temp_77_130 = icmp i1 Ne temp_76_130, 0_0 
-                    #found literal reg Some(a7) already exist with 0_0
-    xor     s1,a0,a7
+                    #found literal reg Some(a6) already exist with 0_0
+    xor     s1,a0,a6
     snez    s1, s1
                     #      new_var temp_78_130:i1 
                     #      temp_78_130 = xor i1 temp_77_130, true 
@@ -1154,8 +1156,8 @@ eval:
     sw      a0,40(sp)
                     #      new_var temp_98_3459:i1 
                     #      temp_98_3459 = icmp i32 Ne temp_97_147, 0_0 
-                    #found literal reg Some(a7) already exist with 0_0
-    xor     s1,a0,a7
+                    #found literal reg Some(a6) already exist with 0_0
+    xor     s1,a0,a6
     snez    s1, s1
                     #      br i1 temp_98_3459, label while.body_148, label while.exit_148 
     bnez    s1, .while.body_148
@@ -1300,8 +1302,8 @@ eval:
     sw      a0,100(sp)
                     #      new_var temp_85_134:i1 
                     #      temp_85_134 = icmp i32 Ne temp_84_134, 0_0 
-                    #found literal reg Some(a7) already exist with 0_0
-    xor     s1,a0,a7
+                    #found literal reg Some(a6) already exist with 0_0
+    xor     s1,a0,a6
     snez    s1, s1
                     #      new_var temp_86_134:i1 
                     #      temp_86_134 = And i1 temp_85_134, temp_83_134 
@@ -1392,21 +1394,19 @@ eval:
     la      a0, cur_token
                     #occupy reg a0 with *cur_token_0
     lw      a1,0(a0)
-                    #occupy reg a1 with cur_token_0
                     #      new_var temp_92_141:i1 
                     #      temp_92_141 = icmp i32 Ne temp_91_141, 0_0 
-                    #found literal reg Some(a7) already exist with 0_0
-    xor     s1,a2,a7
-    snez    s1, s1
+                    #found literal reg Some(a6) already exist with 0_0
+    xor     a2,a1,a6
+    snez    a2, a2
                     #      br i1 temp_92_141, label branch_true_142, label branch_false_142 
-    bnez    s1, .branch_true_142
+    bnez    a2, .branch_true_142
     j       .branch_false_142
                     #      label branch_true_142: 
 .branch_true_142:
                     #      new_var temp_93_141:i32 
                     #      temp_93_141 =  Call i32 panic_0() 
                     #saved register dumping to mem
-    sb      s1,63(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -1434,7 +1434,6 @@ eval:
     la      s3, num
                     #occupy reg s3 with *num_0
     lw      s4,0(s3)
-                    #occupy reg s4 with num_0
                     #       Call void stack_push_0(oprs_119, temp_94_128) 
                     #saved register dumping to mem
     li      s1, 2224
@@ -1443,9 +1442,11 @@ eval:
     li      s2, 2216
     add     s2,sp,s2
     sd      s2,0(s2)
+    sw      s4,52(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,56(sp)
+    sw      a1,64(sp)
                     #arg load ended
     call    stack_push
                     #      new_var temp_95_128:i32 

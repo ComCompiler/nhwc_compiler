@@ -68,21 +68,21 @@ main:
     la      a2, a
                     #occupy reg a2 with *a_0
     lw      a3,0(a2)
-                    #occupy reg a3 with a_0
                     #      new_var temp_2_23:i32 
                     #      temp_2_23 =  Call i32 func_0(temp_1_23) 
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
+    sw      a3,8(sp)
                     #arg load ended
     call    func
     sw      a0,4(sp)
                     #      b_23 = i32 temp_2_23 
-    mv      a4, a0
+    mv      a3, a0
                     #      ret b_23 
     ld      ra,24(sp)
     ld      s0,16(sp)
-    sw      a4,12(sp)
+    sw      a3,12(sp)
     sw      a0,4(sp)
     addi    sp,sp,32
     ret

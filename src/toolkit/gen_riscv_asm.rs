@@ -206,7 +206,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     },
                     NhwcInstrType::Load { lhs, ptr_symidx, ptr_ty: _ } => {
                         debug_info_red!("{:?} {:?}",instr_struct, ptr_symidx);
-                        load_from_ptr(asm_sect, ptr_symidx,  regtab, symtab)?;
+                        load_from_ptr(asm_sect, ptr_symidx, lhs,  regtab, symtab)?;
                     },
                     NhwcInstrType::Store { val_symidx: value_symidx, value_ty: _, ptr_symidx, ptr_ty: _ } => {
                         store_from_ptr(asm_sect, ptr_symidx, value_symidx,regtab, symtab)?;
@@ -789,10 +789,9 @@ pub fn store_from_ptr(asm_sect:&mut AsmSection,ptr_symidx:&SymIdx,val_symidx:&Sy
 
 // load the value from ptr symidx to value reg
 /// reg alloc is finished in this scope 
-pub fn load_from_ptr(asm_sect:&mut AsmSection,ptr_symidx:&SymIdx, regtab:&mut RegTab, symtab:&mut SymTab) ->Result<()>{
+pub fn load_from_ptr(asm_sect:&mut AsmSection,ptr_symidx:&SymIdx,val_symidx:&SymIdx, regtab:&mut RegTab, symtab:&mut SymTab) ->Result<()>{
 
     let ptr_ty = symtab.get(ptr_symidx)?.get_type()?.clone();
-    let val_symidx = symtab.get(ptr_symidx)?.get_pointed_symidx()?.clone();
     let val_ty = ptr_ty.to_deref_ptr_type()?;
 
     let ptr_reg = regtab.find_and_occupy_reg(ptr_symidx, &ptr_ty, symtab,asm_sect,&mut default_store, &mut default_load)?;

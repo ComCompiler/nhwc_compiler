@@ -38,22 +38,22 @@ main:
     la      a0, a
                     #occupy reg a0 with *a_0
     lw      a1,0(a0)
-                    #occupy reg a1 with a_0
                     #      new_var temp_6_18:ptr->i32 
                     #      new_var temp_7_18:i32 
                     #      temp_6_18 = getelementptr temp_5_18:Array:i32:[Some(5_0)] [Some(4_0)] 
     li      a2, 0
     li      a3, 1
     li      a4, 4
-    mul     a5,a3,a4
-    add     a2,a2,a5
+    add     a2,a2,a1
     slli a2,a2,2
     add     a2,a2,sp
     add     a2,a2,a2
                     #      temp_7_18 = load temp_6_18:ptr->i32 
+    lw      a5,0(a2)
                     #      ret temp_7_18 
     ld      ra,48(sp)
     ld      s0,40(sp)
+    sw      a5,4(sp)
     addi    sp,sp,56
     ret
 .section        .data

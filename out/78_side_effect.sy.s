@@ -39,29 +39,28 @@ inc_a:
     la      a0, a
                     #occupy reg a0 with *a_0
     lw      a1,0(a0)
-                    #occupy reg a1 with a_0
                     #      b_18 = i32 temp_0_18 
-    mv      a3, a2
+    mv      a2, a1
                     #      new_var temp_1_18:i32 
                     #      temp_1_18 = Add i32 b_18, 1_0 
-    li      a4, 1
-    add     a5,a3,a4
+    li      a3, 1
+    add     a4,a2,a3
                     #      b_18 = i32 temp_1_18 
                     #      store b_18:i32 *a_0:ptr->i32 
                     #   load label a as ptr to reg
-    la      a6, a
-                    #occupy reg a6 with *a_0
-    sd      a3,0(a6)
+    la      a5, a
+                    #occupy reg a5 with *a_0
+    sd      a2,0(a5)
                     #      new_var temp_2_18:i32 
                     #      temp_2_18 = load *a_0:ptr->i32 
                     #   load label a as ptr to reg
-    la      a7, a
-                    #occupy reg a7 with *a_0
-    lw      s1,0(a7)
-                    #occupy reg s1 with a_0
+    la      a6, a
+                    #occupy reg a6 with *a_0
+    lw      a7,0(a6)
                     #      ret temp_2_18 
     ld      ra,24(sp)
     ld      s0,16(sp)
+    sw      a7,0(sp)
     addi    sp,sp,32
     ret
                     #      Define main_0 [] -> main_ret_0 
@@ -179,10 +178,10 @@ main:
     la      s2, a
                     #occupy reg s2 with *a_0
     lw      s3,0(s2)
-                    #occupy reg s3 with a_0
                     #       Call void putint_0(temp_12_31) 
                     #saved register dumping to mem
     sb      s1,78(sp)
+    sw      s3,72(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,80(sp)
@@ -201,9 +200,9 @@ main:
     la      a0, b
                     #occupy reg a0 with *b_0
     lw      s1,0(a0)
-                    #occupy reg s1 with b_0
                     #       Call void putint_0(temp_13_31) 
                     #saved register dumping to mem
+    sw      s1,68(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -298,12 +297,12 @@ main:
     la      s5, a
                     #occupy reg s5 with *a_0
     lw      s6,0(s5)
-                    #occupy reg s6 with a_0
                     #       Call void putint_0(temp_25_38) 
                     #saved register dumping to mem
     sb      s2,39(sp)
     sb      s3,45(sp)
     sb      s4,38(sp)
+    sw      s6,32(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,40(sp)
@@ -322,16 +321,15 @@ main:
     la      a0, b
                     #occupy reg a0 with *b_0
     lw      s1,0(a0)
-                    #occupy reg s1 with b_0
                     #      new_var temp_27_38:i32 
                     #      temp_27_38 = Mul i32 temp_26_38, 2_0 
-    li      s3, 2
-    mul     s4,s2,s3
+    li      s2, 2
+    mul     s3,s1,s2
                     #      store temp_27_38:i32 *b_0:ptr->i32 
                     #   load label b as ptr to reg
-    la      s5, b
-                    #occupy reg s5 with *b_0
-    sd      s4,0(s5)
+    la      s4, b
+                    #occupy reg s4 with *b_0
+    sd      s3,0(s4)
                     #      jump label: L2_0 
     j       .L2_0
                     #      label branch_false_37: 
@@ -339,8 +337,8 @@ main:
                     #      new_var temp_29_42:i32 
                     #      temp_29_42 =  Call i32 inc_a_0() 
                     #saved register dumping to mem
-    sw      s2,28(sp)
-    sw      s4,24(sp)
+    sw      s1,28(sp)
+    sw      s3,24(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -367,11 +365,11 @@ main:
     la      s4, a
                     #occupy reg s4 with *a_0
     lw      s5,0(s4)
-                    #occupy reg s5 with a_0
                     #       Call void putint_0(temp_30_24) 
                     #saved register dumping to mem
     sw      s1,100(sp)
     sw      s3,20(sp)
+    sw      s5,12(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,16(sp)
@@ -390,9 +388,9 @@ main:
     la      a0, b
                     #occupy reg a0 with *b_0
     lw      s1,0(a0)
-                    #occupy reg s1 with b_0
                     #       Call void putint_0(temp_31_24) 
                     #saved register dumping to mem
+    sw      s1,8(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -410,10 +408,10 @@ main:
     la      a0, a
                     #occupy reg a0 with *a_0
     lw      s1,0(a0)
-                    #occupy reg s1 with a_0
                     #      ret temp_32_24 
     ld      ra,112(sp)
     ld      s0,104(sp)
+    sw      s1,4(sp)
     addi    sp,sp,120
     ret
 .section        .data

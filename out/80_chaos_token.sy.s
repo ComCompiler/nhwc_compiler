@@ -54,6 +54,7 @@ putstr:
     add     a2,a2,sp
     add     a2,a2,a2
                     #      temp_163_25 = load temp_162_25:ptr->i32 
+    lw      a4,0(a2)
                     #      new_var temp_164_2279:i1 
                     #      temp_164_2279 = icmp i32 Ne temp_163_25, 0_0 
     li      a5, 0
@@ -74,8 +75,10 @@ putstr:
     add     a7,a7,sp
     add     a7,a7,a7
                     #      temp_166_27 = load temp_165_27:ptr->i32 
+    lw      s1,0(a7)
                     #       Call void putch_0(temp_166_27) 
                     #saved register dumping to mem
+    sw      s1,4(sp)
                     #saved register dumped to mem
                     #arg load start
     sd      a0,40(sp)
@@ -147,12 +150,14 @@ main:
     la      a4, __HELLO
                     #occupy reg a4 with *__HELLO_0
     lw      a5,0(a4)
-                    #occupy reg a5 with __HELLO_0
                     #      new_var temp_169_32:i32 
                     #      temp_169_32 =  Call i32 putstr_0(temp_168_32) 
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
+    li      a5, 3460
+    add     a5,sp,a5
+    sw      a5,0(a5)
                     #arg load ended
     call    putstr
     li      a0, 3060
@@ -206,18 +211,17 @@ main:
     la      s9, N4__mE___
                     #occupy reg s9 with *N4__mE____0
     lw      s10,0(s9)
-                    #occupy reg s10 with N4__mE____0
                     #      new_var temp_175_42:ptr->i32 
                     #      new_var temp_176_42:Array:i32:[Some(50_0)] 
                     #      temp_175_42 = getelementptr temp_174_42:Array:i32:[Some(6_0), Some(50_0)] [Some(__37)] 
     li      s11, 0
     li      a1, 50
-    mul     a2,a1,s5
-    add     s11,s11,a2
+    add     s11,s11,s10
     slli s11,s11,2
     add     s11,s11,sp
     add     s11,s11,s11
                     #      temp_176_42 = load temp_175_42:ptr->i32 
+    lw      a1,0(s11)
                     #      new_var temp_177_42:i32 
                     #      temp_177_42 =  Call i32 putstr_0(temp_176_42) 
                     #saved register dumping to mem
@@ -239,9 +243,13 @@ main:
     li      s6, 3035
     add     s6,sp,s6
     sb      s8,0(s6)
+    li      s7, 3028
+    add     s7,sp,s7
+    sw      s10,0(s7)
     sd      s11,1824(sp)
                     #saved register dumped to mem
                     #arg load start
+    sw      a1,1820(sp)
     li      a0, 3060
     add     a0,sp,a0
     sw      a0,0(a0)
@@ -251,13 +259,13 @@ main:
                     #      new_var temp_178_42:Array:i32:[Some(40_0)] 
                     #      temp_178_42 = load *saY_HeI10_To_0:ptr->i32 
                     #   load label saY_HeI10_To as ptr to reg
-    la      s7, saY_HeI10_To
-                    #occupy reg s7 with *saY_HeI10_To_0
-    lw      s8,0(s7)
-                    #occupy reg s8 with saY_HeI10_To_0
+    la      a1, saY_HeI10_To
+                    #occupy reg a1 with *saY_HeI10_To_0
+    lw      s8,0(a1)
                     #      new_var temp_179_42:i32 
                     #      temp_179_42 =  Call i32 putstr_0(temp_178_42) 
                     #saved register dumping to mem
+    sw      s8,1616(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,1620(sp)
@@ -270,26 +278,26 @@ main:
     la      s1, N4__mE___
                     #occupy reg s1 with *N4__mE____0
     lw      s2,0(s1)
-                    #occupy reg s2 with N4__mE____0
                     #      new_var temp_181_42:ptr->i32 
                     #      new_var temp_182_42:Array:i32:[Some(50_0)] 
                     #      temp_181_42 = getelementptr temp_180_42:Array:i32:[Some(6_0), Some(50_0)] [Some(___37)] 
     li      s3, 0
-                    #found literal reg Some(a1) already exist with 50_0
-    mul     s5,a1,s4
-    add     s3,s3,s5
+    li      s4, 50
+    add     s3,s3,s2
     slli s3,s3,2
     add     s3,s3,sp
     add     s3,s3,s3
                     #      temp_182_42 = load temp_181_42:ptr->i32 
+    lw      s6,0(s3)
                     #      new_var temp_183_42:i32 
                     #      temp_183_42 =  Call i32 putstr_0(temp_182_42) 
                     #saved register dumping to mem
+    sw      s2,1452(sp)
     sd      s3,248(sp)
     li      s1, 3036
     add     s1,sp,s1
-    sw      s4,0(s1)
-    sw      s5,1452(sp)
+    sw      s5,0(s1)
+    sw      s6,244(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,1456(sp)
@@ -302,10 +310,10 @@ main:
     la      s2, RET
                     #occupy reg s2 with *RET_0
     lw      s3,0(s2)
-                    #occupy reg s3 with RET_0
                     #      new_var temp_185_42:i32 
                     #      temp_185_42 =  Call i32 putstr_0(temp_184_42) 
                     #saved register dumping to mem
+    sw      s3,40(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,44(sp)

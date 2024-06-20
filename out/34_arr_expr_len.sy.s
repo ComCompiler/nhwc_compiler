@@ -60,26 +60,25 @@ main:
     la      a4, arr
                     #occupy reg a4 with *arr_0
     lw      a5,0(a4)
-                    #occupy reg a5 with arr_0
                     #      new_var temp_8_23:ptr->i32 
                     #      new_var temp_9_23:i32 
                     #      temp_8_23 = getelementptr temp_7_23:Array:i32:[Some(6_0)] [Some(i_19)] 
     li      a6, 0
     li      a7, 1
-    mul     s1,a7,a0
-    add     a6,a6,s1
+    add     a6,a6,a5
     slli a6,a6,2
     add     a6,a6,sp
     add     a6,a6,a6
                     #      temp_9_23 = load temp_8_23:ptr->i32 
+    lw      s1,0(a6)
                     #      new_var temp_10_23:i32 
                     #      temp_10_23 = Add i32 sum_19, temp_9_23 
-    add     s3,a1,s2
+    add     s2,a1,s1
                     #      sum_19 = i32 temp_10_23 
                     #      new_var temp_11_23:i32 
                     #      temp_11_23 = Add i32 i_19, 1_0 
                     #found literal reg Some(a7) already exist with 1_0
-    add     s4,a0,a7
+    add     s3,a0,a7
                     #      i_19 = i32 temp_11_23 
                     #      jump label: while.head_22 
     j       .while.head_22

@@ -62,81 +62,76 @@ main:
     la      a1, d
                     #occupy reg a1 with *d_0
     lw      a2,0(a1)
-                    #occupy reg a2 with d_0
                     #      new_var temp_1_24:i32 
                     #      temp_1_24 = load *c_0:ptr->i32 
                     #   load label c as ptr to reg
     la      a3, c
                     #occupy reg a3 with *c_0
     lw      a4,0(a3)
-                    #occupy reg a4 with c_0
                     #      new_var temp_2_24:i32 
                     #      temp_2_24 = load *a_0:ptr->i32 
                     #   load label a as ptr to reg
     la      a5, a
                     #occupy reg a5 with *a_0
     lw      a6,0(a5)
-                    #occupy reg a6 with a_0
                     #      new_var temp_3_24:i32 
                     #      temp_3_24 = Div i32 temp_2_24, temp_1_24 
-    div     s2,a7,s1
+    div     a7,a6,a4
                     #      new_var temp_4_24:i32 
                     #      temp_4_24 = Sub i32 temp_3_24, temp_0_24 
-    sub     s4,s2,s3
+    sub     s1,a7,a2
                     #      new_var temp_5_24:i32 
                     #      temp_5_24 = load *b_0:ptr->i32 
                     #   load label b as ptr to reg
-    la      s5, b
-                    #occupy reg s5 with *b_0
-    lw      s6,0(s5)
-                    #occupy reg s6 with b_0
+    la      s2, b
+                    #occupy reg s2 with *b_0
+    lw      s3,0(s2)
                     #      new_var temp_6_24:i32 
                     #      temp_6_24 = Mul i32 temp_5_24, temp_1_24 
-    mul     s8,s7,s1
+    mul     s4,s3,a4
                     #      new_var temp_7_24:i32 
                     #      temp_7_24 = Sub i32 temp_6_24, temp_2_24 
-    sub     s9,s8,a7
+    sub     s5,s4,a6
                     #      new_var temp_8_24:i1 
                     #      temp_8_24 = icmp i32 Eq temp_7_24, temp_4_24 
-    xor     s10,s9,s4
-    seqz    s10, s10
+    xor     s6,s5,s1
+    seqz    s6, s6
                     #      new_var temp_9_24:i32 
                     #      temp_9_24 = load *e_0:ptr->i32 
                     #   load label e as ptr to reg
-    la      s11, e
-                    #occupy reg s11 with *e_0
-    lw      a1,0(s11)
-                    #occupy reg a1 with e_0
+    la      s7, e
+                    #occupy reg s7 with *e_0
+    lw      s8,0(s7)
                     #      new_var temp_10_24:i32 
                     #      temp_10_24 = Add i32 temp_9_24, temp_0_24 
-    add     a2,a1,s3
+    add     s9,s8,a2
                     #      new_var temp_11_24:i32 
                     #      temp_11_24 = Add i32 temp_2_24, temp_5_24 
-    add     a3,a7,s7
+    add     s10,a6,s3
                     #      new_var temp_12_24:i32 
                     #      temp_12_24 = Mul i32 temp_11_24, temp_2_24 
-    mul     a4,a3,a7
+    mul     s11,s10,a6
                     #      new_var temp_13_24:i32 
                     #      temp_13_24 = Add i32 temp_12_24, temp_1_24 
-    add     a5,a4,s1
+    add     a1,s11,a4
                     #      new_var temp_14_24:i1 
                     #      temp_14_24 = icmp i32 Sle temp_13_24, temp_10_24 
-    slt     a6,a2,a5
-    xori    a6,a6,1
+    slt     a3,s9,a1
+    xori    a3,a3,1
                     #      new_var temp_15_24:i32 
                     #      temp_15_24 = Mul i32 temp_2_24, temp_5_24 
-    mul     s5,a7,s7
+    mul     a5,a6,s3
                     #      new_var temp_16_24:i32 
                     #      temp_16_24 = Div i32 temp_15_24, temp_1_24 
-    div     s6,s5,s1
+    div     s2,a5,a4
                     #      new_var temp_17_24:i1 
                     #      temp_17_24 = icmp i32 Eq temp_16_24, temp_10_24 
-    xor     s11,s6,a2
-    seqz    s11, s11
+    xor     s7,s2,s9
+    seqz    s7, s7
                     #      new_var temp_18_24:i1 
                     #      temp_18_24 = And i1 temp_17_24, temp_14_24 
     sw      a0,76(sp)
-    and     a0,s11,a6
+    and     a0,s7,a3
                     #      new_var temp_19_24:i1 
                     #      temp_19_24 = Or i1 temp_18_24, temp_8_24 
                     #      br i1 temp_19_24, label branch_true_25, label branch_false_25 
@@ -156,17 +151,17 @@ main:
 .L2_0:
                     #       Call void putint_0(flag_22) 
                     #saved register dumping to mem
-    sw      s1,68(sp)
-    sw      s2,60(sp)
-    sw      s3,72(sp)
-    sw      s4,56(sp)
-    sw      s5,12(sp)
-    sw      s6,8(sp)
-    sw      s7,52(sp)
-    sw      s8,48(sp)
-    sw      s9,44(sp)
-    sb      s10,43(sp)
-    sb      s11,7(sp)
+    sw      s1,56(sp)
+    sw      s2,8(sp)
+    sw      s3,52(sp)
+    sw      s4,48(sp)
+    sw      s5,44(sp)
+    sb      s6,43(sp)
+    sb      s7,7(sp)
+    sw      s8,36(sp)
+    sw      s9,32(sp)
+    sw      s10,28(sp)
+    sw      s11,24(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,76(sp)

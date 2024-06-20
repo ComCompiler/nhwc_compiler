@@ -173,32 +173,30 @@ EightWhile:
     la      s10, e
                     #occupy reg s10 with *e_0
     lw      s11,0(s10)
-                    #occupy reg s11 with e_0
                     #      new_var temp_9_46:i1 
                     #      temp_9_46 = icmp i32 Sgt temp_8_46, 1_0 
                     #found literal reg Some(s3) already exist with 1_0
-    slt     a6,s3,a4
+    slt     a4,s3,s11
                     #      br i1 temp_9_46, label while.body_47, label while.exit_47 
-    bnez    a6, .while.body_47
+    bnez    a4, .while.body_47
     j       .while.exit_47
                     #      label while.body_47: 
 .while.body_47:
                     #      new_var temp_10_48:i32 
                     #      temp_10_48 = load *e_0:ptr->i32 
                     #   load label e as ptr to reg
-    la      s1, e
-                    #occupy reg s1 with *e_0
-    lw      s3,0(s1)
-                    #occupy reg s3 with e_0
+    la      a6, e
+                    #occupy reg a6 with *e_0
+    lw      s1,0(a6)
                     #      new_var temp_11_48:i32 
                     #      temp_11_48 = Sub i32 temp_10_48, 1_0 
-    li      s3, 1
-    sub     s5,s1,s3
+                    #found literal reg Some(s3) already exist with 1_0
+    sub     a6,s1,s3
                     #      store temp_11_48:i32 *e_0:ptr->i32 
                     #   load label e as ptr to reg
     la      s3, e
                     #occupy reg s3 with *e_0
-    sd      s5,0(s3)
+    sd      a6,0(s3)
                     #      jump label: while.head_51 
     j       .while.head_51
                     #      label while.head_51: 
@@ -208,35 +206,33 @@ EightWhile:
                     #   load label f as ptr to reg
     la      s3, f
                     #occupy reg s3 with *f_0
-    lw      s10,0(s3)
-                    #occupy reg s10 with f_0
+    lw      s5,0(s3)
                     #      new_var temp_13_50:i1 
                     #      temp_13_50 = icmp i32 Sgt temp_12_50, 2_0 
-    li      s10, 2
-    slt     s11,s10,s3
+    li      s3, 2
+    slt     s10,s3,s5
                     #      br i1 temp_13_50, label while.body_51, label while.exit_51 
-    bnez    s11, .while.body_51
+    bnez    s10, .while.body_51
     j       .while.exit_51
                     #      label while.body_51: 
 .while.body_51:
                     #      new_var temp_14_52:i32 
                     #      temp_14_52 = load *f_0:ptr->i32 
                     #   load label f as ptr to reg
-    la      s10, f
-                    #occupy reg s10 with *f_0
+    la      s3, f
+                    #occupy reg s3 with *f_0
     sw      a0,196(sp)
-    lw      a0,0(s10)
-                    #occupy reg a0 with f_0
+    lw      a0,0(s3)
                     #      new_var temp_15_52:i32 
                     #      temp_15_52 = Sub i32 temp_14_52, 2_0 
-    li      s10, 2
+    li      s3, 2
     sw      a1,192(sp)
-    sub     a1,a0,s10
+    sub     a1,a0,s3
                     #      store temp_15_52:i32 *f_0:ptr->i32 
                     #   load label f as ptr to reg
-    la      s10, f
-                    #occupy reg s10 with *f_0
-    sd      a1,0(s10)
+    la      s3, f
+                    #occupy reg s3 with *f_0
+    sd      a1,0(s3)
                     #      jump label: while.head_55 
     j       .while.head_55
                     #      label while.head_55: 
@@ -244,16 +240,15 @@ EightWhile:
                     #      new_var temp_16_54:i32 
                     #      temp_16_54 = load *g_0:ptr->i32 
                     #   load label g as ptr to reg
-    la      s10, g
-                    #occupy reg s10 with *g_0
+    la      s3, g
+                    #occupy reg s3 with *g_0
     sw      a0,124(sp)
-    lw      a0,0(s10)
-                    #occupy reg a0 with g_0
+    lw      a0,0(s3)
                     #      new_var temp_17_54:i1 
                     #      temp_17_54 = icmp i32 Slt temp_16_54, 3_0 
-    li      s10, 3
+    li      s3, 3
     sw      a1,120(sp)
-    slt     a1,a0,s10
+    slt     a1,a0,s3
                     #      br i1 temp_17_54, label while.body_55, label while.exit_55 
     bnez    a1, .while.body_55
     j       .while.exit_55
@@ -262,21 +257,20 @@ EightWhile:
                     #      new_var temp_18_56:i32 
                     #      temp_18_56 = load *g_0:ptr->i32 
                     #   load label g as ptr to reg
-    la      s10, g
-                    #occupy reg s10 with *g_0
+    la      s3, g
+                    #occupy reg s3 with *g_0
     sw      a0,116(sp)
-    lw      a0,0(s10)
-                    #occupy reg a0 with g_0
+    lw      a0,0(s3)
                     #      new_var temp_19_56:i32 
                     #      temp_19_56 = Add i32 temp_18_56, 10_0 
-    li      s10, 10
+    li      s3, 10
     sb      a1,115(sp)
-    add     a1,a0,s10
+    add     a1,a0,s3
                     #      store temp_19_56:i32 *g_0:ptr->i32 
                     #   load label g as ptr to reg
-    la      s10, g
-                    #occupy reg s10 with *g_0
-    sd      a1,0(s10)
+    la      s3, g
+                    #occupy reg s3 with *g_0
+    sd      a1,0(s3)
                     #      jump label: while.head_59 
     j       .while.head_59
                     #      label while.head_59: 
@@ -284,16 +278,15 @@ EightWhile:
                     #      new_var temp_20_58:i32 
                     #      temp_20_58 = load *h_0:ptr->i32 
                     #   load label h as ptr to reg
-    la      s10, h
-                    #occupy reg s10 with *h_0
+    la      s3, h
+                    #occupy reg s3 with *h_0
     sw      a0,108(sp)
-    lw      a0,0(s10)
-                    #occupy reg a0 with h_0
+    lw      a0,0(s3)
                     #      new_var temp_21_58:i1 
                     #      temp_21_58 = icmp i32 Slt temp_20_58, 10_0 
-    li      s10, 10
+    li      s3, 10
     sw      a1,104(sp)
-    slt     a1,a0,s10
+    slt     a1,a0,s3
                     #      br i1 temp_21_58, label while.body_59, label while.exit_59 
     bnez    a1, .while.body_59
     j       .while.exit_59
@@ -302,21 +295,20 @@ EightWhile:
                     #      new_var temp_22_60:i32 
                     #      temp_22_60 = load *h_0:ptr->i32 
                     #   load label h as ptr to reg
-    la      s10, h
-                    #occupy reg s10 with *h_0
+    la      s3, h
+                    #occupy reg s3 with *h_0
     sw      a0,100(sp)
-    lw      a0,0(s10)
-                    #occupy reg a0 with h_0
+    lw      a0,0(s3)
                     #      new_var temp_23_60:i32 
                     #      temp_23_60 = Add i32 temp_22_60, 8_0 
-    li      s10, 8
+    li      s3, 8
     sb      a1,99(sp)
-    add     a1,a0,s10
+    add     a1,a0,s3
                     #      store temp_23_60:i32 *h_0:ptr->i32 
                     #   load label h as ptr to reg
-    la      s10, h
-                    #occupy reg s10 with *h_0
-    sd      a1,0(s10)
+    la      s3, h
+                    #occupy reg s3 with *h_0
+    sd      a1,0(s3)
                     #      jump label: while.head_59 
     j       .while.head_59
                     #      label while.exit_59: 
@@ -324,21 +316,20 @@ EightWhile:
                     #      new_var temp_24_56:i32 
                     #      temp_24_56 = load *h_0:ptr->i32 
                     #   load label h as ptr to reg
-    la      s10, h
-                    #occupy reg s10 with *h_0
+    la      s3, h
+                    #occupy reg s3 with *h_0
     sw      a0,92(sp)
-    lw      a0,0(s10)
-                    #occupy reg a0 with h_0
+    lw      a0,0(s3)
                     #      new_var temp_25_56:i32 
                     #      temp_25_56 = Sub i32 temp_24_56, 1_0 
-    li      s10, 1
+    li      s3, 1
     sw      a1,88(sp)
-    sub     a1,a0,s10
+    sub     a1,a0,s3
                     #      store temp_25_56:i32 *h_0:ptr->i32 
                     #   load label h as ptr to reg
-    la      s10, h
-                    #occupy reg s10 with *h_0
-    sd      a1,0(s10)
+    la      s3, h
+                    #occupy reg s3 with *h_0
+    sd      a1,0(s3)
                     #      jump label: while.head_55 
     j       .while.head_55
                     #      label while.exit_55: 
@@ -346,21 +337,20 @@ EightWhile:
                     #      new_var temp_26_52:i32 
                     #      temp_26_52 = load *g_0:ptr->i32 
                     #   load label g as ptr to reg
-    la      s10, g
-                    #occupy reg s10 with *g_0
+    la      s3, g
+                    #occupy reg s3 with *g_0
     sw      a0,84(sp)
-    lw      a0,0(s10)
-                    #occupy reg a0 with g_0
+    lw      a0,0(s3)
                     #      new_var temp_27_52:i32 
                     #      temp_27_52 = Sub i32 temp_26_52, 8_0 
-    li      s10, 8
+    li      s3, 8
     sw      a1,80(sp)
-    sub     a1,a0,s10
+    sub     a1,a0,s3
                     #      store temp_27_52:i32 *g_0:ptr->i32 
                     #   load label g as ptr to reg
-    la      s10, g
-                    #occupy reg s10 with *g_0
-    sd      a1,0(s10)
+    la      s3, g
+                    #occupy reg s3 with *g_0
+    sd      a1,0(s3)
                     #      jump label: while.head_51 
     j       .while.head_51
                     #      label while.exit_51: 
@@ -368,21 +358,20 @@ EightWhile:
                     #      new_var temp_28_48:i32 
                     #      temp_28_48 = load *f_0:ptr->i32 
                     #   load label f as ptr to reg
-    la      s10, f
-                    #occupy reg s10 with *f_0
+    la      s3, f
+                    #occupy reg s3 with *f_0
     sw      a0,76(sp)
-    lw      a0,0(s10)
-                    #occupy reg a0 with f_0
+    lw      a0,0(s3)
                     #      new_var temp_29_48:i32 
                     #      temp_29_48 = Add i32 temp_28_48, 1_0 
-    li      s10, 1
+    li      s3, 1
     sw      a1,72(sp)
-    add     a1,a0,s10
+    add     a1,a0,s3
                     #      store temp_29_48:i32 *f_0:ptr->i32 
                     #   load label f as ptr to reg
-    la      s10, f
-                    #occupy reg s10 with *f_0
-    sd      a1,0(s10)
+    la      s3, f
+                    #occupy reg s3 with *f_0
+    sd      a1,0(s3)
                     #      jump label: while.head_47 
     j       .while.head_47
                     #      label while.exit_47: 
@@ -390,30 +379,29 @@ EightWhile:
                     #      new_var temp_30_44:i32 
                     #      temp_30_44 = load *e_0:ptr->i32 
                     #   load label e as ptr to reg
-    la      s10, e
-                    #occupy reg s10 with *e_0
+    la      s3, e
+                    #occupy reg s3 with *e_0
     sw      a0,68(sp)
-    lw      a0,0(s10)
-                    #occupy reg a0 with e_0
+    lw      a0,0(s3)
                     #      new_var temp_31_44:i32 
                     #      temp_31_44 = Add i32 temp_30_44, 1_0 
-    li      s10, 1
+    li      s3, 1
     sw      a1,64(sp)
-    add     a1,a0,s10
+    add     a1,a0,s3
                     #      store temp_31_44:i32 *e_0:ptr->i32 
                     #   load label e as ptr to reg
-    la      s10, e
-                    #occupy reg s10 with *e_0
-    sd      a1,0(s10)
+    la      s3, e
+                    #occupy reg s3 with *e_0
+    sd      a1,0(s3)
                     #      jump label: while.head_43 
     j       .while.head_43
                     #      label while.exit_43: 
 .while.exit_43:
                     #      new_var temp_32_40:i32 
                     #      temp_32_40 = Sub i32 d_21, 1_0 
-    li      s10, 1
+    li      s3, 1
     sw      a0,60(sp)
-    sub     a0,a3,s10
+    sub     a0,a3,s3
                     #      d_21 = i32 temp_32_40 
                     #      jump label: while.head_39 
     j       .while.head_39
@@ -421,9 +409,9 @@ EightWhile:
 .while.exit_39:
                     #      new_var temp_33_36:i32 
                     #      temp_33_36 = Add i32 c_21, 1_0 
-                    #found literal reg Some(s10) already exist with 1_0
+                    #found literal reg Some(s3) already exist with 1_0
     sw      a0,52(sp)
-    add     a0,a2,s10
+    add     a0,a2,s3
                     #      c_21 = i32 temp_33_36 
                     #      jump label: while.head_35 
     j       .while.head_35
@@ -434,7 +422,7 @@ EightWhile:
     sw      a0,48(sp)
     li      a0, 2
     sw      a1,56(sp)
-    sub     a1,s10,a0
+    sub     a1,s3,a0
                     #      b_21 = i32 temp_34_32 
                     #      jump label: while.head_31 
     j       .while.head_31
@@ -447,21 +435,20 @@ EightWhile:
                     #occupy reg a0 with *h_0
     sw      a1,44(sp)
     lw      a1,0(a0)
-                    #occupy reg a1 with h_0
                     #      new_var temp_36_21:i32 
                     #      temp_36_21 = load *g_0:ptr->i32 
                     #   load label g as ptr to reg
     la      a0, g
                     #occupy reg a0 with *g_0
+    sw      a1,40(sp)
     lw      a1,0(a0)
-                    #occupy reg a1 with g_0
                     #      new_var temp_37_21:i32 
                     #      temp_37_21 = Add i32 temp_36_21, temp_35_21 
     sw      a2,188(sp)
-    add     a2,a0,a1
+    add     a2,a1,a0
                     #      new_var temp_38_21:i32 
                     #      temp_38_21 = Sub i32 temp_37_21, d_21 
-    sw      a0,36(sp)
+    sw      a0,40(sp)
     sub     a0,a2,a3
                     #      new_var temp_39_21:i32 
                     #      temp_39_21 = load *e_0:ptr->i32 
@@ -469,20 +456,19 @@ EightWhile:
                     #   load label e as ptr to reg
     la      a0, e
                     #occupy reg a0 with *e_0
-    sw      a1,40(sp)
+    sw      a1,36(sp)
     lw      a1,0(a0)
-                    #occupy reg a1 with e_0
                     #      new_var temp_40_21:i32 
                     #      temp_40_21 = Add i32 temp_39_21, temp_38_21 
     sw      a2,32(sp)
-    add     a2,a0,a1
+    add     a2,a1,a0
                     #      new_var temp_41_21:i32 
                     #      temp_41_21 = Add i32 b_21, d_21 
-    sw      a0,24(sp)
-    add     a0,s10,a3
+    sw      a0,28(sp)
+    add     a0,s3,a3
                     #      new_var temp_42_21:i32 
                     #      temp_42_21 = Add i32 temp_41_21, c_21 
-    sw      a1,28(sp)
+    sw      a1,24(sp)
     sw      a2,20(sp)
     add     a2,a0,a1
                     #      new_var temp_43_21:i32 

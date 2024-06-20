@@ -127,6 +127,7 @@ main:
     add     s4,s4,sp
     add     s4,s4,s4
                     #      temp_8_26 = load temp_7_26:ptr->i32 
+    lw      s5,0(s4)
                     #      new_var temp_9_26:i32 
                     #      temp_9_26 = Add i32 sum_17, temp_8_26 
     add     s6,a1,s5

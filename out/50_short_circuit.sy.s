@@ -39,26 +39,25 @@ func:
     la      a1, g
                     #occupy reg a1 with *g_0
     lw      a2,0(a1)
-                    #occupy reg a2 with g_0
                     #      new_var temp_1_19:i32 
                     #      temp_1_19 = Add i32 temp_0_19, n_17 
-    add     a4,a3,a0
+    add     a3,a2,a0
                     #      store temp_1_19:i32 *g_0:ptr->i32 
                     #   load label g as ptr to reg
-    la      a5, g
-                    #occupy reg a5 with *g_0
-    sd      a4,0(a5)
+    la      a4, g
+                    #occupy reg a4 with *g_0
+    sd      a3,0(a4)
                     #      new_var temp_2_19:i32 
                     #      temp_2_19 = load *g_0:ptr->i32 
                     #   load label g as ptr to reg
-    la      a6, g
-                    #occupy reg a6 with *g_0
-    lw      a7,0(a6)
-                    #occupy reg a7 with g_0
+    la      a5, g
+                    #occupy reg a5 with *g_0
+    lw      a6,0(a5)
                     #       Call void putint_0(temp_2_19) 
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
+    sw      a6,8(sp)
     sw      a0,20(sp)
                     #arg load ended
     call    putint
@@ -67,11 +66,11 @@ func:
                     #   load label g as ptr to reg
     la      a0, g
                     #occupy reg a0 with *g_0
-    lw      s1,0(a0)
-                    #occupy reg s1 with g_0
+    lw      a6,0(a0)
                     #      ret temp_3_19 
     ld      ra,32(sp)
     ld      s0,24(sp)
+    sw      a6,4(sp)
     addi    sp,sp,40
     ret
                     #      Define main_0 [] -> main_ret_0 

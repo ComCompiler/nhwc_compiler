@@ -40,28 +40,27 @@ func:
     la      a0, a
                     #occupy reg a0 with *a_0
     lw      a1,0(a0)
-                    #occupy reg a1 with a_0
                     #      b_18 = i32 temp_0_18 
-    mv      a3, a2
+    mv      a2, a1
                     #      a_18 = i32 1_0 
-    li      a4, 1
+    li      a3, 1
                     #      jump label: L5_0 
     j       .L5_0
                     #      label L5_0: 
 .L5_0:
                     #      new_var temp_1_21:i1 
                     #      temp_1_21 = icmp i32 Eq a_18, b_18 
-    xor     a5,a4,a3
-    seqz    a5, a5
+    xor     a4,a3,a2
+    seqz    a4, a4
                     #      br i1 temp_1_21, label branch_true_22, label branch_false_22 
-    bnez    a5, .branch_true_22
+    bnez    a4, .branch_true_22
     j       .branch_false_22
                     #      label branch_true_22: 
 .branch_true_22:
                     #      new_var temp_2_23:i32 
                     #      temp_2_23 = Add i32 a_18, 1_0 
-    li      a6, 1
-    add     a7,a4,a6
+    li      a5, 1
+    add     a6,a3,a5
                     #      a_18 = i32 temp_2_23 
                     #      ret 1_0 
     ld      ra,32(sp)
