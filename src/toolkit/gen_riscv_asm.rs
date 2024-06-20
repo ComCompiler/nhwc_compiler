@@ -379,12 +379,11 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                             super::nhwc_instr::IcmpPlan::Eq => {
                                                 // BinOp!(sect asm_sect func_name {Compare::new} args{a,b,1,2,3} with_symtab src_symtab);
                                                 asm_sect.asm(Logical::new_xor(rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).into());
-                                                asm_sect.asm(Compare::new_sltiu(rst_reg.clone(),rst_reg.clone(),Imm::from_offset(1)).into());
+                                                asm_sect.asm(PseudoInstr::new_seqz(rst_reg.clone(), rst_reg.clone()).into());
                                             },
                                             super::nhwc_instr::IcmpPlan::Ne => {
                                                 asm_sect.asm(Logical::new_xor(rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).into());
-                                                asm_sect.asm(Compare::new_sltiu(rst_reg.clone(),rst_reg.clone(),Imm::from_offset(1)).into());
-                                                asm_sect.asm(Logical::new_xori(rst_reg.clone(),rst_reg.clone(),Imm::from_offset(1)).into());
+                                                asm_sect.asm(PseudoInstr::new_snez(rst_reg.clone(), rst_reg.clone()).into());
                                             },
                                             super::nhwc_instr::IcmpPlan::Ugt => {
                                                 todo!()
@@ -402,15 +401,15 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                                 asm_sect.asm(Compare::new_slt(rst_reg.clone(), val_reg2.clone(), val_reg1.clone()).into());
                                             },
                                             super::nhwc_instr::IcmpPlan::Sge => {
-                                                asm_sect.asm({Compare::new_slt } (rst_reg.clone(), val_reg2.clone(), val_reg1.clone()).into());
-                                                asm_sect.asm({Logical::new_xori } (rst_reg.clone(), rst_reg.clone(), Imm::from_offset(1)).into());
+                                                asm_sect.asm(Compare::new_slt(rst_reg.clone(), val_reg1.clone(), val_reg2.clone()).into());
+                                                asm_sect.asm(Logical::new_xori(rst_reg.clone(), rst_reg.clone(), Imm::from_offset(1)).into());
                                             },
                                             super::nhwc_instr::IcmpPlan::Slt => {
                                                 asm_sect.asm(Compare::new_slt(rst_reg.clone(), val_reg1.clone(), val_reg2.clone()).into());
                                             },
                                             super::nhwc_instr::IcmpPlan::Sle => {
-                                                asm_sect.asm({Compare::new_slt } (rst_reg.clone(), val_reg1.clone(), val_reg2.clone()).into());
-                                                asm_sect.asm({Logical::new_xori } (rst_reg.clone(), rst_reg.clone(), Imm::from_offset(1)).into());
+                                                asm_sect.asm(Compare::new_slt(rst_reg.clone(), val_reg2.clone(), val_reg1.clone()).into());
+                                                asm_sect.asm(Logical::new_xori(rst_reg.clone(), rst_reg.clone(), Imm::from_offset(1)).into());
                                             },
                                         }
                                         Ok(())
