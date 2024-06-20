@@ -5,7 +5,7 @@ use derive_new::new;
 use strum_macros::EnumIs;
 use crate::{debug_info_blue, toolkit::symtab::*};
 
-use crate::{debug_info_green, reg_field_for_struct};
+use crate::{debug_info_green, debug_info_red, reg_field_for_struct};
 
 use super::rv64_instr::{REG_A_RANGE, REG_FA_RANGE, REG_FS_RANGE, REG_S_RANGE, REG_T_RANGE};
 use super::{asm_struct::AsmSection, field::Type, nhwc_instr::NhwcInstr, rv64_instr::Register, symbol::Symbol, symtab::{SymIdx, SymTab}};
@@ -355,7 +355,8 @@ impl RegTab{
     }
     /// reset the symtab's cur_reg field and drop it self
     pub fn reset(self,symtab:&mut SymTab) -> Result<()>{
-        debug_info_blue!("reset regtab");
+        debug_info_red!("reset regtab!");
+        debug_info_red!("{:?}",self.reg_symidx_map);
         for (k,v) in self.reg_symidx_map.iter(){
             if !self.is_temp(k){
                 match v{

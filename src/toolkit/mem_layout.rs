@@ -90,7 +90,6 @@ impl MemLayout{
     /// 返回这个 新插入data 的起始位置
     pub fn insert_data(&mut self, align:usize,data_len:usize, symidx:&SymIdx)-> usize{
         debug_info_red!("insert data_len {} for symidx {:?}",data_len,symidx);
-        let symidx_rc = Rc::new(symidx.clone());
             // debug_info_blue!("align:{} data_len:{}",align,data_len);
         let rst = self.find_available(align,data_len);
         match rst {
@@ -121,7 +120,7 @@ impl MemLayout{
     }
     /// 会在末尾填充足够的空内存以对齐给定align
     pub fn align_mem_with_blank(&mut self,align:usize){
-        if self.mem.len()%align !=0{
+        if self.get_mem_len()%align !=0{
             if self.mem.last().unwrap().op_symidx.is_none(){
                 let mem_len = self.get_mem_len();
                 let last_seg_len = &mut self.mem.last_mut().unwrap().len;

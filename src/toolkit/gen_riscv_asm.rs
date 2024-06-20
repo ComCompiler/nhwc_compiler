@@ -3,7 +3,7 @@
 
 use std::{default, ops::Deref, str::FromStr};
 
-use crate::{antlr_parser::clexer::{Register, Void}, debug_info_red, direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, toolkit::rv64_instr::{Arithmetic, REG_A_RANGE, REG_FA_RANGE}};
+use crate::{antlr_parser::clexer::{Register, Void}, debug_info_blue, debug_info_red, direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, toolkit::rv64_instr::{Arithmetic, REG_A_RANGE, REG_FA_RANGE}};
 use anyhow::*;
 
 use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Type, gen_nhwc_cfg::{IS_LITERAL, TYPE}, nhwc_instr::{FuncOp, InstrSlab, NhwcInstr, NhwcInstrType}, regtab::{self, RegTab}, rv64_instr::{Compare, Imm, Loads, Logical, PseudoInstr, RV64Instr, Register, RiscvOffsetLimit, Shifts, Stores, Trans, REG_FS_RANGE, REG_S_RANGE}, simulator::Simulator, symtab::{self, SymIdx, SymTab}};
@@ -97,8 +97,6 @@ fn default_store(symidx:SymIdx,reg:Register,symtab:&mut SymTab,asm_sect:& mut As
 /// convert `cfg_entry_node` into riscv 
 /// assume first instr be func_def instr while others are alloc instr
 fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, _riscv_instr_slab:&mut InstrSlab<RV64Instr>, symtab:&mut SymTab) -> Result<AsmSection>{
-    let mut _regtab = RegTab::new();
-    let regtab =&mut _regtab;
     let entries = direct_child_nodes!(at CFG_ROOT in cfg_graph);
     let mut _asm_sect = AsmSection::new();
     _asm_sect.text() ;
@@ -130,6 +128,8 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
             CfgEdgeType::GatherTrue {  } => -1,
             CfgEdgeType::GatherFalse {  } => 5,
         });
+        let mut _regtab = RegTab::new();
+        let regtab =&mut _regtab;
 
         for &cfg_node in &dfs_node_vec{
             for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs() {
@@ -180,12 +180,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         // default_store,|symidx,temp_reg,symtab,asm_sect,regtab|{
                         add_literal_to_reg(asm_sect, Register::SP, Register::SP, regtab,symtab,-(stack_size as isize))?;
                         // })?;
+                        add_literal_to_reg(asm_sect, Register::new_s0(),  Register::SP,regtab, symtab,stack_size as isize)?;
 
                         let ra_symidx= symtab.get(func_symidx)?.get_func_cor_ra_symidx()?.clone();
                         let s0_symidx = symtab.get(func_symidx)?.get_func_cor_s0_symidx()?.clone();
                         _store_sym(asm_sect, &ra_symidx, Register::RA, symtab)?;
                         _store_sym(asm_sect, &s0_symidx, Register::new_s0(), symtab)?;
-                        add_literal_to_reg(asm_sect, Register::new_s0(),  Register::SP,regtab, symtab,stack_size as isize)?;
 
                         
                     },
@@ -694,8 +694,8 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                 }
             }
         }
+        _regtab.reset(symtab)?;
     }
-    _regtab.reset(symtab)?;
     Ok(_asm_sect)
 }
 ///  sym in memory -> reg or literal li -> reg
