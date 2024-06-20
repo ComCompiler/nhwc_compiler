@@ -18,18 +18,27 @@
 
 .section        .text
     .align 4
+                    #      Define main_0 [] -> main_ret_0 
     .globl main
     .type main,@function
 main:
+                    #mem layout:|ra_main:8|s0_main:8|a:4|b:4
     addi    sp,sp,-24
     sd      ra,16(sp)
     sd      s0,8(sp)
     addi    s0,sp,24
+                    #      alloc i32 a_17 
+                    #      alloc i32 b_17 
+                    #      label L0_0: 
 .L0_0:
+                    #      a_17 = i32 10_0 
     li      a0, 10
+                    #      b_17 = i32 5_0 
     li      a1, 5
+                    #      ret 5_0 
     ld      ra,16(sp)
     ld      s0,8(sp)
+    sw      a0,4(sp)
     li      a0, 5
     addi    sp,sp,24
     ret

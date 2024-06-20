@@ -11,6 +11,6 @@ for filename in "$path"/*; do
         # 获取文件的基本名称，没有路径
         base_name=$(basename "$filename")
         # 执行编译命令，输出到同一目录
-        ./target/debug/compiler "$filename" -o "./out/${base_name}.s" > ./out/${base_name}.out
+        ./target/debug/compiler "$filename" -o "./out/${base_name}.s" -a > ./out/${base_name}.out
     fi
 done

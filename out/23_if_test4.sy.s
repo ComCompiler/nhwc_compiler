@@ -18,53 +18,99 @@
 
 .section        .text
     .align 4
+                    #      Define if_ifElse__0 [] -> if_ifElse__ret_0 
     .globl if_ifElse_
     .type if_ifElse_,@function
 if_ifElse_:
+                    #mem layout:|ra_if_ifElse_:8|s0_if_ifElse_:8|a:4|b:4|temp_0:1|temp_1:1|none:2|temp_2:4
     addi    sp,sp,-32
     sd      ra,24(sp)
     sd      s0,16(sp)
     addi    s0,sp,32
+                    #      alloc i32 a_17 
+                    #      alloc i32 b_17 
+                    #      alloc i1 temp_0_22 
+                    #      alloc i1 temp_1_25 
+                    #      alloc i32 temp_2_25 
+                    #      label L1_0: 
 .L1_0:
+                    #      new_var a_17:i32 
+                    #      a_17 = i32 5_0 
     li      a0, 5
+                    #      new_var b_17:i32 
+                    #      b_17 = i32 10_0 
     li      a1, 10
+                    #      jump label: L2_0 
     j       .L2_0
+                    #      label L2_0: 
 .L2_0:
+                    #      new_var temp_0_22:i1 
+                    #      temp_0_22 = icmp i32 Eq a_17, 5_0 
     li      a2, 5
     xor     a3,a0,a2
     seqz    a3, a3
+                    #      br i1 temp_0_22, label branch_true_23, label branch_false_23 
     bnez    a3, .branch_true_23
     j       .branch_false_23
+                    #      label branch_true_23: 
 .branch_true_23:
+                    #      new_var temp_1_25:i1 
+                    #      temp_1_25 = icmp i32 Eq b_17, 10_0 
     li      a4, 10
     xor     a5,a1,a4
     seqz    a5, a5
+                    #      br i1 temp_1_25, label branch_true_26, label branch_false_26 
     bnez    a5, .branch_true_26
     j       .branch_false_26
+                    #      label branch_true_26: 
 .branch_true_26:
+                    #      a_17 = i32 25_0 
+                    #      jump label: L3_0 
     j       .L3_0
+                    #      label branch_false_26: 
 .branch_false_26:
+                    #      new_var temp_2_25:i32 
+                    #      temp_2_25 = Add i32 a_17, 15_0 
     li      a6, 15
     add     a7,a0,a6
+                    #      a_17 = i32 temp_2_25 
+                    #      jump label: L3_0 
     j       .L3_0
+                    #      label L3_0: 
 .L3_0:
+                    #      label branch_false_23: 
 .branch_false_23:
+                    #      label L4_0: 
 .L4_0:
+                    #      ret a_17 
     ld      ra,24(sp)
     ld      s0,16(sp)
+    sw      a0,12(sp)
     addi    sp,sp,32
     ret
+                    #      Define main_0 [] -> main_ret_0 
     .globl main
     .type main,@function
 main:
+                    #mem layout:|ra_main:8|s0_main:8|temp_3:4|none:4
     addi    sp,sp,-24
     sd      ra,16(sp)
     sd      s0,8(sp)
     addi    s0,sp,24
+                    #      alloc i32 temp_3_31 
+                    #      label L0_0: 
 .L0_0:
+                    #      new_var temp_3_31:i32 
+                    #      temp_3_31 =  Call i32 if_ifElse__0() 
+                    #saved register dumping to mem
+                    #saved register dumped to mem
+                    #arg load start
+                    #arg load ended
     call    if_ifElse_
     sw      a0,4(sp)
+                    #      ret temp_3_31 
     ld      ra,16(sp)
     ld      s0,8(sp)
+    sw      a0,4(sp)
     addi    sp,sp,24
     ret

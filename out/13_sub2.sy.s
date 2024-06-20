@@ -18,25 +18,37 @@
 
 .section        .text
     .align 4
+                    #      Define main_0 [] -> main_ret_0 
     .globl main
     .type main,@function
 main:
+                    #mem layout:|ra_main:8|s0_main:8|b:4|temp_0:4
     addi    sp,sp,-24
     sd      ra,16(sp)
     sd      s0,8(sp)
     addi    s0,sp,24
+                    #      alloc i32 b_18 
+                    #      alloc i32 temp_0_18 
+                    #      label L0_0: 
 .L0_0:
+                    #      new_var b_18:i32 
+                    #      b_18 = i32 2_0 
     li      a0, 2
+                    #      new_var temp_0_18:i32 
+                    #      temp_0_18 = Sub i32 b_18, 10_0 
     li      a1, 10
     sub     a2,a0,a1
+                    #      ret temp_0_18 
     ld      ra,16(sp)
     ld      s0,8(sp)
-    mv      a0, a2
+    sw      a2,0(sp)
+    sw      a0,4(sp)
     addi    sp,sp,24
     ret
 .section        .data
     .align 4
     .globl a
+                    #      global i32 a_0 
     .type a,@object
 a:
     .word 10

@@ -138,8 +138,8 @@ impl RegTab{
     }
     /// occupy a anonymous reg
     pub fn anonymous_occupy(&mut self, symidx:&SymIdx, sym_ty:&Type,symtab:&mut SymTab, asm_sect:&mut AsmSection,  
-        store_f:impl FnOnce(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
-        load_f:impl FnOnce(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,) -> Result<Register>{
+        store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
+        load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,) -> Result<Register>{
         let reg = self.find_avail_reg_for_ty_and_try_release(sym_ty, symtab, asm_sect, store_f)?;
         self.occupy_reg(reg.clone(), &SymIdx::from_str(format!("_anonymous_of_{:?}",symidx).as_str()), symtab, true)?;
         load_f(symidx.clone(),reg.clone(),symtab,asm_sect,self)?;
@@ -158,8 +158,8 @@ impl RegTab{
     /// *Mention*
     /// literal symidx must be temp 
     pub fn find_and_occupy_reg(&mut self, symidx:&SymIdx, sym_ty:&Type,symtab:&mut SymTab, asm_sect:&mut AsmSection,  
-        store_f:impl FnOnce(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
-        load_f:impl FnOnce(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
+        store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
+        load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
     )-> Result<Register>{
         // debug_info_green!("{:?}",symtab.get(&SymIdx { scope_node: 41, symbol_name: "get".to_string(), index_ssa: None })?);
         // judge wether it is temp
@@ -240,7 +240,7 @@ impl RegTab{
         }
 
     }
-    pub fn try_release_reg(&mut self, reg:Register, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:impl FnOnce(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>)-> Result<()>{
+    pub fn try_release_reg(&mut self, reg:Register, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>)-> Result<()>{
         if self.is_freed(&reg){
             self.release_reg(reg.clone(), symtab,asm_sect, store_f)?;
         };
@@ -250,7 +250,7 @@ impl RegTab{
     /// 1. will delete the reg info in symbol and 
     /// 2. drop the value in reg into mem
     /// 3. you can only release a freed reg
-    pub fn release_reg(&mut self, reg:Register, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:impl FnOnce(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>) -> Result<()>{
+    pub fn release_reg(&mut self, reg:Register, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>) -> Result<()>{
         debug_info_blue!("release {:?}",reg);
         let regstat = self.reg_symidx_map.get_mut(&reg).unwrap();
         match regstat{
@@ -273,7 +273,7 @@ impl RegTab{
             }
         }
     }
-    pub fn try_release_symidx(&mut self, symidx:&SymIdx, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:impl FnOnce(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>) -> Result<()>{
+    pub fn try_release_symidx(&mut self, symidx:&SymIdx, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>) -> Result<()>{
         if symtab.get(symidx)?.has_cur_reg(){
             match  symtab.get(symidx)?.get_cur_reg()?{
                 Some(reg) => {
@@ -290,8 +290,10 @@ impl RegTab{
         debug_info_blue!("free reg {:?} ",reg);
         regstat.free_once()
     }
-    pub fn find_avail_reg_for_ty_and_try_release(&mut self, sym_ty:&Type, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:impl FnOnce(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self)-> Result<()>) -> Result<Register>{
+    pub fn find_avail_reg_for_ty_and_try_release(&mut self, sym_ty:&Type, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self)-> Result<()>) -> Result<Register>{
         let reg = self.find_avail_reg_for_ty(sym_ty)?;
+        self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
+        // try release more than one time because there may be a offset in this reg(try_release_reg may also use the reg)
         self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
         Ok(reg)
     }
@@ -376,9 +378,8 @@ impl RegTab{
     }
     // load a symbol into specified register 
     pub fn load_into(&mut self,reg:Register,symidx:&SymIdx,sym_ty:&Type,symtab:&mut SymTab,asm_sect:&mut AsmSection,
-        store_symidx_f:impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
-        store_reg_f:impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
-        load_f:impl FnOnce(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>
+        store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
+        load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>
     ,) -> Result<Register>{
         match sym_ty{
             Type::F32 => {
@@ -386,9 +387,11 @@ impl RegTab{
             },
             _ => {}
         }
-        self.try_release_symidx(symidx, symtab, asm_sect, store_symidx_f)?;
-        self.try_release_reg(reg.clone(), symtab, asm_sect, store_reg_f)?;
+        self.try_release_symidx(symidx, symtab, asm_sect, store_f)?;
+        self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
         let is_temp= RegTab::symidx_is_temp(symidx, symtab)?;
+        self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
+        // self.try_release_reg(reg.clone(), symtab, asm_sect, store_reg_f)?;
         self.occupy_reg(reg.clone(), symidx, symtab, is_temp)?;
         load_f(symidx.clone(),reg.clone(),symtab,asm_sect,self)?;
         Ok(reg)

@@ -18,215 +18,606 @@
 
 .section        .text
     .align 4
+                    #      Define get_next_0 [str_16, next_16] -> get_next_ret_0 
+    .globl get_next
+    .type get_next,@function
+get_next:
+                    #mem layout:|ra_get_next:8|s0_get_next:8|str:8|next:8|temp_0:8|i:4|j:4|temp_1:8|temp_2:4|temp_3:1|none:3|temp_4:8|temp_5:4|none:4|temp_6:8|temp_7:4|temp_8:1|temp_9:1|temp_10:1|none:1|temp_11:4|temp_12:4|temp_13:8|temp_14:8|temp_15:4|none:4
+    addi    sp,sp,-128
+    sd      ra,120(sp)
+    sd      s0,112(sp)
+    addi    s0,sp,128
+                    #      new_var str_16:ptr->i32 
+                    #      new_var next_16:ptr->i32 
+                    #      alloc ptr->i32 temp_0_18 
+                    #      alloc i32 i_18 
+                    #      alloc i32 j_18 
+                    #      alloc ptr->i32 temp_1_21 
+                    #      alloc i32 temp_2_21 
+                    #      alloc i1 temp_3_161 
+                    #      alloc ptr->i32 temp_4_24 
+                    #      alloc i32 temp_5_24 
+                    #      alloc ptr->i32 temp_6_24 
+                    #      alloc i32 temp_7_24 
+                    #      alloc i1 temp_8_24 
+                    #      alloc i1 temp_9_24 
+                    #      alloc i1 temp_10_24 
+                    #      alloc i32 temp_11_26 
+                    #      alloc i32 temp_12_26 
+                    #      alloc ptr->i32 temp_13_26 
+                    #      alloc ptr->i32 temp_14_24 
+                    #      alloc i32 temp_15_24 
+                    #      label L8_0: 
+.L8_0:
+                    #      new_var temp_0_18:ptr->i32 
+                    #      temp_0_18 = getelementptr next_16:ptr->i32 [Some(0_0)] 
+    li      a2, 0
+    li      a3, 1
+    li      a4, 0
+    add     a2,a2,a1
+    slli a2,a2,3
+    add     a2,a2,sp
+    add     a2,a2,a2
+                    #      store -1_0:i32 temp_0_18:ptr->i32 
+    li      a5, -1
+    sd      a5,0(a2)
+                    #      mu next_16:27 
+                    #      next_16 = chi next_16:27 
+                    #      i_18 = i32 0_0 
+    li      a6, 0
+                    #      j_18 = i32 -1_0 
+    li      a7, -1
+                    #      jump label: while.head_22 
+    j       .while.head_22
+                    #      label while.head_22: 
+.while.head_22:
+                    #      new_var temp_1_21:ptr->i32 
+                    #      new_var temp_2_21:i32 
+                    #      temp_1_21 = getelementptr str_16:ptr->i32 [Some(i_18)] 
+    li      s1, 0
+                    #found literal reg Some(a3) already exist with 1_0
+    add     s1,s1,a0
+    slli s1,s1,3
+    add     s1,s1,sp
+    add     s1,s1,s1
+                    #      temp_2_21 = load temp_1_21:ptr->i32 
+                    #      new_var temp_3_161:i1 
+                    #      temp_3_161 = icmp i32 Ne temp_2_21, 0_0 
+                    #found literal reg Some(a4) already exist with 0_0
+    xor     s3,s2,a4
+    snez    s3, s3
+                    #      br i1 temp_3_161, label while.body_22, label while.exit_22 
+    bnez    s3, .while.body_22
+    j       .while.exit_22
+                    #      label while.body_22: 
+.while.body_22:
+                    #      new_var temp_4_24:ptr->i32 
+                    #      new_var temp_5_24:i32 
+                    #      temp_4_24 = getelementptr str_16:ptr->i32 [Some(j_18)] 
+    li      s4, 0
+                    #found literal reg Some(a3) already exist with 1_0
+    add     s4,s4,a0
+    slli s4,s4,3
+    add     s4,s4,sp
+    add     s4,s4,s4
+                    #      temp_5_24 = load temp_4_24:ptr->i32 
+                    #      new_var temp_6_24:ptr->i32 
+                    #      new_var temp_7_24:i32 
+                    #      temp_6_24 = getelementptr str_16:ptr->i32 [Some(i_18)] 
+    li      s5, 0
+                    #found literal reg Some(a3) already exist with 1_0
+    add     s5,s5,a0
+    slli s5,s5,3
+    add     s5,s5,sp
+    add     s5,s5,s5
+                    #      temp_7_24 = load temp_6_24:ptr->i32 
+                    #      new_var temp_8_24:i1 
+                    #      temp_8_24 = icmp i32 Eq temp_7_24, temp_5_24 
+    xor     s8,s6,s7
+    seqz    s8, s8
+                    #      new_var temp_9_24:i1 
+                    #      temp_9_24 = icmp i32 Eq j_18, -1_0 
+                    #found literal reg Some(a5) already exist with -1_0
+    xor     s9,a7,a5
+    seqz    s9, s9
+                    #      new_var temp_10_24:i1 
+                    #      temp_10_24 = Or i1 temp_9_24, temp_8_24 
+                    #      br i1 temp_10_24, label branch_true_25, label branch_false_25 
+    bnez    s10, .branch_true_25
+    j       .branch_false_25
+                    #      label branch_true_25: 
+.branch_true_25:
+                    #      new_var temp_11_26:i32 
+                    #      temp_11_26 = Add i32 j_18, 1_0 
+                    #found literal reg Some(a3) already exist with 1_0
+    add     s11,a7,a3
+                    #      j_18 = i32 temp_11_26 
+                    #      new_var temp_12_26:i32 
+                    #      temp_12_26 = Add i32 i_18, 1_0 
+                    #found literal reg Some(a3) already exist with 1_0
+    add     a4,a6,a3
+                    #      i_18 = i32 temp_12_26 
+                    #      new_var temp_13_26:ptr->i32 
+                    #      temp_13_26 = getelementptr next_16:ptr->i32 [Some(i_18)] 
+    li      a3, 0
+    li      a5, 1
+    add     a3,a3,a1
+    slli a3,a3,3
+    add     a3,a3,sp
+    add     a3,a3,a3
+                    #      store j_18:i32 temp_13_26:ptr->i32 
+    sd      a7,0(a3)
+                    #      mu next_16:83 
+                    #      next_16 = chi next_16:83 
+                    #      jump label: L9_0 
+    j       .L9_0
+                    #      label branch_false_25: 
+.branch_false_25:
+                    #      new_var temp_14_24:ptr->i32 
+                    #      new_var temp_15_24:i32 
+                    #      temp_14_24 = getelementptr next_16:ptr->i32 [Some(j_18)] 
+    li      a5, 0
+    sd      a0,104(sp)
+    li      a0, 1
+    add     a5,a5,a1
+    slli a5,a5,3
+    add     a5,a5,sp
+    add     a5,a5,a5
+                    #      temp_15_24 = load temp_14_24:ptr->i32 
+                    #      j_18 = i32 temp_15_24 
+                    #      jump label: L9_0 
+    j       .L9_0
+                    #      label L9_0: 
+.L9_0:
+                    #      jump label: while.head_22 
+    j       .while.head_22
+                    #      label while.exit_22: 
+.while.exit_22:
+                    #      Define KMP_0 [dst_31, src_31] -> KMP_ret_0 
+    .globl KMP
+    .type KMP,@function
+KMP:
+                    #mem layout:|ra_KMP:8|s0_KMP:8|dst:8|src:8|next:16384|i:4|j:4|temp_16:8|temp_17:4|temp_18:1|none:3|temp_19:8|temp_20:4|none:4|temp_21:8|temp_22:4|temp_23:1|none:3|temp_24:4|temp_25:4|temp_26:8|temp_27:4|temp_28:1|temp_29:1|none:2|temp_30:8|temp_31:4|temp_32:1|none:3|temp_33:4|temp_34:4|temp_35:4|none:4
+    li      a2, -16528
+    li      a2, -16528
+    add     sp,a2,sp
+    li      a3, 16520
+    add     a3,sp,a3
+    sd      ra,0(a3)
+    li      a4, 16512
+    add     a4,sp,a4
+    sd      s0,0(a4)
+    li      a5, 16528
+    li      a5, 16528
+    add     s0,a5,sp
+                    #      new_var dst_31:ptr->i32 
+                    #      new_var src_31:ptr->i32 
+                    #      alloc Array:i32:[Some(4096_0)] next_33 
+                    #      alloc i32 i_33 
+                    #      alloc i32 j_33 
+                    #      alloc ptr->i32 temp_16_37 
+                    #      alloc i32 temp_17_37 
+                    #      alloc i1 temp_18_684 
+                    #      alloc ptr->i32 temp_19_40 
+                    #      alloc i32 temp_20_40 
+                    #      alloc ptr->i32 temp_21_40 
+                    #      alloc i32 temp_22_40 
+                    #      alloc i1 temp_23_40 
+                    #      alloc i32 temp_24_42 
+                    #      alloc i32 temp_25_42 
+                    #      alloc ptr->i32 temp_26_45 
+                    #      alloc i32 temp_27_45 
+                    #      alloc i1 temp_28_45 
+                    #      alloc i1 temp_29_45 
+                    #      alloc ptr->i32 temp_30_49 
+                    #      alloc i32 temp_31_49 
+                    #      alloc i1 temp_32_51 
+                    #      alloc i32 temp_33_53 
+                    #      alloc i32 temp_34_53 
+                    #      alloc i32 temp_35_33 
+                    #      label L4_0: 
+.L4_0:
+                    #      new_var next_33:Array:i32:[Some(4096_0)] 
+                    #       Call void get_next_0(dst_31, next_33) 
+                    #saved register dumping to mem
+                    #saved register dumped to mem
+                    #arg load start
+    li      a0, 16504
+    add     a0,sp,a0
+    sd      a0,0(a0)
+    li      a0, 16496
+    add     a0,sp,a0
+    sd      a1,0(a0)
+                    #arg load ended
+    call    get_next
+                    #      i_33 = i32 0_0 
+    li      a1, 0
+                    #      j_33 = i32 0_0 
+    li      a6, 0
+                    #      jump label: while.head_38 
+    j       .while.head_38
+                    #      label while.head_38: 
+.while.head_38:
+                    #      new_var temp_16_37:ptr->i32 
+                    #      new_var temp_17_37:i32 
+                    #      temp_16_37 = getelementptr src_31:ptr->i32 [Some(j_33)] 
+    li      a7, 0
+    li      s1, 1
+    mul     s2,s1,a6
+    add     a7,a7,s2
+    slli a7,a7,3
+    add     a7,a7,sp
+    add     a7,a7,a7
+                    #      temp_17_37 = load temp_16_37:ptr->i32 
+                    #      new_var temp_18_684:i1 
+                    #      temp_18_684 = icmp i32 Ne temp_17_37, 0_0 
+    li      s4, 0
+    xor     s5,s3,s4
+    snez    s5, s5
+                    #      br i1 temp_18_684, label while.body_38, label while.exit_38 
+    bnez    s5, .while.body_38
+    j       .while.exit_38
+                    #      label while.body_38: 
+.while.body_38:
+                    #      new_var temp_19_40:ptr->i32 
+                    #      new_var temp_20_40:i32 
+                    #      temp_19_40 = getelementptr src_31:ptr->i32 [Some(j_33)] 
+    li      s6, 0
+                    #found literal reg Some(s1) already exist with 1_0
+    add     s6,s6,s2
+    slli s6,s6,3
+    add     s6,s6,sp
+    add     s6,s6,s6
+                    #      temp_20_40 = load temp_19_40:ptr->i32 
+                    #      new_var temp_21_40:ptr->i32 
+                    #      new_var temp_22_40:i32 
+                    #      temp_21_40 = getelementptr dst_31:ptr->i32 [Some(i_33)] 
+    li      s7, 0
+                    #found literal reg Some(s1) already exist with 1_0
+    mul     s8,s1,a1
+    add     s7,s7,s8
+    slli s7,s7,3
+    add     s7,s7,sp
+    add     s7,s7,s7
+                    #      temp_22_40 = load temp_21_40:ptr->i32 
+                    #      new_var temp_23_40:i1 
+                    #      temp_23_40 = icmp i32 Eq temp_22_40, temp_20_40 
+    xor     s11,s9,s10
+    seqz    s11, s11
+                    #      br i1 temp_23_40, label branch_true_41, label branch_false_41 
+    bnez    s11, .branch_true_41
+    j       .branch_false_41
+                    #      label branch_true_41: 
+.branch_true_41:
+                    #      new_var temp_24_42:i32 
+                    #      temp_24_42 = Add i32 i_33, 1_0 
+                    #found literal reg Some(s1) already exist with 1_0
+    add     a0,a1,s1
+                    #      i_33 = i32 temp_24_42 
+                    #      new_var temp_25_42:i32 
+                    #      temp_25_42 = Add i32 j_33, 1_0 
+                    #found literal reg Some(s1) already exist with 1_0
+    add     a2,a6,s1
+                    #      j_33 = i32 temp_25_42 
+                    #      jump label: L5_0 
+    j       .L5_0
+                    #      label L5_0: 
+.L5_0:
+                    #      new_var temp_26_45:ptr->i32 
+                    #      new_var temp_27_45:i32 
+                    #      temp_26_45 = getelementptr dst_31:ptr->i32 [Some(i_33)] 
+    li      a3, 0
+                    #found literal reg Some(s1) already exist with 1_0
+    add     a3,a3,s8
+    slli a3,a3,3
+    add     a3,a3,sp
+    add     a3,a3,a3
+                    #      temp_27_45 = load temp_26_45:ptr->i32 
+                    #      new_var temp_28_45:i1 
+                    #      temp_28_45 = icmp i1 Ne temp_27_45, 0_0 
+                    #found literal reg Some(s4) already exist with 0_0
+    xor     a5,a4,s4
+    snez    a5, a5
+                    #      new_var temp_29_45:i1 
+                    #      temp_29_45 = xor i1 temp_28_45, true 
+    xori    s1,a5,-1
+                    #      br i1 temp_29_45, label branch_true_46, label branch_false_46 
+    bnez    s1, .branch_true_46
+    j       .branch_false_46
+                    #      label branch_true_46: 
+.branch_true_46:
+                    #      ret j_33 
+    li      s4, 16520
+    add     s4,sp,s4
+    ld      ra,0(s4)
+    sw      a0,52(sp)
+    li      a0, 16512
+    add     a0,sp,a0
+    ld      s0,0(a0)
+    sw      a6,104(sp)
+    li      a0, 16512
+    add     a0,sp,a0
+    sd      a0,0(a0)
+    li      a6, 16528
+    li      a6, 16528
+    add     sp,a6,sp
+    ret
+                    #      label branch_false_46: 
+.branch_false_46:
+                    #      label branch_false_41: 
+.branch_false_41:
+                    #      new_var temp_30_49:ptr->i32 
+                    #      new_var temp_31_49:i32 
+                    #      temp_30_49 = getelementptr next_33:Array:i32:[Some(4096_0)] [Some(i_33)] 
+    li      a6, 0
+    sw      a0,104(sp)
+    li      a0, 1
+    sw      a2,48(sp)
+    mul     a2,a0,a1
+    add     a6,a6,a2
+    slli a6,a6,2
+    add     a6,a6,sp
+    add     a6,a6,a6
+                    #      temp_31_49 = load temp_30_49:ptr->i32 
+                    #      i_33 = i32 temp_31_49 
+                    #      jump label: L6_0 
+    j       .L6_0
+                    #      label L6_0: 
+.L6_0:
+                    #      new_var temp_32_51:i1 
+                    #      temp_32_51 = icmp i32 Eq i_33, -1_0 
+    sw      a0,20(sp)
+    li      a0, -1
+    li      a2, 16492
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    xor     a2,a1,a0
+    seqz    a2, a2
+                    #      br i1 temp_32_51, label branch_true_52, label branch_false_52 
+    bnez    a2, .branch_true_52
+    j       .branch_false_52
+                    #      label branch_true_52: 
+.branch_true_52:
+                    #      new_var temp_33_53:i32 
+                    #      temp_33_53 = Add i32 i_33, 1_0 
+    li      a0, 1
+    sb      a2,19(sp)
+    add     a2,a1,a0
+                    #      i_33 = i32 temp_33_53 
+                    #      new_var temp_34_53:i32 
+                    #      temp_34_53 = Add i32 j_33, 1_0 
+    sw      a1,108(sp)
+    li      a1, 1
+    sw      a2,12(sp)
+    add     a2,a0,a1
+                    #      j_33 = i32 temp_34_53 
+                    #      jump label: branch_false_52 
+    j       .branch_false_52
+                    #      label branch_false_52: 
+.branch_false_52:
+                    #      label L7_0: 
+.L7_0:
+                    #      jump label: while.head_38 
+    j       .while.head_38
+                    #      label while.exit_38: 
+.while.exit_38:
+                    #      new_var temp_35_33:i32 
+                    #      temp_35_33 = Sub i32 0_0, 1_0 
+    li      a1, 0
+    sw      a0,104(sp)
+    li      a0, 1
+    sw      a2,8(sp)
+    sub     a2,a1,a0
+                    #      ret temp_35_33 
+    mv      ra, s4
+    li      a0, 16512
+    add     a0,sp,a0
+    ld      s0,0(a0)
+    sw      a2,4(sp)
+    li      a0, 16512
+    add     a0,sp,a0
+    sd      a0,0(a0)
+    li      a2, 16528
+    li      a2, 16528
+    add     sp,a2,sp
+    ret
+                    #      Define read_str_0 [buf_57] -> read_str_ret_0 
+    .globl read_str
+    .type read_str,@function
+read_str:
+                    #mem layout:|ra_read_str:8|s0_read_str:8|buf:8|i:4|temp_36:1|none:3|temp_37:8|temp_38:4|none:4|temp_39:8|temp_40:4|temp_41:1|none:3|temp_42:4|none:4|temp_43:8
+    addi    sp,sp,-80
+    sd      ra,72(sp)
+    sd      s0,64(sp)
+    addi    s0,sp,80
+                    #      new_var buf_57:ptr->i32 
+                    #      alloc i32 i_59 
+                    #      alloc i1 temp_36_1228 
+                    #      alloc ptr->i32 temp_37_63 
+                    #      alloc i32 temp_38_63 
+                    #      alloc ptr->i32 temp_39_65 
+                    #      alloc i32 temp_40_65 
+                    #      alloc i1 temp_41_65 
+                    #      alloc i32 temp_42_63 
+                    #      alloc ptr->i32 temp_43_59 
+                    #      label L1_0: 
+.L1_0:
+                    #      i_59 = i32 0_0 
+    li      a1, 0
+                    #      jump label: while.head_62 
+    j       .while.head_62
+                    #      label while.head_62: 
+.while.head_62:
+                    #      new_var temp_36_1228:i1 
+                    #      temp_36_1228 = icmp i32 Ne 1_0, 0_0 
+    li      a2, 1
+    li      a3, 0
+    xor     a4,a2,a3
+    snez    a4, a4
+                    #      br i1 temp_36_1228, label while.body_62, label while.exit_62 
+    bnez    a4, .while.body_62
+    j       .while.exit_62
+                    #      label while.body_62: 
+.while.body_62:
+                    #      new_var temp_37_63:ptr->i32 
+                    #      temp_37_63 = getelementptr buf_57:ptr->i32 [Some(i_59)] 
+    li      a5, 0
+                    #found literal reg Some(a2) already exist with 1_0
+    add     a5,a5,a0
+    slli a5,a5,3
+    add     a5,a5,sp
+    add     a5,a5,a5
+                    #      new_var temp_38_63:i32 
+                    #      temp_38_63 =  Call i32 getch_0() 
+                    #saved register dumping to mem
+                    #saved register dumped to mem
+                    #arg load start
+                    #arg load ended
+    call    getch
+    sd      a0,56(sp)
+    sw      a0,36(sp)
+                    #      store temp_38_63:i32 temp_37_63:ptr->i32 
+    sd      a0,0(a5)
+                    #      mu buf_57:199 
+                    #      buf_57 = chi buf_57:199 
+                    #      jump label: L2_0 
+    j       .L2_0
+                    #      label L2_0: 
+.L2_0:
+                    #      new_var temp_39_65:ptr->i32 
+                    #      new_var temp_40_65:i32 
+                    #      temp_39_65 = getelementptr buf_57:ptr->i32 [Some(i_59)] 
+    li      a6, 0
+                    #found literal reg Some(a2) already exist with 1_0
+    mul     a7,a2,a1
+    add     a6,a6,a7
+    slli a6,a6,3
+    add     a6,a6,sp
+    add     a6,a6,a6
+                    #      temp_40_65 = load temp_39_65:ptr->i32 
+                    #      new_var temp_41_65:i1 
+                    #      temp_41_65 = icmp i32 Eq temp_40_65, 10_0 
+    li      s2, 10
+    xor     s3,s1,s2
+    seqz    s3, s3
+                    #      br i1 temp_41_65, label branch_true_66, label branch_false_66 
+    bnez    s3, .branch_true_66
+    j       .branch_false_66
+                    #      label branch_true_66: 
+.branch_true_66:
+                    #      jump label: while.exit_62 
+    j       .while.exit_62
+                    #      label while.exit_62: 
+.while.exit_62:
+                    #      new_var temp_43_59:ptr->i32 
+                    #      temp_43_59 = getelementptr buf_57:ptr->i32 [Some(i_59)] 
+    li      s4, 0
+                    #found literal reg Some(a2) already exist with 1_0
+    add     s4,s4,a7
+    slli s4,s4,3
+    add     s4,s4,sp
+    add     s4,s4,s4
+                    #      store 0_0:i32 temp_43_59:ptr->i32 
+                    #found literal reg Some(a3) already exist with 0_0
+    sd      a3,0(s4)
+                    #      mu buf_57:222 
+                    #      buf_57 = chi buf_57:222 
+                    #      ret i_59 
+    ld      ra,72(sp)
+    ld      s0,64(sp)
+    sw      a1,52(sp)
+    sw      a0,36(sp)
+    addi    sp,sp,80
+    ret
+                    #      label branch_false_66: 
+.branch_false_66:
+                    #      label L3_0: 
+.L3_0:
+                    #      new_var temp_42_63:i32 
+                    #      temp_42_63 = Add i32 i_59, 1_0 
+                    #found literal reg Some(a2) already exist with 1_0
+    add     a1,a0,a2
+                    #      i_59 = i32 temp_42_63 
+                    #      jump label: while.head_62 
+    j       .while.head_62
                     #      Define main_0 [] -> main_ret_0 
     .globl main
     .type main,@function
 main:
-                    #mem layout:|ra_main:8|s0_main:8|a:4|b:4|a:4|temp_0:4|temp_1:4|b:4|temp_2:4|temp_3:4|a:4|temp_4:4|temp_5:4|temp_6:4|temp_7:4|temp_8:4|temp_9:4|temp_10:4|temp_11:4|temp_12:4|temp_13:4|temp_14:4|temp_15:4|temp_16:4|temp_17:4|temp_18:4|temp_19:4|temp_20:4|temp_21:4|temp_22:4|temp_23:4|temp_24:4|temp_25:4|none:4
-    addi    sp,sp,-144
-    sd      ra,136(sp)
-    sd      s0,128(sp)
-    addi    s0,sp,144
-                    #      alloc i32 a_17 
-                    #      alloc i32 b_17 
-                    #      alloc i32 a_20 
-                    #      alloc i32 temp_0_20 
-                    #      alloc i32 temp_1_20 
-                    #      alloc i32 b_24 
-                    #      alloc i32 temp_2_24 
-                    #      alloc i32 temp_3_24 
-                    #      alloc i32 a_27 
-                    #      alloc i32 temp_4_27 
-                    #      alloc i32 temp_5_27 
-                    #      alloc i32 temp_6_27 
-                    #      alloc i32 temp_7_24 
-                    #      alloc i32 temp_8_24 
-                    #      alloc i32 temp_9_24 
-                    #      alloc i32 temp_10_33 
-                    #      alloc i32 temp_11_33 
-                    #      alloc i32 temp_12_20 
-                    #      alloc i32 temp_13_20 
-                    #      alloc i32 temp_14_20 
-                    #      alloc i32 temp_15_20 
-                    #      alloc i32 temp_16_37 
-                    #      alloc i32 temp_17_37 
-                    #      alloc i32 temp_18_20 
-                    #      alloc i32 temp_19_20 
-                    #      alloc i32 temp_20_17 
-                    #      alloc i32 temp_21_17 
-                    #      alloc i32 temp_22_17 
-                    #      alloc i32 temp_23_17 
-                    #      alloc i32 temp_24_17 
-                    #      alloc i32 temp_25_17 
+                    #mem layout:|ra_main:8|s0_main:8|dst:16384|src:16384|temp_44:4|temp_45:4|temp_46:4|none:4
+    li      a0, -32800
+    li      a0, -32800
+    add     sp,a0,sp
+    li      a1, 32792
+    add     a1,sp,a1
+    sd      ra,0(a1)
+    li      a2, 32784
+    add     a2,sp,a2
+    sd      s0,0(a2)
+    li      a3, 32800
+    li      a3, 32800
+    add     s0,a3,sp
+                    #      alloc Array:i32:[Some(4096_0)] dst_72 
+                    #      alloc Array:i32:[Some(4096_0)] src_72 
+                    #      alloc i32 temp_44_72 
+                    #      alloc i32 temp_45_72 
+                    #      alloc i32 temp_46_72 
                     #      label L0_0: 
 .L0_0:
-                    #      a_17 = i32 893_0 
-    li      a0, 893
-                    #      b_17 = i32 716_0 
-    li      a1, 716
-                    #      a_20 = i32 837_0 
-    li      a2, 837
-                    #      new_var temp_0_20:i32 
-                    #      temp_0_20 = Add i32 a_20, 128_0 
-    li      a3, 128
-    add     a4,a2,a3
-                    #      a_20 = i32 temp_0_20 
-                    #      new_var temp_1_20:i32 
-                    #      temp_1_20 = Add i32 b_17, a_20 
-    add     a5,a1,a2
-                    #      b_17 = i32 temp_1_20 
-                    #      b_24 = i32 241_0 
-    li      a6, 241
-                    #      new_var temp_2_24:i32 
-                    #      temp_2_24 = Sub i32 b_24, 412_0 
-    li      a7, 412
-    sub     s1,a6,a7
-                    #      new_var temp_3_24:i32 
-                    #      temp_3_24 = Add i32 a_20, temp_2_24 
-    add     s2,a2,s1
-                    #      a_20 = i32 temp_3_24 
-                    #      a_27 = i32 771_0 
-    li      s3, 771
-                    #      new_var temp_4_27:i32 
-                    #      temp_4_27 = Sub i32 a_27, 18_0 
-    li      s4, 18
-    sub     s5,s3,s4
-                    #      new_var temp_5_27:i32 
-                    #      temp_5_27 = Add i32 b_24, temp_4_27 
-    add     s6,a6,s5
-                    #      b_24 = i32 temp_5_27 
-                    #      new_var temp_6_27:i32 
-                    #      temp_6_27 = Add i32 b_24, 66_0 
-    li      s7, 66
-    add     s8,a6,s7
-                    #      a_27 = i32 temp_6_27 
-                    #      new_var temp_7_24:i32 
-                    #      temp_7_24 = Sub i32 a_20, 33_0 
-    li      s9, 33
-    sub     s10,a2,s9
-                    #      new_var temp_8_24:i32 
-                    #      temp_8_24 = Add i32 b_24, temp_7_24 
-    add     s11,a6,s10
-                    #      b_24 = i32 temp_8_24 
-                    #      new_var temp_9_24:i32 
-                    #      temp_9_24 = Sub i32 b_24, 55_0 
-    li      a3, 55
-    sub     a7,a6,a3
-                    #      a_20 = i32 temp_9_24 
-                    #      new_var temp_10_33:i32 
-                    #      temp_10_33 = Add i32 a_20, b_24 
-    add     a3,a2,a6
-                    #      new_var temp_11_33:i32 
-                    #      temp_11_33 = Mod i32 temp_10_33, 21_0 
-    li      s4, 21
-    rem     s7,a3,s4
-                    #      ret temp_11_33 
-    ld      ra,136(sp)
-    ld      s0,128(sp)
-    mv      a0, s7
-    addi    sp,sp,144
-    ret
-                    #      label L1_0: 
-.L1_0:
-                    #      new_var temp_12_20:i32 
-                    #      temp_12_20 = Sub i32 a_20, 97_0 
-    li      s4, 97
-    sub     s9,a2,s4
-                    #      new_var temp_13_20:i32 
-                    #      temp_13_20 = Add i32 b_17, temp_12_20 
-    add     s4,a1,s9
-                    #      a_20 = i32 temp_13_20 
-                    #      new_var temp_14_20:i32 
-                    #      temp_14_20 = Sub i32 b_17, a_20 
-    sw      a0,124(sp)
-    sub     a0,a1,a2
-                    #      new_var temp_15_20:i32 
-                    #      temp_15_20 = Mod i32 temp_14_20, 62_0 
-    sw      a1,120(sp)
-    li      a1, 62
-    sw      a2,116(sp)
-    rem     a2,a0,a1
-                    #      b_17 = i32 temp_15_20 
-    mv      a1, a2
-                    #      new_var temp_16_37:i32 
-                    #      temp_16_37 = Add i32 a_20, b_17 
-    sw      a0,48(sp)
-    sw      a2,44(sp)
-    add     a2,a0,a1
-                    #      new_var temp_17_37:i32 
-                    #      temp_17_37 = Mod i32 temp_16_37, 17_0 
-    sw      a0,116(sp)
-    li      a0, 17
-    sw      a1,120(sp)
-    rem     a1,a2,a0
-                    #      ret temp_17_37 
-    ld      ra,136(sp)
-    ld      s0,128(sp)
-    mv      a0, a1
-    addi    sp,sp,144
-    ret
-                    #      label L2_0: 
-.L2_0:
-                    #      new_var temp_18_20:i32 
-                    #      temp_18_20 = Add i32 a_20, b_17 
-    sw      a1,36(sp)
-    sw      a2,40(sp)
-    add     a2,a0,a1
-                    #      new_var temp_19_20:i32 
-                    #      temp_19_20 = Mod i32 temp_18_20, 13_0 
-    sw      a0,116(sp)
-    li      a0, 13
-    sw      a1,120(sp)
-    rem     a1,a2,a0
-                    #      ret temp_19_20 
-    ld      ra,136(sp)
-    ld      s0,128(sp)
-    mv      a0, a1
-    addi    sp,sp,144
-    ret
-                    #      label L3_0: 
-.L3_0:
-                    #      new_var temp_20_17:i32 
-                    #      temp_20_17 = Mul i32 b_17, a_17 
-    sw      a1,28(sp)
-    sw      a2,32(sp)
-    mul     a2,a0,a1
-                    #      new_var temp_21_17:i32 
-                    #      temp_21_17 = Mod i32 temp_20_17, 83_0 
-    sw      a0,120(sp)
-    li      a0, 83
-    sw      a1,124(sp)
-    rem     a1,a2,a0
-                    #      a_17 = i32 temp_21_17 
-    mv      a0, a1
-                    #      new_var temp_22_17:i32 
-                    #      temp_22_17 = Sub i32 b_17, 771_0 
-    sw      a0,124(sp)
-    sw      a1,20(sp)
-    li      a1, 771
-    sw      a2,24(sp)
-    sub     a2,a0,a1
-                    #      new_var temp_23_17:i32 
-                    #      temp_23_17 = Add i32 a_17, temp_22_17 
-    sw      a0,120(sp)
-    add     a0,a1,a2
-                    #      b_17 = i32 temp_23_17 
-    sw      a1,124(sp)
-    mv      a1, a0
-                    #      new_var temp_24_17:i32 
-                    #      temp_24_17 = Add i32 a_17, b_17 
+                    #      new_var dst_72:Array:i32:[Some(4096_0)] 
+                    #      new_var src_72:Array:i32:[Some(4096_0)] 
+                    #      new_var temp_44_72:i32 
+                    #      temp_44_72 =  Call i32 read_str_0(dst_72) 
+                    #saved register dumping to mem
+                    #saved register dumped to mem
+                    #arg load start
+                    #arg load ended
+    call    read_str
     sw      a0,12(sp)
-    sw      a2,16(sp)
-    add     a2,a0,a1
-                    #      new_var temp_25_17:i32 
-                    #      temp_25_17 = Mod i32 temp_24_17, 11_0 
-    sw      a0,124(sp)
-    li      a0, 11
-    sw      a1,120(sp)
-    rem     a1,a2,a0
-                    #      ret temp_25_17 
-    ld      ra,136(sp)
-    ld      s0,128(sp)
-    mv      a0, a1
-    addi    sp,sp,144
+                    #      new_var temp_45_72:i32 
+                    #      temp_45_72 =  Call i32 read_str_0(src_72) 
+                    #saved register dumping to mem
+                    #saved register dumped to mem
+                    #arg load start
+    sw      a0,12(sp)
+                    #arg load ended
+    call    read_str
+    sw      a0,8(sp)
+                    #      new_var temp_46_72:i32 
+                    #      temp_46_72 =  Call i32 KMP_0(dst_72, src_72) 
+                    #saved register dumping to mem
+                    #saved register dumped to mem
+                    #arg load start
+    sw      a0,8(sp)
+                    #arg load ended
+    call    KMP
+    sw      a0,4(sp)
+                    #       Call void putint_0(temp_46_72) 
+                    #saved register dumping to mem
+                    #saved register dumped to mem
+                    #arg load start
+    sw      a0,4(sp)
+                    #arg load ended
+    call    putint
+                    #       Call void putch_0(10_0) 
+                    #saved register dumping to mem
+                    #saved register dumped to mem
+                    #arg load start
+    li      a0, 10
+                    #arg load ended
+    call    putch
+                    #      ret 0_0 
+    li      a0, 32792
+    add     a0,sp,a0
+    ld      ra,0(a0)
+    li      a1, 32784
+    add     a1,sp,a1
+    ld      s0,0(a1)
+    li      a0, 32792
+    add     a0,sp,a0
+    sd      a0,0(a0)
+    li      a0, 0
+                    #found literal reg Some(a3) already exist with 32800_0
+    li      a3, 32800
+    add     sp,a3,sp
     ret

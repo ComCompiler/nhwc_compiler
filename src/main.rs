@@ -35,6 +35,9 @@ pub struct Args {
 
     #[arg(short, value_name = "with_header", default_value = "false")]
     pub no_header:bool,
+
+    #[arg(short, value_name = "annotation", default_value = "false")]
+    pub annotation:bool,
 }
 
 // 这是一个计时宏
@@ -56,6 +59,7 @@ fn main() {
     env_logger::init();
     let args = Args::parse();
     let debug = args.debug;
+    let annotation = args.annotation;
     // args.c_file_path = PathBuf::from_str("./demos/demo1.c").unwrap();
     let mut pass_manager = PassManager::new(args);
     let code2ast_pass = Code2AstPass::new(debug);
@@ -71,7 +75,7 @@ fn main() {
     let symtab_debug_pass = SymtabDebugPass::new(debug);
     let _simulator_debug_pass = SimulatorDebugPass::new(debug,debug);
     let nhwc_dump_pass = NhwcDumpPass::new(debug);
-    let nhwc2riscv_pass = Nhwc2RiscvPass::new(debug, true ,debug);
+    let nhwc2riscv_pass = Nhwc2RiscvPass::new(debug, true ,annotation);
     let mem_alloc_pass = MemAllocPass::new();
     add_passes!(
         code2ast_pass

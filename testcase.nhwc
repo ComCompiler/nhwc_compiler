@@ -1,4 +1,4 @@
-# input: "./compiler2022/公开样例与运行时库/hidden_functional/02_ret_in_block.sy"
+# input: "./compiler2022/公开样例与运行时库/functional/74_kmp.sy"
       global Fn[]->getint_ret_0 getint_0 
       global Fn[]->getch_ret_0 getch_0 
       global Fn[zz_array_3]->getarray_ret_0 getarray_0 
@@ -15,110 +15,246 @@
       global Fn[zz_ptr_14, zz_len_14, zz_val_14]->memset_ret_0 memset_0 
       global Fn[zz_dest_15, zz_ptr_15, zz_len_15]->memcpy_ret_0 memcpy_0 
       Define main_0 [] -> main_ret_0 
-              alloc i32 a_17 
-              alloc i32 b_17 
-              alloc i32 a_20 
-              alloc i32 temp_0_20 
-              alloc i32 temp_1_20 
-              alloc i32 b_24 
-              alloc i32 temp_2_24 
-              alloc i32 temp_3_24 
-              alloc i32 a_27 
-              alloc i32 temp_4_27 
-              alloc i32 temp_5_27 
-              alloc i32 temp_6_27 
-              alloc i32 temp_7_24 
-              alloc i32 temp_8_24 
-              alloc i32 temp_9_24 
-              alloc i32 temp_10_33 
-              alloc i32 temp_11_33 
-              alloc i32 temp_12_20 
-              alloc i32 temp_13_20 
-              alloc i32 temp_14_20 
-              alloc i32 temp_15_20 
-              alloc i32 temp_16_37 
-              alloc i32 temp_17_37 
-              alloc i32 temp_18_20 
-              alloc i32 temp_19_20 
-              alloc i32 temp_20_17 
-              alloc i32 temp_21_17 
-              alloc i32 temp_22_17 
-              alloc i32 temp_23_17 
-              alloc i32 temp_24_17 
-              alloc i32 temp_25_17 
+              alloc Array:i32:[Some(4096_0)] dst_72 
+              alloc Array:i32:[Some(4096_0)] src_72 
+              alloc i32 temp_44_72 
+              alloc i32 temp_45_72 
+              alloc i32 temp_46_72 
           label L0_0: 
-              a_17 = i32 893_0 
-              b_17 = i32 716_0 
-              a_20 = i32 837_0 
-              new_var temp_0_20:i32 
-              temp_0_20 = Add i32 a_20, 128_0 
-              a_20 = i32 temp_0_20 
-              new_var temp_1_20:i32 
-              temp_1_20 = Add i32 b_17, a_20 
-              b_17 = i32 temp_1_20 
-              b_24 = i32 241_0 
-              new_var temp_2_24:i32 
-              temp_2_24 = Sub i32 b_24, 412_0 
-              new_var temp_3_24:i32 
-              temp_3_24 = Add i32 a_20, temp_2_24 
-              a_20 = i32 temp_3_24 
-              a_27 = i32 771_0 
-              new_var temp_4_27:i32 
-              temp_4_27 = Sub i32 a_27, 18_0 
-              new_var temp_5_27:i32 
-              temp_5_27 = Add i32 b_24, temp_4_27 
-              b_24 = i32 temp_5_27 
-              new_var temp_6_27:i32 
-              temp_6_27 = Add i32 b_24, 66_0 
-              a_27 = i32 temp_6_27 
-              new_var temp_7_24:i32 
-              temp_7_24 = Sub i32 a_20, 33_0 
-              new_var temp_8_24:i32 
-              temp_8_24 = Add i32 b_24, temp_7_24 
-              b_24 = i32 temp_8_24 
-              new_var temp_9_24:i32 
-              temp_9_24 = Sub i32 b_24, 55_0 
-              a_20 = i32 temp_9_24 
-              new_var temp_10_33:i32 
-              temp_10_33 = Add i32 a_20, b_24 
-              new_var temp_11_33:i32 
-              temp_11_33 = Mod i32 temp_10_33, 21_0 
-              ret temp_11_33 
+              new_var dst_72:Array:i32:[Some(4096_0)] 
+              new_var src_72:Array:i32:[Some(4096_0)] 
+              new_var temp_44_72:i32 
+              temp_44_72 =  Call i32 read_str_0(dst_72) 
+              new_var temp_45_72:i32 
+              temp_45_72 =  Call i32 read_str_0(src_72) 
+              new_var temp_46_72:i32 
+              temp_46_72 =  Call i32 KMP_0(dst_72, src_72) 
+               Call void putint_0(temp_46_72) 
+               Call void putch_0(10_0) 
+              ret 0_0 
+      Define read_str_0 [buf_57] -> read_str_ret_0 
+              new_var buf_57:ptr->i32 
+              alloc i32 i_59 
+              alloc i1 temp_36_1228 
+              alloc ptr->i32 temp_37_63 
+              alloc i32 temp_38_63 
+              alloc ptr->i32 temp_39_65 
+              alloc i32 temp_40_65 
+              alloc i1 temp_41_65 
+              alloc i32 temp_42_63 
+              alloc ptr->i32 temp_43_59 
           label L1_0: 
-              new_var temp_12_20:i32 
-              temp_12_20 = Sub i32 a_20, 97_0 
-              new_var temp_13_20:i32 
-              temp_13_20 = Add i32 b_17, temp_12_20 
-              a_20 = i32 temp_13_20 
-              new_var temp_14_20:i32 
-              temp_14_20 = Sub i32 b_17, a_20 
-              new_var temp_15_20:i32 
-              temp_15_20 = Mod i32 temp_14_20, 62_0 
-              b_17 = i32 temp_15_20 
-              new_var temp_16_37:i32 
-              temp_16_37 = Add i32 a_20, b_17 
-              new_var temp_17_37:i32 
-              temp_17_37 = Mod i32 temp_16_37, 17_0 
-              ret temp_17_37 
+              i_59 = i32 0_0 
+              jump label: while.head_62 
+          label while.head_62: 
+              new_var temp_36_1228:i1 
+              temp_36_1228 = icmp i32 Ne 1_0, 0_0 
+              br i1 temp_36_1228, label while.body_62, label while.exit_62 
+          label while.body_62: 
+              new_var temp_37_63:ptr->i32 
+              temp_37_63 = getelementptr buf_57:ptr->i32 [Some(i_59)] 
+              new_var temp_38_63:i32 
+              temp_38_63 =  Call i32 getch_0() 
+              store temp_38_63:i32 temp_37_63:ptr->i32 
+              mu buf_57:199 
+              buf_57 = chi buf_57:199 
+              jump label: L2_0 
           label L2_0: 
-              new_var temp_18_20:i32 
-              temp_18_20 = Add i32 a_20, b_17 
-              new_var temp_19_20:i32 
-              temp_19_20 = Mod i32 temp_18_20, 13_0 
-              ret temp_19_20 
+              new_var temp_39_65:ptr->i32 
+              new_var temp_40_65:i32 
+              temp_39_65 = getelementptr buf_57:ptr->i32 [Some(i_59)] 
+              temp_40_65 = load temp_39_65:ptr->i32 
+              new_var temp_41_65:i1 
+              temp_41_65 = icmp i32 Eq temp_40_65, 10_0 
+              br i1 temp_41_65, label branch_true_66, label branch_false_66 
+          label branch_true_66: 
+              jump label: while.exit_62 
+          label while.exit_62: 
+              new_var temp_43_59:ptr->i32 
+              temp_43_59 = getelementptr buf_57:ptr->i32 [Some(i_59)] 
+              store 0_0:i32 temp_43_59:ptr->i32 
+              mu buf_57:222 
+              buf_57 = chi buf_57:222 
+              ret i_59 
+          label branch_false_66: 
           label L3_0: 
-              new_var temp_20_17:i32 
-              temp_20_17 = Mul i32 b_17, a_17 
-              new_var temp_21_17:i32 
-              temp_21_17 = Mod i32 temp_20_17, 83_0 
-              a_17 = i32 temp_21_17 
-              new_var temp_22_17:i32 
-              temp_22_17 = Sub i32 b_17, 771_0 
-              new_var temp_23_17:i32 
-              temp_23_17 = Add i32 a_17, temp_22_17 
-              b_17 = i32 temp_23_17 
-              new_var temp_24_17:i32 
-              temp_24_17 = Add i32 a_17, b_17 
-              new_var temp_25_17:i32 
-              temp_25_17 = Mod i32 temp_24_17, 11_0 
-              ret temp_25_17 
+              new_var temp_42_63:i32 
+              temp_42_63 = Add i32 i_59, 1_0 
+              i_59 = i32 temp_42_63 
+              jump label: while.head_62 
+      Define KMP_0 [dst_31, src_31] -> KMP_ret_0 
+              new_var dst_31:ptr->i32 
+              new_var src_31:ptr->i32 
+              alloc Array:i32:[Some(4096_0)] next_33 
+              alloc i32 i_33 
+              alloc i32 j_33 
+              alloc ptr->i32 temp_16_37 
+              alloc i32 temp_17_37 
+              alloc i1 temp_18_684 
+              alloc ptr->i32 temp_19_40 
+              alloc i32 temp_20_40 
+              alloc ptr->i32 temp_21_40 
+              alloc i32 temp_22_40 
+              alloc i1 temp_23_40 
+              alloc i32 temp_24_42 
+              alloc i32 temp_25_42 
+              alloc ptr->i32 temp_26_45 
+              alloc i32 temp_27_45 
+              alloc i1 temp_28_45 
+              alloc i1 temp_29_45 
+              alloc ptr->i32 temp_30_49 
+              alloc i32 temp_31_49 
+              alloc i1 temp_32_51 
+              alloc i32 temp_33_53 
+              alloc i32 temp_34_53 
+              alloc i32 temp_35_33 
+          label L4_0: 
+              new_var next_33:Array:i32:[Some(4096_0)] 
+               Call void get_next_0(dst_31, next_33) 
+              i_33 = i32 0_0 
+              j_33 = i32 0_0 
+              jump label: while.head_38 
+          label while.head_38: 
+              new_var temp_16_37:ptr->i32 
+              new_var temp_17_37:i32 
+              temp_16_37 = getelementptr src_31:ptr->i32 [Some(j_33)] 
+              temp_17_37 = load temp_16_37:ptr->i32 
+              new_var temp_18_684:i1 
+              temp_18_684 = icmp i32 Ne temp_17_37, 0_0 
+              br i1 temp_18_684, label while.body_38, label while.exit_38 
+          label while.body_38: 
+              new_var temp_19_40:ptr->i32 
+              new_var temp_20_40:i32 
+              temp_19_40 = getelementptr src_31:ptr->i32 [Some(j_33)] 
+              temp_20_40 = load temp_19_40:ptr->i32 
+              new_var temp_21_40:ptr->i32 
+              new_var temp_22_40:i32 
+              temp_21_40 = getelementptr dst_31:ptr->i32 [Some(i_33)] 
+              temp_22_40 = load temp_21_40:ptr->i32 
+              new_var temp_23_40:i1 
+              temp_23_40 = icmp i32 Eq temp_22_40, temp_20_40 
+              br i1 temp_23_40, label branch_true_41, label branch_false_41 
+          label branch_true_41: 
+              new_var temp_24_42:i32 
+              temp_24_42 = Add i32 i_33, 1_0 
+              i_33 = i32 temp_24_42 
+              new_var temp_25_42:i32 
+              temp_25_42 = Add i32 j_33, 1_0 
+              j_33 = i32 temp_25_42 
+              jump label: L5_0 
+          label L5_0: 
+              new_var temp_26_45:ptr->i32 
+              new_var temp_27_45:i32 
+              temp_26_45 = getelementptr dst_31:ptr->i32 [Some(i_33)] 
+              temp_27_45 = load temp_26_45:ptr->i32 
+              new_var temp_28_45:i1 
+              temp_28_45 = icmp i1 Ne temp_27_45, 0_0 
+              new_var temp_29_45:i1 
+              temp_29_45 = xor i1 temp_28_45, true 
+              br i1 temp_29_45, label branch_true_46, label branch_false_46 
+          label branch_true_46: 
+              ret j_33 
+          label branch_false_46: 
+          label branch_false_41: 
+              new_var temp_30_49:ptr->i32 
+              new_var temp_31_49:i32 
+              temp_30_49 = getelementptr next_33:Array:i32:[Some(4096_0)] [Some(i_33)] 
+              temp_31_49 = load temp_30_49:ptr->i32 
+              i_33 = i32 temp_31_49 
+              jump label: L6_0 
+          label L6_0: 
+              new_var temp_32_51:i1 
+              temp_32_51 = icmp i32 Eq i_33, -1_0 
+              br i1 temp_32_51, label branch_true_52, label branch_false_52 
+          label branch_true_52: 
+              new_var temp_33_53:i32 
+              temp_33_53 = Add i32 i_33, 1_0 
+              i_33 = i32 temp_33_53 
+              new_var temp_34_53:i32 
+              temp_34_53 = Add i32 j_33, 1_0 
+              j_33 = i32 temp_34_53 
+              jump label: branch_false_52 
+          label branch_false_52: 
+          label L7_0: 
+              jump label: while.head_38 
+          label while.exit_38: 
+              new_var temp_35_33:i32 
+              temp_35_33 = Sub i32 0_0, 1_0 
+              ret temp_35_33 
+      Define get_next_0 [str_16, next_16] -> get_next_ret_0 
+              new_var str_16:ptr->i32 
+              new_var next_16:ptr->i32 
+              alloc ptr->i32 temp_0_18 
+              alloc i32 i_18 
+              alloc i32 j_18 
+              alloc ptr->i32 temp_1_21 
+              alloc i32 temp_2_21 
+              alloc i1 temp_3_161 
+              alloc ptr->i32 temp_4_24 
+              alloc i32 temp_5_24 
+              alloc ptr->i32 temp_6_24 
+              alloc i32 temp_7_24 
+              alloc i1 temp_8_24 
+              alloc i1 temp_9_24 
+              alloc i1 temp_10_24 
+              alloc i32 temp_11_26 
+              alloc i32 temp_12_26 
+              alloc ptr->i32 temp_13_26 
+              alloc ptr->i32 temp_14_24 
+              alloc i32 temp_15_24 
+          label L8_0: 
+              new_var temp_0_18:ptr->i32 
+              temp_0_18 = getelementptr next_16:ptr->i32 [Some(0_0)] 
+              store -1_0:i32 temp_0_18:ptr->i32 
+              mu next_16:27 
+              next_16 = chi next_16:27 
+              i_18 = i32 0_0 
+              j_18 = i32 -1_0 
+              jump label: while.head_22 
+          label while.head_22: 
+              new_var temp_1_21:ptr->i32 
+              new_var temp_2_21:i32 
+              temp_1_21 = getelementptr str_16:ptr->i32 [Some(i_18)] 
+              temp_2_21 = load temp_1_21:ptr->i32 
+              new_var temp_3_161:i1 
+              temp_3_161 = icmp i32 Ne temp_2_21, 0_0 
+              br i1 temp_3_161, label while.body_22, label while.exit_22 
+          label while.body_22: 
+              new_var temp_4_24:ptr->i32 
+              new_var temp_5_24:i32 
+              temp_4_24 = getelementptr str_16:ptr->i32 [Some(j_18)] 
+              temp_5_24 = load temp_4_24:ptr->i32 
+              new_var temp_6_24:ptr->i32 
+              new_var temp_7_24:i32 
+              temp_6_24 = getelementptr str_16:ptr->i32 [Some(i_18)] 
+              temp_7_24 = load temp_6_24:ptr->i32 
+              new_var temp_8_24:i1 
+              temp_8_24 = icmp i32 Eq temp_7_24, temp_5_24 
+              new_var temp_9_24:i1 
+              temp_9_24 = icmp i32 Eq j_18, -1_0 
+              new_var temp_10_24:i1 
+              temp_10_24 = Or i1 temp_9_24, temp_8_24 
+              br i1 temp_10_24, label branch_true_25, label branch_false_25 
+          label branch_true_25: 
+              new_var temp_11_26:i32 
+              temp_11_26 = Add i32 j_18, 1_0 
+              j_18 = i32 temp_11_26 
+              new_var temp_12_26:i32 
+              temp_12_26 = Add i32 i_18, 1_0 
+              i_18 = i32 temp_12_26 
+              new_var temp_13_26:ptr->i32 
+              temp_13_26 = getelementptr next_16:ptr->i32 [Some(i_18)] 
+              store j_18:i32 temp_13_26:ptr->i32 
+              mu next_16:83 
+              next_16 = chi next_16:83 
+              jump label: L9_0 
+          label branch_false_25: 
+              new_var temp_14_24:ptr->i32 
+              new_var temp_15_24:i32 
+              temp_14_24 = getelementptr next_16:ptr->i32 [Some(j_18)] 
+              temp_15_24 = load temp_14_24:ptr->i32 
+              j_18 = i32 temp_15_24 
+              jump label: L9_0 
+          label L9_0: 
+              jump label: while.head_22 
+          label while.exit_22: 
