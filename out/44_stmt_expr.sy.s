@@ -65,6 +65,7 @@ main:
     li      a1, 1
     add     a3,a0,a1
                     #      i_19 = i32 temp_1_24 
+    mv      a0, a3
                     #      new_var temp_2_24:i32 
                     #      temp_2_24 = load *k_0:ptr->i32 
                     #   load label k as ptr to reg
@@ -91,12 +92,12 @@ main:
                     #occupy reg s4 with *k_0
     sd      s3,0(s4)
                     #      jump label: while.head_23 
-    sw      a6,20(sp)
+    sb      a2,35(sp)
     sw      a3,28(sp)
     sw      a5,24(sp)
     sw      s3,12(sp)
     sw      s1,16(sp)
-    sb      a2,35(sp)
+    sw      a6,20(sp)
     j       .while.head_23
                     #      label while.exit_23: 
 .while.exit_23:

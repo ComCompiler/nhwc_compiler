@@ -128,15 +128,15 @@ main:
                     #arg load ended
     call    putint
                     #      jump label: branch_false_29 
+    lb      s6,42(sp)
     lb      s9,34(sp)
     lw      a0,76(sp)
-    lw      s1,52(sp)
+    lw      s7,36(sp)
+    lb      s5,43(sp)
     lb      s8,35(sp)
     lw      s4,44(sp)
+    lw      s1,52(sp)
     lb      s3,51(sp)
-    lb      s5,43(sp)
-    lw      s7,36(sp)
-    lb      s6,42(sp)
     j       .branch_false_29
                     #      label branch_false_29: 
 .branch_false_29:
@@ -211,18 +211,18 @@ main:
                     #arg load ended
     call    putint
                     #      jump label: branch_false_33 
-    lb      s9,34(sp)
-    lb      s11,23(sp)
-    lb      a0,2(sp)
-    lw      s1,52(sp)
-    lb      s10,14(sp)
-    lb      s8,35(sp)
-    lw      s4,44(sp)
-    lb      s3,51(sp)
-    lb      s5,43(sp)
-    lw      s2,24(sp)
-    lw      s7,36(sp)
     lb      s6,42(sp)
+    lb      s10,14(sp)
+    lb      s9,34(sp)
+    lb      a0,2(sp)
+    lb      s11,23(sp)
+    lw      s7,36(sp)
+    lb      s5,43(sp)
+    lb      s8,35(sp)
+    lw      s2,24(sp)
+    lw      s4,44(sp)
+    lw      s1,52(sp)
+    lb      s3,51(sp)
     j       .branch_false_33
                     #      label branch_false_33: 
 .branch_false_33:

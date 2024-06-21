@@ -70,9 +70,10 @@ main:
     li      a2, 1
     add     a5,a0,a2
                     #      i_17 = i32 temp_2_27 
+    mv      a0, a5
                     #      jump label: while.exit_23 
-    sb      a4,14(sp)
     sw      a5,8(sp)
+    sb      a4,14(sp)
     j       .while.exit_23
                     #      label branch_false_26: 
 .branch_false_26:
@@ -82,15 +83,17 @@ main:
                     #      temp_3_24 = Add i32 sum_17, i_17 
     add     a2,a1,a0
                     #      sum_17 = i32 temp_3_24 
+    mv      a1, a2
                     #      new_var temp_4_24:i32 
                     #      temp_4_24 = Add i32 i_17, 1_0 
     li      a5, 1
     add     a6,a0,a5
                     #      i_17 = i32 temp_4_24 
+    mv      a0, a6
                     #      jump label: while.head_23 
+    sw      a2,4(sp)
     sw      a6,0(sp)
     sb      a3,15(sp)
-    sw      a2,4(sp)
     sb      a4,14(sp)
     j       .while.head_23
                     #      label while.exit_23: 

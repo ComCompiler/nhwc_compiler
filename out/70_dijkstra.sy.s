@@ -173,31 +173,32 @@ Dijkstra:
                     #found literal reg Some(a3) already exist with 1_0
     add     s7,a4,a3
                     #      i_23 = i32 temp_7_28 
+    mv      a4, s7
                     #      jump label: while.head_27 
-    li      a7, 4732
-    add     a7,sp,a7
-    sw      a7,0(a7)
-    li      a2, 4747
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    li      s4, 3688
-    add     s4,sp,s4
-    sd      s4,0(s4)
-    li      s3, 3700
-    add     s3,sp,s3
-    sw      s3,0(s3)
-    li      a0, 4736
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    li      a1, 4748
-    add     a1,sp,a1
-    sw      a1,0(a1)
     li      s7, 3684
     add     s7,sp,s7
     sw      s7,0(s7)
+    li      s4, 3688
+    add     s4,sp,s4
+    sd      s4,0(s4)
+    li      a0, 4736
+    add     a0,sp,a0
+    sd      a0,0(a0)
+    li      s3, 3700
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    li      a2, 4747
+    add     a2,sp,a2
+    sb      a2,0(a2)
     li      s1, 3704
     add     s1,sp,s1
     sd      s1,0(s1)
+    li      a1, 4748
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a7, 4732
+    add     a7,sp,a7
+    sw      a7,0(a7)
     j       .while.head_27
                     #      label while.exit_27: 
 .while.exit_27:
@@ -352,27 +353,29 @@ Dijkstra:
                     #      temp_25_45 = load temp_24_45:ptr->i32 
     lw      a1,0(a0)
                     #      min_num_36 = i32 temp_25_45 
+    mv      a3, a1
                     #      min_index_36 = i32 k_36 
+    mv      a6, s2
                     #      jump label: branch_false_44 
-    li      a2, 3476
-    add     a2,sp,a2
-    sw      a2,0(a2)
     li      a0, 3408
     add     a0,sp,a0
     sd      a0,0(a0)
-    li      a0, 4747
-    add     a0,sp,a0
-    lb      a2,0(a0)
-    li      a0, 4747
-    add     a0,sp,a0
-    sb      a0,0(a0)
     li      a1, 3404
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 3483
     add     a1,sp,a1
     lb      a0,0(a1)
+    li      a2, 3476
+    add     a2,sp,a2
+    sw      a2,0(a2)
     li      a1, 3483
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a1, 4747
+    add     a1,sp,a1
+    lb      a2,0(a1)
+    li      a1, 4747
     add     a1,sp,a1
     sb      a1,0(a1)
     li      a3, 3656
@@ -397,34 +400,41 @@ Dijkstra:
     sb      a1,0(a1)
     add     a1,s2,a0
                     #      k_36 = i32 temp_26_42 
+    mv      s2, a1
                     #      jump label: while.head_41 
-    li      s10, 3484
-    add     s10,sp,s10
-    sw      s10,0(s10)
     li      s6, 3636
     add     s6,sp,s6
     sw      s6,0(s6)
-    li      s5, 3643
-    add     s5,sp,s5
-    sb      s5,0(s5)
-    li      s9, 3564
-    add     s9,sp,s9
-    sw      s9,0(s9)
+    li      s7, 3568
+    add     s7,sp,s7
+    sd      s7,0(s7)
+    li      s10, 3484
+    add     s10,sp,s10
+    sw      s10,0(s10)
     li      s4, 3644
     add     s4,sp,s4
     sw      s4,0(s4)
-    li      s11, 3563
-    add     s11,sp,s11
-    sb      s11,0(s11)
-    li      s3, 3488
-    add     s3,sp,s3
-    sd      s3,0(s3)
     li      a1, 3400
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 3672
     add     a1,sp,a1
     ld      a0,0(a1)
+    li      s11, 3563
+    add     s11,sp,s11
+    sb      s11,0(s11)
+    li      s9, 3564
+    add     s9,sp,s9
+    sw      s9,0(s9)
+    li      s3, 3488
+    add     s3,sp,s3
+    sd      s3,0(s3)
+    li      s8, 3556
+    add     s8,sp,s8
+    sw      s8,0(s8)
+    li      s5, 3643
+    add     s5,sp,s5
+    sb      s5,0(s5)
     li      a1, 3672
     add     a1,sp,a1
     sd      a1,0(a1)
@@ -434,12 +444,6 @@ Dijkstra:
     li      a2, 4748
     add     a2,sp,a2
     lw      a1,0(a2)
-    li      s7, 3568
-    add     s7,sp,s7
-    sd      s7,0(s7)
-    li      s8, 3556
-    add     s8,sp,s8
-    sw      s8,0(s8)
     j       .while.head_41
                     #      label while.exit_41: 
 .while.exit_41:
@@ -667,10 +671,10 @@ Dijkstra:
                     #      mu dis_0:248 
                     #      dis_0 = chi dis_0:248 
                     #      jump label: branch_false_58 
-    sw      a2,8(sp)
-    lb      a2,1139(sp)
     sd      a0,1128(sp)
     lw      a0,1216(sp)
+    sw      a2,8(sp)
+    lb      a2,1139(sp)
     sw      a1,12(sp)
     lw      a1,1140(sp)
     j       .branch_false_58
@@ -688,23 +692,27 @@ Dijkstra:
     sb      a1,0(a1)
     add     a1,s8,a0
                     #      j_36 = i32 temp_53_53 
+    mv      s8, a1
                     #      jump label: while.head_52 
-    li      s10, 3376
-    add     s10,sp,s10
-    sw      s10,0(s10)
     li      s6, 2340
     add     s6,sp,s6
     sw      s6,0(s6)
-    li      s9, 3383
-    add     s9,sp,s9
-    sb      s9,0(s9)
-    li      s11, 2344
-    add     s11,sp,s11
-    sd      s11,0(s11)
+    li      s7, 3384
+    add     s7,sp,s7
+    sw      s7,0(s7)
+    li      s10, 3376
+    add     s10,sp,s10
+    sw      s10,0(s10)
     sw      a1,4(sp)
     li      a1, 3672
     add     a1,sp,a1
     ld      a0,0(a1)
+    li      s11, 2344
+    add     s11,sp,s11
+    sd      s11,0(s11)
+    li      s9, 3383
+    add     s9,sp,s9
+    sb      s9,0(s9)
     li      a1, 3672
     add     a1,sp,a1
     sd      a1,0(a1)
@@ -714,9 +722,6 @@ Dijkstra:
     li      a2, 4748
     add     a2,sp,a2
     lw      a1,0(a2)
-    li      s7, 3384
-    add     s7,sp,s7
-    sw      s7,0(s7)
     j       .while.head_52
                     #      label while.exit_52: 
 .while.exit_52:
@@ -725,35 +730,27 @@ Dijkstra:
     li      s6, 1
     add     s10,a4,s6
                     #      i_23 = i32 temp_54_36 
+    mv      a4, s10
                     #      jump label: while.head_35 
-    sw      s10,0(sp)
-    li      a7, 3664
-    add     a7,sp,a7
-    sw      a7,0(a7)
-    li      s5, 3643
-    add     s5,sp,s5
-    sb      s5,0(s5)
-    li      s9, 3383
-    add     s9,sp,s9
-    sb      s9,0(s9)
-    li      s4, 3644
-    add     s4,sp,s4
-    sw      s4,0(s4)
     li      a3, 3656
     add     a3,sp,a3
     sw      a3,0(a3)
-    li      s3, 3392
-    add     s3,sp,s3
-    sd      s3,0(s3)
-    li      a5, 3668
-    add     a5,sp,a5
-    sw      a5,0(a5)
     li      s7, 3384
     add     s7,sp,s7
     sw      s7,0(s7)
+    sw      s10,0(sp)
     li      s2, 3648
     add     s2,sp,s2
     sw      s2,0(s2)
+    li      s4, 3644
+    add     s4,sp,s4
+    sw      s4,0(s4)
+    li      s9, 3383
+    add     s9,sp,s9
+    sb      s9,0(s9)
+    li      s3, 3392
+    add     s3,sp,s3
+    sd      s3,0(s3)
     li      a6, 3652
     add     a6,sp,a6
     sw      a6,0(a6)
@@ -763,6 +760,15 @@ Dijkstra:
     li      s1, 3663
     add     s1,sp,s1
     sb      s1,0(s1)
+    li      s5, 3643
+    add     s5,sp,s5
+    sb      s5,0(s5)
+    li      a7, 3664
+    add     a7,sp,a7
+    sw      a7,0(a7)
+    li      a5, 3668
+    add     a5,sp,a5
+    sw      a5,0(a5)
     j       .while.head_35
                     #      label while.exit_35: 
 .while.exit_35:
@@ -937,12 +943,13 @@ main:
     li      s2, 1
     add     s3,a1,s2
                     #      j_71 = i32 temp_63_75 
+    mv      a1, s3
                     #      jump label: while.head_74 
-    sd      s1,152(sp)
-    sb      a7,163(sp)
     sw      a6,164(sp)
-    sw      s3,148(sp)
+    sb      a7,163(sp)
     sb      a5,162(sp)
+    sw      s3,148(sp)
+    sd      s1,152(sp)
     j       .while.head_74
                     #      label while.exit_74: 
 .while.exit_74:
@@ -951,13 +958,14 @@ main:
     li      a5, 1
     add     s1,a3,a5
                     #      i_64 = i32 temp_65_71 
+    mv      a3, s1
                     #      jump label: while.head_70 
-    sw      s1,132(sp)
-    sb      a7,163(sp)
     sw      a6,164(sp)
-    sw      a1,168(sp)
+    sb      a7,163(sp)
     sb      a4,175(sp)
     sw      a2,176(sp)
+    sw      s1,132(sp)
+    sw      a1,168(sp)
     j       .while.head_70
                     #      label while.exit_70: 
 .while.exit_70:
@@ -1035,15 +1043,16 @@ main:
     li      s2, 1
     add     s3,a3,s2
                     #      i_64 = i32 temp_72_85 
+    mv      a3, s3
                     #      jump label: while.head_84 
-    sd      s1,96(sp)
-    sw      a7,108(sp)
     sb      a6,127(sp)
+    sw      a7,108(sp)
+    sw      a5,128(sp)
     sw      s3,88(sp)
-    sw      a1,116(sp)
     sw      a0,92(sp)
     lw      a0,180(sp)
-    sw      a5,128(sp)
+    sd      s1,96(sp)
+    sw      a1,116(sp)
     j       .while.head_84
                     #      label while.exit_84: 
 .while.exit_84:
@@ -1114,10 +1123,11 @@ main:
     li      a0, 1
     add     s1,a3,a0
                     #      i_64 = i32 temp_78_93 
+    mv      a3, s1
                     #      jump label: while.head_92 
-    sw      s1,0(sp)
     sw      a7,84(sp)
     lw      a0,180(sp)
+    sw      s1,0(sp)
     j       .while.head_92
                     #      label while.exit_92: 
 .while.exit_92:

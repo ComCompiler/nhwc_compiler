@@ -297,6 +297,7 @@ merge_sort:
     sw      a1,0(a1)
     add     a1,a3,a0
                     #      i_19 = i32 temp_18_32 
+    mv      a3, a1
                     #      jump label: L3_0 
     j       .L3_0
                     #      label branch_false_31: 
@@ -365,34 +366,35 @@ merge_sort:
     sd      a1,0(a1)
     add     a1,s2,a0
                     #      j_19 = i32 temp_24_35 
+    mv      s2, a1
                     #      jump label: L3_0 
-    li      a1, 2496
-    add     a1,sp,a1
-    sw      a1,0(a1)
     li      a2, 3308
     add     a2,sp,a2
     sw      a2,0(a2)
-    li      a2, 3328
-    add     a2,sp,a2
-    lw      a1,0(a2)
+    li      a0, 4140
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a0, 4140
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a3, 3312
     add     a3,sp,a3
     sd      a3,0(a3)
-    li      a2, 3328
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    li      a2, 5800
-    add     a2,sp,a2
-    lw      a3,0(a2)
-    li      a2, 5800
-    add     a2,sp,a2
-    sw      a2,0(a2)
+    li      a1, 2496
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 5800
+    add     a1,sp,a1
+    lw      a3,0(a1)
+    li      a1, 5800
+    add     a1,sp,a1
+    sw      a1,0(a1)
     li      a4, 5808
     add     a4,sp,a4
     sw      a4,0(a4)
-    li      a4, 4140
+    li      a4, 3328
     add     a4,sp,a4
-    lw      a2,0(a4)
+    lw      a1,0(a4)
     j       .L3_0
                     #      label L3_0: 
 .L3_0:
@@ -406,56 +408,62 @@ merge_sort:
     sw      a1,0(a1)
     add     a1,s3,a0
                     #      k_19 = i32 temp_19_29 
+    mv      s3, a1
                     #      jump label: while.head_28 
+    li      s7, 4976
+    add     s7,sp,s7
+    sd      s7,0(s7)
+    li      s11, 4972
+    add     s11,sp,s11
+    sw      s11,0(s11)
+    li      s9, 4156
+    add     s9,sp,s9
+    sw      s9,0(s9)
+    li      s10, 4155
+    add     s10,sp,s10
+    sb      s10,0(s10)
+    li      a2, 4140
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 5812
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a0, 5812
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a1, 3324
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 5828
     add     a1,sp,a1
     lw      a0,0(a1)
+    li      a3, 5800
+    add     a3,sp,a3
+    sw      a3,0(a3)
     li      s4, 5789
     add     s4,sp,s4
     sb      s4,0(s4)
     li      a1, 5828
     add     a1,sp,a1
     sw      a1,0(a1)
-    mv      a1, a3
-    li      s11, 4972
-    add     s11,sp,s11
-    sw      s11,0(s11)
-    li      a6, 5790
-    add     a6,sp,a6
-    sb      a6,0(a6)
-    li      s5, 4160
-    add     s5,sp,s5
-    sd      s5,0(s5)
-    li      s6, 5784
-    add     s6,sp,s6
-    sw      s6,0(s6)
-    li      s10, 4155
-    add     s10,sp,s10
-    sb      s10,0(s10)
-    li      s8, 4968
-    add     s8,sp,s8
-    sw      s8,0(s8)
-    li      s9, 4156
-    add     s9,sp,s9
-    sw      s9,0(s9)
-    li      s7, 4976
-    add     s7,sp,s7
-    sd      s7,0(s7)
-    li      a3, 5800
-    add     a3,sp,a3
-    sw      a3,0(a3)
-    li      a2, 4140
-    add     a2,sp,a2
-    sw      a2,0(a2)
     li      a4, 5808
     add     a4,sp,a4
     sw      a4,0(a4)
-    li      a4, 5812
+    li      a4, 5800
     add     a4,sp,a4
-    lw      a2,0(a4)
+    lw      a1,0(a4)
+    li      s5, 4160
+    add     s5,sp,s5
+    sd      s5,0(s5)
+    li      s8, 4968
+    add     s8,sp,s8
+    sw      s8,0(s8)
+    li      a6, 5790
+    add     a6,sp,a6
+    sb      a6,0(a6)
+    li      s6, 5784
+    add     s6,sp,s6
+    sw      s6,0(s6)
     j       .while.head_28
                     #      label while.head_40: 
 .while.head_40:
@@ -510,6 +518,7 @@ merge_sort:
     li      s10, 1
     add     s11,a1,s10
                     #      i_19 = i32 temp_30_41 
+    mv      a1, s11
                     #      new_var temp_31_41:i32 
                     #      temp_31_41 = Add i32 k_19, 1_0 
                     #found literal reg Some(s10) already exist with 1_0
@@ -518,26 +527,36 @@ merge_sort:
     sw      a0,0(a0)
     add     a0,s3,s10
                     #      k_19 = i32 temp_31_41 
+    mv      s3, a0
                     #      jump label: while.head_40 
-    sw      a0,1660(sp)
-    li      s10, 5828
-    add     s10,sp,s10
-    lw      a0,0(s10)
-    sw      s11,1664(sp)
-    li      s5, 2495
-    add     s5,sp,s5
-    sb      s5,0(s5)
-    li      s6, 2480
-    add     s6,sp,s6
-    sd      s6,0(s6)
-    li      s10, 5828
-    add     s10,sp,s10
-    sw      s10,0(s10)
-    sd      s8,1672(sp)
-    sw      s9,1668(sp)
     li      s7, 2476
     add     s7,sp,s7
     sw      s7,0(s7)
+    sw      s11,1664(sp)
+    sw      s9,1668(sp)
+    sw      a0,1660(sp)
+    li      a1, 5800
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 5828
+    add     a1,sp,a1
+    lw      a0,0(a1)
+    li      a1, 5828
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a2, 5812
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a2, 5800
+    add     a2,sp,a2
+    lw      a1,0(a2)
+    li      s5, 2495
+    add     s5,sp,s5
+    sb      s5,0(s5)
+    sd      s8,1672(sp)
+    li      s6, 2480
+    add     s6,sp,s6
+    sd      s6,0(s6)
     j       .while.head_40
                     #      label while.head_46: 
 .while.head_46:
@@ -595,25 +614,36 @@ merge_sort:
     sw      a0,0(a0)
     add     a0,s2,s11
                     #      j_19 = i32 temp_37_47 
+    mv      s2, a0
                     #      new_var temp_38_47:i32 
                     #      temp_38_47 = Add i32 k_19, 1_0 
                     #found literal reg Some(s11) already exist with 1_0
     sw      a0,832(sp)
     add     a0,s3,s11
                     #      k_19 = i32 temp_38_47 
+    mv      s3, a0
                     #      jump label: while.head_46 
-    sw      a0,828(sp)
-    li      s11, 5828
-    add     s11,sp,s11
-    lw      a0,0(s11)
-    li      s11, 5828
-    add     s11,sp,s11
-    sw      s11,0(s11)
-    sb      s6,1659(sp)
-    sw      s10,836(sp)
-    sd      s8,840(sp)
-    sw      s9,1644(sp)
     sd      s7,1648(sp)
+    sw      s9,1644(sp)
+    sw      s10,836(sp)
+    sw      a0,828(sp)
+    li      a1, 5800
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 5828
+    add     a1,sp,a1
+    lw      a0,0(a1)
+    li      a1, 5828
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a2, 5812
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a2, 5800
+    add     a2,sp,a2
+    lw      a1,0(a2)
+    sd      s8,840(sp)
+    sb      s6,1659(sp)
     j       .while.head_46
                     #      label while.head_52: 
 .while.head_52:
@@ -675,31 +705,28 @@ merge_sort:
     sw      a1,0(a1)
     add     a1,s11,a0
                     #      l_17 = i32 temp_44_53 
+    mv      s11, a1
                     #      jump label: while.head_52 
-    mv      a0, s11
+    sb      s7,827(sp)
+    li      s11, 5828
+    add     s11,sp,s11
+    sw      s11,0(s11)
+    sd      s9,8(sp)
+    sw      s10,812(sp)
     sw      a1,0(sp)
+    li      a1, 5828
+    add     a1,sp,a1
+    lw      a0,0(a1)
+    li      a1, 5828
+    add     a1,sp,a1
+    sw      a1,0(a1)
     li      a2, 5812
     add     a2,sp,a2
     sw      a2,0(a2)
     li      a2, 5800
     add     a2,sp,a2
     lw      a1,0(a2)
-    li      s11, 5828
-    add     s11,sp,s11
-    sw      s11,0(s11)
-    sw      s10,812(sp)
     sd      s8,816(sp)
-    sd      s9,8(sp)
-    sb      s7,827(sp)
-    li      a2, 5800
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    li      a3, 5791
-    add     a3,sp,a3
-    sb      a3,0(a3)
-    li      a3, 5812
-    add     a3,sp,a3
-    lw      a2,0(a3)
     j       .while.head_52
                     #      label while.exit_52: 
 .while.exit_52:

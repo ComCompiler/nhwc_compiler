@@ -140,14 +140,15 @@ QuickSort:
     li      s3, 1
     sub     s10,a5,s3
                     #      j_22 = i32 temp_10_34 
+    mv      a5, s10
                     #      jump label: while.head_33 
+    sw      s10,108(sp)
     sw      s4,132(sp)
+    sw      s6,116(sp)
     sd      s5,120(sp)
     sb      s9,113(sp)
-    sb      s7,115(sp)
     sb      s8,114(sp)
-    sw      s10,108(sp)
-    sw      s6,116(sp)
+    sb      s7,115(sp)
     j       .while.head_33
                     #      label while.exit_33: 
 .while.exit_33:
@@ -192,12 +193,13 @@ QuickSort:
     sd      a1,176(sp)
     add     a1,a4,a0
                     #      i_22 = i32 temp_15_38 
+    mv      a4, a1
                     #      jump label: branch_false_37 
+    sd      s10,96(sp)
+    ld      a0,176(sp)
+    sd      s11,88(sp)
     sw      a1,80(sp)
     lw      a1,172(sp)
-    ld      a0,176(sp)
-    sd      s10,96(sp)
-    sd      s11,88(sp)
     j       .branch_false_37
                     #      label branch_false_37: 
 .branch_false_37:
@@ -239,14 +241,15 @@ QuickSort:
     sb      a1,67(sp)
     add     a1,a4,a0
                     #      i_22 = i32 temp_21_43 
+    mv      a4, a1
                     #      jump label: while.head_42 
+    sd      s10,72(sp)
+    ld      a0,176(sp)
     sb      a2,65(sp)
     lw      a2,168(sp)
+    sw      s11,68(sp)
     sw      a1,60(sp)
     lw      a1,172(sp)
-    ld      a0,176(sp)
-    sd      s10,72(sp)
-    sw      s11,68(sp)
     j       .while.head_42
                     #      label while.exit_42: 
 .while.exit_42:
@@ -296,32 +299,33 @@ QuickSort:
     sw      a1,36(sp)
     sub     a1,a5,a0
                     #      j_22 = i32 temp_26_47 
+    mv      a5, a1
                     #      jump label: branch_false_46 
+    lb      a0,59(sp)
     sd      a2,176(sp)
     lb      a2,65(sp)
     sw      a1,32(sp)
     lb      a1,67(sp)
-    lb      a0,59(sp)
     j       .branch_false_46
                     #      label branch_false_46: 
 .branch_false_46:
                     #      jump label: while.head_30 
-    sb      a2,65(sp)
-    lw      a2,168(sp)
-    sw      s4,132(sp)
-    sd      s5,120(sp)
-    sb      s9,113(sp)
+    sd      s10,72(sp)
     sb      a7,139(sp)
-    sb      a1,67(sp)
-    lw      a1,172(sp)
-    sb      s7,115(sp)
+    sw      s4,132(sp)
     sb      a0,59(sp)
     ld      a0,176(sp)
-    sb      s8,114(sp)
-    sd      s10,72(sp)
-    sw      s6,116(sp)
     sb      s3,107(sp)
+    sw      s6,116(sp)
+    sd      s5,120(sp)
+    sb      s9,113(sp)
+    sb      s8,114(sp)
+    sb      a2,65(sp)
+    lw      a2,168(sp)
+    sb      s7,115(sp)
     sw      s11,68(sp)
+    sb      a1,67(sp)
+    lw      a1,172(sp)
     j       .while.head_30
                     #      label while.exit_30: 
 .while.exit_30:
@@ -370,6 +374,7 @@ QuickSort:
     li      a2, 1
     add     s1,a4,a2
                     #      tmp_22 = i32 temp_30_22 
+    mv      a1, s1
                     #      new_var temp_31_22:i32 
                     #      temp_31_22 =  Call i32 QuickSort_0(arr_17, tmp_22, high_17) 
                     #saved register dumping to mem
@@ -387,15 +392,15 @@ QuickSort:
                     #      tmp_22 = i32 temp_31_22 
     mv      a1, a0
                     #      jump label: branch_false_21 
-    sw      a5,156(sp)
-    sw      a4,160(sp)
-    lw      a2,168(sp)
-    sb      a7,139(sp)
-    sw      a1,20(sp)
-    lw      a1,172(sp)
     sd      a6,144(sp)
+    sb      a7,139(sp)
+    sw      a4,160(sp)
+    sw      a5,156(sp)
     sw      a0,4(sp)
     ld      a0,176(sp)
+    lw      a2,168(sp)
+    sw      a1,20(sp)
+    lw      a1,172(sp)
     j       .branch_false_21
                     #      label branch_false_21: 
 .branch_false_21:
@@ -478,7 +483,7 @@ main:
                     #      new_var temp_34_58:ptr->i32 
                     #      temp_34_58 = getelementptr a_58:Array:i32:[Some(10_0)] [Some(2_0)] 
     li      s3, 0
-                    #found literal reg Some(a3) already exist with 1_0
+                    #found literal reg Some(s1) already exist with 1_0
     li      s4, 2
     add     s3,s3,a5
     slli s3,s3,2
@@ -492,7 +497,7 @@ main:
                     #      new_var temp_35_58:ptr->i32 
                     #      temp_35_58 = getelementptr a_58:Array:i32:[Some(10_0)] [Some(3_0)] 
     li      s6, 0
-                    #found literal reg Some(a3) already exist with 1_0
+                    #found literal reg Some(s1) already exist with 1_0
                     #found literal reg Some(s2) already exist with 3_0
     add     s6,s6,a5
     slli s6,s6,2
@@ -506,7 +511,7 @@ main:
                     #      new_var temp_36_58:ptr->i32 
                     #      temp_36_58 = getelementptr a_58:Array:i32:[Some(10_0)] [Some(4_0)] 
     li      s7, 0
-                    #found literal reg Some(a3) already exist with 1_0
+                    #found literal reg Some(s1) already exist with 1_0
                     #found literal reg Some(a6) already exist with 4_0
     add     s7,s7,a5
     slli s7,s7,2
@@ -520,21 +525,21 @@ main:
                     #      new_var temp_37_58:ptr->i32 
                     #      temp_37_58 = getelementptr a_58:Array:i32:[Some(10_0)] [Some(5_0)] 
     li      s8, 0
-                    #found literal reg Some(a3) already exist with 1_0
+                    #found literal reg Some(s1) already exist with 1_0
     li      s9, 5
     add     s8,s8,a5
     slli s8,s8,2
     add     s8,s8,sp
     add     s8,s8,s8
                     #      store 1_0:i32 temp_37_58:ptr->i32 
-                    #found literal reg Some(a3) already exist with 1_0
-    sd      a3,0(s8)
+                    #found literal reg Some(s1) already exist with 1_0
+    sd      s1,0(s8)
                     #      mu a_58:205 
                     #      a_58 = chi a_58:205 
                     #      new_var temp_38_58:ptr->i32 
                     #      temp_38_58 = getelementptr a_58:Array:i32:[Some(10_0)] [Some(6_0)] 
     li      s10, 0
-                    #found literal reg Some(a3) already exist with 1_0
+                    #found literal reg Some(s1) already exist with 1_0
     li      s11, 6
     add     s10,s10,a5
     slli s10,s10,2
@@ -548,7 +553,7 @@ main:
                     #      new_var temp_39_58:ptr->i32 
                     #      temp_39_58 = getelementptr a_58:Array:i32:[Some(10_0)] [Some(7_0)] 
     li      a0, 0
-                    #found literal reg Some(a3) already exist with 1_0
+                    #found literal reg Some(s1) already exist with 1_0
     li      a1, 7
     add     a0,a0,a5
     slli a0,a0,2
@@ -562,8 +567,8 @@ main:
                     #      new_var temp_40_58:ptr->i32 
                     #      temp_40_58 = getelementptr a_58:Array:i32:[Some(10_0)] [Some(8_0)] 
     li      a1, 0
-                    #found literal reg Some(a3) already exist with 1_0
-    li      a4, 8
+                    #found literal reg Some(s1) already exist with 1_0
+    li      a3, 8
     add     a1,a1,a5
     slli a1,a1,2
     add     a1,a1,sp
@@ -583,7 +588,7 @@ main:
     add     a3,a3,sp
     add     a3,a3,a3
                     #      store 8_0:i32 temp_41_58:ptr->i32 
-                    #found literal reg Some(a4) already exist with 8_0
+    li      a4, 8
     sd      a4,0(a3)
                     #      mu a_58:229 
                     #      a_58 = chi a_58:229 
@@ -613,6 +618,7 @@ main:
     call    QuickSort
     sw      a0,28(sp)
                     #      i_58 = i32 temp_42_58 
+    mv      a4, a0
                     #      jump label: while.head_77 
     j       .while.head_77
                     #      label while.head_77: 
@@ -671,11 +677,12 @@ main:
     li      a0, 1
     add     s1,a4,a0
                     #      i_58 = i32 temp_47_78 
+    mv      a4, s1
                     #      jump label: while.head_77 
-    lw      a0,28(sp)
-    sd      a1,8(sp)
-    sw      s1,0(sp)
     sw      a2,24(sp)
+    sd      a1,8(sp)
+    lw      a0,28(sp)
+    sw      s1,0(sp)
     j       .while.head_77
                     #      label while.exit_77: 
 .while.exit_77:

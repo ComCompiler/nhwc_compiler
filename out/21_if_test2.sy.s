@@ -123,6 +123,7 @@ ifElseIf:
     li      a2, 15
     add     s3,a0,a2
                     #      a_17 = i32 temp_9_30 
+    mv      a0, s3
                     #      jump label: L3_0 
     j       .L3_0
                     #      label branch_false_31: 
@@ -132,6 +133,7 @@ ifElseIf:
     li      a2, 0
     sub     s3,a2,a0
                     #      a_17 = i32 temp_10_30 
+    mv      a0, s3
                     #      jump label: L3_0 
     sw      s3,4(sp)
     lw      s3,8(sp)

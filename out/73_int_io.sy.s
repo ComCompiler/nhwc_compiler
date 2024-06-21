@@ -99,27 +99,28 @@ my_getint:
 .branch_true_24:
                     #      jump label: while.exit_20 
     sb      a7,26(sp)
-    sw      a2,28(sp)
     sw      a4,40(sp)
     sw      a0,32(sp)
     lw      a0,44(sp)
     sb      s1,25(sp)
     sb      a5,27(sp)
+    sw      a2,28(sp)
     j       .while.exit_20
                     #      label branch_false_24: 
 .branch_false_24:
                     #      jump label: while.exit_20 
     sb      a7,26(sp)
-    sw      a2,28(sp)
     sw      a4,40(sp)
     sw      a0,32(sp)
     lw      a0,44(sp)
     sb      s1,25(sp)
     sb      a5,27(sp)
+    sw      a2,28(sp)
     j       .while.exit_20
                     #      label while.exit_20: 
 .while.exit_20:
                     #      sum_17 = i32 c_17 
+    mv      a0, a1
                     #      jump label: while.head_31 
     j       .while.head_31
                     #      label while.head_31: 
@@ -149,6 +150,7 @@ my_getint:
     li      a2, 48
     sub     a4,a0,a2
                     #      c_17 = i32 temp_8_32 
+    mv      a1, a4
                     #      jump label: L2_0 
     j       .L2_0
                     #      label L2_0: 
@@ -179,15 +181,16 @@ my_getint:
                     #      temp_13_36 = Add i32 temp_12_36, c_17 
     add     s4,s3,a1
                     #      sum_17 = i32 temp_13_36 
+    mv      a2, s4
                     #      label branch_false_35: 
 .branch_false_35:
                     #      jump label: while.exit_31 
-    sb      a6,15(sp)
+    sb      s2,13(sp)
     sw      a4,16(sp)
     sw      a0,20(sp)
     lw      a0,44(sp)
-    sb      s2,13(sp)
     sb      s1,14(sp)
+    sb      a6,15(sp)
     j       .while.exit_31
                     #      label while.exit_31: 
 .while.exit_31:

@@ -135,11 +135,13 @@ get_next:
     li      s1, 1
     add     s7,a7,s1
                     #      j_18 = i32 temp_11_26 
+    mv      a7, s7
                     #      new_var temp_12_26:i32 
                     #      temp_12_26 = Add i32 i_18, 1_0 
                     #found literal reg Some(s1) already exist with 1_0
     add     s10,a6,s1
                     #      i_18 = i32 temp_12_26 
+    mv      a6, s10
                     #      new_var temp_13_26:ptr->i32 
                     #      temp_13_26 = getelementptr next_16:ptr->i32 [Some(i_18)] 
     li      s11, 0
@@ -168,29 +170,30 @@ get_next:
                     #      temp_15_24 = load temp_14_24:ptr->i32 
     lw      s10,0(s1)
                     #      j_18 = i32 temp_15_24 
+    mv      a7, s10
                     #      jump label: L9_0 
-    ld      s11,16(sp)
     lw      s7,28(sp)
-    sd      s1,8(sp)
+    ld      s11,16(sp)
     sw      s10,4(sp)
     lw      s10,24(sp)
+    sd      s1,8(sp)
     j       .L9_0
                     #      label L9_0: 
 .L9_0:
                     #      jump label: while.head_22 
-    sd      a4,56(sp)
-    sb      s2,67(sp)
-    sb      s9,33(sp)
-    sw      s3,52(sp)
+    sw      s5,36(sp)
+    sw      s7,28(sp)
     sb      s6,35(sp)
+    sb      s8,34(sp)
     sd      s11,16(sp)
     sd      s4,40(sp)
-    sw      s7,28(sp)
-    sd      a3,72(sp)
-    sw      a5,68(sp)
+    sb      s9,33(sp)
+    sb      s2,67(sp)
+    sw      s3,52(sp)
     sw      s10,24(sp)
-    sw      s5,36(sp)
-    sb      s8,34(sp)
+    sw      a5,68(sp)
+    sd      a4,56(sp)
+    sd      a3,72(sp)
     j       .while.head_22
                     #      label while.exit_22: 
 .while.exit_22:
@@ -323,11 +326,13 @@ KMP:
     li      s1, 1
     add     s7,a0,s1
                     #      i_33 = i32 temp_24_42 
+    mv      a0, s7
                     #      new_var temp_25_42:i32 
                     #      temp_25_42 = Add i32 j_33, 1_0 
                     #found literal reg Some(s1) already exist with 1_0
     add     s8,a1,s1
                     #      j_33 = i32 temp_25_42 
+    mv      a1, s8
                     #      jump label: L5_0 
     j       .L5_0
                     #      label L5_0: 
@@ -391,6 +396,7 @@ KMP:
                     #      temp_31_49 = load temp_30_49:ptr->i32 
     lw      s8,0(s1)
                     #      i_33 = i32 temp_31_49 
+    mv      a0, s8
                     #      jump label: L6_0 
     j       .L6_0
                     #      label L6_0: 
@@ -410,34 +416,36 @@ KMP:
     li      s7, 1
     add     s10,a0,s7
                     #      i_33 = i32 temp_33_53 
+    mv      a0, s10
                     #      new_var temp_34_53:i32 
                     #      temp_34_53 = Add i32 j_33, 1_0 
                     #found literal reg Some(s7) already exist with 1_0
     add     s11,a1,s7
                     #      j_33 = i32 temp_34_53 
+    mv      a1, s11
                     #      jump label: branch_false_52 
-    sw      s11,8(sp)
     sw      s10,12(sp)
+    sw      s11,8(sp)
     j       .branch_false_52
                     #      label branch_false_52: 
 .branch_false_52:
                     #      label L7_0: 
 .L7_0:
                     #      jump label: while.head_38 
-    sw      s3,76(sp)
-    sw      a5,92(sp)
-    sb      s2,91(sp)
-    sw      s8,20(sp)
-    sb      s9,19(sp)
+    sw      s5,60(sp)
     li      a4, 16496
     add     a4,sp,a4
     sd      a4,0(a4)
-    sw      s5,60(sp)
+    sw      s3,76(sp)
+    sb      s9,19(sp)
+    sw      s8,20(sp)
     sd      s1,24(sp)
     sb      s6,59(sp)
+    sw      a5,92(sp)
+    sd      s4,64(sp)
     sd      a2,96(sp)
     sd      a3,80(sp)
-    sd      s4,64(sp)
+    sb      s2,91(sp)
     j       .while.head_38
                     #      label while.exit_38: 
 .while.exit_38:
@@ -545,13 +553,13 @@ read_str:
                     #      label branch_true_66: 
 .branch_true_66:
                     #      jump label: while.exit_62 
-    sd      a2,40(sp)
-    sd      a6,56(sp)
     sd      a3,24(sp)
+    sd      a6,56(sp)
+    sd      a2,40(sp)
     sw      a7,20(sp)
-    sb      s2,19(sp)
     sw      a0,36(sp)
     ld      a0,56(sp)
+    sb      s2,19(sp)
     j       .while.exit_62
                     #      label while.exit_62: 
 .while.exit_62:
@@ -584,16 +592,17 @@ read_str:
     li      a5, 1
     add     s1,a1,a5
                     #      i_59 = i32 temp_42_63 
+    mv      a1, s1
                     #      jump label: while.head_62 
-    sd      a2,40(sp)
-    sd      a6,56(sp)
     sd      a3,24(sp)
-    sw      s1,12(sp)
+    sd      a6,56(sp)
+    sd      a2,40(sp)
     sw      a7,20(sp)
-    sb      a4,51(sp)
-    sb      s2,19(sp)
+    sw      s1,12(sp)
     sw      a0,36(sp)
     ld      a0,56(sp)
+    sb      a4,51(sp)
+    sb      s2,19(sp)
     j       .while.head_62
                     #      Define main_0 [] -> main_ret_0 
     .globl main

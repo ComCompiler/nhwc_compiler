@@ -103,8 +103,8 @@ reverse:
                     #arg load ended
     call    putint
                     #      jump label: L3_0 
-    sw      a3,20(sp)
     sw      a5,0(sp)
+    sw      a3,20(sp)
     j       .L3_0
                     #      label L3_0: 
 .L3_0:

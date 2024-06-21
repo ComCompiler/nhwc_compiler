@@ -120,6 +120,7 @@ counting_sort:
                     #found literal reg Some(s1) already exist with 1_0
     add     s4,a3,s1
                     #      k_19 = i32 temp_2_29 
+    mv      a3, s4
                     #      jump label: while.head_28 
     sd      a6,272(sp)
     sw      s4,268(sp)
@@ -191,18 +192,19 @@ counting_sort:
                     #found literal reg Some(s2) already exist with 1_0
     add     s11,a4,s2
                     #      i_19 = i32 temp_12_34 
+    mv      a4, s11
                     #      jump label: while.head_33 
-    sw      s7,228(sp)
-    sw      s11,204(sp)
-    sd      s6,232(sp)
+    sw      s10,208(sp)
+    sw      s9,212(sp)
+    sd      s1,256(sp)
     sw      s5,336(sp)
     sb      a6,267(sp)
     sd      s4,240(sp)
-    sd      s8,216(sp)
-    sw      s9,212(sp)
-    sd      s1,256(sp)
-    sw      s10,208(sp)
+    sw      s7,228(sp)
     sw      s3,252(sp)
+    sd      s6,232(sp)
+    sw      s11,204(sp)
+    sd      s8,216(sp)
     j       .while.head_33
                     #      label while.exit_33: 
 .while.exit_33:
@@ -267,21 +269,23 @@ counting_sort:
                     #found literal reg Some(s3) already exist with 1_0
     add     s11,a3,s3
                     #      k_19 = i32 temp_21_40 
+    mv      a3, s11
                     #      jump label: while.head_39 
-    sw      s7,172(sp)
-    sw      s11,148(sp)
-    sd      s6,176(sp)
-    sw      s5,188(sp)
-    sw      s4,336(sp)
-    sd      s8,160(sp)
+    sw      s10,152(sp)
     sw      s9,156(sp)
     sd      s1,192(sp)
-    sw      s10,152(sp)
+    sw      s5,188(sp)
+    sw      s4,336(sp)
+    sw      s7,172(sp)
+    sd      s6,176(sp)
+    sw      s11,148(sp)
     sb      s2,203(sp)
+    sd      s8,160(sp)
     j       .while.head_39
                     #      label while.exit_39: 
 .while.exit_39:
                     #      j_19 = i32 n_17 
+    mv      a5, a2
                     #      jump label: while.head_45 
     j       .while.head_45
                     #      label while.head_45: 
@@ -436,24 +440,25 @@ counting_sort:
     sw      a1,4(sp)
     sub     a1,a5,a0
                     #      j_19 = i32 temp_42_46 
+    mv      a5, a1
                     #      jump label: while.head_45 
+    mv      a0, a3
+    sd      s10,96(sp)
+    sw      s9,108(sp)
+    sd      s1,80(sp)
+    sd      s5,128(sp)
+    sd      a3,352(sp)
+    lw      a3,288(sp)
     sw      a1,0(sp)
     ld      a1,344(sp)
-    sd      s7,112(sp)
-    sw      s11,92(sp)
-    sw      s6,124(sp)
-    sd      s5,128(sp)
     sw      a2,20(sp)
     lw      a2,340(sp)
     sw      s4,140(sp)
-    sw      s8,336(sp)
-    sd      a3,352(sp)
-    lw      a3,288(sp)
-    sw      s9,108(sp)
-    sd      s1,80(sp)
-    sd      s10,96(sp)
+    sd      s7,112(sp)
     sb      s3,147(sp)
-    ld      a0,352(sp)
+    sw      s6,124(sp)
+    sw      s11,92(sp)
+    sw      s8,336(sp)
     j       .while.head_45
                     #      label while.exit_45: 
 .while.exit_45:
@@ -675,6 +680,7 @@ main:
     call    counting_sort
     sw      a0,28(sp)
                     #      i_52 = i32 temp_54_52 
+    mv      a4, a0
                     #      jump label: while.head_70 
     j       .while.head_70
                     #      label while.head_70: 
@@ -734,11 +740,12 @@ main:
     li      a0, 1
     add     s1,a4,a0
                     #      i_52 = i32 temp_59_71 
+    mv      a4, s1
                     #      jump label: while.head_70 
-    sd      a1,8(sp)
-    lw      a0,28(sp)
     sw      s1,0(sp)
     sw      a2,24(sp)
+    sd      a1,8(sp)
+    lw      a0,28(sp)
     sb      a6,23(sp)
     j       .while.head_70
                     #      label while.exit_70: 

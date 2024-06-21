@@ -75,18 +75,20 @@ main:
                     #      temp_10_23 = Add i32 sum_19, temp_9_23 
     add     s1,a1,a7
                     #      sum_19 = i32 temp_10_23 
+    mv      a1, s1
                     #      new_var temp_11_23:i32 
                     #      temp_11_23 = Add i32 i_19, 1_0 
                     #found literal reg Some(a6) already exist with 1_0
     add     s2,a0,a6
                     #      i_19 = i32 temp_11_23 
+    mv      a0, s2
                     #      jump label: while.head_22 
-    sd      a5,16(sp)
+    sw      s1,8(sp)
+    sw      a4,48(sp)
+    sw      a7,12(sp)
     sw      s2,4(sp)
     sb      a3,55(sp)
-    sw      a7,12(sp)
-    sw      a4,48(sp)
-    sw      s1,8(sp)
+    sd      a5,16(sp)
     j       .while.head_22
                     #      label while.exit_22: 
 .while.exit_22:

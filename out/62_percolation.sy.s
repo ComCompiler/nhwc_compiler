@@ -76,12 +76,13 @@ init:
                     #found literal reg Some(a6) already exist with 1_0
     add     s2,a1,a6
                     #      i_20 = i32 temp_4_24 
+    mv      a1, s2
                     #      jump label: while.head_23 
-    sd      a3,8(sp)
-    sw      a4,24(sp)
     sw      a2,28(sp)
+    sw      a4,24(sp)
     sb      a5,23(sp)
     sw      s2,4(sp)
+    sd      a3,8(sp)
     j       .while.head_23
                     #      label while.exit_23: 
 .while.exit_23:
@@ -411,6 +412,7 @@ main:
     li      a0, 1
     sub     a2,a4,a0
                     #      t_45 = i32 temp_22_51 
+    mv      a4, a2
                     #      store 4_0:i32 *n_0:ptr->i32 
                     #   load label n as ptr to reg
     la      a3, n
@@ -652,84 +654,84 @@ main:
                     #arg load ended
     call    mmerge
                     #      jump label: branch_false_70 
-    li      a1, 2896
+    li      a0, 2888
+    add     a0,sp,a0
+    lw      s5,0(a0)
+    li      a1, 2895
     add     a1,sp,a1
-    lw      a0,0(a1)
-    li      a2, 2863
+    lb      s1,0(a1)
+    li      a2, 2876
     add     a2,sp,a2
-    lb      s6,0(a2)
-    li      s1, 2876
-    add     s1,sp,s1
-    lw      s9,0(s1)
-    li      a2, 2863
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    li      s2, 2936
+    lw      s9,0(a2)
+    li      s2, 2863
     add     s2,sp,s2
-    lw      a2,0(s2)
-    li      a1, 2896
+    lb      s6,0(s2)
+    li      a2, 2876
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      s3, 2936
+    add     s3,sp,s3
+    lw      a2,0(s3)
+    li      a1, 2895
     add     a1,sp,a1
-    sw      a1,0(a1)
-    li      s3, 2943
-    add     s3,sp,s3
-    lb      a1,0(s3)
-    li      s3, 2943
-    add     s3,sp,s3
-    sb      s3,0(s3)
-    li      s4, 2944
+    sb      a1,0(a1)
+    li      s4, 2943
     add     s4,sp,s4
-    lw      s3,0(s4)
-    li      s2, 2936
-    add     s2,sp,s2
-    sw      s2,0(s2)
-    li      s5, 2894
-    add     s5,sp,s5
-    lb      s2,0(s5)
-    li      s1, 2876
-    add     s1,sp,s1
-    sw      s1,0(s1)
-    li      s7, 2895
+    lb      a1,0(s4)
+    li      s7, 2864
     add     s7,sp,s7
-    lb      s1,0(s7)
-    li      s5, 2894
-    add     s5,sp,s5
-    sb      s5,0(s5)
-    li      s8, 2888
-    add     s8,sp,s8
-    lw      s5,0(s8)
-    li      s10, 2864
+    ld      s11,0(s7)
+    li      s10, 2880
     add     s10,sp,s10
-    ld      s11,0(s10)
-    li      s8, 2888
-    add     s8,sp,s8
-    sw      s8,0(s8)
+    lw      s8,0(s10)
+    li      s3, 2936
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    li      a0, 2888
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2944
+    add     a0,sp,a0
+    lw      s3,0(a0)
+    li      s2, 2863
+    add     s2,sp,s2
+    sb      s2,0(s2)
+    li      a0, 2944
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2894
+    add     a0,sp,a0
+    lb      s2,0(a0)
+    li      s7, 2864
+    add     s7,sp,s7
+    sd      s7,0(s7)
+    li      a0, 2894
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 2884
+    add     a0,sp,a0
+    lw      s7,0(a0)
+    li      s10, 2880
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 2884
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2872
+    add     a0,sp,a0
+    lw      s10,0(a0)
+    li      a0, 2872
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a3, 2928
     add     a3,sp,a3
     sw      a3,0(a3)
-    li      a3, 2880
+    li      a3, 2896
     add     a3,sp,a3
-    lw      s8,0(a3)
-    li      s4, 2944
+    lw      a0,0(a3)
+    li      s4, 2943
     add     s4,sp,s4
-    sw      s4,0(s4)
-    li      s7, 2895
-    add     s7,sp,s7
-    sb      s7,0(s7)
-    li      a3, 2880
-    add     a3,sp,a3
-    sw      a3,0(a3)
-    li      a3, 2884
-    add     a3,sp,a3
-    lw      s7,0(a3)
-    li      s10, 2864
-    add     s10,sp,s10
-    sd      s10,0(s10)
-    li      a3, 2884
-    add     a3,sp,a3
-    sw      a3,0(a3)
-    li      a3, 2872
-    add     a3,sp,a3
-    lw      s10,0(a3)
+    sb      s4,0(s4)
     j       .branch_false_70
                     #      label branch_false_70: 
 .branch_false_70:
@@ -828,99 +830,99 @@ main:
                     #arg load ended
     call    mmerge
                     #      jump label: branch_false_75 
-    li      a1, 2844
+    li      a0, 2888
+    add     a0,sp,a0
+    lw      s5,0(a0)
+    li      a1, 2895
     add     a1,sp,a1
-    lw      a0,0(a1)
-    li      a3, 2863
+    lb      s1,0(a1)
+    li      a3, 2876
     add     a3,sp,a3
-    lb      s6,0(a3)
-    li      s1, 2876
-    add     s1,sp,s1
-    lw      s9,0(s1)
+    lw      s9,0(a3)
+    li      s2, 2863
+    add     s2,sp,s2
+    lb      s6,0(s2)
     li      a2, 2908
     add     a2,sp,a2
     sw      a2,0(a2)
-    li      s2, 2936
-    add     s2,sp,s2
-    lw      a2,0(s2)
-    li      a1, 2844
+    li      s3, 2936
+    add     s3,sp,s3
+    lw      a2,0(s3)
+    li      a1, 2895
     add     a1,sp,a1
-    sw      a1,0(a1)
-    li      s3, 2943
-    add     s3,sp,s3
-    lb      a1,0(s3)
-    li      s3, 2943
-    add     s3,sp,s3
-    sb      s3,0(s3)
-    li      s4, 2944
+    sb      a1,0(a1)
+    li      s4, 2943
     add     s4,sp,s4
-    lw      s3,0(s4)
-    li      s2, 2936
-    add     s2,sp,s2
-    sw      s2,0(s2)
-    li      s5, 2894
-    add     s5,sp,s5
-    lb      s2,0(s5)
-    li      a3, 2863
-    add     a3,sp,a3
-    sb      a3,0(a3)
-    li      s7, 2928
+    lb      a1,0(s4)
+    li      s7, 2864
     add     s7,sp,s7
-    lw      a3,0(s7)
-    li      s1, 2876
-    add     s1,sp,s1
-    sw      s1,0(s1)
-    li      s8, 2895
-    add     s8,sp,s8
-    lb      s1,0(s8)
-    li      s5, 2894
-    add     s5,sp,s5
-    sb      s5,0(s5)
-    li      s10, 2888
+    ld      s11,0(s7)
+    li      s10, 2880
     add     s10,sp,s10
-    lw      s5,0(s10)
+    lw      s8,0(s10)
+    li      s3, 2936
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    li      a0, 2888
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2944
+    add     a0,sp,a0
+    lw      s3,0(a0)
+    li      s2, 2863
+    add     s2,sp,s2
+    sb      s2,0(s2)
+    li      a0, 2944
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2894
+    add     a0,sp,a0
+    lb      s2,0(a0)
+    li      s7, 2864
+    add     s7,sp,s7
+    sd      s7,0(s7)
+    li      a0, 2894
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 2884
+    add     a0,sp,a0
+    lw      s7,0(a0)
+    li      a3, 2876
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a0, 2884
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2928
+    add     a0,sp,a0
+    lw      a3,0(a0)
+    li      s10, 2880
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 2928
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2872
+    add     a0,sp,a0
+    lw      s10,0(a0)
+    li      a0, 2872
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a4, 2956
     add     a4,sp,a4
     sw      a4,0(a4)
-    li      a4, 2864
+    li      a4, 2844
     add     a4,sp,a4
-    ld      s11,0(a4)
-    li      s8, 2895
-    add     s8,sp,s8
-    sb      s8,0(s8)
-    li      a4, 2864
-    add     a4,sp,a4
-    sd      a4,0(a4)
-    li      a4, 2880
-    add     a4,sp,a4
-    lw      s8,0(a4)
-    li      s4, 2944
+    lw      a0,0(a4)
+    li      s4, 2943
     add     s4,sp,s4
-    sw      s4,0(s4)
-    li      a4, 2880
+    sb      s4,0(s4)
+    li      a4, 2844
     add     a4,sp,a4
     sw      a4,0(a4)
     li      a4, 2843
     add     a4,sp,a4
     lb      s4,0(a4)
-    li      s7, 2928
-    add     s7,sp,s7
-    sw      s7,0(s7)
-    li      a4, 2843
-    add     a4,sp,a4
-    sb      a4,0(a4)
-    li      a4, 2884
-    add     a4,sp,a4
-    lw      s7,0(a4)
-    li      s10, 2888
-    add     s10,sp,s10
-    sw      s10,0(s10)
-    li      a4, 2884
-    add     a4,sp,a4
-    sw      a4,0(a4)
-    li      a4, 2872
-    add     a4,sp,a4
-    lw      s10,0(a4)
     j       .branch_false_75
                     #      label branch_false_75: 
 .branch_false_75:
@@ -1059,90 +1061,90 @@ main:
                     #arg load ended
     call    mmerge
                     #      jump label: branch_false_80 
-    li      a1, 2363
-    add     a1,sp,a1
-    lb      a0,0(a1)
-    li      s3, 2863
-    add     s3,sp,s3
-    lb      s6,0(s3)
-    li      s4, 2876
-    add     s4,sp,s4
-    lw      s9,0(s4)
-    li      a1, 2363
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    li      s5, 2362
-    add     s5,sp,s5
-    lb      a1,0(s5)
-    li      s3, 2863
-    add     s3,sp,s3
-    sb      s3,0(s3)
-    li      s7, 2944
-    add     s7,sp,s7
-    lw      s3,0(s7)
-    li      s2, 2356
-    add     s2,sp,s2
-    sw      s2,0(s2)
-    li      s8, 2894
-    add     s8,sp,s8
-    lb      s2,0(s8)
+    li      a0, 2888
+    add     a0,sp,a0
+    lw      s5,0(a0)
                     #found literal reg Some(s10) already exist with 2872_0
     add     s10,sp,s10
     sw      s1,0(s10)
-    li      s10, 2895
+    li      a1, 2895
+    add     a1,sp,a1
+    lb      s1,0(a1)
+    li      s3, 2876
+    add     s3,sp,s3
+    lw      s9,0(s3)
+    li      s4, 2863
+    add     s4,sp,s4
+    lb      s6,0(s4)
+    li      a1, 2895
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      s7, 2362
+    add     s7,sp,s7
+    lb      a1,0(s7)
+    li      s8, 2864
+    add     s8,sp,s8
+    ld      s11,0(s8)
+    li      s8, 2864
+    add     s8,sp,s8
+    sd      s8,0(s8)
+    li      s10, 2880
     add     s10,sp,s10
-    lb      s1,0(s10)
-    li      s5, 2362
-    add     s5,sp,s5
-    sb      s5,0(s5)
-    li      s11, 2888
-    add     s11,sp,s11
-    lw      s5,0(s11)
-    li      s11, 2888
-    add     s11,sp,s11
-    sw      s11,0(s11)
+    lw      s8,0(s10)
+    li      s3, 2876
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    li      a0, 2888
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2944
+    add     a0,sp,a0
+    lw      s3,0(a0)
+    li      s2, 2356
+    add     s2,sp,s2
+    sw      s2,0(s2)
+    li      a0, 2944
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2894
+    add     a0,sp,a0
+    lb      s2,0(a0)
+    li      s7, 2362
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    li      a0, 2894
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 2884
+    add     a0,sp,a0
+    lw      s7,0(a0)
+    li      s10, 2880
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 2884
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2872
+    add     a0,sp,a0
+    lw      s10,0(a0)
+    li      a0, 2872
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a2, 2371
     add     a2,sp,a2
     sb      a2,0(a2)
-    li      a2, 2864
+    li      a2, 2363
     add     a2,sp,a2
-    ld      s11,0(a2)
-    li      s8, 2894
-    add     s8,sp,s8
-    sb      s8,0(s8)
-    li      a2, 2864
-    add     a2,sp,a2
-    sd      a2,0(a2)
-    li      a2, 2880
-    add     a2,sp,a2
-    lw      s8,0(a2)
-    li      s4, 2876
+    lb      a0,0(a2)
+    li      s4, 2863
     add     s4,sp,s4
-    sw      s4,0(s4)
-    li      a2, 2880
+    sb      s4,0(s4)
+    li      a2, 2363
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     li      a2, 2843
     add     a2,sp,a2
     lb      s4,0(a2)
-    li      s7, 2944
-    add     s7,sp,s7
-    sw      s7,0(s7)
-    li      a2, 2843
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    li      a2, 2884
-    add     a2,sp,a2
-    lw      s7,0(a2)
-    li      s10, 2895
-    add     s10,sp,s10
-    sb      s10,0(s10)
-    li      a2, 2884
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    li      a2, 2872
-    add     a2,sp,a2
-    lw      s10,0(a2)
     j       .branch_false_80
                     #      label branch_false_80: 
 .branch_false_80:
@@ -1261,75 +1263,75 @@ main:
                     #arg load ended
     call    mmerge
                     #      jump label: branch_false_84 
-    lb      a0,1897(sp)
-    li      a1, 2863
-    add     a1,sp,a1
-    lb      s6,0(a1)
-    li      s2, 2876
-    add     s2,sp,s2
-    lw      s9,0(s2)
-    li      a1, 2863
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    lb      a1,1898(sp)
-    li      s4, 2944
-    add     s4,sp,s4
-    lw      s3,0(s4)
-    li      s2, 2876
-    add     s2,sp,s2
-    sw      s2,0(s2)
-    li      s5, 2894
-    add     s5,sp,s5
-    lb      s2,0(s5)
+    li      a0, 2888
+    add     a0,sp,a0
+    lw      s5,0(a0)
                     #found literal reg Some(s10) already exist with 2872_0
     add     s10,sp,s10
     sw      s1,0(s10)
-    li      s7, 2895
-    add     s7,sp,s7
-    lb      s1,0(s7)
-    li      s5, 2894
-    add     s5,sp,s5
-    sb      s5,0(s5)
-    li      s8, 2888
-    add     s8,sp,s8
-    lw      s5,0(s8)
-    li      s10, 2864
-    add     s10,sp,s10
-    ld      s11,0(s10)
-    li      s8, 2888
-    add     s8,sp,s8
-    sw      s8,0(s8)
-    sb      a2,1899(sp)
-    li      a2, 2880
-    add     a2,sp,a2
-    lw      s8,0(a2)
-    li      s4, 2944
+    li      a1, 2895
+    add     a1,sp,a1
+    lb      s1,0(a1)
+    li      s2, 2876
+    add     s2,sp,s2
+    lw      s9,0(s2)
+    li      s3, 2863
+    add     s3,sp,s3
+    lb      s6,0(s3)
+    li      a1, 2895
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    lb      a1,1898(sp)
+    li      s4, 2864
     add     s4,sp,s4
-    sw      s4,0(s4)
-    li      a2, 2880
-    add     a2,sp,a2
-    sw      a2,0(a2)
+    ld      s11,0(s4)
+    li      s7, 2880
+    add     s7,sp,s7
+    lw      s8,0(s7)
+    li      s3, 2863
+    add     s3,sp,s3
+    sb      s3,0(s3)
+    li      s10, 2944
+    add     s10,sp,s10
+    lw      s3,0(s10)
+    li      s2, 2876
+    add     s2,sp,s2
+    sw      s2,0(s2)
+    li      a0, 2888
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2894
+    add     a0,sp,a0
+    lb      s2,0(a0)
+    li      s7, 2880
+    add     s7,sp,s7
+    sw      s7,0(s7)
+    li      a0, 2894
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 2884
+    add     a0,sp,a0
+    lw      s7,0(a0)
+    li      s10, 2944
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 2884
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2872
+    add     a0,sp,a0
+    lw      s10,0(a0)
+    li      a0, 2872
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lb      a0,1897(sp)
+    li      s4, 2864
+    add     s4,sp,s4
+    sd      s4,0(s4)
+    sb      a2,1899(sp)
     li      a2, 2843
     add     a2,sp,a2
     lb      s4,0(a2)
-    li      s7, 2895
-    add     s7,sp,s7
-    sb      s7,0(s7)
-    li      a2, 2843
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    li      a2, 2884
-    add     a2,sp,a2
-    lw      s7,0(a2)
-    li      s10, 2864
-    add     s10,sp,s10
-    sd      s10,0(s10)
-    li      a2, 2884
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    li      a2, 2872
-    add     a2,sp,a2
-    lw      s10,0(a2)
     j       .branch_false_84
                     #      label branch_false_84: 
 .branch_false_84:
@@ -1448,75 +1450,75 @@ main:
                     #arg load ended
     call    mmerge
                     #      jump label: branch_false_88 
-    lb      a0,1425(sp)
-    li      a1, 2863
-    add     a1,sp,a1
-    lb      s6,0(a1)
-    li      s2, 2876
-    add     s2,sp,s2
-    lw      s9,0(s2)
-    li      a1, 2863
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    lb      a1,1426(sp)
-    li      s4, 2944
-    add     s4,sp,s4
-    lw      s3,0(s4)
-    li      s2, 2876
-    add     s2,sp,s2
-    sw      s2,0(s2)
-    li      s5, 2894
-    add     s5,sp,s5
-    lb      s2,0(s5)
+    li      a0, 2888
+    add     a0,sp,a0
+    lw      s5,0(a0)
                     #found literal reg Some(s10) already exist with 2872_0
     add     s10,sp,s10
     sw      s1,0(s10)
-    li      s7, 2895
-    add     s7,sp,s7
-    lb      s1,0(s7)
-    li      s5, 2894
-    add     s5,sp,s5
-    sb      s5,0(s5)
-    li      s8, 2888
-    add     s8,sp,s8
-    lw      s5,0(s8)
-    li      s10, 2864
-    add     s10,sp,s10
-    ld      s11,0(s10)
-    li      s8, 2888
-    add     s8,sp,s8
-    sw      s8,0(s8)
-    sb      a2,1427(sp)
-    li      a2, 2880
-    add     a2,sp,a2
-    lw      s8,0(a2)
-    li      s4, 2944
+    li      a1, 2895
+    add     a1,sp,a1
+    lb      s1,0(a1)
+    li      s2, 2876
+    add     s2,sp,s2
+    lw      s9,0(s2)
+    li      s3, 2863
+    add     s3,sp,s3
+    lb      s6,0(s3)
+    li      a1, 2895
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    lb      a1,1426(sp)
+    li      s4, 2864
     add     s4,sp,s4
-    sw      s4,0(s4)
-    li      a2, 2880
-    add     a2,sp,a2
-    sw      a2,0(a2)
+    ld      s11,0(s4)
+    li      s7, 2880
+    add     s7,sp,s7
+    lw      s8,0(s7)
+    li      s3, 2863
+    add     s3,sp,s3
+    sb      s3,0(s3)
+    li      s10, 2944
+    add     s10,sp,s10
+    lw      s3,0(s10)
+    li      s2, 2876
+    add     s2,sp,s2
+    sw      s2,0(s2)
+    li      a0, 2888
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2894
+    add     a0,sp,a0
+    lb      s2,0(a0)
+    li      s7, 2880
+    add     s7,sp,s7
+    sw      s7,0(s7)
+    li      a0, 2894
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 2884
+    add     a0,sp,a0
+    lw      s7,0(a0)
+    li      s10, 2944
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 2884
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2872
+    add     a0,sp,a0
+    lw      s10,0(a0)
+    li      a0, 2872
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lb      a0,1425(sp)
+    li      s4, 2864
+    add     s4,sp,s4
+    sd      s4,0(s4)
+    sb      a2,1427(sp)
     li      a2, 2843
     add     a2,sp,a2
     lb      s4,0(a2)
-    li      s7, 2895
-    add     s7,sp,s7
-    sb      s7,0(s7)
-    li      a2, 2843
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    li      a2, 2884
-    add     a2,sp,a2
-    lw      s7,0(a2)
-    li      s10, 2864
-    add     s10,sp,s10
-    sd      s10,0(s10)
-    li      a2, 2884
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    li      a2, 2872
-    add     a2,sp,a2
-    lw      s10,0(a2)
     j       .branch_false_88
                     #      label branch_false_88: 
 .branch_false_88:
@@ -1633,75 +1635,75 @@ main:
                     #arg load ended
     call    mmerge
                     #      jump label: branch_false_92 
-    lb      a0,953(sp)
-    li      a1, 2863
-    add     a1,sp,a1
-    lb      s6,0(a1)
-    li      s2, 2876
-    add     s2,sp,s2
-    lw      s9,0(s2)
-    li      a1, 2863
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    lb      a1,954(sp)
-    li      s4, 2944
-    add     s4,sp,s4
-    lw      s3,0(s4)
-    li      s2, 2876
-    add     s2,sp,s2
-    sw      s2,0(s2)
-    li      s5, 2894
-    add     s5,sp,s5
-    lb      s2,0(s5)
+    li      a0, 2888
+    add     a0,sp,a0
+    lw      s5,0(a0)
                     #found literal reg Some(s10) already exist with 2872_0
     add     s10,sp,s10
     sw      s1,0(s10)
-    li      s7, 2895
-    add     s7,sp,s7
-    lb      s1,0(s7)
-    li      s5, 2894
-    add     s5,sp,s5
-    sb      s5,0(s5)
-    li      s8, 2888
-    add     s8,sp,s8
-    lw      s5,0(s8)
-    li      s10, 2864
-    add     s10,sp,s10
-    ld      s11,0(s10)
-    li      s8, 2888
-    add     s8,sp,s8
-    sw      s8,0(s8)
-    sb      a2,955(sp)
-    li      a2, 2880
-    add     a2,sp,a2
-    lw      s8,0(a2)
-    li      s4, 2944
+    li      a1, 2895
+    add     a1,sp,a1
+    lb      s1,0(a1)
+    li      s2, 2876
+    add     s2,sp,s2
+    lw      s9,0(s2)
+    li      s3, 2863
+    add     s3,sp,s3
+    lb      s6,0(s3)
+    li      a1, 2895
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    lb      a1,954(sp)
+    li      s4, 2864
     add     s4,sp,s4
-    sw      s4,0(s4)
-    li      a2, 2880
-    add     a2,sp,a2
-    sw      a2,0(a2)
+    ld      s11,0(s4)
+    li      s7, 2880
+    add     s7,sp,s7
+    lw      s8,0(s7)
+    li      s3, 2863
+    add     s3,sp,s3
+    sb      s3,0(s3)
+    li      s10, 2944
+    add     s10,sp,s10
+    lw      s3,0(s10)
+    li      s2, 2876
+    add     s2,sp,s2
+    sw      s2,0(s2)
+    li      a0, 2888
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2894
+    add     a0,sp,a0
+    lb      s2,0(a0)
+    li      s7, 2880
+    add     s7,sp,s7
+    sw      s7,0(s7)
+    li      a0, 2894
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 2884
+    add     a0,sp,a0
+    lw      s7,0(a0)
+    li      s10, 2944
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 2884
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2872
+    add     a0,sp,a0
+    lw      s10,0(a0)
+    li      a0, 2872
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lb      a0,953(sp)
+    li      s4, 2864
+    add     s4,sp,s4
+    sd      s4,0(s4)
+    sb      a2,955(sp)
     li      a2, 2843
     add     a2,sp,a2
     lb      s4,0(a2)
-    li      s7, 2895
-    add     s7,sp,s7
-    sb      s7,0(s7)
-    li      a2, 2843
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    li      a2, 2884
-    add     a2,sp,a2
-    lw      s7,0(a2)
-    li      s10, 2864
-    add     s10,sp,s10
-    sd      s10,0(s10)
-    li      a2, 2884
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    li      a2, 2872
-    add     a2,sp,a2
-    lw      s10,0(a2)
     j       .branch_false_92
                     #      label branch_false_92: 
 .branch_false_92:
@@ -1869,25 +1871,25 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_96 
-    lw      a0,20(sp)
-    ld      s6,480(sp)
+    lw      s5,928(sp)
+    lb      s1,474(sp)
     lw      s9,476(sp)
+    ld      s6,480(sp)
     sw      a1,12(sp)
     lb      a1,19(sp)
+    lb      s11,475(sp)
+    li      a0, 2908
+    add     a0,sp,a0
+    lw      s8,0(a0)
     lb      s3,935(sp)
     lw      s2,940(sp)
-    lb      s1,474(sp)
-    lw      s5,928(sp)
-    lb      s11,475(sp)
-    li      s4, 2908
-    add     s4,sp,s4
-    lw      s8,0(s4)
-    li      s4, 2908
-    add     s4,sp,s4
-    sw      s4,0(s4)
-    ld      s4,24(sp)
     lw      s7,468(sp)
     lb      s10,18(sp)
+    li      a0, 2908
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,20(sp)
+    ld      s4,24(sp)
     j       .branch_false_96
                     #      label branch_false_96: 
 .branch_false_96:
@@ -1900,34 +1902,47 @@ main:
     li      a5, 1
     add     s4,a7,a5
                     #      i_51 = i32 temp_93_61 
+    mv      a7, s4
                     #      jump label: while.head_60 
-    li      a0, 2896
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      s3, 2944
-    add     s3,sp,s3
-    sw      s3,0(s3)
-    li      s5, 2924
-    add     s5,sp,s5
-    lw      s3,0(s5)
-    li      s2, 2894
-    add     s2,sp,s2
-    sb      s2,0(s2)
-    li      a3, 2928
-    add     a3,sp,a3
-    sw      a3,0(a3)
+    li      s6, 2916
+    add     s6,sp,s6
+    lw      s5,0(s6)
     li      s1, 2895
     add     s1,sp,s1
     sb      s1,0(s1)
-    li      s5, 2924
-    add     s5,sp,s5
-    sw      s5,0(s5)
-    li      s7, 2916
+    li      s6, 2916
+    add     s6,sp,s6
+    sw      s6,0(s6)
+    li      s7, 2908
     add     s7,sp,s7
-    lw      s5,0(s7)
-    li      s10, 2908
+    lw      s8,0(s7)
+    li      s3, 2944
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    li      s10, 2924
     add     s10,sp,s10
-    lw      s8,0(s10)
+    lw      s3,0(s10)
+    li      s2, 2894
+    add     s2,sp,s2
+    sb      s2,0(s2)
+    li      s7, 2908
+    add     s7,sp,s7
+    sw      s7,0(s7)
+    li      a0, 2896
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2912
+    add     a0,sp,a0
+    lw      s7,0(a0)
+    li      a3, 2928
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      s10, 2924
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 2912
+    add     a0,sp,a0
+    sw      a0,0(a0)
     sw      s4,4(sp)
     li      a1, 2943
     add     a1,sp,a1
@@ -1935,18 +1950,6 @@ main:
     li      a1, 2920
     add     a1,sp,a1
     lw      s4,0(a1)
-    li      s7, 2916
-    add     s7,sp,s7
-    sw      s7,0(s7)
-    li      a1, 2920
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 2912
-    add     a1,sp,a1
-    lw      s7,0(a1)
-    li      s10, 2908
-    add     s10,sp,s10
-    sw      s10,0(s10)
     j       .while.head_60
                     #      label while.exit_60: 
 .while.exit_60:
@@ -1998,83 +2001,83 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_104 
-    li      s1, 2907
-    add     s1,sp,s1
-    lb      a0,0(s1)
-    li      s2, 2924
-    add     s2,sp,s2
-    lw      s3,0(s2)
-                    #found literal reg Some(a5) already exist with 2924_0
-    add     a5,sp,a5
-    sw      s2,0(a5)
-    lb      s2,2(sp)
-    li      s1, 2907
-    add     s1,sp,s1
-    sb      s1,0(s1)
+    li      a0, 2916
+    add     a0,sp,a0
+    lw      s5,0(a0)
     lb      s1,3(sp)
-    li      s4, 2916
+    li      s2, 2908
+    add     s2,sp,s2
+    lw      s8,0(s2)
+    li      s4, 2924
     add     s4,sp,s4
-    lw      s5,0(s4)
-    li      s7, 2908
-    add     s7,sp,s7
-    lw      s8,0(s7)
-    li      s4, 2916
-    add     s4,sp,s4
-    sw      s4,0(s4)
-    li      s10, 2920
+    lw      s3,0(s4)
+    li      s2, 2908
+    add     s2,sp,s2
+    sw      s2,0(s2)
+    lb      s2,2(sp)
+    li      s10, 2912
     add     s10,sp,s10
-    lw      s4,0(s10)
-    li      s7, 2908
-    add     s7,sp,s7
-    sw      s7,0(s7)
+    lw      s7,0(s10)
+    li      s10, 2912
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 2916
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a1, 2943
     add     a1,sp,a1
     sb      a1,0(a1)
-    li      a1, 2912
+    li      a1, 2907
     add     a1,sp,a1
-    lw      s7,0(a1)
-    li      s10, 2920
-    add     s10,sp,s10
-    sw      s10,0(s10)
+    lb      a0,0(a1)
+    li      s4, 2924
+    add     s4,sp,s4
+    sw      s4,0(s4)
+    li      a1, 2907
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a1, 2920
+    add     a1,sp,a1
+    lw      s4,0(a1)
     j       .branch_false_104
                     #      label branch_false_104: 
 .branch_false_104:
                     #      jump label: while.head_50 
-    li      a0, 2907
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    li      a5, 2932
+    li      a5, 2916
     add     a5,sp,a5
-    sw      a7,0(a5)
-    li      a6, 2952
-    add     a6,sp,a6
-    sw      a6,0(a6)
+    sw      s5,0(a5)
+    sb      s1,3(sp)
+    li      a7, 2932
+    add     a7,sp,a7
+    sw      a7,0(a7)
     li      a2, 2936
     add     a2,sp,a2
     sw      a2,0(a2)
     li      a1, 2943
     add     a1,sp,a1
     sb      a1,0(a1)
+    li      s8, 2908
+    add     s8,sp,s8
+    sw      s8,0(s8)
     li      s3, 2924
     add     s3,sp,s3
     sw      s3,0(s3)
     sb      s2,2(sp)
-    li      a3, 2928
-    add     a3,sp,a3
-    sw      a3,0(a3)
-    sb      s1,3(sp)
-    li      s5, 2916
-    add     s5,sp,s5
-    sw      s5,0(s5)
-    li      s8, 2908
-    add     s8,sp,s8
-    sw      s8,0(s8)
-    li      s4, 2920
-    add     s4,sp,s4
-    sw      s4,0(s4)
     li      s7, 2912
     add     s7,sp,s7
     sw      s7,0(s7)
+    li      a6, 2952
+    add     a6,sp,a6
+    sw      a6,0(a6)
+    li      a3, 2928
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a0, 2907
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      s4, 2920
+    add     s4,sp,s4
+    sw      s4,0(s4)
     j       .while.head_50
                     #      label while.exit_50: 
 .while.exit_50:

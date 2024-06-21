@@ -553,8 +553,8 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_69 
-    lb      s2,82(sp)
     lb      s1,83(sp)
+    lb      s2,82(sp)
     j       .branch_false_69
                     #      label branch_false_69: 
 .branch_false_69:
@@ -586,10 +586,10 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_72 
-    lb      s5,75(sp)
-    lb      s2,82(sp)
     lw      s3,76(sp)
+    lb      s5,75(sp)
     lb      s1,83(sp)
+    lb      s2,82(sp)
     j       .branch_false_72
                     #      label branch_false_72: 
 .branch_false_72:
@@ -623,11 +623,11 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_76 
-    lb      s5,75(sp)
-    lb      s2,82(sp)
     lw      s3,76(sp)
-    lw      s6,68(sp)
+    lb      s5,75(sp)
     lb      s1,83(sp)
+    lb      s2,82(sp)
+    lw      s6,68(sp)
     lb      s7,67(sp)
     j       .branch_false_76
                     #      label branch_false_76: 
@@ -669,15 +669,15 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_80 
+    lw      s3,76(sp)
     lb      s5,75(sp)
+    lb      s1,83(sp)
     lb      s2,82(sp)
     lb      s4,66(sp)
-    lb      s10,59(sp)
-    lw      s3,76(sp)
     lw      s6,68(sp)
-    lb      s1,83(sp)
-    lb      s7,67(sp)
     lw      s9,60(sp)
+    lb      s10,59(sp)
+    lb      s7,67(sp)
     j       .branch_false_80
                     #      label branch_false_80: 
 .branch_false_80:
@@ -712,16 +712,16 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_83 
+    lw      s3,76(sp)
     lb      s5,75(sp)
+    lb      s1,83(sp)
     lb      s2,82(sp)
     lb      s4,66(sp)
-    lb      s10,59(sp)
-    lw      s3,76(sp)
-    lb      s8,58(sp)
     lw      s6,68(sp)
-    lb      s1,83(sp)
-    lb      s7,67(sp)
+    lb      s8,58(sp)
     lw      s9,60(sp)
+    lb      s10,59(sp)
+    lb      s7,67(sp)
     j       .branch_false_83
                     #      label branch_false_83: 
 .branch_false_83:
@@ -789,10 +789,10 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: while.head_88 
-    lw      a0,52(sp)
-    lw      s2,40(sp)
     lw      s3,36(sp)
+    lw      a0,52(sp)
     lw      s1,44(sp)
+    lw      s2,40(sp)
     j       .while.head_88
                     #      label while.exit_88: 
 .while.exit_88:
@@ -829,16 +829,16 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_91 
+    lw      s3,36(sp)
     lw      a0,52(sp)
     lb      s5,35(sp)
-    lw      s2,40(sp)
-    lb      s10,30(sp)
-    lw      s3,36(sp)
-    lb      s8,32(sp)
-    lb      s6,34(sp)
     lw      s1,44(sp)
-    lb      s7,33(sp)
+    lw      s2,40(sp)
+    lb      s6,34(sp)
+    lb      s8,32(sp)
     lb      s9,31(sp)
+    lb      s10,30(sp)
+    lb      s7,33(sp)
     j       .branch_false_91
                     #      label branch_false_91: 
 .branch_false_91:
@@ -880,18 +880,18 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_94 
+    lw      s3,36(sp)
     lb      a0,27(sp)
     lb      s5,35(sp)
+    lw      s1,44(sp)
     lw      s2,40(sp)
     lb      s4,29(sp)
-    lb      s10,30(sp)
-    lw      s3,36(sp)
-    lb      s8,32(sp)
     lb      s6,34(sp)
-    lb      s11,28(sp)
-    lw      s1,44(sp)
-    lb      s7,33(sp)
+    lb      s8,32(sp)
     lb      s9,31(sp)
+    lb      s10,30(sp)
+    lb      s11,28(sp)
+    lb      s7,33(sp)
     j       .branch_false_94
                     #      label branch_false_94: 
 .branch_false_94:
@@ -937,18 +937,18 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_97 
+    lw      s3,36(sp)
     lb      a0,25(sp)
     lb      s5,35(sp)
+    lw      s1,44(sp)
     lw      s2,40(sp)
     lb      s4,29(sp)
-    lb      s10,30(sp)
-    lw      s3,36(sp)
-    lb      s8,32(sp)
     lb      s6,34(sp)
-    lb      s11,28(sp)
-    lw      s1,44(sp)
-    lb      s7,33(sp)
+    lb      s8,32(sp)
     lb      s9,31(sp)
+    lb      s10,30(sp)
+    lb      s11,28(sp)
+    lb      s7,33(sp)
     j       .branch_false_97
                     #      label branch_false_97: 
 .branch_false_97:
@@ -1017,18 +1017,18 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_101 
+    lw      s3,36(sp)
     lb      a0,13(sp)
     lb      s5,35(sp)
+    lw      s1,44(sp)
     lw      s2,40(sp)
     lb      s4,29(sp)
-    lb      s10,30(sp)
-    lw      s3,36(sp)
-    lb      s8,32(sp)
     lb      s6,34(sp)
-    lb      s11,28(sp)
-    lw      s1,44(sp)
-    lb      s7,33(sp)
+    lb      s8,32(sp)
     lb      s9,31(sp)
+    lb      s10,30(sp)
+    lb      s11,28(sp)
+    lb      s7,33(sp)
     j       .branch_false_101
                     #      label branch_false_101: 
 .branch_false_101:
@@ -1097,18 +1097,18 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_105 
+    lw      s3,36(sp)
     lb      a0,2(sp)
     lb      s5,35(sp)
+    lw      s1,44(sp)
     lw      s2,40(sp)
     lb      s4,29(sp)
-    lb      s10,30(sp)
-    lw      s3,36(sp)
-    lb      s8,32(sp)
     lb      s6,34(sp)
-    lb      s11,28(sp)
-    lw      s1,44(sp)
-    lb      s7,33(sp)
+    lb      s8,32(sp)
     lb      s9,31(sp)
+    lb      s10,30(sp)
+    lb      s11,28(sp)
+    lb      s7,33(sp)
     j       .branch_false_105
                     #      label branch_false_105: 
 .branch_false_105:

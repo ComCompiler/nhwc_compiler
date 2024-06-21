@@ -98,14 +98,15 @@ main:
                     #found literal reg Some(a4) already exist with 1_0
     add     a7,a5,a4
                     #      i_17 = i32 temp_4_21 
+    mv      a5, a7
                     #      jump label: while.head_20 
+    sb      a3,51(sp)
     sd      a2,40(sp)
-    sw      a7,32(sp)
     sw      a0,36(sp)
     mv      a0, a5
     sw      a6,460(sp)
-    sb      a3,51(sp)
     sw      a5,60(sp)
+    sw      a7,32(sp)
     j       .while.head_20
                     #      label while.head_25: 
 .while.head_25:
@@ -124,6 +125,7 @@ main:
     li      a4, 1
     sub     a6,a2,a4
                     #      i_17 = i32 temp_6_26 
+    mv      a2, a6
                     #      new_var temp_7_26:ptr->i32 
                     #      new_var temp_8_26:i32 
                     #      temp_7_26 = getelementptr arr_17:Array:i32:[Some(100_0)] [Some(i_17)] 
@@ -140,14 +142,15 @@ main:
                     #      temp_9_26 = Add i32 sum_17, temp_8_26 
     add     s3,a1,s2
                     #      sum_17 = i32 temp_9_26 
+    mv      a1, s3
                     #      jump label: while.head_25 
     sw      a2,60(sp)
-    sw      s3,8(sp)
-    sd      a7,16(sp)
-    sw      s1,460(sp)
-    sw      a6,24(sp)
     sw      s2,12(sp)
+    sw      a6,24(sp)
+    sw      s1,460(sp)
     sb      a5,31(sp)
+    sd      a7,16(sp)
+    sw      s3,8(sp)
     j       .while.head_25
                     #      label while.exit_25: 
 .while.exit_25:

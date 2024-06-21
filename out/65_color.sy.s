@@ -402,114 +402,115 @@ dfs:
     li      s7, 1000000007
     rem     s8,s6,s7
                     #      ans_30 = i32 temp_20_38 
+    mv      s5, s8
                     #      jump label: branch_false_39 
-    mv      a5, s1
-    li      s6, 52908080
-    add     s6,sp,s6
-    sw      s6,0(s6)
-    li      s9, 52908116
+    li      s9, 158723976
     add     s9,sp,s9
-    lw      s6,0(s9)
-    li      s3, 52908096
-    add     s3,sp,s3
-    sw      s3,0(s3)
-    li      s10, 52908120
-    add     s10,sp,s10
-    lw      s3,0(s10)
-    li      s11, 158723972
-    add     s11,sp,s11
-    lw      a4,0(s11)
-    li      s10, 52908120
-    add     s10,sp,s10
-    sw      s10,0(s10)
-    li      a2, 52908107
-    add     a2,sp,a2
-    lb      s10,0(a2)
-    li      s7, 158723976
-    add     s7,sp,s7
-    lw      a3,0(s7)
-    li      s7, 158723976
-    add     s7,sp,s7
-    sw      s7,0(s7)
-    mv      s7, s5
-    li      s1, 158723968
-    add     s1,sp,s1
-    sw      s1,0(s1)
+    lw      a3,0(s9)
     li      a0, 52908092
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 105816051
-    add     a0,sp,a0
-    lb      s1,0(a0)
+    mv      a0, a1
+    li      s1, 158723968
+    add     s1,sp,s1
+    sw      s1,0(s1)
+    li      s10, 105816051
+    add     s10,sp,s10
+    lb      s1,0(s10)
     li      s11, 158723972
     add     s11,sp,s11
-    sw      s11,0(s11)
-    li      s9, 52908116
-    add     s9,sp,s9
-    sw      s9,0(s9)
-    li      s4, 52908084
-    add     s4,sp,s4
-    sw      s4,0(s4)
-    li      a0, 105816051
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    li      a0, 158723964
-    add     a0,sp,a0
-    lw      s4,0(a0)
-    li      a1, 158723988
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a0, 158723964
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 158723984
-    add     a0,sp,a0
-    lw      a1,0(a0)
-    li      a2, 52908107
+    lw      a4,0(s11)
+    li      s3, 52908096
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    li      a2, 52908120
     add     a2,sp,a2
-    sb      a2,0(a2)
-    li      a0, 158723984
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 158723980
-    add     a0,sp,a0
-    lw      a2,0(a0)
-    li      s5, 52908108
-    add     s5,sp,s5
-    sw      s5,0(s5)
-    li      a0, 158723980
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 105816056
-    add     a0,sp,a0
-    ld      s5,0(a0)
+    lw      s3,0(a2)
+    li      a2, 52908120
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a5, 158723980
+    add     a5,sp,a5
+    lw      a2,0(a5)
     li      s8, 52908076
     add     s8,sp,s8
     sw      s8,0(s8)
-    li      a0, 105816056
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    li      a0, 52908115
-    add     a0,sp,a0
-    lb      s8,0(a0)
-    li      a0, 52908115
-    add     a0,sp,a0
-    sb      a0,0(a0)
+    li      s7, 52908115
+    add     s7,sp,s7
+    lb      s8,0(s7)
+    li      a5, 158723980
+    add     a5,sp,a5
+    sw      a5,0(a5)
+    li      a1, 158723988
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 158723968
+    add     a1,sp,a1
+    lw      a5,0(a1)
+    li      s11, 158723972
+    add     s11,sp,s11
+    sw      s11,0(s11)
+    li      s7, 52908115
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    mv      s7, s5
+    li      s9, 158723976
+    add     s9,sp,s9
+    sw      s9,0(s9)
+    li      s5, 52908108
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      a1, 158723968
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 105816056
+    add     a1,sp,a1
+    ld      s5,0(a1)
+    li      s6, 52908080
+    add     s6,sp,s6
+    sw      s6,0(s6)
+    li      a1, 105816056
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    li      a1, 52908116
+    add     a1,sp,a1
+    lw      s6,0(a1)
+    li      s10, 105816051
+    add     s10,sp,s10
+    sb      s10,0(s10)
+    li      a1, 52908116
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 52908107
+    add     a1,sp,a1
+    lb      s10,0(a1)
+    li      a1, 52908107
+    add     a1,sp,a1
+    sb      a1,0(a1)
     li      a6, 105816052
     add     a6,sp,a6
     sw      a6,0(a6)
-    li      a6, 158723988
+    li      a6, 158723984
     add     a6,sp,a6
-    lw      a0,0(a6)
+    lw      a1,0(a6)
     li      s2, 52908088
     add     s2,sp,s2
     sw      s2,0(s2)
-    li      a6, 158723988
+    li      a6, 158723984
     add     a6,sp,a6
     sw      a6,0(a6)
     li      a6, 52908124
     add     a6,sp,a6
     lw      s2,0(a6)
+    li      s4, 52908084
+    add     s4,sp,s4
+    sw      s4,0(s4)
+    li      a6, 52908124
+    add     a6,sp,a6
+    sw      a6,0(a6)
+    li      a6, 158723964
+    add     a6,sp,a6
+    lw      s4,0(a6)
     j       .branch_false_39
                     #      label branch_false_39: 
 .branch_false_39:
@@ -662,111 +663,126 @@ dfs:
     li      s7, 1000000007
     rem     s8,s6,s7
                     #      ans_30 = i32 temp_29_41 
+    mv      s5, s8
                     #      jump label: branch_false_42 
-    mv      a5, s1
-    li      s6, 52908044
-    add     s6,sp,s6
-    sw      s6,0(s6)
-    li      s9, 52908116
+    li      s9, 158723976
     add     s9,sp,s9
-    lw      s6,0(s9)
-    li      s3, 52908060
-    add     s3,sp,s3
-    sw      s3,0(s3)
-    li      s10, 52908120
-    add     s10,sp,s10
-    lw      s3,0(s10)
-    li      s11, 158723972
-    add     s11,sp,s11
-    lw      a4,0(s11)
-    li      s10, 52908120
-    add     s10,sp,s10
-    sw      s10,0(s10)
-    li      a2, 52908107
-    add     a2,sp,a2
-    lb      s10,0(a2)
-    li      s7, 158723976
-    add     s7,sp,s7
-    lw      a3,0(s7)
-    li      s7, 158723976
-    add     s7,sp,s7
-    sw      s7,0(s7)
-    mv      s7, s5
-    li      s1, 158723968
-    add     s1,sp,s1
-    sw      s1,0(s1)
+    lw      a3,0(s9)
     li      a0, 52908056
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 105816051
-    add     a0,sp,a0
-    lb      s1,0(a0)
-    li      s11, 158723972
+    li      s10, 158723988
+    add     s10,sp,s10
+    lw      a0,0(s10)
+    li      s1, 158723968
+    add     s1,sp,s1
+    sw      s1,0(s1)
+    li      s11, 105816051
     add     s11,sp,s11
-    sw      s11,0(s11)
-    li      a0, 105816051
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    li      a0, 52908075
-    add     a0,sp,a0
-    lb      s11,0(a0)
-    li      s9, 52908116
-    add     s9,sp,s9
-    sw      s9,0(s9)
-    li      s4, 52908048
-    add     s4,sp,s4
-    sw      s4,0(s4)
-    li      a0, 52908075
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    li      a0, 158723964
-    add     a0,sp,a0
-    lw      s4,0(a0)
-    li      a2, 52908107
+    lb      s1,0(s11)
+    li      a2, 158723972
     add     a2,sp,a2
-    sb      a2,0(a2)
-    li      a0, 158723964
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 158723980
-    add     a0,sp,a0
-    lw      a2,0(a0)
-    li      s5, 52908108
-    add     s5,sp,s5
-    sw      s5,0(s5)
-    li      a0, 158723980
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 105816056
-    add     a0,sp,a0
-    ld      s5,0(a0)
+    lw      a4,0(a2)
+    li      s3, 52908060
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    li      a5, 52908120
+    add     a5,sp,a5
+    lw      s3,0(a5)
+    li      a2, 158723972
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      s7, 158723980
+    add     s7,sp,s7
+    lw      a2,0(s7)
     li      s8, 52908040
     add     s8,sp,s8
     sw      s8,0(s8)
-    li      a0, 105816056
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    li      a0, 52908115
-    add     a0,sp,a0
-    lb      s8,0(a0)
-    li      a0, 52908115
-    add     a0,sp,a0
-    sb      a0,0(a0)
     li      a1, 158723984
     add     a1,sp,a1
     sw      a1,0(a1)
-    li      a1, 158723988
+    li      a1, 52908115
     add     a1,sp,a1
-    lw      a0,0(a1)
+    lb      s8,0(a1)
+    li      a5, 52908120
+    add     a5,sp,a5
+    sw      a5,0(a5)
+    li      a1, 52908115
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a1, 158723968
+    add     a1,sp,a1
+    lw      a5,0(a1)
+    li      s11, 105816051
+    add     s11,sp,s11
+    sb      s11,0(s11)
+    li      a1, 158723968
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 52908075
+    add     a1,sp,a1
+    lb      s11,0(a1)
+    li      s7, 158723980
+    add     s7,sp,s7
+    sw      s7,0(s7)
+    mv      s7, s5
+    li      s9, 158723976
+    add     s9,sp,s9
+    sw      s9,0(s9)
+    li      s5, 52908108
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      a1, 52908075
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a1, 105816056
+    add     a1,sp,a1
+    ld      s5,0(a1)
+    li      s6, 52908044
+    add     s6,sp,s6
+    sw      s6,0(s6)
+    li      a1, 105816056
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    li      a1, 52908116
+    add     a1,sp,a1
+    lw      s6,0(a1)
+    li      s10, 158723988
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a1, 52908116
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 52908107
+    add     a1,sp,a1
+    lb      s10,0(a1)
+    li      a1, 52908107
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a6, 105816052
+    add     a6,sp,a6
+    sw      a6,0(a6)
+    li      a6, 158723984
+    add     a6,sp,a6
+    lw      a1,0(a6)
     li      s2, 52908052
     add     s2,sp,s2
     sw      s2,0(s2)
-    li      a1, 158723988
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 52908124
-    add     a1,sp,a1
-    lw      s2,0(a1)
+    li      a6, 158723984
+    add     a6,sp,a6
+    sw      a6,0(a6)
+    li      a6, 52908124
+    add     a6,sp,a6
+    lw      s2,0(a6)
+    li      s4, 52908048
+    add     s4,sp,s4
+    sw      s4,0(s4)
+    li      a6, 52908124
+    add     a6,sp,a6
+    sw      a6,0(a6)
+    li      a6, 158723964
+    add     a6,sp,a6
+    lw      s4,0(a6)
     j       .branch_false_42
                     #      label branch_false_42: 
 .branch_false_42:
@@ -919,120 +935,121 @@ dfs:
     li      s7, 1000000007
     rem     s8,s6,s7
                     #      ans_30 = i32 temp_38_44 
+    mv      s5, s8
                     #      jump label: branch_false_45 
-    mv      a5, s1
-    li      s6, 52908008
-    add     s6,sp,s6
-    sw      s6,0(s6)
-    li      s9, 52908116
+    li      s9, 158723976
     add     s9,sp,s9
-    lw      s6,0(s9)
-    li      s3, 52908024
-    add     s3,sp,s3
-    sw      s3,0(s3)
-    li      s10, 52908120
-    add     s10,sp,s10
-    lw      s3,0(s10)
-    li      s11, 158723972
-    add     s11,sp,s11
-    lw      a4,0(s11)
-    li      s10, 52908120
-    add     s10,sp,s10
-    sw      s10,0(s10)
-    li      a2, 52908107
-    add     a2,sp,a2
-    lb      s10,0(a2)
-    li      s7, 158723976
-    add     s7,sp,s7
-    lw      a3,0(s7)
-    li      s7, 158723976
-    add     s7,sp,s7
-    sw      s7,0(s7)
-    mv      s7, s5
-    li      s1, 158723968
-    add     s1,sp,s1
-    sw      s1,0(s1)
+    lw      a3,0(s9)
     li      a0, 52908020
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 105816051
-    add     a0,sp,a0
-    lb      s1,0(a0)
-    li      s11, 158723972
+    li      s10, 52908039
+    add     s10,sp,s10
+    lb      a0,0(s10)
+    li      s1, 158723968
+    add     s1,sp,s1
+    sw      s1,0(s1)
+    li      s11, 105816051
     add     s11,sp,s11
-    sw      s11,0(s11)
-    li      a0, 105816051
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    li      a0, 52908075
-    add     a0,sp,a0
-    lb      s11,0(a0)
-    li      s9, 52908116
-    add     s9,sp,s9
-    sw      s9,0(s9)
-    li      s4, 52908012
-    add     s4,sp,s4
-    sw      s4,0(s4)
-    li      a0, 52908075
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    li      a0, 158723964
-    add     a0,sp,a0
-    lw      s4,0(a0)
-    li      a1, 158723980
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a0, 158723964
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 158723984
-    add     a0,sp,a0
-    lw      a1,0(a0)
-    li      a2, 52908107
+    lb      s1,0(s11)
+    li      a2, 158723972
     add     a2,sp,a2
-    sb      a2,0(a2)
-    li      a0, 158723984
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 158723980
-    add     a0,sp,a0
-    lw      a2,0(a0)
-    li      s5, 52908108
-    add     s5,sp,s5
-    sw      s5,0(s5)
-    li      a0, 158723980
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 105816056
-    add     a0,sp,a0
-    ld      s5,0(a0)
+    lw      a4,0(a2)
+    li      s3, 52908024
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    li      a5, 52908120
+    add     a5,sp,a5
+    lw      s3,0(a5)
+    li      a2, 158723972
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    mv      a2, a1
     li      s8, 52908004
     add     s8,sp,s8
     sw      s8,0(s8)
-    li      a0, 105816056
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    li      a0, 52908115
-    add     a0,sp,a0
-    lb      s8,0(a0)
-    li      a0, 52908115
-    add     a0,sp,a0
-    sb      a0,0(a0)
+    li      s7, 52908115
+    add     s7,sp,s7
+    lb      s8,0(s7)
+    li      a5, 52908120
+    add     a5,sp,a5
+    sw      a5,0(a5)
+    li      a1, 158723980
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 158723968
+    add     a1,sp,a1
+    lw      a5,0(a1)
+    li      s11, 105816051
+    add     s11,sp,s11
+    sb      s11,0(s11)
+    li      a1, 158723968
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 52908075
+    add     a1,sp,a1
+    lb      s11,0(a1)
+    li      s7, 52908115
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    mv      s7, s5
+    li      s9, 158723976
+    add     s9,sp,s9
+    sw      s9,0(s9)
+    li      s5, 52908108
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      a1, 52908075
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a1, 105816056
+    add     a1,sp,a1
+    ld      s5,0(a1)
+    li      s6, 52908008
+    add     s6,sp,s6
+    sw      s6,0(s6)
+    li      a1, 105816056
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    li      a1, 52908116
+    add     a1,sp,a1
+    lw      s6,0(a1)
+    li      s10, 52908039
+    add     s10,sp,s10
+    sb      s10,0(s10)
+    li      a1, 52908116
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 52908107
+    add     a1,sp,a1
+    lb      s10,0(a1)
+    li      a1, 52908107
+    add     a1,sp,a1
+    sb      a1,0(a1)
     li      a6, 105816052
     add     a6,sp,a6
     sw      a6,0(a6)
-    li      a6, 52908039
+    li      a6, 158723984
     add     a6,sp,a6
-    lb      a0,0(a6)
+    lw      a1,0(a6)
     li      s2, 52908016
     add     s2,sp,s2
     sw      s2,0(s2)
-    li      a6, 52908039
+    li      a6, 158723984
     add     a6,sp,a6
-    sb      a6,0(a6)
+    sw      a6,0(a6)
     li      a6, 52908124
     add     a6,sp,a6
     lw      s2,0(a6)
+    li      s4, 52908012
+    add     s4,sp,s4
+    sw      s4,0(s4)
+    li      a6, 52908124
+    add     a6,sp,a6
+    sw      a6,0(a6)
+    li      a6, 158723964
+    add     a6,sp,a6
+    lw      s4,0(a6)
     j       .branch_false_45
                     #      label branch_false_45: 
 .branch_false_45:
@@ -1185,115 +1202,121 @@ dfs:
     li      s7, 1000000007
     rem     s8,s6,s7
                     #      ans_30 = i32 temp_47_47 
+    mv      s5, s8
                     #      jump label: branch_false_48 
-    mv      a5, s1
-    li      s6, 52907972
-    add     s6,sp,s6
-    sw      s6,0(s6)
-    li      s9, 52908116
-    add     s9,sp,s9
-    lw      s6,0(s9)
-    li      s3, 52907988
-    add     s3,sp,s3
-    sw      s3,0(s3)
-    li      s10, 52908120
-    add     s10,sp,s10
-    lw      s3,0(s10)
-    li      s11, 158723972
-    add     s11,sp,s11
-    lw      a4,0(s11)
-    li      s10, 52908120
-    add     s10,sp,s10
-    sw      s10,0(s10)
-    li      a2, 52908107
-    add     a2,sp,a2
-    lb      s10,0(a2)
     mv      a3, a1
-    mv      s7, s5
-    li      s1, 158723968
-    add     s1,sp,s1
-    sw      s1,0(s1)
     li      a0, 52907984
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 105816051
-    add     a0,sp,a0
-    lb      s1,0(a0)
+    li      s9, 52908003
+    add     s9,sp,s9
+    lb      a0,0(s9)
+    li      s1, 158723968
+    add     s1,sp,s1
+    sw      s1,0(s1)
+    li      s10, 105816051
+    add     s10,sp,s10
+    lb      s1,0(s10)
     li      s11, 158723972
     add     s11,sp,s11
-    sw      s11,0(s11)
-    li      a0, 105816051
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    li      a0, 52908075
-    add     a0,sp,a0
-    lb      s11,0(a0)
-    li      s9, 52908116
-    add     s9,sp,s9
-    sw      s9,0(s9)
-    li      s4, 52907976
-    add     s4,sp,s4
-    sw      s4,0(s4)
-    li      a0, 52908075
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    li      a0, 158723964
-    add     a0,sp,a0
-    lw      s4,0(a0)
-    li      a1, 158723976
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a0, 158723964
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 158723984
-    add     a0,sp,a0
-    lw      a1,0(a0)
-    li      a2, 52908107
+    lw      a4,0(s11)
+    li      s3, 52907988
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    li      a2, 52908120
     add     a2,sp,a2
-    sb      a2,0(a2)
-    li      a0, 158723984
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 158723980
-    add     a0,sp,a0
-    lw      a2,0(a0)
-    li      s5, 52908108
-    add     s5,sp,s5
-    sw      s5,0(s5)
-    li      a0, 158723980
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 105816056
-    add     a0,sp,a0
-    ld      s5,0(a0)
+    lw      s3,0(a2)
+    li      a2, 52908120
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a5, 158723980
+    add     a5,sp,a5
+    lw      a2,0(a5)
     li      s8, 52907968
     add     s8,sp,s8
     sw      s8,0(s8)
-    li      a0, 105816056
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    li      a0, 52908115
-    add     a0,sp,a0
-    lb      s8,0(a0)
-    li      a0, 52908115
-    add     a0,sp,a0
-    sb      a0,0(a0)
+    li      s7, 52908115
+    add     s7,sp,s7
+    lb      s8,0(s7)
+    li      a5, 158723980
+    add     a5,sp,a5
+    sw      a5,0(a5)
+    li      a1, 158723976
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 158723968
+    add     a1,sp,a1
+    lw      a5,0(a1)
+    li      s11, 158723972
+    add     s11,sp,s11
+    sw      s11,0(s11)
+    li      a1, 158723968
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 52908075
+    add     a1,sp,a1
+    lb      s11,0(a1)
+    li      s7, 52908115
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    mv      s7, s5
+    li      s9, 52908003
+    add     s9,sp,s9
+    sb      s9,0(s9)
+    li      s5, 52908108
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      a1, 52908075
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a1, 105816056
+    add     a1,sp,a1
+    ld      s5,0(a1)
+    li      s6, 52907972
+    add     s6,sp,s6
+    sw      s6,0(s6)
+    li      a1, 105816056
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    li      a1, 52908116
+    add     a1,sp,a1
+    lw      s6,0(a1)
+    li      s10, 105816051
+    add     s10,sp,s10
+    sb      s10,0(s10)
+    li      a1, 52908116
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 52908107
+    add     a1,sp,a1
+    lb      s10,0(a1)
+    li      a1, 52908107
+    add     a1,sp,a1
+    sb      a1,0(a1)
     li      a6, 105816052
     add     a6,sp,a6
     sw      a6,0(a6)
-    li      a6, 52908003
+    li      a6, 158723984
     add     a6,sp,a6
-    lb      a0,0(a6)
+    lw      a1,0(a6)
     li      s2, 52907980
     add     s2,sp,s2
     sw      s2,0(s2)
-    li      a6, 52908003
+    li      a6, 158723984
     add     a6,sp,a6
-    sb      a6,0(a6)
+    sw      a6,0(a6)
     li      a6, 52908124
     add     a6,sp,a6
     lw      s2,0(a6)
+    li      s4, 52907976
+    add     s4,sp,s4
+    sw      s4,0(s4)
+    li      a6, 52908124
+    add     a6,sp,a6
+    sw      a6,0(a6)
+    li      a6, 158723964
+    add     a6,sp,a6
+    lw      s4,0(a6)
     j       .branch_false_48
                     #      label branch_false_48: 
 .branch_false_48:
@@ -1411,126 +1434,127 @@ dfs:
     li      a5, 1000000007
     rem     s5,a4,a5
                     #      ans_30 = i32 temp_54_50 
+    mv      a3, s5
                     #      jump label: branch_false_51 
-    li      s6, 158723968
-    add     s6,sp,s6
-    lw      a5,0(s6)
-    li      s6, 158723968
-    add     s6,sp,s6
-    sw      s6,0(s6)
-    li      s7, 52908116
+                    #found literal reg Some(s7) already exist with 52908108_0
     add     s7,sp,s7
-    lw      s6,0(s7)
+    sw      a3,0(s7)
+    li      a5, 158723976
+    add     a5,sp,a5
+    lw      a3,0(a5)
+    li      a0, 52907952
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      s6, 52907967
+    add     s6,sp,s6
+    lb      a0,0(s6)
+    li      s1, 158723984
+    add     s1,sp,s1
+    sw      s1,0(s1)
+    li      s7, 105816051
+    add     s7,sp,s7
+    lb      s1,0(s7)
+    li      a4, 52907944
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    mv      a4, a1
     li      s3, 52907960
     add     s3,sp,s3
     sw      s3,0(s3)
     li      s8, 52908120
     add     s8,sp,s8
     lw      s3,0(s8)
-    li      a4, 52907944
-    add     a4,sp,a4
-    sw      a4,0(a4)
-    mv      a4, a1
-    li      s9, 52908107
-    add     s9,sp,s9
-    lb      s10,0(s9)
-    li      a3, 52908108
-    add     a3,sp,a3
-    sw      a3,0(a3)
-    li      a0, 52907952
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 158723976
-    add     a0,sp,a0
-    lw      a3,0(a0)
-    li      s7, 52908116
-    add     s7,sp,s7
-    sw      s7,0(s7)
-    li      a0, 158723976
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 52908108
-    add     a0,sp,a0
-    lw      s7,0(a0)
-    li      s1, 158723984
-    add     s1,sp,s1
-    sw      s1,0(s1)
-    li      a0, 52908108
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 105816051
-    add     a0,sp,a0
-    lb      s1,0(a0)
-    li      s11, 158723988
-    add     s11,sp,s11
-    sw      s11,0(s11)
-    li      a0, 105816051
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    li      a0, 52908075
-    add     a0,sp,a0
-    lb      s11,0(a0)
-    li      s9, 52908107
-    add     s9,sp,s9
-    sb      s9,0(s9)
-    li      s4, 52907956
-    add     s4,sp,s4
-    sw      s4,0(s4)
-    li      a0, 52908075
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    li      a0, 158723964
-    add     a0,sp,a0
-    lw      s4,0(a0)
-    li      a1, 158723972
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a0, 158723964
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 158723984
-    add     a0,sp,a0
-    lw      a1,0(a0)
     li      a2, 52907948
     add     a2,sp,a2
     sw      a2,0(a2)
     mv      a2, s2
-    li      s5, 52907940
-    add     s5,sp,s5
-    sw      s5,0(s5)
-    li      a0, 158723984
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 105816056
-    add     a0,sp,a0
-    ld      s5,0(a0)
     li      s8, 52908120
     add     s8,sp,s8
     sw      s8,0(s8)
-    li      a0, 105816056
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    li      a0, 52908115
-    add     a0,sp,a0
-    lb      s8,0(a0)
-    li      a0, 52908115
-    add     a0,sp,a0
-    sb      a0,0(a0)
+    li      s9, 52908115
+    add     s9,sp,s9
+    lb      s8,0(s9)
+    li      a5, 158723976
+    add     a5,sp,a5
+    sw      a5,0(a5)
+    li      s10, 158723968
+    add     s10,sp,s10
+    lw      a5,0(s10)
+    li      s11, 158723988
+    add     s11,sp,s11
+    sw      s11,0(s11)
+    li      a1, 158723972
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 52908075
+    add     a1,sp,a1
+    lb      s11,0(a1)
+    li      s7, 105816051
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    li      a1, 52908075
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a1, 52908108
+    add     a1,sp,a1
+    lw      s7,0(a1)
+    li      s9, 52908115
+    add     s9,sp,s9
+    sb      s9,0(s9)
+    li      s5, 52907940
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      a1, 52908108
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 105816056
+    add     a1,sp,a1
+    ld      s5,0(a1)
+    li      s6, 52907967
+    add     s6,sp,s6
+    sb      s6,0(s6)
+    li      a1, 105816056
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    li      a1, 52908116
+    add     a1,sp,a1
+    lw      s6,0(a1)
+    li      s10, 158723968
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a1, 52908116
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 52908107
+    add     a1,sp,a1
+    lb      s10,0(a1)
+    li      a1, 52908107
+    add     a1,sp,a1
+    sb      a1,0(a1)
     li      a6, 105816052
     add     a6,sp,a6
     sw      a6,0(a6)
-    li      a6, 52907967
+    li      a6, 158723984
     add     a6,sp,a6
-    lb      a0,0(a6)
+    lw      a1,0(a6)
     li      s2, 158723980
     add     s2,sp,s2
     sw      s2,0(s2)
-    li      a6, 52907967
+    li      a6, 158723984
     add     a6,sp,a6
-    sb      a6,0(a6)
+    sw      a6,0(a6)
     li      a6, 52908124
     add     a6,sp,a6
     lw      s2,0(a6)
+    li      s4, 52907956
+    add     s4,sp,s4
+    sw      s4,0(s4)
+    li      a6, 52908124
+    add     a6,sp,a6
+    sw      a6,0(a6)
+    li      a6, 158723964
+    add     a6,sp,a6
+    lw      s4,0(a6)
     j       .branch_false_51
                     #      label branch_false_51: 
 .branch_false_51:
@@ -1869,16 +1893,17 @@ main:
     li      s8, 1
     add     s9,s4,s8
                     #      h_77 = i32 temp_68_81 
+    mv      s4, s9
                     #      jump label: while.head_80 
+    li      s9, 2276
+    add     s9,sp,s9
+    sw      s9,0(s9)
     li      s6, 2280
     add     s6,sp,s6
     sd      s6,0(s6)
     li      s7, 2291
     add     s7,sp,s7
     sb      s7,0(s7)
-    li      s9, 2276
-    add     s9,sp,s9
-    sw      s9,0(s9)
     j       .while.head_80
                     #      label while.exit_80: 
 .while.exit_80:
@@ -1887,19 +1912,20 @@ main:
     li      s6, 1
     add     s8,s2,s6
                     #      m_73 = i32 temp_69_77 
+    mv      s2, s8
                     #      jump label: while.head_76 
-    li      s4, 2292
-    add     s4,sp,s4
-    sw      s4,0(s4)
-    li      s5, 2299
-    add     s5,sp,s5
-    sb      s5,0(s5)
     li      s8, 2272
     add     s8,sp,s8
     sw      s8,0(s8)
+    li      s5, 2299
+    add     s5,sp,s5
+    sb      s5,0(s5)
     li      s7, 2291
     add     s7,sp,s7
     sb      s7,0(s7)
+    li      s4, 2292
+    add     s4,sp,s4
+    sw      s4,0(s4)
     j       .while.head_76
                     #      label while.exit_76: 
 .while.exit_76:
@@ -1908,6 +1934,7 @@ main:
     li      s4, 1
     add     s6,a7,s4
                     #      l_69 = i32 temp_70_73 
+    mv      a7, s6
                     #      jump label: while.head_72 
     li      s2, 2300
     add     s2,sp,s2
@@ -1929,19 +1956,20 @@ main:
     li      s2, 1
     add     s4,a3,s2
                     #      k_65 = i32 temp_71_69 
+    mv      a3, s4
                     #      jump label: while.head_68 
-    li      s4, 2264
-    add     s4,sp,s4
-    sw      s4,0(s4)
-    li      s3, 2307
-    add     s3,sp,s3
-    sb      s3,0(s3)
     li      s1, 2315
     add     s1,sp,s1
     sb      s1,0(s1)
+    li      s3, 2307
+    add     s3,sp,s3
+    sb      s3,0(s3)
     li      a7, 2308
     add     a7,sp,a7
     sw      a7,0(a7)
+    li      s4, 2264
+    add     s4,sp,s4
+    sw      s4,0(s4)
     j       .while.head_68
                     #      label while.exit_68: 
 .while.exit_68:
@@ -1950,19 +1978,20 @@ main:
     li      a7, 1
     add     s2,a1,a7
                     #      j_61 = i32 temp_72_65 
+    mv      a1, s2
                     #      jump label: while.head_64 
     li      s2, 2260
     add     s2,sp,s2
     sw      s2,0(s2)
-    li      a6, 2323
-    add     a6,sp,a6
-    sb      a6,0(a6)
     li      a3, 2316
     add     a3,sp,a3
     sw      a3,0(a3)
     li      s1, 2315
     add     s1,sp,s1
     sb      s1,0(s1)
+    li      a6, 2323
+    add     a6,sp,a6
+    sb      a6,0(a6)
     j       .while.head_64
                     #      label while.exit_64: 
 .while.exit_64:
@@ -1971,19 +2000,20 @@ main:
     li      a3, 1
     add     a7,a5,a3
                     #      i_56 = i32 temp_73_61 
+    mv      a5, a7
                     #      jump label: while.head_60 
-    li      a6, 2323
-    add     a6,sp,a6
-    sb      a6,0(a6)
     li      a2, 2331
     add     a2,sp,a2
     sb      a2,0(a2)
-    li      a1, 2324
-    add     a1,sp,a1
-    sw      a1,0(a1)
     li      a7, 2256
     add     a7,sp,a7
     sw      a7,0(a7)
+    li      a1, 2324
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a6, 2323
+    add     a6,sp,a6
+    sb      a6,0(a6)
     j       .while.head_60
                     #      label while.exit_60: 
 .while.exit_60:
@@ -2099,36 +2129,37 @@ main:
                     #found literal reg Some(s2) already exist with 1_0
     add     s8,a5,s2
                     #      i_56 = i32 temp_88_92 
+    mv      a5, s8
                     #      jump label: while.head_91 
-    sd      s4,1424(sp)
-    li      s3, 2232
-    add     s3,sp,s3
-    sw      s3,0(s3)
-    sd      s6,1408(sp)
-    sd      a6,504(sp)
+    li      a0, 2236
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      s2, 2340
+    add     s2,sp,s2
+    lw      a0,0(s2)
+    sw      s9,1404(sp)
+    sw      s8,492(sp)
+    li      s2, 2340
+    add     s2,sp,s2
+    sw      s2,0(s2)
+    sd      s10,600(sp)
     li      a3, 2240
     add     a3,sp,a3
     sd      a3,0(a3)
     sw      s1,500(sp)
+    li      s3, 2232
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    sw      a7,592(sp)
+    sd      s6,1408(sp)
+    sw      s5,1420(sp)
+    sw      s7,496(sp)
     li      a1, 2255
     add     a1,sp,a1
     sb      a1,0(a1)
     sw      s11,596(sp)
-    sw      s5,1420(sp)
-    sd      s10,600(sp)
-    sw      s8,492(sp)
-    li      a0, 2236
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a2, 2331
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    li      a2, 2340
-    add     a2,sp,a2
-    lw      a0,0(a2)
-    sw      s7,496(sp)
-    sw      a7,592(sp)
-    sw      s9,1404(sp)
+    sd      a6,504(sp)
+    sd      s4,1424(sp)
     j       .while.head_91
                     #      label while.exit_91: 
 .while.exit_91:

@@ -98,6 +98,7 @@ deepWhileBr:
                     #      temp_3_32 = Add i32 c_22, d_27 
     add     a6,a3,a4
                     #      c_22 = i32 temp_3_32 
+    mv      a3, a6
                     #      jump label: L3_0 
     j       .L3_0
                     #      label L3_0: 
@@ -150,9 +151,10 @@ deepWhileBr:
     li      s3, 2
     mul     s4,s1,s3
                     #      c_22 = i32 temp_8_41 
+    mv      a3, s4
                     #      jump label: branch_false_40 
-    sw      s4,0(sp)
     sw      s1,16(sp)
+    sw      s4,0(sp)
     j       .branch_false_40
                     #      label branch_false_40: 
 .branch_false_40:
@@ -161,9 +163,9 @@ deepWhileBr:
                     #      label branch_false_31: 
 .branch_false_31:
                     #      jump label: while.head_26 
-    sb      a7,31(sp)
     sb      a5,39(sp)
     sw      a4,32(sp)
+    sb      a7,31(sp)
     j       .while.head_26
                     #      label while.exit_26: 
 .while.exit_26:

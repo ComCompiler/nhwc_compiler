@@ -35,6 +35,7 @@ func:
     li      a1, 1
     sub     a2,a0,a1
                     #      p_17 = i32 temp_0_19 
+    mv      a0, a2
                     #      ret p_17 
     ld      ra,16(sp)
     ld      s0,8(sp)

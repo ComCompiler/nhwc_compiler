@@ -84,14 +84,16 @@ main:
                     #      temp_2_24 = Add i32 sum_17, i_17 
     add     a2,a1,a0
                     #      sum_17 = i32 temp_2_24 
+    mv      a1, a2
                     #      new_var temp_3_24:i32 
                     #      temp_3_24 = Add i32 i_17, 1_0 
     li      a5, 1
     add     a6,a0,a5
                     #      i_17 = i32 temp_3_24 
+    mv      a0, a6
                     #      jump label: while.head_23 
     sw      a2,8(sp)
-    sw      a6,4(sp)
     sb      a3,15(sp)
     sb      a4,14(sp)
+    sw      a6,4(sp)
     j       .while.head_23

@@ -89,14 +89,15 @@ putstr:
                     #found literal reg Some(a5) already exist with 1_0
     add     a0,a1,a5
                     #      iNd__1X_22 = i32 temp_167_27 
+    mv      a1, a0
                     #      jump label: while.head_26 
-    sd      a3,8(sp)
     sw      a4,20(sp)
-    sw      a7,4(sp)
     sb      a6,19(sp)
+    sw      a7,4(sp)
     sw      a0,0(sp)
     ld      a0,40(sp)
     sd      a2,24(sp)
+    sd      a3,8(sp)
     j       .while.head_26
                     #      label while.exit_26: 
 .while.exit_26:
@@ -346,6 +347,7 @@ main:
     li      s6, 32
     rem     s7,s5,s6
                     #      i_32 = i32 temp_188_37 
+    mv      a6, s7
                     #      jump label: L3_0 
     j       .L3_0
                     #      label L3_0: 
@@ -361,25 +363,25 @@ main:
                     #      label branch_true_49: 
 .branch_true_49:
                     #      jump label: while.exit_36 
-    sw      s3,16(sp)
-    li      a7, 3040
-    add     a7,sp,a7
-    sw      a7,0(a7)
     li      a2, 3048
     add     a2,sp,a2
     sw      a2,0(a2)
+    li      a1, 3035
+    add     a1,sp,a1
+    sb      a1,0(a1)
     li      a4, 3044
     add     a4,sp,a4
     sw      a4,0(a4)
     sw      s5,12(sp)
-    li      a1, 3035
-    add     a1,sp,a1
-    sb      a1,0(a1)
+    li      a7, 3040
+    add     a7,sp,a7
+    sw      a7,0(a7)
+    sw      s3,16(sp)
+    sw      s7,8(sp)
     li      s1, 3036
     add     s1,sp,s1
     sw      s1,0(s1)
     sb      s4,7(sp)
-    sw      s7,8(sp)
     j       .while.exit_36
                     #      label while.exit_36: 
 .while.exit_36:
@@ -401,28 +403,28 @@ main:
                     #      label branch_false_49: 
 .branch_false_49:
                     #      jump label: while.head_36 
-    sw      s3,16(sp)
-    li      a7, 3040
-    add     a7,sp,a7
-    sw      a7,0(a7)
     li      a2, 3048
     add     a2,sp,a2
     sw      a2,0(a2)
-    li      a4, 3044
-    add     a4,sp,a4
-    sw      a4,0(a4)
-    sw      s5,12(sp)
     li      a1, 3035
     add     a1,sp,a1
     sb      a1,0(a1)
+    li      a4, 3044
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a3, 3055
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    sw      s5,12(sp)
+    li      a7, 3040
+    add     a7,sp,a7
+    sw      a7,0(a7)
+    sw      s3,16(sp)
+    sw      s7,8(sp)
     li      s1, 3036
     add     s1,sp,s1
     sw      s1,0(s1)
     sb      s4,7(sp)
-    sw      s7,8(sp)
-    li      a3, 3055
-    add     a3,sp,a3
-    sb      a3,0(a3)
     j       .while.head_36
 .section        .data
     .align 4

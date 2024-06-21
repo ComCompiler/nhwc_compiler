@@ -77,6 +77,7 @@ FourWhile:
     li      a4, 3
     add     a6,a0,a4
                     #      a_17 = i32 temp_1_28 
+    mv      a0, a6
                     #      jump label: while.head_31 
     j       .while.head_31
                     #      label while.head_31: 
@@ -95,6 +96,7 @@ FourWhile:
     li      a4, 1
     add     s1,a1,a4
                     #      b_17 = i32 temp_3_32 
+    mv      a1, s1
                     #      jump label: while.head_35 
     j       .while.head_35
                     #      label while.head_35: 
@@ -114,6 +116,7 @@ FourWhile:
     li      a4, 1
     sub     s3,a2,a4
                     #      c_17 = i32 temp_5_36 
+    mv      a2, s3
                     #      jump label: while.head_39 
     j       .while.head_39
                     #      label while.head_39: 
@@ -132,9 +135,10 @@ FourWhile:
     li      a4, 3
     add     s5,a3,a4
                     #      d_17 = i32 temp_7_40 
+    mv      a3, s5
                     #      jump label: while.head_39 
-    sw      s5,24(sp)
     sb      s4,31(sp)
+    sw      s5,24(sp)
     j       .while.head_39
                     #      label while.exit_39: 
 .while.exit_39:
@@ -143,11 +147,12 @@ FourWhile:
     li      a4, 1
     sub     s5,a3,a4
                     #      d_17 = i32 temp_8_36 
+    mv      a3, s5
                     #      jump label: while.head_35 
     sb      s2,39(sp)
+    sb      s4,31(sp)
     sw      s5,20(sp)
     sw      s3,32(sp)
-    sb      s4,31(sp)
     j       .while.head_35
                     #      label while.exit_35: 
 .while.exit_35:
@@ -156,11 +161,12 @@ FourWhile:
     li      a4, 1
     add     s3,a2,a4
                     #      c_17 = i32 temp_9_32 
+    mv      a2, s3
                     #      jump label: while.head_31 
     sb      s2,39(sp)
-    sb      a7,47(sp)
-    sw      s3,16(sp)
     sw      s1,40(sp)
+    sw      s3,16(sp)
+    sb      a7,47(sp)
     j       .while.head_31
                     #      label while.exit_31: 
 .while.exit_31:
@@ -169,11 +175,12 @@ FourWhile:
     li      a4, 2
     sub     s1,a1,a4
                     #      b_17 = i32 temp_10_28 
+    mv      a1, s1
                     #      jump label: while.head_27 
-    sb      a7,47(sp)
     sw      a6,48(sp)
     sw      s1,12(sp)
     sb      a5,55(sp)
+    sb      a7,47(sp)
     j       .while.head_27
                     #      label while.exit_27: 
 .while.exit_27:

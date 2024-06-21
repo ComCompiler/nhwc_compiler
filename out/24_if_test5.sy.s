@@ -76,6 +76,7 @@ if_if_Else:
     li      a2, 15
     add     a4,a0,a2
                     #      a_17 = i32 temp_2_22 
+    mv      a0, a4
                     #      jump label: L3_0 
     j       .L3_0
                     #      label L3_0: 

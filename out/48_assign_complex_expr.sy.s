@@ -145,6 +145,7 @@ main:
                     #found literal reg Some(a4) already exist with 3_0
     add     a6,a0,a4
                     #      result_17 = i32 temp_16_17 
+    mv      a0, a6
                     #       Call void putint_0(result_17) 
                     #saved register dumping to mem
     sw      s1,36(sp)

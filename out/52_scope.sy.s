@@ -62,6 +62,7 @@ func:
     li      a4, 1
     add     a5,a3,a4
                     #      a_18 = i32 temp_2_23 
+    mv      a3, a5
                     #      ret 1_0 
     ld      ra,32(sp)
     ld      s0,24(sp)
@@ -140,9 +141,10 @@ main:
     li      a5, 1
     add     a6,a2,a5
                     #      result_28 = i32 temp_6_34 
+    mv      a2, a6
                     #      jump label: branch_false_35 
-    sw      a6,8(sp)
     sw      a2,28(sp)
+    sw      a6,8(sp)
     j       .branch_false_35
                     #      label branch_false_35: 
 .branch_false_35:
@@ -153,12 +155,13 @@ main:
     li      a2, 1
     add     a5,a1,a2
                     #      i_28 = i32 temp_7_33 
+    mv      a1, a5
                     #      jump label: while.head_32 
+    sb      a4,15(sp)
     sb      a3,23(sp)
     sw      a5,4(sp)
     sw      a0,16(sp)
     lw      a0,28(sp)
-    sb      a4,15(sp)
     j       .while.head_32
                     #      label while.exit_32: 
 .while.exit_32:

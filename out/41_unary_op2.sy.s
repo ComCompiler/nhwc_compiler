@@ -55,6 +55,7 @@ main:
                     #      temp_1_17 = Sub i32 a_17, temp_0_17 
     sub     a4,a0,a3
                     #      a_17 = i32 temp_1_17 
+    mv      a0, a4
                     #      jump label: L1_0 
     j       .L1_0
                     #      label L1_0: 
@@ -94,6 +95,7 @@ main:
     li      a2, 0
     add     s5,a2,a1
                     #      a_17 = i32 temp_9_26 
+    mv      a0, s5
                     #      jump label: L2_0 
     sw      s5,4(sp)
     j       .L2_0

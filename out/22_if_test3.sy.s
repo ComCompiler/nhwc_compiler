@@ -74,6 +74,7 @@ ififElse:
     li      a2, 15
     add     a5,a0,a2
                     #      a_17 = i32 temp_2_24 
+    mv      a0, a5
                     #      jump label: L3_0 
     sw      a5,0(sp)
     j       .L3_0

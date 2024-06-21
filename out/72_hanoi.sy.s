@@ -225,11 +225,12 @@ main:
     li      a1, 1
     sub     a2,a0,a1
                     #      n_35 = i32 temp_6_39 
+    mv      a0, a2
                     #      jump label: while.head_38 
-    mv      a1, a0
-    sw      a2,4(sp)
     sw      a0,16(sp)
     lw      a0,20(sp)
+    sw      a2,4(sp)
+    lw      a1,16(sp)
     j       .while.head_38
                     #      label while.exit_38: 
 .while.exit_38:

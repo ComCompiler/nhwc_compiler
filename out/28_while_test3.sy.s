@@ -108,6 +108,7 @@ EightWhile:
     li      a4, 3
     add     a6,a0,a4
                     #      a_21 = i32 temp_1_32 
+    mv      a0, a6
                     #      jump label: while.head_35 
     j       .while.head_35
                     #      label while.head_35: 
@@ -126,6 +127,7 @@ EightWhile:
     li      a4, 1
     add     s1,a1,a4
                     #      b_21 = i32 temp_3_36 
+    mv      a1, s1
                     #      jump label: while.head_39 
     j       .while.head_39
                     #      label while.head_39: 
@@ -145,6 +147,7 @@ EightWhile:
     li      a4, 1
     sub     s3,a2,a4
                     #      c_21 = i32 temp_5_40 
+    mv      a2, s3
                     #      jump label: while.head_43 
     j       .while.head_43
                     #      label while.head_43: 
@@ -163,6 +166,7 @@ EightWhile:
     li      a4, 3
     add     s5,a3,a4
                     #      d_21 = i32 temp_7_44 
+    mv      a3, s5
                     #      jump label: while.head_47 
     j       .while.head_47
                     #      label while.head_47: 
@@ -310,10 +314,10 @@ EightWhile:
                     #occupy reg s11 with *h_0
     sd      a1,0(s11)
                     #      jump label: while.head_59 
-    sw      a1,88(sp)
-    lw      a1,104(sp)
     sw      a0,92(sp)
     lw      a0,108(sp)
+    sw      a1,88(sp)
+    lw      a1,104(sp)
     j       .while.head_59
                     #      label while.exit_59: 
 .while.exit_59:
@@ -335,10 +339,10 @@ EightWhile:
                     #occupy reg s11 with *h_0
     sd      a1,0(s11)
                     #      jump label: while.head_55 
-    sw      a1,80(sp)
-    lw      a1,120(sp)
     sw      a0,84(sp)
     lw      a0,124(sp)
+    sw      a1,80(sp)
+    lw      a1,120(sp)
     j       .while.head_55
                     #      label while.exit_55: 
 .while.exit_55:
@@ -360,12 +364,12 @@ EightWhile:
                     #occupy reg s11 with *g_0
     sd      a1,0(s11)
                     #      jump label: while.head_51 
-    sw      s9,132(sp)
     sb      a4,131(sp)
-    sw      a1,72(sp)
-    lw      a1,192(sp)
+    sw      s9,132(sp)
     sw      a0,76(sp)
     lw      a0,196(sp)
+    sw      a1,72(sp)
+    lw      a1,192(sp)
     j       .while.head_51
                     #      label while.exit_51: 
 .while.exit_51:
@@ -387,16 +391,16 @@ EightWhile:
                     #occupy reg s11 with *f_0
     sd      a1,0(s11)
                     #      jump label: while.head_47 
-    sw      s9,132(sp)
     sb      a4,131(sp)
-    sw      a1,64(sp)
-    lw      a1,192(sp)
+    sw      s9,132(sp)
+    sb      s8,147(sp)
+    sw      s6,148(sp)
+    sw      s10,136(sp)
+    sw      s7,140(sp)
     sw      a0,68(sp)
     lw      a0,196(sp)
-    sb      s8,147(sp)
-    sw      s7,140(sp)
-    sw      s10,136(sp)
-    sw      s6,148(sp)
+    sw      a1,64(sp)
+    lw      a1,192(sp)
     j       .while.head_47
                     #      label while.exit_47: 
 .while.exit_47:
@@ -418,9 +422,9 @@ EightWhile:
                     #      jump label: while.head_43 
     sw      s5,152(sp)
     sb      s8,147(sp)
-    sw      s7,60(sp)
-    sw      s10,56(sp)
     sw      s6,148(sp)
+    sw      s10,56(sp)
+    sw      s7,60(sp)
     sb      s4,159(sp)
     j       .while.head_43
                     #      label while.exit_43: 
@@ -430,10 +434,11 @@ EightWhile:
     li      a4, 1
     sub     s5,a3,a4
                     #      d_21 = i32 temp_32_40 
+    mv      a3, s5
                     #      jump label: while.head_39 
     sw      s3,160(sp)
-    sb      s2,167(sp)
     sw      s5,52(sp)
+    sb      s2,167(sp)
     sb      s4,159(sp)
     j       .while.head_39
                     #      label while.exit_39: 
@@ -443,6 +448,7 @@ EightWhile:
     li      a4, 1
     add     s3,a2,a4
                     #      c_21 = i32 temp_33_36 
+    mv      a2, s3
                     #      jump label: while.head_35 
     sw      s3,48(sp)
     sw      s1,168(sp)
@@ -456,11 +462,12 @@ EightWhile:
     li      a4, 2
     sub     s1,a1,a4
                     #      b_21 = i32 temp_34_32 
+    mv      a1, s1
                     #      jump label: while.head_31 
     sw      s1,44(sp)
-    sb      a7,175(sp)
     sb      a5,183(sp)
     sw      a6,176(sp)
+    sb      a7,175(sp)
     j       .while.head_31
                     #      label while.exit_31: 
 .while.exit_31:

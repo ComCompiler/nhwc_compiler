@@ -175,6 +175,7 @@ main:
     sw      a0,52(sp)
     sw      a0,44(sp)
                     #      i_24 = i32 temp_9_24 
+    mv      a1, a0
                     #      jump label: L4_0 
     j       .L4_0
                     #      label L4_0: 
@@ -230,6 +231,7 @@ main:
     sw      a0,40(sp)
     sw      a0,32(sp)
                     #      i_24 = i32 temp_14_24 
+    mv      a1, a0
                     #      jump label: L7_0 
     j       .L7_0
                     #      label L7_0: 
@@ -285,6 +287,7 @@ main:
     sw      a0,28(sp)
     sw      a0,20(sp)
                     #      i_24 = i32 temp_19_24 
+    mv      a1, a0
                     #      jump label: L10_0 
     j       .L10_0
                     #      label L10_0: 

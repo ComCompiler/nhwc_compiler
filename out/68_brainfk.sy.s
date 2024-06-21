@@ -89,13 +89,14 @@ read_program:
                     #found literal reg Some(a5) already exist with 1_0
     add     a7,a2,a5
                     #      i_19 = i32 temp_4_23 
+    mv      a2, a7
                     #      jump label: while.head_22 
+    sb      a3,27(sp)
     sw      a0,12(sp)
     lw      a0,32(sp)
-    sw      a2,36(sp)
-    sb      a3,27(sp)
-    sd      a4,16(sp)
     sw      a7,8(sp)
+    sd      a4,16(sp)
+    sw      a2,36(sp)
     j       .while.head_22
                     #      label while.exit_22: 
 .while.exit_22:
@@ -650,6 +651,7 @@ interpret:
     sw      a0,0(a0)
     sub     a0,a5,a1
                     #      i_29 = i32 temp_51_65 
+    mv      a5, a0
                     #      new_var temp_52_65:ptr->i32 
                     #      new_var temp_53_65:i32 
                     #      temp_52_65 = getelementptr input_27:ptr->i32 [Some(i_29)] 
@@ -665,6 +667,7 @@ interpret:
                     #      temp_53_65 = load temp_52_65:ptr->i32 
     lw      a0,0(a1)
                     #      cur_char_29 = i32 temp_53_65 
+    mv      s1, a0
                     #      jump label: L3_0 
     j       .L3_0
                     #      label L3_0: 
@@ -690,6 +693,7 @@ interpret:
     sd      a2,0(a2)
     sub     a2,a0,a1
                     #      loop_29 = i32 temp_55_70 
+    mv      a0, a2
                     #      jump label: L4_0 
     j       .L4_0
                     #      label branch_false_69: 
@@ -714,6 +718,7 @@ interpret:
     sd      a2,0(a2)
     add     a2,a0,a1
                     #      loop_29 = i32 temp_57_74 
+    mv      a0, a2
                     #      jump label: branch_false_73 
     lb      a1,11(sp)
     sw      a2,4(sp)
@@ -749,6 +754,13 @@ interpret:
     li      a3, 1048824
     add     a3,sp,a3
     lw      a0,0(a3)
+    li      a3, 1048824
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    sw      a4,44(sp)
+    li      a4, 1048804
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_64
                     #      label while.exit_64: 
 .while.exit_64:
@@ -771,37 +783,38 @@ interpret:
     li      a4, 1
     add     s4,a5,a4
                     #      i_29 = i32 temp_14_33 
+    mv      a5, s4
                     #      jump label: while.head_32 
-    li      a6, 1048803
-    add     a6,sp,a6
-    sb      a6,0(a6)
-    li      a3, 1048804
-    add     a3,sp,a3
-    sw      a3,0(a3)
-    li      s5, 1048776
-    add     s5,sp,s5
-    sw      s5,0(s5)
     li      s4, 1048772
     add     s4,sp,s4
     sw      s4,0(s4)
-    li      s2, 1048787
-    add     s2,sp,s2
-    sb      s2,0(s2)
-    li      s1, 1048828
-    add     s1,sp,s1
-    sw      s1,0(s1)
-    li      a7, 1048788
-    add     a7,sp,a7
-    sw      a7,0(a7)
     li      a1, 1048808
     add     a1,sp,a1
     sd      a1,0(a1)
-    li      s3, 1048780
-    add     s3,sp,s3
-    sw      s3,0(s3)
+    li      a6, 1048803
+    add     a6,sp,a6
+    sb      a6,0(a6)
     li      a2, 1048792
     add     a2,sp,a2
     sd      a2,0(a2)
+    li      s5, 1048776
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      s2, 1048787
+    add     s2,sp,s2
+    sb      s2,0(s2)
+    li      a7, 1048788
+    add     a7,sp,a7
+    sw      a7,0(a7)
+    li      s3, 1048780
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    li      a3, 1048804
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      s1, 1048828
+    add     s1,sp,s1
+    sw      s1,0(s1)
     j       .while.head_32
                     #      label while.exit_32: 
 .while.exit_32:

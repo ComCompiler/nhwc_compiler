@@ -104,6 +104,7 @@ main:
     li      a0, 88
     sub     a6,a7,a0
                     #      k_22 = i32 temp_5_27 
+    mv      a7, a6
                     #      jump label: L2_0 
     j       .L2_0
                     #      label L2_0: 
@@ -126,6 +127,7 @@ main:
                     #      temp_7_35 = Sub i32 k_22, g_31 
     sub     s3,a7,a0
                     #      k_22 = i32 temp_7_35 
+    mv      a7, s3
                     #      g_35 = i32 11_0 
     li      s4, 11
                     #      new_var temp_8_35:i32 
@@ -135,20 +137,21 @@ main:
                     #      temp_9_35 = Add i32 k_22, temp_8_35 
     add     s6,a7,s5
                     #      k_22 = i32 temp_9_35 
+    mv      a7, s6
                     #      jump label: branch_false_30 
-    sw      s3,20(sp)
-    sw      s5,12(sp)
-    sw      s4,16(sp)
-    sw      a0,28(sp)
     sw      s6,8(sp)
     sw      s2,24(sp)
+    sw      s5,12(sp)
+    sw      s4,16(sp)
+    sw      s3,20(sp)
+    sw      a0,28(sp)
     j       .branch_false_30
                     #      label branch_false_30: 
 .branch_false_30:
                     #      jump label: while.head_26 
+    sw      a6,36(sp)
     sb      a4,43(sp)
     sb      s1,35(sp)
-    sw      a6,36(sp)
     j       .while.head_26
                     #      label while.exit_26: 
 .while.exit_26:
@@ -160,10 +163,10 @@ main:
                     #arg load ended
     call    putint
                     #      jump label: branch_false_21 
-    sb      a4,43(sp)
-    sw      a2,52(sp)
-    sw      a7,44(sp)
     sw      a5,48(sp)
+    sw      a2,52(sp)
+    sb      a4,43(sp)
+    sw      a7,44(sp)
     j       .branch_false_21
                     #      label branch_false_21: 
 .branch_false_21:

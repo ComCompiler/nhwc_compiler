@@ -90,6 +90,7 @@ whileIf:
     li      a2, 2
     mul     a6,a0,a2
                     #      b_17 = i32 temp_4_33 
+    mv      a1, a6
                     #      jump label: L2_0 
     sw      a6,0(sp)
     j       .L2_0
@@ -104,10 +105,11 @@ whileIf:
     li      a2, 1
     add     a5,a0,a2
                     #      a_17 = i32 temp_2_24 
+    mv      a0, a5
                     #      jump label: while.head_23 
-    sb      a3,15(sp)
-    sb      a4,14(sp)
     sw      a5,8(sp)
+    sb      a4,14(sp)
+    sb      a3,15(sp)
     j       .while.head_23
                     #      label while.exit_23: 
 .while.exit_23:

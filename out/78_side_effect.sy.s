@@ -46,6 +46,7 @@ inc_a:
     li      a3, 1
     add     a4,a2,a3
                     #      b_18 = i32 temp_1_18 
+    mv      a2, a4
                     #      store b_18:i32 *a_0:ptr->i32 
                     #   load label a as ptr to reg
     la      a5, a
@@ -367,15 +368,16 @@ main:
     li      a1, 1
     sub     s2,a0,a1
                     #      k_24 = i32 temp_28_28 
+    mv      a0, s2
                     #      jump label: while.head_27 
-    sb      a6,85(sp)
     sb      a5,86(sp)
-    sw      s3,24(sp)
-    sb      a3,87(sp)
     sw      s2,20(sp)
+    sb      a3,87(sp)
+    sw      a4,92(sp)
+    sw      s3,24(sp)
     sw      s1,28(sp)
     sb      a2,99(sp)
-    sw      a4,92(sp)
+    sb      a6,85(sp)
     sb      a7,79(sp)
     j       .while.head_27
                     #      label while.exit_27: 
