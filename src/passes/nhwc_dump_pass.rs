@@ -3,6 +3,7 @@ use std::io::Write;
 
 
 use crate::toolkit::cfg_node::CFG_ROOT;
+use crate::toolkit::gen_nhwc_cfg;
 use crate::toolkit::nhwc_instr::NhwcInstrType;
 use crate::toolkit::scope_node::ST_ROOT;
 use crate::toolkit::symtab::SymIdx;
@@ -36,7 +37,7 @@ impl Pass for NhwcDumpPass {
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> { 
         let mut nhwc_ir_vec = vec![];
         
-        let (args,instr_slab,cfg_graph,nhwc_ir_list) = (&ctx.args,&mut ctx.nhwc_instr_slab,&mut ctx.cfg_graph, &mut ctx.collected_nhwc_ir);
+        let (args,symtab,instr_slab,cfg_graph,nhwc_ir_list) = (&ctx.args,&mut ctx.symtab,&mut ctx.nhwc_instr_slab,&mut ctx.cfg_graph, &mut ctx.collected_nhwc_ir);
         let dfs_node_vec = dfs_with_priority(cfg_graph,CFG_ROOT,|e| match &e.weight().cfg_edge_type{
             CfgEdgeType::BodyHead {  } => 1,
             CfgEdgeType::IfFalse {  } => 2,
@@ -53,7 +54,8 @@ impl Pass for NhwcDumpPass {
             if !(cfg_node_struct.cfg_node_type.is_exit() || 
                 cfg_node_struct.cfg_node_type.is_entry() ||
                 cfg_node_struct.cfg_node_type.is_root()) && cfg_node_struct.op_label_instr.is_none(){
-                    let anonymous_label= NhwcInstrType::new_label(SymIdx::new(ST_ROOT, format!("L{}",anonymous_label_count))).into();
+                    let anonymous_label_symidx = gen_nhwc_cfg::process_label_symbol(cfg_node,ST_ROOT,format!("L{}",anonymous_label_count),symtab)?;
+                    let anonymous_label= NhwcInstrType::new_label(anonymous_label_symidx).into();
                     node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(anonymous_label, instr_slab)?;
                     anonymous_label_count +=1;
             }

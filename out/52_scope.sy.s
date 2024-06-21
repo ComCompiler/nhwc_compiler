@@ -50,21 +50,22 @@ func:
 .L5_0:
                     #      new_var temp_1_21:i1 
                     #      temp_1_21 = icmp i32 Eq a_18, b_18 
-    xor     a4,a3,a2
-    seqz    a4, a4
+    xor     a0,a3,a2
+    seqz    a0, a0
                     #      br i1 temp_1_21, label branch_true_22, label branch_false_22 
-    bnez    a4, .branch_true_22
+    bnez    a0, .branch_true_22
     j       .branch_false_22
                     #      label branch_true_22: 
 .branch_true_22:
                     #      new_var temp_2_23:i32 
                     #      temp_2_23 = Add i32 a_18, 1_0 
-    li      a5, 1
-    add     a6,a3,a5
+    li      a4, 1
+    add     a5,a3,a4
                     #      a_18 = i32 temp_2_23 
                     #      ret 1_0 
     ld      ra,32(sp)
     ld      s0,24(sp)
+    sb      a0,11(sp)
     li      a0, 1
     addi    sp,sp,40
     ret
@@ -73,6 +74,7 @@ func:
                     #      ret 0_0 
     ld      ra,32(sp)
     ld      s0,24(sp)
+    sb      a0,11(sp)
     li      a0, 0
     addi    sp,sp,40
     ret
@@ -125,20 +127,22 @@ main:
     sw      a0,16(sp)
                     #      new_var temp_5_34:i1 
                     #      temp_5_34 = icmp i32 Eq temp_4_34, 1_0 
-    li      a4, 1
-    xor     a5,a0,a4
-    seqz    a5, a5
+    li      a2, 1
+    xor     a4,a0,a2
+    seqz    a4, a4
                     #      br i1 temp_5_34, label branch_true_35, label branch_false_35 
-    bnez    a5, .branch_true_35
+    bnez    a4, .branch_true_35
     j       .branch_false_35
                     #      label branch_true_35: 
 .branch_true_35:
                     #      new_var temp_6_34:i32 
                     #      temp_6_34 = Add i32 result_28, 1_0 
-                    #found literal reg Some(a4) already exist with 1_0
-    add     a7,a6,a4
+    li      a5, 1
+    add     a6,a2,a5
                     #      result_28 = i32 temp_6_34 
                     #      jump label: branch_false_35 
+    sw      a6,8(sp)
+    sw      a2,28(sp)
     j       .branch_false_35
                     #      label branch_false_35: 
 .branch_false_35:
@@ -146,29 +150,32 @@ main:
 .L1_0:
                     #      new_var temp_7_33:i32 
                     #      temp_7_33 = Add i32 i_28, 1_0 
-                    #found literal reg Some(a4) already exist with 1_0
-    add     s1,a1,a4
+    li      a2, 1
+    add     a5,a1,a2
                     #      i_28 = i32 temp_7_33 
                     #      jump label: while.head_32 
+    sb      a3,23(sp)
+    sw      a5,4(sp)
+    sw      a0,16(sp)
+    lw      a0,28(sp)
+    sb      a4,15(sp)
     j       .while.head_32
                     #      label while.exit_32: 
 .while.exit_32:
                     #      new_var temp_8_38:i1 
                     #      temp_8_38 = icmp i32 Slt result_28, 100_0 
-                    #found literal reg Some(a2) already exist with 100_0
-    slt     s2,a6,a2
+    li      a2, 100
+    slt     a4,a0,a2
                     #      br i1 temp_8_38, label branch_true_39, label branch_false_39 
-    bnez    s2, .branch_true_39
+    bnez    a4, .branch_true_39
     j       .branch_false_39
                     #      label branch_true_39: 
 .branch_true_39:
                     #       Call void putint_0(1_0) 
                     #saved register dumping to mem
-    sw      s1,4(sp)
-    sb      s2,3(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a0,16(sp)
+    sw      a0,28(sp)
     li      a0, 1
                     #arg load ended
     call    putint
@@ -180,6 +187,7 @@ main:
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
+    sw      a0,28(sp)
     li      a0, 0
                     #arg load ended
     call    putint

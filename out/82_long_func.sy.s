@@ -1435,84 +1435,99 @@ long_func:
 .while.head_23:
                     #      new_var temp_16_22:i1 
                     #      temp_16_22 = icmp i32 Sgt pr_20, 0_0 
-    li      a7, 0
-    slt     s1,a7,a5
+    li      a0, 0
+    slt     a1,a0,a5
                     #      br i1 temp_16_22, label while.body_23, label while.exit_23 
-    bnez    s1, .while.body_23
+    bnez    a1, .while.body_23
     j       .while.exit_23
                     #      label while.body_23: 
 .while.body_23:
                     #      ans_18 = i32 0_0 
-    li      s2, 0
+    li      a0, 0
                     #      i_18 = i32 0_0 
-    li      s3, 0
+    li      a2, 0
                     #      x_18 = i32 pr_20 
-    mv      s4, a5
+    mv      a3, a5
                     #      y_18 = i32 1_0 
-    li      s5, 1
+    li      a7, 1
                     #      jump label: while.head_30 
     j       .while.head_30
                     #      label while.head_30: 
 .while.head_30:
                     #      new_var temp_17_29:i1 
                     #      temp_17_29 = icmp i32 Slt i_18, 16_0 
-    li      s6, 16
-    slt     s7,s3,s6
+    li      s1, 16
+    slt     s2,a2,s1
                     #      br i1 temp_17_29, label while.body_30, label while.exit_30 
-    bnez    s7, .while.body_30
+    bnez    s2, .while.body_30
     j       .while.exit_30
                     #      label while.body_30: 
 .while.body_30:
                     #      new_var temp_18_32:i32 
                     #      temp_18_32 = Mod i32 y_18, 2_0 
-    li      s8, 2
-    rem     s9,s5,s8
+    li      s1, 2
+    rem     s3,a7,s1
                     #      new_var temp_19_32:i32 
                     #      temp_19_32 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(s8) already exist with 2_0
-    rem     s10,s4,s8
+                    #found literal reg Some(s1) already exist with 2_0
+    rem     s4,a3,s1
                     #      new_var temp_20_32:i1 
                     #      temp_20_32 = icmp i32 Ne temp_19_32, 0_0 
-                    #found literal reg Some(a7) already exist with 0_0
-    xor     s11,s10,a7
-    snez    s11, s11
+    li      s5, 0
+    xor     s6,s4,s5
+    snez    s6, s6
                     #      new_var temp_21_32:i1 
                     #      temp_20_32 = icmp i32 Ne temp_18_32, 0_0 
-                    #found literal reg Some(a7) already exist with 0_0
+                    #found literal reg Some(s5) already exist with 0_0
                     #      new_var temp_22_32:i1 
                     #      temp_22_32 = And i1 temp_20_32, temp_21_32 
-    and     a1,s11,a0
+    and     s8,s6,s7
                     #      br i1 temp_22_32, label branch_true_33, label branch_false_33 
-    bnez    a1, .branch_true_33
+    bnez    s8, .branch_true_33
     j       .branch_false_33
                     #      label branch_true_33: 
 .branch_true_33:
                     #      new_var temp_23_34:Array:i32:[Some(16_0)] 
                     #      temp_23_34 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a2, SHIFT_TABLE
-                    #occupy reg a2 with *SHIFT_TABLE_0
-    lw      a3,0(a2)
+    la      s1, SHIFT_TABLE
+                    #occupy reg s1 with *SHIFT_TABLE_0
+    lw      s5,0(s1)
                     #      new_var temp_24_34:ptr->i32 
                     #      new_var temp_25_34:i32 
                     #      temp_24_34 = getelementptr temp_23_34:Array:i32:[Some(16_0)] [Some(i_18)] 
-    li      a2, 0
-    li      a7, 1
-    add     a2,a2,a3
-    slli a2,a2,2
-    add     a2,a2,sp
-    add     a2,a2,a2
+    li      s9, 0
+    li      s10, 1
+    add     s9,s9,s5
+    slli s9,s9,2
+    add     s9,s9,sp
+    add     s9,s9,s9
                     #      temp_25_34 = load temp_24_34:ptr->i32 
-    lw      a7,0(a2)
+    lw      s11,0(s9)
                     #      new_var temp_26_34:i32 
                     #      temp_26_34 = Mul i32 1_0, temp_25_34 
-    li      s6, 1
-    mul     s8,s6,a7
+                    #found literal reg Some(s10) already exist with 1_0
+    mul     s1,s10,s11
                     #      new_var temp_27_34:i32 
                     #      temp_27_34 = Add i32 ans_18, temp_26_34 
-    add     s6,s2,s8
+    add     s10,a0,s1
                     #      ans_18 = i32 temp_27_34 
                     #      jump label: branch_false_33 
+    li      s10, 13324
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      s1, 13328
+    add     s1,sp,s1
+    sw      s1,0(s1)
+    li      s5, 13404
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      s11, 13332
+    add     s11,sp,s11
+    sw      s11,0(s11)
+    li      s9, 13336
+    add     s9,sp,s9
+    sd      s9,0(s9)
     j       .branch_false_33
                     #      label branch_false_33: 
 .branch_false_33:
@@ -1520,80 +1535,77 @@ long_func:
 .L2_0:
                     #      new_var temp_28_31:i32 
                     #      temp_28_31 = Div i32 x_18, 2_0 
-    li      a0, 13410
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    li      a0, 2
-    li      a1, 13409
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    div     a1,s4,a0
+    li      s1, 2
+    div     s5,a3,s1
                     #      x_18 = i32 temp_28_31 
                     #      new_var temp_29_31:i32 
                     #      temp_29_31 = Div i32 y_18, 2_0 
-                    #found literal reg Some(a0) already exist with 2_0
-    li      a1, 13320
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s5,a0
+                    #found literal reg Some(s1) already exist with 2_0
+    div     s9,a7,s1
                     #      y_18 = i32 temp_29_31 
                     #      new_var temp_30_31:i32 
                     #      temp_30_31 = Add i32 i_18, 1_0 
-    li      a0, 1
-    li      a1, 13316
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    add     a1,s3,a0
+    li      s10, 1
+    add     s11,a2,s10
                     #      i_18 = i32 temp_30_31 
                     #      jump label: while.head_30 
+    li      s8, 13409
+    add     s8,sp,s8
+    sb      s8,0(s8)
+    li      s6, 13411
+    add     s6,sp,s6
+    sb      s6,0(s6)
+    li      s5, 13320
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      s3, 13416
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    li      s2, 13422
+    add     s2,sp,s2
+    sb      s2,0(s2)
+    li      s7, 13410
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    li      s11, 13312
+    add     s11,sp,s11
+    sw      s11,0(s11)
+    li      s9, 13316
+    add     s9,sp,s9
+    sw      s9,0(s9)
+    li      s4, 13412
+    add     s4,sp,s4
+    sw      s4,0(s4)
     j       .while.head_30
                     #      label while.exit_30: 
 .while.exit_30:
                     #      new_var temp_31_900:i1 
                     #      temp_31_900 = icmp i32 Ne ans_18, 0_0 
-    li      a0, 0
-    li      a1, 13312
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    xor     a1,s2,a0
-    snez    a1, a1
+    li      s1, 0
+    xor     s3,a0,s1
+    snez    s3, s3
                     #      br i1 temp_31_900, label branch_true_40, label branch_false_40 
-    bnez    a1, .branch_true_40
+    bnez    s3, .branch_true_40
     j       .branch_false_40
                     #      label branch_true_40: 
 .branch_true_40:
                     #      ml_42 = i32 pres_20 
-    mv      a0, a6
+    mv      s1, a6
                     #      mr_42 = i32 pl_20 
-    li      a0, 13304
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, a4
+    mv      s4, a4
                     #      mres_42 = i32 0_0 
-    li      a0, 13300
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
+    li      s5, 0
                     #      jump label: while.head_45 
     j       .while.head_45
                     #      label while.head_45: 
 .while.head_45:
                     #      new_var temp_32_1013:i1 
                     #      temp_32_1013 = icmp i32 Ne mr_42, 0_0 
-    li      a0, 13296
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 13311
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    li      a1, 0
-    li      a2, 13336
-    add     a2,sp,a2
-    sd      a2,0(a2)
-    xor     a2,a0,a1
-    snez    a2, a2
+    li      s6, 0
+    xor     s7,s4,s6
+    snez    s7, s7
                     #      br i1 temp_32_1013, label while.body_45, label while.exit_45 
-    bnez    a2, .while.body_45
+    bnez    s7, .while.body_45
     j       .while.exit_45
                     #      label while.body_45: 
 .while.body_45:
@@ -1607,64 +1619,49 @@ long_func:
 .while.head_52:
                     #      new_var temp_33_51:i1 
                     #      temp_33_51 = icmp i32 Slt i_18, 16_0 
-    li      a1, 16
-    li      a0, 13300
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    slt     a0,s3,a1
+    li      s6, 16
+    slt     s8,a2,s6
                     #      br i1 temp_33_51, label while.body_52, label while.exit_52 
-    bnez    a0, .while.body_52
+    bnez    s8, .while.body_52
     j       .while.exit_52
                     #      label while.body_52: 
 .while.body_52:
                     #      new_var temp_34_54:i32 
                     #      temp_34_54 = Mod i32 y_18, 2_0 
-    li      a1, 2
-    li      a0, 13294
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    rem     a0,s5,a1
+    li      s6, 2
+    rem     s9,a7,s6
                     #      new_var temp_35_54:i32 
                     #      temp_35_54 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(a1) already exist with 2_0
-    li      a0, 13288
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    rem     a0,s4,a1
+                    #found literal reg Some(s6) already exist with 2_0
+    rem     s10,a3,s6
                     #      new_var temp_36_54:i1 
                     #      temp_36_54 = icmp i32 Ne temp_35_54, 0_0 
-    li      a1, 0
-    li      a2, 13295
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    xor     a2,a0,a1
-    snez    a2, a2
+    li      s11, 0
+    xor     s6,s10,s11
+    snez    s6, s6
                     #      new_var temp_37_54:i1 
                     #      temp_36_54 = icmp i32 Ne temp_34_54, 0_0 
-    li      a0, 13284
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
+                    #found literal reg Some(s11) already exist with 0_0
                     #      new_var temp_38_54:i1 
                     #      temp_38_54 = And i1 temp_36_54, temp_37_54 
-    li      a1, 13288
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    and     a1,a2,a0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    and     a0,s6,s11
                     #      br i1 temp_38_54, label branch_true_55, label branch_false_55 
-    bnez    a1, .branch_true_55
+    bnez    a0, .branch_true_55
     j       .branch_false_55
                     #      label branch_true_55: 
 .branch_true_55:
                     #      new_var temp_39_56:Array:i32:[Some(16_0)] 
                     #      temp_39_56 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 13282
+    li      a0, 13281
     add     a0,sp,a0
     sb      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 13281
+    li      a1, 13423
     add     a1,sp,a1
     sb      a1,0(a1)
     lw      a1,0(a0)
@@ -1676,11 +1673,11 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 13283
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -1692,15 +1689,54 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 13276
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_43_56:i32 
                     #      temp_43_56 = Add i32 ans_18, temp_42_56 
-    add     a0,s2,a2
+    li      a1, 13204
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_43_56 
                     #      jump label: branch_false_55 
+    li      a2, 13200
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13448
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 13196
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 13276
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13281
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 13281
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_55
                     #      label branch_false_55: 
 .branch_false_55:
@@ -1708,14 +1744,14 @@ long_func:
 .L3_0:
                     #      new_var temp_44_53:i32 
                     #      temp_44_53 = Div i32 x_18, 2_0 
-    li      a0, 13196
+    li      a0, 13281
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 13204
+    li      a1, 13423
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s4,a0
+    sb      a1,0(a1)
+    div     a1,a3,a0
                     #      x_18 = i32 temp_44_53 
                     #      new_var temp_45_53:i32 
                     #      temp_45_53 = Div i32 y_18, 2_0 
@@ -1723,7 +1759,7 @@ long_func:
     li      a1, 13192
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s5,a0
+    div     a1,a7,a0
                     #      y_18 = i32 temp_45_53 
                     #      new_var temp_46_53:i32 
                     #      temp_46_53 = Add i32 i_18, 1_0 
@@ -1731,38 +1767,56 @@ long_func:
     li      a1, 13188
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s3,a0
+    add     a1,a2,a0
                     #      i_18 = i32 temp_46_53 
                     #      jump label: while.head_52 
+    li      s8, 13294
+    add     s8,sp,s8
+    sb      s8,0(s8)
+    li      a1, 13184
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s6, 13283
+    add     s6,sp,s6
+    sb      s6,0(s6)
+    li      s10, 13284
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a2, 13448
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a2, 13452
+    add     a2,sp,a2
+    lw      a0,0(a2)
+    li      s11, 13282
+    add     s11,sp,s11
+    sb      s11,0(s11)
+    li      s9, 13288
+    add     s9,sp,s9
+    sw      s9,0(s9)
     j       .while.head_52
                     #      label while.exit_52: 
 .while.exit_52:
                     #      new_var temp_47_1422:i1 
                     #      temp_47_1422 = icmp i32 Ne ans_18, 0_0 
-    li      a0, 0
-    li      a1, 13184
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    xor     a1,s2,a0
-    snez    a1, a1
+    li      s6, 0
+    xor     s9,a0,s6
+    snez    s9, s9
                     #      br i1 temp_47_1422, label branch_true_62, label branch_false_62 
-    bnez    a1, .branch_true_62
+    bnez    s9, .branch_true_62
     j       .branch_false_62
                     #      label branch_true_62: 
 .branch_true_62:
                     #      al_64 = i32 mres_42 
-    li      a1, 13183
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    mv      a1, a0
+    mv      s6, s5
                     #      c_64 = i32 ml_42 
-    li      a0, 13296
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 13176
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      s10, s1
                     #      new_var sum_64:i32 
                     #      jump label: while.head_67 
     j       .while.head_67
@@ -1770,21 +1824,19 @@ long_func:
 .while.head_67:
                     #      new_var temp_48_1516:i1 
                     #      temp_48_1516 = icmp i32 Ne c_64, 0_0 
-    li      a0, 13304
+    li      s11, 0
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 13200
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
-    snez    a2, a2
+    xor     a0,s10,s11
+    snez    a0, a0
                     #      br i1 temp_48_1516, label while.body_67, label while.exit_67 
-    bnez    a2, .while.body_67
+    bnez    a0, .while.body_67
     j       .while.exit_67
                     #      label while.body_67: 
 .while.body_67:
                     #      ans_18 = i32 0_0 
+    li      s11, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_64 
                     #      y_18 = i32 c_64 
@@ -1794,14 +1846,14 @@ long_func:
 .while.head_74:
                     #      new_var temp_49_73:i1 
                     #      temp_49_73 = icmp i32 Slt i_18, 16_0 
-    li      a0, 13176
+    li      a0, 13167
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 16
-    li      a1, 13172
+    li      a1, 13423
     add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s3,a0
+    sb      a1,0(a1)
+    slt     a1,a2,a0
                     #      br i1 temp_49_73, label while.body_74, label while.exit_74 
     bnez    a1, .while.body_74
     j       .while.exit_74
@@ -1813,13 +1865,13 @@ long_func:
     li      a1, 13166
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s4,a0
+    rem     a1,a3,a0
                     #      new_var temp_51_1699:i1 
                     #      temp_51_1699 = icmp i32 Ne temp_50_76, 0_0 
     li      a0, 0
-    li      a2, 13167
+    li      a2, 13448
     add     a2,sp,a2
-    sb      a2,0(a2)
+    sw      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_51_1699, label branch_true_77, label branch_false_77 
@@ -1833,7 +1885,7 @@ long_func:
     li      a1, 13160
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s5,a0
+    rem     a1,a7,a0
                     #      new_var temp_53_79:i1 
                     #      temp_53_79 = icmp i32 Eq temp_52_79, 0_0 
     li      a0, 0
@@ -1867,8 +1919,11 @@ long_func:
     li      a2, 13151
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -1880,15 +1935,45 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 13144
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_58_81:i32 
                     #      temp_58_81 = Add i32 ans_18, temp_57_81 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_58_81 
                     #      jump label: branch_false_80 
+    li      a2, 13064
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13060
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13151
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 13068
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13151
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13152
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13152
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 13144
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_80
                     #      label branch_false_80: 
 .branch_false_80:
@@ -1896,20 +1981,17 @@ long_func:
 .branch_false_77:
                     #      new_var temp_62_83:i32 
                     #      temp_62_83 = Mod i32 y_18, 2_0 
-    li      a0, 13060
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 13068
+    li      a1, 13160
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s5,a0
+    rem     a1,a7,a0
                     #      new_var temp_63_1844:i1 
                     #      temp_63_1844 = icmp i32 Ne temp_62_83, 0_0 
     li      a0, 0
-    li      a2, 13064
+    li      a2, 13159
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_63_1844, label branch_true_84, label branch_false_84 
@@ -1937,8 +2019,11 @@ long_func:
     li      a2, 13043
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -1950,15 +2035,45 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 13036
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_68_85:i32 
                     #      temp_68_85 = Add i32 ans_18, temp_67_85 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_68_85 
                     #      jump label: branch_false_84 
+    li      a2, 12960
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 12956
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13043
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 12964
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13043
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13044
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13044
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 13036
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_84
                     #      label branch_false_84: 
 .branch_false_84:
@@ -1968,14 +2083,11 @@ long_func:
 .L5_0:
                     #      new_var temp_59_75:i32 
                     #      temp_59_75 = Div i32 x_18, 2_0 
-    li      a0, 12956
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 12964
+    li      a1, 13044
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s4,a0
+    div     a1,a3,a0
                     #      x_18 = i32 temp_59_75 
                     #      new_var temp_60_75:i32 
                     #      temp_60_75 = Div i32 y_18, 2_0 
@@ -1983,46 +2095,71 @@ long_func:
     li      a1, 13056
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s5,a0
+    div     a1,a7,a0
                     #      y_18 = i32 temp_60_75 
                     #      new_var temp_61_75:i32 
                     #      temp_61_75 = Add i32 i_18, 1_0 
-    li      a0, 1
     li      a1, 13052
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s3,a0
+    li      a1, 1
+    li      a2, 13043
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    add     a2,a0,a1
                     #      i_18 = i32 temp_61_75 
                     #      jump label: while.head_74 
+    li      a2, 13048
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    mv      a2, a0
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13167
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 13167
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_74
                     #      label while.exit_74: 
 .while.exit_74:
                     #      sum_64 = i32 ans_18 
-    mv      a0, s2
+    mv      a0, s11
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_64 
-    li      a0, 13168
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      y_18 = i32 c_64 
-    li      a0, 13176
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      jump label: while.head_96 
     j       .while.head_96
                     #      label while.head_96: 
 .while.head_96:
                     #      new_var temp_69_95:i1 
                     #      temp_69_95 = icmp i32 Slt i_18, 16_0 
-    li      a0, 13172
+    li      a0, 13168
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 13048
+    li      a1, 13166
     add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s3,a0
+    sb      a1,0(a1)
+    slt     a1,a2,a0
                     #      br i1 temp_69_95, label while.body_96, label while.exit_96 
     bnez    a1, .while.body_96
     j       .while.exit_96
@@ -2034,18 +2171,18 @@ long_func:
     li      a1, 12955
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s5,a0
+    rem     a1,a7,a0
                     #      new_var temp_71_98:i32 
                     #      temp_71_98 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 12948
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s4,a0
+    rem     a1,a3,a0
                     #      new_var temp_72_98:i1 
                     #      temp_72_98 = icmp i32 Ne temp_71_98, 0_0 
     li      a0, 0
-    li      a2, 12960
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     xor     a2,a1,a0
@@ -2090,8 +2227,11 @@ long_func:
     li      a2, 12943
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -2103,15 +2243,51 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 12936
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_79_100:i32 
                     #      temp_79_100 = Add i32 ans_18, temp_78_100 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_79_100 
                     #      jump label: branch_false_99 
+    li      a2, 12856
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 12852
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 12943
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 12860
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 12943
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 12942
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 12942
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 12936
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 12941
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 12941
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_99
                     #      label branch_false_99: 
 .branch_false_99:
@@ -2119,14 +2295,14 @@ long_func:
 .L6_0:
                     #      new_var temp_80_97:i32 
                     #      temp_80_97 = Div i32 x_18, 2_0 
-    li      a0, 12852
+    li      a0, 12941
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 12860
+    li      a1, 12942
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s4,a0
+    sb      a1,0(a1)
+    div     a1,a3,a0
                     #      x_18 = i32 temp_80_97 
                     #      new_var temp_81_97:i32 
                     #      temp_81_97 = Div i32 y_18, 2_0 
@@ -2134,37 +2310,64 @@ long_func:
     li      a1, 12848
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s5,a0
+    div     a1,a7,a0
                     #      y_18 = i32 temp_81_97 
                     #      new_var temp_82_97:i32 
                     #      temp_82_97 = Add i32 i_18, 1_0 
-    li      a0, 1
     li      a1, 12844
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s3,a0
+    li      a1, 1
+    li      a2, 12943
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    add     a2,a0,a1
                     #      i_18 = i32 temp_82_97 
                     #      jump label: while.head_96 
+    li      a2, 12840
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    mv      a2, a0
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13166
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13166
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13168
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13168
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_96
                     #      label while.exit_96: 
 .while.exit_96:
                     #      c_64 = i32 ans_18 
-    mv      a0, s2
                     #      jump label: L7_0 
     j       .L7_0
                     #      label L7_0: 
 .L7_0:
                     #      new_var temp_83_106:i1 
                     #      temp_83_106 = icmp i32 Sgt 1_0, 15_0 
-    li      a0, 13172
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 1
-    li      a1, 12840
+    li      a1, 12955
     add     a1,sp,a1
-    sw      a1,0(a1)
+    sb      a1,0(a1)
     li      a1, 15
-    li      a2, 12856
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     slt     a2,a1,a0
@@ -2180,41 +2383,46 @@ long_func:
 .branch_false_107:
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
+    li      a0, 0
                     #      new_var temp_84_110:Array:i32:[Some(16_0)] 
                     #      temp_84_110 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_85_110:ptr->i32 
                     #      new_var temp_86_110:i32 
                     #      temp_85_110 = getelementptr temp_84_110:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    li      a1, 12832
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
+    li      a1, 0
+    li      a0, 12832
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a2, 12839
     add     a2,sp,a2
     sb      a2,0(a2)
     li      a2, 1
-    li      a3, 13404
+    li      a3, 13444
     add     a3,sp,a3
     sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_86_110 = load temp_85_110:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_87_110:i32 
                     #      temp_87_110 = Mul i32 c_64, temp_86_110 
-    li      a0, 12760
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a2,a1
+    mul     a2,s10,a0
                     #      x_18 = i32 temp_87_110 
+    li      a0, 12756
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    mv      a0, a2
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_116 
     j       .while.head_116
@@ -2222,47 +2430,79 @@ long_func:
 .while.head_116:
                     #      new_var temp_88_115:i1 
                     #      temp_88_115 = icmp i32 Slt i_18, 16_0 
-    li      a0, 12752
+    li      a0, 13444
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 16
-    li      a1, 12756
+    li      a1, 12760
     add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s3,a0
+    sd      a1,0(a1)
+    li      a1, 16
+    li      a2, 12752
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    slt     a2,a0,a1
                     #      br i1 temp_88_115, label while.body_116, label while.exit_116 
-    bnez    a1, .while.body_116
+    bnez    a2, .while.body_116
+    li      a1, 12751
+    add     a1,sp,a1
+    sb      a2,0(a1)
+    li      a1, 12839
+    add     a1,sp,a1
+    lb      a2,0(a1)
+    li      a1, 12839
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 12832
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_116
                     #      label while.body_116: 
 .while.body_116:
                     #      new_var temp_89_118:i32 
                     #      temp_89_118 = Mod i32 y_18, 2_0 
-    li      a0, 2
-    li      a1, 12751
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    rem     a1,s5,a0
+    li      a1, 2
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    rem     a0,a7,a1
                     #      new_var temp_90_118:i32 
                     #      temp_90_118 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(a0) already exist with 2_0
-    li      a1, 12744
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    rem     a1,s4,a0
+    li      a0, 12744
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2
+    li      a2, 12751
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    rem     a2,a1,a0
                     #      new_var temp_91_118:i1 
                     #      temp_91_118 = icmp i32 Ne temp_90_118, 0_0 
     li      a0, 0
-    li      a2, 13172
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
-    snez    a2, a2
-                    #      new_var temp_92_118:i1 
-                    #      temp_91_118 = icmp i32 Ne temp_89_118, 0_0 
-    li      a1, 12740
+    li      a1, 13444
     add     a1,sp,a1
     sw      a1,0(a1)
+    xor     a1,a2,a0
+    snez    a1, a1
+                    #      new_var temp_92_118:i1 
+                    #      temp_91_118 = icmp i32 Ne temp_89_118, 0_0 
+    li      a1, 12739
+    add     a1,sp,a1
+    sb      a1,0(a1)
     li      a1, 0
+    li      a2, 12740
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    xor     a2,a0,a1
+    snez    a2, a2
                     #      new_var temp_93_118:i1 
                     #      temp_93_118 = And i1 temp_91_118, temp_92_118 
     li      a0, 12744
@@ -2297,8 +2537,11 @@ long_func:
     li      a2, 12739
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 12832
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -2310,15 +2553,51 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 12732
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_98_120:i32 
                     #      temp_98_120 = Add i32 ans_18, temp_97_120 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_98_120 
                     #      jump label: branch_false_119 
+    li      a2, 12656
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 12652
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 12739
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 12660
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 12739
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 12738
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 12738
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 12732
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 12737
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 12737
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 12832
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_119
                     #      label branch_false_119: 
 .branch_false_119:
@@ -2326,76 +2605,130 @@ long_func:
 .L8_0:
                     #      new_var temp_99_117:i32 
                     #      temp_99_117 = Div i32 x_18, 2_0 
-    li      a0, 12652
+    li      a0, 12737
     add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 2
-    li      a1, 12660
+    sb      a0,0(a0)
+    li      a1, 12738
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s4,a0
+    sb      a1,0(a1)
+    li      a1, 2
+    li      a2, 12739
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    div     a2,a0,a1
                     #      x_18 = i32 temp_99_117 
                     #      new_var temp_100_117:i32 
                     #      temp_100_117 = Div i32 y_18, 2_0 
-                    #found literal reg Some(a0) already exist with 2_0
-    li      a1, 12648
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s5,a0
+                    #found literal reg Some(a1) already exist with 2_0
+    li      a0, 13444
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    div     a0,a7,a1
                     #      y_18 = i32 temp_100_117 
                     #      new_var temp_101_117:i32 
                     #      temp_101_117 = Add i32 i_18, 1_0 
+    li      a0, 12644
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a0, 1
-    li      a1, 12644
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    add     a1,s3,a0
+    li      a2, 12648
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    add     a2,a1,a0
                     #      i_18 = i32 temp_101_117 
                     #      jump label: while.head_116 
+    li      a2, 12640
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 12752
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 13448
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 12752
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 12760
+    add     a0,sp,a0
+    ld      a1,0(a0)
+    li      a0, 12760
+    add     a0,sp,a0
+    sd      a0,0(a0)
+    li      a3, 12832
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13444
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 12832
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_116
                     #      label while.exit_116: 
 .while.exit_116:
                     #      label L9_0: 
 .L9_0:
                     #      c_64 = i32 ans_18 
-    mv      a0, s2
                     #      al_64 = i32 sum_64 
-    li      a0, 13172
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 12640
+                    #      jump label: while.head_67 
+    li      a1, 12839
+    add     a1,sp,a1
+    sb      a2,0(a1)
+    li      a1, 13448
+    add     a1,sp,a1
+    lw      a2,0(a1)
+    li      a1, 13448
     add     a1,sp,a1
     sw      a1,0(a1)
-    mv      a1, a0
-                    #      jump label: while.head_67 
+    li      a0, 13168
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    mv      a0, s11
+    li      s11, 13452
+    add     s11,sp,s11
+    sw      s11,0(s11)
     j       .while.head_67
                     #      label while.exit_67: 
 .while.exit_67:
                     #      ans_18 = i32 al_64 
+    mv      s11, s6
                     #      mres_42 = i32 ans_18 
-    li      a0, 13168
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, s2
                     #      jump label: branch_false_62 
+    li      s6, 13176
+    add     s6,sp,s6
+    sw      s6,0(s6)
+    li      s10, 13172
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 13167
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    mv      a0, s11
+    li      s11, 13452
+    add     s11,sp,s11
+    sw      s11,0(s11)
     j       .branch_false_62
                     #      label branch_false_62: 
 .branch_false_62:
                     #      label L10_0: 
 .L10_0:
                     #      al_129 = i32 ml_42 
-    li      a0, 13296
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 13176
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      s6, s1
                     #      c_129 = i32 ml_42 
-    li      a1, 12636
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      s10, s1
                     #      new_var sum_129:i32 
                     #      jump label: while.head_132 
     j       .while.head_132
@@ -2403,21 +2736,19 @@ long_func:
 .while.head_132:
                     #      new_var temp_102_3191:i1 
                     #      temp_102_3191 = icmp i32 Ne c_129, 0_0 
-    li      a0, 13304
+    li      s11, 0
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 12656
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
-    snez    a2, a2
+    xor     a0,s10,s11
+    snez    a0, a0
                     #      br i1 temp_102_3191, label while.body_132, label while.exit_132 
-    bnez    a2, .while.body_132
+    bnez    a0, .while.body_132
     j       .while.exit_132
                     #      label while.body_132: 
 .while.body_132:
                     #      ans_18 = i32 0_0 
+    li      s11, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_129 
                     #      y_18 = i32 c_129 
@@ -2427,14 +2758,14 @@ long_func:
 .while.head_139:
                     #      new_var temp_103_138:i1 
                     #      temp_103_138 = icmp i32 Slt i_18, 16_0 
-    li      a0, 12636
+    li      a0, 12627
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 16
-    li      a1, 12632
+    li      a1, 13423
     add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s3,a0
+    sb      a1,0(a1)
+    slt     a1,a2,a0
                     #      br i1 temp_103_138, label while.body_139, label while.exit_139 
     bnez    a1, .while.body_139
     j       .while.exit_139
@@ -2446,13 +2777,13 @@ long_func:
     li      a1, 12626
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s4,a0
+    rem     a1,a3,a0
                     #      new_var temp_105_3374:i1 
                     #      temp_105_3374 = icmp i32 Ne temp_104_141, 0_0 
     li      a0, 0
-    li      a2, 12627
+    li      a2, 13448
     add     a2,sp,a2
-    sb      a2,0(a2)
+    sw      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_105_3374, label branch_true_142, label branch_false_142 
@@ -2466,7 +2797,7 @@ long_func:
     li      a1, 12620
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s5,a0
+    rem     a1,a7,a0
                     #      new_var temp_107_144:i1 
                     #      temp_107_144 = icmp i32 Eq temp_106_144, 0_0 
     li      a0, 0
@@ -2500,8 +2831,11 @@ long_func:
     li      a2, 12611
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -2513,15 +2847,45 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 12604
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_112_146:i32 
                     #      temp_112_146 = Add i32 ans_18, temp_111_146 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_112_146 
                     #      jump label: branch_false_145 
+    li      a2, 12528
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 12524
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 12611
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 12532
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 12611
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 12612
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 12612
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 12604
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_145
                     #      label branch_false_145: 
 .branch_false_145:
@@ -2529,20 +2893,17 @@ long_func:
 .branch_false_142:
                     #      new_var temp_116_148:i32 
                     #      temp_116_148 = Mod i32 y_18, 2_0 
-    li      a0, 12524
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 12532
+    li      a1, 12620
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s5,a0
+    rem     a1,a7,a0
                     #      new_var temp_117_3519:i1 
                     #      temp_117_3519 = icmp i32 Ne temp_116_148, 0_0 
     li      a0, 0
-    li      a2, 12528
+    li      a2, 12619
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_117_3519, label branch_true_149, label branch_false_149 
@@ -2570,8 +2931,11 @@ long_func:
     li      a2, 12507
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -2583,15 +2947,45 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 12500
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_122_150:i32 
                     #      temp_122_150 = Add i32 ans_18, temp_121_150 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_122_150 
                     #      jump label: branch_false_149 
+    li      a2, 12424
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 12420
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 12507
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 12428
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 12507
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 12508
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 12508
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 12500
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_149
                     #      label branch_false_149: 
 .branch_false_149:
@@ -2601,14 +2995,11 @@ long_func:
 .L12_0:
                     #      new_var temp_113_140:i32 
                     #      temp_113_140 = Div i32 x_18, 2_0 
-    li      a0, 12420
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 12428
+    li      a1, 12508
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s4,a0
+    div     a1,a3,a0
                     #      x_18 = i32 temp_113_140 
                     #      new_var temp_114_140:i32 
                     #      temp_114_140 = Div i32 y_18, 2_0 
@@ -2616,46 +3007,71 @@ long_func:
     li      a1, 12520
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s5,a0
+    div     a1,a7,a0
                     #      y_18 = i32 temp_114_140 
                     #      new_var temp_115_140:i32 
                     #      temp_115_140 = Add i32 i_18, 1_0 
-    li      a0, 1
     li      a1, 12516
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s3,a0
+    li      a1, 1
+    li      a2, 12507
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    add     a2,a0,a1
                     #      i_18 = i32 temp_115_140 
                     #      jump label: while.head_139 
+    li      a2, 12512
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    mv      a2, a0
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 12627
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 12627
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_139
                     #      label while.exit_139: 
 .while.exit_139:
                     #      sum_129 = i32 ans_18 
-    mv      a0, s2
+    mv      a0, s11
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_129 
-    li      a0, 12628
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      y_18 = i32 c_129 
-    li      a0, 12636
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      jump label: while.head_161 
     j       .while.head_161
                     #      label while.head_161: 
 .while.head_161:
                     #      new_var temp_123_160:i1 
                     #      temp_123_160 = icmp i32 Slt i_18, 16_0 
-    li      a0, 12632
+    li      a0, 12628
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 12512
+    li      a1, 12626
     add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s3,a0
+    sb      a1,0(a1)
+    slt     a1,a2,a0
                     #      br i1 temp_123_160, label while.body_161, label while.exit_161 
     bnez    a1, .while.body_161
     j       .while.exit_161
@@ -2667,18 +3083,18 @@ long_func:
     li      a1, 12419
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s5,a0
+    rem     a1,a7,a0
                     #      new_var temp_125_163:i32 
                     #      temp_125_163 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 12412
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s4,a0
+    rem     a1,a3,a0
                     #      new_var temp_126_163:i1 
                     #      temp_126_163 = icmp i32 Ne temp_125_163, 0_0 
     li      a0, 0
-    li      a2, 12424
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     xor     a2,a1,a0
@@ -2723,8 +3139,11 @@ long_func:
     li      a2, 12407
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -2736,15 +3155,51 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 12400
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_133_165:i32 
                     #      temp_133_165 = Add i32 ans_18, temp_132_165 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_133_165 
                     #      jump label: branch_false_164 
+    li      a2, 12320
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 12316
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 12407
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 12324
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 12407
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 12406
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 12406
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 12400
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 12405
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 12405
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_164
                     #      label branch_false_164: 
 .branch_false_164:
@@ -2752,14 +3207,14 @@ long_func:
 .L13_0:
                     #      new_var temp_134_162:i32 
                     #      temp_134_162 = Div i32 x_18, 2_0 
-    li      a0, 12316
+    li      a0, 12405
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 12324
+    li      a1, 12406
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s4,a0
+    sb      a1,0(a1)
+    div     a1,a3,a0
                     #      x_18 = i32 temp_134_162 
                     #      new_var temp_135_162:i32 
                     #      temp_135_162 = Div i32 y_18, 2_0 
@@ -2767,37 +3222,64 @@ long_func:
     li      a1, 12312
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s5,a0
+    div     a1,a7,a0
                     #      y_18 = i32 temp_135_162 
                     #      new_var temp_136_162:i32 
                     #      temp_136_162 = Add i32 i_18, 1_0 
-    li      a0, 1
     li      a1, 12308
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s3,a0
+    li      a1, 1
+    li      a2, 12407
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    add     a2,a0,a1
                     #      i_18 = i32 temp_136_162 
                     #      jump label: while.head_161 
+    li      a2, 12304
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    mv      a2, a0
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 12626
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 12626
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 12628
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 12628
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_161
                     #      label while.exit_161: 
 .while.exit_161:
                     #      c_129 = i32 ans_18 
-    mv      a0, s2
                     #      jump label: L14_0 
     j       .L14_0
                     #      label L14_0: 
 .L14_0:
                     #      new_var temp_137_171:i1 
                     #      temp_137_171 = icmp i32 Sgt 1_0, 15_0 
-    li      a0, 12632
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 1
-    li      a1, 12304
+    li      a1, 12419
     add     a1,sp,a1
-    sw      a1,0(a1)
+    sb      a1,0(a1)
     li      a1, 15
-    li      a2, 12320
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     slt     a2,a1,a0
@@ -2813,41 +3295,46 @@ long_func:
 .branch_false_172:
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
+    li      a0, 0
                     #      new_var temp_138_175:Array:i32:[Some(16_0)] 
                     #      temp_138_175 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_139_175:ptr->i32 
                     #      new_var temp_140_175:i32 
                     #      temp_139_175 = getelementptr temp_138_175:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    li      a1, 12296
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
+    li      a1, 0
+    li      a0, 12296
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a2, 12303
     add     a2,sp,a2
     sb      a2,0(a2)
     li      a2, 1
-    li      a3, 12832
+    li      a3, 13444
     add     a3,sp,a3
     sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_140_175 = load temp_139_175:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_141_175:i32 
                     #      temp_141_175 = Mul i32 c_129, temp_140_175 
-    li      a0, 12224
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a2,a1
+    mul     a2,s10,a0
                     #      x_18 = i32 temp_141_175 
+    li      a0, 12220
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    mv      a0, a2
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_181 
     j       .while.head_181
@@ -2855,47 +3342,79 @@ long_func:
 .while.head_181:
                     #      new_var temp_142_180:i1 
                     #      temp_142_180 = icmp i32 Slt i_18, 16_0 
-    li      a0, 12216
+    li      a0, 13444
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 16
-    li      a1, 12220
+    li      a1, 12224
     add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s3,a0
+    sd      a1,0(a1)
+    li      a1, 16
+    li      a2, 12216
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    slt     a2,a0,a1
                     #      br i1 temp_142_180, label while.body_181, label while.exit_181 
-    bnez    a1, .while.body_181
+    bnez    a2, .while.body_181
+    li      a1, 12215
+    add     a1,sp,a1
+    sb      a2,0(a1)
+    li      a1, 12303
+    add     a1,sp,a1
+    lb      a2,0(a1)
+    li      a1, 12303
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 12296
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_181
                     #      label while.body_181: 
 .while.body_181:
                     #      new_var temp_143_183:i32 
                     #      temp_143_183 = Mod i32 y_18, 2_0 
-    li      a0, 2
-    li      a1, 12215
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    rem     a1,s5,a0
+    li      a1, 2
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    rem     a0,a7,a1
                     #      new_var temp_144_183:i32 
                     #      temp_144_183 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(a0) already exist with 2_0
-    li      a1, 12208
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    rem     a1,s4,a0
+    li      a0, 12208
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2
+    li      a2, 12215
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    rem     a2,a1,a0
                     #      new_var temp_145_183:i1 
                     #      temp_145_183 = icmp i32 Ne temp_144_183, 0_0 
     li      a0, 0
-    li      a2, 12632
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
-    snez    a2, a2
-                    #      new_var temp_146_183:i1 
-                    #      temp_145_183 = icmp i32 Ne temp_143_183, 0_0 
-    li      a1, 12204
+    li      a1, 13444
     add     a1,sp,a1
     sw      a1,0(a1)
+    xor     a1,a2,a0
+    snez    a1, a1
+                    #      new_var temp_146_183:i1 
+                    #      temp_145_183 = icmp i32 Ne temp_143_183, 0_0 
+    li      a1, 12203
+    add     a1,sp,a1
+    sb      a1,0(a1)
     li      a1, 0
+    li      a2, 12204
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    xor     a2,a0,a1
+    snez    a2, a2
                     #      new_var temp_147_183:i1 
                     #      temp_147_183 = And i1 temp_145_183, temp_146_183 
     li      a0, 12208
@@ -2930,8 +3449,11 @@ long_func:
     li      a2, 12203
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 12296
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -2943,15 +3465,51 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 12196
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_152_185:i32 
                     #      temp_152_185 = Add i32 ans_18, temp_151_185 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_152_185 
                     #      jump label: branch_false_184 
+    li      a2, 12120
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 12116
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 12203
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 12124
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 12203
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 12202
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 12202
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 12196
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 12201
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 12201
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 12296
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_184
                     #      label branch_false_184: 
 .branch_false_184:
@@ -2959,61 +3517,108 @@ long_func:
 .L15_0:
                     #      new_var temp_153_182:i32 
                     #      temp_153_182 = Div i32 x_18, 2_0 
-    li      a0, 12116
+    li      a0, 12201
     add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 2
-    li      a1, 12124
+    sb      a0,0(a0)
+    li      a1, 12202
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s4,a0
+    sb      a1,0(a1)
+    li      a1, 2
+    li      a2, 12203
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    div     a2,a0,a1
                     #      x_18 = i32 temp_153_182 
                     #      new_var temp_154_182:i32 
                     #      temp_154_182 = Div i32 y_18, 2_0 
-                    #found literal reg Some(a0) already exist with 2_0
-    li      a1, 12112
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s5,a0
+                    #found literal reg Some(a1) already exist with 2_0
+    li      a0, 13444
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    div     a0,a7,a1
                     #      y_18 = i32 temp_154_182 
                     #      new_var temp_155_182:i32 
                     #      temp_155_182 = Add i32 i_18, 1_0 
+    li      a0, 12108
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a0, 1
-    li      a1, 12108
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    add     a1,s3,a0
+    li      a2, 12112
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    add     a2,a1,a0
                     #      i_18 = i32 temp_155_182 
                     #      jump label: while.head_181 
+    li      a2, 12104
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 12216
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 13448
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 12216
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 12224
+    add     a0,sp,a0
+    ld      a1,0(a0)
+    li      a0, 12224
+    add     a0,sp,a0
+    sd      a0,0(a0)
+    li      a3, 12296
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13444
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 12296
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_181
                     #      label while.exit_181: 
 .while.exit_181:
                     #      label L16_0: 
 .L16_0:
                     #      c_129 = i32 ans_18 
-    mv      a0, s2
                     #      al_129 = i32 sum_129 
-    li      a0, 12632
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 12104
+                    #      jump label: while.head_132 
+    li      a1, 12303
+    add     a1,sp,a1
+    sb      a2,0(a1)
+    li      a1, 13448
+    add     a1,sp,a1
+    lw      a2,0(a1)
+    li      a1, 13448
     add     a1,sp,a1
     sw      a1,0(a1)
-    mv      a1, a0
-                    #      jump label: while.head_132 
+    li      a0, 12628
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    mv      a0, s11
+    li      s11, 13452
+    add     s11,sp,s11
+    sw      s11,0(s11)
     j       .while.head_132
                     #      label while.exit_132: 
 .while.exit_132:
                     #      ans_18 = i32 al_129 
+    mv      s11, s6
                     #      ml_42 = i32 ans_18 
-    li      a0, 12628
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, s2
                     #      x_18 = i32 mr_42 
-    li      a0, 13304
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      y_18 = i32 1_0 
                     #      jump label: L17_0 
     j       .L17_0
@@ -3021,14 +3626,14 @@ long_func:
 .L17_0:
                     #      new_var temp_156_196:i1 
                     #      temp_156_196 = icmp i32 Sge y_18, 15_0 
-    li      a0, 13300
+    li      a0, 12627
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 15
-    li      a1, 12636
+    li      a1, 13423
     add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s5,a0
+    sb      a1,0(a1)
+    slt     a1,a7,a0
     xori    a1,a1,1
                     #      br i1 temp_156_196, label branch_true_197, label branch_false_197 
     bnez    a1, .branch_true_197
@@ -3041,7 +3646,7 @@ long_func:
     li      a1, 12103
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,s4,a0
+    slt     a1,a3,a0
                     #      br i1 temp_157_199, label branch_true_200, label branch_false_200 
     bnez    a1, .branch_true_200
     j       .branch_false_200
@@ -3061,11 +3666,11 @@ long_func:
 .branch_false_197:
                     #      new_var temp_158_205:i1 
                     #      temp_158_205 = icmp i32 Sgt y_18, 0_0 
-                    #found literal reg Some(a0) already exist with 0_0
-    li      a1, 12102
+    li      a0, 0
+    li      a1, 12103
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s5
+    slt     a1,a0,a7
                     #      br i1 temp_158_205, label branch_true_206, label branch_false_206 
     bnez    a1, .branch_true_206
     j       .branch_false_206
@@ -3077,7 +3682,7 @@ long_func:
     li      a1, 12101
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s4
+    slt     a1,a0,a3
                     #      br i1 temp_159_208, label branch_true_209, label branch_false_209 
     bnez    a1, .branch_true_209
     j       .branch_false_209
@@ -3100,10 +3705,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 12120
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
-    mul     a2,a1,s5
+    mul     a2,a1,a7
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -3115,7 +3720,7 @@ long_func:
     li      a0, 12024
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s4,a1
+    div     a0,a3,a1
                     #      x_18 = i32 temp_163_210 
                     #      new_var temp_164_210:i32 
                     #      temp_164_210 = Add i32 y_18, 1_0 
@@ -3126,7 +3731,7 @@ long_func:
     li      a1, 12020
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s5,a0
+    add     a1,a7,a0
                     #      new_var temp_165_210:i32 
                     #      temp_165_210 = Sub i32 15_0, temp_164_210 
     li      a0, 15
@@ -3151,7 +3756,7 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a3, 12296
+    li      a3, 13444
     add     a3,sp,a3
     sw      a3,0(a3)
     mul     a3,a1,a2
@@ -3173,7 +3778,10 @@ long_func:
     sub     a2,a0,a1
                     #      new_var temp_170_210:i32 
                     #      temp_170_210 = Add i32 x_18, temp_169_210 
-    add     a0,s4,a2
+    li      a1, 11932
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_170_210 
                     #      jump label: L19_0 
     j       .L19_0
@@ -3181,15 +3789,12 @@ long_func:
 .branch_false_209:
                     #      new_var temp_171_213:Array:i32:[Some(16_0)] 
                     #      temp_171_213 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 11924
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 11932
+    li      a1, 12100
     add     a1,sp,a1
-    sw      a1,0(a1)
+    sb      a1,0(a1)
     lw      a1,0(a0)
                     #      new_var temp_172_213:ptr->i32 
                     #      new_var temp_173_213:i32 
@@ -3199,10 +3804,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 11928
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
-    mul     a2,a1,s5
+    mul     a2,a1,a7
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -3214,9 +3819,40 @@ long_func:
     li      a0, 11848
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s4,a1
+    div     a0,a3,a1
                     #      ans_18 = i32 temp_174_213 
                     #      jump label: L19_0 
+    li      a2, 11920
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 11840
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 11928
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 11844
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 11928
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 11924
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 11924
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    mv      a0, a3
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 12004
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .L19_0
                     #      label L19_0: 
 .L19_0:
@@ -3232,60 +3868,75 @@ long_func:
                     #      label L22_0: 
 .L22_0:
                     #      mr_42 = i32 ans_18 
-    li      a0, 11840
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, s2
                     #      jump label: while.head_45 
+    li      a0, 13294
+    add     a0,sp,a0
+    sb      s8,0(a0)
+    li      a1, 12101
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s6, 12636
+    add     s6,sp,s6
+    sw      s6,0(s6)
+    li      s10, 12632
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      s7, 13295
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    mv      a0, s11
+    li      s11, 13452
+    add     s11,sp,s11
+    sw      s11,0(s11)
+    li      s9, 13183
+    add     s9,sp,s9
+    sb      s9,0(s9)
     j       .while.head_45
                     #      label while.exit_45: 
 .while.exit_45:
                     #      ans_18 = i32 mres_42 
-    li      a0, 13300
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      pres_20 = i32 ans_18 
                     #      jump label: branch_false_40 
+    li      s1, 13304
+    add     s1,sp,s1
+    sw      s1,0(s1)
+    li      s5, 13296
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      s7, 13295
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    li      s4, 13300
+    add     s4,sp,s4
+    sw      s4,0(s4)
     j       .branch_false_40
                     #      label branch_false_40: 
 .branch_false_40:
                     #      label L23_0: 
 .L23_0:
                     #      ml_220 = i32 pl_20 
-    li      a0, 13296
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, a4
+    mv      s1, a4
                     #      mr_220 = i32 pl_20 
-    li      a0, 11836
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, a4
+    mv      s4, a4
                     #      mres_220 = i32 0_0 
-    li      a0, 11832
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
+    li      s5, 0
                     #      jump label: while.head_223 
     j       .while.head_223
                     #      label while.head_223: 
 .while.head_223:
                     #      new_var temp_175_5483:i1 
                     #      temp_175_5483 = icmp i32 Ne mr_220, 0_0 
-    li      a0, 11828
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 11844
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 0
-    li      a2, 11920
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a0,a1
-    snez    a2, a2
+    li      s6, 0
+    xor     s7,s4,s6
+    snez    s7, s7
                     #      br i1 temp_175_5483, label while.body_223, label while.exit_223 
-    bnez    a2, .while.body_223
+    bnez    s7, .while.body_223
     j       .while.exit_223
                     #      label while.body_223: 
 .while.body_223:
@@ -3299,64 +3950,49 @@ long_func:
 .while.head_230:
                     #      new_var temp_176_229:i1 
                     #      temp_176_229 = icmp i32 Slt i_18, 16_0 
-    li      a1, 16
-    li      a0, 11832
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    slt     a0,s3,a1
+    li      s6, 16
+    slt     s8,a2,s6
                     #      br i1 temp_176_229, label while.body_230, label while.exit_230 
-    bnez    a0, .while.body_230
+    bnez    s8, .while.body_230
     j       .while.exit_230
                     #      label while.body_230: 
 .while.body_230:
                     #      new_var temp_177_232:i32 
                     #      temp_177_232 = Mod i32 y_18, 2_0 
-    li      a1, 2
-    li      a0, 11826
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    rem     a0,s5,a1
+    li      s6, 2
+    rem     s9,a7,s6
                     #      new_var temp_178_232:i32 
                     #      temp_178_232 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(a1) already exist with 2_0
-    li      a0, 11820
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    rem     a0,s4,a1
+                    #found literal reg Some(s6) already exist with 2_0
+    rem     s10,a3,s6
                     #      new_var temp_179_232:i1 
                     #      temp_179_232 = icmp i32 Ne temp_178_232, 0_0 
-    li      a1, 0
-    li      a2, 11827
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    xor     a2,a0,a1
-    snez    a2, a2
+    li      s11, 0
+    xor     s6,s10,s11
+    snez    s6, s6
                     #      new_var temp_180_232:i1 
                     #      temp_179_232 = icmp i32 Ne temp_177_232, 0_0 
-    li      a0, 11816
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
+                    #found literal reg Some(s11) already exist with 0_0
                     #      new_var temp_181_232:i1 
                     #      temp_181_232 = And i1 temp_179_232, temp_180_232 
-    li      a1, 11820
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    and     a1,a2,a0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    and     a0,s6,s11
                     #      br i1 temp_181_232, label branch_true_233, label branch_false_233 
-    bnez    a1, .branch_true_233
+    bnez    a0, .branch_true_233
     j       .branch_false_233
                     #      label branch_true_233: 
 .branch_true_233:
                     #      new_var temp_182_234:Array:i32:[Some(16_0)] 
                     #      temp_182_234 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 11814
+    li      a0, 11813
     add     a0,sp,a0
     sb      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 11813
+    li      a1, 13423
     add     a1,sp,a1
     sb      a1,0(a1)
     lw      a1,0(a0)
@@ -3368,11 +4004,11 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 11815
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -3384,15 +4020,54 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 11808
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_186_234:i32 
                     #      temp_186_234 = Add i32 ans_18, temp_185_234 
-    add     a0,s2,a2
+    li      a1, 11732
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_186_234 
                     #      jump label: branch_false_233 
+    li      a2, 11728
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13448
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 11724
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 11808
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 11813
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 11813
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_233
                     #      label branch_false_233: 
 .branch_false_233:
@@ -3400,14 +4075,14 @@ long_func:
 .L24_0:
                     #      new_var temp_187_231:i32 
                     #      temp_187_231 = Div i32 x_18, 2_0 
-    li      a0, 11724
+    li      a0, 11813
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 11732
+    li      a1, 13423
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s4,a0
+    sb      a1,0(a1)
+    div     a1,a3,a0
                     #      x_18 = i32 temp_187_231 
                     #      new_var temp_188_231:i32 
                     #      temp_188_231 = Div i32 y_18, 2_0 
@@ -3415,7 +4090,7 @@ long_func:
     li      a1, 11720
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s5,a0
+    div     a1,a7,a0
                     #      y_18 = i32 temp_188_231 
                     #      new_var temp_189_231:i32 
                     #      temp_189_231 = Add i32 i_18, 1_0 
@@ -3423,38 +4098,56 @@ long_func:
     li      a1, 11716
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s3,a0
+    add     a1,a2,a0
                     #      i_18 = i32 temp_189_231 
                     #      jump label: while.head_230 
+    li      s8, 11826
+    add     s8,sp,s8
+    sb      s8,0(s8)
+    li      a1, 11712
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s6, 11815
+    add     s6,sp,s6
+    sb      s6,0(s6)
+    li      s10, 11816
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a2, 13448
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a2, 13452
+    add     a2,sp,a2
+    lw      a0,0(a2)
+    li      s11, 11814
+    add     s11,sp,s11
+    sb      s11,0(s11)
+    li      s9, 11820
+    add     s9,sp,s9
+    sw      s9,0(s9)
     j       .while.head_230
                     #      label while.exit_230: 
 .while.exit_230:
                     #      new_var temp_190_5892:i1 
                     #      temp_190_5892 = icmp i32 Ne ans_18, 0_0 
-    li      a0, 0
-    li      a1, 11712
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    xor     a1,s2,a0
-    snez    a1, a1
+    li      s6, 0
+    xor     s9,a0,s6
+    snez    s9, s9
                     #      br i1 temp_190_5892, label branch_true_240, label branch_false_240 
-    bnez    a1, .branch_true_240
+    bnez    s9, .branch_true_240
     j       .branch_false_240
                     #      label branch_true_240: 
 .branch_true_240:
                     #      al_242 = i32 mres_220 
-    li      a1, 11711
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    mv      a1, a0
+    mv      s6, s5
                     #      c_242 = i32 ml_220 
-    li      a0, 11828
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 11704
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      s10, s1
                     #      new_var sum_242:i32 
                     #      jump label: while.head_245 
     j       .while.head_245
@@ -3462,21 +4155,19 @@ long_func:
 .while.head_245:
                     #      new_var temp_191_5986:i1 
                     #      temp_191_5986 = icmp i32 Ne c_242, 0_0 
-    li      a0, 11836
+    li      s11, 0
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 11728
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
-    snez    a2, a2
+    xor     a0,s10,s11
+    snez    a0, a0
                     #      br i1 temp_191_5986, label while.body_245, label while.exit_245 
-    bnez    a2, .while.body_245
+    bnez    a0, .while.body_245
     j       .while.exit_245
                     #      label while.body_245: 
 .while.body_245:
                     #      ans_18 = i32 0_0 
+    li      s11, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_242 
                     #      y_18 = i32 c_242 
@@ -3486,14 +4177,14 @@ long_func:
 .while.head_252:
                     #      new_var temp_192_251:i1 
                     #      temp_192_251 = icmp i32 Slt i_18, 16_0 
-    li      a0, 11704
+    li      a0, 11695
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 16
-    li      a1, 11700
+    li      a1, 13423
     add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s3,a0
+    sb      a1,0(a1)
+    slt     a1,a2,a0
                     #      br i1 temp_192_251, label while.body_252, label while.exit_252 
     bnez    a1, .while.body_252
     j       .while.exit_252
@@ -3505,13 +4196,13 @@ long_func:
     li      a1, 11694
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s4,a0
+    rem     a1,a3,a0
                     #      new_var temp_194_6169:i1 
                     #      temp_194_6169 = icmp i32 Ne temp_193_254, 0_0 
     li      a0, 0
-    li      a2, 11695
+    li      a2, 13448
     add     a2,sp,a2
-    sb      a2,0(a2)
+    sw      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_194_6169, label branch_true_255, label branch_false_255 
@@ -3525,7 +4216,7 @@ long_func:
     li      a1, 11688
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s5,a0
+    rem     a1,a7,a0
                     #      new_var temp_196_257:i1 
                     #      temp_196_257 = icmp i32 Eq temp_195_257, 0_0 
     li      a0, 0
@@ -3559,8 +4250,11 @@ long_func:
     li      a2, 11679
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -3572,15 +4266,45 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 11672
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_201_259:i32 
                     #      temp_201_259 = Add i32 ans_18, temp_200_259 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_201_259 
                     #      jump label: branch_false_258 
+    li      a2, 11592
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 11588
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 11679
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 11596
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 11679
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 11680
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 11680
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 11672
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_258
                     #      label branch_false_258: 
 .branch_false_258:
@@ -3588,20 +4312,17 @@ long_func:
 .branch_false_255:
                     #      new_var temp_205_261:i32 
                     #      temp_205_261 = Mod i32 y_18, 2_0 
-    li      a0, 11588
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 11596
+    li      a1, 11688
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s5,a0
+    rem     a1,a7,a0
                     #      new_var temp_206_6314:i1 
                     #      temp_206_6314 = icmp i32 Ne temp_205_261, 0_0 
     li      a0, 0
-    li      a2, 11592
+    li      a2, 11687
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_206_6314, label branch_true_262, label branch_false_262 
@@ -3629,8 +4350,11 @@ long_func:
     li      a2, 11571
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -3642,15 +4366,45 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 11564
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_211_263:i32 
                     #      temp_211_263 = Add i32 ans_18, temp_210_263 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_211_263 
                     #      jump label: branch_false_262 
+    li      a2, 11488
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 11484
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 11571
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 11492
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 11571
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 11572
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 11572
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 11564
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_262
                     #      label branch_false_262: 
 .branch_false_262:
@@ -3660,14 +4414,11 @@ long_func:
 .L26_0:
                     #      new_var temp_202_253:i32 
                     #      temp_202_253 = Div i32 x_18, 2_0 
-    li      a0, 11484
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 11492
+    li      a1, 11572
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s4,a0
+    div     a1,a3,a0
                     #      x_18 = i32 temp_202_253 
                     #      new_var temp_203_253:i32 
                     #      temp_203_253 = Div i32 y_18, 2_0 
@@ -3675,46 +4426,71 @@ long_func:
     li      a1, 11584
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s5,a0
+    div     a1,a7,a0
                     #      y_18 = i32 temp_203_253 
                     #      new_var temp_204_253:i32 
                     #      temp_204_253 = Add i32 i_18, 1_0 
-    li      a0, 1
     li      a1, 11580
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s3,a0
+    li      a1, 1
+    li      a2, 11571
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    add     a2,a0,a1
                     #      i_18 = i32 temp_204_253 
                     #      jump label: while.head_252 
+    li      a2, 11576
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    mv      a2, a0
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 11695
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 11695
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_252
                     #      label while.exit_252: 
 .while.exit_252:
                     #      sum_242 = i32 ans_18 
-    mv      a0, s2
+    mv      a0, s11
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_242 
-    li      a0, 11696
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      y_18 = i32 c_242 
-    li      a0, 11704
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      jump label: while.head_274 
     j       .while.head_274
                     #      label while.head_274: 
 .while.head_274:
                     #      new_var temp_212_273:i1 
                     #      temp_212_273 = icmp i32 Slt i_18, 16_0 
-    li      a0, 11700
+    li      a0, 11696
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 11576
+    li      a1, 11694
     add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s3,a0
+    sb      a1,0(a1)
+    slt     a1,a2,a0
                     #      br i1 temp_212_273, label while.body_274, label while.exit_274 
     bnez    a1, .while.body_274
     j       .while.exit_274
@@ -3726,18 +4502,18 @@ long_func:
     li      a1, 11483
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s5,a0
+    rem     a1,a7,a0
                     #      new_var temp_214_276:i32 
                     #      temp_214_276 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 11476
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s4,a0
+    rem     a1,a3,a0
                     #      new_var temp_215_276:i1 
                     #      temp_215_276 = icmp i32 Ne temp_214_276, 0_0 
     li      a0, 0
-    li      a2, 11488
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     xor     a2,a1,a0
@@ -3782,8 +4558,11 @@ long_func:
     li      a2, 11471
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -3795,15 +4574,51 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 11464
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_222_278:i32 
                     #      temp_222_278 = Add i32 ans_18, temp_221_278 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_222_278 
                     #      jump label: branch_false_277 
+    li      a2, 11384
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 11380
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 11471
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 11388
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 11471
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 11470
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 11470
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 11464
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 11469
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 11469
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_277
                     #      label branch_false_277: 
 .branch_false_277:
@@ -3811,14 +4626,14 @@ long_func:
 .L27_0:
                     #      new_var temp_223_275:i32 
                     #      temp_223_275 = Div i32 x_18, 2_0 
-    li      a0, 11380
+    li      a0, 11469
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 11388
+    li      a1, 11470
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s4,a0
+    sb      a1,0(a1)
+    div     a1,a3,a0
                     #      x_18 = i32 temp_223_275 
                     #      new_var temp_224_275:i32 
                     #      temp_224_275 = Div i32 y_18, 2_0 
@@ -3826,37 +4641,64 @@ long_func:
     li      a1, 11376
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s5,a0
+    div     a1,a7,a0
                     #      y_18 = i32 temp_224_275 
                     #      new_var temp_225_275:i32 
                     #      temp_225_275 = Add i32 i_18, 1_0 
-    li      a0, 1
     li      a1, 11372
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s3,a0
+    li      a1, 1
+    li      a2, 11471
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    add     a2,a0,a1
                     #      i_18 = i32 temp_225_275 
                     #      jump label: while.head_274 
+    li      a2, 11368
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    mv      a2, a0
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 11694
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 11694
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 11696
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 11696
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_274
                     #      label while.exit_274: 
 .while.exit_274:
                     #      c_242 = i32 ans_18 
-    mv      a0, s2
                     #      jump label: L28_0 
     j       .L28_0
                     #      label L28_0: 
 .L28_0:
                     #      new_var temp_226_284:i1 
                     #      temp_226_284 = icmp i32 Sgt 1_0, 15_0 
-    li      a0, 11700
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 1
-    li      a1, 11368
+    li      a1, 11483
     add     a1,sp,a1
-    sw      a1,0(a1)
+    sb      a1,0(a1)
     li      a1, 15
-    li      a2, 11384
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     slt     a2,a1,a0
@@ -3872,41 +4714,46 @@ long_func:
 .branch_false_285:
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
+    li      a0, 0
                     #      new_var temp_227_288:Array:i32:[Some(16_0)] 
                     #      temp_227_288 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_228_288:ptr->i32 
                     #      new_var temp_229_288:i32 
                     #      temp_228_288 = getelementptr temp_227_288:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    li      a1, 11360
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
+    li      a1, 0
+    li      a0, 11360
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a2, 11367
     add     a2,sp,a2
     sb      a2,0(a2)
     li      a2, 1
-    li      a3, 12004
+    li      a3, 13444
     add     a3,sp,a3
     sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_229_288 = load temp_228_288:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_230_288:i32 
                     #      temp_230_288 = Mul i32 c_242, temp_229_288 
-    li      a0, 11288
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a2,a1
+    mul     a2,s10,a0
                     #      x_18 = i32 temp_230_288 
+    li      a0, 11284
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    mv      a0, a2
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_294 
     j       .while.head_294
@@ -3914,47 +4761,79 @@ long_func:
 .while.head_294:
                     #      new_var temp_231_293:i1 
                     #      temp_231_293 = icmp i32 Slt i_18, 16_0 
-    li      a0, 11280
+    li      a0, 13444
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 16
-    li      a1, 11284
+    li      a1, 11288
     add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s3,a0
+    sd      a1,0(a1)
+    li      a1, 16
+    li      a2, 11280
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    slt     a2,a0,a1
                     #      br i1 temp_231_293, label while.body_294, label while.exit_294 
-    bnez    a1, .while.body_294
+    bnez    a2, .while.body_294
+    li      a1, 11279
+    add     a1,sp,a1
+    sb      a2,0(a1)
+    li      a1, 11367
+    add     a1,sp,a1
+    lb      a2,0(a1)
+    li      a1, 11367
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 11360
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_294
                     #      label while.body_294: 
 .while.body_294:
                     #      new_var temp_232_296:i32 
                     #      temp_232_296 = Mod i32 y_18, 2_0 
-    li      a0, 2
-    li      a1, 11279
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    rem     a1,s5,a0
+    li      a1, 2
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    rem     a0,a7,a1
                     #      new_var temp_233_296:i32 
                     #      temp_233_296 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(a0) already exist with 2_0
-    li      a1, 11272
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    rem     a1,s4,a0
+    li      a0, 11272
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2
+    li      a2, 11279
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    rem     a2,a1,a0
                     #      new_var temp_234_296:i1 
                     #      temp_234_296 = icmp i32 Ne temp_233_296, 0_0 
     li      a0, 0
-    li      a2, 11700
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
-    snez    a2, a2
-                    #      new_var temp_235_296:i1 
-                    #      temp_234_296 = icmp i32 Ne temp_232_296, 0_0 
-    li      a1, 11268
+    li      a1, 13444
     add     a1,sp,a1
     sw      a1,0(a1)
+    xor     a1,a2,a0
+    snez    a1, a1
+                    #      new_var temp_235_296:i1 
+                    #      temp_234_296 = icmp i32 Ne temp_232_296, 0_0 
+    li      a1, 11267
+    add     a1,sp,a1
+    sb      a1,0(a1)
     li      a1, 0
+    li      a2, 11268
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    xor     a2,a0,a1
+    snez    a2, a2
                     #      new_var temp_236_296:i1 
                     #      temp_236_296 = And i1 temp_234_296, temp_235_296 
     li      a0, 11272
@@ -3989,8 +4868,11 @@ long_func:
     li      a2, 11267
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 11360
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -4002,15 +4884,51 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 11260
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_241_298:i32 
                     #      temp_241_298 = Add i32 ans_18, temp_240_298 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_241_298 
                     #      jump label: branch_false_297 
+    li      a2, 11184
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 11180
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 11267
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 11188
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 11267
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 11266
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 11266
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 11260
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 11265
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 11265
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 11360
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_297
                     #      label branch_false_297: 
 .branch_false_297:
@@ -4018,76 +4936,130 @@ long_func:
 .L29_0:
                     #      new_var temp_242_295:i32 
                     #      temp_242_295 = Div i32 x_18, 2_0 
-    li      a0, 11180
+    li      a0, 11265
     add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 2
-    li      a1, 11188
+    sb      a0,0(a0)
+    li      a1, 11266
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s4,a0
+    sb      a1,0(a1)
+    li      a1, 2
+    li      a2, 11267
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    div     a2,a0,a1
                     #      x_18 = i32 temp_242_295 
                     #      new_var temp_243_295:i32 
                     #      temp_243_295 = Div i32 y_18, 2_0 
-                    #found literal reg Some(a0) already exist with 2_0
-    li      a1, 11176
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s5,a0
+                    #found literal reg Some(a1) already exist with 2_0
+    li      a0, 13444
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    div     a0,a7,a1
                     #      y_18 = i32 temp_243_295 
                     #      new_var temp_244_295:i32 
                     #      temp_244_295 = Add i32 i_18, 1_0 
+    li      a0, 11172
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a0, 1
-    li      a1, 11172
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    add     a1,s3,a0
+    li      a2, 11176
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    add     a2,a1,a0
                     #      i_18 = i32 temp_244_295 
                     #      jump label: while.head_294 
+    li      a2, 11168
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 11280
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 13448
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 11280
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 11288
+    add     a0,sp,a0
+    ld      a1,0(a0)
+    li      a0, 11288
+    add     a0,sp,a0
+    sd      a0,0(a0)
+    li      a3, 11360
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13444
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 11360
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_294
                     #      label while.exit_294: 
 .while.exit_294:
                     #      label L30_0: 
 .L30_0:
                     #      c_242 = i32 ans_18 
-    mv      a0, s2
                     #      al_242 = i32 sum_242 
-    li      a0, 11700
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 11168
+                    #      jump label: while.head_245 
+    li      a1, 11367
+    add     a1,sp,a1
+    sb      a2,0(a1)
+    li      a1, 13448
+    add     a1,sp,a1
+    lw      a2,0(a1)
+    li      a1, 13448
     add     a1,sp,a1
     sw      a1,0(a1)
-    mv      a1, a0
-                    #      jump label: while.head_245 
+    li      a0, 11696
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    mv      a0, s11
+    li      s11, 13452
+    add     s11,sp,s11
+    sw      s11,0(s11)
     j       .while.head_245
                     #      label while.exit_245: 
 .while.exit_245:
                     #      ans_18 = i32 al_242 
+    mv      s11, s6
                     #      mres_220 = i32 ans_18 
-    li      a0, 11696
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, s2
                     #      jump label: branch_false_240 
+    li      s6, 11704
+    add     s6,sp,s6
+    sw      s6,0(s6)
+    li      s10, 11700
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 11695
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    mv      a0, s11
+    li      s11, 13452
+    add     s11,sp,s11
+    sw      s11,0(s11)
     j       .branch_false_240
                     #      label branch_false_240: 
 .branch_false_240:
                     #      label L31_0: 
 .L31_0:
                     #      al_307 = i32 ml_220 
-    li      a0, 11828
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 11704
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      s6, s1
                     #      c_307 = i32 ml_220 
-    li      a1, 11164
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      s10, s1
                     #      new_var sum_307:i32 
                     #      jump label: while.head_310 
     j       .while.head_310
@@ -4095,21 +5067,19 @@ long_func:
 .while.head_310:
                     #      new_var temp_245_7661:i1 
                     #      temp_245_7661 = icmp i32 Ne c_307, 0_0 
-    li      a0, 11836
+    li      s11, 0
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 11184
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
-    snez    a2, a2
+    xor     a0,s10,s11
+    snez    a0, a0
                     #      br i1 temp_245_7661, label while.body_310, label while.exit_310 
-    bnez    a2, .while.body_310
+    bnez    a0, .while.body_310
     j       .while.exit_310
                     #      label while.body_310: 
 .while.body_310:
                     #      ans_18 = i32 0_0 
+    li      s11, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_307 
                     #      y_18 = i32 c_307 
@@ -4119,14 +5089,14 @@ long_func:
 .while.head_317:
                     #      new_var temp_246_316:i1 
                     #      temp_246_316 = icmp i32 Slt i_18, 16_0 
-    li      a0, 11164
+    li      a0, 11155
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 16
-    li      a1, 11160
+    li      a1, 13423
     add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s3,a0
+    sb      a1,0(a1)
+    slt     a1,a2,a0
                     #      br i1 temp_246_316, label while.body_317, label while.exit_317 
     bnez    a1, .while.body_317
     j       .while.exit_317
@@ -4138,13 +5108,13 @@ long_func:
     li      a1, 11154
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s4,a0
+    rem     a1,a3,a0
                     #      new_var temp_248_7844:i1 
                     #      temp_248_7844 = icmp i32 Ne temp_247_319, 0_0 
     li      a0, 0
-    li      a2, 11155
+    li      a2, 13448
     add     a2,sp,a2
-    sb      a2,0(a2)
+    sw      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_248_7844, label branch_true_320, label branch_false_320 
@@ -4158,7 +5128,7 @@ long_func:
     li      a1, 11148
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s5,a0
+    rem     a1,a7,a0
                     #      new_var temp_250_322:i1 
                     #      temp_250_322 = icmp i32 Eq temp_249_322, 0_0 
     li      a0, 0
@@ -4192,8 +5162,11 @@ long_func:
     li      a2, 11139
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -4205,15 +5178,45 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 11132
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_255_324:i32 
                     #      temp_255_324 = Add i32 ans_18, temp_254_324 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_255_324 
                     #      jump label: branch_false_323 
+    li      a2, 11056
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 11052
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 11139
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 11060
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 11139
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 11140
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 11140
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 11132
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_323
                     #      label branch_false_323: 
 .branch_false_323:
@@ -4221,20 +5224,17 @@ long_func:
 .branch_false_320:
                     #      new_var temp_259_326:i32 
                     #      temp_259_326 = Mod i32 y_18, 2_0 
-    li      a0, 11052
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 11060
+    li      a1, 11148
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s5,a0
+    rem     a1,a7,a0
                     #      new_var temp_260_7989:i1 
                     #      temp_260_7989 = icmp i32 Ne temp_259_326, 0_0 
     li      a0, 0
-    li      a2, 11056
+    li      a2, 11147
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_260_7989, label branch_true_327, label branch_false_327 
@@ -4262,8 +5262,11 @@ long_func:
     li      a2, 11035
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -4275,15 +5278,45 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 11028
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_265_328:i32 
                     #      temp_265_328 = Add i32 ans_18, temp_264_328 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_265_328 
                     #      jump label: branch_false_327 
+    li      a2, 10952
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 10948
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 11035
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 10956
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 11035
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 11036
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 11036
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 11028
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_327
                     #      label branch_false_327: 
 .branch_false_327:
@@ -4293,14 +5326,11 @@ long_func:
 .L33_0:
                     #      new_var temp_256_318:i32 
                     #      temp_256_318 = Div i32 x_18, 2_0 
-    li      a0, 10948
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 10956
+    li      a1, 11036
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s4,a0
+    div     a1,a3,a0
                     #      x_18 = i32 temp_256_318 
                     #      new_var temp_257_318:i32 
                     #      temp_257_318 = Div i32 y_18, 2_0 
@@ -4308,46 +5338,71 @@ long_func:
     li      a1, 11048
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s5,a0
+    div     a1,a7,a0
                     #      y_18 = i32 temp_257_318 
                     #      new_var temp_258_318:i32 
                     #      temp_258_318 = Add i32 i_18, 1_0 
-    li      a0, 1
     li      a1, 11044
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s3,a0
+    li      a1, 1
+    li      a2, 11035
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    add     a2,a0,a1
                     #      i_18 = i32 temp_258_318 
                     #      jump label: while.head_317 
+    li      a2, 11040
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    mv      a2, a0
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 11155
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 11155
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_317
                     #      label while.exit_317: 
 .while.exit_317:
                     #      sum_307 = i32 ans_18 
-    mv      a0, s2
+    mv      a0, s11
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_307 
-    li      a0, 11156
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      y_18 = i32 c_307 
-    li      a0, 11164
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      jump label: while.head_339 
     j       .while.head_339
                     #      label while.head_339: 
 .while.head_339:
                     #      new_var temp_266_338:i1 
                     #      temp_266_338 = icmp i32 Slt i_18, 16_0 
-    li      a0, 11160
+    li      a0, 11156
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 11040
+    li      a1, 11154
     add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s3,a0
+    sb      a1,0(a1)
+    slt     a1,a2,a0
                     #      br i1 temp_266_338, label while.body_339, label while.exit_339 
     bnez    a1, .while.body_339
     j       .while.exit_339
@@ -4359,18 +5414,18 @@ long_func:
     li      a1, 10947
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s5,a0
+    rem     a1,a7,a0
                     #      new_var temp_268_341:i32 
                     #      temp_268_341 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 10940
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s4,a0
+    rem     a1,a3,a0
                     #      new_var temp_269_341:i1 
                     #      temp_269_341 = icmp i32 Ne temp_268_341, 0_0 
     li      a0, 0
-    li      a2, 10952
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     xor     a2,a1,a0
@@ -4415,8 +5470,11 @@ long_func:
     li      a2, 10935
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -4428,15 +5486,51 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 10928
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_276_343:i32 
                     #      temp_276_343 = Add i32 ans_18, temp_275_343 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_276_343 
                     #      jump label: branch_false_342 
+    li      a2, 10848
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 10844
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 10935
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 10852
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 10935
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 10934
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 10934
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10928
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 10933
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 10933
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_342
                     #      label branch_false_342: 
 .branch_false_342:
@@ -4444,14 +5538,14 @@ long_func:
 .L34_0:
                     #      new_var temp_277_340:i32 
                     #      temp_277_340 = Div i32 x_18, 2_0 
-    li      a0, 10844
+    li      a0, 10933
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 10852
+    li      a1, 10934
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s4,a0
+    sb      a1,0(a1)
+    div     a1,a3,a0
                     #      x_18 = i32 temp_277_340 
                     #      new_var temp_278_340:i32 
                     #      temp_278_340 = Div i32 y_18, 2_0 
@@ -4459,37 +5553,64 @@ long_func:
     li      a1, 10840
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s5,a0
+    div     a1,a7,a0
                     #      y_18 = i32 temp_278_340 
                     #      new_var temp_279_340:i32 
                     #      temp_279_340 = Add i32 i_18, 1_0 
-    li      a0, 1
     li      a1, 10836
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s3,a0
+    li      a1, 1
+    li      a2, 10935
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    add     a2,a0,a1
                     #      i_18 = i32 temp_279_340 
                     #      jump label: while.head_339 
+    li      a2, 10832
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    mv      a2, a0
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 11154
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 11154
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 11156
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 11156
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_339
                     #      label while.exit_339: 
 .while.exit_339:
                     #      c_307 = i32 ans_18 
-    mv      a0, s2
                     #      jump label: L35_0 
     j       .L35_0
                     #      label L35_0: 
 .L35_0:
                     #      new_var temp_280_349:i1 
                     #      temp_280_349 = icmp i32 Sgt 1_0, 15_0 
-    li      a0, 11160
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 1
-    li      a1, 10832
+    li      a1, 10947
     add     a1,sp,a1
-    sw      a1,0(a1)
+    sb      a1,0(a1)
     li      a1, 15
-    li      a2, 10848
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     slt     a2,a1,a0
@@ -4505,41 +5626,46 @@ long_func:
 .branch_false_350:
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
+    li      a0, 0
                     #      new_var temp_281_353:Array:i32:[Some(16_0)] 
                     #      temp_281_353 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_282_353:ptr->i32 
                     #      new_var temp_283_353:i32 
                     #      temp_282_353 = getelementptr temp_281_353:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    li      a1, 10824
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
+    li      a1, 0
+    li      a0, 10824
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a2, 10831
     add     a2,sp,a2
     sb      a2,0(a2)
     li      a2, 1
-    li      a3, 11360
+    li      a3, 13444
     add     a3,sp,a3
     sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_283_353 = load temp_282_353:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_284_353:i32 
                     #      temp_284_353 = Mul i32 c_307, temp_283_353 
-    li      a0, 10752
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a2,a1
+    mul     a2,s10,a0
                     #      x_18 = i32 temp_284_353 
+    li      a0, 10748
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    mv      a0, a2
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_359 
     j       .while.head_359
@@ -4547,47 +5673,79 @@ long_func:
 .while.head_359:
                     #      new_var temp_285_358:i1 
                     #      temp_285_358 = icmp i32 Slt i_18, 16_0 
-    li      a0, 10744
+    li      a0, 13444
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 16
-    li      a1, 10748
+    li      a1, 10752
     add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s3,a0
+    sd      a1,0(a1)
+    li      a1, 16
+    li      a2, 10744
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    slt     a2,a0,a1
                     #      br i1 temp_285_358, label while.body_359, label while.exit_359 
-    bnez    a1, .while.body_359
+    bnez    a2, .while.body_359
+    li      a1, 10743
+    add     a1,sp,a1
+    sb      a2,0(a1)
+    li      a1, 10831
+    add     a1,sp,a1
+    lb      a2,0(a1)
+    li      a1, 10831
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10824
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 13444
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_359
                     #      label while.body_359: 
 .while.body_359:
                     #      new_var temp_286_361:i32 
                     #      temp_286_361 = Mod i32 y_18, 2_0 
-    li      a0, 2
-    li      a1, 10743
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    rem     a1,s5,a0
+    li      a1, 2
+    li      a0, 13448
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    rem     a0,a7,a1
                     #      new_var temp_287_361:i32 
                     #      temp_287_361 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(a0) already exist with 2_0
-    li      a1, 10736
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    rem     a1,s4,a0
+    li      a0, 10736
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2
+    li      a2, 10743
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    rem     a2,a1,a0
                     #      new_var temp_288_361:i1 
                     #      temp_288_361 = icmp i32 Ne temp_287_361, 0_0 
     li      a0, 0
-    li      a2, 11160
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
-    snez    a2, a2
-                    #      new_var temp_289_361:i1 
-                    #      temp_288_361 = icmp i32 Ne temp_286_361, 0_0 
-    li      a1, 10732
+    li      a1, 13444
     add     a1,sp,a1
     sw      a1,0(a1)
+    xor     a1,a2,a0
+    snez    a1, a1
+                    #      new_var temp_289_361:i1 
+                    #      temp_288_361 = icmp i32 Ne temp_286_361, 0_0 
+    li      a1, 10731
+    add     a1,sp,a1
+    sb      a1,0(a1)
     li      a1, 0
+    li      a2, 10732
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    xor     a2,a0,a1
+    snez    a2, a2
                     #      new_var temp_290_361:i1 
                     #      temp_290_361 = And i1 temp_288_361, temp_289_361 
     li      a0, 10736
@@ -4622,8 +5780,11 @@ long_func:
     li      a2, 10731
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
+    li      a3, 10824
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a1,a2
+    add     a0,a0,a3
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -4635,15 +5796,51 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    li      a2, 10724
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_295_363:i32 
                     #      temp_295_363 = Add i32 ans_18, temp_294_363 
-    add     a0,s2,a2
+    add     a0,s11,a2
                     #      ans_18 = i32 temp_295_363 
                     #      jump label: branch_false_362 
+    li      a2, 10648
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 10644
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 10731
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 10652
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 10731
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 10730
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 10730
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10724
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 10729
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 10729
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10824
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_362
                     #      label branch_false_362: 
 .branch_false_362:
@@ -4651,61 +5848,108 @@ long_func:
 .L36_0:
                     #      new_var temp_296_360:i32 
                     #      temp_296_360 = Div i32 x_18, 2_0 
-    li      a0, 10644
+    li      a0, 10729
     add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 2
-    li      a1, 10652
+    sb      a0,0(a0)
+    li      a1, 10730
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s4,a0
+    sb      a1,0(a1)
+    li      a1, 2
+    li      a2, 10731
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    div     a2,a0,a1
                     #      x_18 = i32 temp_296_360 
                     #      new_var temp_297_360:i32 
                     #      temp_297_360 = Div i32 y_18, 2_0 
-                    #found literal reg Some(a0) already exist with 2_0
-    li      a1, 10640
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s5,a0
+                    #found literal reg Some(a1) already exist with 2_0
+    li      a0, 13444
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    div     a0,a7,a1
                     #      y_18 = i32 temp_297_360 
                     #      new_var temp_298_360:i32 
                     #      temp_298_360 = Add i32 i_18, 1_0 
+    li      a0, 10636
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a0, 1
-    li      a1, 10636
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    add     a1,s3,a0
+    li      a2, 10640
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    add     a2,a1,a0
                     #      i_18 = i32 temp_298_360 
                     #      jump label: while.head_359 
+    li      a2, 10632
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 10744
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 13448
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 10744
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 10752
+    add     a0,sp,a0
+    ld      a1,0(a0)
+    li      a0, 10752
+    add     a0,sp,a0
+    sd      a0,0(a0)
+    li      a3, 10824
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13444
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10824
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_359
                     #      label while.exit_359: 
 .while.exit_359:
                     #      label L37_0: 
 .L37_0:
                     #      c_307 = i32 ans_18 
-    mv      a0, s2
                     #      al_307 = i32 sum_307 
-    li      a0, 11160
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 10632
+                    #      jump label: while.head_310 
+    li      a1, 10831
+    add     a1,sp,a1
+    sb      a2,0(a1)
+    li      a1, 13448
+    add     a1,sp,a1
+    lw      a2,0(a1)
+    li      a1, 13448
     add     a1,sp,a1
     sw      a1,0(a1)
-    mv      a1, a0
-                    #      jump label: while.head_310 
+    li      a0, 11156
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    mv      a0, s11
+    li      s11, 13452
+    add     s11,sp,s11
+    sw      s11,0(s11)
     j       .while.head_310
                     #      label while.exit_310: 
 .while.exit_310:
                     #      ans_18 = i32 al_307 
+    mv      s11, s6
                     #      ml_220 = i32 ans_18 
-    li      a0, 11156
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, s2
                     #      x_18 = i32 mr_220 
-    li      a0, 11836
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      y_18 = i32 1_0 
                     #      jump label: L38_0 
     j       .L38_0
@@ -4713,14 +5957,14 @@ long_func:
 .L38_0:
                     #      new_var temp_299_374:i1 
                     #      temp_299_374 = icmp i32 Sge y_18, 15_0 
-    li      a0, 11832
+    li      a0, 11155
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 15
-    li      a1, 11164
+    li      a1, 13423
     add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s5,a0
+    sb      a1,0(a1)
+    slt     a1,a7,a0
     xori    a1,a1,1
                     #      br i1 temp_299_374, label branch_true_375, label branch_false_375 
     bnez    a1, .branch_true_375
@@ -4733,7 +5977,7 @@ long_func:
     li      a1, 10631
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,s4,a0
+    slt     a1,a3,a0
                     #      br i1 temp_300_377, label branch_true_378, label branch_false_378 
     bnez    a1, .branch_true_378
     j       .branch_false_378
@@ -4753,11 +5997,11 @@ long_func:
 .branch_false_375:
                     #      new_var temp_301_383:i1 
                     #      temp_301_383 = icmp i32 Sgt y_18, 0_0 
-                    #found literal reg Some(a0) already exist with 0_0
-    li      a1, 10630
+    li      a0, 0
+    li      a1, 10631
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s5
+    slt     a1,a0,a7
                     #      br i1 temp_301_383, label branch_true_384, label branch_false_384 
     bnez    a1, .branch_true_384
     j       .branch_false_384
@@ -4769,7 +6013,7 @@ long_func:
     li      a1, 10629
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s4
+    slt     a1,a0,a3
                     #      br i1 temp_302_386, label branch_true_387, label branch_false_387 
     bnez    a1, .branch_true_387
     j       .branch_false_387
@@ -4792,10 +6036,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 10648
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
-    mul     a2,a1,s5
+    mul     a2,a1,a7
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -4807,7 +6051,7 @@ long_func:
     li      a0, 10552
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s4,a1
+    div     a0,a3,a1
                     #      x_18 = i32 temp_306_388 
                     #      new_var temp_307_388:i32 
                     #      temp_307_388 = Add i32 y_18, 1_0 
@@ -4818,7 +6062,7 @@ long_func:
     li      a1, 10548
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s5,a0
+    add     a1,a7,a0
                     #      new_var temp_308_388:i32 
                     #      temp_308_388 = Sub i32 15_0, temp_307_388 
     li      a0, 15
@@ -4843,7 +6087,7 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a3, 10824
+    li      a3, 13444
     add     a3,sp,a3
     sw      a3,0(a3)
     mul     a3,a1,a2
@@ -4865,7 +6109,10 @@ long_func:
     sub     a2,a0,a1
                     #      new_var temp_313_388:i32 
                     #      temp_313_388 = Add i32 x_18, temp_312_388 
-    add     a0,s4,a2
+    li      a1, 10460
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_313_388 
                     #      jump label: L40_0 
     j       .L40_0
@@ -4873,15 +6120,12 @@ long_func:
 .branch_false_387:
                     #      new_var temp_314_391:Array:i32:[Some(16_0)] 
                     #      temp_314_391 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 10452
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 10460
+    li      a1, 10628
     add     a1,sp,a1
-    sw      a1,0(a1)
+    sb      a1,0(a1)
     lw      a1,0(a0)
                     #      new_var temp_315_391:ptr->i32 
                     #      new_var temp_316_391:i32 
@@ -4891,10 +6135,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 10456
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
-    mul     a2,a1,s5
+    mul     a2,a1,a7
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -4906,9 +6150,40 @@ long_func:
     li      a0, 10376
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s4,a1
+    div     a0,a3,a1
                     #      ans_18 = i32 temp_317_391 
                     #      jump label: L40_0 
+    li      a2, 10448
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 10368
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 10456
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 10372
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 10456
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 10452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 10452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    mv      a0, a3
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10532
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .L40_0
                     #      label L40_0: 
 .L40_0:
@@ -4924,18 +6199,39 @@ long_func:
                     #      label L43_0: 
 .L43_0:
                     #      mr_220 = i32 ans_18 
-    li      a0, 10368
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, s2
                     #      jump label: while.head_223 
+    li      a0, 11826
+    add     a0,sp,a0
+    sb      s8,0(a0)
+    li      a1, 10629
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s6, 11164
+    add     s6,sp,s6
+    sw      s6,0(s6)
+    li      s10, 11160
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      s7, 11827
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    mv      a0, s11
+    li      s11, 13452
+    add     s11,sp,s11
+    sw      s11,0(s11)
+    li      s9, 11711
+    add     s9,sp,s9
+    sb      s9,0(s9)
     j       .while.head_223
                     #      label while.exit_223: 
 .while.exit_223:
                     #      ans_18 = i32 mres_220 
-    li      a0, 11832
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      pl_20 = i32 ans_18 
                     #      x_18 = i32 pr_20 
                     #      y_18 = i32 1_0 
@@ -4945,29 +6241,20 @@ long_func:
 .L44_0:
                     #      new_var temp_318_400:i1 
                     #      temp_318_400 = icmp i32 Sge y_18, 15_0 
-    li      a0, 11828
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 15
-    li      a1, 10372
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s5,a0
-    xori    a1,a1,1
+    li      s6, 15
+    slt     s8,a7,s6
+    xori    s8,s8,1
                     #      br i1 temp_318_400, label branch_true_401, label branch_false_401 
-    bnez    a1, .branch_true_401
+    bnez    s8, .branch_true_401
     j       .branch_false_401
                     #      label branch_true_401: 
 .branch_true_401:
                     #      new_var temp_319_403:i1 
                     #      temp_319_403 = icmp i32 Slt x_18, 0_0 
-    li      a0, 0
-    li      a1, 10367
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    slt     a1,s4,a0
+    li      s6, 0
+    slt     s9,a3,s6
                     #      br i1 temp_319_403, label branch_true_404, label branch_false_404 
-    bnez    a1, .branch_true_404
+    bnez    s9, .branch_true_404
     j       .branch_false_404
                     #      label branch_true_404: 
 .branch_true_404:
@@ -4985,76 +6272,63 @@ long_func:
 .branch_false_401:
                     #      new_var temp_320_409:i1 
                     #      temp_320_409 = icmp i32 Sgt y_18, 0_0 
-                    #found literal reg Some(a0) already exist with 0_0
-    li      a1, 10366
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    slt     a1,a0,s5
+    li      s6, 0
+    slt     s9,s6,a7
                     #      br i1 temp_320_409, label branch_true_410, label branch_false_410 
-    bnez    a1, .branch_true_410
+    bnez    s9, .branch_true_410
     j       .branch_false_410
                     #      label branch_true_410: 
 .branch_true_410:
                     #      new_var temp_321_412:i1 
                     #      temp_321_412 = icmp i32 Sgt x_18, 0x7fff_0 
-    li      a0, 0x7fff
-    li      a1, 10365
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    slt     a1,a0,s4
+    li      s6, 0x7fff
+    slt     s10,s6,a3
                     #      br i1 temp_321_412, label branch_true_413, label branch_false_413 
-    bnez    a1, .branch_true_413
+    bnez    s10, .branch_true_413
     j       .branch_false_413
                     #      label branch_true_413: 
 .branch_true_413:
                     #      new_var temp_322_414:Array:i32:[Some(16_0)] 
                     #      temp_322_414 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 10364
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    lw      a1,0(a0)
+    la      s6, SHIFT_TABLE
+                    #occupy reg s6 with *SHIFT_TABLE_0
+    lw      s11,0(s6)
                     #      new_var temp_323_414:ptr->i32 
                     #      new_var temp_324_414:i32 
                     #      temp_323_414 = getelementptr temp_322_414:Array:i32:[Some(16_0)] [Some(y_18)] 
-    li      a0, 0
-    li      a1, 10360
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
-    li      a2, 10448
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s5
-    add     a0,a0,a2
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
-                    #      temp_324_414 = load temp_323_414:ptr->i32 
-    lw      a1,0(a0)
-                    #      new_var temp_325_414:i32 
-                    #      temp_325_414 = Div i32 x_18, temp_324_414 
-    li      a0, 10288
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    div     a0,s4,a1
-                    #      x_18 = i32 temp_325_414 
-                    #      new_var temp_326_414:i32 
-                    #      temp_326_414 = Add i32 y_18, 1_0 
-    li      a0, 10280
+    li      s6, 0
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 1
-    li      a1, 10284
+    add     s6,s6,s11
+    slli s6,s6,2
+    add     s6,s6,sp
+    add     s6,s6,s6
+                    #      temp_324_414 = load temp_323_414:ptr->i32 
+    lw      a0,0(s6)
+                    #      new_var temp_325_414:i32 
+                    #      temp_325_414 = Div i32 x_18, temp_324_414 
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    div     a1,a3,a0
+                    #      x_18 = i32 temp_325_414 
+                    #      new_var temp_326_414:i32 
+                    #      temp_326_414 = Add i32 y_18, 1_0 
+    li      a0, 10284
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
+    li      a1, 10280
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s5,a0
+    add     a1,a7,a0
                     #      new_var temp_327_414:i32 
                     #      temp_327_414 = Sub i32 15_0, temp_326_414 
     li      a0, 15
-    li      a2, 10360
+    li      a2, 13448
     add     a2,sp,a2
     sw      a2,0(a2)
     sub     a2,a0,a1
@@ -5075,7 +6349,7 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a3, 10532
+    li      a3, 13444
     add     a3,sp,a3
     sw      a3,0(a3)
     mul     a3,a1,a2
@@ -5097,50 +6371,105 @@ long_func:
     sub     a2,a0,a1
                     #      new_var temp_332_414:i32 
                     #      temp_332_414 = Add i32 x_18, temp_331_414 
-    add     a0,s4,a2
+    li      a1, 10196
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_332_414 
+    li      a0, 13444
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    mv      a0, a1
                     #      jump label: L46_0 
     j       .L46_0
                     #      label branch_false_413: 
 .branch_false_413:
                     #      new_var temp_333_417:Array:i32:[Some(16_0)] 
                     #      temp_333_417 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 10188
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 10196
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    lw      a1,0(a0)
+    la      s6, SHIFT_TABLE
+                    #occupy reg s6 with *SHIFT_TABLE_0
+    lw      s11,0(s6)
                     #      new_var temp_334_417:ptr->i32 
                     #      new_var temp_335_417:i32 
                     #      temp_334_417 = getelementptr temp_333_417:Array:i32:[Some(16_0)] [Some(y_18)] 
-    li      a0, 0
-    li      a1, 10184
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
-    li      a2, 10192
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s5
-    add     a0,a0,a2
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    li      s6, 0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
+    add     s6,s6,s11
+    slli s6,s6,2
+    add     s6,s6,sp
+    add     s6,s6,s6
                     #      temp_335_417 = load temp_334_417:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(s6)
                     #      new_var temp_336_417:i32 
                     #      temp_336_417 = Div i32 x_18, temp_335_417 
-    li      a0, 10112
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    div     a1,a3,a0
+                    #      ans_18 = i32 temp_336_417 
+    li      a0, 10108
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    mv      a0, a1
+                    #      jump label: L46_0 
+    li      a2, 13448
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 10192
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 10104
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 10192
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 10188
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      s6, 10112
+    add     s6,sp,s6
+    sd      s6,0(s6)
+    li      a0, 10188
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 10288
+    add     a0,sp,a0
+    ld      s6,0(a0)
+    li      a0, 10288
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s4,a1
-                    #      ans_18 = i32 temp_336_417 
-                    #      jump label: L46_0 
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      s11, 10184
+    add     s11,sp,s11
+    sw      s11,0(s11)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 10360
+    add     a3,sp,a3
+    lw      s11,0(a3)
+    li      a3, 10360
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10268
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .L46_0
                     #      label L46_0: 
 .L46_0:
@@ -5157,50 +6486,60 @@ long_func:
 .L49_0:
                     #      pr_20 = i32 ans_18 
                     #      jump label: while.head_23 
+    li      a2, 13448
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a7, 13440
+    add     a7,sp,a7
+    sw      a7,0(a7)
+    li      s6, 10367
+    add     s6,sp,s6
+    sb      s8,0(s6)
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      s1, 11836
+    add     s1,sp,s1
+    sw      s1,0(s1)
+    li      s5, 11828
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      s3, 13311
+    add     s3,sp,s3
+    sb      s3,0(s3)
+    li      s2, 13422
+    add     s2,sp,s2
+    sb      s2,0(s2)
+    li      s7, 11827
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      s9, 10365
+    add     s9,sp,s9
+    sb      s9,0(s9)
+    li      a3, 13444
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      s4, 11832
+    add     s4,sp,s4
+    sw      s4,0(s4)
     j       .while.head_23
                     #      label while.exit_23: 
 .while.exit_23:
                     #      ans_18 = i32 pres_20 
+    mv      a0, a6
                     #       Call void putint_0(ans_18) 
                     #saved register dumping to mem
-    li      s1, 13423
-    add     s1,sp,s1
-    sb      s1,0(s1)
-    li      s2, 13452
-    add     s2,sp,s2
-    sw      s2,0(s2)
-    li      s3, 13448
-    add     s3,sp,s3
-    sw      s3,0(s3)
-    li      s4, 13444
-    add     s4,sp,s4
-    sw      s4,0(s4)
-    li      s5, 13440
-    add     s5,sp,s5
-    sw      s5,0(s5)
-    li      s6, 13324
-    add     s6,sp,s6
-    sw      s6,0(s6)
-    li      s7, 13422
-    add     s7,sp,s7
-    sb      s7,0(s7)
-    li      s8, 13328
-    add     s8,sp,s8
-    sw      s8,0(s8)
-    li      s9, 13416
-    add     s9,sp,s9
-    sw      s9,0(s9)
-    li      s10, 13412
-    add     s10,sp,s10
-    sw      s10,0(s10)
-    li      s11, 13411
-    add     s11,sp,s11
-    sb      s11,0(s11)
                     #saved register dumped to mem
                     #arg load start
-    li      a0, 10104
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
+    li      a2, 13452
+    add     a2,sp,a2
+    lw      a0,0(a2)
                     #arg load ended
     call    putint
                     #       Call void putch_0(10_0) 
@@ -5213,118 +6552,148 @@ long_func:
                     #      pl_425 = i32 2_0 
     li      a0, 2
                     #      pr_425 = i32 1_0 
-    li      s1, 1
+    li      a3, 1
                     #      pres_425 = i32 1_0 
-    li      s2, 1
+    li      a7, 1
                     #      jump label: while.head_428 
     j       .while.head_428
                     #      label while.head_428: 
 .while.head_428:
                     #      new_var temp_337_427:i1 
                     #      temp_337_427 = icmp i32 Sgt pr_425, 0_0 
-    li      s3, 0
-    slt     s4,s3,s1
+    li      s1, 0
+    slt     s2,s1,a3
                     #      br i1 temp_337_427, label while.body_428, label while.exit_428 
-    bnez    s4, .while.body_428
+    bnez    s2, .while.body_428
     j       .while.exit_428
                     #      label while.body_428: 
 .while.body_428:
                     #      ans_18 = i32 0_0 
-    li      s5, 0
                     #      i_18 = i32 0_0 
-    li      s6, 0
+    li      s1, 0
                     #      x_18 = i32 pr_425 
-    mv      s7, s1
+    mv      s3, a3
                     #      y_18 = i32 1_0 
-    li      s8, 1
+    li      s4, 1
                     #      jump label: while.head_435 
     j       .while.head_435
                     #      label while.head_435: 
 .while.head_435:
                     #      new_var temp_338_434:i1 
                     #      temp_338_434 = icmp i32 Slt i_18, 16_0 
-    li      s9, 16
-    slt     s10,s6,s9
+    li      s5, 16
+    slt     s6,s1,s5
                     #      br i1 temp_338_434, label while.body_435, label while.exit_435 
-    bnez    s10, .while.body_435
+    bnez    s6, .while.body_435
     j       .while.exit_435
                     #      label while.body_435: 
 .while.body_435:
                     #      new_var temp_339_437:i32 
                     #      temp_339_437 = Mod i32 y_18, 2_0 
-    li      s11, 2
-    rem     s3,s8,s11
+    li      s5, 2
+    rem     s7,s4,s5
                     #      new_var temp_340_437:i32 
                     #      temp_340_437 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(s11) already exist with 2_0
-    rem     s9,s7,s11
+                    #found literal reg Some(s5) already exist with 2_0
+    rem     s8,s3,s5
                     #      new_var temp_341_437:i1 
                     #      temp_341_437 = icmp i32 Ne temp_340_437, 0_0 
-    li      s11, 0
-    li      a0, 10100
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    xor     a0,s9,s11
-    snez    a0, a0
+    li      s9, 0
+    xor     s10,s8,s9
+    snez    s10, s10
                     #      new_var temp_342_437:i1 
                     #      temp_341_437 = icmp i32 Ne temp_339_437, 0_0 
-                    #found literal reg Some(s11) already exist with 0_0
+                    #found literal reg Some(s9) already exist with 0_0
                     #      new_var temp_343_437:i1 
                     #      temp_343_437 = And i1 temp_341_437, temp_342_437 
-    li      a1, 10108
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    and     a1,a0,s11
+    and     s5,s10,s11
                     #      br i1 temp_343_437, label branch_true_438, label branch_false_438 
-    bnez    a1, .branch_true_438
+    bnez    s5, .branch_true_438
     j       .branch_false_438
                     #      label branch_true_438: 
 .branch_true_438:
                     #      new_var temp_344_439:Array:i32:[Some(16_0)] 
                     #      temp_344_439 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 10079
-    add     a0,sp,a0
-    sb      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 10077
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    lw      a1,0(a0)
+    la      s9, SHIFT_TABLE
+                    #occupy reg s9 with *SHIFT_TABLE_0
+    li      a0, 10100
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(s9)
                     #      new_var temp_345_439:ptr->i32 
                     #      new_var temp_346_439:i32 
                     #      temp_345_439 = getelementptr temp_344_439:Array:i32:[Some(16_0)] [Some(i_18)] 
-    li      a0, 0
+    li      s9, 0
+    li      a0, 10072
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mul     a1,a0,s1
+    add     s9,s9,a1
+    slli s9,s9,2
+    add     s9,s9,sp
+    add     s9,s9,s9
+                    #      temp_346_439 = load temp_345_439:ptr->i32 
+    lw      a0,0(s9)
+                    #      new_var temp_347_439:i32 
+                    #      temp_347_439 = Mul i32 1_0, temp_346_439 
+    li      a0, 9996
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a1, 10072
     add     a1,sp,a1
     sw      a1,0(a1)
-    li      a1, 1
-    li      a2, 10184
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s6
-    add     a0,a0,a2
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
-                    #      temp_346_439 = load temp_345_439:ptr->i32 
-    lw      a1,0(a0)
-                    #      new_var temp_347_439:i32 
-                    #      temp_347_439 = Mul i32 1_0, temp_346_439 
-    li      a0, 10000
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    li      a0, 1
-    li      a2, 10072
+    li      a2, 13452
     add     a2,sp,a2
     sw      a2,0(a2)
     mul     a2,a0,a1
                     #      new_var temp_348_439:i32 
                     #      temp_348_439 = Add i32 ans_18, temp_347_439 
-    add     a0,s5,a2
+    li      a1, 9996
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_348_439 
                     #      jump label: branch_false_438 
+    li      a2, 9992
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    mv      a2, a0
+    li      a1, 9988
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 10100
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      s9, 10000
+    add     s9,sp,s9
+    sd      s9,0(s9)
+    li      a3, 10100
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_438
                     #      label branch_false_438: 
 .branch_false_438:
@@ -5332,80 +6701,86 @@ long_func:
 .L50_0:
                     #      new_var temp_349_436:i32 
                     #      temp_349_436 = Div i32 x_18, 2_0 
-    li      a0, 9988
+    li      s9, 2
+    li      a0, 10100
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 2
-    li      a1, 9996
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s7,a0
+    div     a0,s3,s9
                     #      x_18 = i32 temp_349_436 
                     #      new_var temp_350_436:i32 
                     #      temp_350_436 = Div i32 y_18, 2_0 
-                    #found literal reg Some(a0) already exist with 2_0
-    li      a1, 9984
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s8,a0
+                    #found literal reg Some(s9) already exist with 2_0
+    li      a0, 9984
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    div     a0,s4,s9
                     #      y_18 = i32 temp_350_436 
                     #      new_var temp_351_436:i32 
                     #      temp_351_436 = Add i32 i_18, 1_0 
-    li      a0, 1
-    li      a1, 9980
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    add     a1,s6,a0
+    li      s9, 1
+    li      a0, 9980
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    add     a0,s1,s9
                     #      i_18 = i32 temp_351_436 
                     #      jump label: while.head_435 
+    li      s8, 10080
+    add     s8,sp,s8
+    sw      s8,0(s8)
+    li      s6, 10090
+    add     s6,sp,s6
+    sb      s6,0(s6)
+    li      s10, 10079
+    add     s10,sp,s10
+    sb      s10,0(s10)
+    li      s5, 10077
+    add     s5,sp,s5
+    sb      s5,0(s5)
+    li      s7, 10084
+    add     s7,sp,s7
+    sw      s7,0(s7)
+    li      a0, 9976
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      s9, 10100
+    add     s9,sp,s9
+    lw      a0,0(s9)
+    li      s11, 10078
+    add     s11,sp,s11
+    sb      s11,0(s11)
+    li      s9, 10100
+    add     s9,sp,s9
+    sw      s9,0(s9)
     j       .while.head_435
                     #      label while.exit_435: 
 .while.exit_435:
                     #      new_var temp_352_11025:i1 
                     #      temp_352_11025 = icmp i32 Ne ans_18, 0_0 
-    li      a0, 0
-    li      a1, 9976
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    xor     a1,s5,a0
-    snez    a1, a1
+    li      s5, 0
+    xor     s7,a2,s5
+    snez    s7, s7
                     #      br i1 temp_352_11025, label branch_true_445, label branch_false_445 
-    bnez    a1, .branch_true_445
+    bnez    s7, .branch_true_445
     j       .branch_false_445
                     #      label branch_true_445: 
 .branch_true_445:
                     #      ml_447 = i32 pres_425 
-    mv      a0, s2
+    mv      s5, a7
                     #      mr_447 = i32 pl_425 
-    li      a0, 9968
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 9975
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    mv      a1, a0
+    mv      s8, a0
                     #      mres_447 = i32 0_0 
-    li      a0, 10100
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
+    li      s9, 0
                     #      jump label: while.head_450 
     j       .while.head_450
                     #      label while.head_450: 
 .while.head_450:
                     #      new_var temp_353_11138:i1 
                     #      temp_353_11138 = icmp i32 Ne mr_447, 0_0 
-    li      a0, 9960
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 9992
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
-    snez    a2, a2
+    li      s10, 0
+    xor     s11,s8,s10
+    snez    s11, s11
                     #      br i1 temp_353_11138, label while.body_450, label while.exit_450 
-    bnez    a2, .while.body_450
+    bnez    s11, .while.body_450
     j       .while.exit_450
                     #      label while.body_450: 
 .while.body_450:
@@ -5419,64 +6794,64 @@ long_func:
 .while.head_457:
                     #      new_var temp_354_456:i1 
                     #      temp_354_456 = icmp i32 Slt i_18, 16_0 
-    li      a0, 16
-    li      a1, 9964
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s6,a0
+    li      s10, 16
+    li      a0, 10100
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    slt     a0,s1,s10
                     #      br i1 temp_354_456, label while.body_457, label while.exit_457 
-    bnez    a1, .while.body_457
+    bnez    a0, .while.body_457
     j       .while.exit_457
                     #      label while.body_457: 
 .while.body_457:
                     #      new_var temp_355_459:i32 
                     #      temp_355_459 = Mod i32 y_18, 2_0 
-    li      a0, 2
-    li      a1, 9958
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    rem     a1,s8,a0
+    li      s10, 2
+    li      a0, 9958
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    rem     a0,s4,s10
                     #      new_var temp_356_459:i32 
                     #      temp_356_459 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(a0) already exist with 2_0
-    li      a1, 9952
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    rem     a1,s7,a0
-                    #      new_var temp_357_459:i1 
-                    #      temp_357_459 = icmp i32 Ne temp_356_459, 0_0 
-    li      a0, 0
-    li      a2, 9959
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    xor     a2,a1,a0
-    snez    a2, a2
-                    #      new_var temp_358_459:i1 
-                    #      temp_357_459 = icmp i32 Ne temp_355_459, 0_0 
-    li      a1, 9948
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 0
-                    #      new_var temp_359_459:i1 
-                    #      temp_359_459 = And i1 temp_357_459, temp_358_459 
+                    #found literal reg Some(s10) already exist with 2_0
     li      a0, 9952
     add     a0,sp,a0
     sw      a0,0(a0)
-    and     a0,a2,a1
+    rem     a0,s3,s10
+                    #      new_var temp_357_459:i1 
+                    #      temp_357_459 = icmp i32 Ne temp_356_459, 0_0 
+    li      s10, 0
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    xor     a1,a0,s10
+    snez    a1, a1
+                    #      new_var temp_358_459:i1 
+                    #      temp_357_459 = icmp i32 Ne temp_355_459, 0_0 
+    li      a0, 9948
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 0
+                    #      new_var temp_359_459:i1 
+                    #      temp_359_459 = And i1 temp_357_459, temp_358_459 
+    li      a2, 13452
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    and     a2,a1,a0
                     #      br i1 temp_359_459, label branch_true_460, label branch_false_460 
-    bnez    a0, .branch_true_460
+    bnez    a2, .branch_true_460
     j       .branch_false_460
                     #      label branch_true_460: 
 .branch_true_460:
                     #      new_var temp_360_461:Array:i32:[Some(16_0)] 
                     #      temp_360_461 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 9945
+    li      a0, 9946
     add     a0,sp,a0
     sb      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 9946
+    li      a1, 9947
     add     a1,sp,a1
     sb      a1,0(a1)
     lw      a1,0(a0)
@@ -5488,10 +6863,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 9947
+    li      a2, 9945
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -5510,9 +6885,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_364_461:i32 
                     #      temp_364_461 = Add i32 ans_18, temp_363_461 
-    add     a0,s5,a2
+    li      a1, 9868
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_364_461 
                     #      jump label: branch_false_460 
+    li      a2, 9864
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 9945
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 9860
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9945
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 9947
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 9947
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 9946
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 9946
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_460
                     #      label branch_false_460: 
 .branch_false_460:
@@ -5520,14 +6934,14 @@ long_func:
 .L51_0:
                     #      new_var temp_365_458:i32 
                     #      temp_365_458 = Div i32 x_18, 2_0 
-    li      a0, 9860
+    li      a0, 9946
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 9868
+    li      a1, 9947
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s7,a0
+    sb      a1,0(a1)
+    div     a1,s3,a0
                     #      x_18 = i32 temp_365_458 
                     #      new_var temp_366_458:i32 
                     #      temp_366_458 = Div i32 y_18, 2_0 
@@ -5535,7 +6949,7 @@ long_func:
     li      a1, 9856
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s8,a0
+    div     a1,s4,a0
                     #      y_18 = i32 temp_366_458 
                     #      new_var temp_367_458:i32 
                     #      temp_367_458 = Add i32 i_18, 1_0 
@@ -5543,38 +6957,68 @@ long_func:
     li      a1, 9852
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s6,a0
+    add     a1,s1,a0
                     #      i_18 = i32 temp_367_458 
                     #      jump label: while.head_457 
+    li      a2, 9945
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 9848
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s10, 9952
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 10100
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 10100
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_457
                     #      label while.exit_457: 
 .while.exit_457:
                     #      new_var temp_368_11547:i1 
                     #      temp_368_11547 = icmp i32 Ne ans_18, 0_0 
-    li      a0, 0
-    li      a1, 9848
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    xor     a1,s5,a0
-    snez    a1, a1
+    li      s10, 0
+    li      a0, 9958
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    xor     a0,a2,s10
+    snez    a0, a0
                     #      br i1 temp_368_11547, label branch_true_467, label branch_false_467 
-    bnez    a1, .branch_true_467
+    bnez    a0, .branch_true_467
     j       .branch_false_467
                     #      label branch_true_467: 
 .branch_true_467:
                     #      al_469 = i32 mres_447 
-    li      a1, 9847
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    mv      a1, a0
+    mv      s10, s9
                     #      c_469 = i32 ml_447 
-    li      a0, 9960
+    li      a0, 9847
     add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 9840
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    sb      a0,0(a0)
+    mv      a0, s5
                     #      new_var sum_469:i32 
                     #      jump label: while.head_472 
     j       .while.head_472
@@ -5582,14 +7026,14 @@ long_func:
 .while.head_472:
                     #      new_var temp_369_11641:i1 
                     #      temp_369_11641 = icmp i32 Ne c_469, 0_0 
-    li      a0, 9968
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 9864
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a1, 0
+    li      a2, 13452
     add     a2,sp,a2
     sw      a2,0(a2)
-    xor     a2,a1,a0
+    xor     a2,a0,a1
     snez    a2, a2
                     #      br i1 temp_369_11641, label while.body_472, label while.exit_472 
     bnez    a2, .while.body_472
@@ -5597,6 +7041,7 @@ long_func:
                     #      label while.body_472: 
 .while.body_472:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_469 
                     #      y_18 = i32 c_469 
@@ -5606,14 +7051,14 @@ long_func:
 .while.head_479:
                     #      new_var temp_370_478:i1 
                     #      temp_370_478 = icmp i32 Slt i_18, 16_0 
-    li      a0, 9840
+    li      a0, 9836
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 9836
+    li      a1, 13452
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s6,a0
+    slt     a1,s1,a0
                     #      br i1 temp_370_478, label while.body_479, label while.exit_479 
     bnez    a1, .while.body_479
     j       .while.exit_479
@@ -5625,7 +7070,7 @@ long_func:
     li      a1, 9830
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s7,a0
+    rem     a1,s3,a0
                     #      new_var temp_372_11824:i1 
                     #      temp_372_11824 = icmp i32 Ne temp_371_481, 0_0 
     li      a0, 0
@@ -5645,7 +7090,7 @@ long_func:
     li      a1, 9824
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_374_484:i1 
                     #      temp_374_484 = icmp i32 Eq temp_373_484, 0_0 
     li      a0, 0
@@ -5679,7 +7124,7 @@ long_func:
     li      a2, 9815
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -5698,9 +7143,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_379_486:i32 
                     #      temp_379_486 = Add i32 ans_18, temp_378_486 
-    add     a0,s5,a2
+    li      a1, 9732
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_379_486 
                     #      jump label: branch_false_485 
+    li      a2, 9728
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 9815
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 9724
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9815
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 9816
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 9816
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_485
                     #      label branch_false_485: 
 .branch_false_485:
@@ -5708,20 +7177,17 @@ long_func:
 .branch_false_482:
                     #      new_var temp_383_488:i32 
                     #      temp_383_488 = Mod i32 y_18, 2_0 
-    li      a0, 9724
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 9732
+    li      a1, 9824
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_384_11969:i1 
                     #      temp_384_11969 = icmp i32 Ne temp_383_488, 0_0 
     li      a0, 0
-    li      a2, 9728
+    li      a2, 9823
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_384_11969, label branch_true_489, label branch_false_489 
@@ -5749,7 +7215,7 @@ long_func:
     li      a2, 9707
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -5768,9 +7234,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_389_490:i32 
                     #      temp_389_490 = Add i32 ans_18, temp_388_490 
-    add     a0,s5,a2
+    li      a1, 9628
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_389_490 
                     #      jump label: branch_false_489 
+    li      a2, 9624
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 9707
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 9620
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9707
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 9708
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 9708
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_489
                     #      label branch_false_489: 
 .branch_false_489:
@@ -5780,14 +7270,11 @@ long_func:
 .L53_0:
                     #      new_var temp_380_480:i32 
                     #      temp_380_480 = Div i32 x_18, 2_0 
-    li      a0, 9620
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 9628
+    li      a1, 9708
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s7,a0
+    div     a1,s3,a0
                     #      x_18 = i32 temp_380_480 
                     #      new_var temp_381_480:i32 
                     #      temp_381_480 = Div i32 y_18, 2_0 
@@ -5795,7 +7282,7 @@ long_func:
     li      a1, 9720
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s8,a0
+    div     a1,s4,a0
                     #      y_18 = i32 temp_381_480 
                     #      new_var temp_382_480:i32 
                     #      temp_382_480 = Add i32 i_18, 1_0 
@@ -5803,22 +7290,55 @@ long_func:
     li      a1, 9716
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s6,a0
+    add     a1,s1,a0
                     #      i_18 = i32 temp_382_480 
                     #      jump label: while.head_479 
+    li      a2, 9707
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 9831
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 9712
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9831
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 9836
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 9836
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_479
                     #      label while.exit_479: 
 .while.exit_479:
                     #      sum_469 = i32 ans_18 
-    mv      a0, s5
+    li      a1, 9830
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_469 
-    li      a0, 9832
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      y_18 = i32 c_469 
-    li      a0, 9840
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
                     #      jump label: while.head_501 
@@ -5831,10 +7351,10 @@ long_func:
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 9712
+    li      a1, 9832
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s6,a0
+    slt     a1,s1,a0
                     #      br i1 temp_390_500, label while.body_501, label while.exit_501 
     bnez    a1, .while.body_501
     j       .while.exit_501
@@ -5846,20 +7366,20 @@ long_func:
     li      a1, 9619
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_392_503:i32 
                     #      temp_392_503 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 9612
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s7,a0
+    rem     a1,s3,a0
                     #      new_var temp_393_503:i1 
                     #      temp_393_503 = icmp i32 Ne temp_392_503, 0_0 
     li      a0, 0
-    li      a2, 9624
+    li      a2, 9831
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      new_var temp_394_503:i1 
@@ -5902,7 +7422,7 @@ long_func:
     li      a2, 9607
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -5921,9 +7441,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_400_505:i32 
                     #      temp_400_505 = Add i32 ans_18, temp_399_505 
-    add     a0,s5,a2
+    li      a1, 9524
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_400_505 
                     #      jump label: branch_false_504 
+    li      a2, 9520
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 9607
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 9516
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9607
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 9606
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 9606
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 9605
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 9605
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_504
                     #      label branch_false_504: 
 .branch_false_504:
@@ -5931,14 +7490,14 @@ long_func:
 .L54_0:
                     #      new_var temp_401_502:i32 
                     #      temp_401_502 = Div i32 x_18, 2_0 
-    li      a0, 9516
+    li      a0, 9605
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 9524
+    li      a1, 9606
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s7,a0
+    sb      a1,0(a1)
+    div     a1,s3,a0
                     #      x_18 = i32 temp_401_502 
                     #      new_var temp_402_502:i32 
                     #      temp_402_502 = Div i32 y_18, 2_0 
@@ -5946,7 +7505,7 @@ long_func:
     li      a1, 9512
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s8,a0
+    div     a1,s4,a0
                     #      y_18 = i32 temp_402_502 
                     #      new_var temp_403_502:i32 
                     #      temp_403_502 = Add i32 i_18, 1_0 
@@ -5954,31 +7513,67 @@ long_func:
     li      a1, 9508
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s6,a0
+    add     a1,s1,a0
                     #      i_18 = i32 temp_403_502 
                     #      jump label: while.head_501 
+    li      a2, 9607
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 9831
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 9504
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9831
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 9832
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 9832
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 9836
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 9836
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_501
                     #      label while.exit_501: 
 .while.exit_501:
                     #      c_469 = i32 ans_18 
-    mv      a0, s5
+    li      a1, 9619
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L55_0 
     j       .L55_0
                     #      label L55_0: 
 .L55_0:
                     #      new_var temp_404_511:i1 
                     #      temp_404_511 = icmp i32 Sgt 1_0, 15_0 
-    li      a0, 9836
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 1
-    li      a1, 9504
+    li      a1, 9836
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 15
-    li      a2, 9520
+    li      a2, 9831
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     slt     a2,a1,a0
                     #      br i1 temp_404_511, label branch_true_512, label branch_false_512 
     bnez    a2, .branch_true_512
@@ -5986,46 +7581,51 @@ long_func:
                     #      label branch_true_512: 
 .branch_true_512:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: while.exit_521 
     j       .while.exit_521
                     #      label branch_false_512: 
 .branch_false_512:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      i_18 = i32 0_0 
                     #      new_var temp_405_515:Array:i32:[Some(16_0)] 
                     #      temp_405_515 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_406_515:ptr->i32 
                     #      new_var temp_407_515:i32 
                     #      temp_406_515 = getelementptr temp_405_515:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    li      a1, 9496
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
+    li      a1, 0
+    li      a0, 9496
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a2, 9503
     add     a2,sp,a2
     sb      a2,0(a2)
     li      a2, 1
-    li      a3, 10268
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_407_515 = load temp_406_515:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_408_515:i32 
                     #      temp_408_515 = Mul i32 c_469, temp_407_515 
-    li      a0, 9424
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a2,a1
+    li      a1, 9424
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    mul     a1,a2,a0
                     #      x_18 = i32 temp_408_515 
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_521 
@@ -6034,16 +7634,43 @@ long_func:
 .while.head_521:
                     #      new_var temp_409_520:i1 
                     #      temp_409_520 = icmp i32 Slt i_18, 16_0 
-    li      a0, 9416
+    li      a0, 9420
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 9420
+    li      a1, 9416
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s6,a0
+    slt     a1,s1,a0
                     #      br i1 temp_409_520, label while.body_521, label while.exit_521 
     bnez    a1, .while.body_521
+    li      a0, 9836
+    add     a0,sp,a0
+    sw      a2,0(a0)
+    li      a0, 9503
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 9415
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 9503
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 9496
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_521
                     #      label while.body_521: 
 .while.body_521:
@@ -6053,14 +7680,14 @@ long_func:
     li      a1, 9415
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_411_523:i32 
                     #      temp_411_523 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 9408
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s7,a0
+    rem     a1,s3,a0
                     #      new_var temp_412_523:i1 
                     #      temp_412_523 = icmp i32 Ne temp_411_523, 0_0 
     li      a0, 0
@@ -6109,7 +7736,7 @@ long_func:
     li      a2, 9403
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -6128,9 +7755,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_419_525:i32 
                     #      temp_419_525 = Add i32 ans_18, temp_418_525 
-    add     a0,s5,a2
+    li      a1, 9324
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_419_525 
                     #      jump label: branch_false_524 
+    li      a2, 9320
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 9403
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 9316
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9403
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 9402
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 9402
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 9496
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 9401
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 9401
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 9496
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_524
                     #      label branch_false_524: 
 .branch_false_524:
@@ -6138,14 +7804,14 @@ long_func:
 .L56_0:
                     #      new_var temp_420_522:i32 
                     #      temp_420_522 = Div i32 x_18, 2_0 
-    li      a0, 9316
+    li      a0, 9401
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 9324
+    li      a1, 9402
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s7,a0
+    sb      a1,0(a1)
+    div     a1,s3,a0
                     #      x_18 = i32 temp_420_522 
                     #      new_var temp_421_522:i32 
                     #      temp_421_522 = Div i32 y_18, 2_0 
@@ -6153,7 +7819,7 @@ long_func:
     li      a1, 9312
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s8,a0
+    div     a1,s4,a0
                     #      y_18 = i32 temp_421_522 
                     #      new_var temp_422_522:i32 
                     #      temp_422_522 = Add i32 i_18, 1_0 
@@ -6161,53 +7827,143 @@ long_func:
     li      a1, 9308
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s6,a0
+    add     a1,s1,a0
                     #      i_18 = i32 temp_422_522 
                     #      jump label: while.head_521 
+    li      a2, 9403
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 9836
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 9304
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9836
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 9416
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 9416
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 9496
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 9420
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 9420
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 9496
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_521
                     #      label while.exit_521: 
 .while.exit_521:
                     #      label L57_0: 
 .L57_0:
                     #      c_469 = i32 ans_18 
-    mv      a0, s5
+    mv      a1, a0
                     #      al_469 = i32 sum_469 
-    li      a0, 9836
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 9304
+                    #      jump label: while.head_472 
+    li      a2, 9503
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 9832
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 9836
     add     a1,sp,a1
     sw      a1,0(a1)
-    mv      a1, a0
-                    #      jump label: while.head_472 
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 9836
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 9836
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_472
                     #      label while.exit_472: 
 .while.exit_472:
                     #      ans_18 = i32 al_469 
+    mv      a1, s10
                     #      mres_447 = i32 ans_18 
-    li      a0, 9832
+                    #      jump label: branch_false_467 
+    li      a2, 9831
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    mv      a2, a1
+    li      a1, 13452
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9836
     add     a0,sp,a0
     sw      a0,0(a0)
-    mv      a0, s5
-                    #      jump label: branch_false_467 
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s10, 9840
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 9847
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 9847
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_467
                     #      label branch_false_467: 
 .branch_false_467:
                     #      label L58_0: 
 .L58_0:
                     #      al_534 = i32 ml_447 
-    li      a0, 9960
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 9840
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      s10, s5
                     #      c_534 = i32 ml_447 
-    li      a1, 9300
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    li      a0, 9847
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    mv      a0, s5
                     #      new_var sum_534:i32 
                     #      jump label: while.head_537 
     j       .while.head_537
@@ -6215,14 +7971,14 @@ long_func:
 .while.head_537:
                     #      new_var temp_423_13316:i1 
                     #      temp_423_13316 = icmp i32 Ne c_534, 0_0 
-    li      a0, 9968
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 9320
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a1, 0
+    li      a2, 13452
     add     a2,sp,a2
     sw      a2,0(a2)
-    xor     a2,a1,a0
+    xor     a2,a0,a1
     snez    a2, a2
                     #      br i1 temp_423_13316, label while.body_537, label while.exit_537 
     bnez    a2, .while.body_537
@@ -6230,6 +7986,7 @@ long_func:
                     #      label while.body_537: 
 .while.body_537:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_534 
                     #      y_18 = i32 c_534 
@@ -6239,14 +7996,14 @@ long_func:
 .while.head_544:
                     #      new_var temp_424_543:i1 
                     #      temp_424_543 = icmp i32 Slt i_18, 16_0 
-    li      a0, 9300
+    li      a0, 9296
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 9296
+    li      a1, 13452
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s6,a0
+    slt     a1,s1,a0
                     #      br i1 temp_424_543, label while.body_544, label while.exit_544 
     bnez    a1, .while.body_544
     j       .while.exit_544
@@ -6258,7 +8015,7 @@ long_func:
     li      a1, 9290
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s7,a0
+    rem     a1,s3,a0
                     #      new_var temp_426_13499:i1 
                     #      temp_426_13499 = icmp i32 Ne temp_425_546, 0_0 
     li      a0, 0
@@ -6278,7 +8035,7 @@ long_func:
     li      a1, 9284
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_428_549:i1 
                     #      temp_428_549 = icmp i32 Eq temp_427_549, 0_0 
     li      a0, 0
@@ -6312,7 +8069,7 @@ long_func:
     li      a2, 9275
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -6331,9 +8088,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_433_551:i32 
                     #      temp_433_551 = Add i32 ans_18, temp_432_551 
-    add     a0,s5,a2
+    li      a1, 9196
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_433_551 
                     #      jump label: branch_false_550 
+    li      a2, 9192
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 9275
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 9188
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9275
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 9276
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 9276
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_550
                     #      label branch_false_550: 
 .branch_false_550:
@@ -6341,20 +8122,17 @@ long_func:
 .branch_false_547:
                     #      new_var temp_437_553:i32 
                     #      temp_437_553 = Mod i32 y_18, 2_0 
-    li      a0, 9188
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 9196
+    li      a1, 9284
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_438_13644:i1 
                     #      temp_438_13644 = icmp i32 Ne temp_437_553, 0_0 
     li      a0, 0
-    li      a2, 9192
+    li      a2, 9283
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_438_13644, label branch_true_554, label branch_false_554 
@@ -6382,7 +8160,7 @@ long_func:
     li      a2, 9171
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -6401,9 +8179,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_443_555:i32 
                     #      temp_443_555 = Add i32 ans_18, temp_442_555 
-    add     a0,s5,a2
+    li      a1, 9092
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_443_555 
                     #      jump label: branch_false_554 
+    li      a2, 9088
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 9171
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 9084
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9171
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 9172
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 9172
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_554
                     #      label branch_false_554: 
 .branch_false_554:
@@ -6413,14 +8215,11 @@ long_func:
 .L60_0:
                     #      new_var temp_434_545:i32 
                     #      temp_434_545 = Div i32 x_18, 2_0 
-    li      a0, 9084
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 9092
+    li      a1, 9172
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s7,a0
+    div     a1,s3,a0
                     #      x_18 = i32 temp_434_545 
                     #      new_var temp_435_545:i32 
                     #      temp_435_545 = Div i32 y_18, 2_0 
@@ -6428,7 +8227,7 @@ long_func:
     li      a1, 9184
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s8,a0
+    div     a1,s4,a0
                     #      y_18 = i32 temp_435_545 
                     #      new_var temp_436_545:i32 
                     #      temp_436_545 = Add i32 i_18, 1_0 
@@ -6436,22 +8235,55 @@ long_func:
     li      a1, 9180
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s6,a0
+    add     a1,s1,a0
                     #      i_18 = i32 temp_436_545 
                     #      jump label: while.head_544 
+    li      a2, 9171
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 9291
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 9176
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9291
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 9296
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 9296
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_544
                     #      label while.exit_544: 
 .while.exit_544:
                     #      sum_534 = i32 ans_18 
-    mv      a0, s5
+    li      a1, 9290
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_534 
-    li      a0, 9292
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      y_18 = i32 c_534 
-    li      a0, 9300
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
                     #      jump label: while.head_566 
@@ -6464,10 +8296,10 @@ long_func:
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 9176
+    li      a1, 9292
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s6,a0
+    slt     a1,s1,a0
                     #      br i1 temp_444_565, label while.body_566, label while.exit_566 
     bnez    a1, .while.body_566
     j       .while.exit_566
@@ -6479,20 +8311,20 @@ long_func:
     li      a1, 9083
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_446_568:i32 
                     #      temp_446_568 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 9076
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s7,a0
+    rem     a1,s3,a0
                     #      new_var temp_447_568:i1 
                     #      temp_447_568 = icmp i32 Ne temp_446_568, 0_0 
     li      a0, 0
-    li      a2, 9088
+    li      a2, 9291
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      new_var temp_448_568:i1 
@@ -6535,7 +8367,7 @@ long_func:
     li      a2, 9071
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -6554,9 +8386,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_454_570:i32 
                     #      temp_454_570 = Add i32 ans_18, temp_453_570 
-    add     a0,s5,a2
+    li      a1, 8988
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_454_570 
                     #      jump label: branch_false_569 
+    li      a2, 8984
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 9071
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 8980
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9071
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 9070
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 9070
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 9069
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 9069
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_569
                     #      label branch_false_569: 
 .branch_false_569:
@@ -6564,14 +8435,14 @@ long_func:
 .L61_0:
                     #      new_var temp_455_567:i32 
                     #      temp_455_567 = Div i32 x_18, 2_0 
-    li      a0, 8980
+    li      a0, 9069
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 8988
+    li      a1, 9070
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s7,a0
+    sb      a1,0(a1)
+    div     a1,s3,a0
                     #      x_18 = i32 temp_455_567 
                     #      new_var temp_456_567:i32 
                     #      temp_456_567 = Div i32 y_18, 2_0 
@@ -6579,7 +8450,7 @@ long_func:
     li      a1, 8976
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s8,a0
+    div     a1,s4,a0
                     #      y_18 = i32 temp_456_567 
                     #      new_var temp_457_567:i32 
                     #      temp_457_567 = Add i32 i_18, 1_0 
@@ -6587,31 +8458,67 @@ long_func:
     li      a1, 8972
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s6,a0
+    add     a1,s1,a0
                     #      i_18 = i32 temp_457_567 
                     #      jump label: while.head_566 
+    li      a2, 9071
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 9291
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 8968
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9291
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 9292
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 9292
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 9296
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 9296
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_566
                     #      label while.exit_566: 
 .while.exit_566:
                     #      c_534 = i32 ans_18 
-    mv      a0, s5
+    li      a1, 9083
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L62_0 
     j       .L62_0
                     #      label L62_0: 
 .L62_0:
                     #      new_var temp_458_576:i1 
                     #      temp_458_576 = icmp i32 Sgt 1_0, 15_0 
-    li      a0, 9296
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 1
-    li      a1, 8968
+    li      a1, 9296
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 15
-    li      a2, 8984
+    li      a2, 9291
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     slt     a2,a1,a0
                     #      br i1 temp_458_576, label branch_true_577, label branch_false_577 
     bnez    a2, .branch_true_577
@@ -6619,46 +8526,51 @@ long_func:
                     #      label branch_true_577: 
 .branch_true_577:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: while.exit_586 
     j       .while.exit_586
                     #      label branch_false_577: 
 .branch_false_577:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      i_18 = i32 0_0 
                     #      new_var temp_459_580:Array:i32:[Some(16_0)] 
                     #      temp_459_580 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_460_580:ptr->i32 
                     #      new_var temp_461_580:i32 
                     #      temp_460_580 = getelementptr temp_459_580:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    li      a1, 8960
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
+    li      a1, 0
+    li      a0, 8960
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a2, 8967
     add     a2,sp,a2
     sb      a2,0(a2)
     li      a2, 1
-    li      a3, 9496
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_461_580 = load temp_460_580:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_462_580:i32 
                     #      temp_462_580 = Mul i32 c_534, temp_461_580 
-    li      a0, 8888
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a2,a1
+    li      a1, 8888
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    mul     a1,a2,a0
                     #      x_18 = i32 temp_462_580 
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_586 
@@ -6667,16 +8579,43 @@ long_func:
 .while.head_586:
                     #      new_var temp_463_585:i1 
                     #      temp_463_585 = icmp i32 Slt i_18, 16_0 
-    li      a0, 8880
+    li      a0, 8884
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 8884
+    li      a1, 8880
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s6,a0
+    slt     a1,s1,a0
                     #      br i1 temp_463_585, label while.body_586, label while.exit_586 
     bnez    a1, .while.body_586
+    li      a0, 9296
+    add     a0,sp,a0
+    sw      a2,0(a0)
+    li      a0, 8967
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 8879
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 8967
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 8960
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_586
                     #      label while.body_586: 
 .while.body_586:
@@ -6686,14 +8625,14 @@ long_func:
     li      a1, 8879
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_465_588:i32 
                     #      temp_465_588 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 8872
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s7,a0
+    rem     a1,s3,a0
                     #      new_var temp_466_588:i1 
                     #      temp_466_588 = icmp i32 Ne temp_465_588, 0_0 
     li      a0, 0
@@ -6742,7 +8681,7 @@ long_func:
     li      a2, 8867
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -6761,9 +8700,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_473_590:i32 
                     #      temp_473_590 = Add i32 ans_18, temp_472_590 
-    add     a0,s5,a2
+    li      a1, 8788
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_473_590 
                     #      jump label: branch_false_589 
+    li      a2, 8784
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 8867
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 8780
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 8867
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 8866
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 8866
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 8960
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 8865
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 8865
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 8960
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_589
                     #      label branch_false_589: 
 .branch_false_589:
@@ -6771,14 +8749,14 @@ long_func:
 .L63_0:
                     #      new_var temp_474_587:i32 
                     #      temp_474_587 = Div i32 x_18, 2_0 
-    li      a0, 8780
+    li      a0, 8865
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 8788
+    li      a1, 8866
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s7,a0
+    sb      a1,0(a1)
+    div     a1,s3,a0
                     #      x_18 = i32 temp_474_587 
                     #      new_var temp_475_587:i32 
                     #      temp_475_587 = Div i32 y_18, 2_0 
@@ -6786,7 +8764,7 @@ long_func:
     li      a1, 8776
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s8,a0
+    div     a1,s4,a0
                     #      y_18 = i32 temp_475_587 
                     #      new_var temp_476_587:i32 
                     #      temp_476_587 = Add i32 i_18, 1_0 
@@ -6794,38 +8772,97 @@ long_func:
     li      a1, 8772
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s6,a0
+    add     a1,s1,a0
                     #      i_18 = i32 temp_476_587 
                     #      jump label: while.head_586 
+    li      a2, 8867
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 9296
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 8768
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 9296
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 8880
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 8880
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 8960
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 8884
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 8884
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 8960
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_586
                     #      label while.exit_586: 
 .while.exit_586:
                     #      label L64_0: 
 .L64_0:
                     #      c_534 = i32 ans_18 
-    mv      a0, s5
+    mv      a1, a0
                     #      al_534 = i32 sum_534 
-    li      a0, 9296
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 8768
+                    #      jump label: while.head_537 
+    li      a2, 8967
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 9292
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 9296
     add     a1,sp,a1
     sw      a1,0(a1)
-    mv      a1, a0
-                    #      jump label: while.head_537 
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 9296
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 9296
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_537
                     #      label while.exit_537: 
 .while.exit_537:
                     #      ans_18 = i32 al_534 
+    mv      a1, s10
                     #      ml_447 = i32 ans_18 
-    li      a0, 9292
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, s5
                     #      x_18 = i32 mr_447 
-    li      a0, 9968
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      y_18 = i32 1_0 
                     #      jump label: L65_0 
     j       .L65_0
@@ -6833,14 +8870,14 @@ long_func:
 .L65_0:
                     #      new_var temp_477_601:i1 
                     #      temp_477_601 = icmp i32 Sge y_18, 15_0 
-    li      a0, 9964
+    li      a0, 9296
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 15
-    li      a1, 9300
+    li      a1, 13452
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s8,a0
+    slt     a1,s4,a0
     xori    a1,a1,1
                     #      br i1 temp_477_601, label branch_true_602, label branch_false_602 
     bnez    a1, .branch_true_602
@@ -6853,18 +8890,20 @@ long_func:
     li      a1, 8767
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,s7,a0
+    slt     a1,s3,a0
                     #      br i1 temp_478_604, label branch_true_605, label branch_false_605 
     bnez    a1, .branch_true_605
     j       .branch_false_605
                     #      label branch_true_605: 
 .branch_true_605:
                     #      ans_18 = i32 0xffff_0 
+    li      a0, 0xffff
                     #      jump label: L66_0 
     j       .L66_0
                     #      label branch_false_605: 
 .branch_false_605:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: L66_0 
     j       .L66_0
                     #      label L66_0: 
@@ -6873,11 +8912,11 @@ long_func:
 .branch_false_602:
                     #      new_var temp_479_610:i1 
                     #      temp_479_610 = icmp i32 Sgt y_18, 0_0 
-                    #found literal reg Some(a0) already exist with 0_0
-    li      a1, 8766
+    li      a0, 0
+    li      a1, 8767
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s8
+    slt     a1,a0,s4
                     #      br i1 temp_479_610, label branch_true_611, label branch_false_611 
     bnez    a1, .branch_true_611
     j       .branch_false_611
@@ -6889,7 +8928,7 @@ long_func:
     li      a1, 8765
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s7
+    slt     a1,a0,s3
                     #      br i1 temp_480_613, label branch_true_614, label branch_false_614 
     bnez    a1, .branch_true_614
     j       .branch_false_614
@@ -6912,10 +8951,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 8784
+    li      a2, 9291
     add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s8
+    sb      a2,0(a2)
+    mul     a2,a1,s4
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -6927,7 +8966,7 @@ long_func:
     li      a0, 8688
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s7,a1
+    div     a0,s3,a1
                     #      x_18 = i32 temp_484_615 
                     #      new_var temp_485_615:i32 
                     #      temp_485_615 = Add i32 y_18, 1_0 
@@ -6938,7 +8977,7 @@ long_func:
     li      a1, 8684
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s8,a0
+    add     a1,s4,a0
                     #      new_var temp_486_615:i32 
                     #      temp_486_615 = Sub i32 15_0, temp_485_615 
     li      a0, 15
@@ -6963,7 +9002,7 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a3, 8960
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
     mul     a3,a1,a2
@@ -6985,23 +9024,24 @@ long_func:
     sub     a2,a0,a1
                     #      new_var temp_491_615:i32 
                     #      temp_491_615 = Add i32 x_18, temp_490_615 
-    add     a0,s7,a2
+    add     a0,s3,a2
                     #      ans_18 = i32 temp_491_615 
+    li      a1, 8596
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L67_0 
     j       .L67_0
                     #      label branch_false_614: 
 .branch_false_614:
                     #      new_var temp_492_618:Array:i32:[Some(16_0)] 
                     #      temp_492_618 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 8588
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 8596
+    li      a1, 8764
     add     a1,sp,a1
-    sw      a1,0(a1)
+    sb      a1,0(a1)
     lw      a1,0(a0)
                     #      new_var temp_493_618:ptr->i32 
                     #      new_var temp_494_618:i32 
@@ -7011,10 +9051,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 8592
+    li      a2, 9291
     add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s8
+    sb      a2,0(a2)
+    mul     a2,a1,s4
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -7026,15 +9066,47 @@ long_func:
     li      a0, 8512
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s7,a1
+    div     a0,s3,a1
                     #      ans_18 = i32 temp_495_618 
+    li      a1, 8508
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L67_0 
+    li      a2, 8584
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 8504
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 8592
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a0, 8592
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a1, 13452
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 8588
+    add     a1,sp,a1
+    lw      a0,0(a1)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a1, 8588
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 8668
+    add     a1,sp,a1
+    lw      a3,0(a1)
     j       .L67_0
                     #      label L67_0: 
 .L67_0:
                     #      label branch_false_611: 
 .branch_false_611:
                     #      ans_18 = i32 x_18 
+    mv      a0, s3
                     #      jump label: L68_0 
     j       .L68_0
                     #      label L68_0: 
@@ -7044,60 +9116,84 @@ long_func:
                     #      label L70_0: 
 .L70_0:
                     #      mr_447 = i32 ans_18 
-    li      a0, 8504
+                    #      jump label: while.head_450 
+    li      a2, 9291
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    mv      a2, a0
+    li      a1, 8765
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    mv      a0, s5
-                    #      jump label: while.head_450 
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s10, 9300
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 10100
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      s11, 9959
+    add     s11,sp,s11
+    sb      s11,0(s11)
+    li      a3, 10100
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_450
                     #      label while.exit_450: 
 .while.exit_450:
                     #      ans_18 = i32 mres_447 
-    li      a0, 9964
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      pres_425 = i32 ans_18 
                     #      jump label: branch_false_445 
+    li      s8, 9964
+    add     s8,sp,s8
+    sw      s8,0(s8)
+    li      s5, 9968
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      s11, 9959
+    add     s11,sp,s11
+    sb      s11,0(s11)
+    li      s9, 9960
+    add     s9,sp,s9
+    sw      s9,0(s9)
     j       .branch_false_445
                     #      label branch_false_445: 
 .branch_false_445:
                     #      label L71_0: 
 .L71_0:
                     #      ml_625 = i32 pl_425 
-    li      a0, 9960
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 8508
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      s5, a0
                     #      mr_625 = i32 pl_425 
-    li      a1, 8500
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      s8, a0
                     #      mres_625 = i32 0_0 
-    li      a0, 10100
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
+    li      s9, 0
                     #      jump label: while.head_628 
     j       .while.head_628
                     #      label while.head_628: 
 .while.head_628:
                     #      new_var temp_496_15608:i1 
                     #      temp_496_15608 = icmp i32 Ne mr_625, 0_0 
-    li      a0, 8492
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 8584
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
-    snez    a2, a2
+    li      s10, 0
+    xor     s11,s8,s10
+    snez    s11, s11
                     #      br i1 temp_496_15608, label while.body_628, label while.exit_628 
-    bnez    a2, .while.body_628
+    bnez    s11, .while.body_628
     j       .while.exit_628
                     #      label while.body_628: 
 .while.body_628:
@@ -7111,64 +9207,64 @@ long_func:
 .while.head_635:
                     #      new_var temp_497_634:i1 
                     #      temp_497_634 = icmp i32 Slt i_18, 16_0 
-    li      a0, 16
-    li      a1, 8496
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s6,a0
+    li      s10, 16
+    li      a0, 10100
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    slt     a0,s1,s10
                     #      br i1 temp_497_634, label while.body_635, label while.exit_635 
-    bnez    a1, .while.body_635
+    bnez    a0, .while.body_635
     j       .while.exit_635
                     #      label while.body_635: 
 .while.body_635:
                     #      new_var temp_498_637:i32 
                     #      temp_498_637 = Mod i32 y_18, 2_0 
-    li      a0, 2
-    li      a1, 8490
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    rem     a1,s8,a0
+    li      s10, 2
+    li      a0, 8490
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    rem     a0,s4,s10
                     #      new_var temp_499_637:i32 
                     #      temp_499_637 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(a0) already exist with 2_0
-    li      a1, 8484
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    rem     a1,s7,a0
-                    #      new_var temp_500_637:i1 
-                    #      temp_500_637 = icmp i32 Ne temp_499_637, 0_0 
-    li      a0, 0
-    li      a2, 8491
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    xor     a2,a1,a0
-    snez    a2, a2
-                    #      new_var temp_501_637:i1 
-                    #      temp_500_637 = icmp i32 Ne temp_498_637, 0_0 
-    li      a1, 8480
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 0
-                    #      new_var temp_502_637:i1 
-                    #      temp_502_637 = And i1 temp_500_637, temp_501_637 
+                    #found literal reg Some(s10) already exist with 2_0
     li      a0, 8484
     add     a0,sp,a0
     sw      a0,0(a0)
-    and     a0,a2,a1
+    rem     a0,s3,s10
+                    #      new_var temp_500_637:i1 
+                    #      temp_500_637 = icmp i32 Ne temp_499_637, 0_0 
+    li      s10, 0
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    xor     a1,a0,s10
+    snez    a1, a1
+                    #      new_var temp_501_637:i1 
+                    #      temp_500_637 = icmp i32 Ne temp_498_637, 0_0 
+    li      a0, 8480
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 0
+                    #      new_var temp_502_637:i1 
+                    #      temp_502_637 = And i1 temp_500_637, temp_501_637 
+    li      a2, 13452
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    and     a2,a1,a0
                     #      br i1 temp_502_637, label branch_true_638, label branch_false_638 
-    bnez    a0, .branch_true_638
+    bnez    a2, .branch_true_638
     j       .branch_false_638
                     #      label branch_true_638: 
 .branch_true_638:
                     #      new_var temp_503_639:Array:i32:[Some(16_0)] 
                     #      temp_503_639 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 8477
+    li      a0, 8478
     add     a0,sp,a0
     sb      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 8478
+    li      a1, 8479
     add     a1,sp,a1
     sb      a1,0(a1)
     lw      a1,0(a0)
@@ -7180,10 +9276,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 8479
+    li      a2, 8477
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -7202,9 +9298,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_507_639:i32 
                     #      temp_507_639 = Add i32 ans_18, temp_506_639 
-    add     a0,s5,a2
+    li      a1, 8396
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_507_639 
                     #      jump label: branch_false_638 
+    li      a2, 8392
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 8477
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 8388
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 8477
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 8479
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 8479
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 8478
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 8478
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_638
                     #      label branch_false_638: 
 .branch_false_638:
@@ -7212,14 +9347,14 @@ long_func:
 .L72_0:
                     #      new_var temp_508_636:i32 
                     #      temp_508_636 = Div i32 x_18, 2_0 
-    li      a0, 8388
+    li      a0, 8478
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 8396
+    li      a1, 8479
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s7,a0
+    sb      a1,0(a1)
+    div     a1,s3,a0
                     #      x_18 = i32 temp_508_636 
                     #      new_var temp_509_636:i32 
                     #      temp_509_636 = Div i32 y_18, 2_0 
@@ -7227,7 +9362,7 @@ long_func:
     li      a1, 8384
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s8,a0
+    div     a1,s4,a0
                     #      y_18 = i32 temp_509_636 
                     #      new_var temp_510_636:i32 
                     #      temp_510_636 = Add i32 i_18, 1_0 
@@ -7235,38 +9370,68 @@ long_func:
     li      a1, 8380
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s6,a0
+    add     a1,s1,a0
                     #      i_18 = i32 temp_510_636 
                     #      jump label: while.head_635 
+    li      a2, 8477
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 8376
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s10, 8484
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 10100
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 10100
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_635
                     #      label while.exit_635: 
 .while.exit_635:
                     #      new_var temp_511_16017:i1 
                     #      temp_511_16017 = icmp i32 Ne ans_18, 0_0 
-    li      a0, 0
-    li      a1, 8376
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    xor     a1,s5,a0
-    snez    a1, a1
+    li      s10, 0
+    li      a0, 8490
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    xor     a0,a2,s10
+    snez    a0, a0
                     #      br i1 temp_511_16017, label branch_true_645, label branch_false_645 
-    bnez    a1, .branch_true_645
+    bnez    a0, .branch_true_645
     j       .branch_false_645
                     #      label branch_true_645: 
 .branch_true_645:
                     #      al_647 = i32 mres_625 
-    li      a1, 8375
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    mv      a1, a0
+    mv      s10, s9
                     #      c_647 = i32 ml_625 
-    li      a0, 8492
+    li      a0, 8375
     add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 8368
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    sb      a0,0(a0)
+    mv      a0, s5
                     #      new_var sum_647:i32 
                     #      jump label: while.head_650 
     j       .while.head_650
@@ -7274,14 +9439,14 @@ long_func:
 .while.head_650:
                     #      new_var temp_512_16111:i1 
                     #      temp_512_16111 = icmp i32 Ne c_647, 0_0 
-    li      a0, 8500
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 8392
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a1, 0
+    li      a2, 13452
     add     a2,sp,a2
     sw      a2,0(a2)
-    xor     a2,a1,a0
+    xor     a2,a0,a1
     snez    a2, a2
                     #      br i1 temp_512_16111, label while.body_650, label while.exit_650 
     bnez    a2, .while.body_650
@@ -7289,6 +9454,7 @@ long_func:
                     #      label while.body_650: 
 .while.body_650:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_647 
                     #      y_18 = i32 c_647 
@@ -7298,14 +9464,14 @@ long_func:
 .while.head_657:
                     #      new_var temp_513_656:i1 
                     #      temp_513_656 = icmp i32 Slt i_18, 16_0 
-    li      a0, 8368
+    li      a0, 8364
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 8364
+    li      a1, 13452
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s6,a0
+    slt     a1,s1,a0
                     #      br i1 temp_513_656, label while.body_657, label while.exit_657 
     bnez    a1, .while.body_657
     j       .while.exit_657
@@ -7317,7 +9483,7 @@ long_func:
     li      a1, 8358
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s7,a0
+    rem     a1,s3,a0
                     #      new_var temp_515_16294:i1 
                     #      temp_515_16294 = icmp i32 Ne temp_514_659, 0_0 
     li      a0, 0
@@ -7337,7 +9503,7 @@ long_func:
     li      a1, 8352
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_517_662:i1 
                     #      temp_517_662 = icmp i32 Eq temp_516_662, 0_0 
     li      a0, 0
@@ -7371,7 +9537,7 @@ long_func:
     li      a2, 8343
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -7390,9 +9556,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_522_664:i32 
                     #      temp_522_664 = Add i32 ans_18, temp_521_664 
-    add     a0,s5,a2
+    li      a1, 8260
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_522_664 
                     #      jump label: branch_false_663 
+    li      a2, 8256
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 8343
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 8252
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 8343
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 8344
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 8344
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_663
                     #      label branch_false_663: 
 .branch_false_663:
@@ -7400,20 +9590,17 @@ long_func:
 .branch_false_660:
                     #      new_var temp_526_666:i32 
                     #      temp_526_666 = Mod i32 y_18, 2_0 
-    li      a0, 8252
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 8260
+    li      a1, 8352
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_527_16439:i1 
                     #      temp_527_16439 = icmp i32 Ne temp_526_666, 0_0 
     li      a0, 0
-    li      a2, 8256
+    li      a2, 8351
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_527_16439, label branch_true_667, label branch_false_667 
@@ -7441,7 +9628,7 @@ long_func:
     li      a2, 8235
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -7460,9 +9647,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_532_668:i32 
                     #      temp_532_668 = Add i32 ans_18, temp_531_668 
-    add     a0,s5,a2
+    li      a1, 8156
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_532_668 
                     #      jump label: branch_false_667 
+    li      a2, 8152
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 8235
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 8148
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 8235
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 8236
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 8236
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_667
                     #      label branch_false_667: 
 .branch_false_667:
@@ -7472,14 +9683,11 @@ long_func:
 .L74_0:
                     #      new_var temp_523_658:i32 
                     #      temp_523_658 = Div i32 x_18, 2_0 
-    li      a0, 8148
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 8156
+    li      a1, 8236
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s7,a0
+    div     a1,s3,a0
                     #      x_18 = i32 temp_523_658 
                     #      new_var temp_524_658:i32 
                     #      temp_524_658 = Div i32 y_18, 2_0 
@@ -7487,7 +9695,7 @@ long_func:
     li      a1, 8248
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s8,a0
+    div     a1,s4,a0
                     #      y_18 = i32 temp_524_658 
                     #      new_var temp_525_658:i32 
                     #      temp_525_658 = Add i32 i_18, 1_0 
@@ -7495,22 +9703,55 @@ long_func:
     li      a1, 8244
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s6,a0
+    add     a1,s1,a0
                     #      i_18 = i32 temp_525_658 
                     #      jump label: while.head_657 
+    li      a2, 8235
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 8359
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 8240
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 8359
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 8364
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 8364
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_657
                     #      label while.exit_657: 
 .while.exit_657:
                     #      sum_647 = i32 ans_18 
-    mv      a0, s5
+    li      a1, 8358
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_647 
-    li      a0, 8360
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      y_18 = i32 c_647 
-    li      a0, 8368
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
                     #      jump label: while.head_679 
@@ -7523,10 +9764,10 @@ long_func:
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 8240
+    li      a1, 8360
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s6,a0
+    slt     a1,s1,a0
                     #      br i1 temp_533_678, label while.body_679, label while.exit_679 
     bnez    a1, .while.body_679
     j       .while.exit_679
@@ -7538,20 +9779,20 @@ long_func:
     li      a1, 8147
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_535_681:i32 
                     #      temp_535_681 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 8140
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s7,a0
+    rem     a1,s3,a0
                     #      new_var temp_536_681:i1 
                     #      temp_536_681 = icmp i32 Ne temp_535_681, 0_0 
     li      a0, 0
-    li      a2, 8152
+    li      a2, 8359
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      new_var temp_537_681:i1 
@@ -7594,7 +9835,7 @@ long_func:
     li      a2, 8135
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -7613,9 +9854,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_543_683:i32 
                     #      temp_543_683 = Add i32 ans_18, temp_542_683 
-    add     a0,s5,a2
+    li      a1, 8052
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_543_683 
                     #      jump label: branch_false_682 
+    li      a2, 8048
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 8135
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 8044
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 8135
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 8134
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 8134
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 8133
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 8133
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_682
                     #      label branch_false_682: 
 .branch_false_682:
@@ -7623,14 +9903,14 @@ long_func:
 .L75_0:
                     #      new_var temp_544_680:i32 
                     #      temp_544_680 = Div i32 x_18, 2_0 
-    li      a0, 8044
+    li      a0, 8133
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 8052
+    li      a1, 8134
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s7,a0
+    sb      a1,0(a1)
+    div     a1,s3,a0
                     #      x_18 = i32 temp_544_680 
                     #      new_var temp_545_680:i32 
                     #      temp_545_680 = Div i32 y_18, 2_0 
@@ -7638,7 +9918,7 @@ long_func:
     li      a1, 8040
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s8,a0
+    div     a1,s4,a0
                     #      y_18 = i32 temp_545_680 
                     #      new_var temp_546_680:i32 
                     #      temp_546_680 = Add i32 i_18, 1_0 
@@ -7646,31 +9926,67 @@ long_func:
     li      a1, 8036
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s6,a0
+    add     a1,s1,a0
                     #      i_18 = i32 temp_546_680 
                     #      jump label: while.head_679 
+    li      a2, 8135
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 8359
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 8032
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 8359
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 8360
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 8360
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 8364
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 8364
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_679
                     #      label while.exit_679: 
 .while.exit_679:
                     #      c_647 = i32 ans_18 
-    mv      a0, s5
+    li      a1, 8147
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L76_0 
     j       .L76_0
                     #      label L76_0: 
 .L76_0:
                     #      new_var temp_547_689:i1 
                     #      temp_547_689 = icmp i32 Sgt 1_0, 15_0 
-    li      a0, 8364
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 1
-    li      a1, 8032
+    li      a1, 8364
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 15
-    li      a2, 8048
+    li      a2, 8359
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     slt     a2,a1,a0
                     #      br i1 temp_547_689, label branch_true_690, label branch_false_690 
     bnez    a2, .branch_true_690
@@ -7678,46 +9994,51 @@ long_func:
                     #      label branch_true_690: 
 .branch_true_690:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: while.exit_699 
     j       .while.exit_699
                     #      label branch_false_690: 
 .branch_false_690:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      i_18 = i32 0_0 
                     #      new_var temp_548_693:Array:i32:[Some(16_0)] 
                     #      temp_548_693 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_549_693:ptr->i32 
                     #      new_var temp_550_693:i32 
                     #      temp_549_693 = getelementptr temp_548_693:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    li      a1, 8024
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
+    li      a1, 0
+    li      a0, 8024
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a2, 8031
     add     a2,sp,a2
     sb      a2,0(a2)
     li      a2, 1
-    li      a3, 8668
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_550_693 = load temp_549_693:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_551_693:i32 
                     #      temp_551_693 = Mul i32 c_647, temp_550_693 
-    li      a0, 7952
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a2,a1
+    li      a1, 7952
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    mul     a1,a2,a0
                     #      x_18 = i32 temp_551_693 
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_699 
@@ -7726,16 +10047,43 @@ long_func:
 .while.head_699:
                     #      new_var temp_552_698:i1 
                     #      temp_552_698 = icmp i32 Slt i_18, 16_0 
-    li      a0, 7944
+    li      a0, 7948
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 7948
+    li      a1, 7944
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s6,a0
+    slt     a1,s1,a0
                     #      br i1 temp_552_698, label while.body_699, label while.exit_699 
     bnez    a1, .while.body_699
+    li      a0, 8364
+    add     a0,sp,a0
+    sw      a2,0(a0)
+    li      a0, 8031
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 7943
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 8031
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 8024
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_699
                     #      label while.body_699: 
 .while.body_699:
@@ -7745,14 +10093,14 @@ long_func:
     li      a1, 7943
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_554_701:i32 
                     #      temp_554_701 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 7936
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s7,a0
+    rem     a1,s3,a0
                     #      new_var temp_555_701:i1 
                     #      temp_555_701 = icmp i32 Ne temp_554_701, 0_0 
     li      a0, 0
@@ -7801,7 +10149,7 @@ long_func:
     li      a2, 7931
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -7820,9 +10168,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_562_703:i32 
                     #      temp_562_703 = Add i32 ans_18, temp_561_703 
-    add     a0,s5,a2
+    li      a1, 7852
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_562_703 
                     #      jump label: branch_false_702 
+    li      a2, 7848
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 7931
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 7844
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 7931
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 7930
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 7930
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 8024
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 7929
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 7929
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 8024
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_702
                     #      label branch_false_702: 
 .branch_false_702:
@@ -7830,14 +10217,14 @@ long_func:
 .L77_0:
                     #      new_var temp_563_700:i32 
                     #      temp_563_700 = Div i32 x_18, 2_0 
-    li      a0, 7844
+    li      a0, 7929
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 7852
+    li      a1, 7930
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s7,a0
+    sb      a1,0(a1)
+    div     a1,s3,a0
                     #      x_18 = i32 temp_563_700 
                     #      new_var temp_564_700:i32 
                     #      temp_564_700 = Div i32 y_18, 2_0 
@@ -7845,7 +10232,7 @@ long_func:
     li      a1, 7840
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s8,a0
+    div     a1,s4,a0
                     #      y_18 = i32 temp_564_700 
                     #      new_var temp_565_700:i32 
                     #      temp_565_700 = Add i32 i_18, 1_0 
@@ -7853,53 +10240,143 @@ long_func:
     li      a1, 7836
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s6,a0
+    add     a1,s1,a0
                     #      i_18 = i32 temp_565_700 
                     #      jump label: while.head_699 
+    li      a2, 7931
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 8364
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 7832
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 8364
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 7944
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 7944
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 8024
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 7948
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 7948
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 8024
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_699
                     #      label while.exit_699: 
 .while.exit_699:
                     #      label L78_0: 
 .L78_0:
                     #      c_647 = i32 ans_18 
-    mv      a0, s5
+    mv      a1, a0
                     #      al_647 = i32 sum_647 
-    li      a0, 8364
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 7832
+                    #      jump label: while.head_650 
+    li      a2, 8031
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 8360
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 8364
     add     a1,sp,a1
     sw      a1,0(a1)
-    mv      a1, a0
-                    #      jump label: while.head_650 
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 8364
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 8364
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_650
                     #      label while.exit_650: 
 .while.exit_650:
                     #      ans_18 = i32 al_647 
+    mv      a1, s10
                     #      mres_625 = i32 ans_18 
-    li      a0, 8360
+                    #      jump label: branch_false_645 
+    li      a2, 8359
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    mv      a2, a1
+    li      a1, 13452
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 8364
     add     a0,sp,a0
     sw      a0,0(a0)
-    mv      a0, s5
-                    #      jump label: branch_false_645 
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s10, 8368
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 8375
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 8375
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_645
                     #      label branch_false_645: 
 .branch_false_645:
                     #      label L79_0: 
 .L79_0:
                     #      al_712 = i32 ml_625 
-    li      a0, 8492
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a1, 8368
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      s10, s5
                     #      c_712 = i32 ml_625 
-    li      a1, 7828
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    li      a0, 8375
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    mv      a0, s5
                     #      new_var sum_712:i32 
                     #      jump label: while.head_715 
     j       .while.head_715
@@ -7907,14 +10384,14 @@ long_func:
 .while.head_715:
                     #      new_var temp_566_17786:i1 
                     #      temp_566_17786 = icmp i32 Ne c_712, 0_0 
-    li      a0, 8500
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 7848
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a1, 0
+    li      a2, 13452
     add     a2,sp,a2
     sw      a2,0(a2)
-    xor     a2,a1,a0
+    xor     a2,a0,a1
     snez    a2, a2
                     #      br i1 temp_566_17786, label while.body_715, label while.exit_715 
     bnez    a2, .while.body_715
@@ -7922,6 +10399,7 @@ long_func:
                     #      label while.body_715: 
 .while.body_715:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_712 
                     #      y_18 = i32 c_712 
@@ -7931,14 +10409,14 @@ long_func:
 .while.head_722:
                     #      new_var temp_567_721:i1 
                     #      temp_567_721 = icmp i32 Slt i_18, 16_0 
-    li      a0, 7828
+    li      a0, 7824
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 7824
+    li      a1, 13452
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s6,a0
+    slt     a1,s1,a0
                     #      br i1 temp_567_721, label while.body_722, label while.exit_722 
     bnez    a1, .while.body_722
     j       .while.exit_722
@@ -7950,7 +10428,7 @@ long_func:
     li      a1, 7818
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s7,a0
+    rem     a1,s3,a0
                     #      new_var temp_569_17969:i1 
                     #      temp_569_17969 = icmp i32 Ne temp_568_724, 0_0 
     li      a0, 0
@@ -7970,7 +10448,7 @@ long_func:
     li      a1, 7812
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_571_727:i1 
                     #      temp_571_727 = icmp i32 Eq temp_570_727, 0_0 
     li      a0, 0
@@ -8004,7 +10482,7 @@ long_func:
     li      a2, 7803
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -8023,9 +10501,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_576_729:i32 
                     #      temp_576_729 = Add i32 ans_18, temp_575_729 
-    add     a0,s5,a2
+    li      a1, 7724
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_576_729 
                     #      jump label: branch_false_728 
+    li      a2, 7720
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 7803
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 7716
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 7803
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 7804
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 7804
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_728
                     #      label branch_false_728: 
 .branch_false_728:
@@ -8033,20 +10535,17 @@ long_func:
 .branch_false_725:
                     #      new_var temp_580_731:i32 
                     #      temp_580_731 = Mod i32 y_18, 2_0 
-    li      a0, 7716
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 7724
+    li      a1, 7812
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_581_18114:i1 
                     #      temp_581_18114 = icmp i32 Ne temp_580_731, 0_0 
     li      a0, 0
-    li      a2, 7720
+    li      a2, 7811
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_581_18114, label branch_true_732, label branch_false_732 
@@ -8074,7 +10573,7 @@ long_func:
     li      a2, 7699
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -8093,9 +10592,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_586_733:i32 
                     #      temp_586_733 = Add i32 ans_18, temp_585_733 
-    add     a0,s5,a2
+    li      a1, 7620
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_586_733 
                     #      jump label: branch_false_732 
+    li      a2, 7616
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 7699
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 7612
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 7699
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 7700
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 7700
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_732
                     #      label branch_false_732: 
 .branch_false_732:
@@ -8105,14 +10628,11 @@ long_func:
 .L81_0:
                     #      new_var temp_577_723:i32 
                     #      temp_577_723 = Div i32 x_18, 2_0 
-    li      a0, 7612
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 7620
+    li      a1, 7700
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s7,a0
+    div     a1,s3,a0
                     #      x_18 = i32 temp_577_723 
                     #      new_var temp_578_723:i32 
                     #      temp_578_723 = Div i32 y_18, 2_0 
@@ -8120,7 +10640,7 @@ long_func:
     li      a1, 7712
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s8,a0
+    div     a1,s4,a0
                     #      y_18 = i32 temp_578_723 
                     #      new_var temp_579_723:i32 
                     #      temp_579_723 = Add i32 i_18, 1_0 
@@ -8128,22 +10648,55 @@ long_func:
     li      a1, 7708
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s6,a0
+    add     a1,s1,a0
                     #      i_18 = i32 temp_579_723 
                     #      jump label: while.head_722 
+    li      a2, 7699
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 7819
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 7704
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 7819
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 7824
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 7824
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_722
                     #      label while.exit_722: 
 .while.exit_722:
                     #      sum_712 = i32 ans_18 
-    mv      a0, s5
+    li      a1, 7818
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_712 
-    li      a0, 7820
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      y_18 = i32 c_712 
-    li      a0, 7828
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
                     #      jump label: while.head_744 
@@ -8156,10 +10709,10 @@ long_func:
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 7704
+    li      a1, 7820
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s6,a0
+    slt     a1,s1,a0
                     #      br i1 temp_587_743, label while.body_744, label while.exit_744 
     bnez    a1, .while.body_744
     j       .while.exit_744
@@ -8171,20 +10724,20 @@ long_func:
     li      a1, 7611
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_589_746:i32 
                     #      temp_589_746 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 7604
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s7,a0
+    rem     a1,s3,a0
                     #      new_var temp_590_746:i1 
                     #      temp_590_746 = icmp i32 Ne temp_589_746, 0_0 
     li      a0, 0
-    li      a2, 7616
+    li      a2, 7819
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      new_var temp_591_746:i1 
@@ -8227,7 +10780,7 @@ long_func:
     li      a2, 7599
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -8246,9 +10799,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_597_748:i32 
                     #      temp_597_748 = Add i32 ans_18, temp_596_748 
-    add     a0,s5,a2
+    li      a1, 7516
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_597_748 
                     #      jump label: branch_false_747 
+    li      a2, 7512
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 7599
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 7508
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 7599
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 7598
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 7598
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 7597
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 7597
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_747
                     #      label branch_false_747: 
 .branch_false_747:
@@ -8256,14 +10848,14 @@ long_func:
 .L82_0:
                     #      new_var temp_598_745:i32 
                     #      temp_598_745 = Div i32 x_18, 2_0 
-    li      a0, 7508
+    li      a0, 7597
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 7516
+    li      a1, 7598
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s7,a0
+    sb      a1,0(a1)
+    div     a1,s3,a0
                     #      x_18 = i32 temp_598_745 
                     #      new_var temp_599_745:i32 
                     #      temp_599_745 = Div i32 y_18, 2_0 
@@ -8271,7 +10863,7 @@ long_func:
     li      a1, 7504
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s8,a0
+    div     a1,s4,a0
                     #      y_18 = i32 temp_599_745 
                     #      new_var temp_600_745:i32 
                     #      temp_600_745 = Add i32 i_18, 1_0 
@@ -8279,31 +10871,67 @@ long_func:
     li      a1, 7500
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s6,a0
+    add     a1,s1,a0
                     #      i_18 = i32 temp_600_745 
                     #      jump label: while.head_744 
+    li      a2, 7599
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 7819
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 7496
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 7819
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 7820
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 7820
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 7824
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 7824
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_744
                     #      label while.exit_744: 
 .while.exit_744:
                     #      c_712 = i32 ans_18 
-    mv      a0, s5
+    li      a1, 7611
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L83_0 
     j       .L83_0
                     #      label L83_0: 
 .L83_0:
                     #      new_var temp_601_754:i1 
                     #      temp_601_754 = icmp i32 Sgt 1_0, 15_0 
-    li      a0, 7824
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 1
-    li      a1, 7496
+    li      a1, 7824
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 15
-    li      a2, 7512
+    li      a2, 7819
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     slt     a2,a1,a0
                     #      br i1 temp_601_754, label branch_true_755, label branch_false_755 
     bnez    a2, .branch_true_755
@@ -8311,46 +10939,51 @@ long_func:
                     #      label branch_true_755: 
 .branch_true_755:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: while.exit_764 
     j       .while.exit_764
                     #      label branch_false_755: 
 .branch_false_755:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      i_18 = i32 0_0 
                     #      new_var temp_602_758:Array:i32:[Some(16_0)] 
                     #      temp_602_758 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_603_758:ptr->i32 
                     #      new_var temp_604_758:i32 
                     #      temp_603_758 = getelementptr temp_602_758:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    li      a1, 7488
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
+    li      a1, 0
+    li      a0, 7488
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a2, 7495
     add     a2,sp,a2
     sb      a2,0(a2)
     li      a2, 1
-    li      a3, 8024
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_604_758 = load temp_603_758:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_605_758:i32 
                     #      temp_605_758 = Mul i32 c_712, temp_604_758 
-    li      a0, 7416
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a2,a1
+    li      a1, 7416
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    mul     a1,a2,a0
                     #      x_18 = i32 temp_605_758 
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_764 
@@ -8359,16 +10992,43 @@ long_func:
 .while.head_764:
                     #      new_var temp_606_763:i1 
                     #      temp_606_763 = icmp i32 Slt i_18, 16_0 
-    li      a0, 7408
+    li      a0, 7412
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 7412
+    li      a1, 7408
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s6,a0
+    slt     a1,s1,a0
                     #      br i1 temp_606_763, label while.body_764, label while.exit_764 
     bnez    a1, .while.body_764
+    li      a0, 7824
+    add     a0,sp,a0
+    sw      a2,0(a0)
+    li      a0, 7495
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 7407
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 7495
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 7488
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_764
                     #      label while.body_764: 
 .while.body_764:
@@ -8378,14 +11038,14 @@ long_func:
     li      a1, 7407
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s8,a0
+    rem     a1,s4,a0
                     #      new_var temp_608_766:i32 
                     #      temp_608_766 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 7400
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s7,a0
+    rem     a1,s3,a0
                     #      new_var temp_609_766:i1 
                     #      temp_609_766 = icmp i32 Ne temp_608_766, 0_0 
     li      a0, 0
@@ -8434,7 +11094,7 @@ long_func:
     li      a2, 7395
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s6
+    mul     a2,a1,s1
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -8453,9 +11113,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_616_768:i32 
                     #      temp_616_768 = Add i32 ans_18, temp_615_768 
-    add     a0,s5,a2
+    li      a1, 7316
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_616_768 
                     #      jump label: branch_false_767 
+    li      a2, 7312
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 7395
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 7308
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 7395
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 7394
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 7394
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 7488
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 7393
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 7393
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 7488
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_767
                     #      label branch_false_767: 
 .branch_false_767:
@@ -8463,14 +11162,14 @@ long_func:
 .L84_0:
                     #      new_var temp_617_765:i32 
                     #      temp_617_765 = Div i32 x_18, 2_0 
-    li      a0, 7308
+    li      a0, 7393
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 7316
+    li      a1, 7394
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s7,a0
+    sb      a1,0(a1)
+    div     a1,s3,a0
                     #      x_18 = i32 temp_617_765 
                     #      new_var temp_618_765:i32 
                     #      temp_618_765 = Div i32 y_18, 2_0 
@@ -8478,7 +11177,7 @@ long_func:
     li      a1, 7304
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s8,a0
+    div     a1,s4,a0
                     #      y_18 = i32 temp_618_765 
                     #      new_var temp_619_765:i32 
                     #      temp_619_765 = Add i32 i_18, 1_0 
@@ -8486,38 +11185,97 @@ long_func:
     li      a1, 7300
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s6,a0
+    add     a1,s1,a0
                     #      i_18 = i32 temp_619_765 
                     #      jump label: while.head_764 
+    li      a2, 7395
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 7824
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 7296
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 7824
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 7408
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 7408
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 7488
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 7412
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 7412
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 7488
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_764
                     #      label while.exit_764: 
 .while.exit_764:
                     #      label L85_0: 
 .L85_0:
                     #      c_712 = i32 ans_18 
-    mv      a0, s5
+    mv      a1, a0
                     #      al_712 = i32 sum_712 
-    li      a0, 7824
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 7296
+                    #      jump label: while.head_715 
+    li      a2, 7495
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 7820
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 7824
     add     a1,sp,a1
     sw      a1,0(a1)
-    mv      a1, a0
-                    #      jump label: while.head_715 
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 7824
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 7824
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_715
                     #      label while.exit_715: 
 .while.exit_715:
                     #      ans_18 = i32 al_712 
+    mv      a1, s10
                     #      ml_625 = i32 ans_18 
-    li      a0, 7820
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, s5
                     #      x_18 = i32 mr_625 
-    li      a0, 8500
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      y_18 = i32 1_0 
                     #      jump label: L86_0 
     j       .L86_0
@@ -8525,14 +11283,14 @@ long_func:
 .L86_0:
                     #      new_var temp_620_779:i1 
                     #      temp_620_779 = icmp i32 Sge y_18, 15_0 
-    li      a0, 8496
+    li      a0, 7824
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 15
-    li      a1, 7828
+    li      a1, 13452
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s8,a0
+    slt     a1,s4,a0
     xori    a1,a1,1
                     #      br i1 temp_620_779, label branch_true_780, label branch_false_780 
     bnez    a1, .branch_true_780
@@ -8545,18 +11303,20 @@ long_func:
     li      a1, 7295
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,s7,a0
+    slt     a1,s3,a0
                     #      br i1 temp_621_782, label branch_true_783, label branch_false_783 
     bnez    a1, .branch_true_783
     j       .branch_false_783
                     #      label branch_true_783: 
 .branch_true_783:
                     #      ans_18 = i32 0xffff_0 
+    li      a0, 0xffff
                     #      jump label: L87_0 
     j       .L87_0
                     #      label branch_false_783: 
 .branch_false_783:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: L87_0 
     j       .L87_0
                     #      label L87_0: 
@@ -8565,11 +11325,11 @@ long_func:
 .branch_false_780:
                     #      new_var temp_622_788:i1 
                     #      temp_622_788 = icmp i32 Sgt y_18, 0_0 
-                    #found literal reg Some(a0) already exist with 0_0
-    li      a1, 7294
+    li      a0, 0
+    li      a1, 7295
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s8
+    slt     a1,a0,s4
                     #      br i1 temp_622_788, label branch_true_789, label branch_false_789 
     bnez    a1, .branch_true_789
     j       .branch_false_789
@@ -8581,7 +11341,7 @@ long_func:
     li      a1, 7293
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s7
+    slt     a1,a0,s3
                     #      br i1 temp_623_791, label branch_true_792, label branch_false_792 
     bnez    a1, .branch_true_792
     j       .branch_false_792
@@ -8604,10 +11364,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 7312
+    li      a2, 7819
     add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s8
+    sb      a2,0(a2)
+    mul     a2,a1,s4
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -8619,7 +11379,7 @@ long_func:
     li      a0, 7216
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s7,a1
+    div     a0,s3,a1
                     #      x_18 = i32 temp_627_793 
                     #      new_var temp_628_793:i32 
                     #      temp_628_793 = Add i32 y_18, 1_0 
@@ -8630,7 +11390,7 @@ long_func:
     li      a1, 7212
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s8,a0
+    add     a1,s4,a0
                     #      new_var temp_629_793:i32 
                     #      temp_629_793 = Sub i32 15_0, temp_628_793 
     li      a0, 15
@@ -8655,7 +11415,7 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a3, 7488
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
     mul     a3,a1,a2
@@ -8677,23 +11437,24 @@ long_func:
     sub     a2,a0,a1
                     #      new_var temp_634_793:i32 
                     #      temp_634_793 = Add i32 x_18, temp_633_793 
-    add     a0,s7,a2
+    add     a0,s3,a2
                     #      ans_18 = i32 temp_634_793 
+    li      a1, 7124
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L88_0 
     j       .L88_0
                     #      label branch_false_792: 
 .branch_false_792:
                     #      new_var temp_635_796:Array:i32:[Some(16_0)] 
                     #      temp_635_796 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 7116
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 7124
+    li      a1, 7292
     add     a1,sp,a1
-    sw      a1,0(a1)
+    sb      a1,0(a1)
     lw      a1,0(a0)
                     #      new_var temp_636_796:ptr->i32 
                     #      new_var temp_637_796:i32 
@@ -8703,10 +11464,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 7120
+    li      a2, 7819
     add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s8
+    sb      a2,0(a2)
+    mul     a2,a1,s4
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -8718,15 +11479,47 @@ long_func:
     li      a0, 7040
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s7,a1
+    div     a0,s3,a1
                     #      ans_18 = i32 temp_638_796 
+    li      a1, 7036
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L88_0 
+    li      a2, 7112
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 7032
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 7120
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a0, 7120
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a1, 13452
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 7116
+    add     a1,sp,a1
+    lw      a0,0(a1)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a1, 7116
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 7196
+    add     a1,sp,a1
+    lw      a3,0(a1)
     j       .L88_0
                     #      label L88_0: 
 .L88_0:
                     #      label branch_false_789: 
 .branch_false_789:
                     #      ans_18 = i32 x_18 
+    mv      a0, s3
                     #      jump label: L89_0 
     j       .L89_0
                     #      label L89_0: 
@@ -8736,23 +11529,49 @@ long_func:
                     #      label L91_0: 
 .L91_0:
                     #      mr_625 = i32 ans_18 
-    li      a0, 7032
+                    #      jump label: while.head_628 
+    li      a2, 7819
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    mv      a2, a0
+    li      a1, 7293
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    mv      a0, s5
-                    #      jump label: while.head_628 
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s10, 7828
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 10100
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      s11, 8491
+    add     s11,sp,s11
+    sb      s11,0(s11)
+    li      a3, 10100
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_628
                     #      label while.exit_628: 
 .while.exit_628:
                     #      ans_18 = i32 mres_625 
-    li      a0, 8496
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #      pl_425 = i32 ans_18 
-    li      a0, 8492
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, s5
                     #      x_18 = i32 pr_425 
                     #      y_18 = i32 1_0 
                     #      jump label: L92_0 
@@ -8761,29 +11580,26 @@ long_func:
 .L92_0:
                     #      new_var temp_639_805:i1 
                     #      temp_639_805 = icmp i32 Sge y_18, 15_0 
+    li      s10, 15
     li      a0, 10100
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 15
-    li      a1, 7036
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    slt     a1,s8,a0
-    xori    a1,a1,1
+    slt     a0,s4,s10
+    xori    a0,a0,1
                     #      br i1 temp_639_805, label branch_true_806, label branch_false_806 
-    bnez    a1, .branch_true_806
+    bnez    a0, .branch_true_806
     j       .branch_false_806
                     #      label branch_true_806: 
 .branch_true_806:
                     #      new_var temp_640_808:i1 
                     #      temp_640_808 = icmp i32 Slt x_18, 0_0 
-    li      a0, 0
-    li      a1, 7031
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    slt     a1,s7,a0
+    li      s10, 0
+    li      a0, 7031
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    slt     a0,s3,s10
                     #      br i1 temp_640_808, label branch_true_809, label branch_false_809 
-    bnez    a1, .branch_true_809
+    bnez    a0, .branch_true_809
     j       .branch_false_809
                     #      label branch_true_809: 
 .branch_true_809:
@@ -8801,76 +11617,76 @@ long_func:
 .branch_false_806:
                     #      new_var temp_641_814:i1 
                     #      temp_641_814 = icmp i32 Sgt y_18, 0_0 
-                    #found literal reg Some(a0) already exist with 0_0
-    li      a1, 7030
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    slt     a1,a0,s8
+    li      s10, 0
+    li      a0, 7031
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    slt     a0,s10,s4
                     #      br i1 temp_641_814, label branch_true_815, label branch_false_815 
-    bnez    a1, .branch_true_815
+    bnez    a0, .branch_true_815
     j       .branch_false_815
                     #      label branch_true_815: 
 .branch_true_815:
                     #      new_var temp_642_817:i1 
                     #      temp_642_817 = icmp i32 Sgt x_18, 0x7fff_0 
-    li      a0, 0x7fff
-    li      a1, 7029
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    slt     a1,a0,s7
+    li      s10, 0x7fff
+    li      a0, 7029
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    slt     a0,s10,s3
                     #      br i1 temp_642_817, label branch_true_818, label branch_false_818 
-    bnez    a1, .branch_true_818
+    bnez    a0, .branch_true_818
     j       .branch_false_818
                     #      label branch_true_818: 
 .branch_true_818:
                     #      new_var temp_643_819:Array:i32:[Some(16_0)] 
                     #      temp_643_819 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 7028
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    lw      a1,0(a0)
+    la      s10, SHIFT_TABLE
+                    #occupy reg s10 with *SHIFT_TABLE_0
+    li      a0, 7028
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    lw      a0,0(s10)
                     #      new_var temp_644_819:ptr->i32 
                     #      new_var temp_645_819:i32 
                     #      temp_644_819 = getelementptr temp_643_819:Array:i32:[Some(16_0)] [Some(y_18)] 
-    li      a0, 0
-    li      a1, 7024
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
-    li      a2, 7112
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s8
-    add     a0,a0,a2
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
-                    #      temp_645_819 = load temp_644_819:ptr->i32 
-    lw      a1,0(a0)
-                    #      new_var temp_646_819:i32 
-                    #      temp_646_819 = Div i32 x_18, temp_645_819 
-    li      a0, 6952
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    div     a0,s7,a1
-                    #      x_18 = i32 temp_646_819 
-                    #      new_var temp_647_819:i32 
-                    #      temp_647_819 = Add i32 y_18, 1_0 
-    li      a0, 6944
+    li      s10, 0
+    li      a0, 7024
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 1
-    li      a1, 6948
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mul     a1,a0,s4
+    add     s10,s10,a1
+    slli s10,s10,2
+    add     s10,s10,sp
+    add     s10,s10,s10
+                    #      temp_645_819 = load temp_644_819:ptr->i32 
+    lw      a0,0(s10)
+                    #      new_var temp_646_819:i32 
+                    #      temp_646_819 = Div i32 x_18, temp_645_819 
+    li      a1, 7024
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s8,a0
+    div     a1,s3,a0
+                    #      x_18 = i32 temp_646_819 
+                    #      new_var temp_647_819:i32 
+                    #      temp_647_819 = Add i32 y_18, 1_0 
+    li      a0, 6948
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
+    li      a1, 6944
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,s4,a0
                     #      new_var temp_648_819:i32 
                     #      temp_648_819 = Sub i32 15_0, temp_647_819 
     li      a0, 15
-    li      a2, 7024
+    li      a2, 13452
     add     a2,sp,a2
     sw      a2,0(a2)
     sub     a2,a0,a1
@@ -8891,7 +11707,7 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a3, 7196
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
     mul     a3,a1,a2
@@ -8913,50 +11729,96 @@ long_func:
     sub     a2,a0,a1
                     #      new_var temp_653_819:i32 
                     #      temp_653_819 = Add i32 x_18, temp_652_819 
-    add     a0,s7,a2
+    add     a0,s3,a2
                     #      ans_18 = i32 temp_653_819 
+    li      a1, 6860
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L94_0 
     j       .L94_0
                     #      label branch_false_818: 
 .branch_false_818:
                     #      new_var temp_654_822:Array:i32:[Some(16_0)] 
                     #      temp_654_822 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 6852
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 6860
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    lw      a1,0(a0)
+    la      s10, SHIFT_TABLE
+                    #occupy reg s10 with *SHIFT_TABLE_0
+    li      a0, 7028
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    lw      a0,0(s10)
                     #      new_var temp_655_822:ptr->i32 
                     #      new_var temp_656_822:i32 
                     #      temp_655_822 = getelementptr temp_654_822:Array:i32:[Some(16_0)] [Some(y_18)] 
-    li      a0, 0
+    li      s10, 0
+    li      a0, 6848
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mul     a1,a0,s4
+    add     s10,s10,a1
+    slli s10,s10,2
+    add     s10,s10,sp
+    add     s10,s10,s10
+                    #      temp_656_822 = load temp_655_822:ptr->i32 
+    lw      a0,0(s10)
+                    #      new_var temp_657_822:i32 
+                    #      temp_657_822 = Div i32 x_18, temp_656_822 
     li      a1, 6848
     add     a1,sp,a1
     sw      a1,0(a1)
-    li      a1, 1
-    li      a2, 6856
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s8
-    add     a0,a0,a2
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
-                    #      temp_656_822 = load temp_655_822:ptr->i32 
-    lw      a1,0(a0)
-                    #      new_var temp_657_822:i32 
-                    #      temp_657_822 = Div i32 x_18, temp_656_822 
-    li      a0, 6776
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    div     a0,s7,a1
+    div     a1,s3,a0
                     #      ans_18 = i32 temp_657_822 
                     #      jump label: L94_0 
+    li      a2, 13452
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 6772
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 6856
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 6768
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 6856
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      s10, 6776
+    add     s10,sp,s10
+    sd      s10,0(s10)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 6952
+    add     a0,sp,a0
+    ld      s10,0(a0)
+    li      a0, 6952
+    add     a0,sp,a0
+    sd      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 6852
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 6852
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 6932
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .L94_0
                     #      label L94_0: 
 .L94_0:
@@ -8973,50 +11835,60 @@ long_func:
 .L97_0:
                     #      pr_425 = i32 ans_18 
                     #      jump label: while.head_428 
+    li      s8, 8496
+    add     s8,sp,s8
+    sw      s8,0(s8)
+    li      s6, 10090
+    add     s6,sp,s6
+    sb      s6,0(s6)
+    li      s1, 13448
+    add     s1,sp,s1
+    sw      s1,0(s1)
+    li      s5, 8500
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      s3, 13444
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    li      s2, 10091
+    add     s2,sp,s2
+    sb      s2,0(s2)
+    li      s7, 9975
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    li      a0, 7029
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a1, 10100
+    add     a1,sp,a1
+    lw      a0,0(a1)
+    li      s11, 8491
+    add     s11,sp,s11
+    sb      s11,0(s11)
+    li      s9, 8492
+    add     s9,sp,s9
+    sw      s9,0(s9)
+    li      s4, 13440
+    add     s4,sp,s4
+    sw      s4,0(s4)
     j       .while.head_428
                     #      label while.exit_428: 
 .while.exit_428:
                     #      ans_18 = i32 pres_425 
                     #       Call void putint_0(ans_18) 
                     #saved register dumping to mem
-    li      s1, 10096
+    li      s1, 10091
     add     s1,sp,s1
-    sw      s1,0(s1)
-    li      s2, 10092
-    add     s2,sp,s2
-    sw      s2,0(s2)
-    li      s3, 10084
-    add     s3,sp,s3
-    sw      s3,0(s3)
-    li      s4, 10091
-    add     s4,sp,s4
-    sb      s4,0(s4)
-    li      s5, 13452
-    add     s5,sp,s5
-    sw      s5,0(s5)
-    li      s6, 13448
-    add     s6,sp,s6
-    sw      s6,0(s6)
-    li      s7, 13444
-    add     s7,sp,s7
-    sw      s7,0(s7)
-    li      s8, 13440
-    add     s8,sp,s8
-    sw      s8,0(s8)
-    li      s9, 10080
-    add     s9,sp,s9
-    sw      s9,0(s9)
-    li      s10, 10090
-    add     s10,sp,s10
-    sb      s10,0(s10)
-    li      s11, 10078
-    add     s11,sp,s11
-    sb      s11,0(s11)
+    sb      s2,0(s1)
                     #saved register dumped to mem
                     #arg load start
-    li      a0, 6768
+    li      a0, 10100
     add     a0,sp,a0
     sw      a0,0(a0)
+    mv      a0, a2
                     #arg load ended
     call    putint
                     #       Call void putch_0(10_0) 
@@ -9042,87 +11914,80 @@ long_func:
                     #      label while.body_832: 
 .while.body_832:
                     #      pl_834 = i32 2_0 
-    li      s3, 2
+    li      s1, 2
                     #      pr_834 = i32 cur_18 
-    mv      s4, a0
+    mv      s3, a0
                     #      pres_834 = i32 1_0 
-    li      s5, 1
+    li      s4, 1
                     #      jump label: while.head_837 
     j       .while.head_837
                     #      label while.head_837: 
 .while.head_837:
                     #      new_var temp_659_836:i1 
                     #      temp_659_836 = icmp i32 Sgt pr_834, 0_0 
-    li      s6, 0
-    slt     s7,s6,s4
+    li      s5, 0
+    slt     s6,s5,s3
                     #      br i1 temp_659_836, label while.body_837, label while.exit_837 
-    bnez    s7, .while.body_837
+    bnez    s6, .while.body_837
     j       .while.exit_837
                     #      label while.body_837: 
 .while.body_837:
                     #      ans_18 = i32 0_0 
-    li      s8, 0
                     #      i_18 = i32 0_0 
-    li      s9, 0
+    li      s5, 0
                     #      x_18 = i32 pr_834 
-    mv      s10, s4
+    mv      s7, s3
                     #      y_18 = i32 1_0 
-    li      s11, 1
+    li      s8, 1
                     #      jump label: while.head_844 
     j       .while.head_844
                     #      label while.head_844: 
 .while.head_844:
                     #      new_var temp_660_843:i1 
                     #      temp_660_843 = icmp i32 Slt i_18, 16_0 
-                    #found literal reg Some(s1) already exist with 16_0
-    slt     s6,s9,s1
+    li      s9, 16
+    slt     s10,s5,s9
                     #      br i1 temp_660_843, label while.body_844, label while.exit_844 
-    bnez    s6, .while.body_844
+    bnez    s10, .while.body_844
     j       .while.exit_844
                     #      label while.body_844: 
 .while.body_844:
                     #      new_var temp_661_846:i32 
                     #      temp_661_846 = Mod i32 y_18, 2_0 
-    li      s1, 2
+    li      s9, 2
+    rem     s11,s8,s9
+                    #      new_var temp_662_846:i32 
+                    #      temp_662_846 = Mod i32 x_18, 2_0 
+                    #found literal reg Some(s9) already exist with 2_0
     li      a0, 13436
     add     a0,sp,a0
     sw      a0,0(a0)
-    rem     a0,s11,s1
-                    #      new_var temp_662_846:i32 
-                    #      temp_662_846 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(s1) already exist with 2_0
-    li      a0, 6744
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    rem     a0,s10,s1
+    rem     a0,s7,s9
                     #      new_var temp_663_846:i1 
                     #      temp_663_846 = icmp i32 Ne temp_662_846, 0_0 
-    li      s1, 0
-    li      a1, 6772
+    li      s9, 0
+    li      a1, 13423
     add     a1,sp,a1
-    sw      a1,0(a1)
-    xor     a1,a0,s1
+    sb      a1,0(a1)
+    xor     a1,a0,s9
     snez    a1, a1
                     #      new_var temp_664_846:i1 
                     #      temp_663_846 = icmp i32 Ne temp_661_846, 0_0 
+                    #found literal reg Some(s9) already exist with 0_0
+                    #      new_var temp_665_846:i1 
+                    #      temp_665_846 = And i1 temp_663_846, temp_664_846 
     li      a0, 6740
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 0
-                    #      new_var temp_665_846:i1 
-                    #      temp_665_846 = And i1 temp_663_846, temp_664_846 
-    li      a2, 6848
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    and     a2,a1,a0
+    and     a0,a1,s9
                     #      br i1 temp_665_846, label branch_true_847, label branch_false_847 
-    bnez    a2, .branch_true_847
+    bnez    a0, .branch_true_847
     j       .branch_false_847
                     #      label branch_true_847: 
 .branch_true_847:
                     #      new_var temp_666_848:Array:i32:[Some(16_0)] 
                     #      temp_666_848 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 6738
+    li      a0, 6737
     add     a0,sp,a0
     sb      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
@@ -9140,10 +12005,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 6737
+    li      a2, 13452
     add     a2,sp,a2
-    sb      a2,0(a2)
-    mul     a2,a1,s9
+    sw      a2,0(a2)
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -9162,9 +12027,43 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_670_848:i32 
                     #      temp_670_848 = Add i32 ans_18, temp_669_848 
-    add     a0,s8,a2
+    li      a1, 6660
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_670_848 
                     #      jump label: branch_false_847 
+    li      a2, 6656
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    mv      a2, a0
+    li      a1, 6652
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 6739
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 6739
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 6737
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 6737
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_847
                     #      label branch_false_847: 
 .branch_false_847:
@@ -9172,14 +12071,14 @@ long_func:
 .L98_0:
                     #      new_var temp_671_845:i32 
                     #      temp_671_845 = Div i32 x_18, 2_0 
-    li      a0, 6652
+    li      a0, 6737
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 6660
+    li      a1, 6739
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s10,a0
+    sb      a1,0(a1)
+    div     a1,s7,a0
                     #      x_18 = i32 temp_671_845 
                     #      new_var temp_672_845:i32 
                     #      temp_672_845 = Div i32 y_18, 2_0 
@@ -9187,7 +12086,7 @@ long_func:
     li      a1, 6648
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_672_845 
                     #      new_var temp_673_845:i32 
                     #      temp_673_845 = Add i32 i_18, 1_0 
@@ -9195,32 +12094,53 @@ long_func:
     li      a1, 6644
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_673_845 
                     #      jump label: while.head_844 
+    li      a1, 6640
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s10, 6750
+    add     s10,sp,s10
+    sb      s10,0(s10)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a2, 13452
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a2, 13436
+    add     a2,sp,a2
+    lw      a0,0(a2)
+    li      s11, 6744
+    add     s11,sp,s11
+    sw      s11,0(s11)
+    li      s9, 6738
+    add     s9,sp,s9
+    sb      s9,0(s9)
     j       .while.head_844
                     #      label while.exit_844: 
 .while.exit_844:
                     #      new_var temp_674_21217:i1 
                     #      temp_674_21217 = icmp i32 Ne ans_18, 0_0 
-    li      a0, 0
-    li      a1, 6640
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    xor     a1,s8,a0
-    snez    a1, a1
+    li      s9, 0
+    xor     s11,a2,s9
+    snez    s11, s11
                     #      br i1 temp_674_21217, label branch_true_854, label branch_false_854 
-    bnez    a1, .branch_true_854
+    bnez    s11, .branch_true_854
     j       .branch_false_854
                     #      label branch_true_854: 
 .branch_true_854:
                     #      ml_856 = i32 pres_834 
-    mv      a0, s5
+    mv      s9, s4
                     #      mr_856 = i32 pl_834 
-    li      a0, 6632
+    li      a0, 13436
     add     a0,sp,a0
     sw      a0,0(a0)
-    mv      a0, s3
+    mv      a0, s1
                     #      mres_856 = i32 0_0 
     li      a0, 6628
     add     a0,sp,a0
@@ -9235,11 +12155,11 @@ long_func:
     li      a0, 6624
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 6639
+    li      a1, 13423
     add     a1,sp,a1
     sb      a1,0(a1)
     li      a1, 0
-    li      a2, 6656
+    li      a2, 13452
     add     a2,sp,a2
     sw      a2,0(a2)
     xor     a2,a0,a1
@@ -9250,6 +12170,7 @@ long_func:
                     #      label while.body_859: 
 .while.body_859:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 mr_856 
                     #      y_18 = i32 1_0 
@@ -9259,64 +12180,67 @@ long_func:
 .while.head_866:
                     #      new_var temp_676_865:i1 
                     #      temp_676_865 = icmp i32 Slt i_18, 16_0 
-    li      a1, 16
     li      a0, 6628
     add     a0,sp,a0
     sw      a0,0(a0)
-    slt     a0,s9,a1
+    li      a0, 16
+    li      a1, 13452
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    slt     a1,s5,a0
                     #      br i1 temp_676_865, label while.body_866, label while.exit_866 
-    bnez    a0, .while.body_866
+    bnez    a1, .while.body_866
     j       .while.exit_866
                     #      label while.body_866: 
 .while.body_866:
                     #      new_var temp_677_868:i32 
                     #      temp_677_868 = Mod i32 y_18, 2_0 
-    li      a1, 2
-    li      a0, 6622
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    rem     a0,s11,a1
+    li      a0, 2
+    li      a1, 6622
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    rem     a1,s8,a0
                     #      new_var temp_678_868:i32 
                     #      temp_678_868 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(a1) already exist with 2_0
-    li      a0, 6616
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    rem     a0,s10,a1
-                    #      new_var temp_679_868:i1 
-                    #      temp_679_868 = icmp i32 Ne temp_678_868, 0_0 
-    li      a1, 0
-    li      a2, 6623
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    xor     a2,a0,a1
-    snez    a2, a2
-                    #      new_var temp_680_868:i1 
-                    #      temp_679_868 = icmp i32 Ne temp_677_868, 0_0 
-    li      a0, 6612
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-                    #      new_var temp_681_868:i1 
-                    #      temp_681_868 = And i1 temp_679_868, temp_680_868 
+                    #found literal reg Some(a0) already exist with 2_0
     li      a1, 6616
     add     a1,sp,a1
     sw      a1,0(a1)
-    and     a1,a2,a0
+    rem     a1,s7,a0
+                    #      new_var temp_679_868:i1 
+                    #      temp_679_868 = icmp i32 Ne temp_678_868, 0_0 
+    li      a0, 0
+    li      a2, 6623
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    xor     a2,a1,a0
+    snez    a2, a2
+                    #      new_var temp_680_868:i1 
+                    #      temp_679_868 = icmp i32 Ne temp_677_868, 0_0 
+    li      a1, 6612
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 0
+                    #      new_var temp_681_868:i1 
+                    #      temp_681_868 = And i1 temp_679_868, temp_680_868 
+    li      a0, 6616
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    and     a0,a2,a1
                     #      br i1 temp_681_868, label branch_true_869, label branch_false_869 
-    bnez    a1, .branch_true_869
+    bnez    a0, .branch_true_869
     j       .branch_false_869
                     #      label branch_true_869: 
 .branch_true_869:
                     #      new_var temp_682_870:Array:i32:[Some(16_0)] 
                     #      temp_682_870 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 6610
+    li      a0, 6609
     add     a0,sp,a0
     sb      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 6609
+    li      a1, 6610
     add     a1,sp,a1
     sb      a1,0(a1)
     lw      a1,0(a0)
@@ -9331,7 +12255,7 @@ long_func:
     li      a2, 6611
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -9350,9 +12274,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_686_870:i32 
                     #      temp_686_870 = Add i32 ans_18, temp_685_870 
-    add     a0,s8,a2
+    li      a1, 6532
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_686_870 
                     #      jump label: branch_false_869 
+    li      a2, 6528
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 6611
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 6524
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 6611
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 6610
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 6610
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 6609
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 6609
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_869
                     #      label branch_false_869: 
 .branch_false_869:
@@ -9360,14 +12323,14 @@ long_func:
 .L99_0:
                     #      new_var temp_687_867:i32 
                     #      temp_687_867 = Div i32 x_18, 2_0 
-    li      a0, 6524
+    li      a0, 6609
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 6532
+    li      a1, 6610
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s10,a0
+    sb      a1,0(a1)
+    div     a1,s7,a0
                     #      x_18 = i32 temp_687_867 
                     #      new_var temp_688_867:i32 
                     #      temp_688_867 = Div i32 y_18, 2_0 
@@ -9375,7 +12338,7 @@ long_func:
     li      a1, 6520
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_688_867 
                     #      new_var temp_689_867:i32 
                     #      temp_689_867 = Add i32 i_18, 1_0 
@@ -9383,38 +12346,71 @@ long_func:
     li      a1, 6516
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_689_867 
                     #      jump label: while.head_866 
+    li      a2, 6611
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 6623
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 6512
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 6623
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 6628
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 6628
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_866
                     #      label while.exit_866: 
 .while.exit_866:
                     #      new_var temp_690_21739:i1 
                     #      temp_690_21739 = icmp i32 Ne ans_18, 0_0 
-    li      a0, 0
-    li      a1, 6512
+    li      a1, 6622
     add     a1,sp,a1
-    sw      a1,0(a1)
-    xor     a1,s8,a0
-    snez    a1, a1
+    sb      a1,0(a1)
+    li      a1, 0
+    li      a2, 6623
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    xor     a2,a0,a1
+    snez    a2, a2
                     #      br i1 temp_690_21739, label branch_true_876, label branch_false_876 
-    bnez    a1, .branch_true_876
+    bnez    a2, .branch_true_876
     j       .branch_false_876
                     #      label branch_true_876: 
 .branch_true_876:
                     #      al_878 = i32 mres_856 
-    li      a1, 6511
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    mv      a1, a0
-                    #      c_878 = i32 ml_856 
-    li      a0, 6624
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 6504
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      a0, a1
+                    #      c_878 = i32 ml_856 
+    li      a0, 6504
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    mv      a0, s9
                     #      new_var sum_878:i32 
                     #      jump label: while.head_881 
     j       .while.head_881
@@ -9422,14 +12418,14 @@ long_func:
 .while.head_881:
                     #      new_var temp_691_21833:i1 
                     #      temp_691_21833 = icmp i32 Ne c_878, 0_0 
-    li      a0, 6632
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 6528
+    li      a1, 6624
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 0
+    li      a2, 6511
     add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
+    sb      a2,0(a2)
+    xor     a2,a0,a1
     snez    a2, a2
                     #      br i1 temp_691_21833, label while.body_881, label while.exit_881 
     bnez    a2, .while.body_881
@@ -9437,23 +12433,30 @@ long_func:
                     #      label while.body_881: 
 .while.body_881:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_878 
+    li      a0, 6500
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      y_18 = i32 c_878 
+    li      a0, 6504
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      jump label: while.head_888 
     j       .while.head_888
                     #      label while.head_888: 
 .while.head_888:
                     #      new_var temp_692_887:i1 
                     #      temp_692_887 = icmp i32 Slt i_18, 16_0 
-    li      a0, 6504
+    li      a0, 6500
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 6500
+    li      a1, 13452
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s9,a0
+    slt     a1,s5,a0
                     #      br i1 temp_692_887, label while.body_888, label while.exit_888 
     bnez    a1, .while.body_888
     j       .while.exit_888
@@ -9465,7 +12468,7 @@ long_func:
     li      a1, 6494
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s10,a0
+    rem     a1,s7,a0
                     #      new_var temp_694_22016:i1 
                     #      temp_694_22016 = icmp i32 Ne temp_693_890, 0_0 
     li      a0, 0
@@ -9485,7 +12488,7 @@ long_func:
     li      a1, 6488
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_696_893:i1 
                     #      temp_696_893 = icmp i32 Eq temp_695_893, 0_0 
     li      a0, 0
@@ -9519,7 +12522,7 @@ long_func:
     li      a2, 6479
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -9538,9 +12541,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_701_895:i32 
                     #      temp_701_895 = Add i32 ans_18, temp_700_895 
-    add     a0,s8,a2
+    li      a1, 6396
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_701_895 
                     #      jump label: branch_false_894 
+    li      a2, 6392
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 6479
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 6388
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 6479
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 6480
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 6480
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_894
                     #      label branch_false_894: 
 .branch_false_894:
@@ -9548,20 +12575,17 @@ long_func:
 .branch_false_891:
                     #      new_var temp_705_897:i32 
                     #      temp_705_897 = Mod i32 y_18, 2_0 
-    li      a0, 6388
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 6396
+    li      a1, 6488
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_706_22161:i1 
                     #      temp_706_22161 = icmp i32 Ne temp_705_897, 0_0 
     li      a0, 0
-    li      a2, 6392
+    li      a2, 6487
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_706_22161, label branch_true_898, label branch_false_898 
@@ -9589,7 +12613,7 @@ long_func:
     li      a2, 6371
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -9608,9 +12632,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_711_899:i32 
                     #      temp_711_899 = Add i32 ans_18, temp_710_899 
-    add     a0,s8,a2
+    li      a1, 6292
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_711_899 
                     #      jump label: branch_false_898 
+    li      a2, 6288
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 6371
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 6284
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 6371
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 6372
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 6372
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_898
                     #      label branch_false_898: 
 .branch_false_898:
@@ -9620,14 +12668,11 @@ long_func:
 .L101_0:
                     #      new_var temp_702_889:i32 
                     #      temp_702_889 = Div i32 x_18, 2_0 
-    li      a0, 6284
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 6292
+    li      a1, 6372
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s10,a0
+    div     a1,s7,a0
                     #      x_18 = i32 temp_702_889 
                     #      new_var temp_703_889:i32 
                     #      temp_703_889 = Div i32 y_18, 2_0 
@@ -9635,7 +12680,7 @@ long_func:
     li      a1, 6384
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_703_889 
                     #      new_var temp_704_889:i32 
                     #      temp_704_889 = Add i32 i_18, 1_0 
@@ -9643,18 +12688,54 @@ long_func:
     li      a1, 6380
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_704_889 
                     #      jump label: while.head_888 
+    li      a2, 6371
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 6495
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 6376
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 6495
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 6500
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 6500
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_888
                     #      label while.exit_888: 
 .while.exit_888:
                     #      sum_878 = i32 ans_18 
-    mv      a0, s8
+    li      a1, 6494
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_878 
-    li      a0, 6496
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
                     #      y_18 = i32 c_878 
@@ -9671,10 +12752,10 @@ long_func:
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 6376
+    li      a1, 6496
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s9,a0
+    slt     a1,s5,a0
                     #      br i1 temp_712_909, label while.body_910, label while.exit_910 
     bnez    a1, .while.body_910
     j       .while.exit_910
@@ -9686,20 +12767,20 @@ long_func:
     li      a1, 6283
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_714_912:i32 
                     #      temp_714_912 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 6276
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s10,a0
+    rem     a1,s7,a0
                     #      new_var temp_715_912:i1 
                     #      temp_715_912 = icmp i32 Ne temp_714_912, 0_0 
     li      a0, 0
-    li      a2, 6288
+    li      a2, 6495
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      new_var temp_716_912:i1 
@@ -9742,7 +12823,7 @@ long_func:
     li      a2, 6271
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -9761,9 +12842,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_722_914:i32 
                     #      temp_722_914 = Add i32 ans_18, temp_721_914 
-    add     a0,s8,a2
+    li      a1, 6188
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_722_914 
                     #      jump label: branch_false_913 
+    li      a2, 6184
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 6271
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 6180
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 6271
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 6270
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 6270
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 6269
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 6269
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_913
                     #      label branch_false_913: 
 .branch_false_913:
@@ -9771,14 +12891,14 @@ long_func:
 .L102_0:
                     #      new_var temp_723_911:i32 
                     #      temp_723_911 = Div i32 x_18, 2_0 
-    li      a0, 6180
+    li      a0, 6269
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 6188
+    li      a1, 6270
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s10,a0
+    sb      a1,0(a1)
+    div     a1,s7,a0
                     #      x_18 = i32 temp_723_911 
                     #      new_var temp_724_911:i32 
                     #      temp_724_911 = Div i32 y_18, 2_0 
@@ -9786,7 +12906,7 @@ long_func:
     li      a1, 6176
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_724_911 
                     #      new_var temp_725_911:i32 
                     #      temp_725_911 = Add i32 i_18, 1_0 
@@ -9794,31 +12914,67 @@ long_func:
     li      a1, 6172
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_725_911 
                     #      jump label: while.head_910 
+    li      a2, 6271
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 6495
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 6168
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 6495
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 6496
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 6496
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 6500
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 6500
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_910
                     #      label while.exit_910: 
 .while.exit_910:
                     #      c_878 = i32 ans_18 
-    mv      a0, s8
+    li      a1, 6283
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L103_0 
     j       .L103_0
                     #      label L103_0: 
 .L103_0:
                     #      new_var temp_726_920:i1 
                     #      temp_726_920 = icmp i32 Sgt 1_0, 15_0 
-    li      a0, 6500
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 1
-    li      a1, 6168
+    li      a1, 6500
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 15
-    li      a2, 6184
+    li      a2, 6495
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     slt     a2,a1,a0
                     #      br i1 temp_726_920, label branch_true_921, label branch_false_921 
     bnez    a2, .branch_true_921
@@ -9826,46 +12982,51 @@ long_func:
                     #      label branch_true_921: 
 .branch_true_921:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: while.exit_930 
     j       .while.exit_930
                     #      label branch_false_921: 
 .branch_false_921:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      i_18 = i32 0_0 
                     #      new_var temp_727_924:Array:i32:[Some(16_0)] 
                     #      temp_727_924 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_728_924:ptr->i32 
                     #      new_var temp_729_924:i32 
                     #      temp_728_924 = getelementptr temp_727_924:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    li      a1, 6160
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
+    li      a1, 0
+    li      a0, 6160
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a2, 6167
     add     a2,sp,a2
     sb      a2,0(a2)
     li      a2, 1
-    li      a3, 6932
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_729_924 = load temp_728_924:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_730_924:i32 
                     #      temp_730_924 = Mul i32 c_878, temp_729_924 
-    li      a0, 6088
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a2,a1
+    li      a1, 6088
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    mul     a1,a2,a0
                     #      x_18 = i32 temp_730_924 
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_930 
@@ -9874,16 +13035,43 @@ long_func:
 .while.head_930:
                     #      new_var temp_731_929:i1 
                     #      temp_731_929 = icmp i32 Slt i_18, 16_0 
-    li      a0, 6080
+    li      a0, 6084
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 6084
+    li      a1, 6080
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s9,a0
+    slt     a1,s5,a0
                     #      br i1 temp_731_929, label while.body_930, label while.exit_930 
     bnez    a1, .while.body_930
+    li      a0, 6500
+    add     a0,sp,a0
+    sw      a2,0(a0)
+    li      a0, 6167
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 6079
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 6167
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 6160
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_930
                     #      label while.body_930: 
 .while.body_930:
@@ -9893,14 +13081,14 @@ long_func:
     li      a1, 6079
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_733_932:i32 
                     #      temp_733_932 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 6072
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s10,a0
+    rem     a1,s7,a0
                     #      new_var temp_734_932:i1 
                     #      temp_734_932 = icmp i32 Ne temp_733_932, 0_0 
     li      a0, 0
@@ -9949,7 +13137,7 @@ long_func:
     li      a2, 6067
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -9968,9 +13156,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_741_934:i32 
                     #      temp_741_934 = Add i32 ans_18, temp_740_934 
-    add     a0,s8,a2
+    li      a1, 5988
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_741_934 
                     #      jump label: branch_false_933 
+    li      a2, 5984
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 6067
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 5980
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 6067
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 6066
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 6066
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 6160
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 6065
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 6065
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 6160
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_933
                     #      label branch_false_933: 
 .branch_false_933:
@@ -9978,14 +13205,14 @@ long_func:
 .L104_0:
                     #      new_var temp_742_931:i32 
                     #      temp_742_931 = Div i32 x_18, 2_0 
-    li      a0, 5980
+    li      a0, 6065
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 5988
+    li      a1, 6066
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s10,a0
+    sb      a1,0(a1)
+    div     a1,s7,a0
                     #      x_18 = i32 temp_742_931 
                     #      new_var temp_743_931:i32 
                     #      temp_743_931 = Div i32 y_18, 2_0 
@@ -9993,7 +13220,7 @@ long_func:
     li      a1, 5976
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_743_931 
                     #      new_var temp_744_931:i32 
                     #      temp_744_931 = Add i32 i_18, 1_0 
@@ -10001,53 +13228,150 @@ long_func:
     li      a1, 5972
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_744_931 
                     #      jump label: while.head_930 
+    li      a2, 6067
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 6500
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 5968
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 6500
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 6080
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 6080
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 6160
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 6084
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 6084
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 6160
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_930
                     #      label while.exit_930: 
 .while.exit_930:
                     #      label L105_0: 
 .L105_0:
                     #      c_878 = i32 ans_18 
-    mv      a0, s8
+    mv      a1, a0
                     #      al_878 = i32 sum_878 
-    li      a0, 6500
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 5968
+    li      a1, 6500
     add     a1,sp,a1
     sw      a1,0(a1)
     mv      a1, a0
                     #      jump label: while.head_881 
+    li      a2, 6167
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 6496
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 6511
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 6504
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 6511
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 6624
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 6624
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 6500
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 6500
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_881
                     #      label while.exit_881: 
 .while.exit_881:
                     #      ans_18 = i32 al_878 
-                    #      mres_856 = i32 ans_18 
-    li      a0, 6496
+    li      a0, 6500
     add     a0,sp,a0
     sw      a0,0(a0)
-    mv      a0, s8
+    mv      a0, a1
+                    #      mres_856 = i32 ans_18 
+    li      a1, 6504
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    mv      a1, a0
                     #      jump label: branch_false_876 
+    li      a2, 6495
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 6511
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 6624
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 6511
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_876
                     #      label branch_false_876: 
 .branch_false_876:
                     #      label L106_0: 
 .L106_0:
                     #      al_943 = i32 ml_856 
-    li      a0, 6624
+    mv      a1, s9
+                    #      c_943 = i32 ml_856 
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 6504
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
-                    #      c_943 = i32 ml_856 
-    li      a1, 5964
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      a0, s9
                     #      new_var sum_943:i32 
                     #      jump label: while.head_946 
     j       .while.head_946
@@ -10055,14 +13379,14 @@ long_func:
 .while.head_946:
                     #      new_var temp_745_23508:i1 
                     #      temp_745_23508 = icmp i32 Ne c_943, 0_0 
-    li      a0, 6632
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 5984
+    li      a1, 5964
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 0
+    li      a2, 6511
     add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
+    sb      a2,0(a2)
+    xor     a2,a0,a1
     snez    a2, a2
                     #      br i1 temp_745_23508, label while.body_946, label while.exit_946 
     bnez    a2, .while.body_946
@@ -10070,23 +13394,30 @@ long_func:
                     #      label while.body_946: 
 .while.body_946:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_943 
+    li      a0, 5960
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      y_18 = i32 c_943 
+    li      a0, 5964
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      jump label: while.head_953 
     j       .while.head_953
                     #      label while.head_953: 
 .while.head_953:
                     #      new_var temp_746_952:i1 
                     #      temp_746_952 = icmp i32 Slt i_18, 16_0 
-    li      a0, 5964
+    li      a0, 5960
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 5960
+    li      a1, 13452
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s9,a0
+    slt     a1,s5,a0
                     #      br i1 temp_746_952, label while.body_953, label while.exit_953 
     bnez    a1, .while.body_953
     j       .while.exit_953
@@ -10098,7 +13429,7 @@ long_func:
     li      a1, 5954
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s10,a0
+    rem     a1,s7,a0
                     #      new_var temp_748_23691:i1 
                     #      temp_748_23691 = icmp i32 Ne temp_747_955, 0_0 
     li      a0, 0
@@ -10118,7 +13449,7 @@ long_func:
     li      a1, 5948
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_750_958:i1 
                     #      temp_750_958 = icmp i32 Eq temp_749_958, 0_0 
     li      a0, 0
@@ -10152,7 +13483,7 @@ long_func:
     li      a2, 5939
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -10171,9 +13502,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_755_960:i32 
                     #      temp_755_960 = Add i32 ans_18, temp_754_960 
-    add     a0,s8,a2
+    li      a1, 5860
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_755_960 
                     #      jump label: branch_false_959 
+    li      a2, 5856
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 5939
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 5852
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5939
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 5940
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 5940
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_959
                     #      label branch_false_959: 
 .branch_false_959:
@@ -10181,20 +13536,17 @@ long_func:
 .branch_false_956:
                     #      new_var temp_759_962:i32 
                     #      temp_759_962 = Mod i32 y_18, 2_0 
-    li      a0, 5852
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 5860
+    li      a1, 5948
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_760_23836:i1 
                     #      temp_760_23836 = icmp i32 Ne temp_759_962, 0_0 
     li      a0, 0
-    li      a2, 5856
+    li      a2, 5947
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_760_23836, label branch_true_963, label branch_false_963 
@@ -10222,7 +13574,7 @@ long_func:
     li      a2, 5835
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -10241,9 +13593,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_765_964:i32 
                     #      temp_765_964 = Add i32 ans_18, temp_764_964 
-    add     a0,s8,a2
+    li      a1, 5756
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_765_964 
                     #      jump label: branch_false_963 
+    li      a2, 5752
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 5835
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 5748
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5835
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 5836
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 5836
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_963
                     #      label branch_false_963: 
 .branch_false_963:
@@ -10253,14 +13629,11 @@ long_func:
 .L108_0:
                     #      new_var temp_756_954:i32 
                     #      temp_756_954 = Div i32 x_18, 2_0 
-    li      a0, 5748
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 5756
+    li      a1, 5836
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s10,a0
+    div     a1,s7,a0
                     #      x_18 = i32 temp_756_954 
                     #      new_var temp_757_954:i32 
                     #      temp_757_954 = Div i32 y_18, 2_0 
@@ -10268,7 +13641,7 @@ long_func:
     li      a1, 5848
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_757_954 
                     #      new_var temp_758_954:i32 
                     #      temp_758_954 = Add i32 i_18, 1_0 
@@ -10276,18 +13649,54 @@ long_func:
     li      a1, 5844
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_758_954 
                     #      jump label: while.head_953 
+    li      a2, 5835
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 5955
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 5840
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5955
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 5960
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 5960
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_953
                     #      label while.exit_953: 
 .while.exit_953:
                     #      sum_943 = i32 ans_18 
-    mv      a0, s8
+    li      a1, 5954
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_943 
-    li      a0, 5956
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
                     #      y_18 = i32 c_943 
@@ -10304,10 +13713,10 @@ long_func:
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 5840
+    li      a1, 5956
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s9,a0
+    slt     a1,s5,a0
                     #      br i1 temp_766_974, label while.body_975, label while.exit_975 
     bnez    a1, .while.body_975
     j       .while.exit_975
@@ -10319,20 +13728,20 @@ long_func:
     li      a1, 5747
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_768_977:i32 
                     #      temp_768_977 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 5740
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s10,a0
+    rem     a1,s7,a0
                     #      new_var temp_769_977:i1 
                     #      temp_769_977 = icmp i32 Ne temp_768_977, 0_0 
     li      a0, 0
-    li      a2, 5752
+    li      a2, 5955
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      new_var temp_770_977:i1 
@@ -10375,7 +13784,7 @@ long_func:
     li      a2, 5735
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -10394,9 +13803,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_776_979:i32 
                     #      temp_776_979 = Add i32 ans_18, temp_775_979 
-    add     a0,s8,a2
+    li      a1, 5652
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_776_979 
                     #      jump label: branch_false_978 
+    li      a2, 5648
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 5735
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 5644
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5735
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 5734
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 5734
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 5733
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 5733
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_978
                     #      label branch_false_978: 
 .branch_false_978:
@@ -10404,14 +13852,14 @@ long_func:
 .L109_0:
                     #      new_var temp_777_976:i32 
                     #      temp_777_976 = Div i32 x_18, 2_0 
-    li      a0, 5644
+    li      a0, 5733
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 5652
+    li      a1, 5734
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s10,a0
+    sb      a1,0(a1)
+    div     a1,s7,a0
                     #      x_18 = i32 temp_777_976 
                     #      new_var temp_778_976:i32 
                     #      temp_778_976 = Div i32 y_18, 2_0 
@@ -10419,7 +13867,7 @@ long_func:
     li      a1, 5640
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_778_976 
                     #      new_var temp_779_976:i32 
                     #      temp_779_976 = Add i32 i_18, 1_0 
@@ -10427,31 +13875,67 @@ long_func:
     li      a1, 5636
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_779_976 
                     #      jump label: while.head_975 
+    li      a2, 5735
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 5955
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 5632
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5955
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 5956
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 5956
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 5960
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 5960
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_975
                     #      label while.exit_975: 
 .while.exit_975:
                     #      c_943 = i32 ans_18 
-    mv      a0, s8
+    li      a1, 5747
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L110_0 
     j       .L110_0
                     #      label L110_0: 
 .L110_0:
                     #      new_var temp_780_985:i1 
                     #      temp_780_985 = icmp i32 Sgt 1_0, 15_0 
-    li      a0, 5960
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 1
-    li      a1, 5632
+    li      a1, 5960
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 15
-    li      a2, 5648
+    li      a2, 5955
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     slt     a2,a1,a0
                     #      br i1 temp_780_985, label branch_true_986, label branch_false_986 
     bnez    a2, .branch_true_986
@@ -10459,46 +13943,51 @@ long_func:
                     #      label branch_true_986: 
 .branch_true_986:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: while.exit_995 
     j       .while.exit_995
                     #      label branch_false_986: 
 .branch_false_986:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      i_18 = i32 0_0 
                     #      new_var temp_781_989:Array:i32:[Some(16_0)] 
                     #      temp_781_989 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_782_989:ptr->i32 
                     #      new_var temp_783_989:i32 
                     #      temp_782_989 = getelementptr temp_781_989:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    li      a1, 5624
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
+    li      a1, 0
+    li      a0, 5624
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a2, 5631
     add     a2,sp,a2
     sb      a2,0(a2)
     li      a2, 1
-    li      a3, 6160
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_783_989 = load temp_782_989:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_784_989:i32 
                     #      temp_784_989 = Mul i32 c_943, temp_783_989 
-    li      a0, 5552
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a2,a1
+    li      a1, 5552
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    mul     a1,a2,a0
                     #      x_18 = i32 temp_784_989 
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_995 
@@ -10507,16 +13996,43 @@ long_func:
 .while.head_995:
                     #      new_var temp_785_994:i1 
                     #      temp_785_994 = icmp i32 Slt i_18, 16_0 
-    li      a0, 5544
+    li      a0, 5548
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 5548
+    li      a1, 5544
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s9,a0
+    slt     a1,s5,a0
                     #      br i1 temp_785_994, label while.body_995, label while.exit_995 
     bnez    a1, .while.body_995
+    li      a0, 5960
+    add     a0,sp,a0
+    sw      a2,0(a0)
+    li      a0, 5631
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 5543
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 5631
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 5624
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_995
                     #      label while.body_995: 
 .while.body_995:
@@ -10526,14 +14042,14 @@ long_func:
     li      a1, 5543
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_787_997:i32 
                     #      temp_787_997 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 5536
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s10,a0
+    rem     a1,s7,a0
                     #      new_var temp_788_997:i1 
                     #      temp_788_997 = icmp i32 Ne temp_787_997, 0_0 
     li      a0, 0
@@ -10582,7 +14098,7 @@ long_func:
     li      a2, 5531
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -10601,9 +14117,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_795_999:i32 
                     #      temp_795_999 = Add i32 ans_18, temp_794_999 
-    add     a0,s8,a2
+    li      a1, 5452
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_795_999 
                     #      jump label: branch_false_998 
+    li      a2, 5448
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 5531
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 5444
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5531
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 5530
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 5530
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 5624
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 5529
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 5529
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 5624
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_998
                     #      label branch_false_998: 
 .branch_false_998:
@@ -10611,14 +14166,14 @@ long_func:
 .L111_0:
                     #      new_var temp_796_996:i32 
                     #      temp_796_996 = Div i32 x_18, 2_0 
-    li      a0, 5444
+    li      a0, 5529
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 5452
+    li      a1, 5530
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s10,a0
+    sb      a1,0(a1)
+    div     a1,s7,a0
                     #      x_18 = i32 temp_796_996 
                     #      new_var temp_797_996:i32 
                     #      temp_797_996 = Div i32 y_18, 2_0 
@@ -10626,7 +14181,7 @@ long_func:
     li      a1, 5440
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_797_996 
                     #      new_var temp_798_996:i32 
                     #      temp_798_996 = Add i32 i_18, 1_0 
@@ -10634,36 +14189,87 @@ long_func:
     li      a1, 5436
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_798_996 
                     #      jump label: while.head_995 
+    li      a2, 5531
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 5960
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 5432
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5960
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 5544
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 5544
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 5624
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 5548
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 5548
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 5624
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_995
                     #      label while.exit_995: 
 .while.exit_995:
                     #      label L112_0: 
 .L112_0:
                     #      c_943 = i32 ans_18 
-    mv      a0, s8
+    mv      a1, a0
                     #      al_943 = i32 sum_943 
-    li      a0, 5960
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 5432
+    li      a1, 5960
     add     a1,sp,a1
     sw      a1,0(a1)
     mv      a1, a0
                     #      jump label: while.head_946 
+    li      a2, 5631
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 5956
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 6511
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a0, 6511
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a1, 5964
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 5960
+    add     a1,sp,a1
+    lw      a0,0(a1)
     j       .while.head_946
                     #      label while.exit_946: 
 .while.exit_946:
                     #      ans_18 = i32 al_943 
-                    #      ml_856 = i32 ans_18 
-    li      a0, 5956
+    li      a0, 5960
     add     a0,sp,a0
     sw      a0,0(a0)
-    mv      a0, s8
+    mv      a0, a1
+                    #      ml_856 = i32 ans_18 
                     #      x_18 = i32 mr_856 
-    li      a0, 6632
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
                     #      y_18 = i32 1_0 
@@ -10680,7 +14286,7 @@ long_func:
     li      a1, 5964
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s11,a0
+    slt     a1,s8,a0
     xori    a1,a1,1
                     #      br i1 temp_799_1010, label branch_true_1011, label branch_false_1011 
     bnez    a1, .branch_true_1011
@@ -10693,18 +14299,20 @@ long_func:
     li      a1, 5431
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,s10,a0
+    slt     a1,s7,a0
                     #      br i1 temp_800_1013, label branch_true_1014, label branch_false_1014 
     bnez    a1, .branch_true_1014
     j       .branch_false_1014
                     #      label branch_true_1014: 
 .branch_true_1014:
                     #      ans_18 = i32 0xffff_0 
+    li      a0, 0xffff
                     #      jump label: L114_0 
     j       .L114_0
                     #      label branch_false_1014: 
 .branch_false_1014:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: L114_0 
     j       .L114_0
                     #      label L114_0: 
@@ -10713,11 +14321,11 @@ long_func:
 .branch_false_1011:
                     #      new_var temp_801_1019:i1 
                     #      temp_801_1019 = icmp i32 Sgt y_18, 0_0 
-                    #found literal reg Some(a0) already exist with 0_0
-    li      a1, 5430
+    li      a0, 0
+    li      a1, 5431
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s11
+    slt     a1,a0,s8
                     #      br i1 temp_801_1019, label branch_true_1020, label branch_false_1020 
     bnez    a1, .branch_true_1020
     j       .branch_false_1020
@@ -10729,7 +14337,7 @@ long_func:
     li      a1, 5429
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s10
+    slt     a1,a0,s7
                     #      br i1 temp_802_1022, label branch_true_1023, label branch_false_1023 
     bnez    a1, .branch_true_1023
     j       .branch_false_1023
@@ -10752,10 +14360,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 5448
+    li      a2, 5955
     add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s11
+    sb      a2,0(a2)
+    mul     a2,a1,s8
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -10767,7 +14375,7 @@ long_func:
     li      a0, 5352
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s10,a1
+    div     a0,s7,a1
                     #      x_18 = i32 temp_806_1024 
                     #      new_var temp_807_1024:i32 
                     #      temp_807_1024 = Add i32 y_18, 1_0 
@@ -10778,7 +14386,7 @@ long_func:
     li      a1, 5348
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s11,a0
+    add     a1,s8,a0
                     #      new_var temp_808_1024:i32 
                     #      temp_808_1024 = Sub i32 15_0, temp_807_1024 
     li      a0, 15
@@ -10803,7 +14411,7 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a3, 5624
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
     mul     a3,a1,a2
@@ -10825,23 +14433,24 @@ long_func:
     sub     a2,a0,a1
                     #      new_var temp_813_1024:i32 
                     #      temp_813_1024 = Add i32 x_18, temp_812_1024 
-    add     a0,s10,a2
+    add     a0,s7,a2
                     #      ans_18 = i32 temp_813_1024 
+    li      a1, 5260
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L115_0 
     j       .L115_0
                     #      label branch_false_1023: 
 .branch_false_1023:
                     #      new_var temp_814_1027:Array:i32:[Some(16_0)] 
                     #      temp_814_1027 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 5252
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 5260
+    li      a1, 5428
     add     a1,sp,a1
-    sw      a1,0(a1)
+    sb      a1,0(a1)
     lw      a1,0(a0)
                     #      new_var temp_815_1027:ptr->i32 
                     #      new_var temp_816_1027:i32 
@@ -10851,10 +14460,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 5256
+    li      a2, 5955
     add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s11
+    sb      a2,0(a2)
+    mul     a2,a1,s8
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -10866,15 +14475,47 @@ long_func:
     li      a0, 5176
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s10,a1
+    div     a0,s7,a1
                     #      ans_18 = i32 temp_817_1027 
+    li      a1, 5172
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L115_0 
+    li      a2, 5248
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 5168
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 5256
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a0, 5256
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a1, 13452
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 5252
+    add     a1,sp,a1
+    lw      a0,0(a1)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a1, 5252
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 5332
+    add     a1,sp,a1
+    lw      a3,0(a1)
     j       .L115_0
                     #      label L115_0: 
 .L115_0:
                     #      label branch_false_1020: 
 .branch_false_1020:
                     #      ans_18 = i32 x_18 
+    mv      a0, s7
                     #      jump label: L116_0 
     j       .L116_0
                     #      label L116_0: 
@@ -10884,11 +14525,42 @@ long_func:
                     #      label L118_0: 
 .L118_0:
                     #      mr_856 = i32 ans_18 
-    li      a0, 5168
+    li      a1, 5429
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
+                    #      jump label: while.head_859 
+    li      a2, 5955
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    mv      a2, a0
+    li      a1, 6628
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    mv      a0, s8
-                    #      jump label: while.head_859 
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 6624
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 6624
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_859
                     #      label while.exit_859: 
 .while.exit_859:
@@ -10896,23 +14568,55 @@ long_func:
     li      a0, 6628
     add     a0,sp,a0
     sw      a0,0(a0)
+    mv      a0, a1
                     #      pres_834 = i32 ans_18 
                     #      jump label: branch_false_854 
+    li      a2, 6623
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    mv      a2, a0
+    li      a1, 6624
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13436
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      s9, 6632
+    add     s9,sp,s9
+    sw      s9,0(s9)
+    li      a3, 13436
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_854
                     #      label branch_false_854: 
 .branch_false_854:
                     #      label L119_0: 
 .L119_0:
                     #      ml_1034 = i32 pl_834 
-    li      a0, 6624
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, s3
+    mv      s9, s1
                     #      mr_1034 = i32 pl_834 
-    li      a0, 5164
+    li      a0, 13436
     add     a0,sp,a0
     sw      a0,0(a0)
-    mv      a0, s3
+    mv      a0, s1
                     #      mres_1034 = i32 0_0 
     li      a0, 5160
     add     a0,sp,a0
@@ -10927,11 +14631,11 @@ long_func:
     li      a0, 5156
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 5172
+    li      a1, 13423
     add     a1,sp,a1
-    sw      a1,0(a1)
+    sb      a1,0(a1)
     li      a1, 0
-    li      a2, 5248
+    li      a2, 13452
     add     a2,sp,a2
     sw      a2,0(a2)
     xor     a2,a0,a1
@@ -10942,6 +14646,7 @@ long_func:
                     #      label while.body_1037: 
 .while.body_1037:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 mr_1034 
                     #      y_18 = i32 1_0 
@@ -10951,64 +14656,67 @@ long_func:
 .while.head_1044:
                     #      new_var temp_819_1043:i1 
                     #      temp_819_1043 = icmp i32 Slt i_18, 16_0 
-    li      a1, 16
     li      a0, 5160
     add     a0,sp,a0
     sw      a0,0(a0)
-    slt     a0,s9,a1
+    li      a0, 16
+    li      a1, 13452
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    slt     a1,s5,a0
                     #      br i1 temp_819_1043, label while.body_1044, label while.exit_1044 
-    bnez    a0, .while.body_1044
+    bnez    a1, .while.body_1044
     j       .while.exit_1044
                     #      label while.body_1044: 
 .while.body_1044:
                     #      new_var temp_820_1046:i32 
                     #      temp_820_1046 = Mod i32 y_18, 2_0 
-    li      a1, 2
-    li      a0, 5154
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    rem     a0,s11,a1
+    li      a0, 2
+    li      a1, 5154
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    rem     a1,s8,a0
                     #      new_var temp_821_1046:i32 
                     #      temp_821_1046 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(a1) already exist with 2_0
-    li      a0, 5148
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    rem     a0,s10,a1
-                    #      new_var temp_822_1046:i1 
-                    #      temp_822_1046 = icmp i32 Ne temp_821_1046, 0_0 
-    li      a1, 0
-    li      a2, 5155
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    xor     a2,a0,a1
-    snez    a2, a2
-                    #      new_var temp_823_1046:i1 
-                    #      temp_822_1046 = icmp i32 Ne temp_820_1046, 0_0 
-    li      a0, 5144
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-                    #      new_var temp_824_1046:i1 
-                    #      temp_824_1046 = And i1 temp_822_1046, temp_823_1046 
+                    #found literal reg Some(a0) already exist with 2_0
     li      a1, 5148
     add     a1,sp,a1
     sw      a1,0(a1)
-    and     a1,a2,a0
+    rem     a1,s7,a0
+                    #      new_var temp_822_1046:i1 
+                    #      temp_822_1046 = icmp i32 Ne temp_821_1046, 0_0 
+    li      a0, 0
+    li      a2, 5155
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    xor     a2,a1,a0
+    snez    a2, a2
+                    #      new_var temp_823_1046:i1 
+                    #      temp_822_1046 = icmp i32 Ne temp_820_1046, 0_0 
+    li      a1, 5144
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 0
+                    #      new_var temp_824_1046:i1 
+                    #      temp_824_1046 = And i1 temp_822_1046, temp_823_1046 
+    li      a0, 5148
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    and     a0,a2,a1
                     #      br i1 temp_824_1046, label branch_true_1047, label branch_false_1047 
-    bnez    a1, .branch_true_1047
+    bnez    a0, .branch_true_1047
     j       .branch_false_1047
                     #      label branch_true_1047: 
 .branch_true_1047:
                     #      new_var temp_825_1048:Array:i32:[Some(16_0)] 
                     #      temp_825_1048 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 5142
+    li      a0, 5141
     add     a0,sp,a0
     sb      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 5141
+    li      a1, 5142
     add     a1,sp,a1
     sb      a1,0(a1)
     lw      a1,0(a0)
@@ -11023,7 +14731,7 @@ long_func:
     li      a2, 5143
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -11042,9 +14750,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_829_1048:i32 
                     #      temp_829_1048 = Add i32 ans_18, temp_828_1048 
-    add     a0,s8,a2
+    li      a1, 5060
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_829_1048 
                     #      jump label: branch_false_1047 
+    li      a2, 5056
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 5143
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 5052
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5143
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 5142
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 5142
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 5141
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 5141
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_1047
                     #      label branch_false_1047: 
 .branch_false_1047:
@@ -11052,14 +14799,14 @@ long_func:
 .L120_0:
                     #      new_var temp_830_1045:i32 
                     #      temp_830_1045 = Div i32 x_18, 2_0 
-    li      a0, 5052
+    li      a0, 5141
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 5060
+    li      a1, 5142
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s10,a0
+    sb      a1,0(a1)
+    div     a1,s7,a0
                     #      x_18 = i32 temp_830_1045 
                     #      new_var temp_831_1045:i32 
                     #      temp_831_1045 = Div i32 y_18, 2_0 
@@ -11067,7 +14814,7 @@ long_func:
     li      a1, 5048
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_831_1045 
                     #      new_var temp_832_1045:i32 
                     #      temp_832_1045 = Add i32 i_18, 1_0 
@@ -11075,38 +14822,71 @@ long_func:
     li      a1, 5044
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_832_1045 
                     #      jump label: while.head_1044 
+    li      a2, 5143
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 5155
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 5040
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5155
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 5160
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 5160
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1044
                     #      label while.exit_1044: 
 .while.exit_1044:
                     #      new_var temp_833_26209:i1 
                     #      temp_833_26209 = icmp i32 Ne ans_18, 0_0 
-    li      a0, 0
-    li      a1, 5040
+    li      a1, 5154
     add     a1,sp,a1
-    sw      a1,0(a1)
-    xor     a1,s8,a0
-    snez    a1, a1
+    sb      a1,0(a1)
+    li      a1, 0
+    li      a2, 5155
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    xor     a2,a0,a1
+    snez    a2, a2
                     #      br i1 temp_833_26209, label branch_true_1054, label branch_false_1054 
-    bnez    a1, .branch_true_1054
+    bnez    a2, .branch_true_1054
     j       .branch_false_1054
                     #      label branch_true_1054: 
 .branch_true_1054:
                     #      al_1056 = i32 mres_1034 
-    li      a1, 5039
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    mv      a1, a0
-                    #      c_1056 = i32 ml_1034 
-    li      a0, 5156
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 5032
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      a0, a1
+                    #      c_1056 = i32 ml_1034 
+    li      a0, 5032
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    mv      a0, s9
                     #      new_var sum_1056:i32 
                     #      jump label: while.head_1059 
     j       .while.head_1059
@@ -11114,14 +14894,14 @@ long_func:
 .while.head_1059:
                     #      new_var temp_834_26303:i1 
                     #      temp_834_26303 = icmp i32 Ne c_1056, 0_0 
-    li      a0, 5164
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 5056
+    li      a1, 5156
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 0
+    li      a2, 5039
     add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
+    sb      a2,0(a2)
+    xor     a2,a0,a1
     snez    a2, a2
                     #      br i1 temp_834_26303, label while.body_1059, label while.exit_1059 
     bnez    a2, .while.body_1059
@@ -11129,23 +14909,30 @@ long_func:
                     #      label while.body_1059: 
 .while.body_1059:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_1056 
+    li      a0, 5028
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      y_18 = i32 c_1056 
+    li      a0, 5032
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      jump label: while.head_1066 
     j       .while.head_1066
                     #      label while.head_1066: 
 .while.head_1066:
                     #      new_var temp_835_1065:i1 
                     #      temp_835_1065 = icmp i32 Slt i_18, 16_0 
-    li      a0, 5032
+    li      a0, 5028
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 5028
+    li      a1, 13452
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s9,a0
+    slt     a1,s5,a0
                     #      br i1 temp_835_1065, label while.body_1066, label while.exit_1066 
     bnez    a1, .while.body_1066
     j       .while.exit_1066
@@ -11157,7 +14944,7 @@ long_func:
     li      a1, 5022
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s10,a0
+    rem     a1,s7,a0
                     #      new_var temp_837_26486:i1 
                     #      temp_837_26486 = icmp i32 Ne temp_836_1068, 0_0 
     li      a0, 0
@@ -11177,7 +14964,7 @@ long_func:
     li      a1, 5016
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_839_1071:i1 
                     #      temp_839_1071 = icmp i32 Eq temp_838_1071, 0_0 
     li      a0, 0
@@ -11211,7 +14998,7 @@ long_func:
     li      a2, 5007
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -11230,9 +15017,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_844_1073:i32 
                     #      temp_844_1073 = Add i32 ans_18, temp_843_1073 
-    add     a0,s8,a2
+    li      a1, 4924
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_844_1073 
                     #      jump label: branch_false_1072 
+    li      a2, 4920
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 5007
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 4916
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5007
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 5008
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 5008
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_1072
                     #      label branch_false_1072: 
 .branch_false_1072:
@@ -11240,20 +15051,17 @@ long_func:
 .branch_false_1069:
                     #      new_var temp_848_1075:i32 
                     #      temp_848_1075 = Mod i32 y_18, 2_0 
-    li      a0, 4916
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 4924
+    li      a1, 5016
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_849_26631:i1 
                     #      temp_849_26631 = icmp i32 Ne temp_848_1075, 0_0 
     li      a0, 0
-    li      a2, 4920
+    li      a2, 5015
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_849_26631, label branch_true_1076, label branch_false_1076 
@@ -11281,7 +15089,7 @@ long_func:
     li      a2, 4899
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -11300,9 +15108,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_854_1077:i32 
                     #      temp_854_1077 = Add i32 ans_18, temp_853_1077 
-    add     a0,s8,a2
+    li      a1, 4820
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_854_1077 
                     #      jump label: branch_false_1076 
+    li      a2, 4816
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 4899
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 4812
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 4899
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 4900
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 4900
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_1076
                     #      label branch_false_1076: 
 .branch_false_1076:
@@ -11312,14 +15144,11 @@ long_func:
 .L122_0:
                     #      new_var temp_845_1067:i32 
                     #      temp_845_1067 = Div i32 x_18, 2_0 
-    li      a0, 4812
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 4820
+    li      a1, 4900
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s10,a0
+    div     a1,s7,a0
                     #      x_18 = i32 temp_845_1067 
                     #      new_var temp_846_1067:i32 
                     #      temp_846_1067 = Div i32 y_18, 2_0 
@@ -11327,7 +15156,7 @@ long_func:
     li      a1, 4912
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_846_1067 
                     #      new_var temp_847_1067:i32 
                     #      temp_847_1067 = Add i32 i_18, 1_0 
@@ -11335,18 +15164,54 @@ long_func:
     li      a1, 4908
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_847_1067 
                     #      jump label: while.head_1066 
+    li      a2, 4899
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 5023
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 4904
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5023
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 5028
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 5028
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1066
                     #      label while.exit_1066: 
 .while.exit_1066:
                     #      sum_1056 = i32 ans_18 
-    mv      a0, s8
+    li      a1, 5022
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_1056 
-    li      a0, 5024
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
                     #      y_18 = i32 c_1056 
@@ -11363,10 +15228,10 @@ long_func:
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 4904
+    li      a1, 5024
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s9,a0
+    slt     a1,s5,a0
                     #      br i1 temp_855_1087, label while.body_1088, label while.exit_1088 
     bnez    a1, .while.body_1088
     j       .while.exit_1088
@@ -11378,20 +15243,20 @@ long_func:
     li      a1, 4811
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_857_1090:i32 
                     #      temp_857_1090 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 4804
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s10,a0
+    rem     a1,s7,a0
                     #      new_var temp_858_1090:i1 
                     #      temp_858_1090 = icmp i32 Ne temp_857_1090, 0_0 
     li      a0, 0
-    li      a2, 4816
+    li      a2, 5023
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      new_var temp_859_1090:i1 
@@ -11434,7 +15299,7 @@ long_func:
     li      a2, 4799
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -11453,9 +15318,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_865_1092:i32 
                     #      temp_865_1092 = Add i32 ans_18, temp_864_1092 
-    add     a0,s8,a2
+    li      a1, 4716
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_865_1092 
                     #      jump label: branch_false_1091 
+    li      a2, 4712
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 4799
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 4708
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 4799
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 4798
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 4798
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 4797
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 4797
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_1091
                     #      label branch_false_1091: 
 .branch_false_1091:
@@ -11463,14 +15367,14 @@ long_func:
 .L123_0:
                     #      new_var temp_866_1089:i32 
                     #      temp_866_1089 = Div i32 x_18, 2_0 
-    li      a0, 4708
+    li      a0, 4797
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 4716
+    li      a1, 4798
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s10,a0
+    sb      a1,0(a1)
+    div     a1,s7,a0
                     #      x_18 = i32 temp_866_1089 
                     #      new_var temp_867_1089:i32 
                     #      temp_867_1089 = Div i32 y_18, 2_0 
@@ -11478,7 +15382,7 @@ long_func:
     li      a1, 4704
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_867_1089 
                     #      new_var temp_868_1089:i32 
                     #      temp_868_1089 = Add i32 i_18, 1_0 
@@ -11486,31 +15390,67 @@ long_func:
     li      a1, 4700
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_868_1089 
                     #      jump label: while.head_1088 
+    li      a2, 4799
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 5023
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 4696
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5023
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 5024
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 5024
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 5028
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 5028
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1088
                     #      label while.exit_1088: 
 .while.exit_1088:
                     #      c_1056 = i32 ans_18 
-    mv      a0, s8
+    li      a1, 4811
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L124_0 
     j       .L124_0
                     #      label L124_0: 
 .L124_0:
                     #      new_var temp_869_1098:i1 
                     #      temp_869_1098 = icmp i32 Sgt 1_0, 15_0 
-    li      a0, 5028
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 1
-    li      a1, 4696
+    li      a1, 5028
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 15
-    li      a2, 4712
+    li      a2, 5023
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     slt     a2,a1,a0
                     #      br i1 temp_869_1098, label branch_true_1099, label branch_false_1099 
     bnez    a2, .branch_true_1099
@@ -11518,46 +15458,51 @@ long_func:
                     #      label branch_true_1099: 
 .branch_true_1099:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: while.exit_1108 
     j       .while.exit_1108
                     #      label branch_false_1099: 
 .branch_false_1099:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      i_18 = i32 0_0 
                     #      new_var temp_870_1102:Array:i32:[Some(16_0)] 
                     #      temp_870_1102 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_871_1102:ptr->i32 
                     #      new_var temp_872_1102:i32 
                     #      temp_871_1102 = getelementptr temp_870_1102:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    li      a1, 4688
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
+    li      a1, 0
+    li      a0, 4688
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a2, 4695
     add     a2,sp,a2
     sb      a2,0(a2)
     li      a2, 1
-    li      a3, 5332
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_872_1102 = load temp_871_1102:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_873_1102:i32 
                     #      temp_873_1102 = Mul i32 c_1056, temp_872_1102 
-    li      a0, 4616
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a2,a1
+    li      a1, 4616
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    mul     a1,a2,a0
                     #      x_18 = i32 temp_873_1102 
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_1108 
@@ -11566,16 +15511,43 @@ long_func:
 .while.head_1108:
                     #      new_var temp_874_1107:i1 
                     #      temp_874_1107 = icmp i32 Slt i_18, 16_0 
-    li      a0, 4608
+    li      a0, 4612
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 4612
+    li      a1, 4608
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s9,a0
+    slt     a1,s5,a0
                     #      br i1 temp_874_1107, label while.body_1108, label while.exit_1108 
     bnez    a1, .while.body_1108
+    li      a0, 5028
+    add     a0,sp,a0
+    sw      a2,0(a0)
+    li      a0, 4695
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 4607
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 4695
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 4688
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_1108
                     #      label while.body_1108: 
 .while.body_1108:
@@ -11585,14 +15557,14 @@ long_func:
     li      a1, 4607
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_876_1110:i32 
                     #      temp_876_1110 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 4600
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s10,a0
+    rem     a1,s7,a0
                     #      new_var temp_877_1110:i1 
                     #      temp_877_1110 = icmp i32 Ne temp_876_1110, 0_0 
     li      a0, 0
@@ -11641,7 +15613,7 @@ long_func:
     li      a2, 4595
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -11660,9 +15632,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_884_1112:i32 
                     #      temp_884_1112 = Add i32 ans_18, temp_883_1112 
-    add     a0,s8,a2
+    li      a1, 4516
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_884_1112 
                     #      jump label: branch_false_1111 
+    li      a2, 4512
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 4595
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 4508
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 4595
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 4594
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 4594
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 4688
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 4593
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 4593
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 4688
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_1111
                     #      label branch_false_1111: 
 .branch_false_1111:
@@ -11670,14 +15681,14 @@ long_func:
 .L125_0:
                     #      new_var temp_885_1109:i32 
                     #      temp_885_1109 = Div i32 x_18, 2_0 
-    li      a0, 4508
+    li      a0, 4593
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 4516
+    li      a1, 4594
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s10,a0
+    sb      a1,0(a1)
+    div     a1,s7,a0
                     #      x_18 = i32 temp_885_1109 
                     #      new_var temp_886_1109:i32 
                     #      temp_886_1109 = Div i32 y_18, 2_0 
@@ -11685,7 +15696,7 @@ long_func:
     li      a1, 4504
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_886_1109 
                     #      new_var temp_887_1109:i32 
                     #      temp_887_1109 = Add i32 i_18, 1_0 
@@ -11693,53 +15704,150 @@ long_func:
     li      a1, 4500
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_887_1109 
                     #      jump label: while.head_1108 
+    li      a2, 4595
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 5028
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 4496
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5028
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 4608
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 4608
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 4688
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 4612
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 4612
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 4688
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1108
                     #      label while.exit_1108: 
 .while.exit_1108:
                     #      label L126_0: 
 .L126_0:
                     #      c_1056 = i32 ans_18 
-    mv      a0, s8
+    mv      a1, a0
                     #      al_1056 = i32 sum_1056 
-    li      a0, 5028
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 4496
+    li      a1, 5028
     add     a1,sp,a1
     sw      a1,0(a1)
     mv      a1, a0
                     #      jump label: while.head_1059 
+    li      a2, 4695
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 5024
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 5039
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 5032
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5039
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 5156
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 5156
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 5028
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 5028
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1059
                     #      label while.exit_1059: 
 .while.exit_1059:
                     #      ans_18 = i32 al_1056 
-                    #      mres_1034 = i32 ans_18 
-    li      a0, 5024
+    li      a0, 5028
     add     a0,sp,a0
     sw      a0,0(a0)
-    mv      a0, s8
+    mv      a0, a1
+                    #      mres_1034 = i32 ans_18 
+    li      a1, 5032
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    mv      a1, a0
                     #      jump label: branch_false_1054 
+    li      a2, 5023
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 5039
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 5156
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 5039
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_1054
                     #      label branch_false_1054: 
 .branch_false_1054:
                     #      label L127_0: 
 .L127_0:
                     #      al_1121 = i32 ml_1034 
-    li      a0, 5156
+    mv      a1, s9
+                    #      c_1121 = i32 ml_1034 
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 5032
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
-                    #      c_1121 = i32 ml_1034 
-    li      a1, 4492
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      a0, s9
                     #      new_var sum_1121:i32 
                     #      jump label: while.head_1124 
     j       .while.head_1124
@@ -11747,14 +15855,14 @@ long_func:
 .while.head_1124:
                     #      new_var temp_888_27978:i1 
                     #      temp_888_27978 = icmp i32 Ne c_1121, 0_0 
-    li      a0, 5164
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 4512
+    li      a1, 4492
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 0
+    li      a2, 5039
     add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
+    sb      a2,0(a2)
+    xor     a2,a0,a1
     snez    a2, a2
                     #      br i1 temp_888_27978, label while.body_1124, label while.exit_1124 
     bnez    a2, .while.body_1124
@@ -11762,23 +15870,30 @@ long_func:
                     #      label while.body_1124: 
 .while.body_1124:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_1121 
+    li      a0, 4488
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      y_18 = i32 c_1121 
+    li      a0, 4492
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      jump label: while.head_1131 
     j       .while.head_1131
                     #      label while.head_1131: 
 .while.head_1131:
                     #      new_var temp_889_1130:i1 
                     #      temp_889_1130 = icmp i32 Slt i_18, 16_0 
-    li      a0, 4492
+    li      a0, 4488
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 4488
+    li      a1, 13452
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s9,a0
+    slt     a1,s5,a0
                     #      br i1 temp_889_1130, label while.body_1131, label while.exit_1131 
     bnez    a1, .while.body_1131
     j       .while.exit_1131
@@ -11790,7 +15905,7 @@ long_func:
     li      a1, 4482
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s10,a0
+    rem     a1,s7,a0
                     #      new_var temp_891_28161:i1 
                     #      temp_891_28161 = icmp i32 Ne temp_890_1133, 0_0 
     li      a0, 0
@@ -11810,7 +15925,7 @@ long_func:
     li      a1, 4476
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_893_1136:i1 
                     #      temp_893_1136 = icmp i32 Eq temp_892_1136, 0_0 
     li      a0, 0
@@ -11844,7 +15959,7 @@ long_func:
     li      a2, 4467
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -11863,9 +15978,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_898_1138:i32 
                     #      temp_898_1138 = Add i32 ans_18, temp_897_1138 
-    add     a0,s8,a2
+    li      a1, 4388
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_898_1138 
                     #      jump label: branch_false_1137 
+    li      a2, 4384
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 4467
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 4380
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 4467
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 4468
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 4468
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_1137
                     #      label branch_false_1137: 
 .branch_false_1137:
@@ -11873,20 +16012,17 @@ long_func:
 .branch_false_1134:
                     #      new_var temp_902_1140:i32 
                     #      temp_902_1140 = Mod i32 y_18, 2_0 
-    li      a0, 4380
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 4388
+    li      a1, 4476
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_903_28306:i1 
                     #      temp_903_28306 = icmp i32 Ne temp_902_1140, 0_0 
     li      a0, 0
-    li      a2, 4384
+    li      a2, 4475
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_903_28306, label branch_true_1141, label branch_false_1141 
@@ -11914,7 +16050,7 @@ long_func:
     li      a2, 4363
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -11933,9 +16069,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_908_1142:i32 
                     #      temp_908_1142 = Add i32 ans_18, temp_907_1142 
-    add     a0,s8,a2
+    li      a1, 4284
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_908_1142 
                     #      jump label: branch_false_1141 
+    li      a2, 4280
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 4363
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 4276
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 4363
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 4364
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 4364
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_1141
                     #      label branch_false_1141: 
 .branch_false_1141:
@@ -11945,14 +16105,11 @@ long_func:
 .L129_0:
                     #      new_var temp_899_1132:i32 
                     #      temp_899_1132 = Div i32 x_18, 2_0 
-    li      a0, 4276
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 4284
+    li      a1, 4364
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s10,a0
+    div     a1,s7,a0
                     #      x_18 = i32 temp_899_1132 
                     #      new_var temp_900_1132:i32 
                     #      temp_900_1132 = Div i32 y_18, 2_0 
@@ -11960,7 +16117,7 @@ long_func:
     li      a1, 4376
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_900_1132 
                     #      new_var temp_901_1132:i32 
                     #      temp_901_1132 = Add i32 i_18, 1_0 
@@ -11968,18 +16125,54 @@ long_func:
     li      a1, 4372
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_901_1132 
                     #      jump label: while.head_1131 
+    li      a2, 4363
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 4483
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 4368
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 4483
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 4488
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 4488
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1131
                     #      label while.exit_1131: 
 .while.exit_1131:
                     #      sum_1121 = i32 ans_18 
-    mv      a0, s8
+    li      a1, 4482
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_1121 
-    li      a0, 4484
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
                     #      y_18 = i32 c_1121 
@@ -11996,10 +16189,10 @@ long_func:
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 4368
+    li      a1, 4484
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s9,a0
+    slt     a1,s5,a0
                     #      br i1 temp_909_1152, label while.body_1153, label while.exit_1153 
     bnez    a1, .while.body_1153
     j       .while.exit_1153
@@ -12011,20 +16204,20 @@ long_func:
     li      a1, 4275
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_911_1155:i32 
                     #      temp_911_1155 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 4268
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s10,a0
+    rem     a1,s7,a0
                     #      new_var temp_912_1155:i1 
                     #      temp_912_1155 = icmp i32 Ne temp_911_1155, 0_0 
     li      a0, 0
-    li      a2, 4280
+    li      a2, 4483
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      new_var temp_913_1155:i1 
@@ -12067,7 +16260,7 @@ long_func:
     li      a2, 4263
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -12086,9 +16279,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_919_1157:i32 
                     #      temp_919_1157 = Add i32 ans_18, temp_918_1157 
-    add     a0,s8,a2
+    li      a1, 4180
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_919_1157 
                     #      jump label: branch_false_1156 
+    li      a2, 4176
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 4263
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 4172
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 4263
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 4262
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 4262
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 4261
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 4261
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_1156
                     #      label branch_false_1156: 
 .branch_false_1156:
@@ -12096,14 +16328,14 @@ long_func:
 .L130_0:
                     #      new_var temp_920_1154:i32 
                     #      temp_920_1154 = Div i32 x_18, 2_0 
-    li      a0, 4172
+    li      a0, 4261
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 4180
+    li      a1, 4262
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s10,a0
+    sb      a1,0(a1)
+    div     a1,s7,a0
                     #      x_18 = i32 temp_920_1154 
                     #      new_var temp_921_1154:i32 
                     #      temp_921_1154 = Div i32 y_18, 2_0 
@@ -12111,7 +16343,7 @@ long_func:
     li      a1, 4168
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_921_1154 
                     #      new_var temp_922_1154:i32 
                     #      temp_922_1154 = Add i32 i_18, 1_0 
@@ -12119,31 +16351,67 @@ long_func:
     li      a1, 4164
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_922_1154 
                     #      jump label: while.head_1153 
+    li      a2, 4263
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 4483
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 4160
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 4483
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 4484
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 4484
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 4488
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 4488
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1153
                     #      label while.exit_1153: 
 .while.exit_1153:
                     #      c_1121 = i32 ans_18 
-    mv      a0, s8
+    li      a1, 4275
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L131_0 
     j       .L131_0
                     #      label L131_0: 
 .L131_0:
                     #      new_var temp_923_1163:i1 
                     #      temp_923_1163 = icmp i32 Sgt 1_0, 15_0 
-    li      a0, 4488
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 1
-    li      a1, 4160
+    li      a1, 4488
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 15
-    li      a2, 4176
+    li      a2, 4483
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     slt     a2,a1,a0
                     #      br i1 temp_923_1163, label branch_true_1164, label branch_false_1164 
     bnez    a2, .branch_true_1164
@@ -12151,46 +16419,51 @@ long_func:
                     #      label branch_true_1164: 
 .branch_true_1164:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: while.exit_1173 
     j       .while.exit_1173
                     #      label branch_false_1164: 
 .branch_false_1164:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      i_18 = i32 0_0 
                     #      new_var temp_924_1167:Array:i32:[Some(16_0)] 
                     #      temp_924_1167 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_925_1167:ptr->i32 
                     #      new_var temp_926_1167:i32 
                     #      temp_925_1167 = getelementptr temp_924_1167:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    li      a1, 4152
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
+    li      a1, 0
+    li      a0, 4152
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a2, 4159
     add     a2,sp,a2
     sb      a2,0(a2)
     li      a2, 1
-    li      a3, 4688
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_926_1167 = load temp_925_1167:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_927_1167:i32 
                     #      temp_927_1167 = Mul i32 c_1121, temp_926_1167 
-    li      a0, 4080
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a2,a1
+    li      a1, 4080
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    mul     a1,a2,a0
                     #      x_18 = i32 temp_927_1167 
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_1173 
@@ -12199,16 +16472,43 @@ long_func:
 .while.head_1173:
                     #      new_var temp_928_1172:i1 
                     #      temp_928_1172 = icmp i32 Slt i_18, 16_0 
-    li      a0, 4072
+    li      a0, 4076
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 4076
+    li      a1, 4072
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s9,a0
+    slt     a1,s5,a0
                     #      br i1 temp_928_1172, label while.body_1173, label while.exit_1173 
     bnez    a1, .while.body_1173
+    li      a0, 4488
+    add     a0,sp,a0
+    sw      a2,0(a0)
+    li      a0, 4159
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 4071
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 4159
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 4152
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_1173
                     #      label while.body_1173: 
 .while.body_1173:
@@ -12218,14 +16518,14 @@ long_func:
     li      a1, 4071
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s11,a0
+    rem     a1,s8,a0
                     #      new_var temp_930_1175:i32 
                     #      temp_930_1175 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 4064
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s10,a0
+    rem     a1,s7,a0
                     #      new_var temp_931_1175:i1 
                     #      temp_931_1175 = icmp i32 Ne temp_930_1175, 0_0 
     li      a0, 0
@@ -12274,7 +16574,7 @@ long_func:
     li      a2, 4059
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s9
+    mul     a2,a1,s5
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -12293,9 +16593,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_938_1177:i32 
                     #      temp_938_1177 = Add i32 ans_18, temp_937_1177 
-    add     a0,s8,a2
+    li      a1, 3980
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_938_1177 
                     #      jump label: branch_false_1176 
+    li      a2, 3976
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 4059
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 3972
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 4059
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 4058
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 4058
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 4152
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 4057
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 4057
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 4152
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_1176
                     #      label branch_false_1176: 
 .branch_false_1176:
@@ -12303,14 +16642,14 @@ long_func:
 .L132_0:
                     #      new_var temp_939_1174:i32 
                     #      temp_939_1174 = Div i32 x_18, 2_0 
-    li      a0, 3972
+    li      a0, 4057
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 3980
+    li      a1, 4058
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s10,a0
+    sb      a1,0(a1)
+    div     a1,s7,a0
                     #      x_18 = i32 temp_939_1174 
                     #      new_var temp_940_1174:i32 
                     #      temp_940_1174 = Div i32 y_18, 2_0 
@@ -12318,7 +16657,7 @@ long_func:
     li      a1, 3968
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s11,a0
+    div     a1,s8,a0
                     #      y_18 = i32 temp_940_1174 
                     #      new_var temp_941_1174:i32 
                     #      temp_941_1174 = Add i32 i_18, 1_0 
@@ -12326,36 +16665,87 @@ long_func:
     li      a1, 3964
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s9,a0
+    add     a1,s5,a0
                     #      i_18 = i32 temp_941_1174 
                     #      jump label: while.head_1173 
+    li      a2, 4059
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 4488
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 3960
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 4488
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 4072
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 4072
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 4152
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 4076
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 4076
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 4152
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1173
                     #      label while.exit_1173: 
 .while.exit_1173:
                     #      label L133_0: 
 .L133_0:
                     #      c_1121 = i32 ans_18 
-    mv      a0, s8
+    mv      a1, a0
                     #      al_1121 = i32 sum_1121 
-    li      a0, 4488
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 3960
+    li      a1, 4488
     add     a1,sp,a1
     sw      a1,0(a1)
     mv      a1, a0
                     #      jump label: while.head_1124 
+    li      a2, 4159
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 4484
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 5039
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a0, 5039
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a1, 4492
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 4488
+    add     a1,sp,a1
+    lw      a0,0(a1)
     j       .while.head_1124
                     #      label while.exit_1124: 
 .while.exit_1124:
                     #      ans_18 = i32 al_1121 
-                    #      ml_1034 = i32 ans_18 
-    li      a0, 4484
+    li      a0, 4488
     add     a0,sp,a0
     sw      a0,0(a0)
-    mv      a0, s8
+    mv      a0, a1
+                    #      ml_1034 = i32 ans_18 
                     #      x_18 = i32 mr_1034 
-    li      a0, 5164
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
                     #      y_18 = i32 1_0 
@@ -12372,7 +16762,7 @@ long_func:
     li      a1, 4492
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s11,a0
+    slt     a1,s8,a0
     xori    a1,a1,1
                     #      br i1 temp_942_1188, label branch_true_1189, label branch_false_1189 
     bnez    a1, .branch_true_1189
@@ -12385,18 +16775,20 @@ long_func:
     li      a1, 3959
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,s10,a0
+    slt     a1,s7,a0
                     #      br i1 temp_943_1191, label branch_true_1192, label branch_false_1192 
     bnez    a1, .branch_true_1192
     j       .branch_false_1192
                     #      label branch_true_1192: 
 .branch_true_1192:
                     #      ans_18 = i32 0xffff_0 
+    li      a0, 0xffff
                     #      jump label: L135_0 
     j       .L135_0
                     #      label branch_false_1192: 
 .branch_false_1192:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: L135_0 
     j       .L135_0
                     #      label L135_0: 
@@ -12405,11 +16797,11 @@ long_func:
 .branch_false_1189:
                     #      new_var temp_944_1197:i1 
                     #      temp_944_1197 = icmp i32 Sgt y_18, 0_0 
-                    #found literal reg Some(a0) already exist with 0_0
-    li      a1, 3958
+    li      a0, 0
+    li      a1, 3959
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s11
+    slt     a1,a0,s8
                     #      br i1 temp_944_1197, label branch_true_1198, label branch_false_1198 
     bnez    a1, .branch_true_1198
     j       .branch_false_1198
@@ -12421,7 +16813,7 @@ long_func:
     li      a1, 3957
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s10
+    slt     a1,a0,s7
                     #      br i1 temp_945_1200, label branch_true_1201, label branch_false_1201 
     bnez    a1, .branch_true_1201
     j       .branch_false_1201
@@ -12444,10 +16836,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 3976
+    li      a2, 4483
     add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s11
+    sb      a2,0(a2)
+    mul     a2,a1,s8
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -12459,7 +16851,7 @@ long_func:
     li      a0, 3880
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s10,a1
+    div     a0,s7,a1
                     #      x_18 = i32 temp_949_1202 
                     #      new_var temp_950_1202:i32 
                     #      temp_950_1202 = Add i32 y_18, 1_0 
@@ -12470,7 +16862,7 @@ long_func:
     li      a1, 3876
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s11,a0
+    add     a1,s8,a0
                     #      new_var temp_951_1202:i32 
                     #      temp_951_1202 = Sub i32 15_0, temp_950_1202 
     li      a0, 15
@@ -12495,7 +16887,7 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a3, 4152
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
     mul     a3,a1,a2
@@ -12517,23 +16909,24 @@ long_func:
     sub     a2,a0,a1
                     #      new_var temp_956_1202:i32 
                     #      temp_956_1202 = Add i32 x_18, temp_955_1202 
-    add     a0,s10,a2
+    add     a0,s7,a2
                     #      ans_18 = i32 temp_956_1202 
+    li      a1, 3788
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L136_0 
     j       .L136_0
                     #      label branch_false_1201: 
 .branch_false_1201:
                     #      new_var temp_957_1205:Array:i32:[Some(16_0)] 
                     #      temp_957_1205 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 3780
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 3788
+    li      a1, 3956
     add     a1,sp,a1
-    sw      a1,0(a1)
+    sb      a1,0(a1)
     lw      a1,0(a0)
                     #      new_var temp_958_1205:ptr->i32 
                     #      new_var temp_959_1205:i32 
@@ -12543,10 +16936,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 3784
+    li      a2, 4483
     add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s11
+    sb      a2,0(a2)
+    mul     a2,a1,s8
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -12558,15 +16951,47 @@ long_func:
     li      a0, 3704
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s10,a1
+    div     a0,s7,a1
                     #      ans_18 = i32 temp_960_1205 
+    li      a1, 3700
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L136_0 
+    li      a2, 3776
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 3696
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 3784
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a0, 3784
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a1, 13452
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 3780
+    add     a1,sp,a1
+    lw      a0,0(a1)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a1, 3780
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 3860
+    add     a1,sp,a1
+    lw      a3,0(a1)
     j       .L136_0
                     #      label L136_0: 
 .L136_0:
                     #      label branch_false_1198: 
 .branch_false_1198:
                     #      ans_18 = i32 x_18 
+    mv      a0, s7
                     #      jump label: L137_0 
     j       .L137_0
                     #      label L137_0: 
@@ -12576,11 +17001,42 @@ long_func:
                     #      label L139_0: 
 .L139_0:
                     #      mr_1034 = i32 ans_18 
-    li      a0, 3696
+    li      a1, 3957
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
+                    #      jump label: while.head_1037 
+    li      a2, 4483
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    mv      a2, a0
+    li      a1, 5160
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    mv      a0, s8
-                    #      jump label: while.head_1037 
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 5156
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 5156
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1037
                     #      label while.exit_1037: 
 .while.exit_1037:
@@ -12588,6 +17044,7 @@ long_func:
     li      a0, 5160
     add     a0,sp,a0
     sw      a0,0(a0)
+    mv      a0, a1
                     #      pl_834 = i32 ans_18 
                     #      x_18 = i32 pr_834 
                     #      y_18 = i32 1_0 
@@ -12597,14 +17054,14 @@ long_func:
 .L140_0:
                     #      new_var temp_961_1214:i1 
                     #      temp_961_1214 = icmp i32 Sge y_18, 15_0 
-    li      a0, 5156
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 15
-    li      a1, 3700
+    li      a1, 5156
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s11,a0
+    slt     a1,s8,a0
     xori    a1,a1,1
                     #      br i1 temp_961_1214, label branch_true_1215, label branch_false_1215 
     bnez    a1, .branch_true_1215
@@ -12617,18 +17074,20 @@ long_func:
     li      a1, 3695
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,s10,a0
+    slt     a1,s7,a0
                     #      br i1 temp_962_1217, label branch_true_1218, label branch_false_1218 
     bnez    a1, .branch_true_1218
     j       .branch_false_1218
                     #      label branch_true_1218: 
 .branch_true_1218:
                     #      ans_18 = i32 0xffff_0 
+    li      a0, 0xffff
                     #      jump label: L141_0 
     j       .L141_0
                     #      label branch_false_1218: 
 .branch_false_1218:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: L141_0 
     j       .L141_0
                     #      label L141_0: 
@@ -12637,11 +17096,11 @@ long_func:
 .branch_false_1215:
                     #      new_var temp_963_1223:i1 
                     #      temp_963_1223 = icmp i32 Sgt y_18, 0_0 
-                    #found literal reg Some(a0) already exist with 0_0
-    li      a1, 3694
+    li      a0, 0
+    li      a1, 3695
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s11
+    slt     a1,a0,s8
                     #      br i1 temp_963_1223, label branch_true_1224, label branch_false_1224 
     bnez    a1, .branch_true_1224
     j       .branch_false_1224
@@ -12653,7 +17112,7 @@ long_func:
     li      a1, 3693
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s10
+    slt     a1,a0,s7
                     #      br i1 temp_964_1226, label branch_true_1227, label branch_false_1227 
     bnez    a1, .branch_true_1227
     j       .branch_false_1227
@@ -12676,10 +17135,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 3776
+    li      a2, 5155
     add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s11
+    sb      a2,0(a2)
+    mul     a2,a1,s8
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -12691,7 +17150,7 @@ long_func:
     li      a0, 3616
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s10,a1
+    div     a0,s7,a1
                     #      x_18 = i32 temp_968_1228 
                     #      new_var temp_969_1228:i32 
                     #      temp_969_1228 = Add i32 y_18, 1_0 
@@ -12702,7 +17161,7 @@ long_func:
     li      a1, 3612
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s11,a0
+    add     a1,s8,a0
                     #      new_var temp_970_1228:i32 
                     #      temp_970_1228 = Sub i32 15_0, temp_969_1228 
     li      a0, 15
@@ -12727,7 +17186,7 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a3, 3860
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
     mul     a3,a1,a2
@@ -12749,23 +17208,24 @@ long_func:
     sub     a2,a0,a1
                     #      new_var temp_975_1228:i32 
                     #      temp_975_1228 = Add i32 x_18, temp_974_1228 
-    add     a0,s10,a2
+    add     a0,s7,a2
                     #      ans_18 = i32 temp_975_1228 
+    li      a1, 3524
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L142_0 
     j       .L142_0
                     #      label branch_false_1227: 
 .branch_false_1227:
                     #      new_var temp_976_1231:Array:i32:[Some(16_0)] 
                     #      temp_976_1231 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 3516
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 3524
+    li      a1, 3692
     add     a1,sp,a1
-    sw      a1,0(a1)
+    sb      a1,0(a1)
     lw      a1,0(a0)
                     #      new_var temp_977_1231:ptr->i32 
                     #      new_var temp_978_1231:i32 
@@ -12775,10 +17235,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 3520
+    li      a2, 5155
     add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s11
+    sb      a2,0(a2)
+    mul     a2,a1,s8
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -12790,15 +17250,47 @@ long_func:
     li      a0, 3440
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s10,a1
+    div     a0,s7,a1
                     #      ans_18 = i32 temp_979_1231 
+    li      a1, 3436
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L142_0 
+    li      a2, 3512
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 3432
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 3520
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a0, 3520
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a1, 13452
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 3516
+    add     a1,sp,a1
+    lw      a0,0(a1)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a1, 3516
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 3596
+    add     a1,sp,a1
+    lw      a3,0(a1)
     j       .L142_0
                     #      label L142_0: 
 .L142_0:
                     #      label branch_false_1224: 
 .branch_false_1224:
                     #      ans_18 = i32 x_18 
+    mv      a0, s7
                     #      jump label: L143_0 
     j       .L143_0
                     #      label L143_0: 
@@ -12809,50 +17301,85 @@ long_func:
 .L145_0:
                     #      pr_834 = i32 ans_18 
                     #      jump label: while.head_837 
+    li      a2, 5155
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    mv      a2, a0
+    li      s8, 13440
+    add     s8,sp,s8
+    sw      s8,0(s8)
+    li      a1, 3693
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s6, 6751
+    add     s6,sp,s6
+    sb      s6,0(s6)
+    li      s10, 6750
+    add     s10,sp,s10
+    sb      s10,0(s10)
+    li      s5, 13448
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      s7, 13444
+    add     s7,sp,s7
+    sw      s7,0(s7)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13436
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      s11, 6639
+    add     s11,sp,s11
+    sb      s11,0(s11)
+    li      s9, 5164
+    add     s9,sp,s9
+    sw      s9,0(s9)
+    li      a3, 13436
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_837
                     #      label while.exit_837: 
 .while.exit_837:
                     #      ans_18 = i32 pres_834 
                     #       Call void putint_0(ans_18) 
                     #saved register dumping to mem
-    li      s1, 6744
+    li      s1, 6760
     add     s1,sp,s1
     sw      s1,0(s1)
     li      s2, 6767
     add     s2,sp,s2
     sb      s2,0(s2)
-    li      s3, 6760
+    li      s3, 6756
     add     s3,sp,s3
     sw      s3,0(s3)
-    li      s4, 6756
+    li      s4, 6752
     add     s4,sp,s4
     sw      s4,0(s4)
-    li      s5, 6752
+    li      s5, 6751
     add     s5,sp,s5
-    sw      s5,0(s5)
-    li      s6, 6750
-    add     s6,sp,s6
-    sb      s6,0(s6)
-    li      s7, 6751
-    add     s7,sp,s7
-    sb      s7,0(s7)
-    li      s8, 13452
-    add     s8,sp,s8
-    sw      s8,0(s8)
-    li      s9, 13448
-    add     s9,sp,s9
-    sw      s9,0(s9)
-    li      s10, 13444
-    add     s10,sp,s10
-    sw      s10,0(s10)
-    li      s11, 13440
-    add     s11,sp,s11
-    sw      s11,0(s11)
+    sb      s6,0(s5)
                     #saved register dumped to mem
                     #arg load start
-    li      a0, 3432
+    li      a0, 13436
     add     a0,sp,a0
     sw      a0,0(a0)
+    mv      a0, a2
                     #arg load ended
     call    putint
                     #       Call void putch_0(10_0) 
@@ -12868,6 +17395,9 @@ long_func:
     add     s2,a0,s1
                     #      cur_18 = i32 temp_980_833 
                     #      jump label: while.head_832 
+    li      s2, 3428
+    add     s2,sp,s2
+    sw      s2,0(s2)
     j       .while.head_832
                     #      label while.exit_832: 
 .while.exit_832:
@@ -12878,77 +17408,73 @@ long_func:
 .while.head_1242:
                     #      new_var temp_981_1241:i1 
                     #      temp_981_1241 = icmp i32 Slt cur_18, 16_0 
-    li      s3, 16
-    slt     s4,a0,s3
+    li      s1, 16
+    slt     s3,a0,s1
                     #      br i1 temp_981_1241, label while.body_1242, label while.exit_1242 
-    bnez    s4, .while.body_1242
+    bnez    s3, .while.body_1242
     j       .while.exit_1242
                     #      label while.body_1242: 
 .while.body_1242:
                     #      pl_1244 = i32 2_0 
-    li      s5, 2
+    li      s1, 2
                     #      pr_1244 = i32 cur_18 
-    mv      s6, a0
+    mv      s4, a0
                     #      pres_1244 = i32 1_0 
-    li      s7, 1
+    li      s5, 1
                     #      jump label: while.head_1247 
     j       .while.head_1247
                     #      label while.head_1247: 
 .while.head_1247:
                     #      new_var temp_982_1246:i1 
                     #      temp_982_1246 = icmp i32 Sgt pr_1244, 0_0 
-    li      s8, 0
-    slt     s9,s8,s6
+    li      s6, 0
+    slt     s7,s6,s4
                     #      br i1 temp_982_1246, label while.body_1247, label while.exit_1247 
-    bnez    s9, .while.body_1247
+    bnez    s7, .while.body_1247
     j       .while.exit_1247
                     #      label while.body_1247: 
 .while.body_1247:
                     #      ans_18 = i32 0_0 
-    li      s10, 0
                     #      i_18 = i32 0_0 
-    li      s11, 0
+    li      s6, 0
                     #      x_18 = i32 pr_1244 
-    mv      s1, s6
+    mv      s8, s4
                     #      y_18 = i32 1_0 
-    li      s3, 1
+    li      s9, 1
                     #      jump label: while.head_1254 
     j       .while.head_1254
                     #      label while.head_1254: 
 .while.head_1254:
                     #      new_var temp_983_1253:i1 
                     #      temp_983_1253 = icmp i32 Slt i_18, 16_0 
-    li      s8, 16
-    li      a0, 13436
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    slt     a0,s11,s8
+    li      s10, 16
+    slt     s11,s6,s10
                     #      br i1 temp_983_1253, label while.body_1254, label while.exit_1254 
-    bnez    a0, .while.body_1254
+    bnez    s11, .while.body_1254
     j       .while.exit_1254
                     #      label while.body_1254: 
 .while.body_1254:
                     #      new_var temp_984_1256:i32 
                     #      temp_984_1256 = Mod i32 y_18, 2_0 
-    li      s8, 2
-    li      a0, 3410
+    li      s10, 2
+    li      a0, 13436
     add     a0,sp,a0
-    sb      a0,0(a0)
-    rem     a0,s3,s8
+    sw      a0,0(a0)
+    rem     a0,s9,s10
                     #      new_var temp_985_1256:i32 
                     #      temp_985_1256 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(s8) already exist with 2_0
+                    #found literal reg Some(s10) already exist with 2_0
     li      a0, 3404
     add     a0,sp,a0
     sw      a0,0(a0)
-    rem     a0,s1,s8
+    rem     a0,s8,s10
                     #      new_var temp_986_1256:i1 
                     #      temp_986_1256 = icmp i32 Ne temp_985_1256, 0_0 
-    li      s8, 0
-    li      a1, 3436
+    li      s10, 0
+    li      a1, 13423
     add     a1,sp,a1
-    sw      a1,0(a1)
-    xor     a1,a0,s8
+    sb      a1,0(a1)
+    xor     a1,a0,s10
     snez    a1, a1
                     #      new_var temp_987_1256:i1 
                     #      temp_986_1256 = icmp i32 Ne temp_984_1256, 0_0 
@@ -12958,7 +17484,7 @@ long_func:
     li      a0, 0
                     #      new_var temp_988_1256:i1 
                     #      temp_988_1256 = And i1 temp_986_1256, temp_987_1256 
-    li      a2, 3512
+    li      a2, 13452
     add     a2,sp,a2
     sw      a2,0(a2)
     and     a2,a1,a0
@@ -12990,7 +17516,7 @@ long_func:
     li      a2, 3397
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -13009,9 +17535,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_993_1258:i32 
                     #      temp_993_1258 = Add i32 ans_18, temp_992_1258 
-    add     a0,s10,a2
+    li      a1, 3316
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_993_1258 
                     #      jump label: branch_false_1257 
+    li      a2, 3312
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 3397
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 3308
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 3397
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 3399
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 3399
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 3398
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 3398
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_1257
                     #      label branch_false_1257: 
 .branch_false_1257:
@@ -13019,14 +17584,14 @@ long_func:
 .L146_0:
                     #      new_var temp_994_1255:i32 
                     #      temp_994_1255 = Div i32 x_18, 2_0 
-    li      a0, 3308
+    li      a0, 3398
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 3316
+    li      a1, 3399
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s1,a0
+    sb      a1,0(a1)
+    div     a1,s8,a0
                     #      x_18 = i32 temp_994_1255 
                     #      new_var temp_995_1255:i32 
                     #      temp_995_1255 = Div i32 y_18, 2_0 
@@ -13034,7 +17599,7 @@ long_func:
     li      a1, 3304
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_995_1255 
                     #      new_var temp_996_1255:i32 
                     #      temp_996_1255 = Add i32 i_18, 1_0 
@@ -13042,32 +17607,71 @@ long_func:
     li      a1, 3300
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_996_1255 
                     #      jump label: while.head_1254 
+    li      a2, 3397
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 3296
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s10, 3404
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13436
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      s11, 3410
+    add     s11,sp,s11
+    sb      s11,0(s11)
+    li      a3, 13436
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1254
                     #      label while.exit_1254: 
 .while.exit_1254:
                     #      new_var temp_997_31446:i1 
                     #      temp_997_31446 = icmp i32 Ne ans_18, 0_0 
-    li      a0, 0
-    li      a1, 3296
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    xor     a1,s10,a0
-    snez    a1, a1
+    li      s10, 0
+    li      a0, 13436
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    xor     a0,a2,s10
+    snez    a0, a0
                     #      br i1 temp_997_31446, label branch_true_1264, label branch_false_1264 
-    bnez    a1, .branch_true_1264
+    bnez    a0, .branch_true_1264
     j       .branch_false_1264
                     #      label branch_true_1264: 
 .branch_true_1264:
                     #      ml_1266 = i32 pres_1244 
-    mv      a0, s7
+    mv      s10, s5
                     #      mr_1266 = i32 pl_1244 
-    li      a0, 3288
+    li      a0, 3295
     add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, s5
+    sb      a0,0(a0)
+    mv      a0, s1
                     #      mres_1266 = i32 0_0 
     li      a0, 3284
     add     a0,sp,a0
@@ -13082,11 +17686,11 @@ long_func:
     li      a0, 3280
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 3295
+    li      a1, 13423
     add     a1,sp,a1
     sb      a1,0(a1)
     li      a1, 0
-    li      a2, 3312
+    li      a2, 13452
     add     a2,sp,a2
     sw      a2,0(a2)
     xor     a2,a0,a1
@@ -13097,6 +17701,7 @@ long_func:
                     #      label while.body_1269: 
 .while.body_1269:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 mr_1266 
                     #      y_18 = i32 1_0 
@@ -13106,64 +17711,67 @@ long_func:
 .while.head_1276:
                     #      new_var temp_999_1275:i1 
                     #      temp_999_1275 = icmp i32 Slt i_18, 16_0 
-    li      a1, 16
     li      a0, 3284
     add     a0,sp,a0
     sw      a0,0(a0)
-    slt     a0,s11,a1
+    li      a0, 16
+    li      a1, 13452
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    slt     a1,s6,a0
                     #      br i1 temp_999_1275, label while.body_1276, label while.exit_1276 
-    bnez    a0, .while.body_1276
+    bnez    a1, .while.body_1276
     j       .while.exit_1276
                     #      label while.body_1276: 
 .while.body_1276:
                     #      new_var temp_1000_1278:i32 
                     #      temp_1000_1278 = Mod i32 y_18, 2_0 
-    li      a1, 2
-    li      a0, 3278
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    rem     a0,s3,a1
+    li      a0, 2
+    li      a1, 3278
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    rem     a1,s9,a0
                     #      new_var temp_1001_1278:i32 
                     #      temp_1001_1278 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(a1) already exist with 2_0
-    li      a0, 3272
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    rem     a0,s1,a1
-                    #      new_var temp_1002_1278:i1 
-                    #      temp_1002_1278 = icmp i32 Ne temp_1001_1278, 0_0 
-    li      a1, 0
-    li      a2, 3279
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    xor     a2,a0,a1
-    snez    a2, a2
-                    #      new_var temp_1003_1278:i1 
-                    #      temp_1002_1278 = icmp i32 Ne temp_1000_1278, 0_0 
-    li      a0, 3268
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-                    #      new_var temp_1004_1278:i1 
-                    #      temp_1004_1278 = And i1 temp_1002_1278, temp_1003_1278 
+                    #found literal reg Some(a0) already exist with 2_0
     li      a1, 3272
     add     a1,sp,a1
     sw      a1,0(a1)
-    and     a1,a2,a0
+    rem     a1,s8,a0
+                    #      new_var temp_1002_1278:i1 
+                    #      temp_1002_1278 = icmp i32 Ne temp_1001_1278, 0_0 
+    li      a0, 0
+    li      a2, 3279
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    xor     a2,a1,a0
+    snez    a2, a2
+                    #      new_var temp_1003_1278:i1 
+                    #      temp_1002_1278 = icmp i32 Ne temp_1000_1278, 0_0 
+    li      a1, 3268
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 0
+                    #      new_var temp_1004_1278:i1 
+                    #      temp_1004_1278 = And i1 temp_1002_1278, temp_1003_1278 
+    li      a0, 3272
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    and     a0,a2,a1
                     #      br i1 temp_1004_1278, label branch_true_1279, label branch_false_1279 
-    bnez    a1, .branch_true_1279
+    bnez    a0, .branch_true_1279
     j       .branch_false_1279
                     #      label branch_true_1279: 
 .branch_true_1279:
                     #      new_var temp_1005_1280:Array:i32:[Some(16_0)] 
                     #      temp_1005_1280 = load *SHIFT_TABLE_0:ptr->i32 
-    li      a0, 3266
+    li      a0, 3265
     add     a0,sp,a0
     sb      a0,0(a0)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    li      a1, 3265
+    li      a1, 3266
     add     a1,sp,a1
     sb      a1,0(a1)
     lw      a1,0(a0)
@@ -13178,7 +17786,7 @@ long_func:
     li      a2, 3267
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -13197,9 +17805,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1009_1280:i32 
                     #      temp_1009_1280 = Add i32 ans_18, temp_1008_1280 
-    add     a0,s10,a2
+    li      a1, 3188
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1009_1280 
                     #      jump label: branch_false_1279 
+    li      a2, 3184
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 3267
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 3180
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 3267
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 3266
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 3266
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 3265
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 3265
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_1279
                     #      label branch_false_1279: 
 .branch_false_1279:
@@ -13207,14 +17854,14 @@ long_func:
 .L147_0:
                     #      new_var temp_1010_1277:i32 
                     #      temp_1010_1277 = Div i32 x_18, 2_0 
-    li      a0, 3180
+    li      a0, 3265
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 3188
+    li      a1, 3266
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s1,a0
+    sb      a1,0(a1)
+    div     a1,s8,a0
                     #      x_18 = i32 temp_1010_1277 
                     #      new_var temp_1011_1277:i32 
                     #      temp_1011_1277 = Div i32 y_18, 2_0 
@@ -13222,7 +17869,7 @@ long_func:
     li      a1, 3176
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_1011_1277 
                     #      new_var temp_1012_1277:i32 
                     #      temp_1012_1277 = Add i32 i_18, 1_0 
@@ -13230,38 +17877,71 @@ long_func:
     li      a1, 3172
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_1012_1277 
                     #      jump label: while.head_1276 
+    li      a2, 3267
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 3279
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 3168
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 3279
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 3284
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 3284
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1276
                     #      label while.exit_1276: 
 .while.exit_1276:
                     #      new_var temp_1013_31968:i1 
                     #      temp_1013_31968 = icmp i32 Ne ans_18, 0_0 
-    li      a0, 0
-    li      a1, 3168
+    li      a1, 3278
     add     a1,sp,a1
-    sw      a1,0(a1)
-    xor     a1,s10,a0
-    snez    a1, a1
+    sb      a1,0(a1)
+    li      a1, 0
+    li      a2, 3279
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    xor     a2,a0,a1
+    snez    a2, a2
                     #      br i1 temp_1013_31968, label branch_true_1286, label branch_false_1286 
-    bnez    a1, .branch_true_1286
+    bnez    a2, .branch_true_1286
     j       .branch_false_1286
                     #      label branch_true_1286: 
 .branch_true_1286:
                     #      al_1288 = i32 mres_1266 
-    li      a1, 3167
-    add     a1,sp,a1
-    sb      a1,0(a1)
-    mv      a1, a0
-                    #      c_1288 = i32 ml_1266 
-    li      a0, 3280
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 3160
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      a0, a1
+                    #      c_1288 = i32 ml_1266 
+    li      a0, 3160
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    mv      a0, s10
                     #      new_var sum_1288:i32 
                     #      jump label: while.head_1291 
     j       .while.head_1291
@@ -13269,14 +17949,14 @@ long_func:
 .while.head_1291:
                     #      new_var temp_1014_32062:i1 
                     #      temp_1014_32062 = icmp i32 Ne c_1288, 0_0 
-    li      a0, 3288
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 3184
+    li      a1, 3280
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 0
+    li      a2, 3167
     add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
+    sb      a2,0(a2)
+    xor     a2,a0,a1
     snez    a2, a2
                     #      br i1 temp_1014_32062, label while.body_1291, label while.exit_1291 
     bnez    a2, .while.body_1291
@@ -13284,23 +17964,30 @@ long_func:
                     #      label while.body_1291: 
 .while.body_1291:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_1288 
+    li      a0, 3156
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      y_18 = i32 c_1288 
+    li      a0, 3160
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      jump label: while.head_1298 
     j       .while.head_1298
                     #      label while.head_1298: 
 .while.head_1298:
                     #      new_var temp_1015_1297:i1 
                     #      temp_1015_1297 = icmp i32 Slt i_18, 16_0 
-    li      a0, 3160
+    li      a0, 3156
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 3156
+    li      a1, 13452
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s11,a0
+    slt     a1,s6,a0
                     #      br i1 temp_1015_1297, label while.body_1298, label while.exit_1298 
     bnez    a1, .while.body_1298
     j       .while.exit_1298
@@ -13312,7 +17999,7 @@ long_func:
     li      a1, 3150
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s1,a0
+    rem     a1,s8,a0
                     #      new_var temp_1017_32245:i1 
                     #      temp_1017_32245 = icmp i32 Ne temp_1016_1300, 0_0 
     li      a0, 0
@@ -13332,7 +18019,7 @@ long_func:
     li      a1, 3144
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s3,a0
+    rem     a1,s9,a0
                     #      new_var temp_1019_1303:i1 
                     #      temp_1019_1303 = icmp i32 Eq temp_1018_1303, 0_0 
     li      a0, 0
@@ -13366,7 +18053,7 @@ long_func:
     li      a2, 3135
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -13385,9 +18072,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1024_1305:i32 
                     #      temp_1024_1305 = Add i32 ans_18, temp_1023_1305 
-    add     a0,s10,a2
+    li      a1, 3052
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1024_1305 
                     #      jump label: branch_false_1304 
+    li      a2, 3048
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 3135
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 3044
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 3135
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 3136
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 3136
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_1304
                     #      label branch_false_1304: 
 .branch_false_1304:
@@ -13395,20 +18106,17 @@ long_func:
 .branch_false_1301:
                     #      new_var temp_1028_1307:i32 
                     #      temp_1028_1307 = Mod i32 y_18, 2_0 
-    li      a0, 3044
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 3052
+    li      a1, 3144
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s3,a0
+    rem     a1,s9,a0
                     #      new_var temp_1029_32390:i1 
                     #      temp_1029_32390 = icmp i32 Ne temp_1028_1307, 0_0 
     li      a0, 0
-    li      a2, 3048
+    li      a2, 3143
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_1029_32390, label branch_true_1308, label branch_false_1308 
@@ -13436,7 +18144,7 @@ long_func:
     li      a2, 3027
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -13455,9 +18163,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1034_1309:i32 
                     #      temp_1034_1309 = Add i32 ans_18, temp_1033_1309 
-    add     a0,s10,a2
+    li      a1, 2948
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1034_1309 
                     #      jump label: branch_false_1308 
+    li      a2, 2944
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 3027
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 2940
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 3027
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 3028
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 3028
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_1308
                     #      label branch_false_1308: 
 .branch_false_1308:
@@ -13467,14 +18199,11 @@ long_func:
 .L149_0:
                     #      new_var temp_1025_1299:i32 
                     #      temp_1025_1299 = Div i32 x_18, 2_0 
-    li      a0, 2940
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 2948
+    li      a1, 3028
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s1,a0
+    div     a1,s8,a0
                     #      x_18 = i32 temp_1025_1299 
                     #      new_var temp_1026_1299:i32 
                     #      temp_1026_1299 = Div i32 y_18, 2_0 
@@ -13482,7 +18211,7 @@ long_func:
     li      a1, 3040
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_1026_1299 
                     #      new_var temp_1027_1299:i32 
                     #      temp_1027_1299 = Add i32 i_18, 1_0 
@@ -13490,18 +18219,54 @@ long_func:
     li      a1, 3036
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_1027_1299 
                     #      jump label: while.head_1298 
+    li      a2, 3027
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 3151
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 3032
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 3151
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 3156
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 3156
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1298
                     #      label while.exit_1298: 
 .while.exit_1298:
                     #      sum_1288 = i32 ans_18 
-    mv      a0, s10
+    li      a1, 3150
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_1288 
-    li      a0, 3152
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
                     #      y_18 = i32 c_1288 
@@ -13518,10 +18283,10 @@ long_func:
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 3032
+    li      a1, 3152
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s11,a0
+    slt     a1,s6,a0
                     #      br i1 temp_1035_1319, label while.body_1320, label while.exit_1320 
     bnez    a1, .while.body_1320
     j       .while.exit_1320
@@ -13533,20 +18298,20 @@ long_func:
     li      a1, 2939
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s3,a0
+    rem     a1,s9,a0
                     #      new_var temp_1037_1322:i32 
                     #      temp_1037_1322 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 2932
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s1,a0
+    rem     a1,s8,a0
                     #      new_var temp_1038_1322:i1 
                     #      temp_1038_1322 = icmp i32 Ne temp_1037_1322, 0_0 
     li      a0, 0
-    li      a2, 2944
+    li      a2, 3151
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      new_var temp_1039_1322:i1 
@@ -13589,7 +18354,7 @@ long_func:
     li      a2, 2927
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -13608,9 +18373,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1045_1324:i32 
                     #      temp_1045_1324 = Add i32 ans_18, temp_1044_1324 
-    add     a0,s10,a2
+    li      a1, 2844
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1045_1324 
                     #      jump label: branch_false_1323 
+    li      a2, 2840
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2927
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 2836
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 2927
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 2926
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 2926
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 2925
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 2925
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_1323
                     #      label branch_false_1323: 
 .branch_false_1323:
@@ -13618,14 +18422,14 @@ long_func:
 .L150_0:
                     #      new_var temp_1046_1321:i32 
                     #      temp_1046_1321 = Div i32 x_18, 2_0 
-    li      a0, 2836
+    li      a0, 2925
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 2844
+    li      a1, 2926
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s1,a0
+    sb      a1,0(a1)
+    div     a1,s8,a0
                     #      x_18 = i32 temp_1046_1321 
                     #      new_var temp_1047_1321:i32 
                     #      temp_1047_1321 = Div i32 y_18, 2_0 
@@ -13633,7 +18437,7 @@ long_func:
     li      a1, 2832
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_1047_1321 
                     #      new_var temp_1048_1321:i32 
                     #      temp_1048_1321 = Add i32 i_18, 1_0 
@@ -13641,31 +18445,67 @@ long_func:
     li      a1, 2828
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_1048_1321 
                     #      jump label: while.head_1320 
+    li      a2, 2927
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 3151
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 2824
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 3151
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 3152
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 3152
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 3156
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 3156
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1320
                     #      label while.exit_1320: 
 .while.exit_1320:
                     #      c_1288 = i32 ans_18 
-    mv      a0, s10
+    li      a1, 2939
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L151_0 
     j       .L151_0
                     #      label L151_0: 
 .L151_0:
                     #      new_var temp_1049_1330:i1 
                     #      temp_1049_1330 = icmp i32 Sgt 1_0, 15_0 
-    li      a0, 3156
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 1
-    li      a1, 2824
+    li      a1, 3156
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 15
-    li      a2, 2840
+    li      a2, 3151
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     slt     a2,a1,a0
                     #      br i1 temp_1049_1330, label branch_true_1331, label branch_false_1331 
     bnez    a2, .branch_true_1331
@@ -13673,46 +18513,51 @@ long_func:
                     #      label branch_true_1331: 
 .branch_true_1331:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: while.exit_1340 
     j       .while.exit_1340
                     #      label branch_false_1331: 
 .branch_false_1331:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      i_18 = i32 0_0 
                     #      new_var temp_1050_1334:Array:i32:[Some(16_0)] 
                     #      temp_1050_1334 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_1051_1334:ptr->i32 
                     #      new_var temp_1052_1334:i32 
                     #      temp_1051_1334 = getelementptr temp_1050_1334:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    li      a1, 2816
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
+    li      a1, 0
+    li      a0, 2816
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a2, 2823
     add     a2,sp,a2
     sb      a2,0(a2)
     li      a2, 1
-    li      a3, 3596
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_1052_1334 = load temp_1051_1334:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_1053_1334:i32 
                     #      temp_1053_1334 = Mul i32 c_1288, temp_1052_1334 
-    li      a0, 2744
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a2,a1
+    li      a1, 2744
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    mul     a1,a2,a0
                     #      x_18 = i32 temp_1053_1334 
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_1340 
@@ -13721,16 +18566,43 @@ long_func:
 .while.head_1340:
                     #      new_var temp_1054_1339:i1 
                     #      temp_1054_1339 = icmp i32 Slt i_18, 16_0 
-    li      a0, 2736
+    li      a0, 2740
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 2740
+    li      a1, 2736
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s11,a0
+    slt     a1,s6,a0
                     #      br i1 temp_1054_1339, label while.body_1340, label while.exit_1340 
     bnez    a1, .while.body_1340
+    li      a0, 3156
+    add     a0,sp,a0
+    sw      a2,0(a0)
+    li      a0, 2823
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 2735
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 2823
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 2816
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_1340
                     #      label while.body_1340: 
 .while.body_1340:
@@ -13740,14 +18612,14 @@ long_func:
     li      a1, 2735
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s3,a0
+    rem     a1,s9,a0
                     #      new_var temp_1056_1342:i32 
                     #      temp_1056_1342 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 2728
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s1,a0
+    rem     a1,s8,a0
                     #      new_var temp_1057_1342:i1 
                     #      temp_1057_1342 = icmp i32 Ne temp_1056_1342, 0_0 
     li      a0, 0
@@ -13796,7 +18668,7 @@ long_func:
     li      a2, 2723
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -13815,9 +18687,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1064_1344:i32 
                     #      temp_1064_1344 = Add i32 ans_18, temp_1063_1344 
-    add     a0,s10,a2
+    li      a1, 2644
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1064_1344 
                     #      jump label: branch_false_1343 
+    li      a2, 2640
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2723
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 2636
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 2723
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 2722
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 2722
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 2816
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 2721
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 2721
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 2816
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_1343
                     #      label branch_false_1343: 
 .branch_false_1343:
@@ -13825,14 +18736,14 @@ long_func:
 .L152_0:
                     #      new_var temp_1065_1341:i32 
                     #      temp_1065_1341 = Div i32 x_18, 2_0 
-    li      a0, 2636
+    li      a0, 2721
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 2644
+    li      a1, 2722
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s1,a0
+    sb      a1,0(a1)
+    div     a1,s8,a0
                     #      x_18 = i32 temp_1065_1341 
                     #      new_var temp_1066_1341:i32 
                     #      temp_1066_1341 = Div i32 y_18, 2_0 
@@ -13840,7 +18751,7 @@ long_func:
     li      a1, 2632
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_1066_1341 
                     #      new_var temp_1067_1341:i32 
                     #      temp_1067_1341 = Add i32 i_18, 1_0 
@@ -13848,53 +18759,150 @@ long_func:
     li      a1, 2628
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_1067_1341 
                     #      jump label: while.head_1340 
+    li      a2, 2723
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 3156
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 2624
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 3156
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2736
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 2736
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 2816
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 2740
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 2740
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 2816
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1340
                     #      label while.exit_1340: 
 .while.exit_1340:
                     #      label L153_0: 
 .L153_0:
                     #      c_1288 = i32 ans_18 
-    mv      a0, s10
+    mv      a1, a0
                     #      al_1288 = i32 sum_1288 
-    li      a0, 3156
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 2624
+    li      a1, 3156
     add     a1,sp,a1
     sw      a1,0(a1)
     mv      a1, a0
                     #      jump label: while.head_1291 
+    li      a2, 2823
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 3152
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 3167
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 3160
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 3167
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 3280
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 3280
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 3156
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 3156
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1291
                     #      label while.exit_1291: 
 .while.exit_1291:
                     #      ans_18 = i32 al_1288 
-                    #      mres_1266 = i32 ans_18 
-    li      a0, 3152
+    li      a0, 3156
     add     a0,sp,a0
     sw      a0,0(a0)
-    mv      a0, s10
+    mv      a0, a1
+                    #      mres_1266 = i32 ans_18 
+    li      a1, 3160
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    mv      a1, a0
                     #      jump label: branch_false_1286 
+    li      a2, 3151
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 3167
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 3280
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 3167
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_1286
                     #      label branch_false_1286: 
 .branch_false_1286:
                     #      label L154_0: 
 .L154_0:
                     #      al_1353 = i32 ml_1266 
-    li      a0, 3280
+    mv      a1, s10
+                    #      c_1353 = i32 ml_1266 
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 3160
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
-                    #      c_1353 = i32 ml_1266 
-    li      a1, 2620
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    mv      a1, a0
+    mv      a0, s10
                     #      new_var sum_1353:i32 
                     #      jump label: while.head_1356 
     j       .while.head_1356
@@ -13902,14 +18910,14 @@ long_func:
 .while.head_1356:
                     #      new_var temp_1068_33737:i1 
                     #      temp_1068_33737 = icmp i32 Ne c_1353, 0_0 
-    li      a0, 3288
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 0
-    li      a2, 2640
+    li      a1, 2620
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 0
+    li      a2, 3167
     add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a1,a0
+    sb      a2,0(a2)
+    xor     a2,a0,a1
     snez    a2, a2
                     #      br i1 temp_1068_33737, label while.body_1356, label while.exit_1356 
     bnez    a2, .while.body_1356
@@ -13917,23 +18925,30 @@ long_func:
                     #      label while.body_1356: 
 .while.body_1356:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_1353 
+    li      a0, 2616
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      y_18 = i32 c_1353 
+    li      a0, 2620
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      jump label: while.head_1363 
     j       .while.head_1363
                     #      label while.head_1363: 
 .while.head_1363:
                     #      new_var temp_1069_1362:i1 
                     #      temp_1069_1362 = icmp i32 Slt i_18, 16_0 
-    li      a0, 2620
+    li      a0, 2616
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 2616
+    li      a1, 13452
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s11,a0
+    slt     a1,s6,a0
                     #      br i1 temp_1069_1362, label while.body_1363, label while.exit_1363 
     bnez    a1, .while.body_1363
     j       .while.exit_1363
@@ -13945,7 +18960,7 @@ long_func:
     li      a1, 2610
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s1,a0
+    rem     a1,s8,a0
                     #      new_var temp_1071_33920:i1 
                     #      temp_1071_33920 = icmp i32 Ne temp_1070_1365, 0_0 
     li      a0, 0
@@ -13965,7 +18980,7 @@ long_func:
     li      a1, 2604
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s3,a0
+    rem     a1,s9,a0
                     #      new_var temp_1073_1368:i1 
                     #      temp_1073_1368 = icmp i32 Eq temp_1072_1368, 0_0 
     li      a0, 0
@@ -13999,7 +19014,7 @@ long_func:
     li      a2, 2595
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -14018,9 +19033,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1078_1370:i32 
                     #      temp_1078_1370 = Add i32 ans_18, temp_1077_1370 
-    add     a0,s10,a2
+    li      a1, 2516
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1078_1370 
                     #      jump label: branch_false_1369 
+    li      a2, 2512
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2595
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 2508
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 2595
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 2596
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 2596
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_1369
                     #      label branch_false_1369: 
 .branch_false_1369:
@@ -14028,20 +19067,17 @@ long_func:
 .branch_false_1366:
                     #      new_var temp_1082_1372:i32 
                     #      temp_1082_1372 = Mod i32 y_18, 2_0 
-    li      a0, 2508
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 2516
+    li      a1, 2604
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s3,a0
+    rem     a1,s9,a0
                     #      new_var temp_1083_34065:i1 
                     #      temp_1083_34065 = icmp i32 Ne temp_1082_1372, 0_0 
     li      a0, 0
-    li      a2, 2512
+    li      a2, 2603
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_1083_34065, label branch_true_1373, label branch_false_1373 
@@ -14069,7 +19105,7 @@ long_func:
     li      a2, 2491
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -14088,9 +19124,33 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1088_1374:i32 
                     #      temp_1088_1374 = Add i32 ans_18, temp_1087_1374 
-    add     a0,s10,a2
+    li      a1, 2412
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1088_1374 
                     #      jump label: branch_false_1373 
+    li      a2, 2408
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2491
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 2404
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 2491
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 2492
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 2492
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_1373
                     #      label branch_false_1373: 
 .branch_false_1373:
@@ -14100,14 +19160,11 @@ long_func:
 .L156_0:
                     #      new_var temp_1079_1364:i32 
                     #      temp_1079_1364 = Div i32 x_18, 2_0 
-    li      a0, 2404
-    add     a0,sp,a0
-    sw      a0,0(a0)
     li      a0, 2
-    li      a1, 2412
+    li      a1, 2492
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s1,a0
+    div     a1,s8,a0
                     #      x_18 = i32 temp_1079_1364 
                     #      new_var temp_1080_1364:i32 
                     #      temp_1080_1364 = Div i32 y_18, 2_0 
@@ -14115,7 +19172,7 @@ long_func:
     li      a1, 2504
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_1080_1364 
                     #      new_var temp_1081_1364:i32 
                     #      temp_1081_1364 = Add i32 i_18, 1_0 
@@ -14123,18 +19180,54 @@ long_func:
     li      a1, 2500
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_1081_1364 
                     #      jump label: while.head_1363 
+    li      a2, 2491
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 2611
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 2496
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 2611
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 2616
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 2616
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1363
                     #      label while.exit_1363: 
 .while.exit_1363:
                     #      sum_1353 = i32 ans_18 
-    mv      a0, s10
+    li      a1, 2610
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_1353 
-    li      a0, 2612
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
                     #      y_18 = i32 c_1353 
@@ -14151,10 +19244,10 @@ long_func:
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 2496
+    li      a1, 2612
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s11,a0
+    slt     a1,s6,a0
                     #      br i1 temp_1089_1384, label while.body_1385, label while.exit_1385 
     bnez    a1, .while.body_1385
     j       .while.exit_1385
@@ -14166,20 +19259,20 @@ long_func:
     li      a1, 2403
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s3,a0
+    rem     a1,s9,a0
                     #      new_var temp_1091_1387:i32 
                     #      temp_1091_1387 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 2396
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s1,a0
+    rem     a1,s8,a0
                     #      new_var temp_1092_1387:i1 
                     #      temp_1092_1387 = icmp i32 Ne temp_1091_1387, 0_0 
     li      a0, 0
-    li      a2, 2408
+    li      a2, 2611
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     xor     a2,a1,a0
     snez    a2, a2
                     #      new_var temp_1093_1387:i1 
@@ -14222,7 +19315,7 @@ long_func:
     li      a2, 2391
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -14241,9 +19334,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1099_1389:i32 
                     #      temp_1099_1389 = Add i32 ans_18, temp_1098_1389 
-    add     a0,s10,a2
+    li      a1, 2308
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1099_1389 
                     #      jump label: branch_false_1388 
+    li      a2, 2304
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2391
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 2300
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 2391
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 2390
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 2390
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 2389
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 2389
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_1388
                     #      label branch_false_1388: 
 .branch_false_1388:
@@ -14251,14 +19383,14 @@ long_func:
 .L157_0:
                     #      new_var temp_1100_1386:i32 
                     #      temp_1100_1386 = Div i32 x_18, 2_0 
-    li      a0, 2300
+    li      a0, 2389
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 2308
+    li      a1, 2390
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s1,a0
+    sb      a1,0(a1)
+    div     a1,s8,a0
                     #      x_18 = i32 temp_1100_1386 
                     #      new_var temp_1101_1386:i32 
                     #      temp_1101_1386 = Div i32 y_18, 2_0 
@@ -14266,7 +19398,7 @@ long_func:
     li      a1, 2296
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_1101_1386 
                     #      new_var temp_1102_1386:i32 
                     #      temp_1102_1386 = Add i32 i_18, 1_0 
@@ -14274,31 +19406,67 @@ long_func:
     li      a1, 2292
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_1102_1386 
                     #      jump label: while.head_1385 
+    li      a2, 2391
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 2611
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 2288
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 2611
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 2612
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 2612
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 2616
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 2616
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1385
                     #      label while.exit_1385: 
 .while.exit_1385:
                     #      c_1353 = i32 ans_18 
-    mv      a0, s10
+    li      a1, 2403
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      jump label: L158_0 
     j       .L158_0
                     #      label L158_0: 
 .L158_0:
                     #      new_var temp_1103_1395:i1 
                     #      temp_1103_1395 = icmp i32 Sgt 1_0, 15_0 
-    li      a0, 2616
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 1
-    li      a1, 2288
+    li      a1, 2616
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 15
-    li      a2, 2304
+    li      a2, 2611
     add     a2,sp,a2
-    sw      a2,0(a2)
+    sb      a2,0(a2)
     slt     a2,a1,a0
                     #      br i1 temp_1103_1395, label branch_true_1396, label branch_false_1396 
     bnez    a2, .branch_true_1396
@@ -14306,46 +19474,51 @@ long_func:
                     #      label branch_true_1396: 
 .branch_true_1396:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: while.exit_1405 
     j       .while.exit_1405
                     #      label branch_false_1396: 
 .branch_false_1396:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      i_18 = i32 0_0 
                     #      new_var temp_1104_1399:Array:i32:[Some(16_0)] 
                     #      temp_1104_1399 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_1105_1399:ptr->i32 
                     #      new_var temp_1106_1399:i32 
                     #      temp_1105_1399 = getelementptr temp_1104_1399:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    li      a1, 2280
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
+    li      a1, 0
+    li      a0, 2280
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 1
     li      a2, 2287
     add     a2,sp,a2
     sb      a2,0(a2)
     li      a2, 1
-    li      a3, 2816
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_1106_1399 = load temp_1105_1399:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_1107_1399:i32 
                     #      temp_1107_1399 = Mul i32 c_1353, temp_1106_1399 
-    li      a0, 2208
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    mul     a0,a2,a1
+    li      a1, 2208
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    mul     a1,a2,a0
                     #      x_18 = i32 temp_1107_1399 
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_1405 
@@ -14354,16 +19527,43 @@ long_func:
 .while.head_1405:
                     #      new_var temp_1108_1404:i1 
                     #      temp_1108_1404 = icmp i32 Slt i_18, 16_0 
-    li      a0, 2200
+    li      a0, 2204
     add     a0,sp,a0
     sw      a0,0(a0)
     li      a0, 16
-    li      a1, 2204
+    li      a1, 2200
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s11,a0
+    slt     a1,s6,a0
                     #      br i1 temp_1108_1404, label while.body_1405, label while.exit_1405 
     bnez    a1, .while.body_1405
+    li      a0, 2616
+    add     a0,sp,a0
+    sw      a2,0(a0)
+    li      a0, 2287
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 2199
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a0, 2287
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 2280
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_1405
                     #      label while.body_1405: 
 .while.body_1405:
@@ -14373,14 +19573,14 @@ long_func:
     li      a1, 2199
     add     a1,sp,a1
     sb      a1,0(a1)
-    rem     a1,s3,a0
+    rem     a1,s9,a0
                     #      new_var temp_1110_1407:i32 
                     #      temp_1110_1407 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     li      a1, 2192
     add     a1,sp,a1
     sw      a1,0(a1)
-    rem     a1,s1,a0
+    rem     a1,s8,a0
                     #      new_var temp_1111_1407:i1 
                     #      temp_1111_1407 = icmp i32 Ne temp_1110_1407, 0_0 
     li      a0, 0
@@ -14429,7 +19629,7 @@ long_func:
     li      a2, 2187
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -14448,9 +19648,48 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1118_1409:i32 
                     #      temp_1118_1409 = Add i32 ans_18, temp_1117_1409 
-    add     a0,s10,a2
+    li      a1, 2108
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1118_1409 
                     #      jump label: branch_false_1408 
+    li      a2, 2104
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2187
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a1, 2100
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 2187
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a0, 2186
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 2186
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 2280
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 2185
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 2185
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 2280
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_1408
                     #      label branch_false_1408: 
 .branch_false_1408:
@@ -14458,14 +19697,14 @@ long_func:
 .L159_0:
                     #      new_var temp_1119_1406:i32 
                     #      temp_1119_1406 = Div i32 x_18, 2_0 
-    li      a0, 2100
+    li      a0, 2185
     add     a0,sp,a0
-    sw      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 2
-    li      a1, 2108
+    li      a1, 2186
     add     a1,sp,a1
-    sw      a1,0(a1)
-    div     a1,s1,a0
+    sb      a1,0(a1)
+    div     a1,s8,a0
                     #      x_18 = i32 temp_1119_1406 
                     #      new_var temp_1120_1406:i32 
                     #      temp_1120_1406 = Div i32 y_18, 2_0 
@@ -14473,7 +19712,7 @@ long_func:
     li      a1, 2096
     add     a1,sp,a1
     sw      a1,0(a1)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_1120_1406 
                     #      new_var temp_1121_1406:i32 
                     #      temp_1121_1406 = Add i32 i_18, 1_0 
@@ -14481,36 +19720,87 @@ long_func:
     li      a1, 2092
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_1121_1406 
                     #      jump label: while.head_1405 
+    li      a2, 2187
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 2616
+    add     a0,sp,a0
+    lw      a2,0(a0)
+    li      a1, 2088
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 2616
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 2200
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 2200
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a3, 2280
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 2204
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 2204
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 2280
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1405
                     #      label while.exit_1405: 
 .while.exit_1405:
                     #      label L160_0: 
 .L160_0:
                     #      c_1353 = i32 ans_18 
-    mv      a0, s10
+    mv      a1, a0
                     #      al_1353 = i32 sum_1353 
-    li      a0, 2616
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a1, 2088
+    li      a1, 2616
     add     a1,sp,a1
     sw      a1,0(a1)
     mv      a1, a0
                     #      jump label: while.head_1356 
+    li      a2, 2287
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a0, 2612
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 3167
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a0, 3167
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a1, 2620
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 2616
+    add     a1,sp,a1
+    lw      a0,0(a1)
     j       .while.head_1356
                     #      label while.exit_1356: 
 .while.exit_1356:
                     #      ans_18 = i32 al_1353 
-                    #      ml_1266 = i32 ans_18 
-    li      a0, 2612
+    li      a0, 2616
     add     a0,sp,a0
     sw      a0,0(a0)
-    mv      a0, s10
+    mv      a0, a1
+                    #      ml_1266 = i32 ans_18 
                     #      x_18 = i32 mr_1266 
-    li      a0, 3288
+    li      a0, 13452
     add     a0,sp,a0
     sw      a0,0(a0)
                     #      y_18 = i32 1_0 
@@ -14527,7 +19817,7 @@ long_func:
     li      a1, 2620
     add     a1,sp,a1
     sw      a1,0(a1)
-    slt     a1,s3,a0
+    slt     a1,s9,a0
     xori    a1,a1,1
                     #      br i1 temp_1122_1420, label branch_true_1421, label branch_false_1421 
     bnez    a1, .branch_true_1421
@@ -14540,18 +19830,20 @@ long_func:
     li      a1, 2087
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,s1,a0
+    slt     a1,s8,a0
                     #      br i1 temp_1123_1423, label branch_true_1424, label branch_false_1424 
     bnez    a1, .branch_true_1424
     j       .branch_false_1424
                     #      label branch_true_1424: 
 .branch_true_1424:
                     #      ans_18 = i32 0xffff_0 
+    li      a0, 0xffff
                     #      jump label: L162_0 
     j       .L162_0
                     #      label branch_false_1424: 
 .branch_false_1424:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: L162_0 
     j       .L162_0
                     #      label L162_0: 
@@ -14560,11 +19852,11 @@ long_func:
 .branch_false_1421:
                     #      new_var temp_1124_1429:i1 
                     #      temp_1124_1429 = icmp i32 Sgt y_18, 0_0 
-                    #found literal reg Some(a0) already exist with 0_0
-    li      a1, 2086
+    li      a0, 0
+    li      a1, 2087
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s3
+    slt     a1,a0,s9
                     #      br i1 temp_1124_1429, label branch_true_1430, label branch_false_1430 
     bnez    a1, .branch_true_1430
     j       .branch_false_1430
@@ -14576,7 +19868,7 @@ long_func:
     li      a1, 2085
     add     a1,sp,a1
     sb      a1,0(a1)
-    slt     a1,a0,s1
+    slt     a1,a0,s8
                     #      br i1 temp_1125_1432, label branch_true_1433, label branch_false_1433 
     bnez    a1, .branch_true_1433
     j       .branch_false_1433
@@ -14599,10 +19891,10 @@ long_func:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 2104
+    li      a2, 2611
     add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s3
+    sb      a2,0(a2)
+    mul     a2,a1,s9
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -14614,7 +19906,7 @@ long_func:
     li      a0, 2008
     add     a0,sp,a0
     sd      a0,0(a0)
-    div     a0,s1,a1
+    div     a0,s8,a1
                     #      x_18 = i32 temp_1129_1434 
                     #      new_var temp_1130_1434:i32 
                     #      temp_1130_1434 = Add i32 y_18, 1_0 
@@ -14623,7 +19915,7 @@ long_func:
     li      a1, 2004
     add     a1,sp,a1
     sw      a1,0(a1)
-    add     a1,s3,a0
+    add     a1,s9,a0
                     #      new_var temp_1131_1434:i32 
                     #      temp_1131_1434 = Sub i32 15_0, temp_1130_1434 
     li      a0, 15
@@ -14644,7 +19936,7 @@ long_func:
     li      a0, 0
     sw      a1,1988(sp)
     li      a1, 1
-    li      a3, 2280
+    li      a3, 10096
     add     a3,sp,a3
     sw      a3,0(a3)
     mul     a3,a1,a2
@@ -14662,19 +19954,22 @@ long_func:
     sub     a2,a0,a1
                     #      new_var temp_1136_1434:i32 
                     #      temp_1136_1434 = Add i32 x_18, temp_1135_1434 
-    add     a0,s1,a2
+    add     a0,s8,a2
                     #      ans_18 = i32 temp_1136_1434 
+    sw      a1,1916(sp)
+    mv      a1, a0
                     #      jump label: L163_0 
     j       .L163_0
                     #      label branch_false_1433: 
 .branch_false_1433:
                     #      new_var temp_1137_1437:Array:i32:[Some(16_0)] 
                     #      temp_1137_1437 = load *SHIFT_TABLE_0:ptr->i32 
-    sw      a0,1908(sp)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    sw      a1,1916(sp)
+    li      a1, 2084
+    add     a1,sp,a1
+    sb      a1,0(a1)
     lw      a1,0(a0)
                     #      new_var temp_1138_1437:ptr->i32 
                     #      new_var temp_1139_1437:i32 
@@ -14682,8 +19977,10 @@ long_func:
     li      a0, 0
     sw      a1,1904(sp)
     li      a1, 1
-    sw      a2,1912(sp)
-    mul     a2,a1,s3
+    li      a2, 2611
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    mul     a2,a1,s9
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -14693,15 +19990,26 @@ long_func:
                     #      new_var temp_1140_1437:i32 
                     #      temp_1140_1437 = Div i32 x_18, temp_1139_1437 
     sd      a0,1832(sp)
-    div     a0,s1,a1
+    div     a0,s8,a1
                     #      ans_18 = i32 temp_1140_1437 
+    sw      a1,1828(sp)
+    mv      a1, a0
                     #      jump label: L163_0 
+    sw      a2,1904(sp)
+    lw      a2,1912(sp)
+    sw      a0,1824(sp)
+    lw      a0,1908(sp)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    lw      a3,1988(sp)
     j       .L163_0
                     #      label L163_0: 
 .L163_0:
                     #      label branch_false_1430: 
 .branch_false_1430:
                     #      ans_18 = i32 x_18 
+    mv      a0, s8
                     #      jump label: L164_0 
     j       .L164_0
                     #      label L164_0: 
@@ -14711,9 +20019,42 @@ long_func:
                     #      label L166_0: 
 .L166_0:
                     #      mr_1266 = i32 ans_18 
-    sw      a0,1824(sp)
-    mv      a0, s10
+    li      a1, 2085
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    mv      a1, a0
                     #      jump label: while.head_1269 
+    li      a2, 2611
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    mv      a2, a0
+    li      a1, 3284
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 3280
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 3280
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1269
                     #      label while.exit_1269: 
 .while.exit_1269:
@@ -14721,21 +20062,55 @@ long_func:
     li      a0, 3284
     add     a0,sp,a0
     sw      a0,0(a0)
+    mv      a0, a1
                     #      pres_1244 = i32 ans_18 
                     #      jump label: branch_false_1264 
+    li      a2, 3279
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    mv      a2, a0
+    li      a1, 3280
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s10, 3288
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 3295
+    add     a3,sp,a3
+    lb      a0,0(a3)
+    li      a3, 3295
+    add     a3,sp,a3
+    sb      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .branch_false_1264
                     #      label branch_false_1264: 
 .branch_false_1264:
                     #      label L167_0: 
 .L167_0:
                     #      ml_1444 = i32 pl_1244 
-    li      a0, 3280
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    mv      a0, s5
+    mv      s10, s1
                     #      mr_1444 = i32 pl_1244 
-    sw      a0,1820(sp)
-    mv      a0, s5
+    li      a0, 3295
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    mv      a0, s1
                     #      mres_1444 = i32 0_0 
     sw      a0,1816(sp)
     li      a0, 0
@@ -14746,9 +20121,13 @@ long_func:
                     #      new_var temp_1141_36029:i1 
                     #      temp_1141_36029 = icmp i32 Ne mr_1444, 0_0 
     sw      a0,1812(sp)
-    sw      a1,1828(sp)
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
     li      a1, 0
-    sw      a2,1904(sp)
+    li      a2, 13452
+    add     a2,sp,a2
+    sw      a2,0(a2)
     xor     a2,a0,a1
     snez    a2, a2
                     #      br i1 temp_1141_36029, label while.body_1447, label while.exit_1447 
@@ -14757,6 +20136,7 @@ long_func:
                     #      label while.body_1447: 
 .while.body_1447:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 mr_1444 
                     #      y_18 = i32 1_0 
@@ -14766,50 +20146,53 @@ long_func:
 .while.head_1454:
                     #      new_var temp_1142_1453:i1 
                     #      temp_1142_1453 = icmp i32 Slt i_18, 16_0 
-    li      a1, 16
     sw      a0,1816(sp)
-    slt     a0,s11,a1
+    li      a0, 16
+    li      a1, 13452
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    slt     a1,s6,a0
                     #      br i1 temp_1142_1453, label while.body_1454, label while.exit_1454 
-    bnez    a0, .while.body_1454
+    bnez    a1, .while.body_1454
     j       .while.exit_1454
                     #      label while.body_1454: 
 .while.body_1454:
                     #      new_var temp_1143_1456:i32 
                     #      temp_1143_1456 = Mod i32 y_18, 2_0 
-    li      a1, 2
-    sb      a0,1810(sp)
-    rem     a0,s3,a1
+    li      a0, 2
+    sb      a1,1810(sp)
+    rem     a1,s9,a0
                     #      new_var temp_1144_1456:i32 
                     #      temp_1144_1456 = Mod i32 x_18, 2_0 
-                    #found literal reg Some(a1) already exist with 2_0
-    sw      a0,1804(sp)
-    rem     a0,s1,a1
+                    #found literal reg Some(a0) already exist with 2_0
+    sw      a1,1804(sp)
+    rem     a1,s8,a0
                     #      new_var temp_1145_1456:i1 
                     #      temp_1145_1456 = icmp i32 Ne temp_1144_1456, 0_0 
-    li      a1, 0
+    li      a0, 0
     sb      a2,1811(sp)
-    xor     a2,a0,a1
+    xor     a2,a1,a0
     snez    a2, a2
                     #      new_var temp_1146_1456:i1 
                     #      temp_1145_1456 = icmp i32 Ne temp_1143_1456, 0_0 
-    sw      a0,1800(sp)
-    li      a0, 0
+    sw      a1,1800(sp)
+    li      a1, 0
                     #      new_var temp_1147_1456:i1 
                     #      temp_1147_1456 = And i1 temp_1145_1456, temp_1146_1456 
-    sw      a1,1804(sp)
-    and     a1,a2,a0
+    sw      a0,1804(sp)
+    and     a0,a2,a1
                     #      br i1 temp_1147_1456, label branch_true_1457, label branch_false_1457 
-    bnez    a1, .branch_true_1457
+    bnez    a0, .branch_true_1457
     j       .branch_false_1457
                     #      label branch_true_1457: 
 .branch_true_1457:
                     #      new_var temp_1148_1458:Array:i32:[Some(16_0)] 
                     #      temp_1148_1458 = load *SHIFT_TABLE_0:ptr->i32 
-    sb      a0,1798(sp)
+    sb      a0,1797(sp)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    sb      a1,1797(sp)
+    sb      a1,1798(sp)
     lw      a1,0(a0)
                     #      new_var temp_1149_1458:ptr->i32 
                     #      new_var temp_1150_1458:i32 
@@ -14818,7 +20201,7 @@ long_func:
     sw      a1,1792(sp)
     li      a1, 1
     sb      a2,1799(sp)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -14833,9 +20216,18 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1152_1458:i32 
                     #      temp_1152_1458 = Add i32 ans_18, temp_1151_1458 
-    add     a0,s10,a2
+    sw      a1,1716(sp)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1152_1458 
                     #      jump label: branch_false_1457 
+    sw      a2,1712(sp)
+    lb      a2,1799(sp)
+    sw      a1,1708(sp)
+    lb      a1,1798(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lb      a0,1797(sp)
     j       .branch_false_1457
                     #      label branch_false_1457: 
 .branch_false_1457:
@@ -14843,45 +20235,57 @@ long_func:
 .L168_0:
                     #      new_var temp_1153_1455:i32 
                     #      temp_1153_1455 = Div i32 x_18, 2_0 
-    sw      a0,1708(sp)
+    sb      a0,1797(sp)
     li      a0, 2
-    sw      a1,1716(sp)
-    div     a1,s1,a0
+    sb      a1,1798(sp)
+    div     a1,s8,a0
                     #      x_18 = i32 temp_1153_1455 
                     #      new_var temp_1154_1455:i32 
                     #      temp_1154_1455 = Div i32 y_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     sw      a1,1704(sp)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_1154_1455 
                     #      new_var temp_1155_1455:i32 
                     #      temp_1155_1455 = Add i32 i_18, 1_0 
     li      a0, 1
     sw      a1,1700(sp)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_1155_1455 
                     #      jump label: while.head_1454 
+    sb      a2,1799(sp)
+    lb      a2,1811(sp)
+    sw      a1,1696(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,1816(sp)
     j       .while.head_1454
                     #      label while.exit_1454: 
 .while.exit_1454:
                     #      new_var temp_1156_36438:i1 
                     #      temp_1156_36438 = icmp i32 Ne ans_18, 0_0 
-    li      a0, 0
-    sw      a1,1696(sp)
-    xor     a1,s10,a0
-    snez    a1, a1
+    sb      a1,1810(sp)
+    li      a1, 0
+    sb      a2,1811(sp)
+    xor     a2,a0,a1
+    snez    a2, a2
                     #      br i1 temp_1156_36438, label branch_true_1464, label branch_false_1464 
-    bnez    a1, .branch_true_1464
+    bnez    a2, .branch_true_1464
     j       .branch_false_1464
                     #      label branch_true_1464: 
 .branch_true_1464:
                     #      al_1466 = i32 mres_1444 
-    sb      a1,1695(sp)
-    mv      a1, a0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    mv      a0, a1
                     #      c_1466 = i32 ml_1444 
-    sw      a0,1812(sp)
-    sw      a1,1688(sp)
-    mv      a1, a0
+    sw      a0,1688(sp)
+    mv      a0, s10
                     #      new_var sum_1466:i32 
                     #      jump label: while.head_1469 
     j       .while.head_1469
@@ -14889,10 +20293,10 @@ long_func:
 .while.head_1469:
                     #      new_var temp_1157_36532:i1 
                     #      temp_1157_36532 = icmp i32 Ne c_1466, 0_0 
-    sw      a0,1820(sp)
-    li      a0, 0
-    sw      a2,1712(sp)
-    xor     a2,a1,a0
+    sw      a1,1812(sp)
+    li      a1, 0
+    sb      a2,1695(sp)
+    xor     a2,a0,a1
     snez    a2, a2
                     #      br i1 temp_1157_36532, label while.body_1469, label while.exit_1469 
     bnez    a2, .while.body_1469
@@ -14900,19 +20304,24 @@ long_func:
                     #      label while.body_1469: 
 .while.body_1469:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_1466 
+    sw      a0,1684(sp)
                     #      y_18 = i32 c_1466 
+    sw      a0,1688(sp)
                     #      jump label: while.head_1476 
     j       .while.head_1476
                     #      label while.head_1476: 
 .while.head_1476:
                     #      new_var temp_1158_1475:i1 
                     #      temp_1158_1475 = icmp i32 Slt i_18, 16_0 
-    sw      a0,1688(sp)
+    sw      a0,1684(sp)
     li      a0, 16
-    sw      a1,1684(sp)
-    slt     a1,s11,a0
+    li      a1, 13452
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    slt     a1,s6,a0
                     #      br i1 temp_1158_1475, label while.body_1476, label while.exit_1476 
     bnez    a1, .while.body_1476
     j       .while.exit_1476
@@ -14922,7 +20331,7 @@ long_func:
                     #      temp_1159_1478 = Mod i32 x_18, 2_0 
     li      a0, 2
     sb      a1,1678(sp)
-    rem     a1,s1,a0
+    rem     a1,s8,a0
                     #      new_var temp_1160_36715:i1 
                     #      temp_1160_36715 = icmp i32 Ne temp_1159_1478, 0_0 
     li      a0, 0
@@ -14938,7 +20347,7 @@ long_func:
                     #      temp_1161_1481 = Mod i32 y_18, 2_0 
     li      a0, 2
     sw      a1,1672(sp)
-    rem     a1,s3,a0
+    rem     a1,s9,a0
                     #      new_var temp_1162_1481:i1 
                     #      temp_1162_1481 = icmp i32 Eq temp_1161_1481, 0_0 
     li      a0, 0
@@ -14964,7 +20373,7 @@ long_func:
     sw      a1,1656(sp)
     li      a1, 1
     sb      a2,1663(sp)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -14979,9 +20388,17 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1167_1483:i32 
                     #      temp_1167_1483 = Add i32 ans_18, temp_1166_1483 
-    add     a0,s10,a2
+    sw      a1,1580(sp)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1167_1483 
                     #      jump label: branch_false_1482 
+    sw      a2,1576(sp)
+    lb      a2,1663(sp)
+    sw      a1,1572(sp)
+    lw      a1,1664(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_1482
                     #      label branch_false_1482: 
 .branch_false_1482:
@@ -14989,14 +20406,13 @@ long_func:
 .branch_false_1479:
                     #      new_var temp_1171_1485:i32 
                     #      temp_1171_1485 = Mod i32 y_18, 2_0 
-    sw      a0,1572(sp)
     li      a0, 2
-    sw      a1,1580(sp)
-    rem     a1,s3,a0
+    sw      a1,1672(sp)
+    rem     a1,s9,a0
                     #      new_var temp_1172_36860:i1 
                     #      temp_1172_36860 = icmp i32 Ne temp_1171_1485, 0_0 
     li      a0, 0
-    sw      a2,1576(sp)
+    sb      a2,1671(sp)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_1172_36860, label branch_true_1486, label branch_false_1486 
@@ -15018,7 +20434,7 @@ long_func:
     sw      a1,1548(sp)
     li      a1, 1
     sb      a2,1555(sp)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -15033,9 +20449,17 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1177_1487:i32 
                     #      temp_1177_1487 = Add i32 ans_18, temp_1176_1487 
-    add     a0,s10,a2
+    sw      a1,1476(sp)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1177_1487 
                     #      jump label: branch_false_1486 
+    sw      a2,1472(sp)
+    lb      a2,1555(sp)
+    sw      a1,1468(sp)
+    lw      a1,1556(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_1486
                     #      label branch_false_1486: 
 .branch_false_1486:
@@ -15045,33 +20469,45 @@ long_func:
 .L170_0:
                     #      new_var temp_1168_1477:i32 
                     #      temp_1168_1477 = Div i32 x_18, 2_0 
-    sw      a0,1468(sp)
     li      a0, 2
-    sw      a1,1476(sp)
-    div     a1,s1,a0
+    sw      a1,1556(sp)
+    div     a1,s8,a0
                     #      x_18 = i32 temp_1168_1477 
                     #      new_var temp_1169_1477:i32 
                     #      temp_1169_1477 = Div i32 y_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     sw      a1,1568(sp)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_1169_1477 
                     #      new_var temp_1170_1477:i32 
                     #      temp_1170_1477 = Add i32 i_18, 1_0 
     li      a0, 1
     sw      a1,1564(sp)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_1170_1477 
                     #      jump label: while.head_1476 
+    sb      a2,1555(sp)
+    lb      a2,1679(sp)
+    sw      a1,1560(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,1684(sp)
     j       .while.head_1476
                     #      label while.exit_1476: 
 .while.exit_1476:
                     #      sum_1466 = i32 ans_18 
-    mv      a0, s10
+    sb      a1,1678(sp)
+    mv      a1, a0
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_1466 
-    sw      a0,1680(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      y_18 = i32 c_1466 
     sw      a0,1688(sp)
                     #      jump label: while.head_1498 
@@ -15082,8 +20518,8 @@ long_func:
                     #      temp_1178_1497 = icmp i32 Slt i_18, 16_0 
     sw      a0,1684(sp)
     li      a0, 16
-    sw      a1,1560(sp)
-    slt     a1,s11,a0
+    sw      a1,1680(sp)
+    slt     a1,s6,a0
                     #      br i1 temp_1178_1497, label while.body_1498, label while.exit_1498 
     bnez    a1, .while.body_1498
     j       .while.exit_1498
@@ -15093,16 +20529,16 @@ long_func:
                     #      temp_1179_1500 = Mod i32 y_18, 2_0 
     li      a0, 2
     sb      a1,1467(sp)
-    rem     a1,s3,a0
+    rem     a1,s9,a0
                     #      new_var temp_1180_1500:i32 
                     #      temp_1180_1500 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     sw      a1,1460(sp)
-    rem     a1,s1,a0
+    rem     a1,s8,a0
                     #      new_var temp_1181_1500:i1 
                     #      temp_1181_1500 = icmp i32 Ne temp_1180_1500, 0_0 
     li      a0, 0
-    sw      a2,1472(sp)
+    sb      a2,1679(sp)
     xor     a2,a1,a0
     snez    a2, a2
                     #      new_var temp_1182_1500:i1 
@@ -15133,7 +20569,7 @@ long_func:
     sw      a1,1448(sp)
     li      a1, 1
     sb      a2,1455(sp)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -15148,9 +20584,18 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1188_1502:i32 
                     #      temp_1188_1502 = Add i32 ans_18, temp_1187_1502 
-    add     a0,s10,a2
+    sw      a1,1372(sp)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1188_1502 
                     #      jump label: branch_false_1501 
+    sw      a2,1368(sp)
+    lb      a2,1455(sp)
+    sw      a1,1364(sp)
+    lb      a1,1454(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lb      a0,1453(sp)
     j       .branch_false_1501
                     #      label branch_false_1501: 
 .branch_false_1501:
@@ -15158,40 +20603,48 @@ long_func:
 .L171_0:
                     #      new_var temp_1189_1499:i32 
                     #      temp_1189_1499 = Div i32 x_18, 2_0 
-    sw      a0,1364(sp)
+    sb      a0,1453(sp)
     li      a0, 2
-    sw      a1,1372(sp)
-    div     a1,s1,a0
+    sb      a1,1454(sp)
+    div     a1,s8,a0
                     #      x_18 = i32 temp_1189_1499 
                     #      new_var temp_1190_1499:i32 
                     #      temp_1190_1499 = Div i32 y_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     sw      a1,1360(sp)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_1190_1499 
                     #      new_var temp_1191_1499:i32 
                     #      temp_1191_1499 = Add i32 i_18, 1_0 
     li      a0, 1
     sw      a1,1356(sp)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_1191_1499 
                     #      jump label: while.head_1498 
+    sb      a2,1455(sp)
+    lb      a2,1679(sp)
+    sw      a1,1352(sp)
+    lw      a1,1680(sp)
+    lw      a0,1684(sp)
     j       .while.head_1498
                     #      label while.exit_1498: 
 .while.exit_1498:
                     #      c_1466 = i32 ans_18 
-    mv      a0, s10
+    sb      a1,1467(sp)
+    mv      a1, a0
                     #      jump label: L172_0 
     j       .L172_0
                     #      label L172_0: 
 .L172_0:
                     #      new_var temp_1192_1508:i1 
                     #      temp_1192_1508 = icmp i32 Sgt 1_0, 15_0 
-    sw      a0,1684(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a0, 1
-    sw      a1,1352(sp)
+    sw      a1,1684(sp)
     li      a1, 15
-    sw      a2,1368(sp)
+    sb      a2,1679(sp)
     slt     a2,a1,a0
                     #      br i1 temp_1192_1508, label branch_true_1509, label branch_false_1509 
     bnez    a2, .branch_true_1509
@@ -15199,38 +20652,45 @@ long_func:
                     #      label branch_true_1509: 
 .branch_true_1509:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: while.exit_1518 
     j       .while.exit_1518
                     #      label branch_false_1509: 
 .branch_false_1509:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      i_18 = i32 0_0 
                     #      new_var temp_1193_1512:Array:i32:[Some(16_0)] 
                     #      temp_1193_1512 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_1194_1512:ptr->i32 
                     #      new_var temp_1195_1512:i32 
                     #      temp_1194_1512 = getelementptr temp_1193_1512:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    sw      a1,1344(sp)
-    li      a1, 1
+    li      a1, 0
+    sw      a0,1344(sp)
+    li      a0, 1
     sb      a2,1351(sp)
     li      a2, 1
-    sw      a3,1988(sp)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_1195_1512 = load temp_1194_1512:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_1196_1512:i32 
                     #      temp_1196_1512 = Mul i32 c_1466, temp_1195_1512 
-    sd      a0,1272(sp)
-    mul     a0,a2,a1
+    sd      a1,1272(sp)
+    mul     a1,a2,a0
                     #      x_18 = i32 temp_1196_1512 
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_1518 
@@ -15239,12 +20699,28 @@ long_func:
 .while.head_1518:
                     #      new_var temp_1197_1517:i1 
                     #      temp_1197_1517 = icmp i32 Slt i_18, 16_0 
-    sw      a0,1264(sp)
+    sw      a0,1268(sp)
     li      a0, 16
-    sw      a1,1268(sp)
-    slt     a1,s11,a0
+    sw      a1,1264(sp)
+    slt     a1,s6,a0
                     #      br i1 temp_1197_1517, label while.body_1518, label while.exit_1518 
     bnez    a1, .while.body_1518
+    sw      a2,1684(sp)
+    lb      a2,1351(sp)
+    sb      a1,1263(sp)
+    sw      a3,1344(sp)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_1518
                     #      label while.body_1518: 
 .while.body_1518:
@@ -15252,12 +20728,12 @@ long_func:
                     #      temp_1198_1520 = Mod i32 y_18, 2_0 
     li      a0, 2
     sb      a1,1263(sp)
-    rem     a1,s3,a0
+    rem     a1,s9,a0
                     #      new_var temp_1199_1520:i32 
                     #      temp_1199_1520 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     sw      a1,1256(sp)
-    rem     a1,s1,a0
+    rem     a1,s8,a0
                     #      new_var temp_1200_1520:i1 
                     #      temp_1200_1520 = icmp i32 Ne temp_1199_1520, 0_0 
     li      a0, 0
@@ -15292,7 +20768,7 @@ long_func:
     sw      a1,1244(sp)
     li      a1, 1
     sb      a2,1251(sp)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -15307,9 +20783,18 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1207_1522:i32 
                     #      temp_1207_1522 = Add i32 ans_18, temp_1206_1522 
-    add     a0,s10,a2
+    sw      a1,1172(sp)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1207_1522 
                     #      jump label: branch_false_1521 
+    sw      a2,1168(sp)
+    lb      a2,1251(sp)
+    sw      a1,1164(sp)
+    lb      a1,1250(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lb      a0,1249(sp)
     j       .branch_false_1521
                     #      label branch_false_1521: 
 .branch_false_1521:
@@ -15317,56 +20802,74 @@ long_func:
 .L173_0:
                     #      new_var temp_1208_1519:i32 
                     #      temp_1208_1519 = Div i32 x_18, 2_0 
-    sw      a0,1164(sp)
+    sb      a0,1249(sp)
     li      a0, 2
-    sw      a1,1172(sp)
-    div     a1,s1,a0
+    sb      a1,1250(sp)
+    div     a1,s8,a0
                     #      x_18 = i32 temp_1208_1519 
                     #      new_var temp_1209_1519:i32 
                     #      temp_1209_1519 = Div i32 y_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     sw      a1,1160(sp)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_1209_1519 
                     #      new_var temp_1210_1519:i32 
                     #      temp_1210_1519 = Add i32 i_18, 1_0 
     li      a0, 1
     sw      a1,1156(sp)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_1210_1519 
                     #      jump label: while.head_1518 
+    sb      a2,1251(sp)
+    lw      a2,1684(sp)
+    sw      a1,1152(sp)
+    lw      a1,1264(sp)
+    lw      a0,1268(sp)
     j       .while.head_1518
                     #      label while.exit_1518: 
 .while.exit_1518:
                     #      label L174_0: 
 .L174_0:
                     #      c_1466 = i32 ans_18 
-    mv      a0, s10
+    mv      a1, a0
                     #      al_1466 = i32 sum_1466 
-    sw      a0,1684(sp)
-    sw      a1,1152(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    sw      a1,1684(sp)
     mv      a1, a0
                     #      jump label: while.head_1469 
+    sb      a2,1351(sp)
+    lb      a2,1695(sp)
+    sw      a1,1688(sp)
+    lw      a1,1812(sp)
+    sw      a0,1680(sp)
+    lw      a0,1684(sp)
     j       .while.head_1469
                     #      label while.exit_1469: 
 .while.exit_1469:
                     #      ans_18 = i32 al_1466 
+    sw      a0,1684(sp)
+    mv      a0, a1
                     #      mres_1444 = i32 ans_18 
-    sw      a0,1680(sp)
-    mv      a0, s10
+    sw      a1,1688(sp)
+    mv      a1, a0
                     #      jump label: branch_false_1464 
+    sb      a2,1679(sp)
+    lb      a2,1695(sp)
+    sw      a1,1812(sp)
     j       .branch_false_1464
                     #      label branch_false_1464: 
 .branch_false_1464:
                     #      label L175_0: 
 .L175_0:
                     #      al_1531 = i32 ml_1444 
-    sw      a0,1812(sp)
-    sw      a1,1688(sp)
-    mv      a1, a0
+    mv      a1, s10
                     #      c_1531 = i32 ml_1444 
-    sw      a1,1148(sp)
-    mv      a1, a0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    mv      a0, s10
                     #      new_var sum_1531:i32 
                     #      jump label: while.head_1534 
     j       .while.head_1534
@@ -15374,10 +20877,10 @@ long_func:
 .while.head_1534:
                     #      new_var temp_1211_38207:i1 
                     #      temp_1211_38207 = icmp i32 Ne c_1531, 0_0 
-    sw      a0,1820(sp)
-    li      a0, 0
-    sw      a2,1168(sp)
-    xor     a2,a1,a0
+    sw      a1,1148(sp)
+    li      a1, 0
+    sb      a2,1695(sp)
+    xor     a2,a0,a1
     snez    a2, a2
                     #      br i1 temp_1211_38207, label while.body_1534, label while.exit_1534 
     bnez    a2, .while.body_1534
@@ -15385,19 +20888,24 @@ long_func:
                     #      label while.body_1534: 
 .while.body_1534:
                     #      ans_18 = i32 0_0 
+    li      a1, 0
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_1531 
+    sw      a0,1144(sp)
                     #      y_18 = i32 c_1531 
+    sw      a0,1148(sp)
                     #      jump label: while.head_1541 
     j       .while.head_1541
                     #      label while.head_1541: 
 .while.head_1541:
                     #      new_var temp_1212_1540:i1 
                     #      temp_1212_1540 = icmp i32 Slt i_18, 16_0 
-    sw      a0,1148(sp)
+    sw      a0,1144(sp)
     li      a0, 16
-    sw      a1,1144(sp)
-    slt     a1,s11,a0
+    li      a1, 13452
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    slt     a1,s6,a0
                     #      br i1 temp_1212_1540, label while.body_1541, label while.exit_1541 
     bnez    a1, .while.body_1541
     j       .while.exit_1541
@@ -15407,7 +20915,7 @@ long_func:
                     #      temp_1213_1543 = Mod i32 x_18, 2_0 
     li      a0, 2
     sb      a1,1138(sp)
-    rem     a1,s1,a0
+    rem     a1,s8,a0
                     #      new_var temp_1214_38390:i1 
                     #      temp_1214_38390 = icmp i32 Ne temp_1213_1543, 0_0 
     li      a0, 0
@@ -15423,7 +20931,7 @@ long_func:
                     #      temp_1215_1546 = Mod i32 y_18, 2_0 
     li      a0, 2
     sw      a1,1132(sp)
-    rem     a1,s3,a0
+    rem     a1,s9,a0
                     #      new_var temp_1216_1546:i1 
                     #      temp_1216_1546 = icmp i32 Eq temp_1215_1546, 0_0 
     li      a0, 0
@@ -15449,7 +20957,7 @@ long_func:
     sw      a1,1116(sp)
     li      a1, 1
     sb      a2,1123(sp)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -15464,9 +20972,17 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1221_1548:i32 
                     #      temp_1221_1548 = Add i32 ans_18, temp_1220_1548 
-    add     a0,s10,a2
+    sw      a1,1044(sp)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1221_1548 
                     #      jump label: branch_false_1547 
+    sw      a2,1040(sp)
+    lb      a2,1123(sp)
+    sw      a1,1036(sp)
+    lw      a1,1124(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_1547
                     #      label branch_false_1547: 
 .branch_false_1547:
@@ -15474,14 +20990,13 @@ long_func:
 .branch_false_1544:
                     #      new_var temp_1225_1550:i32 
                     #      temp_1225_1550 = Mod i32 y_18, 2_0 
-    sw      a0,1036(sp)
     li      a0, 2
-    sw      a1,1044(sp)
-    rem     a1,s3,a0
+    sw      a1,1132(sp)
+    rem     a1,s9,a0
                     #      new_var temp_1226_38535:i1 
                     #      temp_1226_38535 = icmp i32 Ne temp_1225_1550, 0_0 
     li      a0, 0
-    sw      a2,1040(sp)
+    sb      a2,1131(sp)
     xor     a2,a1,a0
     snez    a2, a2
                     #      br i1 temp_1226_38535, label branch_true_1551, label branch_false_1551 
@@ -15503,7 +21018,7 @@ long_func:
     sw      a1,1012(sp)
     li      a1, 1
     sb      a2,1019(sp)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -15518,9 +21033,17 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1231_1552:i32 
                     #      temp_1231_1552 = Add i32 ans_18, temp_1230_1552 
-    add     a0,s10,a2
+    sw      a1,940(sp)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1231_1552 
                     #      jump label: branch_false_1551 
+    sw      a2,936(sp)
+    lb      a2,1019(sp)
+    sw      a1,932(sp)
+    lw      a1,1020(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
     j       .branch_false_1551
                     #      label branch_false_1551: 
 .branch_false_1551:
@@ -15530,33 +21053,45 @@ long_func:
 .L177_0:
                     #      new_var temp_1222_1542:i32 
                     #      temp_1222_1542 = Div i32 x_18, 2_0 
-    sw      a0,932(sp)
     li      a0, 2
-    sw      a1,940(sp)
-    div     a1,s1,a0
+    sw      a1,1020(sp)
+    div     a1,s8,a0
                     #      x_18 = i32 temp_1222_1542 
                     #      new_var temp_1223_1542:i32 
                     #      temp_1223_1542 = Div i32 y_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     sw      a1,1032(sp)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_1223_1542 
                     #      new_var temp_1224_1542:i32 
                     #      temp_1224_1542 = Add i32 i_18, 1_0 
     li      a0, 1
     sw      a1,1028(sp)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_1224_1542 
                     #      jump label: while.head_1541 
+    sb      a2,1019(sp)
+    lb      a2,1139(sp)
+    sw      a1,1024(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    lw      a1,0(a0)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,1144(sp)
     j       .while.head_1541
                     #      label while.exit_1541: 
 .while.exit_1541:
                     #      sum_1531 = i32 ans_18 
-    mv      a0, s10
+    sb      a1,1138(sp)
+    mv      a1, a0
                     #      ans_18 = i32 0_0 
                     #      i_18 = i32 0_0 
                     #      x_18 = i32 al_1531 
-    sw      a0,1140(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      y_18 = i32 c_1531 
     sw      a0,1148(sp)
                     #      jump label: while.head_1563 
@@ -15567,8 +21102,8 @@ long_func:
                     #      temp_1232_1562 = icmp i32 Slt i_18, 16_0 
     sw      a0,1144(sp)
     li      a0, 16
-    sw      a1,1024(sp)
-    slt     a1,s11,a0
+    sw      a1,1140(sp)
+    slt     a1,s6,a0
                     #      br i1 temp_1232_1562, label while.body_1563, label while.exit_1563 
     bnez    a1, .while.body_1563
     j       .while.exit_1563
@@ -15578,16 +21113,16 @@ long_func:
                     #      temp_1233_1565 = Mod i32 y_18, 2_0 
     li      a0, 2
     sb      a1,931(sp)
-    rem     a1,s3,a0
+    rem     a1,s9,a0
                     #      new_var temp_1234_1565:i32 
                     #      temp_1234_1565 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     sw      a1,924(sp)
-    rem     a1,s1,a0
+    rem     a1,s8,a0
                     #      new_var temp_1235_1565:i1 
                     #      temp_1235_1565 = icmp i32 Ne temp_1234_1565, 0_0 
     li      a0, 0
-    sw      a2,936(sp)
+    sb      a2,1139(sp)
     xor     a2,a1,a0
     snez    a2, a2
                     #      new_var temp_1236_1565:i1 
@@ -15618,7 +21153,7 @@ long_func:
     sw      a1,912(sp)
     li      a1, 1
     sb      a2,919(sp)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -15633,9 +21168,18 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1242_1567:i32 
                     #      temp_1242_1567 = Add i32 ans_18, temp_1241_1567 
-    add     a0,s10,a2
+    sw      a1,836(sp)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1242_1567 
                     #      jump label: branch_false_1566 
+    sw      a2,832(sp)
+    lb      a2,919(sp)
+    sw      a1,828(sp)
+    lb      a1,918(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lb      a0,917(sp)
     j       .branch_false_1566
                     #      label branch_false_1566: 
 .branch_false_1566:
@@ -15643,40 +21187,48 @@ long_func:
 .L178_0:
                     #      new_var temp_1243_1564:i32 
                     #      temp_1243_1564 = Div i32 x_18, 2_0 
-    sw      a0,828(sp)
+    sb      a0,917(sp)
     li      a0, 2
-    sw      a1,836(sp)
-    div     a1,s1,a0
+    sb      a1,918(sp)
+    div     a1,s8,a0
                     #      x_18 = i32 temp_1243_1564 
                     #      new_var temp_1244_1564:i32 
                     #      temp_1244_1564 = Div i32 y_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     sw      a1,824(sp)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_1244_1564 
                     #      new_var temp_1245_1564:i32 
                     #      temp_1245_1564 = Add i32 i_18, 1_0 
     li      a0, 1
     sw      a1,820(sp)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_1245_1564 
                     #      jump label: while.head_1563 
+    sb      a2,919(sp)
+    lb      a2,1139(sp)
+    sw      a1,816(sp)
+    lw      a1,1140(sp)
+    lw      a0,1144(sp)
     j       .while.head_1563
                     #      label while.exit_1563: 
 .while.exit_1563:
                     #      c_1531 = i32 ans_18 
-    mv      a0, s10
+    sb      a1,931(sp)
+    mv      a1, a0
                     #      jump label: L179_0 
     j       .L179_0
                     #      label L179_0: 
 .L179_0:
                     #      new_var temp_1246_1573:i1 
                     #      temp_1246_1573 = icmp i32 Sgt 1_0, 15_0 
-    sw      a0,1144(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a0, 1
-    sw      a1,816(sp)
+    sw      a1,1144(sp)
     li      a1, 15
-    sw      a2,832(sp)
+    sb      a2,1139(sp)
     slt     a2,a1,a0
                     #      br i1 temp_1246_1573, label branch_true_1574, label branch_false_1574 
     bnez    a2, .branch_true_1574
@@ -15684,38 +21236,45 @@ long_func:
                     #      label branch_true_1574: 
 .branch_true_1574:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: while.exit_1583 
     j       .while.exit_1583
                     #      label branch_false_1574: 
 .branch_false_1574:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      i_18 = i32 0_0 
                     #      new_var temp_1247_1577:Array:i32:[Some(16_0)] 
                     #      temp_1247_1577 = load *SHIFT_TABLE_0:ptr->i32 
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    lw      a1,0(a0)
+    la      a1, SHIFT_TABLE
+                    #occupy reg a1 with *SHIFT_TABLE_0
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_1248_1577:ptr->i32 
                     #      new_var temp_1249_1577:i32 
                     #      temp_1248_1577 = getelementptr temp_1247_1577:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a0, 0
-    sw      a1,808(sp)
-    li      a1, 1
+    li      a1, 0
+    sw      a0,808(sp)
+    li      a0, 1
     sb      a2,815(sp)
     li      a2, 1
-    sw      a3,1344(sp)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    mul     a3,a0,a2
+    add     a1,a1,a3
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_1249_1577 = load temp_1248_1577:ptr->i32 
-    lw      a1,0(a0)
+    lw      a0,0(a1)
                     #      new_var temp_1250_1577:i32 
                     #      temp_1250_1577 = Mul i32 c_1531, temp_1249_1577 
-    sd      a0,736(sp)
-    mul     a0,a2,a1
+    sd      a1,736(sp)
+    mul     a1,a2,a0
                     #      x_18 = i32 temp_1250_1577 
                     #      y_18 = i32 0xffff_0 
                     #      jump label: while.head_1583 
@@ -15724,12 +21283,28 @@ long_func:
 .while.head_1583:
                     #      new_var temp_1251_1582:i1 
                     #      temp_1251_1582 = icmp i32 Slt i_18, 16_0 
-    sw      a0,728(sp)
+    sw      a0,732(sp)
     li      a0, 16
-    sw      a1,732(sp)
-    slt     a1,s11,a0
+    sw      a1,728(sp)
+    slt     a1,s6,a0
                     #      br i1 temp_1251_1582, label while.body_1583, label while.exit_1583 
     bnez    a1, .while.body_1583
+    sw      a2,1144(sp)
+    lb      a2,815(sp)
+    sb      a1,727(sp)
+    sw      a3,808(sp)
+    li      a3, 13452
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      a3, 13452
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.exit_1583
                     #      label while.body_1583: 
 .while.body_1583:
@@ -15737,12 +21312,12 @@ long_func:
                     #      temp_1252_1585 = Mod i32 y_18, 2_0 
     li      a0, 2
     sb      a1,727(sp)
-    rem     a1,s3,a0
+    rem     a1,s9,a0
                     #      new_var temp_1253_1585:i32 
                     #      temp_1253_1585 = Mod i32 x_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     sw      a1,720(sp)
-    rem     a1,s1,a0
+    rem     a1,s8,a0
                     #      new_var temp_1254_1585:i1 
                     #      temp_1254_1585 = icmp i32 Ne temp_1253_1585, 0_0 
     li      a0, 0
@@ -15777,7 +21352,7 @@ long_func:
     sw      a1,708(sp)
     li      a1, 1
     sb      a2,715(sp)
-    mul     a2,a1,s11
+    mul     a2,a1,s6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -15792,9 +21367,18 @@ long_func:
     mul     a2,a0,a1
                     #      new_var temp_1261_1587:i32 
                     #      temp_1261_1587 = Add i32 ans_18, temp_1260_1587 
-    add     a0,s10,a2
+    sw      a1,636(sp)
+    add     a1,a0,a2
                     #      ans_18 = i32 temp_1261_1587 
                     #      jump label: branch_false_1586 
+    sw      a2,632(sp)
+    lb      a2,715(sp)
+    sw      a1,628(sp)
+    lb      a1,714(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    lb      a0,713(sp)
     j       .branch_false_1586
                     #      label branch_false_1586: 
 .branch_false_1586:
@@ -15802,45 +21386,58 @@ long_func:
 .L180_0:
                     #      new_var temp_1262_1584:i32 
                     #      temp_1262_1584 = Div i32 x_18, 2_0 
-    sw      a0,628(sp)
+    sb      a0,713(sp)
     li      a0, 2
-    sw      a1,636(sp)
-    div     a1,s1,a0
+    sb      a1,714(sp)
+    div     a1,s8,a0
                     #      x_18 = i32 temp_1262_1584 
                     #      new_var temp_1263_1584:i32 
                     #      temp_1263_1584 = Div i32 y_18, 2_0 
                     #found literal reg Some(a0) already exist with 2_0
     sw      a1,624(sp)
-    div     a1,s3,a0
+    div     a1,s9,a0
                     #      y_18 = i32 temp_1263_1584 
                     #      new_var temp_1264_1584:i32 
                     #      temp_1264_1584 = Add i32 i_18, 1_0 
     li      a0, 1
     sw      a1,620(sp)
-    add     a1,s11,a0
+    add     a1,s6,a0
                     #      i_18 = i32 temp_1264_1584 
                     #      jump label: while.head_1583 
+    sb      a2,715(sp)
+    lw      a2,1144(sp)
+    sw      a1,616(sp)
+    lw      a1,728(sp)
+    lw      a0,732(sp)
     j       .while.head_1583
                     #      label while.exit_1583: 
 .while.exit_1583:
                     #      label L181_0: 
 .L181_0:
                     #      c_1531 = i32 ans_18 
-    mv      a0, s10
+    mv      a1, a0
                     #      al_1531 = i32 sum_1531 
-    sw      a0,1144(sp)
-    sw      a1,616(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    sw      a1,1144(sp)
     mv      a1, a0
                     #      jump label: while.head_1534 
+    sb      a2,815(sp)
+    lb      a2,1695(sp)
+    sw      a0,1140(sp)
+    lw      a0,1144(sp)
     j       .while.head_1534
                     #      label while.exit_1534: 
 .while.exit_1534:
                     #      ans_18 = i32 al_1531 
+    sw      a0,1144(sp)
+    mv      a0, a1
                     #      ml_1444 = i32 ans_18 
-    sw      a0,1140(sp)
-    mv      a0, s10
                     #      x_18 = i32 mr_1444 
-    sw      a0,1820(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
                     #      y_18 = i32 1_0 
                     #      jump label: L182_0 
     j       .L182_0
@@ -15851,7 +21448,7 @@ long_func:
     sw      a0,1816(sp)
     li      a0, 15
     sw      a1,1148(sp)
-    slt     a1,s3,a0
+    slt     a1,s9,a0
     xori    a1,a1,1
                     #      br i1 temp_1265_1598, label branch_true_1599, label branch_false_1599 
     bnez    a1, .branch_true_1599
@@ -15862,18 +21459,20 @@ long_func:
                     #      temp_1266_1601 = icmp i32 Slt x_18, 0_0 
     li      a0, 0
     sb      a1,615(sp)
-    slt     a1,s1,a0
+    slt     a1,s8,a0
                     #      br i1 temp_1266_1601, label branch_true_1602, label branch_false_1602 
     bnez    a1, .branch_true_1602
     j       .branch_false_1602
                     #      label branch_true_1602: 
 .branch_true_1602:
                     #      ans_18 = i32 0xffff_0 
+    li      a0, 0xffff
                     #      jump label: L183_0 
     j       .L183_0
                     #      label branch_false_1602: 
 .branch_false_1602:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: L183_0 
     j       .L183_0
                     #      label L183_0: 
@@ -15882,9 +21481,9 @@ long_func:
 .branch_false_1599:
                     #      new_var temp_1267_1607:i1 
                     #      temp_1267_1607 = icmp i32 Sgt y_18, 0_0 
-                    #found literal reg Some(a0) already exist with 0_0
-    sb      a1,614(sp)
-    slt     a1,a0,s3
+    li      a0, 0
+    sb      a1,615(sp)
+    slt     a1,a0,s9
                     #      br i1 temp_1267_1607, label branch_true_1608, label branch_false_1608 
     bnez    a1, .branch_true_1608
     j       .branch_false_1608
@@ -15894,7 +21493,7 @@ long_func:
                     #      temp_1268_1610 = icmp i32 Sgt x_18, 0x7fff_0 
     li      a0, 0x7fff
     sb      a1,613(sp)
-    slt     a1,a0,s1
+    slt     a1,a0,s8
                     #      br i1 temp_1268_1610, label branch_true_1611, label branch_false_1611 
     bnez    a1, .branch_true_1611
     j       .branch_false_1611
@@ -15913,8 +21512,8 @@ long_func:
     li      a0, 0
     sw      a1,608(sp)
     li      a1, 1
-    sw      a2,632(sp)
-    mul     a2,a1,s3
+    sb      a2,1139(sp)
+    mul     a2,a1,s9
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -15924,14 +21523,14 @@ long_func:
                     #      new_var temp_1272_1612:i32 
                     #      temp_1272_1612 = Div i32 x_18, temp_1271_1612 
     sd      a0,536(sp)
-    div     a0,s1,a1
+    div     a0,s8,a1
                     #      x_18 = i32 temp_1272_1612 
                     #      new_var temp_1273_1612:i32 
                     #      temp_1273_1612 = Add i32 y_18, 1_0 
     sw      a0,528(sp)
     li      a0, 1
     sw      a1,532(sp)
-    add     a1,s3,a0
+    add     a1,s9,a0
                     #      new_var temp_1274_1612:i32 
                     #      temp_1274_1612 = Sub i32 15_0, temp_1273_1612 
     li      a0, 15
@@ -15950,7 +21549,9 @@ long_func:
     li      a0, 0
     sw      a1,516(sp)
     li      a1, 1
-    sw      a3,808(sp)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
     mul     a3,a1,a2
     add     a0,a0,a3
     slli a0,a0,2
@@ -15966,19 +21567,20 @@ long_func:
     sub     a2,a0,a1
                     #      new_var temp_1279_1612:i32 
                     #      temp_1279_1612 = Add i32 x_18, temp_1278_1612 
-    add     a0,s1,a2
+    add     a0,s8,a2
                     #      ans_18 = i32 temp_1279_1612 
+    sw      a1,444(sp)
+    mv      a1, a0
                     #      jump label: L184_0 
     j       .L184_0
                     #      label branch_false_1611: 
 .branch_false_1611:
                     #      new_var temp_1280_1615:Array:i32:[Some(16_0)] 
                     #      temp_1280_1615 = load *SHIFT_TABLE_0:ptr->i32 
-    sw      a0,436(sp)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    sw      a1,444(sp)
+    sb      a1,612(sp)
     lw      a1,0(a0)
                     #      new_var temp_1281_1615:ptr->i32 
                     #      new_var temp_1282_1615:i32 
@@ -15986,8 +21588,8 @@ long_func:
     li      a0, 0
     sw      a1,432(sp)
     li      a1, 1
-    sw      a2,440(sp)
-    mul     a2,a1,s3
+    sb      a2,1139(sp)
+    mul     a2,a1,s9
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -15997,15 +21599,26 @@ long_func:
                     #      new_var temp_1283_1615:i32 
                     #      temp_1283_1615 = Div i32 x_18, temp_1282_1615 
     sd      a0,360(sp)
-    div     a0,s1,a1
+    div     a0,s8,a1
                     #      ans_18 = i32 temp_1283_1615 
+    sw      a1,356(sp)
+    mv      a1, a0
                     #      jump label: L184_0 
+    sw      a2,432(sp)
+    lw      a2,440(sp)
+    sw      a0,352(sp)
+    lw      a0,436(sp)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    lw      a3,516(sp)
     j       .L184_0
                     #      label L184_0: 
 .L184_0:
                     #      label branch_false_1608: 
 .branch_false_1608:
                     #      ans_18 = i32 x_18 
+    mv      a0, s8
                     #      jump label: L185_0 
     j       .L185_0
                     #      label L185_0: 
@@ -16015,14 +21628,28 @@ long_func:
                     #      label L187_0: 
 .L187_0:
                     #      mr_1444 = i32 ans_18 
-    sw      a0,352(sp)
-    mv      a0, s10
+    sb      a1,613(sp)
+    mv      a1, a0
                     #      jump label: while.head_1447 
+    sb      a2,1139(sp)
+    mv      a2, a0
+    sw      a1,1816(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    lw      a0,1812(sp)
     j       .while.head_1447
                     #      label while.exit_1447: 
 .while.exit_1447:
                     #      ans_18 = i32 mres_1444 
     sw      a0,1816(sp)
+    mv      a0, a1
                     #      pl_1244 = i32 ans_18 
                     #      x_18 = i32 pr_1244 
                     #      y_18 = i32 1_0 
@@ -16032,10 +21659,12 @@ long_func:
 .L188_0:
                     #      new_var temp_1284_1624:i1 
                     #      temp_1284_1624 = icmp i32 Sge y_18, 15_0 
-    sw      a0,1812(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a0, 15
-    sw      a1,356(sp)
-    slt     a1,s3,a0
+    sw      a1,1812(sp)
+    slt     a1,s9,a0
     xori    a1,a1,1
                     #      br i1 temp_1284_1624, label branch_true_1625, label branch_false_1625 
     bnez    a1, .branch_true_1625
@@ -16046,18 +21675,20 @@ long_func:
                     #      temp_1285_1627 = icmp i32 Slt x_18, 0_0 
     li      a0, 0
     sb      a1,351(sp)
-    slt     a1,s1,a0
+    slt     a1,s8,a0
                     #      br i1 temp_1285_1627, label branch_true_1628, label branch_false_1628 
     bnez    a1, .branch_true_1628
     j       .branch_false_1628
                     #      label branch_true_1628: 
 .branch_true_1628:
                     #      ans_18 = i32 0xffff_0 
+    li      a0, 0xffff
                     #      jump label: L189_0 
     j       .L189_0
                     #      label branch_false_1628: 
 .branch_false_1628:
                     #      ans_18 = i32 0_0 
+    li      a0, 0
                     #      jump label: L189_0 
     j       .L189_0
                     #      label L189_0: 
@@ -16066,9 +21697,9 @@ long_func:
 .branch_false_1625:
                     #      new_var temp_1286_1633:i1 
                     #      temp_1286_1633 = icmp i32 Sgt y_18, 0_0 
-                    #found literal reg Some(a0) already exist with 0_0
-    sb      a1,350(sp)
-    slt     a1,a0,s3
+    li      a0, 0
+    sb      a1,351(sp)
+    slt     a1,a0,s9
                     #      br i1 temp_1286_1633, label branch_true_1634, label branch_false_1634 
     bnez    a1, .branch_true_1634
     j       .branch_false_1634
@@ -16078,7 +21709,7 @@ long_func:
                     #      temp_1287_1636 = icmp i32 Sgt x_18, 0x7fff_0 
     li      a0, 0x7fff
     sb      a1,349(sp)
-    slt     a1,a0,s1
+    slt     a1,a0,s8
                     #      br i1 temp_1287_1636, label branch_true_1637, label branch_false_1637 
     bnez    a1, .branch_true_1637
     j       .branch_false_1637
@@ -16097,8 +21728,8 @@ long_func:
     li      a0, 0
     sw      a1,344(sp)
     li      a1, 1
-    sw      a2,432(sp)
-    mul     a2,a1,s3
+    sb      a2,1811(sp)
+    mul     a2,a1,s9
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -16108,14 +21739,14 @@ long_func:
                     #      new_var temp_1291_1638:i32 
                     #      temp_1291_1638 = Div i32 x_18, temp_1290_1638 
     sd      a0,272(sp)
-    div     a0,s1,a1
+    div     a0,s8,a1
                     #      x_18 = i32 temp_1291_1638 
                     #      new_var temp_1292_1638:i32 
                     #      temp_1292_1638 = Add i32 y_18, 1_0 
     sw      a0,264(sp)
     li      a0, 1
     sw      a1,268(sp)
-    add     a1,s3,a0
+    add     a1,s9,a0
                     #      new_var temp_1293_1638:i32 
                     #      temp_1293_1638 = Sub i32 15_0, temp_1292_1638 
     li      a0, 15
@@ -16134,7 +21765,9 @@ long_func:
     li      a0, 0
     sw      a1,252(sp)
     li      a1, 1
-    sw      a3,516(sp)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
     mul     a3,a1,a2
     add     a0,a0,a3
     slli a0,a0,2
@@ -16150,19 +21783,20 @@ long_func:
     sub     a2,a0,a1
                     #      new_var temp_1298_1638:i32 
                     #      temp_1298_1638 = Add i32 x_18, temp_1297_1638 
-    add     a0,s1,a2
+    add     a0,s8,a2
                     #      ans_18 = i32 temp_1298_1638 
+    sw      a1,180(sp)
+    mv      a1, a0
                     #      jump label: L190_0 
     j       .L190_0
                     #      label branch_false_1637: 
 .branch_false_1637:
                     #      new_var temp_1299_1641:Array:i32:[Some(16_0)] 
                     #      temp_1299_1641 = load *SHIFT_TABLE_0:ptr->i32 
-    sw      a0,172(sp)
                     #   load label SHIFT_TABLE as ptr to reg
     la      a0, SHIFT_TABLE
                     #occupy reg a0 with *SHIFT_TABLE_0
-    sw      a1,180(sp)
+    sb      a1,348(sp)
     lw      a1,0(a0)
                     #      new_var temp_1300_1641:ptr->i32 
                     #      new_var temp_1301_1641:i32 
@@ -16170,8 +21804,8 @@ long_func:
     li      a0, 0
     sw      a1,168(sp)
     li      a1, 1
-    sw      a2,176(sp)
-    mul     a2,a1,s3
+    sb      a2,1811(sp)
+    mul     a2,a1,s9
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -16181,15 +21815,26 @@ long_func:
                     #      new_var temp_1302_1641:i32 
                     #      temp_1302_1641 = Div i32 x_18, temp_1301_1641 
     sd      a0,96(sp)
-    div     a0,s1,a1
+    div     a0,s8,a1
                     #      ans_18 = i32 temp_1302_1641 
+    sw      a1,92(sp)
+    mv      a1, a0
                     #      jump label: L190_0 
+    sw      a2,168(sp)
+    lw      a2,176(sp)
+    sw      a0,88(sp)
+    lw      a0,172(sp)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    lw      a3,252(sp)
     j       .L190_0
                     #      label L190_0: 
 .L190_0:
                     #      label branch_false_1634: 
 .branch_false_1634:
                     #      ans_18 = i32 x_18 
+    mv      a0, s8
                     #      jump label: L191_0 
     j       .L191_0
                     #      label L191_0: 
@@ -16200,6 +21845,49 @@ long_func:
 .L193_0:
                     #      pr_1244 = i32 ans_18 
                     #      jump label: while.head_1247 
+    sb      a2,1811(sp)
+    mv      a2, a0
+    li      s8, 13444
+    add     s8,sp,s8
+    sw      s8,0(s8)
+    sb      a1,349(sp)
+    li      a0, 13452
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a0, 13423
+    add     a0,sp,a0
+    lb      a1,0(a0)
+    li      s6, 13448
+    add     s6,sp,s6
+    sw      s6,0(s6)
+    sw      s10,1820(sp)
+    li      s7, 3411
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    li      a0, 13423
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a3, 10096
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 13436
+    add     a3,sp,a3
+    lw      a0,0(a3)
+    li      s11, 3410
+    add     s11,sp,s11
+    sb      s11,0(s11)
+    li      s9, 13440
+    add     s9,sp,s9
+    sw      s9,0(s9)
+    li      a3, 13436
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a4, 13432
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      a4, 10096
+    add     a4,sp,a4
+    lw      a3,0(a4)
     j       .while.head_1247
                     #      label while.exit_1247: 
 .while.exit_1247:
@@ -16210,45 +21898,37 @@ long_func:
 .L194_0:
                     #      new_var temp_1303_1647:Array:i32:[Some(16_0)] 
                     #      temp_1303_1647 = load *SHIFT_TABLE_0:ptr->i32 
-    sw      a0,88(sp)
                     #   load label SHIFT_TABLE as ptr to reg
-    la      a0, SHIFT_TABLE
-                    #occupy reg a0 with *SHIFT_TABLE_0
-    sw      a1,92(sp)
-    lw      a1,0(a0)
+    la      s6, SHIFT_TABLE
+                    #occupy reg s6 with *SHIFT_TABLE_0
+    lw      s8,0(s6)
                     #      new_var temp_1304_1647:ptr->i32 
                     #      new_var temp_1305_1647:i32 
                     #      temp_1304_1647 = getelementptr temp_1303_1647:Array:i32:[Some(16_0)] [Some(cur_18)] 
-    li      a0, 0
-    sw      a1,84(sp)
-    li      a1, 1
-    sw      a2,168(sp)
-    sw      a3,252(sp)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    li      s9, 0
+    li      s10, 1
+    add     s9,s9,s8
+    slli s9,s9,2
+    add     s9,s9,sp
+    add     s9,s9,s9
                     #      temp_1305_1647 = load temp_1304_1647:ptr->i32 
-    lw      a1,0(a0)
+    lw      s11,0(s9)
                     #      new_var temp_1306_1647:i1 
                     #      temp_1306_1647 = icmp i32 Ne temp_1305_1647, ans_18 
-    sd      a0,16(sp)
-    xor     a0,a1,s10
-    snez    a0, a0
+    xor     s6,s11,a2
+    snez    s6, s6
                     #      br i1 temp_1306_1647, label branch_true_1648, label branch_false_1648 
-    bnez    a0, .branch_true_1648
+    bnez    s6, .branch_true_1648
     j       .branch_false_1648
                     #      label branch_true_1648: 
 .branch_true_1648:
                     #      ret 1_0 
-    sb      a0,11(sp)
-    li      a0, 13464
+    li      s10, 13464
+    add     s10,sp,s10
+    ld      ra,0(s10)
+    li      a0, 13436
     add     a0,sp,a0
-    ld      ra,0(a0)
-    li      a0, 13464
-    add     a0,sp,a0
-    sd      a0,0(a0)
+    sw      a0,0(a0)
     li      a0, 13456
     add     a0,sp,a0
     ld      s0,0(a0)
@@ -16256,7 +21936,9 @@ long_func:
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 1
-    sw      a1,12(sp)
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
     li      a1, 13472
     li      a1, 13472
     add     sp,a1,sp
@@ -16267,31 +21949,56 @@ long_func:
 .L195_0:
                     #      new_var temp_1307_1243:i32 
                     #      temp_1307_1243 = Add i32 cur_18, 1_0 
-                    #found literal reg Some(a0) already exist with 1_0
-    add     a1,a2,a0
+    li      s10, 1
+    li      a1, 13423
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    add     a1,a0,s10
                     #      cur_18 = i32 temp_1307_1243 
                     #      jump label: while.head_1242 
+    sw      s8,84(sp)
+    sw      a1,4(sp)
+    li      s10, 13423
+    add     s10,sp,s10
+    lb      a1,0(s10)
+    sb      s6,11(sp)
+    li      s10, 13423
+    add     s10,sp,s10
+    sb      s10,0(s10)
+    li      s1, 3420
+    add     s1,sp,s1
+    sw      s1,0(s1)
+    li      s5, 3412
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      s3, 3427
+    add     s3,sp,s3
+    sb      s3,0(s3)
+    li      s7, 3411
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    sw      s11,12(sp)
+    sd      s9,16(sp)
+    li      s4, 3416
+    add     s4,sp,s4
+    sw      s4,0(s4)
     j       .while.head_1242
                     #      label while.exit_1242: 
 .while.exit_1242:
                     #      ret 0_0 
-    li      a0, 13464
+    li      s1, 13464
+    add     s1,sp,s1
+    ld      ra,0(s1)
+    li      s4, 13456
+    add     s4,sp,s4
+    ld      s0,0(s4)
+    li      a0, 13436
     add     a0,sp,a0
-    ld      ra,0(a0)
-    li      a0, 13464
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    li      a0, 13456
-    add     a0,sp,a0
-    ld      s0,0(a0)
-    li      a0, 13456
-    add     a0,sp,a0
-    sd      a0,0(a0)
+    sw      a0,0(a0)
     li      a0, 0
-    sw      a1,4(sp)
-    li      a1, 13472
-    li      a1, 13472
-    add     sp,a1,sp
+    li      s5, 13472
+    li      s5, 13472
+    add     sp,s5,sp
     ret
                     #      Define main_0 [] -> main_ret_0 
     .globl main

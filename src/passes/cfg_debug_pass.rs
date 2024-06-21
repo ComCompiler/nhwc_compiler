@@ -16,7 +16,7 @@ impl Pass for CfgDebugPass {
                 cfg_node.clear_text();
                 cfg_node.load_instrs_text(&ctx.nhwc_instr_slab)?;
             }
-            generate_png_by_graph_multi_tasks(&ctx.cfg_graph.clone(), "brief_cfg_graph".to_string(), &[Config::Record, Config::Rounded,  Config::Title("brief_cfg_graph".to_string()),Config::CfgBlock],&mut ctx.io_task_list)?;
+            generate_png_by_graph_multi_tasks(&ctx.cfg_graph.clone(), "brief_cfg_graph".to_string(), &[Config::Record, Config::Rounded,  Config::Title("brief_cfg_graph".to_string()),Config::CfgBlock,Config::NodeIndexLabel],&mut ctx.io_task_list)?;
         }
         Ok(()) 
     }

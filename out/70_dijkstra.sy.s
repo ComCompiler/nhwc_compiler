@@ -109,87 +109,111 @@ Dijkstra:
                     #      new_var temp_0_26:i32 
                     #      temp_0_26 = load *n_0:ptr->i32 
                     #   load label n as ptr to reg
-    la      a5, n
-                    #occupy reg a5 with *n_0
-    lw      a6,0(a5)
+    la      a0, n
+                    #occupy reg a0 with *n_0
+    lw      a1,0(a0)
                     #      new_var temp_1_26:i1 
                     #      temp_1_26 = icmp i32 Sle i_23, temp_0_26 
-    slt     a7,a6,a4
-    xori    a7,a7,1
+    slt     a2,a1,a4
+    xori    a2,a2,1
                     #      br i1 temp_1_26, label while.body_27, label while.exit_27 
-    bnez    a7, .while.body_27
+    bnez    a2, .while.body_27
     j       .while.exit_27
                     #      label while.body_27: 
 .while.body_27:
                     #      new_var temp_2_28:ptr->i32 
                     #      temp_2_28 = getelementptr dis_0:Array:i32:[Some(16_0)] [Some(i_23)] 
-    li      s1, 0
-    li      s2, 1
-    mul     s3,s2,a4
-                    #occupy reg s3 with dis_0
-    add     s1,s1,s3
-    slli s1,s1,2
-    add     s1,s1,s1
+    li      a0, 0
+    li      a3, 1
+    mul     a5,a3,a4
+                    #occupy reg a5 with dis_0
+    add     a0,a0,a5
+    slli a0,a0,2
+    add     a0,a0,a0
                     #      new_var temp_3_28:Array:i32:[Some(16_0), Some(16_0)] 
                     #      temp_3_28 = load *e_0:ptr->Array:i32:[Some(16_0)] 
                     #   load label e as ptr to reg
-    la      s4, e
-                    #occupy reg s4 with *e_0
-    lw      s5,0(s4)
+    la      a6, e
+                    #occupy reg a6 with *e_0
+    lw      a7,0(a6)
                     #      new_var temp_4_28:ptr->i32 
                     #      new_var temp_5_28:i32 
                     #      temp_4_28 = getelementptr temp_3_28:Array:i32:[Some(16_0), Some(16_0)] [Some(1_0), Some(i_23)] 
-    li      s6, 0
-    li      s7, 16
-                    #found literal reg Some(s2) already exist with 1_0
-    add     s6,s6,s5
-                    #found literal reg Some(s2) already exist with 1_0
-    add     s6,s6,s5
-    slli s6,s6,2
-    add     s6,s6,sp
-    add     s6,s6,s6
+    li      s1, 0
+    li      s2, 16
+                    #found literal reg Some(a3) already exist with 1_0
+    add     s1,s1,a7
+                    #found literal reg Some(a3) already exist with 1_0
+    add     s1,s1,a7
+    slli s1,s1,2
+    add     s1,s1,sp
+    add     s1,s1,s1
                     #      temp_5_28 = load temp_4_28:ptr->i32 
-    lw      s8,0(s6)
+    lw      s3,0(s1)
                     #      store temp_5_28:i32 temp_2_28:ptr->i32 
-    sd      s8,0(s1)
+    sd      s3,0(a0)
                     #      mu dis_0:58 
                     #      dis_0 = chi dis_0:58 
                     #      new_var temp_6_28:ptr->i32 
                     #      temp_6_28 = getelementptr book_0:Array:i32:[Some(16_0)] [Some(i_23)] 
-    li      s9, 0
-                    #found literal reg Some(s2) already exist with 1_0
-    mul     s10,s2,a4
-                    #occupy reg s10 with book_0
-    add     s9,s9,s10
-    slli s9,s9,2
-    add     s9,s9,s9
+    li      s4, 0
+                    #found literal reg Some(a3) already exist with 1_0
+    mul     s5,a3,a4
+                    #occupy reg s5 with book_0
+    add     s4,s4,s5
+    slli s4,s4,2
+    add     s4,s4,s4
                     #      store 0_0:i32 temp_6_28:ptr->i32 
-    li      s11, 0
-    sd      s11,0(s9)
+    li      s6, 0
+    sd      s6,0(s4)
                     #      mu book_0:64 
                     #      book_0 = chi book_0:64 
                     #      new_var temp_7_28:i32 
                     #      temp_7_28 = Add i32 i_23, 1_0 
-                    #found literal reg Some(s2) already exist with 1_0
-    add     a0,a4,s2
+                    #found literal reg Some(a3) already exist with 1_0
+    add     s7,a4,a3
                     #      i_23 = i32 temp_7_28 
                     #      jump label: while.head_27 
+    li      a7, 4732
+    add     a7,sp,a7
+    sw      a7,0(a7)
+    li      a2, 4747
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      s4, 3688
+    add     s4,sp,s4
+    sd      s4,0(s4)
+    li      s3, 3700
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    li      a0, 4736
+    add     a0,sp,a0
+    sd      a0,0(a0)
+    li      a1, 4748
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      s7, 3684
+    add     s7,sp,s7
+    sw      s7,0(s7)
+    li      s1, 3704
+    add     s1,sp,s1
+    sd      s1,0(s1)
     j       .while.head_27
                     #      label while.exit_27: 
 .while.exit_27:
                     #      new_var temp_8_23:ptr->i32 
                     #      temp_8_23 = getelementptr book_0:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      a1, 0
-                    #found literal reg Some(s2) already exist with 1_0
-    li      a2, 1
-    mul     a3,s2,a2
-                    #occupy reg a3 with book_0
-    add     a1,a1,a3
-    slli a1,a1,2
-    add     a1,a1,a1
+    li      a0, 0
+    li      a3, 1
+    li      a5, 1
+    mul     a6,a3,a5
+                    #occupy reg a6 with book_0
+    add     a0,a0,a6
+    slli a0,a0,2
+    add     a0,a0,a0
                     #      store 1_0:i32 temp_8_23:ptr->i32 
-                    #found literal reg Some(a2) already exist with 1_0
-    sd      a2,0(a1)
+                    #found literal reg Some(a3) already exist with 1_0
+    sd      a3,0(a0)
                     #      mu book_0:74 
                     #      book_0 = chi book_0:74 
                     #      i_23 = i32 1_0 
@@ -200,28 +224,28 @@ Dijkstra:
                     #      new_var temp_9_34:i32 
                     #      temp_9_34 = load *n_0:ptr->i32 
                     #   load label n as ptr to reg
-    la      a2, n
-                    #occupy reg a2 with *n_0
-    lw      a3,0(a2)
+    la      a3, n
+                    #occupy reg a3 with *n_0
+    lw      a5,0(a3)
                     #      new_var temp_10_34:i32 
                     #      temp_10_34 = Sub i32 temp_9_34, 1_0 
-                    #found literal reg Some(s2) already exist with 1_0
-    sub     a2,a3,s2
+    li      a6, 1
+    sub     a7,a5,a6
                     #      new_var temp_11_34:i1 
                     #      temp_11_34 = icmp i32 Sle i_23, temp_10_34 
-    slt     a5,a2,a4
-    xori    a5,a5,1
+    slt     s1,a7,a4
+    xori    s1,s1,1
                     #      br i1 temp_11_34, label while.body_35, label while.exit_35 
-    bnez    a5, .while.body_35
+    bnez    s1, .while.body_35
     j       .while.exit_35
                     #      label while.body_35: 
 .while.body_35:
                     #      min_num_36 = i32 65535_0 
-    li      s2, 65535
+    li      a3, 65535
                     #      min_index_36 = i32 0_0 
-    li      s3, 0
+    li      a6, 0
                     #      k_36 = i32 1_0 
-    li      s4, 1
+    li      s2, 1
                     #      jump label: while.head_41 
     j       .while.head_41
                     #      label while.head_41: 
@@ -229,112 +253,83 @@ Dijkstra:
                     #      new_var temp_12_40:i32 
                     #      temp_12_40 = load *n_0:ptr->i32 
                     #   load label n as ptr to reg
-    la      s7, n
-                    #occupy reg s7 with *n_0
-    lw      s10,0(s7)
+    la      s3, n
+                    #occupy reg s3 with *n_0
+    lw      s4,0(s3)
                     #      new_var temp_13_40:i1 
                     #      temp_13_40 = icmp i32 Sle k_36, temp_12_40 
-    slt     s7,s10,s4
-    xori    s7,s7,1
+    slt     s5,s4,s2
+    xori    s5,s5,1
                     #      br i1 temp_13_40, label while.body_41, label while.exit_41 
-    bnez    s7, .while.body_41
+    bnez    s5, .while.body_41
     j       .while.exit_41
                     #      label while.body_41: 
 .while.body_41:
                     #      new_var temp_14_43:Array:i32:[Some(16_0)] 
                     #      temp_14_43 = load *book_0:ptr->i32 
                     #   load label book as ptr to reg
-    la      s11, book
-                    #occupy reg s11 with *book_0
-    li      a0, 3684
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    lw      a0,0(s11)
+    la      s3, book
+                    #occupy reg s3 with *book_0
+    lw      s6,0(s3)
                     #      new_var temp_15_43:ptr->i32 
                     #      new_var temp_16_43:i32 
                     #      temp_15_43 = getelementptr temp_14_43:Array:i32:[Some(16_0)] [Some(k_36)] 
-    li      s11, 0
-    li      a0, 3636
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 1
-    li      a1, 3672
-    add     a1,sp,a1
-    sd      a1,0(a1)
-    mul     a1,a0,s4
-    add     s11,s11,a1
-    slli s11,s11,2
-    add     s11,s11,sp
-    add     s11,s11,s11
+    li      s7, 0
+    li      s8, 1
+    add     s7,s7,s6
+    slli s7,s7,2
+    add     s7,s7,sp
+    add     s7,s7,s7
                     #      temp_16_43 = load temp_15_43:ptr->i32 
-    lw      a0,0(s11)
+    lw      s9,0(s7)
                     #      new_var temp_17_43:i1 
                     #      temp_17_43 = icmp i32 Eq temp_16_43, 0_0 
-    li      a1, 3636
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 0
-    li      a2, 3664
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    xor     a2,a0,a1
-    seqz    a2, a2
+    li      s10, 0
+    xor     s11,s9,s10
+    seqz    s11, s11
                     #      new_var temp_18_43:Array:i32:[Some(16_0)] 
                     #      temp_18_43 = load *dis_0:ptr->i32 
                     #   load label dis as ptr to reg
-    la      a1, dis
-                    #occupy reg a1 with *dis_0
-    li      a0, 3564
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    lw      a0,0(a1)
+    la      s3, dis
+                    #occupy reg s3 with *dis_0
+    lw      s8,0(s3)
                     #      new_var temp_19_43:ptr->i32 
                     #      new_var temp_20_43:i32 
                     #      temp_19_43 = getelementptr temp_18_43:Array:i32:[Some(16_0)] [Some(k_36)] 
-    li      a1, 0
-    li      a0, 3556
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 1
-    li      a2, 3563
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    mul     a2,a0,s4
-    add     a1,a1,a2
-    slli a1,a1,2
-    add     a1,a1,sp
-    add     a1,a1,a1
+    li      s3, 0
+    li      s10, 1
+    add     s3,s3,s8
+    slli s3,s3,2
+    add     s3,s3,sp
+    add     s3,s3,s3
                     #      temp_20_43 = load temp_19_43:ptr->i32 
-    lw      a0,0(a1)
+    lw      s10,0(s3)
                     #      new_var temp_21_43:i1 
                     #      temp_21_43 = icmp i32 Sgt min_num_36, temp_20_43 
-    li      a1, 3488
-    add     a1,sp,a1
-    sd      a1,0(a1)
-    slt     a1,a0,s2
+    li      a0, 3672
+    add     a0,sp,a0
+    sd      a0,0(a0)
+    slt     a0,s10,a3
                     #      new_var temp_22_43:i1 
                     #      temp_22_43 = And i1 temp_21_43, temp_17_43 
-    li      a0, 3484
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a2, 3556
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    and     a2,a1,a0
+    li      a1, 4748
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    and     a1,a0,s11
                     #      br i1 temp_22_43, label branch_true_44, label branch_false_44 
-    bnez    a2, .branch_true_44
+    bnez    a1, .branch_true_44
     j       .branch_false_44
                     #      label branch_true_44: 
 .branch_true_44:
                     #      new_var temp_23_45:Array:i32:[Some(16_0)] 
                     #      temp_23_45 = load *dis_0:ptr->i32 
-    li      a0, 3563
+    li      a0, 3483
     add     a0,sp,a0
     sb      a0,0(a0)
                     #   load label dis as ptr to reg
     la      a0, dis
                     #occupy reg a0 with *dis_0
-    li      a1, 3483
+    li      a1, 3482
     add     a1,sp,a1
     sb      a1,0(a1)
     lw      a1,0(a0)
@@ -346,10 +341,10 @@ Dijkstra:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 1
-    li      a2, 3482
+    li      a2, 4747
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s4
+    mul     a2,a1,s2
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -359,6 +354,33 @@ Dijkstra:
                     #      min_num_36 = i32 temp_25_45 
                     #      min_index_36 = i32 k_36 
                     #      jump label: branch_false_44 
+    li      a2, 3476
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a0, 3408
+    add     a0,sp,a0
+    sd      a0,0(a0)
+    li      a0, 4747
+    add     a0,sp,a0
+    lb      a2,0(a0)
+    li      a0, 4747
+    add     a0,sp,a0
+    sb      a0,0(a0)
+    li      a1, 3404
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 3483
+    add     a1,sp,a1
+    lb      a0,0(a1)
+    li      a1, 3483
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a3, 3656
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 3482
+    add     a3,sp,a3
+    lb      a1,0(a3)
     j       .branch_false_44
                     #      label branch_false_44: 
 .branch_false_44:
@@ -366,41 +388,77 @@ Dijkstra:
 .L4_0:
                     #      new_var temp_26_42:i32 
                     #      temp_26_42 = Add i32 k_36, 1_0 
-    li      a0, 3408
+    li      a0, 3483
     add     a0,sp,a0
-    sd      a0,0(a0)
+    sb      a0,0(a0)
     li      a0, 1
-    li      a1, 3404
+    li      a1, 3482
     add     a1,sp,a1
-    sw      a1,0(a1)
-    add     a1,s4,a0
+    sb      a1,0(a1)
+    add     a1,s2,a0
                     #      k_36 = i32 temp_26_42 
                     #      jump label: while.head_41 
+    li      s10, 3484
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      s6, 3636
+    add     s6,sp,s6
+    sw      s6,0(s6)
+    li      s5, 3643
+    add     s5,sp,s5
+    sb      s5,0(s5)
+    li      s9, 3564
+    add     s9,sp,s9
+    sw      s9,0(s9)
+    li      s4, 3644
+    add     s4,sp,s4
+    sw      s4,0(s4)
+    li      s11, 3563
+    add     s11,sp,s11
+    sb      s11,0(s11)
+    li      s3, 3488
+    add     s3,sp,s3
+    sd      s3,0(s3)
+    li      a1, 3400
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 3672
+    add     a1,sp,a1
+    ld      a0,0(a1)
+    li      a1, 3672
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    li      a2, 4747
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a2, 4748
+    add     a2,sp,a2
+    lw      a1,0(a2)
+    li      s7, 3568
+    add     s7,sp,s7
+    sd      s7,0(s7)
+    li      s8, 3556
+    add     s8,sp,s8
+    sw      s8,0(s8)
     j       .while.head_41
                     #      label while.exit_41: 
 .while.exit_41:
                     #      new_var temp_27_36:ptr->i32 
                     #      temp_27_36 = getelementptr book_0:Array:i32:[Some(16_0)] [Some(min_index_36)] 
-    li      a0, 0
-    li      a1, 3400
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 1
-    li      a2, 3476
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s3
-                    #occupy reg a2 with book_0
-    add     a0,a0,a2
-    slli a0,a0,2
-    add     a0,a0,a0
+    li      s3, 0
+    li      s6, 1
+    mul     s7,s6,a6
+                    #occupy reg s7 with book_0
+    add     s3,s3,s7
+    slli s3,s3,2
+    add     s3,s3,s3
                     #      store 1_0:i32 temp_27_36:ptr->i32 
-                    #found literal reg Some(a1) already exist with 1_0
-    sd      a1,0(a0)
+                    #found literal reg Some(s6) already exist with 1_0
+    sd      s6,0(s3)
                     #      mu book_0:157 
                     #      book_0 = chi book_0:157 
                     #      j_36 = i32 1_0 
-    li      a1, 1
+    li      s8, 1
                     #      jump label: while.head_52 
     j       .while.head_52
                     #      label while.head_52: 
@@ -408,72 +466,49 @@ Dijkstra:
                     #      new_var temp_28_51:i32 
                     #      temp_28_51 = load *n_0:ptr->i32 
                     #   load label n as ptr to reg
-    la      a2, n
-                    #occupy reg a2 with *n_0
-    li      a0, 3392
-    add     a0,sp,a0
-    sd      a0,0(a0)
-    lw      a0,0(a2)
+    la      s6, n
+                    #occupy reg s6 with *n_0
+    lw      s7,0(s6)
                     #      new_var temp_29_51:i1 
                     #      temp_29_51 = icmp i32 Sle j_36, temp_28_51 
-    slt     a2,a0,a1
-    xori    a2,a2,1
+    slt     s9,s7,s8
+    xori    s9,s9,1
                     #      br i1 temp_29_51, label while.body_52, label while.exit_52 
-    bnez    a2, .while.body_52
+    bnez    s9, .while.body_52
     j       .while.exit_52
                     #      label while.body_52: 
 .while.body_52:
                     #      new_var temp_30_54:Array:i32:[Some(16_0), Some(16_0)] 
                     #      temp_30_54 = load *e_0:ptr->Array:i32:[Some(16_0)] 
-    li      a0, 3384
-    add     a0,sp,a0
-    sw      a0,0(a0)
                     #   load label e as ptr to reg
-    la      a0, e
-                    #occupy reg a0 with *e_0
-    li      a1, 3388
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    lw      a1,0(a0)
+    la      s6, e
+                    #occupy reg s6 with *e_0
+    lw      s10,0(s6)
                     #      new_var temp_31_54:ptr->i32 
                     #      new_var temp_32_54:i32 
                     #      temp_31_54 = getelementptr temp_30_54:Array:i32:[Some(16_0), Some(16_0)] [Some(min_index_36), Some(j_36)] 
-    li      a0, 0
-    li      a1, 3376
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a1, 16
-    li      a2, 3383
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    mul     a2,a1,s3
-    add     a0,a0,a2
-    li      a1, 1
-    li      a2, 3376
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    li      a3, 3668
-    add     a3,sp,a3
-    sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
+    li      s11, 0
+    li      s6, 16
+    add     s11,s11,s10
+    li      s6, 1
+    add     s11,s11,s10
+    slli s11,s11,2
+    add     s11,s11,sp
+    add     s11,s11,s11
                     #      temp_32_54 = load temp_31_54:ptr->i32 
-    lw      a1,0(a0)
+    lw      s6,0(s11)
                     #      new_var temp_33_54:i1 
                     #      temp_33_54 = icmp i32 Slt temp_32_54, 65535_0 
-    li      a0, 2344
+    li      a0, 3672
     add     a0,sp,a0
     sd      a0,0(a0)
     li      a0, 65535
-    li      a2, 3388
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    slt     a2,a1,a0
+    li      a1, 4748
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    slt     a1,s6,a0
                     #      br i1 temp_33_54, label branch_true_55, label branch_false_55 
-    bnez    a2, .branch_true_55
+    bnez    a1, .branch_true_55
     j       .branch_false_55
                     #      label branch_true_55: 
 .branch_true_55:
@@ -482,9 +517,9 @@ Dijkstra:
                     #   load label e as ptr to reg
     la      a0, e
                     #occupy reg a0 with *e_0
-    li      a1, 2340
+    li      a1, 2339
     add     a1,sp,a1
-    sw      a1,0(a1)
+    sb      a1,0(a1)
     lw      a1,0(a0)
                     #      new_var temp_35_57:ptr->i32 
                     #      new_var temp_36_57:i32 
@@ -494,20 +529,13 @@ Dijkstra:
     add     a1,sp,a1
     sw      a1,0(a1)
     li      a1, 16
-    li      a2, 2339
+    li      a2, 4747
     add     a2,sp,a2
     sb      a2,0(a2)
-    mul     a2,a1,s3
+    mul     a2,a1,a6
     add     a0,a0,a2
     li      a1, 1
-    li      a2, 2332
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    li      a3, 3376
-    add     a3,sp,a3
-    sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
+    add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -527,10 +555,10 @@ Dijkstra:
     li      a0, 0
     sw      a1,1296(sp)
     li      a1, 1
-    li      a2, 3388
+    li      a2, 2332
     add     a2,sp,a2
     sw      a2,0(a2)
-    mul     a2,a1,s3
+    mul     a2,a1,a6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -557,11 +585,8 @@ Dijkstra:
     sw      a1,1212(sp)
     li      a1, 1
     sw      a2,1216(sp)
-    li      a3, 2332
-    add     a3,sp,a3
-    sw      a3,0(a3)
-    mul     a3,a1,a2
-    add     a0,a0,a3
+    mul     a2,a1,s8
+    add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
@@ -570,9 +595,7 @@ Dijkstra:
                     #      new_var temp_44_57:i1 
                     #      temp_44_57 = icmp i32 Sgt temp_43_57, temp_40_57 
     sd      a0,1144(sp)
-    li      a2, 3388
-    add     a2,sp,a2
-    sw      a2,0(a2)
+    sw      a2,1212(sp)
     slt     a2,a0,a1
                     #      br i1 temp_44_57, label branch_true_58, label branch_false_58 
     bnez    a2, .branch_true_58
@@ -586,10 +609,9 @@ Dijkstra:
     sw      a1,1140(sp)
     li      a1, 1
     sb      a2,1139(sp)
-    sw      a3,1212(sp)
-    mul     a3,a1,a2
-                    #occupy reg a3 with dis_0
-    add     a0,a0,a3
+    mul     a2,a1,s8
+                    #occupy reg a2 with dis_0
+    add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,a0
                     #      new_var temp_46_59:Array:i32:[Some(16_0), Some(16_0)] 
@@ -597,16 +619,16 @@ Dijkstra:
                     #   load label e as ptr to reg
     la      a1, e
                     #occupy reg a1 with *e_0
-    lw      a3,0(a1)
+    lw      a2,0(a1)
                     #      new_var temp_47_59:ptr->i32 
                     #      new_var temp_48_59:i32 
                     #      temp_47_59 = getelementptr temp_46_59:Array:i32:[Some(16_0), Some(16_0)] [Some(min_index_36), Some(j_36)] 
     li      a1, 0
     sd      a0,1128(sp)
     li      a0, 16
-    add     a1,a1,a3
+    add     a1,a1,a2
     li      a0, 1
-    add     a1,a1,a3
+    add     a1,a1,a2
     slli a1,a1,2
     add     a1,a1,sp
     add     a1,a1,a1
@@ -626,10 +648,8 @@ Dijkstra:
     li      a0, 0
     sw      a1,88(sp)
     li      a1, 1
-    li      a2, 3388
-    add     a2,sp,a2
-    sw      a2,0(a2)
-    mul     a2,a1,s3
+    sw      a2,1124(sp)
+    mul     a2,a1,a6
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
@@ -647,6 +667,12 @@ Dijkstra:
                     #      mu dis_0:248 
                     #      dis_0 = chi dis_0:248 
                     #      jump label: branch_false_58 
+    sw      a2,8(sp)
+    lb      a2,1139(sp)
+    sd      a0,1128(sp)
+    lw      a0,1216(sp)
+    sw      a1,12(sp)
+    lw      a1,1140(sp)
     j       .branch_false_58
                     #      label branch_false_58: 
 .branch_false_58:
@@ -656,25 +682,87 @@ Dijkstra:
 .L5_0:
                     #      new_var temp_53_53:i32 
                     #      temp_53_53 = Add i32 j_36, 1_0 
-    sd      a0,1128(sp)
-    sw      a1,12(sp)
-    li      a1, 1
-    sw      a2,8(sp)
-    add     a2,a0,a1
+    li      a0, 1
+    li      a1, 2339
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    add     a1,s8,a0
                     #      j_36 = i32 temp_53_53 
                     #      jump label: while.head_52 
+    li      s10, 3376
+    add     s10,sp,s10
+    sw      s10,0(s10)
+    li      s6, 2340
+    add     s6,sp,s6
+    sw      s6,0(s6)
+    li      s9, 3383
+    add     s9,sp,s9
+    sb      s9,0(s9)
+    li      s11, 2344
+    add     s11,sp,s11
+    sd      s11,0(s11)
+    sw      a1,4(sp)
+    li      a1, 3672
+    add     a1,sp,a1
+    ld      a0,0(a1)
+    li      a1, 3672
+    add     a1,sp,a1
+    sd      a1,0(a1)
+    li      a2, 4747
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a2, 4748
+    add     a2,sp,a2
+    lw      a1,0(a2)
+    li      s7, 3384
+    add     s7,sp,s7
+    sw      s7,0(s7)
     j       .while.head_52
                     #      label while.exit_52: 
 .while.exit_52:
                     #      new_var temp_54_36:i32 
                     #      temp_54_36 = Add i32 i_23, 1_0 
-                    #found literal reg Some(a1) already exist with 1_0
-    li      a0, 3388
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    add     a0,a4,a1
+    li      s6, 1
+    add     s10,a4,s6
                     #      i_23 = i32 temp_54_36 
                     #      jump label: while.head_35 
+    sw      s10,0(sp)
+    li      a7, 3664
+    add     a7,sp,a7
+    sw      a7,0(a7)
+    li      s5, 3643
+    add     s5,sp,s5
+    sb      s5,0(s5)
+    li      s9, 3383
+    add     s9,sp,s9
+    sb      s9,0(s9)
+    li      s4, 3644
+    add     s4,sp,s4
+    sw      s4,0(s4)
+    li      a3, 3656
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      s3, 3392
+    add     s3,sp,s3
+    sd      s3,0(s3)
+    li      a5, 3668
+    add     a5,sp,a5
+    sw      a5,0(a5)
+    li      s7, 3384
+    add     s7,sp,s7
+    sw      s7,0(s7)
+    li      s2, 3648
+    add     s2,sp,s2
+    sw      s2,0(s2)
+    li      a6, 3652
+    add     a6,sp,a6
+    sw      a6,0(a6)
+    li      s8, 3388
+    add     s8,sp,s8
+    sw      s8,0(s8)
+    li      s1, 3663
+    add     s1,sp,s1
+    sb      s1,0(s1)
     j       .while.head_35
                     #      label while.exit_35: 
 .while.exit_35:
@@ -754,20 +842,20 @@ main:
                     #      new_var temp_57_69:i32 
                     #      temp_57_69 = load *n_0:ptr->i32 
                     #   load label n as ptr to reg
-    la      a4, n
-                    #occupy reg a4 with *n_0
-    lw      a5,0(a4)
+    la      a1, n
+                    #occupy reg a1 with *n_0
+    lw      a2,0(a1)
                     #      new_var temp_58_69:i1 
                     #      temp_58_69 = icmp i32 Sle i_64, temp_57_69 
-    slt     a6,a5,a3
-    xori    a6,a6,1
+    slt     a4,a2,a3
+    xori    a4,a4,1
                     #      br i1 temp_58_69, label while.body_70, label while.exit_70 
-    bnez    a6, .while.body_70
+    bnez    a4, .while.body_70
     j       .while.exit_70
                     #      label while.body_70: 
 .while.body_70:
                     #      j_71 = i32 1_0 
-    li      a7, 1
+    li      a1, 1
                     #      jump label: while.head_74 
     j       .while.head_74
                     #      label while.head_74: 
@@ -775,43 +863,43 @@ main:
                     #      new_var temp_59_73:i32 
                     #      temp_59_73 = load *n_0:ptr->i32 
                     #   load label n as ptr to reg
-    la      s1, n
-                    #occupy reg s1 with *n_0
-    lw      s2,0(s1)
+    la      a5, n
+                    #occupy reg a5 with *n_0
+    lw      a6,0(a5)
                     #      new_var temp_60_73:i1 
                     #      temp_60_73 = icmp i32 Sle j_71, temp_59_73 
-    slt     s3,s2,a7
-    xori    s3,s3,1
+    slt     a7,a6,a1
+    xori    a7,a7,1
                     #      br i1 temp_60_73, label while.body_74, label while.exit_74 
-    bnez    s3, .while.body_74
+    bnez    a7, .while.body_74
     j       .while.exit_74
                     #      label while.body_74: 
 .while.body_74:
                     #      new_var temp_61_76:i1 
                     #      temp_61_76 = icmp i32 Eq i_64, j_71 
-    xor     s4,a3,a7
-    seqz    s4, s4
+    xor     a5,a3,a1
+    seqz    a5, a5
                     #      br i1 temp_61_76, label branch_true_77, label branch_false_77 
-    bnez    s4, .branch_true_77
+    bnez    a5, .branch_true_77
     j       .branch_false_77
                     #      label branch_true_77: 
 .branch_true_77:
                     #      new_var temp_62_76:ptr->i32 
                     #      temp_62_76 = getelementptr e_0:Array:i32:[Some(16_0), Some(16_0)] [Some(i_64), Some(j_71)] 
-    li      s5, 0
-    li      s6, 16
-    mul     s7,s6,a3
-                    #occupy reg s7 with e_0
-    add     s5,s5,s7
-    li      s8, 1
-    mul     s9,s8,a7
-                    #occupy reg s9 with e_0
-    add     s5,s5,s9
-    slli s5,s5,2
-    add     s5,s5,s5
+    li      s1, 0
+    li      s2, 16
+    mul     s3,s2,a3
+                    #occupy reg s3 with e_0
+    add     s1,s1,s3
+    li      s4, 1
+    mul     s5,s4,a1
+                    #occupy reg s5 with e_0
+    add     s1,s1,s5
+    slli s1,s1,2
+    add     s1,s1,s1
                     #      store 0_0:i32 temp_62_76:ptr->i32 
-    li      s10, 0
-    sd      s10,0(s5)
+    li      s6, 0
+    sd      s6,0(s1)
                     #      mu e_0:303 
                     #      e_0 = chi e_0:303 
                     #      jump label: L1_0 
@@ -820,23 +908,25 @@ main:
 .branch_false_77:
                     #      new_var temp_64_76:ptr->i32 
                     #      temp_64_76 = getelementptr e_0:Array:i32:[Some(16_0), Some(16_0)] [Some(i_64), Some(j_71)] 
-    li      s11, 0
-                    #found literal reg Some(s6) already exist with 16_0
-    mul     a1,s6,a3
-                    #occupy reg a1 with e_0
-    add     s11,s11,a1
-                    #found literal reg Some(s8) already exist with 1_0
-    mul     a1,s8,a7
-                    #occupy reg a1 with e_0
-    add     s11,s11,a1
-    slli s11,s11,2
-    add     s11,s11,s11
+    li      s1, 0
+    li      s2, 16
+    mul     s3,s2,a3
+                    #occupy reg s3 with e_0
+    add     s1,s1,s3
+    li      s4, 1
+    mul     s5,s4,a1
+                    #occupy reg s5 with e_0
+    add     s1,s1,s5
+    slli s1,s1,2
+    add     s1,s1,s1
                     #      store 65535_0:i32 temp_64_76:ptr->i32 
-    li      a1, 65535
-    sd      a1,0(s11)
+    li      s6, 65535
+    sd      s6,0(s1)
                     #      mu e_0:313 
                     #      e_0 = chi e_0:313 
                     #      jump label: L1_0 
+    sd      s1,136(sp)
+    ld      s1,152(sp)
     j       .L1_0
                     #      label L1_0: 
 .L1_0:
@@ -844,19 +934,30 @@ main:
 .L2_0:
                     #      new_var temp_63_75:i32 
                     #      temp_63_75 = Add i32 j_71, 1_0 
-                    #found literal reg Some(s8) already exist with 1_0
-    add     a1,a7,s8
+    li      s2, 1
+    add     s3,a1,s2
                     #      j_71 = i32 temp_63_75 
                     #      jump label: while.head_74 
+    sd      s1,152(sp)
+    sb      a7,163(sp)
+    sw      a6,164(sp)
+    sw      s3,148(sp)
+    sb      a5,162(sp)
     j       .while.head_74
                     #      label while.exit_74: 
 .while.exit_74:
                     #      new_var temp_65_71:i32 
                     #      temp_65_71 = Add i32 i_64, 1_0 
-                    #found literal reg Some(s8) already exist with 1_0
-    add     a2,a3,s8
+    li      a5, 1
+    add     s1,a3,a5
                     #      i_64 = i32 temp_65_71 
                     #      jump label: while.head_70 
+    sw      s1,132(sp)
+    sb      a7,163(sp)
+    sw      a6,164(sp)
+    sw      a1,168(sp)
+    sb      a4,175(sp)
+    sw      a2,176(sp)
     j       .while.head_70
                     #      label while.exit_70: 
 .while.exit_70:
@@ -868,27 +969,21 @@ main:
                     #      new_var temp_66_83:i32 
                     #      temp_66_83 = load *m_0:ptr->i32 
                     #   load label m as ptr to reg
-    la      a4, m
-                    #occupy reg a4 with *m_0
-    lw      s1,0(a4)
+    la      a1, m
+                    #occupy reg a1 with *m_0
+    lw      a5,0(a1)
                     #      new_var temp_67_83:i1 
                     #      temp_67_83 = icmp i32 Sle i_64, temp_66_83 
-    slt     a4,s1,a3
-    xori    a4,a4,1
+    slt     a6,a5,a3
+    xori    a6,a6,1
                     #      br i1 temp_67_83, label while.body_84, label while.exit_84 
-    bnez    a4, .while.body_84
+    bnez    a6, .while.body_84
     j       .while.exit_84
                     #      label while.body_84: 
 .while.body_84:
                     #      new_var temp_68_85:i32 
                     #      temp_68_85 =  Call i32 getint_0() 
                     #saved register dumping to mem
-    sw      s1,128(sp)
-    sw      s2,164(sp)
-    sb      s3,163(sp)
-    sb      s4,162(sp)
-    sd      s5,152(sp)
-    sd      s11,136(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -896,11 +991,10 @@ main:
     sw      a0,180(sp)
     sw      a0,120(sp)
                     #      u_85 = i32 temp_68_85 
-    mv      s1, a0
+    mv      a1, a0
                     #      new_var temp_69_85:i32 
                     #      temp_69_85 =  Call i32 getint_0() 
                     #saved register dumping to mem
-    sw      s1,116(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -908,26 +1002,24 @@ main:
     sw      a0,120(sp)
     sw      a0,112(sp)
                     #      v_85 = i32 temp_69_85 
-    mv      s1, a0
+    mv      a7, a0
                     #      new_var temp_70_85:ptr->i32 
                     #      temp_70_85 = getelementptr e_0:Array:i32:[Some(16_0), Some(16_0)] [Some(u_85), Some(v_85)] 
-    li      s2, 0
-    li      s3, 16
-    mul     s5,s3,s4
+    li      s1, 0
+    li      s2, 16
+    mul     s3,s2,a1
+                    #occupy reg s3 with e_0
+    add     s1,s1,s3
+    li      s4, 1
+    mul     s5,s4,a7
                     #occupy reg s5 with e_0
-    add     s2,s2,s5
-    li      s6, 1
-    mul     s7,s6,s1
-                    #occupy reg s7 with e_0
-    add     s2,s2,s7
-    slli s2,s2,2
-    add     s2,s2,s2
+    add     s1,s1,s5
+    slli s1,s1,2
+    add     s1,s1,s1
                     #      new_var temp_71_85:i32 
                     #      temp_71_85 =  Call i32 getint_0() 
                     #saved register dumping to mem
-    sw      s1,108(sp)
-    sd      s2,96(sp)
-    sw      s4,116(sp)
+    sd      s1,96(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -944,13 +1036,19 @@ main:
     add     s3,a3,s2
                     #      i_64 = i32 temp_72_85 
                     #      jump label: while.head_84 
+    sd      s1,96(sp)
+    sw      a7,108(sp)
+    sb      a6,127(sp)
+    sw      s3,88(sp)
+    sw      a1,116(sp)
+    sw      a0,92(sp)
+    lw      a0,180(sp)
+    sw      a5,128(sp)
     j       .while.head_84
                     #      label while.exit_84: 
 .while.exit_84:
                     #       Call void Dijkstra_0() 
                     #saved register dumping to mem
-    sd      s1,96(sp)
-    sw      s3,88(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -963,45 +1061,45 @@ main:
                     #      new_var temp_73_91:i32 
                     #      temp_73_91 = load *n_0:ptr->i32 
                     #   load label n as ptr to reg
-    la      s1, n
-                    #occupy reg s1 with *n_0
-    lw      s2,0(s1)
+    la      a1, n
+                    #occupy reg a1 with *n_0
+    lw      a7,0(a1)
                     #      new_var temp_74_91:i1 
                     #      temp_74_91 = icmp i32 Sle i_64, temp_73_91 
-    slt     s3,s2,a3
-    xori    s3,s3,1
+    slt     s1,a7,a3
+    xori    s1,s1,1
                     #      br i1 temp_74_91, label while.body_92, label while.exit_92 
-    bnez    s3, .while.body_92
+    bnez    s1, .while.body_92
     j       .while.exit_92
                     #      label while.body_92: 
 .while.body_92:
                     #      new_var temp_75_93:Array:i32:[Some(16_0)] 
                     #      temp_75_93 = load *dis_0:ptr->i32 
                     #   load label dis as ptr to reg
-    la      s4, dis
-                    #occupy reg s4 with *dis_0
-    lw      s5,0(s4)
+    la      a1, dis
+                    #occupy reg a1 with *dis_0
+    lw      s2,0(a1)
                     #      new_var temp_76_93:ptr->i32 
                     #      new_var temp_77_93:i32 
                     #      temp_76_93 = getelementptr temp_75_93:Array:i32:[Some(16_0)] [Some(i_64)] 
-    li      s6, 0
-    li      s7, 1
-    add     s6,s6,s5
-    slli s6,s6,2
-    add     s6,s6,sp
-    add     s6,s6,s6
+    li      s3, 0
+    li      s4, 1
+    add     s3,s3,s2
+    slli s3,s3,2
+    add     s3,s3,sp
+    add     s3,s3,s3
                     #      temp_77_93 = load temp_76_93:ptr->i32 
-    lw      s8,0(s6)
+    lw      s5,0(s3)
                     #       Call void putint_0(temp_77_93) 
                     #saved register dumping to mem
-    sw      s2,84(sp)
-    sb      s3,83(sp)
-    sw      s5,76(sp)
-    sd      s6,8(sp)
-    sw      s8,4(sp)
+    sb      s1,83(sp)
+    sw      s2,76(sp)
+    sd      s3,8(sp)
+    sw      s5,4(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a0,92(sp)
+    sw      a0,180(sp)
+    lw      a0,4(sp)
                     #arg load ended
     call    putint
                     #       Call void putch_0(32_0) 
@@ -1017,14 +1115,18 @@ main:
     add     s1,a3,a0
                     #      i_64 = i32 temp_78_93 
                     #      jump label: while.head_92 
+    sw      s1,0(sp)
+    sw      a7,84(sp)
+    lw      a0,180(sp)
     j       .while.head_92
                     #      label while.exit_92: 
 .while.exit_92:
                     #       Call void putch_0(10_0) 
                     #saved register dumping to mem
-    sw      s1,0(sp)
+    sb      s1,83(sp)
                     #saved register dumped to mem
                     #arg load start
+    sw      a0,180(sp)
     li      a0, 10
                     #arg load ended
     call    putch

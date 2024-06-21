@@ -61,30 +61,30 @@ exgcd:
 .branch_true_20:
                     #      new_var temp_1_21:ptr->i32 
                     #      temp_1_21 = getelementptr x_16:ptr->i32 [Some(0_0)] 
-    li      a6, 0
-    li      a7, 1
-                    #found literal reg Some(a4) already exist with 0_0
-    add     a6,a6,a2
-    slli a6,a6,3
-    add     a6,a6,sp
-    add     a6,a6,a6
+    li      a4, 0
+    li      a6, 1
+    li      a7, 0
+    add     a4,a4,a2
+    slli a4,a4,3
+    add     a4,a4,sp
+    add     a4,a4,a4
                     #      store 1_0:i32 temp_1_21:ptr->i32 
-                    #found literal reg Some(a7) already exist with 1_0
-    sd      a7,0(a6)
+                    #found literal reg Some(a6) already exist with 1_0
+    sd      a6,0(a4)
                     #      mu x_16:28 
                     #      x_16 = chi x_16:28 
                     #      new_var temp_2_21:ptr->i32 
                     #      temp_2_21 = getelementptr y_16:ptr->i32 [Some(0_0)] 
     li      s1, 0
-                    #found literal reg Some(a7) already exist with 1_0
-                    #found literal reg Some(a4) already exist with 0_0
+                    #found literal reg Some(a6) already exist with 1_0
+                    #found literal reg Some(a7) already exist with 0_0
     add     s1,s1,a3
     slli s1,s1,3
     add     s1,s1,sp
     add     s1,s1,s1
                     #      store 0_0:i32 temp_2_21:ptr->i32 
-                    #found literal reg Some(a4) already exist with 0_0
-    sd      a4,0(s1)
+                    #found literal reg Some(a7) already exist with 0_0
+    sd      a7,0(s1)
                     #      mu y_16:34 
                     #      y_16 = chi y_16:34 
                     #      ret a_16 
@@ -97,18 +97,20 @@ exgcd:
 .branch_false_20:
                     #      new_var temp_3_25:i32 
                     #      temp_3_25 = Mod i32 a_16, b_16 
-    rem     s2,a0,a1
+    rem     a4,a0,a1
                     #      new_var temp_4_25:i32 
                     #      temp_4_25 =  Call i32 exgcd_0(b_16, temp_3_25, x_16, y_16) 
                     #saved register dumping to mem
-    sd      s1,88(sp)
-    sw      s2,84(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,128(sp)
     sw      a0,132(sp)
+    mv      a0, a1
+    sw      a1,128(sp)
+    mv      a1, a4
     sd      a2,120(sp)
+    ld      a2,120(sp)
     sd      a3,112(sp)
+    ld      a3,112(sp)
                     #arg load ended
     call    exgcd
     sw      a0,80(sp)
@@ -118,10 +120,10 @@ exgcd:
                     #      new_var temp_6_25:i32 
                     #      temp_5_25 = getelementptr x_16:ptr->i32 [Some(0_0)] 
     li      a2, 0
-                    #found literal reg Some(a7) already exist with 1_0
-                    #found literal reg Some(a4) already exist with 0_0
-    mul     a3,a7,a4
-    add     a2,a2,a3
+    li      a3, 1
+    li      a6, 0
+    mul     a7,a3,a6
+    add     a2,a2,a7
     slli a2,a2,3
     add     a2,a2,sp
     add     a2,a2,a2
@@ -132,9 +134,9 @@ exgcd:
                     #      new_var temp_7_25:ptr->i32 
                     #      temp_7_25 = getelementptr x_16:ptr->i32 [Some(0_0)] 
     li      s3, 0
-                    #found literal reg Some(a7) already exist with 1_0
-                    #found literal reg Some(a4) already exist with 0_0
-    add     s3,s3,a3
+                    #found literal reg Some(a3) already exist with 1_0
+                    #found literal reg Some(a6) already exist with 0_0
+    add     s3,s3,a7
     slli s3,s3,3
     add     s3,s3,sp
     add     s3,s3,s3
@@ -142,9 +144,9 @@ exgcd:
                     #      new_var temp_9_25:i32 
                     #      temp_8_25 = getelementptr y_16:ptr->i32 [Some(0_0)] 
     li      s4, 0
-                    #found literal reg Some(a7) already exist with 1_0
-                    #found literal reg Some(a4) already exist with 0_0
-    mul     s5,a7,a4
+                    #found literal reg Some(a3) already exist with 1_0
+                    #found literal reg Some(a6) already exist with 0_0
+    mul     s5,a3,a6
     add     s4,s4,s5
     slli s4,s4,3
     add     s4,s4,sp
@@ -158,8 +160,8 @@ exgcd:
                     #      new_var temp_10_25:ptr->i32 
                     #      temp_10_25 = getelementptr y_16:ptr->i32 [Some(0_0)] 
     li      s7, 0
-                    #found literal reg Some(a7) already exist with 1_0
-                    #found literal reg Some(a4) already exist with 0_0
+                    #found literal reg Some(a3) already exist with 1_0
+                    #found literal reg Some(a6) already exist with 0_0
     add     s7,s7,s5
     slli s7,s7,3
     add     s7,s7,sp
@@ -168,8 +170,8 @@ exgcd:
                     #      new_var temp_12_25:i32 
                     #      temp_11_25 = getelementptr y_16:ptr->i32 [Some(0_0)] 
     li      s8, 0
-                    #found literal reg Some(a7) already exist with 1_0
-                    #found literal reg Some(a4) already exist with 0_0
+                    #found literal reg Some(a3) already exist with 1_0
+                    #found literal reg Some(a6) already exist with 0_0
     add     s8,s8,s5
     slli s8,s8,3
     add     s8,s8,sp
@@ -178,14 +180,14 @@ exgcd:
     lw      s9,0(s8)
                     #      new_var temp_13_25:i32 
                     #      temp_13_25 = Div i32 a_16, b_16 
-    div     a4,s10,s11
+    div     a3,s10,s11
                     #      new_var temp_14_25:i32 
                     #      temp_14_25 = Mul i32 temp_13_25, temp_12_25 
-    mul     a7,a4,s9
+    mul     a6,a3,s9
                     #      new_var temp_15_25:i32 
                     #      temp_15_25 = Sub i32 t_25, temp_14_25 
     sw      a0,80(sp)
-    sub     a0,s2,a7
+    sub     a0,s2,a6
                     #      store temp_15_25:i32 temp_10_25:ptr->i32 
     sd      a0,0(s7)
                     #      mu y_16:85 
@@ -267,10 +269,12 @@ main:
                     #saved register dumped to mem
                     #arg load start
     sw      a0,84(sp)
+    lw      a0,84(sp)
     sw      a1,80(sp)
-    sw      a5,68(sp)
+    lw      a1,80(sp)
     sd      a2,72(sp)
-    sw      a7,52(sp)
+    mv      a2, a5
+    mv      a3, a7
                     #arg load ended
     call    exgcd
     sw      a0,48(sp)
@@ -279,59 +283,60 @@ main:
     li      a1, 0
     li      a2, 1
                     #found literal reg Some(a4) already exist with 0_0
-    mul     a3,a2,a4
-    add     a1,a1,a3
+    add     a1,a1,a5
     slli a1,a1,2
     add     a1,a1,sp
     add     a1,a1,a1
                     #      new_var temp_20_32:ptr->i32 
                     #      new_var temp_21_32:i32 
                     #      temp_20_32 = getelementptr x_32:Array:i32:[Some(1_0)] [Some(0_0)] 
-    li      a5, 0
+    li      a3, 0
                     #found literal reg Some(a2) already exist with 1_0
                     #found literal reg Some(a4) already exist with 0_0
-    add     a5,a5,a3
-    slli a5,a5,2
-    add     a5,a5,sp
-    add     a5,a5,a5
+    add     a3,a3,a5
+    slli a3,a3,2
+    add     a3,a3,sp
+    add     a3,a3,a3
                     #      temp_21_32 = load temp_20_32:ptr->i32 
-    lw      a7,0(a5)
+    lw      s1,0(a3)
                     #      new_var temp_22_32:i32 
                     #      temp_22_32 = Mod i32 temp_21_32, b_32 
-    rem     s2,a7,s1
+    rem     s3,s1,s2
                     #      new_var temp_23_32:i32 
                     #      temp_23_32 = Add i32 temp_22_32, b_32 
-    add     s3,s2,s1
+    add     s4,s3,s2
                     #      new_var temp_24_32:i32 
                     #      temp_24_32 = Mod i32 temp_23_32, b_32 
-    rem     s4,s3,s1
+    rem     s5,s4,s2
                     #      store temp_24_32:i32 temp_19_32:ptr->i32 
-    sd      s4,0(a1)
+    sd      s5,0(a1)
                     #      mu x_32:131 
                     #      x_32 = chi x_32:131 
                     #      new_var temp_25_32:ptr->i32 
                     #      new_var temp_26_32:i32 
                     #      temp_25_32 = getelementptr x_32:Array:i32:[Some(1_0)] [Some(0_0)] 
-    li      s5, 0
+    li      s6, 0
                     #found literal reg Some(a2) already exist with 1_0
                     #found literal reg Some(a4) already exist with 0_0
-    add     s5,s5,a3
-    slli s5,s5,2
-    add     s5,s5,sp
-    add     s5,s5,s5
+    add     s6,s6,a5
+    slli s6,s6,2
+    add     s6,s6,sp
+    add     s6,s6,s6
                     #      temp_26_32 = load temp_25_32:ptr->i32 
-    lw      s6,0(s5)
+    lw      s7,0(s6)
                     #       Call void putint_0(temp_26_32) 
                     #saved register dumping to mem
-    sw      s1,80(sp)
-    sw      s2,24(sp)
-    sw      s3,20(sp)
-    sw      s4,16(sp)
-    sd      s5,8(sp)
-    sw      s6,4(sp)
+    sw      s1,28(sp)
+    sw      s2,80(sp)
+    sw      s3,24(sp)
+    sw      s4,20(sp)
+    sw      s5,16(sp)
+    sd      s6,8(sp)
+    sw      s7,4(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,48(sp)
+    lw      a0,4(sp)
                     #arg load ended
     call    putint
                     #      ret 0_0 

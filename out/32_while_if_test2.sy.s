@@ -60,27 +60,29 @@ ifWhile:
 .while.head_26:
                     #      new_var temp_1_25:i1 
                     #      temp_1_25 = icmp i32 Eq b_17, 2_0 
-    li      a4, 2
-    xor     a5,a1,a4
-    seqz    a5, a5
+    li      a2, 2
+    xor     a4,a1,a2
+    seqz    a4, a4
                     #      br i1 temp_1_25, label while.body_26, label while.exit_26 
-    bnez    a5, .while.body_26
+    bnez    a4, .while.body_26
     j       .while.exit_26
                     #      label while.body_26: 
 .while.body_26:
                     #      new_var temp_2_27:i32 
                     #      temp_2_27 = Add i32 b_17, 2_0 
-                    #found literal reg Some(a4) already exist with 2_0
-    add     a6,a1,a4
+    li      a2, 2
+    add     a5,a1,a2
                     #      b_17 = i32 temp_2_27 
                     #      jump label: while.head_26 
+    sw      a5,16(sp)
+    sb      a4,22(sp)
     j       .while.head_26
                     #      label while.exit_26: 
 .while.exit_26:
                     #      new_var temp_3_24:i32 
                     #      temp_3_24 = Add i32 b_17, 25_0 
-    li      a7, 25
-    add     s1,a1,a7
+    li      a2, 25
+    add     a5,a1,a2
                     #      b_17 = i32 temp_3_24 
                     #      jump label: while.exit_31 
     j       .while.exit_31
@@ -88,24 +90,30 @@ ifWhile:
 .while.head_31:
                     #      new_var temp_4_30:i1 
                     #      temp_4_30 = icmp i32 Slt a_17, 5_0 
-                    #found literal reg Some(a2) already exist with 5_0
-    slt     s2,a0,a2
+    li      a2, 5
+    slt     a4,a0,a2
                     #      br i1 temp_4_30, label while.body_31, label while.exit_31 
-    bnez    s2, .while.body_31
+    bnez    a4, .while.body_31
+    lw      a5,12(sp)
+    sb      a4,11(sp)
+    lb      a4,22(sp)
     j       .while.exit_31
                     #      label while.body_31: 
 .while.body_31:
                     #      new_var temp_5_32:i32 
                     #      temp_5_32 = Mul i32 b_17, 2_0 
-                    #found literal reg Some(a4) already exist with 2_0
-    mul     s3,a1,a4
+    li      a2, 2
+    mul     a5,a1,a2
                     #      b_17 = i32 temp_5_32 
                     #      new_var temp_6_32:i32 
                     #      temp_6_32 = Add i32 a_17, 1_0 
-    li      s4, 1
-    add     s5,a0,s4
+    li      a6, 1
+    add     a7,a0,a6
                     #      a_17 = i32 temp_6_32 
                     #      jump label: while.head_31 
+    sw      a5,4(sp)
+    sw      a7,0(sp)
+    sb      a4,11(sp)
     j       .while.head_31
                     #      label while.exit_31: 
 .while.exit_31:

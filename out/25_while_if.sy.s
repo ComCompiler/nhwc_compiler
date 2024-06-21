@@ -80,23 +80,23 @@ deepWhileBr:
 .while.body_26:
                     #      new_var d_27:i32 
                     #      d_27 = i32 42_0 
-    li      a6, 42
+    li      a4, 42
                     #      jump label: L2_0 
     j       .L2_0
                     #      label L2_0: 
 .L2_0:
                     #      new_var temp_2_30:i1 
                     #      temp_2_30 = icmp i32 Slt c_22, 100_0 
-    li      a7, 100
-    slt     s1,a3,a7
+    li      a6, 100
+    slt     a7,a3,a6
                     #      br i1 temp_2_30, label branch_true_31, label branch_false_31 
-    bnez    s1, .branch_true_31
+    bnez    a7, .branch_true_31
     j       .branch_false_31
                     #      label branch_true_31: 
 .branch_true_31:
                     #      new_var temp_3_32:i32 
                     #      temp_3_32 = Add i32 c_22, d_27 
-    add     s2,a3,a6
+    add     a6,a3,a4
                     #      c_22 = i32 temp_3_32 
                     #      jump label: L3_0 
     j       .L3_0
@@ -104,20 +104,20 @@ deepWhileBr:
 .L3_0:
                     #      new_var temp_4_34:i1 
                     #      temp_4_34 = icmp i32 Sgt c_22, 99_0 
-    li      s3, 99
-    slt     s4,s3,a3
+    li      s1, 99
+    slt     s2,s1,a3
                     #      br i1 temp_4_34, label branch_true_35, label branch_false_35 
-    bnez    s4, .branch_true_35
+    bnez    s2, .branch_true_35
     j       .branch_false_35
                     #      label branch_true_35: 
 .branch_true_35:
                     #      new_var e_36:i32 
                     #      new_var temp_5_36:i32 
                     #      temp_5_36 = Mul i32 d_27, 2_0 
-    li      s5, 2
-    mul     s6,a6,s5
+    li      s1, 2
+    mul     s3,a4,s1
                     #      e_36 = i32 temp_5_36 
-    mv      s7, s6
+    mv      s4, s3
                     #      jump label: L4_0 
     j       .L4_0
                     #      label L4_0: 
@@ -125,11 +125,9 @@ deepWhileBr:
                     #      new_var temp_6_39:i32 
                     #      temp_6_39 =  Call i32 get_one_0(0_0) 
                     #saved register dumping to mem
-    sb      s1,31(sp)
-    sw      s2,24(sp)
-    sb      s4,23(sp)
-    sw      s6,12(sp)
-    sw      s7,16(sp)
+    sb      s2,23(sp)
+    sw      s3,12(sp)
+    sw      s4,16(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,52(sp)
@@ -149,10 +147,12 @@ deepWhileBr:
 .branch_true_40:
                     #      new_var temp_8_41:i32 
                     #      temp_8_41 = Mul i32 e_36, 2_0 
-    li      s4, 2
-    mul     s5,s3,s4
+    li      s3, 2
+    mul     s4,s1,s3
                     #      c_22 = i32 temp_8_41 
                     #      jump label: branch_false_40 
+    sw      s4,0(sp)
+    sw      s1,16(sp)
     j       .branch_false_40
                     #      label branch_false_40: 
 .branch_false_40:
@@ -161,6 +161,9 @@ deepWhileBr:
                     #      label branch_false_31: 
 .branch_false_31:
                     #      jump label: while.head_26 
+    sb      a7,31(sp)
+    sb      a5,39(sp)
+    sw      a4,32(sp)
     j       .while.head_26
                     #      label while.exit_26: 
 .while.exit_26:
@@ -168,7 +171,7 @@ deepWhileBr:
     ld      ra,64(sp)
     ld      s0,56(sp)
     sw      a3,44(sp)
-    sw      a0,8(sp)
+    sw      a0,52(sp)
     addi    sp,sp,72
     ret
                     #      Define main_0 [] -> main_ret_0 
@@ -193,6 +196,8 @@ main:
                     #saved register dumped to mem
                     #arg load start
     sw      a0,4(sp)
+    lw      a0,4(sp)
+    lw      a1,4(sp)
                     #arg load ended
     call    deepWhileBr
     sw      a0,0(sp)
@@ -202,8 +207,8 @@ main:
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,4(sp)
     sw      a0,0(sp)
+    mv      a0, a1
                     #arg load ended
     call    putint
                     #      ret 0_0 

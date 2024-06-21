@@ -59,13 +59,13 @@ reverse:
     sw      a0,20(sp)
     sw      a0,8(sp)
                     #      next_18 = i32 temp_1_22 
-    mv      a3, a0
+    mv      a1, a0
                     #       Call void putint_0(next_18) 
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
-    sw      a3,16(sp)
     sw      a0,8(sp)
+    mv      a0, a1
                     #arg load ended
     call    putint
                     #      jump label: L3_0 
@@ -79,29 +79,32 @@ reverse:
                     #arg load start
                     #arg load ended
     call    getint
+    sw      a0,20(sp)
     sw      a0,4(sp)
                     #      next_18 = i32 temp_2_25 
-    mv      a3, a0
+    mv      a1, a0
                     #      new_var temp_3_25:i32 
                     #      temp_3_25 = Sub i32 n_16, 1_0 
-                    #found literal reg Some(a1) already exist with 1_0
-    sub     a5,a4,a1
+    li      a4, 1
+    sub     a5,a3,a4
                     #       Call void reverse_0(temp_3_25) 
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
-    sw      a5,0(sp)
     sw      a0,4(sp)
+    mv      a0, a5
                     #arg load ended
     call    reverse
                     #       Call void putint_0(next_18) 
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
-    sw      a3,16(sp)
+    mv      a0, a1
                     #arg load ended
     call    putint
                     #      jump label: L3_0 
+    sw      a3,20(sp)
+    sw      a5,0(sp)
     j       .L3_0
                     #      label L3_0: 
 .L3_0:
@@ -124,6 +127,7 @@ main:
                     #saved register dumped to mem
                     #arg load start
     sw      a0,4(sp)
+    lw      a0,4(sp)
                     #arg load ended
     call    reverse
                     #      ret 0_0 

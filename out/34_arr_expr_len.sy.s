@@ -57,30 +57,36 @@ main:
                     #      new_var temp_7_23:Array:i32:[Some(6_0)] 
                     #      temp_7_23 = load *arr_0:ptr->i32 
                     #   load label arr as ptr to reg
-    la      a4, arr
-                    #occupy reg a4 with *arr_0
-    lw      a5,0(a4)
+    la      a2, arr
+                    #occupy reg a2 with *arr_0
+    lw      a4,0(a2)
                     #      new_var temp_8_23:ptr->i32 
                     #      new_var temp_9_23:i32 
                     #      temp_8_23 = getelementptr temp_7_23:Array:i32:[Some(6_0)] [Some(i_19)] 
-    li      a6, 0
-    li      a7, 1
-    add     a6,a6,a5
-    slli a6,a6,2
-    add     a6,a6,sp
-    add     a6,a6,a6
+    li      a5, 0
+    li      a6, 1
+    add     a5,a5,a4
+    slli a5,a5,2
+    add     a5,a5,sp
+    add     a5,a5,a5
                     #      temp_9_23 = load temp_8_23:ptr->i32 
-    lw      s1,0(a6)
+    lw      a7,0(a5)
                     #      new_var temp_10_23:i32 
                     #      temp_10_23 = Add i32 sum_19, temp_9_23 
-    add     s2,a1,s1
+    add     s1,a1,a7
                     #      sum_19 = i32 temp_10_23 
                     #      new_var temp_11_23:i32 
                     #      temp_11_23 = Add i32 i_19, 1_0 
-                    #found literal reg Some(a7) already exist with 1_0
-    add     s3,a0,a7
+                    #found literal reg Some(a6) already exist with 1_0
+    add     s2,a0,a6
                     #      i_19 = i32 temp_11_23 
                     #      jump label: while.head_22 
+    sd      a5,16(sp)
+    sw      s2,4(sp)
+    sb      a3,55(sp)
+    sw      a7,12(sp)
+    sw      a4,48(sp)
+    sw      s1,8(sp)
     j       .while.head_22
                     #      label while.exit_22: 
 .while.exit_22:

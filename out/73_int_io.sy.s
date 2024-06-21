@@ -74,72 +74,80 @@ my_getint:
     sw      a0,32(sp)
                     #      new_var temp_2_21:i32 
                     #      temp_2_21 = Sub i32 temp_1_21, 48_0 
-    li      a4, 48
-    sub     a5,a0,a4
+    li      a1, 48
+    sub     a2,a0,a1
                     #      c_17 = i32 temp_2_21 
-    mv      a6, a5
+    mv      a4, a2
                     #      jump label: L1_0 
     j       .L1_0
                     #      label L1_0: 
 .L1_0:
                     #      new_var temp_3_23:i1 
                     #      temp_3_23 = icmp i32 Sgt 9_0, c_17 
-    li      a7, 9
-    slt     s1,a6,a7
+    li      a1, 9
+    slt     a5,a4,a1
                     #      new_var temp_4_23:i1 
                     #      temp_4_23 = icmp i32 Slt c_17, 0_0 
-                    #found literal reg Some(a2) already exist with 0_0
-    slt     s2,a6,a2
+    li      a6, 0
+    slt     a7,a4,a6
                     #      new_var temp_5_23:i1 
                     #      temp_5_23 = Or i1 temp_4_23, temp_3_23 
                     #      br i1 temp_5_23, label branch_true_24, label branch_false_24 
-    bnez    s3, .branch_true_24
+    bnez    s1, .branch_true_24
     j       .branch_false_24
                     #      label branch_true_24: 
 .branch_true_24:
                     #      jump label: while.exit_20 
+    sb      a7,26(sp)
+    sw      a2,28(sp)
+    sw      a4,40(sp)
+    sw      a0,32(sp)
+    lw      a0,44(sp)
+    sb      s1,25(sp)
+    sb      a5,27(sp)
     j       .while.exit_20
                     #      label branch_false_24: 
 .branch_false_24:
                     #      jump label: while.exit_20 
+    sb      a7,26(sp)
+    sw      a2,28(sp)
+    sw      a4,40(sp)
+    sw      a0,32(sp)
+    lw      a0,44(sp)
+    sb      s1,25(sp)
+    sb      a5,27(sp)
     j       .while.exit_20
                     #      label while.exit_20: 
 .while.exit_20:
                     #      sum_17 = i32 c_17 
-    mv      s4, a6
                     #      jump label: while.head_31 
     j       .while.head_31
                     #      label while.head_31: 
 .while.head_31:
                     #      new_var temp_6_273:i1 
                     #      temp_6_273 = icmp i32 Ne 1_0, 0_0 
-                    #found literal reg Some(a1) already exist with 1_0
-                    #found literal reg Some(a2) already exist with 0_0
-    xor     s5,a1,a2
-    snez    s5, s5
+    li      a2, 1
+    li      a4, 0
+    xor     a5,a2,a4
+    snez    a5, a5
                     #      br i1 temp_6_273, label while.body_31, label while.exit_31 
-    bnez    s5, .while.body_31
+    bnez    a5, .while.body_31
     j       .while.exit_31
                     #      label while.body_31: 
 .while.body_31:
                     #      new_var temp_7_32:i32 
                     #      temp_7_32 =  Call i32 getch_0() 
                     #saved register dumping to mem
-    sb      s1,27(sp)
-    sb      s2,26(sp)
-    sb      s3,25(sp)
-    sw      s4,44(sp)
-    sb      s5,24(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
     call    getch
-    sw      a0,32(sp)
+    sw      a0,44(sp)
     sw      a0,20(sp)
                     #      new_var temp_8_32:i32 
                     #      temp_8_32 = Sub i32 temp_7_32, 48_0 
-                    #found literal reg Some(a4) already exist with 48_0
-    sub     s1,a0,a4
+    li      a2, 48
+    sub     a4,a0,a2
                     #      c_17 = i32 temp_8_32 
                     #      jump label: L2_0 
     j       .L2_0
@@ -147,41 +155,46 @@ my_getint:
 .L2_0:
                     #      new_var temp_9_34:i1 
                     #      temp_9_34 = icmp i32 Sle 9_0, c_17 
-                    #found literal reg Some(a7) already exist with 9_0
-    slt     s2,a6,a7
-    xori    s2,s2,1
+    li      a2, 9
+    slt     a6,a1,a2
+    xori    a6,a6,1
                     #      new_var temp_10_34:i1 
                     #      temp_10_34 = icmp i32 Sge c_17, 0_0 
-                    #found literal reg Some(a2) already exist with 0_0
-    slt     s3,a6,a2
-    xori    s3,s3,1
+    li      a7, 0
+    slt     s1,a1,a7
+    xori    s1,s1,1
                     #      new_var temp_11_34:i1 
                     #      temp_11_34 = And i1 temp_10_34, temp_9_34 
-    and     s4,s3,s2
+    and     s2,s1,a6
                     #      br i1 temp_11_34, label branch_true_35, label branch_false_35 
-    bnez    s4, .branch_true_35
+    bnez    s2, .branch_true_35
     j       .branch_false_35
                     #      label branch_true_35: 
 .branch_true_35:
                     #      new_var temp_12_36:i32 
                     #      temp_12_36 = Mul i32 sum_17, 10_0 
-    li      s6, 10
-    mul     s7,s5,s6
+    li      a7, 10
+    mul     s3,a2,a7
                     #      new_var temp_13_36:i32 
                     #      temp_13_36 = Add i32 temp_12_36, c_17 
-    add     s8,s7,a6
+    add     s4,s3,a1
                     #      sum_17 = i32 temp_13_36 
                     #      label branch_false_35: 
 .branch_false_35:
                     #      jump label: while.exit_31 
+    sb      a6,15(sp)
+    sw      a4,16(sp)
+    sw      a0,20(sp)
+    lw      a0,44(sp)
+    sb      s2,13(sp)
+    sb      s1,14(sp)
     j       .while.exit_31
                     #      label while.exit_31: 
 .while.exit_31:
                     #      ret sum_17 
     ld      ra,56(sp)
     ld      s0,48(sp)
-    sw      s5,44(sp)
-    sw      a0,20(sp)
+    sw      a0,44(sp)
     addi    sp,sp,64
     ret
 .section        .data

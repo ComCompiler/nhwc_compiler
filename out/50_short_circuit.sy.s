@@ -57,8 +57,8 @@ func:
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
-    sw      a6,8(sp)
     sw      a0,20(sp)
+    mv      a0, a6
                     #arg load ended
     call    putint
                     #      new_var temp_3_19:i32 
@@ -66,11 +66,11 @@ func:
                     #   load label g as ptr to reg
     la      a0, g
                     #occupy reg a0 with *g_0
-    lw      a6,0(a0)
+    lw      a7,0(a0)
                     #      ret temp_3_19 
     ld      ra,32(sp)
     ld      s0,24(sp)
-    sw      a6,4(sp)
+    sw      a7,4(sp)
     addi    sp,sp,40
     ret
                     #      Define main_0 [] -> main_ret_0 
@@ -131,8 +131,8 @@ main:
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,60(sp)
     sw      a0,56(sp)
+    mv      a0, a1
                     #arg load ended
     call    func
     sw      a0,52(sp)
@@ -184,25 +184,25 @@ main:
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,60(sp)
     sw      a0,44(sp)
+    mv      a0, a1
                     #arg load ended
     call    func
     sw      a0,40(sp)
                     #      new_var temp_11_32:i1 
                     #      temp_11_32 = icmp i32 Sgt i_24, 11_0 
-    li      a7, 11
-    slt     s1,a7,a1
+    li      a2, 11
+    slt     a4,a2,a1
                     #      new_var temp_12_32:i1 
                     #      temp_12_32 = icmp i32 Ne temp_10_32, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
-    xor     s2,a0,a4
-    snez    s2, s2
+    li      a7, 0
+    xor     s1,a0,a7
+    snez    s1, s1
                     #      new_var temp_13_32:i1 
                     #      temp_13_32 = And i1 temp_11_32, temp_12_32 
-    and     s3,s1,s2
+    and     s2,a4,s1
                     #      br i1 temp_13_32, label branch_true_33, label branch_false_33 
-    bnez    s3, .branch_true_33
+    bnez    s2, .branch_true_33
     j       .branch_false_33
                     #      label branch_true_33: 
 .branch_true_33:
@@ -221,9 +221,8 @@ main:
                     #      new_var temp_14_24:i32 
                     #      temp_14_24 =  Call i32 getint_0() 
                     #saved register dumping to mem
-    sb      s1,39(sp)
-    sb      s2,38(sp)
-    sb      s3,37(sp)
+    sb      s1,38(sp)
+    sb      s2,37(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -240,25 +239,25 @@ main:
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,60(sp)
     sw      a0,32(sp)
+    mv      a0, a1
                     #arg load ended
     call    func
     sw      a0,28(sp)
                     #      new_var temp_16_37:i1 
                     #      temp_16_37 = icmp i32 Sle i_24, 99_0 
-    li      s1, 99
-    slt     s2,s1,a1
-    xori    s2,s2,1
+    li      a2, 99
+    slt     a7,a2,a1
+    xori    a7,a7,1
                     #      new_var temp_17_37:i1 
                     #      temp_17_37 = icmp i32 Ne temp_15_37, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
-    xor     s3,a0,a4
-    snez    s3, s3
+    li      s1, 0
+    xor     s2,a0,s1
+    snez    s2, s2
                     #      new_var temp_18_37:i1 
                     #      temp_18_37 = Or i1 temp_16_37, temp_17_37 
                     #      br i1 temp_18_37, label branch_true_38, label branch_false_38 
-    bnez    s4, .branch_true_38
+    bnez    s3, .branch_true_38
     j       .branch_false_38
                     #      label branch_true_38: 
 .branch_true_38:
@@ -277,9 +276,8 @@ main:
                     #      new_var temp_19_24:i32 
                     #      temp_19_24 =  Call i32 getint_0() 
                     #saved register dumping to mem
-    sb      s2,27(sp)
-    sb      s3,26(sp)
-    sb      s4,25(sp)
+    sb      s2,26(sp)
+    sb      s3,25(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -296,20 +294,20 @@ main:
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,60(sp)
     sw      a0,20(sp)
+    mv      a0, a1
                     #arg load ended
     call    func
     sw      a0,16(sp)
                     #      new_var temp_21_42:i1 
                     #      temp_21_42 = icmp i32 Sle i_24, 100_0 
-    li      s1, 100
-    slt     s2,s1,a1
-    xori    s2,s2,1
+    li      a2, 100
+    slt     s1,a2,a1
+    xori    s1,s1,1
                     #      new_var temp_22_42:i1 
                     #      temp_22_42 = icmp i32 Ne temp_20_42, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
-    xor     s3,a0,a4
+    li      s2, 0
+    xor     s3,a0,s2
     snez    s3, s3
                     #      new_var temp_23_42:i1 
                     #      temp_23_42 = Or i1 temp_21_42, temp_22_42 
@@ -333,7 +331,7 @@ main:
                     #      new_var temp_24_46:i32 
                     #      temp_24_46 =  Call i32 func_0(100_0) 
                     #saved register dumping to mem
-    sb      s2,15(sp)
+    sb      s1,15(sp)
     sb      s3,14(sp)
     sb      s4,13(sp)
                     #saved register dumped to mem
@@ -355,16 +353,16 @@ main:
     sw      a0,4(sp)
                     #      new_var temp_26_46:i1 
                     #      temp_26_46 = icmp i1 Ne temp_25_46, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
-    xor     s1,a0,a4
+    li      a2, 0
+    xor     s1,a0,a2
     snez    s1, s1
                     #      new_var temp_27_46:i1 
                     #      temp_27_46 = xor i1 temp_26_46, true 
     seqz    s2, s1
                     #      new_var temp_28_46:i1 
                     #      temp_28_46 = icmp i32 Ne temp_24_46, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
-    xor     s4,s3,a4
+                    #found literal reg Some(a2) already exist with 0_0
+    xor     s4,s3,a2
     snez    s4, s4
                     #      new_var temp_29_46:i1 
                     #      temp_29_46 = And i1 temp_27_46, temp_28_46 

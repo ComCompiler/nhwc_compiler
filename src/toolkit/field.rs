@@ -604,7 +604,9 @@ impl Type {
             Type::I1
         }else if const_str.contains(".") && (const_str.chars().next().map_or(false, |x|x.is_numeric()|| x=='-')) {
             Type::F32
-        } else if const_str.chars().next().map_or(false, |x|x.is_numeric() || x=='-'){
+        } else if const_str.chars().next().map_or(false, |x|x.is_numeric() || x=='-') && const_str.contains("e"){
+            Type::F32
+        }else if const_str.chars().next().map_or(false, |x|x.is_numeric() || x=='-'){
             Type::I32
         }else if const_str.starts_with("{"){
             Type::Array { dims: vec!(), ele_ty: Box::new(Type::Unknown) }

@@ -57,11 +57,11 @@ whileIf:
 .while.body_23:
                     #      new_var temp_1_25:i1 
                     #      temp_1_25 = icmp i32 Eq a_17, 5_0 
-    li      a4, 5
-    xor     a5,a0,a4
-    seqz    a5, a5
+    li      a2, 5
+    xor     a4,a0,a2
+    seqz    a4, a4
                     #      br i1 temp_1_25, label branch_true_26, label branch_false_26 
-    bnez    a5, .branch_true_26
+    bnez    a4, .branch_true_26
     j       .branch_false_26
                     #      label branch_true_26: 
 .branch_true_26:
@@ -72,11 +72,11 @@ whileIf:
 .branch_false_26:
                     #      new_var temp_3_29:i1 
                     #      temp_3_29 = icmp i32 Eq a_17, 10_0 
-    li      a6, 10
-    xor     a7,a0,a6
-    seqz    a7, a7
+    li      a2, 10
+    xor     a5,a0,a2
+    seqz    a5, a5
                     #      br i1 temp_3_29, label branch_true_30, label branch_false_30 
-    bnez    a7, .branch_true_30
+    bnez    a5, .branch_true_30
     j       .branch_false_30
                     #      label branch_true_30: 
 .branch_true_30:
@@ -87,10 +87,11 @@ whileIf:
 .branch_false_30:
                     #      new_var temp_4_33:i32 
                     #      temp_4_33 = Mul i32 a_17, 2_0 
-    li      s1, 2
-    mul     s2,a0,s1
+    li      a2, 2
+    mul     a6,a0,a2
                     #      b_17 = i32 temp_4_33 
                     #      jump label: L2_0 
+    sw      a6,0(sp)
     j       .L2_0
                     #      label L2_0: 
 .L2_0:
@@ -100,10 +101,13 @@ whileIf:
 .L4_0:
                     #      new_var temp_2_24:i32 
                     #      temp_2_24 = Add i32 a_17, 1_0 
-    li      s3, 1
-    add     s4,a0,s3
+    li      a2, 1
+    add     a5,a0,a2
                     #      a_17 = i32 temp_2_24 
                     #      jump label: while.head_23 
+    sb      a3,15(sp)
+    sb      a4,14(sp)
+    sw      a5,8(sp)
     j       .while.head_23
                     #      label while.exit_23: 
 .while.exit_23:

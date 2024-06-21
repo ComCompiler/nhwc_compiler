@@ -10,7 +10,7 @@ use crate::antlr_parser::cparser::{
 };
 
 use crate::toolkit::symtab::SymIdx;
-use crate::{add_edge, add_node, add_node_with_edge, debug_info_red, debug_info_yellow, direct_child_node, find, find_nodes, node, rule_id, term_id};
+use crate::{add_edge, add_node, add_node_with_edge, debug_info_blue, debug_info_red, debug_info_yellow, direct_child_node, find, find_nodes, node, rule_id, term_id};
 
 use super::et_node::{DeclOrDefOrUse, EtEdgeType, EtNodeType, EtTree};
 use super::eval_et::{compress_et};
@@ -20,7 +20,7 @@ use super::{ast_node::AstTree, scope_node::ScopeTree};
 // 这个函数 返回 separator node
 // 只能处理三类  expr_stmt & declaration & expr
 pub fn process_any_stmt(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, any_stmt_node:u32, scope_node:u32) -> u32 {
-    // debug_info_red!("process any_stmt: {}",any_stmt_node);
+    debug_info_red!("process any_stmt: {}",any_stmt_node);
     let sep_node = match node!(at any_stmt_node in ast_tree).rule_id {
         RULE_expressionStatement => {
             let sep_node = add_node!({EtNodeType::new_sep(any_stmt_node).into()} to et_tree);
@@ -490,6 +490,7 @@ fn process_shift_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeT
 }
 
 fn process_additive_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, additive_expr_node:u32, scope_node:u32, parent_et_node:u32) {
+    debug_info_blue!("process additive expr at {}",additive_expr_node);
     let multiplicative_expr_nodes = find_nodes!(rule RULE_multiplicativeExpression at additive_expr_node in ast_tree);
     let op_nodes = find_nodes!(term at additive_expr_node in ast_tree);
     let get_expr_node_of_op_node = |op_node_index| {

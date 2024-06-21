@@ -56,11 +56,11 @@ if_ifElse_:
 .branch_true_23:
                     #      new_var temp_1_25:i1 
                     #      temp_1_25 = icmp i32 Eq b_17, 10_0 
-    li      a4, 10
-    xor     a5,a1,a4
-    seqz    a5, a5
+    li      a2, 10
+    xor     a4,a1,a2
+    seqz    a4, a4
                     #      br i1 temp_1_25, label branch_true_26, label branch_false_26 
-    bnez    a5, .branch_true_26
+    bnez    a4, .branch_true_26
     j       .branch_false_26
                     #      label branch_true_26: 
 .branch_true_26:
@@ -71,10 +71,11 @@ if_ifElse_:
 .branch_false_26:
                     #      new_var temp_2_25:i32 
                     #      temp_2_25 = Add i32 a_17, 15_0 
-    li      a6, 15
-    add     a7,a0,a6
+    li      a2, 15
+    add     a5,a0,a2
                     #      a_17 = i32 temp_2_25 
                     #      jump label: L3_0 
+    sw      a5,0(sp)
     j       .L3_0
                     #      label L3_0: 
 .L3_0:

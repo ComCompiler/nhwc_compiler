@@ -222,17 +222,17 @@ main:
     sw      a0,144(sp)
                     #      new_var temp_5_36:i1 
                     #      temp_5_36 = icmp i32 Ne temp_4_36, 0_0 
-    li      a4, 0
-    xor     a5,a0,a4
-    snez    a5, a5
+    li      a1, 0
+    xor     a2,a0,a1
+    snez    a2, a2
                     #      new_var temp_6_36:i1 
                     #      temp_5_36 = icmp i32 Ne temp_3_36, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
+                    #found literal reg Some(a1) already exist with 0_0
                     #      new_var temp_7_36:i1 
                     #      temp_7_36 = And i1 temp_5_36, temp_6_36 
-    and     s1,a5,a7
+    and     a5,a2,a4
                     #      br i1 temp_7_36, label branch_true_37, label branch_false_37 
-    bnez    s1, .branch_true_37
+    bnez    a5, .branch_true_37
     j       .branch_false_37
                     #      label branch_false_37: 
 .branch_false_37:
@@ -241,16 +241,15 @@ main:
                     #      new_var temp_8_33:i32 
                     #      temp_8_33 = load *a_0:ptr->i32 
                     #   load label a as ptr to reg
-    la      s2, a
-                    #occupy reg s2 with *a_0
-    lw      s3,0(s2)
+    la      a1, a
+                    #occupy reg a1 with *a_0
+    lw      a6,0(a1)
                     #       Call void putint_0(temp_8_33) 
                     #saved register dumping to mem
-    sb      s1,141(sp)
-    sw      s3,136(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,144(sp)
+    mv      a0, a6
                     #arg load ended
     call    putint
                     #       Call void putch_0(32_0) 
@@ -265,12 +264,12 @@ main:
                     #   load label b as ptr to reg
     la      a0, b
                     #occupy reg a0 with *b_0
-    lw      s1,0(a0)
+    lw      a7,0(a0)
                     #       Call void putint_0(temp_9_33) 
                     #saved register dumping to mem
-    sw      s1,132(sp)
                     #saved register dumped to mem
                     #arg load start
+    mv      a0, a7
                     #arg load ended
     call    putint
                     #       Call void putch_0(32_0) 
@@ -284,14 +283,14 @@ main:
                     #   load label a as ptr to reg
     la      a0, a
                     #occupy reg a0 with *a_0
-                    #found literal reg Some(a1) already exist with 2_0
-    sd      a1,0(a0)
+    li      s1, 2
+    sd      s1,0(a0)
                     #      store 3_0:i32 *b_0:ptr->i32 
                     #   load label b as ptr to reg
-    la      s1, b
-                    #occupy reg s1 with *b_0
-                    #found literal reg Some(a3) already exist with 3_0
-    sd      a3,0(s1)
+    la      s2, b
+                    #occupy reg s2 with *b_0
+    li      s3, 3
+    sd      s3,0(s2)
                     #      jump label: L3_0 
     j       .L3_0
                     #      label L3_0: 
@@ -317,12 +316,12 @@ main:
     sw      a0,124(sp)
                     #      new_var temp_12_45:i1 
                     #      temp_12_45 = icmp i32 Ne temp_11_45, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
-    xor     s1,a0,a4
+    li      a1, 0
+    xor     s1,a0,a1
     snez    s1, s1
                     #      new_var temp_13_45:i1 
                     #      temp_12_45 = icmp i32 Ne temp_10_45, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
+                    #found literal reg Some(a1) already exist with 0_0
                     #      new_var temp_14_45:i1 
                     #      temp_14_45 = And i1 temp_12_45, temp_13_45 
     and     s4,s1,s3
@@ -340,19 +339,20 @@ main:
                     #      new_var temp_15_33:i32 
                     #      temp_15_33 = load *a_0:ptr->i32 
                     #   load label a as ptr to reg
-    la      s5, a
-                    #occupy reg s5 with *a_0
-    lw      s6,0(s5)
+    la      a1, a
+                    #occupy reg a1 with *a_0
+    lw      s5,0(a1)
                     #       Call void putint_0(temp_15_33) 
                     #saved register dumping to mem
     sb      s1,123(sp)
     sw      s2,128(sp)
     sb      s3,122(sp)
     sb      s4,121(sp)
-    sw      s6,116(sp)
+    sw      s5,116(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,124(sp)
+    lw      a0,116(sp)
                     #arg load ended
     call    putint
                     #       Call void putch_0(32_0) 
@@ -373,6 +373,7 @@ main:
     sw      s1,112(sp)
                     #saved register dumped to mem
                     #arg load start
+    lw      a0,112(sp)
                     #arg load ended
     call    putint
                     #       Call void putch_0(10_0) 
@@ -388,8 +389,8 @@ main:
                     #   load label d as ptr to reg
     la      s1, d
                     #occupy reg s1 with *d_0
-                    #found literal reg Some(a1) already exist with 2_0
-    sd      a1,0(s1)
+    li      s2, 2
+    sd      s2,0(s1)
                     #      jump label: L5_0 
     j       .L5_0
                     #      label L5_0: 
@@ -406,12 +407,12 @@ main:
     sw      a0,104(sp)
                     #      new_var temp_18_54:i1 
                     #      temp_18_54 = icmp i32 Ne temp_17_54, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
-    xor     s1,a0,a4
+    li      a1, 0
+    xor     s1,a0,a1
     snez    s1, s1
                     #      new_var temp_19_54:i1 
                     #      temp_19_54 = And i1 temp_18_54, true_0 
-    li      s2, true
+    li      s2, 1
     and     s3,s1,s2
                     #      br i1 temp_19_54, label branch_true_55, label branch_false_55 
     bnez    s3, .branch_true_55
@@ -427,17 +428,18 @@ main:
                     #      new_var temp_20_33:i32 
                     #      temp_20_33 = load *d_0:ptr->i32 
                     #   load label d as ptr to reg
-    la      s4, d
-                    #occupy reg s4 with *d_0
-    lw      s5,0(s4)
+    la      a1, d
+                    #occupy reg a1 with *d_0
+    lw      s2,0(a1)
                     #       Call void putint_0(temp_20_33) 
                     #saved register dumping to mem
     sb      s1,103(sp)
+    sw      s2,96(sp)
     sb      s3,102(sp)
-    sw      s5,96(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,104(sp)
+    lw      a0,96(sp)
                     #arg load ended
     call    putint
                     #       Call void putch_0(32_0) 
@@ -462,12 +464,12 @@ main:
     sw      a0,92(sp)
                     #      new_var temp_22_59:i1 
                     #      temp_22_59 = icmp i32 Ne temp_21_59, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
-    xor     s1,a0,a4
+    li      a1, 0
+    xor     s1,a0,a1
     snez    s1, s1
                     #      new_var temp_23_59:i1 
                     #      temp_23_59 = Or i1 temp_22_59, true_0 
-    li      s2, true
+    li      s2, 1
     or      s3,s1,s2
                     #      br i1 temp_23_59, label branch_true_60, label branch_false_60 
     bnez    s4, .branch_true_60
@@ -479,17 +481,18 @@ main:
                     #      new_var temp_24_33:i32 
                     #      temp_24_33 = load *d_0:ptr->i32 
                     #   load label d as ptr to reg
-    la      s5, d
-                    #occupy reg s5 with *d_0
-    lw      s6,0(s5)
+    la      a1, d
+                    #occupy reg a1 with *d_0
+    lw      s2,0(a1)
                     #       Call void putint_0(temp_24_33) 
                     #saved register dumping to mem
     sb      s1,91(sp)
+    sw      s2,84(sp)
     sb      s4,90(sp)
-    sw      s6,84(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,92(sp)
+    lw      a0,84(sp)
                     #arg load ended
     call    putint
                     #       Call void putch_0(10_0) 
@@ -506,8 +509,8 @@ main:
                     #      new_var temp_25_64:i1 
                     #      temp_25_64 = icmp i32 Sge 16_0, 0_0 
     li      a0, 16
-                    #found literal reg Some(a4) already exist with 0_0
-    slt     s1,a0,a4
+    li      a1, 0
+    slt     s1,a0,a1
     xori    s1,s1,1
                     #      br i1 temp_25_64, label branch_true_65, label branch_false_65 
     bnez    s1, .branch_true_65
@@ -523,6 +526,7 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_65 
+    lb      s1,83(sp)
     j       .branch_false_65
                     #      label branch_false_65: 
 .branch_false_65:
@@ -531,8 +535,8 @@ main:
                     #      new_var temp_26_68:i1 
                     #      temp_26_68 = icmp i32 Ne 18_0, 18_0 
     li      a0, 18
-    li      s1, 18
-    xor     s2,a0,s1
+    li      a1, 18
+    xor     s2,a0,a1
     snez    s2, s2
                     #      br i1 temp_26_68, label branch_true_69, label branch_false_69 
     bnez    s2, .branch_true_69
@@ -541,6 +545,7 @@ main:
 .branch_true_69:
                     #       Call void putch_0(66_0) 
                     #saved register dumping to mem
+    sb      s1,83(sp)
     sb      s2,82(sp)
                     #saved register dumped to mem
                     #arg load start
@@ -548,6 +553,8 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_69 
+    lb      s2,82(sp)
+    lb      s1,83(sp)
     j       .branch_false_69
                     #      label branch_false_69: 
 .branch_false_69:
@@ -555,28 +562,34 @@ main:
 .L11_0:
                     #      new_var temp_27_71:i32 
                     #      temp_27_71 = zext i1 true_0 to i32 
-    li      a0, true
-    andi    s1,a0,1
+    li      a0, 1
+    andi    a1,a0,1
                     #      new_var temp_28_71:i1 
                     #      temp_28_71 = icmp i32 Ne temp_27_71, 1_0 
-    li      s3, 1
-    xor     s4,s2,s3
-    snez    s4, s4
+    li      s4, 1
+    xor     s5,s3,s4
+    snez    s5, s5
                     #      br i1 temp_28_71, label branch_true_72, label branch_false_72 
-    bnez    s4, .branch_true_72
+    bnez    s5, .branch_true_72
     j       .branch_false_72
                     #      label branch_true_72: 
 .branch_true_72:
                     #       Call void putch_0(67_0) 
                     #saved register dumping to mem
-    sw      s2,76(sp)
-    sb      s4,75(sp)
+    sb      s1,83(sp)
+    sb      s2,82(sp)
+    sw      s3,76(sp)
+    sb      s5,75(sp)
                     #saved register dumped to mem
                     #arg load start
     li      a0, 67
                     #arg load ended
     call    putch
                     #      jump label: branch_false_72 
+    lb      s5,75(sp)
+    lb      s2,82(sp)
+    lw      s3,76(sp)
+    lb      s1,83(sp)
     j       .branch_false_72
                     #      label branch_false_72: 
 .branch_false_72:
@@ -584,28 +597,38 @@ main:
 .L12_0:
                     #      new_var temp_29_75:i32 
                     #      temp_29_75 = zext i1 false_0 to i32 
-    li      a0, false
-    andi    s1,a0,1
+    li      a0, 0
+    andi    a1,a0,1
                     #      new_var temp_30_75:i1 
                     #      temp_30_75 = icmp i32 Eq 0_0, temp_29_75 
-                    #found literal reg Some(a4) already exist with 0_0
-    xor     s3,a4,s2
-    seqz    s3, s3
+    li      s4, 0
+    xor     s7,s4,s6
+    seqz    s7, s7
                     #      br i1 temp_30_75, label branch_true_76, label branch_false_76 
-    bnez    s3, .branch_true_76
+    bnez    s7, .branch_true_76
     j       .branch_false_76
                     #      label branch_true_76: 
 .branch_true_76:
                     #       Call void putch_0(68_0) 
                     #saved register dumping to mem
-    sw      s2,68(sp)
-    sb      s3,67(sp)
+    sb      s1,83(sp)
+    sb      s2,82(sp)
+    sw      s3,76(sp)
+    sb      s5,75(sp)
+    sw      s6,68(sp)
+    sb      s7,67(sp)
                     #saved register dumped to mem
                     #arg load start
     li      a0, 68
                     #arg load ended
     call    putch
                     #      jump label: branch_false_76 
+    lb      s5,75(sp)
+    lb      s2,82(sp)
+    lw      s3,76(sp)
+    lw      s6,68(sp)
+    lb      s1,83(sp)
+    lb      s7,67(sp)
     j       .branch_false_76
                     #      label branch_false_76: 
 .branch_false_76:
@@ -614,32 +637,47 @@ main:
                     #      new_var temp_31_79:i1 
                     #      temp_31_79 = icmp i32 Sle 0x66_0, 077_0 
     li      a0, 0x66
-    li      s1, 077
-    slt     s2,s1,a0
-    xori    s2,s2,1
+    li      a1, 077
+    slt     s4,a1,a0
+    xori    s4,s4,1
                     #      new_var temp_32_79:i32 
                     #      temp_32_79 = zext i1 temp_31_79 to i32 
                     #      new_var temp_33_79:i1 
                     #      temp_33_79 = icmp i32 Eq 1_0, temp_32_79 
-    li      s3, 1
-    xor     s5,s3,s4
-    seqz    s5, s5
+    li      s8, 1
+    xor     s10,s8,s9
+    seqz    s10, s10
                     #      br i1 temp_33_79, label branch_true_80, label branch_false_80 
-    bnez    s5, .branch_true_80
+    bnez    s10, .branch_true_80
     j       .branch_false_80
                     #      label branch_true_80: 
 .branch_true_80:
                     #       Call void putch_0(69_0) 
                     #saved register dumping to mem
-    sb      s2,66(sp)
-    sw      s4,60(sp)
-    sb      s5,59(sp)
+    sb      s1,83(sp)
+    sb      s2,82(sp)
+    sw      s3,76(sp)
+    sb      s4,66(sp)
+    sb      s5,75(sp)
+    sw      s6,68(sp)
+    sb      s7,67(sp)
+    sw      s9,60(sp)
+    sb      s10,59(sp)
                     #saved register dumped to mem
                     #arg load start
     li      a0, 69
                     #arg load ended
     call    putch
                     #      jump label: branch_false_80 
+    lb      s5,75(sp)
+    lb      s2,82(sp)
+    lb      s4,66(sp)
+    lb      s10,59(sp)
+    lw      s3,76(sp)
+    lw      s6,68(sp)
+    lb      s1,83(sp)
+    lb      s7,67(sp)
+    lw      s9,60(sp)
     j       .branch_false_80
                     #      label branch_false_80: 
 .branch_false_80:
@@ -648,23 +686,42 @@ main:
                     #      new_var temp_34_82:i1 
                     #      temp_34_82 = icmp i32 Eq -1_0, 1_0 
     li      a0, -1
-    li      s1, 1
-    xor     s2,a0,s1
-    seqz    s2, s2
+    li      a1, 1
+    xor     s8,a0,a1
+    seqz    s8, s8
                     #      br i1 temp_34_82, label branch_true_83, label branch_false_83 
-    bnez    s2, .branch_true_83
+    bnez    s8, .branch_true_83
     j       .branch_false_83
                     #      label branch_true_83: 
 .branch_true_83:
                     #       Call void putch_0(70_0) 
                     #saved register dumping to mem
-    sb      s2,58(sp)
+    sb      s1,83(sp)
+    sb      s2,82(sp)
+    sw      s3,76(sp)
+    sb      s4,66(sp)
+    sb      s5,75(sp)
+    sw      s6,68(sp)
+    sb      s7,67(sp)
+    sb      s8,58(sp)
+    sw      s9,60(sp)
+    sb      s10,59(sp)
                     #saved register dumped to mem
                     #arg load start
     li      a0, 70
                     #arg load ended
     call    putch
                     #      jump label: branch_false_83 
+    lb      s5,75(sp)
+    lb      s2,82(sp)
+    lb      s4,66(sp)
+    lb      s10,59(sp)
+    lw      s3,76(sp)
+    lb      s8,58(sp)
+    lw      s6,68(sp)
+    lb      s1,83(sp)
+    lb      s7,67(sp)
+    lw      s9,60(sp)
     j       .branch_false_83
                     #      label branch_false_83: 
 .branch_false_83:
@@ -672,6 +729,16 @@ main:
 .L15_0:
                     #       Call void putch_0(10_0) 
                     #saved register dumping to mem
+    sb      s1,83(sp)
+    sb      s2,82(sp)
+    sw      s3,76(sp)
+    sb      s4,66(sp)
+    sb      s5,75(sp)
+    sw      s6,68(sp)
+    sb      s7,67(sp)
+    sb      s8,58(sp)
+    sw      s9,60(sp)
+    sb      s10,59(sp)
                     #saved register dumped to mem
                     #arg load start
     li      a0, 10
@@ -680,25 +747,25 @@ main:
                     #      i0_33 = i32 0_0 
     li      a0, 0
                     #      i1_33 = i32 1_0 
-    li      s1, 1
+    li      a1, 1
                     #      i2_33 = i32 2_0 
-    li      s2, 2
+    li      s1, 2
                     #      i3_33 = i32 3_0 
-    li      s3, 3
+    li      s2, 3
                     #      i4_33 = i32 4_0 
-    li      s4, 4
+    li      s3, 4
                     #      jump label: while.head_88 
     j       .while.head_88
                     #      label while.head_88: 
 .while.head_88:
                     #      new_var temp_35_87:i1 
                     #      temp_35_87 = icmp i32 Ne i0_33, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
-    xor     s5,a0,a4
+    li      s4, 0
+    xor     s5,a0,s4
     snez    s5, s5
                     #      new_var temp_36_87:i1 
                     #      temp_35_87 = icmp i32 Ne i1_33, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
+                    #found literal reg Some(s4) already exist with 0_0
                     #      new_var temp_37_87:i1 
                     #      temp_37_87 = And i1 temp_35_87, temp_36_87 
     and     s7,s5,s6
@@ -709,10 +776,9 @@ main:
 .while.body_88:
                     #       Call void putch_0(32_0) 
                     #saved register dumping to mem
-    sw      s1,48(sp)
-    sw      s2,44(sp)
-    sw      s3,40(sp)
-    sw      s4,36(sp)
+    sw      s1,44(sp)
+    sw      s2,40(sp)
+    sw      s3,36(sp)
     sb      s5,35(sp)
     sb      s6,34(sp)
     sb      s7,33(sp)
@@ -723,30 +789,39 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: while.head_88 
+    lw      a0,52(sp)
+    lw      s2,40(sp)
+    lw      s3,36(sp)
+    lw      s1,44(sp)
     j       .while.head_88
                     #      label while.exit_88: 
 .while.exit_88:
                     #      new_var temp_38_90:i1 
                     #      temp_38_90 = icmp i32 Ne i0_33, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
-    xor     s1,a0,a4
-    snez    s1, s1
+    li      s4, 0
+    xor     s8,a0,s4
+    snez    s8, s8
                     #      new_var temp_39_90:i1 
                     #      temp_38_90 = icmp i32 Ne i1_33, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
+                    #found literal reg Some(s4) already exist with 0_0
                     #      new_var temp_40_90:i1 
                     #      temp_40_90 = Or i1 temp_38_90, temp_39_90 
                     #      br i1 temp_40_90, label branch_true_91, label branch_false_91 
-    bnez    s4, .branch_true_91
+    bnez    s10, .branch_true_91
     j       .branch_false_91
                     #      label branch_true_91: 
 .branch_true_91:
                     #       Call void putch_0(67_0) 
                     #saved register dumping to mem
-    sb      s1,32(sp)
-    sw      s2,48(sp)
-    sb      s3,31(sp)
-    sb      s4,30(sp)
+    sw      s1,44(sp)
+    sw      s2,40(sp)
+    sw      s3,36(sp)
+    sb      s5,35(sp)
+    sb      s6,34(sp)
+    sb      s7,33(sp)
+    sb      s8,32(sp)
+    sb      s9,31(sp)
+    sb      s10,30(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,52(sp)
@@ -754,6 +829,16 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_91 
+    lw      a0,52(sp)
+    lb      s5,35(sp)
+    lw      s2,40(sp)
+    lb      s10,30(sp)
+    lw      s3,36(sp)
+    lb      s8,32(sp)
+    lb      s6,34(sp)
+    lw      s1,44(sp)
+    lb      s7,33(sp)
+    lb      s9,31(sp)
     j       .branch_false_91
                     #      label branch_false_91: 
 .branch_false_91:
@@ -761,32 +846,52 @@ main:
 .L16_0:
                     #      new_var temp_41_93:i1 
                     #      temp_41_93 = icmp i32 Sle i1_33, i0_33 
-    slt     s2,s1,a0
-    xori    s2,s2,1
+    slt     s4,a0,a1
+    xori    s4,s4,1
                     #      new_var temp_42_93:i1 
                     #      temp_42_93 = icmp i32 Sge i0_33, i1_33 
-    slt     s3,s1,a0
-    xori    s3,s3,1
+    slt     s11,a0,a1
+    xori    s11,s11,1
                     #      new_var temp_43_93:i1 
                     #      temp_43_93 = Or i1 temp_42_93, temp_41_93 
                     #      br i1 temp_43_93, label branch_true_94, label branch_false_94 
-    bnez    s4, .branch_true_94
+    sw      a0,52(sp)
+    bnez    a0, .branch_true_94
     j       .branch_false_94
                     #      label branch_true_94: 
 .branch_true_94:
                     #       Call void putch_0(72_0) 
                     #saved register dumping to mem
-    sw      s1,52(sp)
-    sb      s2,29(sp)
-    sb      s3,28(sp)
-    sb      s4,27(sp)
+    sw      s1,44(sp)
+    sw      s2,40(sp)
+    sw      s3,36(sp)
+    sb      s4,29(sp)
+    sb      s5,35(sp)
+    sb      s6,34(sp)
+    sb      s7,33(sp)
+    sb      s8,32(sp)
+    sb      s9,31(sp)
+    sb      s10,30(sp)
+    sb      s11,28(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a0,48(sp)
+    sb      a0,27(sp)
     li      a0, 72
                     #arg load ended
     call    putch
                     #      jump label: branch_false_94 
+    lb      a0,27(sp)
+    lb      s5,35(sp)
+    lw      s2,40(sp)
+    lb      s4,29(sp)
+    lb      s10,30(sp)
+    lw      s3,36(sp)
+    lb      s8,32(sp)
+    lb      s6,34(sp)
+    lb      s11,28(sp)
+    lw      s1,44(sp)
+    lb      s7,33(sp)
+    lb      s9,31(sp)
     j       .branch_false_94
                     #      label branch_false_94: 
 .branch_false_94:
@@ -794,35 +899,56 @@ main:
 .L17_0:
                     #      new_var temp_44_96:i1 
                     #      temp_44_96 = icmp i32 Ne i4_33, i3_33 
-    xor     s2,a0,s1
-    snez    s2, s2
+    sb      a0,27(sp)
+    xor     a0,s3,s2
+    snez    a0, a0
                     #      new_var temp_45_96:i1 
                     #      temp_45_96 = icmp i32 Sge i2_33, i1_33 
-    slt     s5,s3,s4
-    xori    s5,s5,1
+    sb      a0,26(sp)
+    slt     a0,s1,a1
+    xori    a0,a0,1
                     #      new_var temp_46_96:i1 
                     #      temp_46_96 = And i1 temp_45_96, temp_44_96 
-    and     s6,s5,s2
+    sw      a1,48(sp)
+    sb      a2,143(sp)
+    and     a2,a0,a1
                     #      br i1 temp_46_96, label branch_true_97, label branch_false_97 
-    bnez    s6, .branch_true_97
+    bnez    a2, .branch_true_97
     j       .branch_false_97
                     #      label branch_true_97: 
 .branch_true_97:
                     #       Call void putch_0(73_0) 
                     #saved register dumping to mem
-    sw      s1,40(sp)
-    sb      s2,26(sp)
-    sw      s3,44(sp)
-    sw      s4,48(sp)
-    sb      s5,25(sp)
-    sb      s6,24(sp)
+    sw      s1,44(sp)
+    sw      s2,40(sp)
+    sw      s3,36(sp)
+    sb      s4,29(sp)
+    sb      s5,35(sp)
+    sb      s6,34(sp)
+    sb      s7,33(sp)
+    sb      s8,32(sp)
+    sb      s9,31(sp)
+    sb      s10,30(sp)
+    sb      s11,28(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a0,36(sp)
+    sb      a0,25(sp)
     li      a0, 73
                     #arg load ended
     call    putch
                     #      jump label: branch_false_97 
+    lb      a0,25(sp)
+    lb      s5,35(sp)
+    lw      s2,40(sp)
+    lb      s4,29(sp)
+    lb      s10,30(sp)
+    lw      s3,36(sp)
+    lb      s8,32(sp)
+    lb      s6,34(sp)
+    lb      s11,28(sp)
+    lw      s1,44(sp)
+    lb      s7,33(sp)
+    lb      s9,31(sp)
     j       .branch_false_97
                     #      label branch_false_97: 
 .branch_false_97:
@@ -830,55 +956,79 @@ main:
 .L18_0:
                     #      new_var temp_47_100:i1 
                     #      temp_47_100 = icmp i32 Sge i4_33, i4_33 
-    slt     s1,a0,a0
-    xori    s1,s1,1
+    sb      a0,25(sp)
+    slt     a0,s3,s3
+    xori    a0,a0,1
                     #      new_var temp_48_100:i1 
                     #      temp_48_100 = icmp i32 Slt i3_33, i3_33 
-    slt     s3,s2,s2
+    sb      a0,23(sp)
+    slt     a0,s2,s2
                     #      new_var temp_49_100:i1 
                     #      temp_49_100 = icmp i1 Ne i1_33, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
-    xor     s5,s4,a4
-    snez    s5, s5
+    sb      a0,22(sp)
+    sb      a1,26(sp)
+    li      a1, 0
+    sb      a2,24(sp)
+    xor     a2,a0,a1
+    snez    a2, a2
                     #      new_var temp_50_100:i1 
                     #      temp_50_100 = xor i1 temp_49_100, true 
-    seqz    s6, s5
+    seqz    a1, a2
                     #      new_var temp_51_100:i32 
                     #      temp_51_100 = zext i1 temp_50_100 to i32 
                     #      new_var temp_52_100:i1 
                     #      temp_52_100 = icmp i32 Eq i0_33, temp_51_100 
-    xor     s9,s7,s8
-    seqz    s9, s9
+    sw      a0,48(sp)
+    sb      a1,20(sp)
+    sb      a2,21(sp)
+    xor     a2,a0,a1
+    seqz    a2, a2
                     #      new_var temp_53_100:i1 
                     #      temp_53_100 = And i1 temp_52_100, temp_48_100 
-    and     s10,s9,s3
+    sw      a0,52(sp)
+    sw      a1,16(sp)
+    and     a1,a2,a0
                     #      new_var temp_54_100:i1 
                     #      temp_54_100 = Or i1 temp_53_100, temp_47_100 
+    sb      a0,22(sp)
                     #      br i1 temp_54_100, label branch_true_101, label branch_false_101 
-    bnez    s11, .branch_true_101
+    sb      a0,23(sp)
+    bnez    a0, .branch_true_101
     j       .branch_false_101
                     #      label branch_true_101: 
 .branch_true_101:
                     #       Call void putch_0(74_0) 
                     #saved register dumping to mem
-    sb      s1,23(sp)
+    sw      s1,44(sp)
     sw      s2,40(sp)
-    sb      s3,22(sp)
-    sw      s4,48(sp)
-    sb      s5,21(sp)
-    sb      s6,20(sp)
-    sw      s7,52(sp)
-    sw      s8,16(sp)
-    sb      s9,15(sp)
-    sb      s10,14(sp)
-    sb      s11,13(sp)
+    sw      s3,36(sp)
+    sb      s4,29(sp)
+    sb      s5,35(sp)
+    sb      s6,34(sp)
+    sb      s7,33(sp)
+    sb      s8,32(sp)
+    sb      s9,31(sp)
+    sb      s10,30(sp)
+    sb      s11,28(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a0,36(sp)
+    sb      a0,13(sp)
     li      a0, 74
                     #arg load ended
     call    putch
                     #      jump label: branch_false_101 
+    lb      a0,13(sp)
+    lb      s5,35(sp)
+    lw      s2,40(sp)
+    lb      s4,29(sp)
+    lb      s10,30(sp)
+    lw      s3,36(sp)
+    lb      s8,32(sp)
+    lb      s6,34(sp)
+    lb      s11,28(sp)
+    lw      s1,44(sp)
+    lb      s7,33(sp)
+    lb      s9,31(sp)
     j       .branch_false_101
                     #      label branch_false_101: 
 .branch_false_101:
@@ -886,55 +1036,79 @@ main:
 .L19_0:
                     #      new_var temp_55_104:i1 
                     #      temp_55_104 = icmp i32 Sge i4_33, i4_33 
-    slt     s1,a0,a0
-    xori    s1,s1,1
+    sb      a0,13(sp)
+    slt     a0,s3,s3
+    xori    a0,a0,1
                     #      new_var temp_56_104:i1 
                     #      temp_56_104 = icmp i32 Slt i3_33, i3_33 
-    slt     s3,s2,s2
+    sb      a0,12(sp)
+    slt     a0,s2,s2
                     #      new_var temp_57_104:i1 
                     #      temp_57_104 = And i1 temp_56_104, temp_55_104 
-    and     s4,s3,s1
+    sb      a1,14(sp)
+    sb      a2,15(sp)
+    and     a2,a0,a1
                     #      new_var temp_58_104:i1 
                     #      temp_58_104 = icmp i1 Ne i1_33, 0_0 
-                    #found literal reg Some(a4) already exist with 0_0
-    xor     s6,s5,a4
-    snez    s6, s6
+    sb      a0,11(sp)
+    sb      a1,12(sp)
+    li      a1, 0
+    sb      a2,10(sp)
+    xor     a2,a0,a1
+    snez    a2, a2
                     #      new_var temp_59_104:i1 
                     #      temp_59_104 = xor i1 temp_58_104, true 
-    seqz    s7, s6
+    seqz    a1, a2
                     #      new_var temp_60_104:i32 
                     #      temp_60_104 = zext i1 temp_59_104 to i32 
                     #      new_var temp_61_104:i1 
                     #      temp_61_104 = icmp i32 Eq i0_33, temp_60_104 
-    xor     s10,s8,s9
-    seqz    s10, s10
+    sw      a0,48(sp)
+    sb      a1,8(sp)
+    sb      a2,9(sp)
+    xor     a2,a0,a1
+    seqz    a2, a2
                     #      new_var temp_62_104:i1 
                     #      temp_62_104 = Or i1 temp_61_104, temp_57_104 
+    sw      a0,52(sp)
                     #      br i1 temp_62_104, label branch_true_105, label branch_false_105 
-    bnez    s11, .branch_true_105
+    sb      a0,10(sp)
+    bnez    a0, .branch_true_105
     j       .branch_false_105
                     #      label branch_true_105: 
 .branch_true_105:
                     #       Call void putch_0(75_0) 
                     #saved register dumping to mem
-    sb      s1,12(sp)
+    sw      s1,44(sp)
     sw      s2,40(sp)
-    sb      s3,11(sp)
-    sb      s4,10(sp)
-    sw      s5,48(sp)
-    sb      s6,9(sp)
-    sb      s7,8(sp)
-    sw      s8,52(sp)
-    sw      s9,4(sp)
-    sb      s10,3(sp)
-    sb      s11,2(sp)
+    sw      s3,36(sp)
+    sb      s4,29(sp)
+    sb      s5,35(sp)
+    sb      s6,34(sp)
+    sb      s7,33(sp)
+    sb      s8,32(sp)
+    sb      s9,31(sp)
+    sb      s10,30(sp)
+    sb      s11,28(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a0,36(sp)
+    sb      a0,2(sp)
     li      a0, 75
                     #arg load ended
     call    putch
                     #      jump label: branch_false_105 
+    lb      a0,2(sp)
+    lb      s5,35(sp)
+    lw      s2,40(sp)
+    lb      s4,29(sp)
+    lb      s10,30(sp)
+    lw      s3,36(sp)
+    lb      s8,32(sp)
+    lb      s6,34(sp)
+    lb      s11,28(sp)
+    lw      s1,44(sp)
+    lb      s7,33(sp)
+    lb      s9,31(sp)
     j       .branch_false_105
                     #      label branch_false_105: 
 .branch_false_105:
@@ -942,8 +1116,20 @@ main:
 .L20_0:
                     #       Call void putch_0(10_0) 
                     #saved register dumping to mem
+    sw      s1,44(sp)
+    sw      s2,40(sp)
+    sw      s3,36(sp)
+    sb      s4,29(sp)
+    sb      s5,35(sp)
+    sb      s6,34(sp)
+    sb      s7,33(sp)
+    sb      s8,32(sp)
+    sb      s9,31(sp)
+    sb      s10,30(sp)
+    sb      s11,28(sp)
                     #saved register dumped to mem
                     #arg load start
+    sb      a0,2(sp)
     li      a0, 10
                     #arg load ended
     call    putch

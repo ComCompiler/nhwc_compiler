@@ -56,15 +56,16 @@ main:
 .while.body_23:
                     #      new_var temp_1_25:i1 
                     #      temp_1_25 = icmp i32 Eq i_17, 50_0 
-    li      a4, 50
-    xor     a5,a0,a4
-    seqz    a5, a5
+    li      a2, 50
+    xor     a4,a0,a2
+    seqz    a4, a4
                     #      br i1 temp_1_25, label branch_true_26, label branch_false_26 
-    bnez    a5, .branch_true_26
+    bnez    a4, .branch_true_26
     j       .branch_false_26
                     #      label branch_true_26: 
 .branch_true_26:
                     #      jump label: while.exit_23 
+    sb      a4,14(sp)
     j       .while.exit_23
                     #      label while.exit_23: 
 .while.exit_23:
@@ -81,12 +82,16 @@ main:
 .L1_0:
                     #      new_var temp_2_24:i32 
                     #      temp_2_24 = Add i32 sum_17, i_17 
-    add     a6,a0,a1
+    add     a2,a1,a0
                     #      sum_17 = i32 temp_2_24 
                     #      new_var temp_3_24:i32 
                     #      temp_3_24 = Add i32 i_17, 1_0 
-    li      a7, 1
-    add     s1,a1,a7
+    li      a5, 1
+    add     a6,a0,a5
                     #      i_17 = i32 temp_3_24 
                     #      jump label: while.head_23 
+    sw      a2,8(sp)
+    sw      a6,4(sp)
+    sb      a3,15(sp)
+    sb      a4,14(sp)
     j       .while.head_23

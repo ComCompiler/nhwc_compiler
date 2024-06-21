@@ -57,8 +57,8 @@ doubleWhile:
 .while.body_23:
                     #      new_var temp_1_24:i32 
                     #      temp_1_24 = Add i32 i_17, 30_0 
-    li      a4, 30
-    add     a5,a0,a4
+    li      a2, 30
+    add     a4,a0,a2
                     #      i_17 = i32 temp_1_24 
                     #      jump label: while.head_27 
     j       .while.head_27
@@ -66,28 +66,34 @@ doubleWhile:
 .while.head_27:
                     #      new_var temp_2_26:i1 
                     #      temp_2_26 = icmp i32 Slt j_17, 100_0 
-                    #found literal reg Some(a2) already exist with 100_0
-    slt     a6,a1,a2
+    li      a2, 100
+    slt     a5,a1,a2
                     #      br i1 temp_2_26, label while.body_27, label while.exit_27 
-    bnez    a6, .while.body_27
+    bnez    a5, .while.body_27
     j       .while.exit_27
                     #      label while.body_27: 
 .while.body_27:
                     #      new_var temp_3_28:i32 
                     #      temp_3_28 = Add i32 j_17, 6_0 
-    li      a7, 6
-    add     s1,a1,a7
+    li      a2, 6
+    add     a6,a1,a2
                     #      j_17 = i32 temp_3_28 
                     #      jump label: while.head_27 
+    sw      a6,8(sp)
+    sb      a5,15(sp)
     j       .while.head_27
                     #      label while.exit_27: 
 .while.exit_27:
                     #      new_var temp_4_24:i32 
                     #      temp_4_24 = Sub i32 j_17, 100_0 
-                    #found literal reg Some(a2) already exist with 100_0
-    sub     s2,a1,a2
+    li      a2, 100
+    sub     a6,a1,a2
                     #      j_17 = i32 temp_4_24 
                     #      jump label: while.head_23 
+    sw      a4,16(sp)
+    sb      a3,23(sp)
+    sw      a6,4(sp)
+    sb      a5,15(sp)
     j       .while.head_23
                     #      label while.exit_23: 
 .while.exit_23:

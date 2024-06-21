@@ -144,6 +144,8 @@ main:
     sb      a0,5(sp)
     li      a0, 1
                     #      jump label: branch_false_25 
+    sw      a0,76(sp)
+    lb      a0,5(sp)
     j       .branch_false_25
                     #      label branch_false_25: 
 .branch_false_25:
@@ -164,7 +166,8 @@ main:
     sw      s11,24(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a0,76(sp)
+    sb      a0,5(sp)
+    lw      a0,76(sp)
                     #arg load ended
     call    putint
                     #      ret flag_22 

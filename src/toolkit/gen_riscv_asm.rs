@@ -1,12 +1,17 @@
 
 //|symidx,temp_reg,symtab,asm_sect,regtab|{
 
-use std::{default, ops::Deref, str::FromStr};
+use std::{default, f64::consts::E, ops::Deref, str::FromStr};
 
-use crate::{antlr_parser::clexer::{Register, Void}, debug_info_blue, debug_info_red, direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, toolkit::rv64_instr::{Arithmetic, REG_A_RANGE, REG_FA_RANGE}};
+use crate::{antlr_parser::clexer::{Register, Void}, debug_info_blue, debug_info_red, direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, reg_field_for_struct, toolkit::rv64_instr::{Arithmetic, REG_A_RANGE, REG_FA_RANGE}};
 use anyhow::*;
+use itertools::Itertools;
 
-use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Type, gen_nhwc_cfg::{IS_LITERAL, TYPE}, nhwc_instr::{FuncOp, InstrSlab, NhwcInstr, NhwcInstrType}, regtab::{self, RegTab}, rv64_instr::{Compare, Imm, Loads, Logical, PseudoInstr, RV64Instr, Register, RiscvOffsetLimit, Shifts, Stores, Trans, REG_FS_RANGE, REG_S_RANGE}, simulator::Simulator, symtab::{self, SymIdx, SymTab}};
+use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CfgNode, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Type, gen_nhwc_cfg::{IS_LITERAL, TYPE}, nhwc_instr::{FuncOp, InstrSlab, NhwcInstr, NhwcInstrType}, regtab::{self, RegTab}, rv64_instr::{Compare, Imm, Loads, Logical, PseudoInstr, RV64Instr, Register, RiscvOffsetLimit, Shifts, Stores, Trans, REG_FS_RANGE, REG_S_RANGE}, simulator::Simulator, symtab::{self, SymIdx, SymTab}};
+
+reg_field_for_struct!(CfgNode {
+    REGTAB:RegTab,
+} with_fields info);
 
 /// convert nhwc ir into riscv
 pub fn parse_nhwcir2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<NhwcInstr>, riscv_instr_slab:&mut InstrSlab<RV64Instr>, asm_structure:&mut AsmStructure, regtab:&mut RegTab,src_symtab:&mut SymTab)->Result<()>{
@@ -131,8 +136,19 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
         let mut _regtab = RegTab::new();
         let regtab =&mut _regtab;
 
+        debug_info_red!("cfg dfs order: {:?} for entry {}",dfs_node_vec,cfg_entry_node);
         for &cfg_node in &dfs_node_vec{
-            for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs() {
+            if node!(at cfg_node in cfg_graph).has_regtab(){
+                // that means travel from src_cfg_node -> cfg_node 
+                //  directjump 
+                regtab.reset(symtab)?;
+                *regtab = node!(at cfg_node in cfg_graph).get_regtab()?.clone();
+                regtab.apply(symtab)?;
+            }else {
+                node_mut!(at cfg_node in cfg_graph).add_regtab(regtab.clone());
+            }
+            debug_info_red!("access cfg_node {} with regtab {:?}",cfg_node,regtab);
+            for instr in node!(at cfg_node in cfg_graph).iter_all_instrs().cloned().collect_vec() {
                 let instr_struct = instr!(at instr in nhwc_instr_slab)?;
                 debug_info_red!("{:?}",instr_struct);
                 asm_sect.annotation(format!("{:?}",instr_struct));
@@ -185,8 +201,6 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         _store_sym(asm_sect, &ra_symidx, Register::RA, regtab,symtab)?;
                         _store_sym(asm_sect, &s0_symidx, Register::new_s0(), regtab,symtab)?;
                         add_literal_to_reg(asm_sect, Register::new_s0(),  Register::SP,regtab, symtab,stack_size as isize)?;
-
-                        
                     },
                     NhwcInstrType::DefineVar { var_symidx, vartype: _, op_value } => {
                         match op_value{
@@ -435,13 +449,13 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                                 asm_sect.asm({Compare::new_flt_s} (rst_reg.clone(),val_reg2.clone(),val_reg1.clone()).into());
                                             },
                                             super::nhwc_instr::FcmpPlan::Oge => {
-                                                let rd1 = regtab.anonymous_occupy(&symidx, vartype, symtab, asm_sect, &mut default_store, 
+                                                let rd1 = regtab.find_and_anonymous_occupy(&symidx, vartype, symtab, asm_sect, &mut default_store, 
                                                     &mut |symidx,rd1,symtab,asm_sect,regtab|{
                                                         asm_sect.asm(Compare::new_feq_s(rd1.clone(),val_reg1.clone(),val_reg2.clone()).into());
                                                         Ok(())
                                                     }
                                                 )?;
-                                                let rd2 = regtab.anonymous_occupy(&symidx, vartype, symtab, asm_sect, &mut default_store, 
+                                                let rd2 = regtab.find_and_anonymous_occupy(&symidx, vartype, symtab, asm_sect, &mut default_store, 
                                                     &mut |symidx,rd2,symtab,asm_sect,regtab|{
                                                         asm_sect.asm(Compare::new_flt_s(rd2.clone(),val_reg2.clone(),val_reg1.clone()).into());
                                                         Ok(())
@@ -454,13 +468,13 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                                 asm_sect.asm(Compare::new_flt_s(rst_reg,val_reg1.clone(),val_reg2.clone()).into());
                                             },
                                             super::nhwc_instr::FcmpPlan::Ole => {
-                                                let rd1 = regtab.anonymous_occupy(&symidx, vartype, symtab, asm_sect, &mut default_store, 
+                                                let rd1 = regtab.find_and_anonymous_occupy(&symidx, vartype, symtab, asm_sect, &mut default_store, 
                                                     &mut |symidx,rd1,symtab,asm_sect,regtab|{
                                                         asm_sect.asm(Compare::new_feq_s(rd1.clone(),val_reg1.clone(),val_reg2.clone()).into());
                                                         Ok(())
                                                     }
                                                 )?;
-                                                let rd2 = regtab.anonymous_occupy(&symidx, vartype, symtab, asm_sect, &mut default_store, 
+                                                let rd2 = regtab.find_and_anonymous_occupy(&symidx, vartype, symtab, asm_sect, &mut default_store, 
                                                     &mut |symidx,rd2,symtab,asm_sect,regtab|{
                                                         asm_sect.asm(Compare::new_flt_s(rd2.clone(),val_reg1.clone(),val_reg2.clone()).into());
                                                         Ok(())
@@ -558,28 +572,40 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         if fpu_args.len() > 8{
                             
                         }
-                        for (idx,arg) in fpu_args.iter().enumerate(){
-                            if REG_FS_RANGE.contains(&(idx as u8)){
-                                let reg =Register::new_fa(idx as u8);
-                                regtab.load_into(reg.clone(), arg, &Type::F32,symtab,asm_sect,&mut default_store, &mut default_load)?;
-                                regtab.forget(reg, symtab)?;
+                        {
+                            // first make all args occupyied 
+                            for (idx,arg) in fpu_args.iter().enumerate(){
+                                if REG_FS_RANGE.contains(&(idx as u8)){
+                                    let reg =Register::new_fa(idx as u8);
+                                        regtab.anonymous_load_into(reg, arg, &Type::F32, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                    // regtab.forget(reg, symtab)?;
+                                }
+                            } 
+                            // than free the arg reg at the same time
+                            for (idx,arg) in fpu_args.iter().enumerate(){
+                                if REG_A_RANGE.contains(&(idx as u8)){
+                                    let reg =Register::new_a(idx as u8);
+                                    regtab.forget(reg, symtab)?;
+                                }
                             }
-                            // else {
-                            //     // first ensure this arg is in reg
-                            //     // since all the arg has been released to mem
-                            //     load_sym_or_imm(asm_sect, arg, regtab, symtab)?;
-                                
-                            // }
-                        }   
-                        for (idx,arg) in gpr_args.iter().enumerate(){
-                            if REG_A_RANGE.contains(&(idx as u8)){
-                                let reg =Register::new_a(idx as u8);
-                                regtab.load_into(reg.clone(), arg, &Type::I32,symtab,asm_sect,&mut default_store,&mut default_load)?;
-                                regtab.forget(reg, symtab)?;
-                            }else {
+                        }  
+                        // for gpr args
+                        {
+                            for (idx,arg) in gpr_args.iter().enumerate(){
+                                if REG_A_RANGE.contains(&(idx as u8)){
+                                    let reg =Register::new_a(idx as u8);
+                                    regtab.anonymous_load_into(reg, arg, &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                }else {
 
-                            }
-                        }   
+                                }
+                            }   
+                            for (idx,arg) in gpr_args.iter().enumerate(){
+                                if REG_A_RANGE.contains(&(idx as u8)){
+                                    let reg =Register::new_a(idx as u8);
+                                    regtab.forget(reg, symtab)?;
+                                }
+                            }   
+                        }
                         asm_sect.annotation("arg load ended".to_string());
                         asm_sect.asm(PseudoInstr::new_call(Imm::new_global_label(func_op.func_symidx.clone())).into());
                         match op_assigned_symidx{
@@ -637,13 +663,56 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 asm_sect.asm(PseudoInstr::new_ret().into());
                             },
                             super::nhwc_instr::JumpOp::Br { cond, t1, t2 } => {
+                                let (&t1_cfg_node,&t2_cfg_node) = (symtab.get(t1)?.get_label_cfg_node()?,symtab.get(t2)?.get_label_cfg_node()?);
+                                debug_info_red!("suit regtab");
+                                debug_info_red!("{:?}",regtab);
+                                let op_t1_regtab = if node!(at t1_cfg_node in cfg_graph).has_regtab(){ Some(node!(at t1_cfg_node in cfg_graph).get_regtab()?) }else { None };
+                                
+                                // *mention* here we occupy reg then free it by design, because we want to the cloned regtab has this field
+                                // this is not redundant !!
+                                let val_reg = regtab.find_and_occupy_reg(cond, &Type::I1, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                regtab.free_reg(val_reg)?;
+                                match op_t1_regtab{
+                                    Some(target_regtab) => {
+                                        // if the cfg_ndoe has been visited, you should suit the regtab left
+                                        regtab.suit(target_regtab, asm_sect, symtab, &mut default_store, &mut default_load)?;
+                                    },
+                                    None => {
+                                        regtab.forget_all_temp();
+                                        node_mut!(at t1_cfg_node in cfg_graph).add_regtab(regtab.clone());
+                                    },
+                                }
                                 let val_reg = regtab.find_and_occupy_reg(cond, &Type::I1, symtab, asm_sect, &mut default_store, &mut default_load)?;
                                 asm_sect.asm(PseudoInstr::new_bnez(val_reg.clone(),Imm::new_local_label(t1.clone())).into());
-                                asm_sect.asm(PseudoInstr::new_j(Imm::new_local_label(t2.clone())).into());
                                 regtab.free_reg(val_reg)?;
+                                
+                                let op_t2_regtab = if node!(at t2_cfg_node in cfg_graph).has_regtab(){ Some(node!(at t2_cfg_node in cfg_graph).get_regtab()?) }else { None };
+                                match op_t2_regtab{
+                                    Some(target_regtab) => {
+                                        regtab.suit(target_regtab, asm_sect, symtab, &mut default_store, &mut default_load)?;
+                                    },
+                                    None => {
+                                        regtab.forget_all_temp();
+                                        node_mut!(at t2_cfg_node in cfg_graph).add_regtab(regtab.clone());
+                                    },
+                                }
+                                asm_sect.asm(PseudoInstr::new_j(Imm::new_local_label(t2.clone())).into());
                             },
                             super::nhwc_instr::JumpOp::Switch { cond: _, default: _, compared: _ } => todo!(),
                             super::nhwc_instr::JumpOp::DirectJump { label_symidx } => {
+                                let &label_cfg_node = symtab.get(label_symidx)?.get_label_cfg_node()?;
+                                let op_regtab = if node!(at label_cfg_node in cfg_graph).has_regtab(){ Some(node!(at label_cfg_node in cfg_graph).get_regtab()?) }else { None };
+                                match op_regtab{
+                                    Some(target_regtab) => {
+                                        regtab.suit(target_regtab, asm_sect, symtab, &mut default_store, &mut default_load)?;
+                                    },
+                                    None => {
+                                        // temp reg will be dropped between basic blocks 
+                                        // first come, fisrt served 
+                                        regtab.forget_all_temp();
+                                        node_mut!(at label_cfg_node in cfg_graph).add_regtab(regtab.clone());
+                                    },
+                                }
                                 asm_sect.asm(PseudoInstr::new_j(Imm::new_local_label(label_symidx.clone())).into())
                             },
                         }

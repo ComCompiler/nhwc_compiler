@@ -73,16 +73,16 @@ main:
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
-    sw      a3,8(sp)
+    mv      a0, a3
                     #arg load ended
     call    func
     sw      a0,4(sp)
                     #      b_23 = i32 temp_2_23 
-    mv      a3, a0
+    mv      a4, a0
                     #      ret b_23 
     ld      ra,24(sp)
     ld      s0,16(sp)
-    sw      a3,12(sp)
+    sw      a4,12(sp)
     sw      a0,4(sp)
     addi    sp,sp,32
     ret

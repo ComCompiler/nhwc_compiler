@@ -52,63 +52,66 @@ main:
 .while.head_23:
                     #      new_var temp_0_22:i1 
                     #      temp_0_22 = icmp i32 Sle i_19, 9_0 
-    li      a3, 9
-    slt     a4,a3,a0
-    xori    a4,a4,1
+    li      a1, 9
+    slt     a2,a1,a0
+    xori    a2,a2,1
                     #      br i1 temp_0_22, label while.body_23, label while.exit_23 
-    bnez    a4, .while.body_23
+    bnez    a2, .while.body_23
     j       .while.exit_23
                     #      label while.body_23: 
 .while.body_23:
                     #      new_var temp_1_24:i32 
                     #      temp_1_24 = Add i32 i_19, 1_0 
-                    #found literal reg Some(a2) already exist with 1_0
-    add     a5,a0,a2
+    li      a1, 1
+    add     a3,a0,a1
                     #      i_19 = i32 temp_1_24 
                     #      new_var temp_2_24:i32 
                     #      temp_2_24 = load *k_0:ptr->i32 
                     #   load label k as ptr to reg
-    la      a6, k
-                    #occupy reg a6 with *k_0
-    lw      a7,0(a6)
+    la      a4, k
+                    #occupy reg a4 with *k_0
+    lw      a5,0(a4)
                     #      new_var temp_3_24:i32 
                     #      temp_3_24 = Add i32 temp_2_24, 1_0 
-                    #found literal reg Some(a2) already exist with 1_0
-    add     s1,a7,a2
+                    #found literal reg Some(a1) already exist with 1_0
+    add     a6,a5,a1
                     #      new_var temp_4_24:i32 
                     #      temp_4_24 = load *k_0:ptr->i32 
                     #   load label k as ptr to reg
-    la      s2, k
-                    #occupy reg s2 with *k_0
-    lw      s3,0(s2)
+    la      a7, k
+                    #occupy reg a7 with *k_0
+    lw      s1,0(a7)
                     #      new_var temp_5_24:i32 
                     #      temp_5_24 = Mul i32 temp_4_24, 2_0 
-    li      s4, 2
-    mul     s5,s3,s4
+    li      s2, 2
+    mul     s3,s1,s2
                     #      store temp_5_24:i32 *k_0:ptr->i32 
                     #   load label k as ptr to reg
-    la      s6, k
-                    #occupy reg s6 with *k_0
-    sd      s5,0(s6)
+    la      s4, k
+                    #occupy reg s4 with *k_0
+    sd      s3,0(s4)
                     #      jump label: while.head_23 
+    sw      a6,20(sp)
+    sw      a3,28(sp)
+    sw      a5,24(sp)
+    sw      s3,12(sp)
+    sw      s1,16(sp)
+    sb      a2,35(sp)
     j       .while.head_23
                     #      label while.exit_23: 
 .while.exit_23:
                     #      new_var temp_6_19:i32 
                     #      temp_6_19 = load *k_0:ptr->i32 
                     #   load label k as ptr to reg
-    la      s7, k
-                    #occupy reg s7 with *k_0
-    lw      s8,0(s7)
+    la      a1, k
+                    #occupy reg a1 with *k_0
+    lw      a3,0(a1)
                     #       Call void putint_0(temp_6_19) 
                     #saved register dumping to mem
-    sw      s1,20(sp)
-    sw      s3,16(sp)
-    sw      s5,12(sp)
-    sw      s8,8(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,36(sp)
+    mv      a0, a3
                     #arg load ended
     call    putint
                     #      new_var temp_7_19:i32 
@@ -116,11 +119,11 @@ main:
                     #   load label k as ptr to reg
     la      a0, k
                     #occupy reg a0 with *k_0
-    lw      s1,0(a0)
+    lw      a4,0(a0)
                     #      ret temp_7_19 
     ld      ra,48(sp)
     ld      s0,40(sp)
-    sw      s1,4(sp)
+    sw      a4,4(sp)
     addi    sp,sp,56
     ret
 .section        .data

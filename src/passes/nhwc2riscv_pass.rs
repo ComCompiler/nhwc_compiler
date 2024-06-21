@@ -33,8 +33,8 @@ stoptime:\n\tmv a0, zero\n\ttail _sysy_stoptime\n\n\n";
         may_err
     }
     // 返回pass的描述，具体作用
-    fn get_desc(&self) -> String { return "pass Nhwc2RiscvDebugPass description".to_string(); }
+    fn get_desc(&self) -> String { return "pass Nhwc2RiscvPass description".to_string(); }
 
     // 返回pass的名称
-    fn get_pass_name(&self) -> String { return "Nhwc2RiscvDebugPass".to_string(); }
+    fn get_pass_name(&self) -> String { return "Nhwc2RiscvPass".to_string(); }
 }

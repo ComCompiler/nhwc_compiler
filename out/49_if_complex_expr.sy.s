@@ -123,11 +123,20 @@ main:
     sb      s9,34(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a4,60(sp)
     sw      a0,76(sp)
+    mv      a0, a4
                     #arg load ended
     call    putint
                     #      jump label: branch_false_29 
+    lb      s9,34(sp)
+    lw      a0,76(sp)
+    lw      s1,52(sp)
+    lb      s8,35(sp)
+    lw      s4,44(sp)
+    lb      s3,51(sp)
+    lb      s5,43(sp)
+    lw      s7,36(sp)
+    lb      s6,42(sp)
     j       .branch_false_29
                     #      label branch_false_29: 
 .branch_false_29:
@@ -135,67 +144,85 @@ main:
 .L2_0:
                     #      new_var temp_9_32:i32 
                     #      temp_9_32 = Add i32 c_17, 2_0 
-                    #found literal reg Some(a7) already exist with 2_0
-    add     a0,a2,a7
+    li      a5, 2
+    add     a7,a2,a5
                     #      new_var temp_10_32:i32 
                     #      temp_10_32 = Mod i32 temp_9_32, 2_0 
-                    #found literal reg Some(a7) already exist with 2_0
-    rem     a4,a0,a7
+                    #found literal reg Some(a5) already exist with 2_0
+    rem     s2,a7,a5
                     #      new_var temp_11_32:i1 
                     #      temp_11_32 = icmp i32 Ne temp_10_32, 0_0 
-    li      s1, 0
-    xor     s2,a4,s1
-    snez    s2, s2
+    li      s10, 0
+    xor     s11,s2,s10
+    snez    s11, s11
                     #      new_var temp_12_32:i32 
                     #      temp_12_32 = Sub i32 a_17, b_17 
-    sub     s4,s3,a1
+    sub     a5,a0,a1
                     #      new_var temp_13_32:i1 
                     #      temp_13_32 = icmp i32 Ne temp_12_32, 0_0 
-                    #found literal reg Some(s1) already exist with 0_0
-    xor     s5,s4,s1
-    snez    s5, s5
+                    #found literal reg Some(s10) already exist with 0_0
+    sw      a0,76(sp)
+    xor     a0,a5,s10
+    snez    a0, a0
                     #      new_var temp_14_32:i1 
                     #      temp_14_32 = And i1 temp_13_32, temp_11_32 
-    and     s6,s5,s2
+    and     s10,a0,s11
                     #      new_var temp_15_32:i32 
                     #      temp_15_32 = Mod i32 d_17, 2_0 
-                    #found literal reg Some(a7) already exist with 2_0
-    rem     s7,a3,a7
+    sb      a0,15(sp)
+    li      a0, 2
+    sw      a1,72(sp)
+    rem     a1,a3,a0
                     #      new_var temp_16_32:i32 
                     #      temp_16_32 = Add i32 temp_15_32, 67_0 
-    li      s8, 67
-    add     s9,s7,s8
+    li      a0, 67
+    sw      a2,68(sp)
+    add     a2,a1,a0
                     #      new_var temp_17_32:i1 
                     #      temp_17_32 = icmp i32 Slt temp_16_32, 0_0 
-                    #found literal reg Some(s1) already exist with 0_0
-    slt     s10,s9,s1
+    li      a0, 0
+    sw      a1,8(sp)
+    slt     a1,a2,a0
                     #      new_var temp_18_32:i1 
                     #      temp_18_32 = Or i1 temp_17_32, temp_14_32 
                     #      br i1 temp_18_32, label branch_true_33, label branch_false_33 
-    bnez    s11, .branch_true_33
+    bnez    a0, .branch_true_33
     j       .branch_false_33
                     #      label branch_true_33: 
 .branch_true_33:
                     #      result_17 = i32 4_0 
-    li      a5, 4
                     #       Call void putint_0(result_17) 
                     #saved register dumping to mem
-    sb      s2,23(sp)
-    sw      s3,76(sp)
-    sw      s4,16(sp)
-    sb      s5,15(sp)
-    sb      s6,14(sp)
-    sw      s7,8(sp)
-    sw      s9,4(sp)
-    sb      s10,3(sp)
-    sb      s11,2(sp)
+    sw      s1,52(sp)
+    sw      s2,24(sp)
+    sb      s3,51(sp)
+    sw      s4,44(sp)
+    sb      s5,43(sp)
+    sb      s6,42(sp)
+    sw      s7,36(sp)
+    sb      s8,35(sp)
+    sb      s9,34(sp)
+    sb      s10,14(sp)
+    sb      s11,23(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a5,60(sp)
-    sw      a0,28(sp)
+    sb      a0,2(sp)
+    mv      a0, a4
                     #arg load ended
     call    putint
                     #      jump label: branch_false_33 
+    lb      s9,34(sp)
+    lb      s11,23(sp)
+    lb      a0,2(sp)
+    lw      s1,52(sp)
+    lb      s10,14(sp)
+    lb      s8,35(sp)
+    lw      s4,44(sp)
+    lb      s3,51(sp)
+    lb      s5,43(sp)
+    lw      s2,24(sp)
+    lw      s7,36(sp)
+    lb      s6,42(sp)
     j       .branch_false_33
                     #      label branch_false_33: 
 .branch_false_33:
@@ -204,6 +231,7 @@ main:
                     #      ret 0_0 
     ld      ra,88(sp)
     ld      s0,80(sp)
+    sb      a0,2(sp)
     li      a0, 0
     addi    sp,sp,96
     ret

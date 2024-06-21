@@ -53,16 +53,17 @@ relu_reg:
 .L6_0:
                     #      new_var temp_1_22:i1 
                     #      temp_1_22 = icmp i32 Slt a_16, 0_0 
-    li      a4, 0
-    slt     a5,a3,a4
+    li      a1, 0
+    slt     a3,a0,a1
                     #      br i1 temp_1_22, label branch_true_23, label branch_false_23 
-    bnez    a5, .branch_true_23
+    bnez    a3, .branch_true_23
     j       .branch_false_23
                     #      label branch_true_23: 
 .branch_true_23:
                     #      ret 0_0 
     ld      ra,16(sp)
     ld      s0,8(sp)
+    sw      a0,4(sp)
     li      a0, 0
     addi    sp,sp,24
     ret
@@ -73,7 +74,7 @@ relu_reg:
                     #      ret a_16 
     ld      ra,16(sp)
     ld      s0,8(sp)
-    sw      a3,4(sp)
+    sw      a0,4(sp)
     addi    sp,sp,24
     ret
                     #      Define model_0 [a_26] -> model_ret_0 
@@ -1414,49 +1415,48 @@ model:
     sw      s11,0(s11)
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,1852(sp)
     sw      a0,1856(sp)
+    mv      a0, a1
                     #arg load ended
     call    relu_reg
     sw      a0,1848(sp)
                     #      new_var temp_102_29:i32 
                     #      temp_102_29 = Mul i32 temp_101_29, 46_0 
-    li      a1, 46
-    mul     s1,a0,a1
+    li      s1, 46
+    mul     s2,a0,s1
                     #      new_var temp_103_29:i32 
                     #      temp_103_29 = Mul i32 -70_0, temp_90_29 
-    li      a1, -70
-    mul     s3,a1,s2
+    li      s1, -70
+    mul     s4,s1,s3
                     #      new_var temp_104_29:i32 
                     #      temp_104_29 = Mul i32 -15_0, temp_78_29 
-    li      a1, -15
-    mul     s5,a1,s4
+    li      s1, -15
+    mul     s6,s1,s5
                     #      new_var temp_105_29:i32 
                     #      temp_105_29 = Mul i32 -62_0, temp_62_29 
-    li      a1, -62
-    mul     s7,a1,s6
+    li      s1, -62
+    mul     s8,s1,s7
                     #      new_var temp_106_29:i32 
                     #      temp_106_29 = Mul i32 temp_6_29, -114_0 
-    li      s8, -114
-    mul     s9,a1,s8
+    li      s9, -114
+    mul     s10,s1,s9
                     #      new_var temp_107_29:i32 
                     #      temp_107_29 = Mul i32 temp_9_29, -13_0 
-    li      s10, -13
-    mul     s11,s8,s10
+    li      s11, -13
+    sw      a0,1848(sp)
+    mul     a0,s9,s11
                     #      new_var temp_108_29:i32 
                     #      temp_108_29 = Add i32 temp_107_29, temp_106_29 
-    add     s10,s11,s9
+    add     s11,a0,s10
                     #      new_var temp_109_29:i32 
                     #      temp_109_29 = Mul i32 temp_13_29, -103_0 
-    sw      a0,1848(sp)
+    sw      a0,1824(sp)
     li      a0, -103
-    li      a1, 2404
-    add     a1,sp,a1
-    sw      a1,0(a1)
+    sw      a1,1852(sp)
     mul     a1,a4,a0
                     #      new_var temp_110_29:i32 
                     #      temp_110_29 = Add i32 temp_109_29, temp_108_29 
-    add     a0,a1,s10
+    add     a0,a1,s11
                     #      new_var temp_111_29:i32 
                     #      temp_111_29 = Mul i32 temp_17_29, 37_0 
     sw      a0,1812(sp)
@@ -1616,7 +1616,7 @@ model:
                     #      new_var temp_135_29:i32 
                     #      temp_135_29 = Add i32 temp_134_29, temp_105_29 
     sw      a1,1724(sp)
-    add     a1,a0,s7
+    add     a1,a0,s8
                     #      new_var temp_136_29:i32 
                     #      temp_136_29 = Mul i32 36_0, temp_66_29 
     sw      a0,1716(sp)
@@ -1659,7 +1659,7 @@ model:
                     #      new_var temp_142_29:i32 
                     #      temp_142_29 = Add i32 temp_141_29, temp_104_29 
     sw      a1,1696(sp)
-    add     a1,a0,s5
+    add     a1,a0,s6
                     #      new_var temp_143_29:i32 
                     #      temp_143_29 = Mul i32 temp_82_29, -90_0 
     sw      a0,1688(sp)
@@ -1685,7 +1685,7 @@ model:
                     #      new_var temp_147_29:i32 
                     #      temp_147_29 = Add i32 temp_146_29, temp_103_29 
     sw      a1,1676(sp)
-    add     a1,a0,s3
+    add     a1,a0,s4
                     #      new_var temp_148_29:i32 
                     #      temp_148_29 = Mul i32 temp_94_29, 7_0 
     sw      a0,1668(sp)
@@ -1711,65 +1711,66 @@ model:
                     #      new_var temp_152_29:i32 
                     #      temp_152_29 =  Call i32 relu_reg_0(temp_151_29) 
                     #saved register dumping to mem
-    sw      s1,1844(sp)
-    sw      s2,1908(sp)
-    sw      s3,1840(sp)
-    sw      s4,1980(sp)
-    sw      s5,1836(sp)
-    li      s1, 2076
+    li      s1, 2404
     add     s1,sp,s1
-    sw      s6,0(s1)
-    sw      s7,1832(sp)
-    li      s2, 2388
+    sw      s1,0(s1)
+    sw      s2,1844(sp)
+    sw      s3,1908(sp)
+    sw      s4,1840(sp)
+    sw      s5,1980(sp)
+    sw      s6,1836(sp)
+    li      s2, 2076
     add     s2,sp,s2
-    sw      s8,0(s2)
-    sw      s9,1828(sp)
-    sw      s10,1820(sp)
-    sw      s11,1824(sp)
+    sw      s7,0(s2)
+    sw      s8,1832(sp)
+    li      s3, 2388
+    add     s3,sp,s3
+    sw      s9,0(s3)
+    sw      s10,1828(sp)
+    sw      s11,1820(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,1648(sp)
     sw      a0,1656(sp)
+    mv      a0, a1
                     #arg load ended
     call    relu_reg
     sw      a0,1644(sp)
                     #      new_var temp_153_29:i32 
                     #      temp_153_29 = Mul i32 temp_152_29, -23_0 
-    li      a1, -23
-    mul     s3,a0,a1
+    li      s4, -23
+    mul     s5,a0,s4
                     #      new_var temp_154_29:i32 
                     #      temp_154_29 = Add i32 temp_153_29, temp_102_29 
-    add     s5,s3,s4
+    add     s7,s5,s6
                     #      new_var temp_155_29:i32 
                     #      temp_155_29 = Mul i32 82_0, temp_94_29 
-    li      s6, 82
-    mul     s8,s6,s7
+    li      s8, 82
+    mul     s10,s8,s9
                     #      new_var temp_156_29:i32 
                     #      temp_156_29 = Mul i32 temp_21_29, 65_0 
-    li      s10, 65
-    mul     s11,s9,s10
+    li      s1, 65
+    mul     s2,s11,s1
                     #      new_var temp_157_29:i32 
                     #      temp_157_29 = Mul i32 -84_0, temp_6_29 
-    li      a1, -84
-    mul     s2,a1,s1
+    li      s1, -84
+    mul     s4,s1,s3
                     #      new_var temp_158_29:i32 
                     #      temp_158_29 = Mul i32 temp_9_29, 46_0 
-    li      s6, 46
-    mul     s10,a1,s6
+    li      s8, 46
+    sw      a0,1644(sp)
+    mul     a0,s1,s8
                     #      new_var temp_159_29:i32 
                     #      temp_159_29 = Add i32 temp_158_29, temp_157_29 
-    add     s6,s10,s2
+    add     s8,a0,s4
                     #      new_var temp_160_29:i32 
                     #      temp_160_29 = Mul i32 temp_13_29, 83_0 
-    sw      a0,1644(sp)
+    sw      a0,1620(sp)
     li      a0, 83
-    li      a1, 2388
-    add     a1,sp,a1
-    sw      a1,0(a1)
+    sw      a1,1648(sp)
     mul     a1,a4,a0
                     #      new_var temp_161_29:i32 
                     #      temp_161_29 = Add i32 temp_160_29, temp_159_29 
-    add     a0,a1,s6
+    add     a0,a1,s8
                     #      new_var temp_162_29:i32 
                     #      temp_162_29 = Mul i32 97_0, temp_17_29 
     sw      a0,1608(sp)
@@ -1786,7 +1787,7 @@ model:
                     #      new_var temp_164_29:i32 
                     #      temp_164_29 = Add i32 temp_163_29, temp_156_29 
     sw      a0,1608(sp)
-    add     a0,a1,s11
+    add     a0,a1,s2
                     #      new_var temp_165_29:i32 
                     #      temp_165_29 = Mul i32 temp_25_29, -121_0 
     sw      a0,1596(sp)
@@ -2010,7 +2011,7 @@ model:
                     #      new_var temp_200_29:i32 
                     #      temp_200_29 = Add i32 temp_199_29, temp_155_29 
     sw      a1,1464(sp)
-    add     a1,a0,s8
+    add     a1,a0,s10
                     #      new_var temp_201_29:i32 
                     #      temp_201_29 = Mul i32 33_0, temp_98_29 
     sw      a0,1456(sp)
@@ -2025,71 +2026,76 @@ model:
                     #      new_var temp_203_29:i32 
                     #      temp_203_29 =  Call i32 relu_reg_0(temp_202_29) 
                     #saved register dumping to mem
-    li      s1, 2404
+    li      s1, 2388
     add     s1,sp,s1
     sw      s1,0(s1)
-    sw      s2,1624(sp)
-    sw      s3,1640(sp)
-    sw      s4,1844(sp)
-    sw      s5,1636(sp)
-    sw      s6,1616(sp)
-    sw      s7,1884(sp)
-    sw      s8,1632(sp)
-    li      s2, 2316
+    sw      s2,1628(sp)
+    li      s2, 2404
     add     s2,sp,s2
-    sw      s9,0(s2)
-    sw      s10,1620(sp)
-    sw      s11,1628(sp)
+    sw      s3,0(s2)
+    sw      s4,1624(sp)
+    sw      s5,1640(sp)
+    sw      s6,1844(sp)
+    sw      s7,1636(sp)
+    sw      s8,1616(sp)
+    sw      s9,1884(sp)
+    sw      s10,1632(sp)
+    li      s3, 2316
+    add     s3,sp,s3
+    sw      s11,0(s3)
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,1444(sp)
     sw      a0,1452(sp)
+    mv      a0, a1
                     #arg load ended
     call    relu_reg
     sw      a0,1440(sp)
                     #      new_var temp_204_29:i32 
                     #      temp_204_29 = Mul i32 temp_203_29, -50_0 
-    li      a1, -50
-    mul     s3,a0,a1
+    li      s4, -50
+    mul     s5,a0,s4
                     #      new_var temp_205_29:i32 
                     #      temp_205_29 = Add i32 temp_204_29, temp_154_29 
-    add     s5,s3,s4
+    add     s7,s5,s6
                     #      new_var temp_206_29:i32 
                     #      temp_206_29 = Mul i32 temp_6_29, 66_0 
-    li      s7, 66
-    mul     s8,s6,s7
+    li      s9, 66
+    mul     s10,s8,s9
                     #      new_var temp_207_29:i32 
                     #      temp_207_29 = Mul i32 temp_9_29, -15_0 
-    li      s10, -15
-    mul     s11,s9,s10
+    li      s1, -15
+    mul     s2,s11,s1
                     #      new_var temp_208_29:i32 
                     #      temp_208_29 = Add i32 temp_207_29, temp_206_29 
-    add     a1,s11,s8
+    add     s1,s2,s10
                     #      new_var temp_209_29:i32 
                     #      temp_209_29 = Mul i32 temp_13_29, -13_0 
-    li      s1, -13
-    mul     s2,a4,s1
+    li      s3, -13
+    mul     s4,a4,s3
                     #      new_var temp_210_29:i32 
                     #      temp_210_29 = Add i32 temp_209_29, temp_208_29 
-    add     s1,s2,a1
+    add     s3,s4,s1
                     #      new_var temp_211_29:i32 
                     #      temp_211_29 = Mul i32 48_0, temp_17_29 
-    li      s7, 48
+    li      s9, 48
     sw      a0,1440(sp)
-    mul     a0,s7,s10
+    sw      a1,1444(sp)
+    mul     a1,s9,a0
                     #      new_var temp_212_29:i32 
                     #      temp_212_29 = Add i32 temp_211_29, temp_210_29 
-    add     s7,a0,s1
+    add     s9,a1,s3
                     #      new_var temp_213_29:i32 
                     #      temp_213_29 = Mul i32 -79_0, temp_21_29 
-    sw      a0,1408(sp)
+    li      a0, 2340
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a0, -79
-    sw      a1,1420(sp)
+    sw      a1,1408(sp)
     sw      a2,1448(sp)
     mul     a2,a0,a1
                     #      new_var temp_214_29:i32 
                     #      temp_214_29 = Add i32 temp_213_29, temp_212_29 
-    add     a0,a2,s7
+    add     a0,a2,s9
                     #      new_var temp_215_29:i32 
                     #      temp_215_29 = Mul i32 86_0, temp_25_29 
     sw      a0,1396(sp)
@@ -2343,60 +2349,59 @@ model:
                     #      new_var temp_255_29:i32 
                     #      temp_255_29 =  Call i32 relu_reg_0(temp_254_29) 
                     #saved register dumping to mem
-    sw      s1,1412(sp)
-    sw      s2,1416(sp)
-    sw      s3,1436(sp)
-    sw      s4,1636(sp)
-    sw      s5,1432(sp)
+    sw      s1,1420(sp)
+    sw      s2,1424(sp)
+    sw      s3,1412(sp)
+    sw      s4,1416(sp)
+    sw      s5,1436(sp)
+    sw      s6,1636(sp)
+    sw      s7,1432(sp)
     li      s1, 2404
     add     s1,sp,s1
-    sw      s6,0(s1)
-    sw      s7,1404(sp)
-    sw      s8,1428(sp)
+    sw      s8,0(s1)
+    sw      s9,1404(sp)
+    sw      s10,1428(sp)
     li      s2, 2388
     add     s2,sp,s2
-    sw      s9,0(s2)
-    li      s3, 2340
-    add     s3,sp,s3
-    sw      s10,0(s3)
-    sw      s11,1424(sp)
+    sw      s11,0(s2)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,1236(sp)
+    lw      a0,1236(sp)
                     #arg load ended
     call    relu_reg
     sw      a0,1232(sp)
                     #      new_var temp_256_29:i32 
                     #      temp_256_29 = Mul i32 temp_255_29, -95_0 
-    li      s4, -95
-    mul     s5,a0,s4
+    li      s3, -95
+    mul     s4,a0,s3
                     #      new_var temp_257_29:i32 
                     #      temp_257_29 = Add i32 temp_256_29, temp_205_29 
-    add     s7,s5,s6
+    add     s6,s4,s5
                     #      new_var temp_258_29:i32 
                     #      temp_258_29 = Mul i32 -72_0, temp_6_29 
-    li      s8, -72
-    mul     s10,s8,s9
+    li      s7, -72
+    mul     s9,s7,s8
                     #      new_var temp_259_29:i32 
                     #      temp_259_29 = Mul i32 temp_9_29, 82_0 
-    li      s1, 82
-    mul     s2,s11,s1
+    li      s11, 82
+    mul     s1,s10,s11
                     #      new_var temp_260_29:i32 
                     #      temp_260_29 = Add i32 temp_259_29, temp_258_29 
-    add     s1,s2,s10
+    add     s2,s1,s9
                     #      new_var temp_261_29:i32 
                     #      temp_261_29 = Mul i32 -54_0, temp_13_29 
     li      s3, -54
-    mul     s4,s3,a4
+    mul     s7,s3,a4
                     #      new_var temp_262_29:i32 
                     #      temp_262_29 = Add i32 temp_261_29, temp_260_29 
-    add     s3,s4,s1
+    add     s3,s7,s2
                     #      new_var temp_263_29:i32 
                     #      temp_263_29 = Mul i32 temp_17_29, -116_0 
     sw      a0,1232(sp)
     li      a0, -116
     sw      a1,1244(sp)
-    mul     a1,s8,a0
+    mul     a1,s11,a0
                     #      new_var temp_264_29:i32 
                     #      temp_264_29 = Add i32 temp_263_29, temp_262_29 
     add     a0,a1,s3
@@ -2651,69 +2656,70 @@ model:
                     #      new_var temp_305_29:i32 
                     #      temp_305_29 =  Call i32 relu_reg_0(temp_304_29) 
                     #saved register dumping to mem
-    sw      s1,1212(sp)
-    sw      s2,1216(sp)
+    sw      s1,1216(sp)
+    sw      s2,1212(sp)
     sw      s3,1204(sp)
-    sw      s4,1208(sp)
-    sw      s5,1228(sp)
-    sw      s6,1432(sp)
-    sw      s7,1224(sp)
-    li      s1, 2340
+    sw      s4,1228(sp)
+    sw      s5,1432(sp)
+    sw      s6,1224(sp)
+    sw      s7,1208(sp)
+    li      s1, 2404
     add     s1,sp,s1
     sw      s8,0(s1)
-    li      s2, 2404
+    sw      s9,1220(sp)
+    li      s2, 2388
     add     s2,sp,s2
-    sw      s9,0(s2)
-    sw      s10,1220(sp)
-    li      s3, 2388
+    sw      s10,0(s2)
+    li      s3, 2340
     add     s3,sp,s3
     sw      s11,0(s3)
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,1036(sp)
     sw      a0,1044(sp)
+    mv      a0, a1
                     #arg load ended
     call    relu_reg
     sw      a0,1032(sp)
                     #      new_var temp_306_29:i32 
                     #      temp_306_29 = Mul i32 temp_305_29, 32_0 
-    li      a1, 32
-    mul     s4,a0,a1
+    li      s4, 32
+    mul     s5,a0,s4
                     #      new_var temp_307_29:i32 
                     #      temp_307_29 = Add i32 temp_306_29, temp_257_29 
-    add     s6,s4,s5
+    add     s7,s5,s6
                     #      new_var temp_308_29:i32 
                     #      temp_308_29 = Mul i32 125_0, temp_66_29 
-    li      s7, 125
-    mul     s9,s7,s8
+    li      s8, 125
+    mul     s10,s8,s9
                     #      new_var temp_309_29:i32 
                     #      temp_309_29 = Mul i32 -124_0, temp_6_29 
-    li      s10, -124
-    mul     a1,s10,s11
+    li      s11, -124
+    mul     s2,s11,s1
                     #      new_var temp_310_29:i32 
                     #      temp_310_29 = Mul i32 temp_9_29, 49_0 
-    li      s2, 49
-    mul     s3,s1,s2
+    li      s4, 49
+    mul     s8,s3,s4
                     #      new_var temp_311_29:i32 
                     #      temp_311_29 = Add i32 temp_310_29, temp_309_29 
-    add     s2,s3,a1
+    add     s4,s8,s2
                     #      new_var temp_312_29:i32 
                     #      temp_312_29 = Mul i32 3_0, temp_13_29 
-    li      s7, 3
-    mul     s10,s7,a4
+    li      s11, 3
+    sw      a0,1032(sp)
+    mul     a0,s11,a4
                     #      new_var temp_313_29:i32 
                     #      temp_313_29 = Add i32 temp_312_29, temp_311_29 
-    add     s7,s10,s2
+    add     s11,a0,s4
                     #      new_var temp_314_29:i32 
                     #      temp_314_29 = Mul i32 79_0, temp_17_29 
-    sw      a0,1032(sp)
+    sw      a0,1004(sp)
     li      a0, 79
-    sw      a1,1016(sp)
+    sw      a1,1036(sp)
     sw      a2,1040(sp)
     mul     a2,a0,a1
                     #      new_var temp_315_29:i32 
                     #      temp_315_29 = Add i32 temp_314_29, temp_313_29 
-    add     a0,a2,s7
+    add     a0,a2,s11
                     #      new_var temp_316_29:i32 
                     #      temp_316_29 = Mul i32 15_0, temp_21_29 
     sw      a0,992(sp)
@@ -2875,7 +2881,7 @@ model:
                     #      new_var temp_340_29:i32 
                     #      temp_340_29 = Add i32 temp_339_29, temp_308_29 
     sw      a0,904(sp)
-    add     a0,a1,s9
+    add     a0,a1,s10
                     #      new_var temp_341_29:i32 
                     #      temp_341_29 = Mul i32 temp_70_29, -70_0 
     sw      a0,892(sp)
@@ -2965,69 +2971,70 @@ model:
                     #      new_var temp_356_29:i32 
                     #      temp_356_29 =  Call i32 relu_reg_0(temp_355_29) 
                     #saved register dumping to mem
-    li      s1, 2388
+    li      s1, 2404
     add     s1,sp,s1
     sw      s1,0(s1)
-    sw      s2,1008(sp)
-    sw      s3,1012(sp)
-    sw      s4,1028(sp)
-    sw      s5,1224(sp)
-    sw      s6,1024(sp)
-    sw      s7,1000(sp)
-    li      s2, 2052
+    sw      s2,1016(sp)
+    li      s2, 2388
     add     s2,sp,s2
-    sw      s8,0(s2)
-    sw      s9,1020(sp)
-    sw      s10,1004(sp)
-    li      s3, 2404
+    sw      s3,0(s2)
+    sw      s4,1008(sp)
+    sw      s5,1028(sp)
+    sw      s6,1224(sp)
+    sw      s7,1024(sp)
+    sw      s8,1012(sp)
+    li      s3, 2052
     add     s3,sp,s3
-    sw      s11,0(s3)
+    sw      s9,0(s3)
+    sw      s10,1020(sp)
+    sw      s11,1000(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,832(sp)
     sw      a0,840(sp)
+    mv      a0, a1
                     #arg load ended
     call    relu_reg
     sw      a0,828(sp)
                     #      new_var temp_357_29:i32 
                     #      temp_357_29 = Mul i32 temp_356_29, -3_0 
-    li      a1, -3
-    mul     s4,a0,a1
+    li      s4, -3
+    mul     s5,a0,s4
                     #      new_var temp_358_29:i32 
                     #      temp_358_29 = Add i32 temp_357_29, temp_307_29 
-    add     s6,s4,s5
+    add     s7,s5,s6
                     #      new_var temp_359_29:i32 
                     #      temp_359_29 = Mul i32 temp_54_29, -67_0 
-    li      s8, -67
-    mul     s9,s7,s8
+    li      s9, -67
+    mul     s10,s8,s9
                     #      new_var temp_360_29:i32 
                     #      temp_360_29 = Mul i32 118_0, temp_6_29 
-    li      s10, 118
-    mul     a1,s10,s11
+    li      s11, 118
+    mul     s2,s11,s1
                     #      new_var temp_361_29:i32 
                     #      temp_361_29 = Mul i32 95_0, temp_9_29 
-    li      s1, 95
-    mul     s3,s1,s2
+    li      s3, 95
+    mul     s9,s3,s4
                     #      new_var temp_362_29:i32 
                     #      temp_362_29 = Add i32 temp_361_29, temp_360_29 
-    add     s1,s3,a1
+    add     s3,s9,s2
                     #      new_var temp_363_29:i32 
                     #      temp_363_29 = Mul i32 temp_13_29, -117_0 
-    li      s8, -117
-    mul     s10,a4,s8
+    li      s11, -117
+    sw      a0,828(sp)
+    mul     a0,a4,s11
                     #      new_var temp_364_29:i32 
                     #      temp_364_29 = Add i32 temp_363_29, temp_362_29 
-    add     s8,s10,s1
+    add     s11,a0,s3
                     #      new_var temp_365_29:i32 
                     #      temp_365_29 = Mul i32 -32_0, temp_17_29 
-    sw      a0,828(sp)
+    sw      a0,800(sp)
     li      a0, -32
-    sw      a1,812(sp)
+    sw      a1,832(sp)
     sw      a2,836(sp)
     mul     a2,a0,a1
                     #      new_var temp_366_29:i32 
                     #      temp_366_29 = Add i32 temp_365_29, temp_364_29 
-    add     a0,a2,s8
+    add     a0,a2,s11
                     #      new_var temp_367_29:i32 
                     #      temp_367_29 = Mul i32 -47_0, temp_21_29 
     sw      a0,788(sp)
@@ -3150,7 +3157,7 @@ model:
                     #      new_var temp_385_29:i32 
                     #      temp_385_29 = Add i32 temp_384_29, temp_359_29 
     sw      a1,724(sp)
-    add     a1,a0,s9
+    add     a1,a0,s10
                     #      new_var temp_386_29:i32 
                     #      temp_386_29 = Mul i32 -65_0, temp_58_29 
     sw      a0,716(sp)
@@ -3277,68 +3284,71 @@ model:
                     #      new_var temp_407_29:i32 
                     #      temp_407_29 =  Call i32 relu_reg_0(temp_406_29) 
                     #saved register dumping to mem
-    sw      s1,804(sp)
-    li      s1, 2388
+    li      s1, 2404
     add     s1,sp,s1
-    sw      s2,0(s1)
-    sw      s3,808(sp)
-    sw      s4,824(sp)
-    sw      s5,1024(sp)
-    sw      s6,820(sp)
-    li      s2, 2124
+    sw      s1,0(s1)
+    sw      s2,812(sp)
+    sw      s3,804(sp)
+    li      s2, 2388
     add     s2,sp,s2
-    sw      s7,0(s2)
-    sw      s8,796(sp)
-    sw      s9,816(sp)
-    sw      s10,800(sp)
-    li      s3, 2404
+    sw      s4,0(s2)
+    sw      s5,824(sp)
+    sw      s6,1024(sp)
+    sw      s7,820(sp)
+    li      s3, 2124
     add     s3,sp,s3
-    sw      s11,0(s3)
+    sw      s8,0(s3)
+    sw      s9,808(sp)
+    sw      s10,816(sp)
+    sw      s11,796(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,628(sp)
     sw      a0,636(sp)
+    mv      a0, a1
                     #arg load ended
     call    relu_reg
     sw      a0,624(sp)
                     #      new_var temp_408_29:i32 
                     #      temp_408_29 = Mul i32 temp_407_29, -106_0 
-    li      a1, -106
-    mul     s4,a0,a1
+    li      s4, -106
+    mul     s5,a0,s4
                     #      new_var temp_409_29:i32 
                     #      temp_409_29 = Add i32 temp_408_29, temp_358_29 
-    add     s6,s4,s5
+    add     s7,s5,s6
                     #      new_var temp_410_29:i32 
                     #      temp_410_29 = Mul i32 94_0, temp_6_29 
-    li      s7, 94
-    mul     s9,s7,s8
+    li      s8, 94
+    mul     s10,s8,s9
                     #      new_var temp_411_29:i32 
                     #      temp_411_29 = Mul i32 -6_0, temp_9_29 
-    li      s10, -6
-    mul     a1,s10,s11
+    li      s11, -6
+    mul     s2,s11,s1
                     #      new_var temp_412_29:i32 
                     #      temp_412_29 = Add i32 temp_411_29, temp_410_29 
-    add     s1,a1,s9
+    add     s3,s2,s10
                     #      new_var temp_413_29:i32 
                     #      temp_413_29 = Mul i32 temp_13_29, -39_0 
-    li      s2, -39
-    mul     s3,a4,s2
+    li      s4, -39
+    mul     s8,a4,s4
                     #      new_var temp_414_29:i32 
                     #      temp_414_29 = Add i32 temp_413_29, temp_412_29 
-    add     s2,s3,s1
+    add     s4,s8,s3
                     #      new_var temp_415_29:i32 
                     #      temp_415_29 = Mul i32 120_0, temp_17_29 
-    li      s7, 120
+    li      s11, 120
     sw      a0,624(sp)
-    mul     a0,s7,s10
+    sw      a1,628(sp)
+    mul     a1,s11,a0
                     #      new_var temp_416_29:i32 
                     #      temp_416_29 = Add i32 temp_415_29, temp_414_29 
-    add     s7,a0,s2
+    add     s11,a1,s4
                     #      new_var temp_417_29:i32 
                     #      temp_417_29 = Add i32 temp_156_29, temp_416_29 
-    sw      a0,592(sp)
-    sw      a1,608(sp)
-    add     a1,a0,s7
+    li      a0, 2340
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    sw      a1,592(sp)
+    add     a1,a0,s11
                     #      new_var temp_418_29:i32 
                     #      temp_418_29 = Mul i32 -99_0, temp_25_29 
     sw      a0,1628(sp)
@@ -3585,34 +3595,32 @@ model:
                     #      new_var temp_457_29:i32 
                     #      temp_457_29 =  Call i32 relu_reg_0(temp_456_29) 
                     #saved register dumping to mem
-    sw      s1,604(sp)
-    sw      s2,596(sp)
-    sw      s3,600(sp)
-    sw      s4,620(sp)
-    sw      s5,820(sp)
-    sw      s6,616(sp)
-    sw      s7,588(sp)
-    li      s1, 2404
+    li      s1, 2388
     add     s1,sp,s1
-    sw      s8,0(s1)
-    sw      s9,612(sp)
-    li      s2, 2340
+    sw      s1,0(s1)
+    sw      s2,608(sp)
+    sw      s3,604(sp)
+    sw      s4,596(sp)
+    sw      s5,620(sp)
+    sw      s6,820(sp)
+    sw      s7,616(sp)
+    sw      s8,600(sp)
+    li      s2, 2404
     add     s2,sp,s2
-    sw      s10,0(s2)
-    li      s3, 2388
-    add     s3,sp,s3
-    sw      s11,0(s3)
+    sw      s9,0(s2)
+    sw      s10,612(sp)
+    sw      s11,588(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,428(sp)
     sw      a0,436(sp)
+    mv      a0, a1
                     #arg load ended
     call    relu_reg
     sw      a0,424(sp)
                     #      new_var temp_458_29:i32 
                     #      temp_458_29 = Mul i32 temp_457_29, 127_0 
-    li      a1, 127
-    mul     s4,a0,a1
+    li      s3, 127
+    mul     s4,a0,s3
                     #      new_var temp_459_29:i32 
                     #      temp_459_29 = Add i32 temp_458_29, temp_409_29 
     add     s6,s4,s5
@@ -3623,35 +3631,38 @@ model:
                     #      new_var temp_461_29:i32 
                     #      temp_461_29 = Mul i32 temp_9_29, -75_0 
     li      s11, -75
-    mul     a1,s10,s11
+    mul     s1,s10,s11
                     #      new_var temp_462_29:i32 
                     #      temp_462_29 = Add i32 temp_461_29, temp_460_29 
-    add     s1,a1,s9
+    add     s2,s1,s9
                     #      new_var temp_463_29:i32 
                     #      temp_463_29 = Mul i32 -22_0, temp_13_29 
-    li      s2, -22
-    mul     s3,s2,a4
+    li      s3, -22
+    mul     s7,s3,a4
                     #      new_var temp_464_29:i32 
                     #      temp_464_29 = Add i32 temp_463_29, temp_462_29 
-    add     s2,s3,s1
+    add     s3,s7,s2
                     #      new_var temp_465_29:i32 
                     #      temp_465_29 = Mul i32 -100_0, temp_17_29 
-    li      s7, -100
+    li      s11, -100
     sw      a0,424(sp)
-    mul     a0,s7,s11
+    sw      a1,428(sp)
+    mul     a1,s11,a0
                     #      new_var temp_466_29:i32 
                     #      temp_466_29 = Add i32 temp_465_29, temp_464_29 
-    add     s7,a0,s2
+    add     s11,a1,s3
                     #      new_var temp_467_29:i32 
                     #      temp_467_29 = Mul i32 -110_0, temp_21_29 
-    sw      a0,392(sp)
+    li      a0, 2340
+    add     a0,sp,a0
+    sw      a0,0(a0)
     li      a0, -110
-    sw      a1,408(sp)
+    sw      a1,392(sp)
     sw      a2,432(sp)
     mul     a2,a0,a1
                     #      new_var temp_468_29:i32 
                     #      temp_468_29 = Add i32 temp_467_29, temp_466_29 
-    add     a0,a2,s7
+    add     a0,a2,s11
                     #      new_var temp_469_29:i32 
                     #      temp_469_29 = Mul i32 temp_25_29, -31_0 
     sw      a0,380(sp)
@@ -3905,13 +3916,13 @@ model:
                     #      new_var temp_509_29:i32 
                     #      temp_509_29 =  Call i32 relu_reg_0(temp_508_29) 
                     #saved register dumping to mem
-    sw      s1,404(sp)
-    sw      s2,396(sp)
-    sw      s3,400(sp)
+    sw      s1,408(sp)
+    sw      s2,404(sp)
+    sw      s3,396(sp)
     sw      s4,420(sp)
     sw      s5,616(sp)
     sw      s6,416(sp)
-    sw      s7,388(sp)
+    sw      s7,400(sp)
     li      s1, 2404
     add     s1,sp,s1
     sw      s8,0(s1)
@@ -3919,46 +3930,45 @@ model:
     li      s2, 2388
     add     s2,sp,s2
     sw      s10,0(s2)
-    li      s3, 2340
-    add     s3,sp,s3
-    sw      s11,0(s3)
+    sw      s11,388(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,220(sp)
+    lw      a0,220(sp)
                     #arg load ended
     call    relu_reg
     sw      a0,216(sp)
                     #      new_var temp_510_29:i32 
                     #      temp_510_29 = Mul i32 temp_509_29, 77_0 
-    li      s4, 77
-    mul     s5,a0,s4
+    li      s3, 77
+    mul     s4,a0,s3
                     #      new_var temp_511_29:i32 
                     #      temp_511_29 = Add i32 temp_510_29, temp_459_29 
-    add     s7,s5,s6
+    add     s6,s4,s5
                     #      new_var temp_512_29:i32 
                     #      temp_512_29 = Mul i32 temp_6_29, 46_0 
-    li      s9, 46
-    mul     s10,s8,s9
+    li      s8, 46
+    mul     s9,s7,s8
                     #      new_var temp_513_29:i32 
                     #      temp_513_29 = Mul i32 temp_9_29, 80_0 
-    li      s1, 80
-    mul     s2,s11,s1
+    li      s11, 80
+    mul     s1,s10,s11
                     #      new_var temp_514_29:i32 
                     #      temp_514_29 = Add i32 temp_513_29, temp_512_29 
-    add     s1,s2,s10
+    add     s2,s1,s9
                     #      new_var temp_515_29:i32 
                     #      temp_515_29 = Mul i32 temp_13_29, -4_0 
     li      s3, -4
-    mul     s4,a4,s3
+    mul     s8,a4,s3
                     #      new_var temp_516_29:i32 
                     #      temp_516_29 = Add i32 temp_515_29, temp_514_29 
-    add     s3,s4,s1
+    add     s3,s8,s2
                     #      new_var temp_517_29:i32 
                     #      temp_517_29 = Mul i32 temp_17_29, 47_0 
     sw      a0,216(sp)
     li      a0, 47
     sw      a1,228(sp)
-    mul     a1,s9,a0
+    mul     a1,s11,a0
                     #      new_var temp_518_29:i32 
                     #      temp_518_29 = Add i32 temp_517_29, temp_516_29 
     add     a0,a1,s3
@@ -4219,26 +4229,27 @@ model:
                     #      new_var temp_560_29:i32 
                     #      temp_560_29 =  Call i32 relu_reg_0(temp_559_29) 
                     #saved register dumping to mem
-    sw      s1,196(sp)
-    sw      s2,200(sp)
+    sw      s1,200(sp)
+    sw      s2,196(sp)
     sw      s3,188(sp)
-    sw      s4,192(sp)
-    sw      s5,212(sp)
-    sw      s6,416(sp)
-    sw      s7,208(sp)
+    sw      s4,212(sp)
+    sw      s5,416(sp)
+    sw      s6,208(sp)
     li      s1, 2404
     add     s1,sp,s1
-    sw      s8,0(s1)
-    li      s2, 2340
+    sw      s7,0(s1)
+    sw      s8,192(sp)
+    sw      s9,204(sp)
+    li      s2, 2388
     add     s2,sp,s2
-    sw      s9,0(s2)
-    sw      s10,204(sp)
-    li      s3, 2388
+    sw      s10,0(s2)
+    li      s3, 2340
     add     s3,sp,s3
     sw      s11,0(s3)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,16(sp)
+    lw      a0,16(sp)
                     #arg load ended
     call    relu_reg
     sw      a0,12(sp)
@@ -4259,29 +4270,34 @@ model:
                     #      label branch_true_30: 
 .branch_true_30:
                     #      ret 1_0 
-    li      s10, 2448
-    add     s10,sp,s10
-    ld      ra,0(s10)
-    li      s11, 2440
-    add     s11,sp,s11
-    ld      s0,0(s11)
+    li      s1, 2448
+    add     s1,sp,s1
+    ld      ra,0(s1)
+    li      s2, 2440
+    add     s2,sp,s2
+    ld      s0,0(s2)
     sw      a0,12(sp)
     li      a0, 1
-    li      s1, 2456
-    li      s1, 2456
-    add     sp,s1,sp
+    li      s3, 2456
+    li      s3, 2456
+    add     sp,s3,sp
     ret
                     #      label branch_false_30: 
 .branch_false_30:
                     #      label L4_0: 
 .L4_0:
                     #      ret 0_0 
-    mv      ra, s10
-    mv      s0, s11
+    li      s1, 2448
+    add     s1,sp,s1
+    ld      ra,0(s1)
+    li      s2, 2440
+    add     s2,sp,s2
+    ld      s0,0(s2)
+    sw      a0,12(sp)
     li      a0, 0
-                    #found literal reg Some(s1) already exist with 2456_0
-    li      s1, 2456
-    add     sp,s1,sp
+    li      s3, 2456
+    li      s3, 2456
+    add     sp,s3,sp
     ret
                     #      Define main_0 [] -> main_ret_0 
     .globl main
@@ -4334,52 +4350,50 @@ main:
                     #      label while.body_38: 
 .while.body_38:
                     #      i_39 = i32 0_0 
-    li      a4, 0
+    li      a2, 0
                     #      jump label: while.head_42 
     j       .while.head_42
                     #      label while.head_42: 
 .while.head_42:
                     #      new_var temp_566_41:i1 
                     #      temp_566_41 = icmp i32 Slt i_39, 5_0 
-    li      a5, 5
-    slt     a6,a4,a5
+    li      a4, 5
+    slt     a5,a2,a4
                     #      br i1 temp_566_41, label while.body_42, label while.exit_42 
-    bnez    a6, .while.body_42
+    bnez    a5, .while.body_42
     j       .while.exit_42
                     #      label while.body_42: 
 .while.body_42:
                     #      j_43 = i32 0_0 
-    li      a7, 0
+    li      a4, 0
                     #      jump label: while.head_46 
     j       .while.head_46
                     #      label while.head_46: 
 .while.head_46:
                     #      new_var temp_567_45:i1 
                     #      temp_567_45 = icmp i32 Slt j_43, 5_0 
-                    #found literal reg Some(a5) already exist with 5_0
-    slt     s1,a7,a5
+    li      a6, 5
+    slt     a7,a4,a6
                     #      br i1 temp_567_45, label while.body_46, label while.exit_46 
-    bnez    s1, .while.body_46
+    bnez    a7, .while.body_46
     j       .while.exit_46
                     #      label while.body_46: 
 .while.body_46:
                     #      new_var temp_568_47:ptr->i32 
                     #      temp_568_47 = getelementptr a_34:Array:i32:[Some(5_0), Some(5_0)] [Some(i_39), Some(j_43)] 
-    li      s2, 0
-                    #found literal reg Some(a5) already exist with 5_0
-    mul     s3,a5,a4
-    add     s2,s2,s3
-    li      s4, 1
-    add     s2,s2,s3
-    slli s2,s2,2
-    add     s2,s2,sp
-    add     s2,s2,s2
+    li      a6, 0
+    li      s1, 5
+    mul     s2,s1,a2
+    add     a6,a6,s2
+    li      s3, 1
+    add     a6,a6,s2
+    slli a6,a6,2
+    add     a6,a6,sp
+    add     a6,a6,a6
                     #      new_var temp_569_47:i32 
                     #      temp_569_47 =  Call i32 getint_0() 
                     #saved register dumping to mem
-    sb      s1,35(sp)
-    sd      s2,24(sp)
-    sw      s3,148(sp)
+    sw      s2,148(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -4387,52 +4401,58 @@ main:
     sw      a0,156(sp)
     sw      a0,20(sp)
                     #      store temp_569_47:i32 temp_568_47:ptr->i32 
-    sd      a0,0(s1)
+    sd      a0,0(a6)
                     #      mu a_34:1771 
                     #      a_34 = chi a_34:1771 
                     #      new_var temp_570_47:i32 
                     #      temp_570_47 = Add i32 j_43, 1_0 
-    li      s2, 1
-    add     s3,a7,s2
+    li      s1, 1
+    add     s2,a4,s1
                     #      j_43 = i32 temp_570_47 
                     #      jump label: while.head_46 
+    sd      a6,24(sp)
+    sb      a7,35(sp)
+    sw      a0,20(sp)
+    lw      a0,156(sp)
+    sw      s2,16(sp)
     j       .while.head_46
                     #      label while.exit_46: 
 .while.exit_46:
                     #      new_var temp_571_43:i32 
                     #      temp_571_43 = Add i32 i_39, 1_0 
-                    #found literal reg Some(s2) already exist with 1_0
-    add     s4,a4,s2
+    li      a6, 1
+    add     s1,a2,a6
                     #      i_39 = i32 temp_571_43 
                     #      jump label: while.head_42 
+    sb      a5,43(sp)
+    sw      a4,36(sp)
+    sb      a7,35(sp)
+    sw      s1,12(sp)
     j       .while.head_42
                     #      label while.exit_42: 
 .while.exit_42:
                     #      new_var temp_572_51:i32 
                     #      temp_572_51 =  Call i32 model_0(a_34) 
                     #saved register dumping to mem
-    sd      s1,24(sp)
-    sw      s3,16(sp)
-    sw      s4,12(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a0,20(sp)
+    sw      a0,156(sp)
+    lw      a0,148(sp)
                     #arg load ended
     call    model
     sw      a0,8(sp)
                     #      new_var temp_573_15294:i1 
                     #      temp_573_15294 = icmp i32 Ne temp_572_51, 0_0 
-                    #found literal reg Some(a2) already exist with 0_0
-    xor     s1,a0,a2
-    snez    s1, s1
+    li      a4, 0
+    xor     a6,a0,a4
+    snez    a6, a6
                     #      br i1 temp_573_15294, label branch_true_52, label branch_false_52 
-    bnez    s1, .branch_true_52
+    bnez    a6, .branch_true_52
     j       .branch_false_52
                     #      label branch_true_52: 
 .branch_true_52:
                     #       Call void putch_0(99_0) 
                     #saved register dumping to mem
-    sb      s1,7(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,8(sp)
@@ -4468,6 +4488,7 @@ main:
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
+    sw      a0,8(sp)
     li      a0, 100
                     #arg load ended
     call    putch
@@ -4501,15 +4522,22 @@ main:
                     #      new_var temp_574_39:i32 
                     #      temp_574_39 = Sub i32 N_34, 1_0 
     li      a0, 1
-    sub     s1,a1,a0
+    sub     a4,a1,a0
                     #      N_34 = i32 temp_574_39 
                     #      jump label: while.head_38 
+    sb      a6,7(sp)
+    sb      a5,43(sp)
+    sw      a4,0(sp)
+    sb      a3,51(sp)
+    lw      a0,156(sp)
+    sw      a2,44(sp)
     j       .while.head_38
                     #      label while.exit_38: 
 .while.exit_38:
                     #      ret 0_0 
     ld      ra,168(sp)
     ld      s0,160(sp)
+    sw      a0,156(sp)
     li      a0, 0
     addi    sp,sp,176
     ret

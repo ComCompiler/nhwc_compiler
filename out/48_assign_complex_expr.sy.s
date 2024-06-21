@@ -102,6 +102,7 @@ main:
                     #saved register dumped to mem
                     #arg load start
     sw      a0,84(sp)
+    lw      a0,68(sp)
                     #arg load ended
     call    putint
                     #      new_var temp_7_17:i32 
@@ -159,6 +160,7 @@ main:
                     #saved register dumped to mem
                     #arg load start
     sw      a0,68(sp)
+    lw      a0,68(sp)
                     #arg load ended
     call    putint
                     #      ret 0_0 

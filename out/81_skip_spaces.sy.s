@@ -73,13 +73,13 @@ main:
 .while.body_20:
                     #      new_var temp_2_21:ptr->i32 
                     #      temp_2_21 = getelementptr arr_17:Array:i32:[Some(100_0)] [Some(i_17)] 
-    li      a4, 0
-    li      a5, 1
-    mul     a7,a5,a6
-    add     a4,a4,a7
-    slli a4,a4,2
-    add     a4,a4,sp
-    add     a4,a4,a4
+    li      a2, 0
+    li      a4, 1
+    mul     a6,a4,a5
+    add     a2,a2,a6
+    slli a2,a2,2
+    add     a2,a2,sp
+    add     a2,a2,a2
                     #      new_var temp_3_21:i32 
                     #      temp_3_21 =  Call i32 getint_0() 
                     #saved register dumping to mem
@@ -90,60 +90,75 @@ main:
     sw      a0,52(sp)
     sw      a0,36(sp)
                     #      store temp_3_21:i32 temp_2_21:ptr->i32 
-    sd      a0,0(a4)
+    sd      a0,0(a2)
                     #      mu arr_17:39 
                     #      arr_17 = chi arr_17:39 
                     #      new_var temp_4_21:i32 
                     #      temp_4_21 = Add i32 i_17, 1_0 
-                    #found literal reg Some(a5) already exist with 1_0
-    add     s1,a6,a5
+                    #found literal reg Some(a4) already exist with 1_0
+    add     a7,a5,a4
                     #      i_17 = i32 temp_4_21 
                     #      jump label: while.head_20 
+    sd      a2,40(sp)
+    sw      a7,32(sp)
+    sw      a0,36(sp)
+    mv      a0, a5
+    sw      a6,460(sp)
+    sb      a3,51(sp)
+    sw      a5,60(sp)
     j       .while.head_20
                     #      label while.head_25: 
 .while.head_25:
                     #      new_var temp_5_227:i1 
                     #      temp_5_227 = icmp i32 Ne i_17, 0_0 
-                    #found literal reg Some(a2) already exist with 0_0
-    xor     s2,a6,a2
-    snez    s2, s2
+    li      a4, 0
+    xor     a5,a2,a4
+    snez    a5, a5
                     #      br i1 temp_5_227, label while.body_25, label while.exit_25 
-    bnez    s2, .while.body_25
+    bnez    a5, .while.body_25
     j       .while.exit_25
                     #      label while.body_25: 
 .while.body_25:
                     #      new_var temp_6_26:i32 
                     #      temp_6_26 = Sub i32 i_17, 1_0 
-                    #found literal reg Some(a5) already exist with 1_0
-    sub     s3,a6,a5
+    li      a4, 1
+    sub     a6,a2,a4
                     #      i_17 = i32 temp_6_26 
                     #      new_var temp_7_26:ptr->i32 
                     #      new_var temp_8_26:i32 
                     #      temp_7_26 = getelementptr arr_17:Array:i32:[Some(100_0)] [Some(i_17)] 
-    li      s4, 0
-                    #found literal reg Some(a5) already exist with 1_0
-    add     s4,s4,a7
-    slli s4,s4,2
-    add     s4,s4,sp
-    add     s4,s4,s4
+    li      a7, 0
+                    #found literal reg Some(a4) already exist with 1_0
+    mul     s1,a4,a2
+    add     a7,a7,s1
+    slli a7,a7,2
+    add     a7,a7,sp
+    add     a7,a7,a7
                     #      temp_8_26 = load temp_7_26:ptr->i32 
-    lw      s5,0(s4)
+    lw      s2,0(a7)
                     #      new_var temp_9_26:i32 
                     #      temp_9_26 = Add i32 sum_17, temp_8_26 
-    add     s6,a1,s5
+    add     s3,a1,s2
                     #      sum_17 = i32 temp_9_26 
                     #      jump label: while.head_25 
+    sw      a2,60(sp)
+    sw      s3,8(sp)
+    sd      a7,16(sp)
+    sw      s1,460(sp)
+    sw      a6,24(sp)
+    sw      s2,12(sp)
+    sb      a5,31(sp)
     j       .while.head_25
                     #      label while.exit_25: 
 .while.exit_25:
                     #      new_var temp_10_17:i32 
                     #      temp_10_17 = Mod i32 sum_17, 79_0 
-    li      s7, 79
-    rem     s8,a1,s7
+    li      a4, 79
+    rem     a6,a1,a4
                     #      ret temp_10_17 
     ld      ra,472(sp)
     ld      s0,464(sp)
-    sw      s8,4(sp)
-    sw      a0,36(sp)
+    sw      a6,4(sp)
+    sw      a0,52(sp)
     addi    sp,sp,480
     ret

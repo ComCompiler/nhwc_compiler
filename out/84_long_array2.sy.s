@@ -243,42 +243,59 @@ main:
 .L0_0:
                     #      new_var b_26:Array:i32:[Some(4_0), Some(1024_0)] 
                     #      new_var temp_17_26:ptr->i32 
-                    #      temp_17_26 = getelementptr b_26:Array:i32:[Some(4_0), Some(1024_0)] [Some(0_0), Some(5_0)] 
+                    #      temp_17_26 = getelementptr b_26:Array:i32:[Some(4_0), Some(1024_0)] [Some(0_0), Some(2_0)] 
     li      a4, 0
     li      a5, 1024
     li      a6, 0
     mul     a7,a5,a6
     add     a4,a4,a7
     li      s1, 1
-    li      s2, 5
+    li      s2, 2
     add     a4,a4,a7
     slli a4,a4,2
     add     a4,a4,sp
     add     a4,a4,a4
-                    #      store 6_0:i32 temp_17_26:ptr->Array:i32:[Some(1024_0)] 
-    li      s3, 6
+                    #      store 3_0:i32 temp_17_26:ptr->Array:i32:[Some(1024_0)] 
+    li      s3, 3
     sd      s3,0(a4)
                     #      mu b_26:89 
                     #      b_26 = chi b_26:89 
                     #      new_var temp_18_26:ptr->i32 
-                    #      temp_18_26 = getelementptr b_26:Array:i32:[Some(4_0), Some(1024_0)] [Some(0_0), Some(2_0)] 
+                    #      temp_18_26 = getelementptr b_26:Array:i32:[Some(4_0), Some(1024_0)] [Some(0_0), Some(3_0)] 
     li      s4, 0
                     #found literal reg Some(a5) already exist with 1024_0
                     #found literal reg Some(a6) already exist with 0_0
     add     s4,s4,a7
                     #found literal reg Some(s1) already exist with 1_0
-    li      s5, 2
+                    #found literal reg Some(s3) already exist with 3_0
     add     s4,s4,a7
     slli s4,s4,2
     add     s4,s4,sp
     add     s4,s4,s4
-                    #      store 3_0:i32 temp_18_26:ptr->Array:i32:[Some(1024_0)] 
-    li      s6, 3
-    sd      s6,0(s4)
+                    #      store 4_0:i32 temp_18_26:ptr->Array:i32:[Some(1024_0)] 
+    li      s5, 4
+    sd      s5,0(s4)
                     #      mu b_26:95 
                     #      b_26 = chi b_26:95 
                     #      new_var temp_19_26:ptr->i32 
-                    #      temp_19_26 = getelementptr b_26:Array:i32:[Some(4_0), Some(1024_0)] [Some(0_0), Some(1_0)] 
+                    #      temp_19_26 = getelementptr b_26:Array:i32:[Some(4_0), Some(1024_0)] [Some(0_0), Some(0_0)] 
+    li      s6, 0
+                    #found literal reg Some(a5) already exist with 1024_0
+                    #found literal reg Some(a6) already exist with 0_0
+    add     s6,s6,a7
+                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a6) already exist with 0_0
+    add     s6,s6,a7
+    slli s6,s6,2
+    add     s6,s6,sp
+    add     s6,s6,s6
+                    #      store 1_0:i32 temp_19_26:ptr->Array:i32:[Some(1024_0)] 
+                    #found literal reg Some(s1) already exist with 1_0
+    sd      s1,0(s6)
+                    #      mu b_26:101 
+                    #      b_26 = chi b_26:101 
+                    #      new_var temp_20_26:ptr->i32 
+                    #      temp_20_26 = getelementptr b_26:Array:i32:[Some(4_0), Some(1024_0)] [Some(0_0), Some(1_0)] 
     li      s7, 0
                     #found literal reg Some(a5) already exist with 1024_0
                     #found literal reg Some(a6) already exist with 0_0
@@ -289,166 +306,152 @@ main:
     slli s7,s7,2
     add     s7,s7,sp
     add     s7,s7,s7
-                    #      store 2_0:i32 temp_19_26:ptr->Array:i32:[Some(1024_0)] 
-                    #found literal reg Some(s5) already exist with 2_0
-    sd      s5,0(s7)
-                    #      mu b_26:101 
-                    #      b_26 = chi b_26:101 
-                    #      new_var temp_20_26:ptr->i32 
-                    #      temp_20_26 = getelementptr b_26:Array:i32:[Some(4_0), Some(1024_0)] [Some(0_0), Some(0_0)] 
+                    #      store 2_0:i32 temp_20_26:ptr->Array:i32:[Some(1024_0)] 
+                    #found literal reg Some(s2) already exist with 2_0
+    sd      s2,0(s7)
+                    #      mu b_26:107 
+                    #      b_26 = chi b_26:107 
+                    #      new_var temp_21_26:ptr->i32 
+                    #      temp_21_26 = getelementptr b_26:Array:i32:[Some(4_0), Some(1024_0)] [Some(0_0), Some(4_0)] 
     li      s9, 0
                     #found literal reg Some(a5) already exist with 1024_0
                     #found literal reg Some(a6) already exist with 0_0
     add     s9,s9,a7
-                    #found literal reg Some(s1) already exist with 1_0
-                    #found literal reg Some(a6) already exist with 0_0
+                    #found literal reg Some(s8) already exist with 1_0
+                    #found literal reg Some(s5) already exist with 4_0
     add     s9,s9,a7
     slli s9,s9,2
     add     s9,s9,sp
     add     s9,s9,s9
-                    #      store 1_0:i32 temp_20_26:ptr->Array:i32:[Some(1024_0)] 
-                    #found literal reg Some(s1) already exist with 1_0
-    sd      s1,0(s9)
-                    #      mu b_26:107 
-                    #      b_26 = chi b_26:107 
-                    #      new_var temp_21_26:ptr->i32 
-                    #      temp_21_26 = getelementptr b_26:Array:i32:[Some(4_0), Some(1024_0)] [Some(0_0), Some(3_0)] 
-    li      s10, 0
-                    #found literal reg Some(a5) already exist with 1024_0
-                    #found literal reg Some(a6) already exist with 0_0
-    add     s10,s10,a7
-                    #found literal reg Some(s1) already exist with 1_0
-                    #found literal reg Some(s6) already exist with 3_0
-    add     s10,s10,a7
-    slli s10,s10,2
-    add     s10,s10,sp
-    add     s10,s10,s10
-                    #      store 4_0:i32 temp_21_26:ptr->Array:i32:[Some(1024_0)] 
-    li      s11, 4
-    sd      s11,0(s10)
+                    #      store 5_0:i32 temp_21_26:ptr->Array:i32:[Some(1024_0)] 
+    li      s10, 5
+    sd      s10,0(s9)
                     #      mu b_26:113 
                     #      b_26 = chi b_26:113 
                     #      new_var temp_22_26:ptr->i32 
-                    #      temp_22_26 = getelementptr b_26:Array:i32:[Some(4_0), Some(1024_0)] [Some(0_0), Some(4_0)] 
-    li      a0, 0
+                    #      temp_22_26 = getelementptr b_26:Array:i32:[Some(4_0), Some(1024_0)] [Some(0_0), Some(5_0)] 
+    li      s11, 0
                     #found literal reg Some(a5) already exist with 1024_0
                     #found literal reg Some(a6) already exist with 0_0
-    add     a0,a0,a7
-                    #found literal reg Some(s1) already exist with 1_0
-                    #found literal reg Some(s11) already exist with 4_0
-    add     a0,a0,a7
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
-                    #      store 5_0:i32 temp_22_26:ptr->Array:i32:[Some(1024_0)] 
-                    #found literal reg Some(s2) already exist with 5_0
-    sd      s2,0(a0)
+    add     s11,s11,a7
+                    #found literal reg Some(s8) already exist with 1_0
+                    #found literal reg Some(s10) already exist with 5_0
+    add     s11,s11,a7
+    slli s11,s11,2
+    add     s11,s11,sp
+    add     s11,s11,s11
+                    #      store 6_0:i32 temp_22_26:ptr->Array:i32:[Some(1024_0)] 
+    li      a0, 6
+    sd      a0,0(s11)
                     #      mu b_26:119 
                     #      b_26 = chi b_26:119 
                     #      new_var c_26:Array:i32:[Some(1024_0), Some(4_0)] 
                     #      new_var temp_23_26:ptr->i32 
-                    #      temp_23_26 = getelementptr c_26:Array:i32:[Some(1024_0), Some(4_0)] [Some(0_0), Some(1_0)] 
-    li      a1, 0
-                    #found literal reg Some(s11) already exist with 4_0
+                    #      temp_23_26 = getelementptr c_26:Array:i32:[Some(1024_0), Some(4_0)] [Some(0_0), Some(3_0)] 
+    li      a0, 0
+                    #found literal reg Some(s5) already exist with 4_0
                     #found literal reg Some(a6) already exist with 0_0
-    mul     a2,s11,a6
-    add     a1,a1,a2
-                    #found literal reg Some(s1) already exist with 1_0
+    mul     a1,s5,a6
+    add     a0,a0,a1
                     #found literal reg Some(s8) already exist with 1_0
-    add     a1,a1,a2
-    slli a1,a1,2
-    add     a1,a1,sp
-    add     a1,a1,a1
-                    #      store 2_0:i32 temp_23_26:ptr->Array:i32:[Some(4_0)] 
-                    #found literal reg Some(s5) already exist with 2_0
-    sd      s5,0(a1)
+                    #found literal reg Some(s3) already exist with 3_0
+    add     a0,a0,a1
+    slli a0,a0,2
+    add     a0,a0,sp
+    add     a0,a0,a0
+                    #      store 4_0:i32 temp_23_26:ptr->Array:i32:[Some(4_0)] 
+                    #found literal reg Some(s5) already exist with 4_0
+    sd      s5,0(a0)
                     #      mu c_26:127 
                     #      c_26 = chi c_26:127 
                     #      new_var temp_24_26:ptr->i32 
-                    #      temp_24_26 = getelementptr c_26:Array:i32:[Some(1024_0), Some(4_0)] [Some(0_0), Some(2_0)] 
-    li      a3, 0
-                    #found literal reg Some(s11) already exist with 4_0
+                    #      temp_24_26 = getelementptr c_26:Array:i32:[Some(1024_0), Some(4_0)] [Some(0_0), Some(0_0)] 
+    li      a2, 0
+                    #found literal reg Some(s5) already exist with 4_0
                     #found literal reg Some(a6) already exist with 0_0
-    add     a3,a3,a2
-                    #found literal reg Some(s1) already exist with 1_0
-                    #found literal reg Some(s5) already exist with 2_0
-    add     a3,a3,a2
-    slli a3,a3,2
-    add     a3,a3,sp
-    add     a3,a3,a3
-                    #      store 3_0:i32 temp_24_26:ptr->Array:i32:[Some(4_0)] 
-                    #found literal reg Some(s6) already exist with 3_0
-    sd      s6,0(a3)
+    add     a2,a2,a1
+                    #found literal reg Some(s8) already exist with 1_0
+                    #found literal reg Some(a6) already exist with 0_0
+    add     a2,a2,a1
+    slli a2,a2,2
+    add     a2,a2,sp
+    add     a2,a2,a2
+                    #      store 1_0:i32 temp_24_26:ptr->Array:i32:[Some(4_0)] 
+                    #found literal reg Some(s8) already exist with 1_0
+    sd      s8,0(a2)
                     #      mu c_26:133 
                     #      c_26 = chi c_26:133 
                     #      new_var temp_25_26:ptr->i32 
-                    #      temp_25_26 = getelementptr c_26:Array:i32:[Some(1024_0), Some(4_0)] [Some(0_0), Some(0_0)] 
-    li      a5, 0
-                    #found literal reg Some(s11) already exist with 4_0
+                    #      temp_25_26 = getelementptr c_26:Array:i32:[Some(1024_0), Some(4_0)] [Some(0_0), Some(1_0)] 
+    li      a3, 0
+                    #found literal reg Some(s5) already exist with 4_0
                     #found literal reg Some(a6) already exist with 0_0
-    add     a5,a5,a2
+    add     a3,a3,a1
+                    #found literal reg Some(s8) already exist with 1_0
                     #found literal reg Some(s1) already exist with 1_0
-                    #found literal reg Some(a6) already exist with 0_0
-    add     a5,a5,a2
-    slli a5,a5,2
-    add     a5,a5,sp
-    add     a5,a5,a5
-                    #      store 1_0:i32 temp_25_26:ptr->Array:i32:[Some(4_0)] 
-                    #found literal reg Some(s1) already exist with 1_0
-    sd      s1,0(a5)
+    add     a3,a3,a1
+    slli a3,a3,2
+    add     a3,a3,sp
+    add     a3,a3,a3
+                    #      store 2_0:i32 temp_25_26:ptr->Array:i32:[Some(4_0)] 
+                    #found literal reg Some(s2) already exist with 2_0
+    sd      s2,0(a3)
                     #      mu c_26:139 
                     #      c_26 = chi c_26:139 
                     #      new_var temp_26_26:ptr->i32 
-                    #      temp_26_26 = getelementptr c_26:Array:i32:[Some(1024_0), Some(4_0)] [Some(0_0), Some(3_0)] 
-    li      a6, 0
-                    #found literal reg Some(s11) already exist with 4_0
-    li      s1, 0
-    add     a6,a6,a2
+                    #      temp_26_26 = getelementptr c_26:Array:i32:[Some(1024_0), Some(4_0)] [Some(0_0), Some(2_0)] 
+    li      a5, 0
+                    #found literal reg Some(s5) already exist with 4_0
+                    #found literal reg Some(a6) already exist with 0_0
+    add     a5,a5,a1
                     #found literal reg Some(s8) already exist with 1_0
-                    #found literal reg Some(s6) already exist with 3_0
-    add     a6,a6,a2
-    slli a6,a6,2
-    add     a6,a6,sp
-    add     a6,a6,a6
-                    #      store 4_0:i32 temp_26_26:ptr->Array:i32:[Some(4_0)] 
-                    #found literal reg Some(s11) already exist with 4_0
-    sd      s11,0(a6)
+                    #found literal reg Some(s2) already exist with 2_0
+    add     a5,a5,a1
+    slli a5,a5,2
+    add     a5,a5,sp
+    add     a5,a5,a5
+                    #      store 3_0:i32 temp_26_26:ptr->Array:i32:[Some(4_0)] 
+                    #found literal reg Some(s3) already exist with 3_0
+    sd      s3,0(a5)
                     #      mu c_26:145 
                     #      c_26 = chi c_26:145 
                     #      new_var temp_27_26:ptr->i32 
                     #      new_var temp_28_26:Array:i32:[Some(4_0)] 
                     #      temp_27_26 = getelementptr c_26:Array:i32:[Some(1024_0), Some(4_0)] [Some(0_0)] 
+    li      a6, 0
+                    #found literal reg Some(s5) already exist with 4_0
     li      s1, 0
-                    #found literal reg Some(s11) already exist with 4_0
-    li      s2, 0
-    add     s1,s1,a2
-    slli s1,s1,2
-    add     s1,s1,sp
-    add     s1,s1,s1
+    add     a6,a6,a1
+    slli a6,a6,2
+    add     a6,a6,sp
+    add     a6,a6,a6
                     #      temp_28_26 = load temp_27_26:ptr->i32 
-    lw      s2,0(s1)
+    lw      s1,0(a6)
                     #      new_var temp_29_26:i32 
                     #      temp_29_26 =  Call i32 f1_0(temp_28_26) 
                     #saved register dumping to mem
-    sd      s1,40(sp)
-    sw      s2,36(sp)
+    sw      s1,36(sp)
     li      s1, 32880
     add     s1,sp,s1
     sd      s4,0(s1)
     li      s2, 32872
     add     s2,sp,s2
-    sd      s7,0(s2)
+    sd      s6,0(s2)
     li      s3, 32864
     add     s3,sp,s3
-    sd      s9,0(s3)
+    sd      s7,0(s3)
     li      s4, 32856
     add     s4,sp,s4
-    sd      s10,0(s4)
+    sd      s9,0(s4)
+    li      s5, 32848
+    add     s5,sp,s5
+    sd      s11,0(s5)
                     #saved register dumped to mem
                     #arg load start
-    li      a0, 32848
+    li      a0, 16456
     add     a0,sp,a0
     sd      a0,0(a0)
+    lw      a0,36(sp)
                     #arg load ended
     call    f1
     sw      a0,20(sp)
@@ -457,6 +460,7 @@ main:
                     #saved register dumped to mem
                     #arg load start
     sw      a0,20(sp)
+    lw      a0,20(sp)
                     #arg load ended
     call    putint
                     #       Call void putch_0(10_0) 
@@ -472,10 +476,10 @@ main:
     li      a0, 0
     li      s1, 4
     li      s2, 2
-    add     a0,a0,a2
+    add     a0,a0,a1
     li      s3, 1
     li      s4, 0
-    add     a0,a0,a2
+    add     a0,a0,a1
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0

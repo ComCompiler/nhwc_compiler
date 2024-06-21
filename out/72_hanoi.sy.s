@@ -34,6 +34,7 @@ move:
                     #saved register dumped to mem
                     #arg load start
     sw      a0,4(sp)
+    lw      a0,4(sp)
                     #arg load ended
     call    putint
                     #       Call void putch_0(32_0) 
@@ -47,7 +48,7 @@ move:
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,0(sp)
+    mv      a0, a1
                     #arg load ended
     call    putint
                     #       Call void putch_0(44_0) 
@@ -92,9 +93,10 @@ hanoi:
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,24(sp)
     sw      a0,28(sp)
-    sw      a3,16(sp)
+    mv      a0, a1
+    sw      a1,24(sp)
+    mv      a1, a3
                     #arg load ended
     call    move
                     #      jump label: L2_0 
@@ -103,21 +105,28 @@ hanoi:
 .branch_false_28:
                     #      new_var temp_1_30:i32 
                     #      temp_1_30 = Sub i32 n_24, 1_0 
-                    #found literal reg Some(a4) already exist with 1_0
-    sub     a1,a0,a4
+    li      a4, 1
+    sub     a6,a0,a4
                     #       Call void hanoi_0(temp_1_30, one_24, three_24, two_24) 
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,8(sp)
     sw      a0,28(sp)
+    mv      a0, a6
+    sw      a1,24(sp)
+    lw      a1,24(sp)
     sw      a2,20(sp)
+    mv      a2, a3
+    sw      a3,16(sp)
+    lw      a3,20(sp)
                     #arg load ended
     call    hanoi
                     #       Call void move_0(one_24, three_24) 
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
+    lw      a0,24(sp)
+    lw      a1,16(sp)
                     #arg load ended
     call    move
                     #      new_var temp_2_30:i32 
@@ -128,11 +137,18 @@ hanoi:
                     #saved register dumping to mem
                     #saved register dumped to mem
                     #arg load start
-    sw      a1,4(sp)
     sw      a0,28(sp)
+    mv      a0, a1
+    sw      a1,4(sp)
+    lw      a1,20(sp)
+    lw      a2,24(sp)
+    lw      a3,16(sp)
                     #arg load ended
     call    hanoi
                     #      jump label: L2_0 
+    lw      a2,20(sp)
+    sw      a6,8(sp)
+    lw      a3,16(sp)
     j       .L2_0
                     #      label L2_0: 
 .L2_0:
@@ -189,6 +205,7 @@ main:
                     #saved register dumped to mem
                     #arg load start
     sw      a0,8(sp)
+    lw      a0,8(sp)
     sw      a1,16(sp)
     li      a1, 1
     li      a2, 2
@@ -209,13 +226,17 @@ main:
     sub     a2,a0,a1
                     #      n_35 = i32 temp_6_39 
                     #      jump label: while.head_38 
+    mv      a1, a0
+    sw      a2,4(sp)
+    sw      a0,16(sp)
+    lw      a0,20(sp)
     j       .while.head_38
                     #      label while.exit_38: 
 .while.exit_38:
                     #      ret 0_0 
     ld      ra,32(sp)
     ld      s0,24(sp)
-    sw      a0,16(sp)
+    sw      a0,20(sp)
     li      a0, 0
     addi    sp,sp,40
     ret

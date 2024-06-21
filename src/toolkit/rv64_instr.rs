@@ -79,6 +79,13 @@ impl Debug for Imm{
                         let f_val:f32 = symidx.symbol_name.parse().unwrap();
                         write!(f,"{}", f_val.to_bits())
                     },
+                    Type::I1 => {
+                        if symidx.symbol_name == "true"{
+                            write!(f,"{}", 1)
+                        }else {
+                            write!(f,"{}", 0)
+                        }
+                    }
                     _ => {
                         write!(f,"{}", symidx)
                     }

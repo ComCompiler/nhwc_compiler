@@ -79,19 +79,19 @@ ifElseIf:
 .branch_false_23:
                     #      new_var temp_3_27:i1 
                     #      temp_3_27 = icmp i32 Eq a_17, 1_0 
-    li      a7, 1
-    xor     s1,a0,a7
-    seqz    s1, s1
+    li      a2, 1
+    xor     a4,a0,a2
+    seqz    a4, a4
                     #      new_var temp_4_27:i1 
                     #      temp_4_27 = icmp i32 Eq b_17, 10_0 
-    li      s2, 10
-    xor     s3,a1,s2
-    seqz    s3, s3
+    li      a7, 10
+    xor     s1,a1,a7
+    seqz    s1, s1
                     #      new_var temp_5_27:i1 
                     #      temp_5_27 = And i1 temp_4_27, temp_3_27 
-    and     s4,s3,s1
+    and     s2,s1,a4
                     #      br i1 temp_5_27, label branch_true_28, label branch_false_28 
-    bnez    s4, .branch_true_28
+    bnez    s2, .branch_true_28
     j       .branch_false_28
                     #      label branch_true_28: 
 .branch_true_28:
@@ -102,26 +102,26 @@ ifElseIf:
 .branch_false_28:
                     #      new_var temp_6_30:i1 
                     #      temp_6_30 = icmp i32 Eq a_17, -5_0 
-    li      s5, -5
-    xor     s6,a0,s5
-    seqz    s6, s6
+    li      a2, -5
+    xor     a7,a0,a2
+    seqz    a7, a7
                     #      new_var temp_7_30:i1 
                     #      temp_7_30 = icmp i32 Eq b_17, 10_0 
-                    #found literal reg Some(s2) already exist with 10_0
-    xor     s7,a1,s2
-    seqz    s7, s7
+    li      s3, 10
+    xor     s4,a1,s3
+    seqz    s4, s4
                     #      new_var temp_8_30:i1 
                     #      temp_8_30 = And i1 temp_7_30, temp_6_30 
-    and     s8,s7,s6
+    and     s5,s4,a7
                     #      br i1 temp_8_30, label branch_true_31, label branch_false_31 
-    bnez    s8, .branch_true_31
+    bnez    s5, .branch_true_31
     j       .branch_false_31
                     #      label branch_true_31: 
 .branch_true_31:
                     #      new_var temp_9_30:i32 
                     #      temp_9_30 = Add i32 a_17, 15_0 
-    li      s9, 15
-    add     s10,a0,s9
+    li      a2, 15
+    add     s3,a0,a2
                     #      a_17 = i32 temp_9_30 
                     #      jump label: L3_0 
     j       .L3_0
@@ -129,10 +129,12 @@ ifElseIf:
 .branch_false_31:
                     #      new_var temp_10_30:i32 
                     #      temp_10_30 = Sub i32 0_0, a_17 
-    li      s11, 0
-    sub     a2,s11,a0
+    li      a2, 0
+    sub     s3,a2,a0
                     #      a_17 = i32 temp_10_30 
                     #      jump label: L3_0 
+    sw      s3,4(sp)
+    lw      s3,8(sp)
     j       .L3_0
                     #      label L3_0: 
 .L3_0:
@@ -173,6 +175,7 @@ main:
                     #saved register dumped to mem
                     #arg load start
     sw      a0,4(sp)
+    lw      a0,4(sp)
                     #arg load ended
     call    putint
                     #      ret 0_0 

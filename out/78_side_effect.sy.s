@@ -141,7 +141,7 @@ main:
     sw      a0,88(sp)
                     #      new_var temp_6_29:i1 
                     #      temp_6_29 = icmp i32 Ne temp_5_29, 0_0 
-                    #found literal reg Some(a1) already exist with 0_0
+    li      a1, 0
     xor     a3,a0,a1
     snez    a3, a3
                     #      new_var temp_7_29:i1 
@@ -175,16 +175,17 @@ main:
                     #      new_var temp_12_31:i32 
                     #      temp_12_31 = load *a_0:ptr->i32 
                     #   load label a as ptr to reg
-    la      s2, a
-                    #occupy reg s2 with *a_0
-    lw      s3,0(s2)
+    la      a1, a
+                    #occupy reg a1 with *a_0
+    lw      s2,0(a1)
                     #       Call void putint_0(temp_12_31) 
                     #saved register dumping to mem
     sb      s1,78(sp)
-    sw      s3,72(sp)
+    sw      s2,72(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,80(sp)
+    lw      a0,72(sp)
                     #arg load ended
     call    putint
                     #       Call void putch_0(32_0) 
@@ -205,6 +206,7 @@ main:
     sw      s1,68(sp)
                     #saved register dumped to mem
                     #arg load start
+    lw      a0,68(sp)
                     #arg load ended
     call    putint
                     #       Call void putch_0(10_0) 
@@ -215,6 +217,8 @@ main:
                     #arg load ended
     call    putch
                     #      jump label: branch_false_30 
+    lw      a0,80(sp)
+    lb      s1,78(sp)
     j       .branch_false_30
                     #      label branch_false_30: 
 .branch_false_30:
@@ -223,19 +227,21 @@ main:
                     #      new_var temp_14_36:i32 
                     #      temp_14_36 =  Call i32 inc_a_0() 
                     #saved register dumping to mem
+    sb      s1,78(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
     call    inc_a
+    sw      a0,80(sp)
     sw      a0,64(sp)
                     #      new_var temp_15_36:i32 
                     #      temp_15_36 = Add i32 temp_14_36, 1_0 
-    li      s1, 1
-    add     s2,a0,s1
+    li      a1, 1
+    add     s1,a0,a1
                     #      new_var temp_16_36:i32 
                     #      temp_16_36 =  Call i32 inc_a_0() 
                     #saved register dumping to mem
-    sw      s2,60(sp)
+    sw      s1,60(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -258,22 +264,22 @@ main:
     sw      a0,48(sp)
                     #      new_var temp_19_36:i1 
                     #      temp_19_36 = icmp i32 Ne temp_18_36, 0_0 
-                    #found literal reg Some(a1) already exist with 0_0
-    xor     s1,a0,a1
-    snez    s1, s1
+    li      s1, 0
+    xor     s2,a0,s1
+    snez    s2, s2
                     #      new_var temp_20_36:i1 
                     #      temp_19_36 = icmp i32 Ne temp_17_36, 0_0 
-                    #found literal reg Some(a1) already exist with 0_0
+                    #found literal reg Some(s1) already exist with 0_0
                     #      new_var temp_21_36:i1 
                     #      temp_21_36 = And i1 temp_19_36, temp_20_36 
-    and     s4,s1,s3
+    and     s5,s2,s4
                     #      new_var temp_22_36:i32 
                     #      temp_22_36 =  Call i32 inc_a_0() 
                     #saved register dumping to mem
-    sb      s1,47(sp)
-    sw      s2,52(sp)
-    sb      s3,46(sp)
-    sb      s4,45(sp)
+    sb      s2,47(sp)
+    sw      s3,52(sp)
+    sb      s4,46(sp)
+    sb      s5,45(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
@@ -294,18 +300,19 @@ main:
                     #      new_var temp_25_38:i32 
                     #      temp_25_38 = load *a_0:ptr->i32 
                     #   load label a as ptr to reg
-    la      s5, a
-                    #occupy reg s5 with *a_0
-    lw      s6,0(s5)
+    la      a1, a
+                    #occupy reg a1 with *a_0
+    lw      s1,0(a1)
                     #       Call void putint_0(temp_25_38) 
                     #saved register dumping to mem
+    sw      s1,32(sp)
     sb      s2,39(sp)
     sb      s3,45(sp)
     sb      s4,38(sp)
-    sw      s6,32(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,40(sp)
+    lw      a0,32(sp)
                     #arg load ended
     call    putint
                     #       Call void putch_0(10_0) 
@@ -337,14 +344,19 @@ main:
                     #      new_var temp_29_42:i32 
                     #      temp_29_42 =  Call i32 inc_a_0() 
                     #saved register dumping to mem
-    sw      s1,28(sp)
-    sw      s3,24(sp)
+    sb      s2,39(sp)
+    sb      s3,45(sp)
+    sb      s4,38(sp)
                     #saved register dumped to mem
                     #arg load start
                     #arg load ended
     call    inc_a
+    sw      a0,40(sp)
     sw      a0,16(sp)
                     #      jump label: L2_0 
+    sw      a0,16(sp)
+    lw      s3,24(sp)
+    lw      s1,28(sp)
     j       .L2_0
                     #      label L2_0: 
 .L2_0:
@@ -352,27 +364,34 @@ main:
 .L3_0:
                     #      new_var temp_28_28:i32 
                     #      temp_28_28 = Sub i32 k_24, 1_0 
-    li      s2, 1
-    sub     s3,s1,s2
+    li      a1, 1
+    sub     s2,a0,a1
                     #      k_24 = i32 temp_28_28 
                     #      jump label: while.head_27 
+    sb      a6,85(sp)
+    sb      a5,86(sp)
+    sw      s3,24(sp)
+    sb      a3,87(sp)
+    sw      s2,20(sp)
+    sw      s1,28(sp)
+    sb      a2,99(sp)
+    sw      a4,92(sp)
+    sb      a7,79(sp)
     j       .while.head_27
                     #      label while.exit_27: 
 .while.exit_27:
                     #      new_var temp_30_24:i32 
                     #      temp_30_24 = load *a_0:ptr->i32 
                     #   load label a as ptr to reg
-    la      s4, a
-                    #occupy reg s4 with *a_0
-    lw      s5,0(s4)
+    la      a1, a
+                    #occupy reg a1 with *a_0
+    lw      a3,0(a1)
                     #       Call void putint_0(temp_30_24) 
                     #saved register dumping to mem
-    sw      s1,100(sp)
-    sw      s3,20(sp)
-    sw      s5,12(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a0,16(sp)
+    sw      a0,100(sp)
+    mv      a0, a3
                     #arg load ended
     call    putint
                     #       Call void putch_0(32_0) 
@@ -387,12 +406,12 @@ main:
                     #   load label b as ptr to reg
     la      a0, b
                     #occupy reg a0 with *b_0
-    lw      s1,0(a0)
+    lw      a4,0(a0)
                     #       Call void putint_0(temp_31_24) 
                     #saved register dumping to mem
-    sw      s1,8(sp)
                     #saved register dumped to mem
                     #arg load start
+    mv      a0, a4
                     #arg load ended
     call    putint
                     #       Call void putch_0(10_0) 
@@ -407,11 +426,11 @@ main:
                     #   load label a as ptr to reg
     la      a0, a
                     #occupy reg a0 with *a_0
-    lw      s1,0(a0)
+    lw      a5,0(a0)
                     #      ret temp_32_24 
     ld      ra,112(sp)
     ld      s0,104(sp)
-    sw      s1,4(sp)
+    sw      a5,4(sp)
     addi    sp,sp,120
     ret
 .section        .data

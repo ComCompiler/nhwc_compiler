@@ -61,26 +61,26 @@ main:
 .L1_0:
                     #      new_var temp_2_22:i1 
                     #      temp_2_22 = icmp i1 Ne a_17, 0_0 
-    li      a5, 0
-    xor     a6,a0,a5
-    snez    a6, a6
+    li      a2, 0
+    xor     a5,a0,a2
+    snez    a5, a5
                     #      new_var temp_3_22:i1 
                     #      temp_3_22 = xor i1 temp_2_22, true 
-    seqz    a7, a6
+    seqz    a6, a5
                     #      new_var temp_4_22:i1 
                     #      new_var temp_5_22:i1 
                     #      temp_5_22 = xor i1 temp_4_22, true 
-    seqz    s2, s1
+    seqz    s1, a7
                     #      new_var temp_6_22:i1 
                     #      new_var temp_7_22:i1 
                     #      temp_7_22 = xor i1 temp_6_22, true 
-    seqz    s4, s3
+    seqz    s3, s2
                     #      new_var temp_8_22:i1 
                     #      temp_8_22 = Sub i1 0_0, temp_7_22 
-                    #found literal reg Some(a5) already exist with 0_0
-    sub     s5,a5,s4
+                    #found literal reg Some(a2) already exist with 0_0
+    sub     s4,a2,s3
                     #      br i1 temp_8_22, label branch_true_23, label branch_false_23 
-    bnez    s5, .branch_true_23
+    bnez    s4, .branch_true_23
     j       .branch_false_23
                     #      label branch_true_23: 
 .branch_true_23:
@@ -91,10 +91,11 @@ main:
 .branch_false_23:
                     #      new_var temp_9_26:i32 
                     #      temp_9_26 = Add i32 0_0, b_17 
-                    #found literal reg Some(a5) already exist with 0_0
-    add     s6,a5,a1
+    li      a2, 0
+    add     s5,a2,a1
                     #      a_17 = i32 temp_9_26 
                     #      jump label: L2_0 
+    sw      s5,4(sp)
     j       .L2_0
                     #      label L2_0: 
 .L2_0:
@@ -102,15 +103,14 @@ main:
 .L3_0:
                     #       Call void putint_0(a_17) 
                     #saved register dumping to mem
-    sb      s1,13(sp)
-    sb      s2,12(sp)
-    sb      s3,11(sp)
-    sb      s4,10(sp)
-    sb      s5,9(sp)
-    sw      s6,4(sp)
+    sb      s1,12(sp)
+    sb      s2,11(sp)
+    sb      s3,10(sp)
+    sb      s4,9(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,28(sp)
+    lw      a0,28(sp)
                     #arg load ended
     call    putint
                     #      ret 0_0 

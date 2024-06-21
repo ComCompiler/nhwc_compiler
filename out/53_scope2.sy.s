@@ -57,52 +57,52 @@ main:
                     #      new_var temp_0_20:i32 
                     #      temp_0_20 = load *k_0:ptr->i32 
                     #   load label k as ptr to reg
-    la      a2, k
-                    #occupy reg a2 with *k_0
-    lw      a3,0(a2)
+    la      a0, k
+                    #occupy reg a0 with *k_0
+    lw      a1,0(a0)
                     #      new_var temp_1_20:i1 
                     #      temp_1_20 = icmp i32 Slt temp_0_20, 10000_0 
-    li      a4, 10000
-    slt     a5,a3,a4
+    li      a2, 10000
+    slt     a3,a1,a2
                     #      br i1 temp_1_20, label branch_true_21, label branch_false_21 
-    bnez    a5, .branch_true_21
+    bnez    a3, .branch_true_21
     j       .branch_false_21
                     #      label branch_true_21: 
 .branch_true_21:
                     #      new_var temp_2_22:i32 
                     #      temp_2_22 = load *k_0:ptr->i32 
                     #   load label k as ptr to reg
-    la      a6, k
-                    #occupy reg a6 with *k_0
-    lw      a7,0(a6)
+    la      a0, k
+                    #occupy reg a0 with *k_0
+    lw      a2,0(a0)
                     #      new_var temp_3_22:i32 
                     #      temp_3_22 = Add i32 temp_2_22, 1_0 
-    li      s1, 1
-    add     s2,a7,s1
+    li      a4, 1
+    add     a5,a2,a4
                     #      store temp_3_22:i32 *k_0:ptr->i32 
                     #   load label k as ptr to reg
-    la      s3, k
-                    #occupy reg s3 with *k_0
-    sd      s2,0(s3)
+    la      a6, k
+                    #occupy reg a6 with *k_0
+    sd      a5,0(a6)
                     #      k_22 = i32 112_0 
-    li      s4, 112
+    li      a7, 112
                     #      jump label: while.head_26 
     j       .while.head_26
                     #      label while.head_26: 
 .while.head_26:
                     #      new_var temp_4_25:i1 
                     #      temp_4_25 = icmp i32 Sgt k_22, 10_0 
-    li      s5, 10
-    slt     s6,s5,s4
+    li      a0, 10
+    slt     a4,a0,a7
                     #      br i1 temp_4_25, label while.body_26, label while.exit_26 
-    bnez    s6, .while.body_26
+    bnez    a4, .while.body_26
     j       .while.exit_26
                     #      label while.body_26: 
 .while.body_26:
                     #      new_var temp_5_27:i32 
                     #      temp_5_27 = Sub i32 k_22, 88_0 
-    li      s7, 88
-    sub     s8,s4,s7
+    li      a0, 88
+    sub     a6,a7,a0
                     #      k_22 = i32 temp_5_27 
                     #      jump label: L2_0 
     j       .L2_0
@@ -110,53 +110,60 @@ main:
 .L2_0:
                     #      new_var temp_6_29:i1 
                     #      temp_6_29 = icmp i32 Slt k_22, 1000_0 
-    li      s9, 1000
-    slt     s10,s4,s9
+    li      a0, 1000
+    slt     s1,a7,a0
                     #      br i1 temp_6_29, label branch_true_30, label branch_false_30 
-    bnez    s10, .branch_true_30
+    bnez    s1, .branch_true_30
     j       .branch_false_30
                     #      label branch_true_30: 
 .branch_true_30:
                     #      g_31 = i32 9_0 
-    li      s11, 9
+    li      a0, 9
                     #      l_33 = i32 11_0 
-    li      a0, 11
+    li      s2, 11
                     #      g_31 = i32 10_0 
                     #      new_var temp_7_35:i32 
                     #      temp_7_35 = Sub i32 k_22, g_31 
-    sub     a1,s4,s11
+    sub     s3,a7,a0
                     #      k_22 = i32 temp_7_35 
                     #      g_35 = i32 11_0 
-    li      a2, 11
+    li      s4, 11
                     #      new_var temp_8_35:i32 
                     #      temp_8_35 = Add i32 g_35, l_33 
-    add     a4,a2,a0
+    add     s5,s4,s2
                     #      new_var temp_9_35:i32 
                     #      temp_9_35 = Add i32 k_22, temp_8_35 
-    add     a6,s4,a4
+    add     s6,a7,s5
                     #      k_22 = i32 temp_9_35 
                     #      jump label: branch_false_30 
+    sw      s3,20(sp)
+    sw      s5,12(sp)
+    sw      s4,16(sp)
+    sw      a0,28(sp)
+    sw      s6,8(sp)
+    sw      s2,24(sp)
     j       .branch_false_30
                     #      label branch_false_30: 
 .branch_false_30:
                     #      jump label: while.head_26 
+    sb      a4,43(sp)
+    sb      s1,35(sp)
+    sw      a6,36(sp)
     j       .while.head_26
                     #      label while.exit_26: 
 .while.exit_26:
                     #       Call void putint_0(k_22) 
                     #saved register dumping to mem
-    sw      s2,48(sp)
-    sw      s4,44(sp)
-    sb      s6,43(sp)
-    sw      s8,36(sp)
-    sb      s10,35(sp)
-    sw      s11,28(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a0,24(sp)
+    mv      a0, a7
                     #arg load ended
     call    putint
                     #      jump label: branch_false_21 
+    sb      a4,43(sp)
+    sw      a2,52(sp)
+    sw      a7,44(sp)
+    sw      a5,48(sp)
     j       .branch_false_21
                     #      label branch_false_21: 
 .branch_false_21:
@@ -167,11 +174,11 @@ main:
                     #   load label k as ptr to reg
     la      a0, k
                     #occupy reg a0 with *k_0
-    lw      s1,0(a0)
+    lw      a2,0(a0)
                     #      ret temp_10_18 
     ld      ra,72(sp)
     ld      s0,64(sp)
-    sw      s1,4(sp)
+    sw      a2,4(sp)
     addi    sp,sp,80
     ret
 .section        .data

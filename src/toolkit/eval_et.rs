@@ -6,6 +6,7 @@ use anyhow::Result;
 use anyhow::anyhow;
 use itertools::Itertools;
 use petgraph::graph::{NodeIndex};
+use syn::ExprAssignOp;
 ///
 /// pattern 
 /// 1. const_expr => const
@@ -27,7 +28,7 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
     // let mut value = SymIdx::new(0, 0.to_string());
     // println!("输入的operator_et_node: {:?}", node!(at any_et_node in et_tree).clone().et_naked_node);
     // 每个节点分两种情况,constant 或者 operator
-    // debug_info_green!("eval et {}",et_node);
+    debug_info_green!("eval et {}",et_node);
     et_tree.update_hash(et_node);
     let value_symidx = match node!(at et_node in et_tree).clone().et_node_type {
         // let value = match node!(at Operator_node in et_tree){
@@ -163,10 +164,15 @@ fn match_x_mul_0(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree) -> bool{
 fn match_x_add_x(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree)->bool{
     if node!(at et_node in et_tree).common_eliminated{return false}
     let et_symidx_vec = get_symidx_vec(et_node, et_tree);
-    let (l,r) = if let (Some(l),Some(r)) = (&et_symidx_vec[0],&et_symidx_vec[1]){ (l,r) }else { return false };
-
     let (&l_node,&r_node) = (&et_nodes[0],&et_nodes[1]);
-    if hash_equal(l_node, r_node, et_tree) {
+    if let (Some(l),Some(r)) = (&et_symidx_vec[0],&et_symidx_vec[1]) { 
+    } else { 
+        if l_node!= r_node{
+            return false;
+        }
+    };
+
+    if hash_equal(l_node, r_node, et_tree){
         let added_node_struct = EtNodeType::new_literal(0, SymIdx::from_str("2")).into();
         add_node_with_edge!({added_node_struct} with_edge {EtEdgeType::Direct.into()} from et_node in et_tree);
         let et_parent_node = direct_et_parent_node!(at et_node in et_tree );
@@ -213,6 +219,10 @@ fn match_x_add_x_mul_const(et_node:u32,et_tree:&mut EtTree) -> Result<bool>{
     let (mul_l_et_ty,mul_r_et_ty) = (&node!(at mul_l_node in et_tree).et_node_type, &node!(at mul_r_node in et_tree).et_node_type);
     let (sym_node2,literal_node,literal_symidx) = match (mul_l,mul_r){
         (l,r) if (matches!(mul_l_et_ty,EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use })&&
+            matches!(mul_r_et_ty,EtNodeType::Literal { literal_symidx, ast_node, text })) => {
+            (mul_l_node,mul_r_node,mul_r)
+        }
+        (l,r) if (matches!(mul_l_et_ty,EtNodeType::Operator { op:ExprOp::ArrayIndex, ast_node, text, op_symidx })&&
             matches!(mul_r_et_ty,EtNodeType::Literal { literal_symidx, ast_node, text })) => {
             (mul_l_node,mul_r_node,mul_r)
         }
@@ -366,7 +376,8 @@ pub fn compress_et(et_tree:&mut EtTree, et_sep_node:u32, symtab:&SymTab, scope_n
     eval_et(et_tree, et_sep_node);
     let dfs_nodes = dfs_with_predicate(&et_tree, et_sep_node, |e|!e.weight().et_edge_type.is_deleted());
     for et_node in direct_et_child_nodes!(at et_sep_node in et_tree ){
-        common_expr_elimination(et_node, et_tree);
+        debug_info_blue!("hash expr eliminate on {}",et_node);
+        hash_expr_elimination(et_node, et_tree);
     }
     for et_node in dfs_nodes{
         reducation(et_node, et_tree);
@@ -376,7 +387,7 @@ pub fn compress_et(et_tree:&mut EtTree, et_sep_node:u32, symtab:&SymTab, scope_n
 }
 
 /// given a et_node make this tree into a dag
-pub fn common_expr_elimination(et_node:u32,et_tree:&mut EtTree){
+pub fn hash_expr_elimination(et_node:u32,et_tree:&mut EtTree){
     let mut map = HashMap::new();
     // map hash into et_node
     _common_expr_elimination_by_hash(et_node, et_tree, &mut map);

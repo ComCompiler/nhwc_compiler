@@ -64,6 +64,7 @@ reg_field_for_struct!(Symbol {
         IS_LITERAL:bool,
         IS_EXTERNAL:bool,
         POINTED_SYMIDX:SymIdx,
+        LABEL_CFG_NODE:u32,
         TEMP_COUNTER:u32,
     } with_fields fields);
 // for compilation unit symbol
@@ -273,13 +274,14 @@ fn parse_whileloop2nhwc(
 ) -> Result<()> {
     match (rule_id!(at ast_expr_node in ast_tree), ast_expr_node) {
         (RULE_expression, expr_ast) => {
-            let while_head_symidx = SymIdx::new(*ast2scope.get(&ast_expr_node).unwrap(), "while.head".to_string());
-            let while_body_symidx = SymIdx::new(*ast2scope.get(&ast_expr_node).unwrap(), "while.body".to_string());
-            let while_exit_symidx = SymIdx::new(*ast2scope.get(&ast_expr_node).unwrap(), "while.exit".to_string());
 
             let cfg_body_head_node = direct_child_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_head() });
             let cfg_exit_node = get_exit_node_of_while_or_for_node(cfg_whileloop, cfg_graph)?;
             let cfg_body_tail_node = direct_parent_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_tail() });
+
+            let while_head_symidx = process_label_symbol(cfg_whileloop,*ast2scope.get(&ast_expr_node).unwrap(), "while.head".to_string(), symtab)?;
+            let while_body_symidx = process_label_symbol(cfg_body_head_node,*ast2scope.get(&ast_expr_node).unwrap(), "while.body".to_string(), symtab)?;
+            let while_exit_symidx = process_label_symbol(cfg_exit_node,*ast2scope.get(&ast_expr_node).unwrap(), "while.exit".to_string(), symtab)?;
 
             let label_body_instr_struct = NhwcInstrType::new_label(while_body_symidx.clone()).into();
             node_mut!(at cfg_body_head_node in cfg_graph).push_nhwc_instr(label_body_instr_struct, instr_slab)?;
@@ -321,10 +323,11 @@ fn parse_whileloop2nhwc(
     }
     Ok(())
 }
-fn process_label_symbol(scope_node:u32,label_name:String,symtab:&mut SymTab)->Result<SymIdx>{
+pub fn process_label_symbol(cfg_node:u32,scope_node:u32,label_name:String,symtab:&mut SymTab)->Result<SymIdx>{
     let label_symidx = add_symbol!({Symbol::new(scope_node,label_name)} 
         with_field TYPE:{Type::Label} 
         with_field IS_LITERAL:{true}
+        with_field LABEL_CFG_NODE:{cfg_node}
         with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
     to symtab);
     Ok(label_symidx)
@@ -337,12 +340,12 @@ fn parse_forloop2nhwc(
     match rule_id!(at ast_before_node in ast_tree) {
         RULE_forBeforeExpression => {
             // push before instr label
-            let label_before_symidx = process_label_symbol(*ast2scope.get(&ast_before_node).unwrap(), "for.before:".to_string(), symtab)?;
-            let label_before_instr = NhwcInstrType::new_label(label_before_symidx).into();
-
             let cfg_for_parent_node = etc::element_remained_after_exclusion_in_vec(direct_parent_nodes!(at cfg_forloop in cfg_graph), cfg_body_tail_node)?;
             // debug_info_yellow!("{:?}",direct_parent_nodes!(at cfg_forloop in cfg_graph));
             let cfg_new_bb_node = insert_bb_between(cfg_for_parent_node, cfg_forloop, cfg_graph)?;
+
+            let label_before_symidx = process_label_symbol(cfg_for_parent_node,*ast2scope.get(&ast_before_node).unwrap(), "for.before:".to_string(), symtab)?;
+            let label_before_instr = NhwcInstrType::new_label(label_before_symidx).into();
 
             node_mut!(at cfg_new_bb_node in cfg_graph).push_nhwc_instr(label_before_instr, instr_slab)?;
             if let Some(&before_scope) = ast2scope.get(&ast_before_node) {
@@ -358,7 +361,7 @@ fn parse_forloop2nhwc(
     match rule_id!(at ast_mid_node in ast_tree) {
         RULE_forMidExpression => {
             // push before instr label
-            let label_mid_symidx = process_label_symbol(*ast2scope.get(&ast_mid_node).unwrap(), "for.mid:".to_string(), symtab)?;
+            let label_mid_symidx = process_label_symbol(cfg_forloop,*ast2scope.get(&ast_mid_node).unwrap(), "for.mid:".to_string(), symtab)?;
             let label_mid_instr = NhwcInstrType::new_label(label_mid_symidx).into();
             node_mut!(at cfg_forloop in cfg_graph).push_nhwc_instr(label_mid_instr, instr_slab)?;
             if let Some(&mid_scope) = ast2scope.get(&ast_mid_node) {
@@ -383,10 +386,12 @@ fn parse_forloop2nhwc(
     match rule_id!(at ast_after_node in ast_tree) {
         RULE_forAfterExpression => {
             // push before instr label
-            let label_after_symidx = process_label_symbol(*ast2scope.get(&ast_after_node).unwrap(),"for.after:".to_string(), symtab)?;
-            let label_after_instr = NhwcInstrType::new_label(label_after_symidx).into();
 
             let cfg_new_bb_node = insert_bb_between(cfg_body_tail_node, cfg_forloop, cfg_graph)?;
+
+            let label_after_symidx = process_label_symbol(cfg_new_bb_node,*ast2scope.get(&ast_after_node).unwrap(),"for.after:".to_string(), symtab)?;
+            let label_after_instr = NhwcInstrType::new_label(label_after_symidx).into();
+
             node_mut!(at cfg_new_bb_node in cfg_graph).push_nhwc_instr(label_after_instr, instr_slab)?;
             if let Some(&after_scope) = ast2scope.get(&ast_after_node) {
                 let after_parent_scope = direct_parent_node!(at after_scope in scope_tree);
@@ -404,14 +409,14 @@ fn parse_branch2nhwc(
     ast_tree:&AstTree, cfg_graph:&mut CfgGraph, scope_tree:&ScopeTree, et_tree:&mut EtTree, symtab:&mut SymTab, ast2scope:&HashMap<u32, u32>, ast_expr_node:u32, cfg_branch_node:u32, 
     instr_slab:&mut InstrSlab<NhwcInstr>, symtab_g:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
-    let label_true_symidx = process_label_symbol(*ast2scope.get(&ast_expr_node).unwrap(), "branch_true".to_string(), symtab)?;
-    let label_false_symidx = process_label_symbol(*ast2scope.get(&ast_expr_node).unwrap(), "branch_false".to_string(), symtab)?;
+    let cfg_true_node = direct_child_node!(at cfg_branch_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_true()});
+    let cfg_false_node = direct_child_node!(at cfg_branch_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_false()});
+
+    let label_true_symidx = process_label_symbol(cfg_true_node,*ast2scope.get(&ast_expr_node).unwrap(), "branch_true".to_string(), symtab)?;
+    let label_false_symidx = process_label_symbol(cfg_false_node,*ast2scope.get(&ast_expr_node).unwrap(), "branch_false".to_string(), symtab)?;
 
     let label_true_instr = NhwcInstrType::new_label(label_true_symidx.clone()).into();
     let label_false_instr = NhwcInstrType::new_label(label_false_symidx.clone()).into();
-
-    let cfg_true_node = direct_child_node!(at cfg_branch_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_true()});
-    let cfg_false_node = direct_child_node!(at cfg_branch_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_false()});
 
     node_mut!(at cfg_true_node in cfg_graph).push_nhwc_instr(label_true_instr, instr_slab)?;
     node_mut!(at cfg_false_node in cfg_graph).push_nhwc_instr(label_false_instr, instr_slab)?;
@@ -537,7 +542,7 @@ fn process_symbol(
                 to symtab debug op_symtab_graph);
             }
             if node!(at cfg_node in cfg_graph).has_func_cor_symidx(){
-                let func_symidx = node_mut!(at cfg_node in cfg_graph).get_func_cor_symidx_with_debug(&symtab,op_symtab_graph)?;
+                let func_symidx = CfgNode::get_func_cor_symidx(node_mut!(at cfg_node in cfg_graph))?;
                 symtab.get_mut(&func_symidx)?.get_mut_declared_vars()?.push(symidx.clone());
             }
             if let Some(et_node) = op_et_node.clone(){
@@ -1493,13 +1498,13 @@ fn process_et(
                         // 后序遍历 左边
                         let l_symidx =  process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, left_child_et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?.unwrap();
                         // let var_type = find!(field TYPE:Type at var_symidx in symtab debug symtab_graph symtab_graph).unwrap().clone();
-                        let l_type = symtab.get(&l_symidx)?.get_type_with_debug(symtab, symtab_graph)?.clone();
+                        let l_type = symtab.get(&l_symidx)?.get_type()?.clone();
                         node_mut!(at et_node in et_tree).add_type(l_type.clone());
 
                         // 后序遍历 右边
                         let r_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, right_child_et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?.unwrap();
                         // let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
-                        let r_type = symtab.get(&r_symidx)?.get_type_with_debug(symtab, symtab_graph)?.clone();
+                        let r_type = symtab.get(&r_symidx)?.get_type()?.clone();
 
                         if let EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use:DeclOrDefOrUse::DeclDef { type_ast_node, is_const }} = &node!(at left_child_et_node in et_tree).et_node_type {
                             if *is_const {

@@ -90,9 +90,10 @@ fn main() {
         // then def_use_chain_debug_pass
         then nhwc_dump_pass
         // then simulator_debug_pass
-        // then ast2et_debug_pass
-        // then symtab_debug_pass
+        then ast2et_debug_pass
+        then symtab_debug_pass
         then nhwc2riscv_pass
+        then cfg_debug_pass2
         to pass_manager
         
     );

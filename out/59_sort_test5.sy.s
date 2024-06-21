@@ -148,62 +148,63 @@ heap_ajust:
 .while.head_33:
                     #      new_var temp_8_32:i32 
                     #      temp_8_32 = Add i32 end_25, 1_0 
-                    #found literal reg Some(a6) already exist with 1_0
-    add     s2,a2,a6
+    li      a4, 1
+    add     a6,a2,a4
                     #      new_var temp_9_32:i1 
                     #      temp_9_32 = icmp i32 Slt son_27, temp_8_32 
-    slt     s3,s1,s2
+    slt     s2,s1,a6
                     #      br i1 temp_9_32, label while.body_33, label while.exit_33 
-    bnez    s3, .while.body_33
+    bnez    s2, .while.body_33
     j       .while.exit_33
                     #      label while.body_33: 
 .while.body_33:
                     #      new_var temp_10_35:i32 
                     #      temp_10_35 = Add i32 1_0, son_27 
-                    #found literal reg Some(a6) already exist with 1_0
-    add     s4,a6,s1
+    li      a4, 1
+    add     s3,a4,s1
                     #      new_var temp_11_35:ptr->i32 
                     #      new_var temp_12_35:i32 
                     #      temp_11_35 = getelementptr arr_25:ptr->i32 [Some(temp_10_35)] 
-    li      s5, 0
-                    #found literal reg Some(a6) already exist with 1_0
-    add     s5,s5,a0
-    slli s5,s5,3
-    add     s5,s5,sp
-    add     s5,s5,s5
+    li      s4, 0
+                    #found literal reg Some(a4) already exist with 1_0
+    add     s4,s4,a0
+    slli s4,s4,3
+    add     s4,s4,sp
+    add     s4,s4,s4
                     #      temp_12_35 = load temp_11_35:ptr->i32 
-    lw      s6,0(s5)
+    lw      s5,0(s4)
                     #      new_var temp_13_35:ptr->i32 
                     #      new_var temp_14_35:i32 
                     #      temp_13_35 = getelementptr arr_25:ptr->i32 [Some(son_27)] 
-    li      s7, 0
-                    #found literal reg Some(a6) already exist with 1_0
-    add     s7,s7,a0
-    slli s7,s7,3
-    add     s7,s7,sp
-    add     s7,s7,s7
+    li      s6, 0
+                    #found literal reg Some(a4) already exist with 1_0
+    add     s6,s6,a0
+    slli s6,s6,3
+    add     s6,s6,sp
+    add     s6,s6,s6
                     #      temp_14_35 = load temp_13_35:ptr->i32 
-    lw      s8,0(s7)
+    lw      s7,0(s6)
                     #      new_var temp_15_35:i1 
                     #      temp_15_35 = icmp i32 Slt temp_14_35, temp_12_35 
-    slt     s9,s8,s6
+    slt     s8,s7,s5
                     #      new_var temp_16_35:i1 
                     #      temp_16_35 = icmp i32 Slt son_27, end_25 
-    slt     s10,s1,a2
+    slt     s9,s1,a2
                     #      new_var temp_17_35:i1 
                     #      temp_17_35 = And i1 temp_16_35, temp_15_35 
-    and     s11,s10,s9
+    and     s10,s9,s8
                     #      br i1 temp_17_35, label branch_true_36, label branch_false_36 
-    bnez    s11, .branch_true_36
+    bnez    s10, .branch_true_36
     j       .branch_false_36
                     #      label branch_true_36: 
 .branch_true_36:
                     #      new_var temp_18_35:i32 
                     #      temp_18_35 = Add i32 son_27, 1_0 
-                    #found literal reg Some(a6) already exist with 1_0
-    add     a4,s1,a6
+    li      a4, 1
+    add     s11,s1,a4
                     #      son_27 = i32 temp_18_35 
                     #      jump label: branch_false_36 
+    sw      s11,52(sp)
     j       .branch_false_36
                     #      label branch_false_36: 
 .branch_false_36:
@@ -212,23 +213,20 @@ heap_ajust:
                     #      new_var temp_19_38:ptr->i32 
                     #      new_var temp_20_38:i32 
                     #      temp_19_38 = getelementptr arr_25:ptr->i32 [Some(son_27)] 
-    li      a6, 0
-    sd      a0,128(sp)
-    li      a0, 1
-    sw      a1,124(sp)
-    mul     a1,a0,s1
-    add     a6,a6,a1
-    slli a6,a6,3
-    add     a6,a6,sp
-    add     a6,a6,a6
+    li      a4, 0
+    li      s11, 1
+    add     a4,a4,a0
+    slli a4,a4,3
+    add     a4,a4,sp
+    add     a4,a4,a4
                     #      temp_20_38 = load temp_19_38:ptr->i32 
-    lw      a0,0(a6)
+    lw      s11,0(a4)
                     #      new_var temp_21_38:ptr->i32 
                     #      new_var temp_22_38:i32 
                     #      temp_21_38 = getelementptr arr_25:ptr->i32 [Some(dad_27)] 
-    sw      a0,36(sp)
+    sd      a0,128(sp)
     li      a0, 0
-    sd      a1,128(sp)
+    sw      a1,124(sp)
     li      a1, 1
     sw      a2,120(sp)
     mul     a2,a1,a3
@@ -241,17 +239,16 @@ heap_ajust:
                     #      new_var temp_23_38:i1 
                     #      temp_23_38 = icmp i32 Sgt temp_22_38, temp_20_38 
     sd      a0,24(sp)
-    sd      a2,128(sp)
-    slt     a2,a0,a1
+    slt     a0,s11,a1
                     #      br i1 temp_23_38, label branch_true_39, label branch_false_39 
-    bnez    a2, .branch_true_39
+    bnez    a0, .branch_true_39
     j       .branch_false_39
                     #      label branch_true_39: 
 .branch_true_39:
                     #      ret 0_0 
     ld      ra,144(sp)
     ld      s0,136(sp)
-    sw      a0,36(sp)
+    sb      a0,19(sp)
     li      a0, 0
     addi    sp,sp,152
     ret
@@ -261,31 +258,33 @@ heap_ajust:
                     #      temp_24_41 =  Call i32 swap_0(arr_25, dad_27, son_27) 
                     #saved register dumping to mem
     sw      s1,112(sp)
-    sw      s2,100(sp)
-    sb      s3,99(sp)
-    sw      s4,92(sp)
-    sd      s5,80(sp)
-    sw      s6,76(sp)
-    sd      s7,64(sp)
-    sw      s8,60(sp)
-    sb      s9,59(sp)
-    sb      s10,58(sp)
-    sb      s11,57(sp)
+    sb      s2,99(sp)
+    sw      s3,92(sp)
+    sd      s4,80(sp)
+    sw      s5,76(sp)
+    sd      s6,64(sp)
+    sw      s7,60(sp)
+    sb      s8,59(sp)
+    sb      s9,58(sp)
+    sb      s10,57(sp)
+    sw      s11,36(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a3,116(sp)
+    sb      a0,19(sp)
+    mv      a0, a2
     sw      a1,20(sp)
-    sb      a2,19(sp)
+    mv      a1, a3
+    sd      a2,128(sp)
+    lw      a2,112(sp)
                     #arg load ended
     call    swap
     sw      a0,12(sp)
                     #      dad_27 = i32 temp_24_41 
-    mv      a1, a0
                     #      dad_27 = i32 son_27 
                     #      new_var temp_25_41:i32 
                     #      temp_25_41 = Mul i32 dad_27, 2_0 
-    li      a3, 2
-    mul     s1,a1,a3
+    li      a2, 2
+    mul     s1,a3,a2
                     #      new_var temp_26_41:i32 
                     #      temp_26_41 = Add i32 temp_25_41, 1_0 
     li      s2, 1
@@ -296,13 +295,23 @@ heap_ajust:
                     #      label L4_0: 
 .L4_0:
                     #      jump label: while.head_33 
+    sw      a6,100(sp)
+    sw      s3,4(sp)
+    sw      a1,112(sp)
+    lw      a1,124(sp)
+    sw      s1,8(sp)
+    lw      s1,112(sp)
+    sd      a4,40(sp)
+    sw      a0,12(sp)
+    ld      a0,128(sp)
+    lw      a2,120(sp)
     j       .while.head_33
                     #      label while.exit_33: 
 .while.exit_33:
                     #      ret 0_0 
     ld      ra,144(sp)
     ld      s0,136(sp)
-    sw      a0,12(sp)
+    sd      a0,128(sp)
     li      a0, 0
     addi    sp,sp,152
     ret
@@ -351,30 +360,30 @@ heap_sort:
 .while.head_53:
                     #      new_var temp_29_52:i1 
                     #      temp_29_52 = icmp i32 Sgt i_48, -1_0 
-    li      a7, -1
-    slt     s1,a7,a6
+    li      a2, -1
+    slt     a4,a2,a6
                     #      br i1 temp_29_52, label while.body_53, label while.exit_53 
-    bnez    s1, .while.body_53
+    bnez    a4, .while.body_53
     j       .while.exit_53
                     #      label while.body_53: 
 .while.body_53:
                     #      new_var temp_30_54:i32 
                     #      temp_30_54 = Sub i32 len_46, 1_0 
-                    #found literal reg Some(a4) already exist with 1_0
-    sub     s2,a1,a4
+    li      a2, 1
+    sub     a7,a1,a2
                     #      tmp_48 = i32 temp_30_54 
-    mv      s3, s2
+    mv      s1, a7
                     #      new_var temp_31_54:i32 
                     #      temp_31_54 =  Call i32 heap_ajust_0(arr_46, i_48, tmp_48) 
                     #saved register dumping to mem
-    sb      s1,43(sp)
-    sw      s2,36(sp)
-    sw      s3,52(sp)
+    sw      s1,52(sp)
                     #saved register dumped to mem
                     #arg load start
     sd      a0,64(sp)
-    sw      a6,56(sp)
+    ld      a0,64(sp)
     sw      a1,60(sp)
+    mv      a1, a6
+    lw      a2,52(sp)
                     #arg load ended
     call    heap_ajust
     sw      a0,32(sp)
@@ -382,17 +391,24 @@ heap_sort:
     mv      a1, a0
                     #      new_var temp_32_54:i32 
                     #      temp_32_54 = Sub i32 i_48, 1_0 
-                    #found literal reg Some(a4) already exist with 1_0
-    sub     a6,a2,a4
+    li      a2, 1
+    sub     s1,a6,a2
                     #      i_48 = i32 temp_32_54 
                     #      jump label: while.head_53 
+    sb      a4,43(sp)
+    sw      a7,36(sp)
+    sw      a0,32(sp)
+    ld      a0,64(sp)
+    sw      a1,52(sp)
+    lw      a1,60(sp)
+    sw      s1,28(sp)
     j       .while.head_53
                     #      label while.exit_53: 
 .while.exit_53:
                     #      new_var temp_33_48:i32 
                     #      temp_33_48 = Sub i32 len_46, 1_0 
-                    #found literal reg Some(a4) already exist with 1_0
-    sub     s2,s1,a4
+    li      a2, 1
+    sub     a7,a1,a2
                     #      i_48 = i32 temp_33_48 
                     #      jump label: while.head_60 
     j       .while.head_60
@@ -400,28 +416,28 @@ heap_sort:
 .while.head_60:
                     #      new_var temp_34_59:i1 
                     #      temp_34_59 = icmp i32 Sgt i_48, 0_0 
-    li      s3, 0
-    slt     s4,s3,a2
+    li      a2, 0
+    slt     s1,a2,a6
                     #      br i1 temp_34_59, label while.body_60, label while.exit_60 
-    bnez    s4, .while.body_60
+    bnez    s1, .while.body_60
     j       .while.exit_60
                     #      label while.body_60: 
 .while.body_60:
                     #      new_var tmp0_61:i32 
                     #      tmp0_61 = i32 0_0 
-    li      s5, 0
+    li      a2, 0
                     #      new_var temp_35_61:i32 
                     #      temp_35_61 =  Call i32 swap_0(arr_46, tmp0_61, i_48) 
                     #saved register dumping to mem
-    sw      s1,60(sp)
-    sw      s2,24(sp)
-    sb      s4,23(sp)
-    sw      s5,16(sp)
+    sb      s1,23(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a0,32(sp)
-    sw      a1,52(sp)
-    sw      a2,56(sp)
+    sd      a0,64(sp)
+    ld      a0,64(sp)
+    sw      a1,60(sp)
+    mv      a1, a2
+    sw      a2,16(sp)
+    mv      a2, a6
                     #arg load ended
     call    swap
     sw      a0,12(sp)
@@ -429,8 +445,8 @@ heap_sort:
     mv      a1, a0
                     #      new_var temp_36_61:i32 
                     #      temp_36_61 = Sub i32 i_48, 1_0 
-                    #found literal reg Some(a4) already exist with 1_0
-    sub     s1,a2,a4
+    li      a2, 1
+    sub     s1,a6,a2
                     #      tmp_48 = i32 temp_36_61 
                     #      new_var temp_37_61:i32 
                     #      temp_37_61 =  Call i32 heap_ajust_0(arr_46, tmp0_61, tmp_48) 
@@ -439,8 +455,10 @@ heap_sort:
                     #saved register dumped to mem
                     #arg load start
     sw      a0,12(sp)
+    ld      a0,64(sp)
     sw      a1,52(sp)
-    sw      a2,56(sp)
+    lw      a1,16(sp)
+    lw      a2,52(sp)
                     #arg load ended
     call    heap_ajust
     sw      a0,4(sp)
@@ -448,17 +466,22 @@ heap_sort:
     mv      a1, a0
                     #      new_var temp_38_61:i32 
                     #      temp_38_61 = Sub i32 i_48, 1_0 
-                    #found literal reg Some(a4) already exist with 1_0
-    sub     s1,a2,a4
+    li      a2, 1
+    sub     s1,a6,a2
                     #      i_48 = i32 temp_38_61 
                     #      jump label: while.head_60 
+    sw      a0,4(sp)
+    ld      a0,64(sp)
+    sw      a1,52(sp)
+    lw      a1,60(sp)
+    sw      s1,0(sp)
     j       .while.head_60
                     #      label while.exit_60: 
 .while.exit_60:
                     #      ret 0_0 
     ld      ra,80(sp)
     ld      s0,72(sp)
-    sw      a0,4(sp)
+    sd      a0,64(sp)
     li      a0, 0
     addi    sp,sp,88
     ret
@@ -532,7 +555,7 @@ main:
                     #      new_var temp_41_70:ptr->i32 
                     #      temp_41_70 = getelementptr a_70:Array:i32:[Some(10_0)] [Some(2_0)] 
     li      s3, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
     li      s4, 2
     add     s3,s3,a5
     slli s3,s3,2
@@ -546,7 +569,7 @@ main:
                     #      new_var temp_42_70:ptr->i32 
                     #      temp_42_70 = getelementptr a_70:Array:i32:[Some(10_0)] [Some(3_0)] 
     li      s6, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
                     #found literal reg Some(s2) already exist with 3_0
     add     s6,s6,a5
     slli s6,s6,2
@@ -560,7 +583,7 @@ main:
                     #      new_var temp_43_70:ptr->i32 
                     #      temp_43_70 = getelementptr a_70:Array:i32:[Some(10_0)] [Some(4_0)] 
     li      s7, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
                     #found literal reg Some(a6) already exist with 4_0
     add     s7,s7,a5
     slli s7,s7,2
@@ -574,21 +597,21 @@ main:
                     #      new_var temp_44_70:ptr->i32 
                     #      temp_44_70 = getelementptr a_70:Array:i32:[Some(10_0)] [Some(5_0)] 
     li      s8, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
     li      s9, 5
     add     s8,s8,a5
     slli s8,s8,2
     add     s8,s8,sp
     add     s8,s8,s8
                     #      store 1_0:i32 temp_44_70:ptr->i32 
-                    #found literal reg Some(s1) already exist with 1_0
-    sd      s1,0(s8)
+                    #found literal reg Some(a3) already exist with 1_0
+    sd      a3,0(s8)
                     #      mu a_70:240 
                     #      a_70 = chi a_70:240 
                     #      new_var temp_45_70:ptr->i32 
                     #      temp_45_70 = getelementptr a_70:Array:i32:[Some(10_0)] [Some(6_0)] 
     li      s10, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
     li      s11, 6
     add     s10,s10,a5
     slli s10,s10,2
@@ -602,7 +625,7 @@ main:
                     #      new_var temp_46_70:ptr->i32 
                     #      temp_46_70 = getelementptr a_70:Array:i32:[Some(10_0)] [Some(7_0)] 
     li      a0, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
     li      a1, 7
     add     a0,a0,a5
     slli a0,a0,2
@@ -616,8 +639,8 @@ main:
                     #      new_var temp_47_70:ptr->i32 
                     #      temp_47_70 = getelementptr a_70:Array:i32:[Some(10_0)] [Some(8_0)] 
     li      a1, 0
-                    #found literal reg Some(s1) already exist with 1_0
-    li      a3, 8
+                    #found literal reg Some(a3) already exist with 1_0
+    li      a4, 8
     add     a1,a1,a5
     slli a1,a1,2
     add     a1,a1,sp
@@ -637,7 +660,7 @@ main:
     add     a3,a3,sp
     add     a3,a3,a3
                     #      store 8_0:i32 temp_48_70:ptr->i32 
-    li      a4, 8
+                    #found literal reg Some(a4) already exist with 8_0
     sd      a4,0(a3)
                     #      mu a_70:264 
                     #      a_70 = chi a_70:264 
@@ -661,9 +684,10 @@ main:
     sd      s10,64(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a5,156(sp)
     sd      a0,56(sp)
+    mv      a0, a5
     sd      a1,48(sp)
+    lw      a1,32(sp)
                     #arg load ended
     call    heap_sort
     sw      a0,28(sp)
@@ -677,10 +701,10 @@ main:
                     #   load label n as ptr to reg
     la      a1, n
                     #occupy reg a1 with *n_0
-    lw      a5,0(a1)
+    lw      a6,0(a1)
                     #      new_var temp_52_86:i1 
                     #      temp_52_86 = icmp i32 Slt i_70, temp_51_86 
-    slt     s1,a4,a5
+    slt     s1,a4,a6
                     #      br i1 temp_52_86, label while.body_87, label while.exit_87 
     bnez    s1, .while.body_87
     j       .while.exit_87
@@ -690,27 +714,25 @@ main:
                     #      new_var temp_53_88:ptr->i32 
                     #      new_var temp_54_88:i32 
                     #      temp_53_88 = getelementptr a_70:Array:i32:[Some(10_0)] [Some(i_70)] 
-    li      s2, 0
-    li      s3, 1
-    mul     s4,s3,a4
-    add     s2,s2,s4
-    slli s2,s2,2
-    add     s2,s2,sp
-    add     s2,s2,s2
+    li      a1, 0
+    li      s2, 1
+    add     a1,a1,a5
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_54_88 = load temp_53_88:ptr->i32 
-    lw      s5,0(s2)
+    lw      s3,0(a1)
                     #      tmp_88 = i32 temp_54_88 
-    mv      s6, s5
+    mv      s4, s3
                     #       Call void putint_0(tmp_88) 
                     #saved register dumping to mem
     sb      s1,23(sp)
-    sd      s2,8(sp)
-    sw      s4,156(sp)
-    sw      s5,4(sp)
-    sw      s6,16(sp)
+    sw      s3,4(sp)
+    sw      s4,16(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,28(sp)
+    lw      a0,16(sp)
                     #arg load ended
     call    putint
                     #      tmp_88 = i32 10_0 
@@ -720,6 +742,7 @@ main:
                     #saved register dumped to mem
                     #arg load start
     sw      a0,16(sp)
+    lw      a0,16(sp)
                     #arg load ended
     call    putch
                     #      new_var temp_55_88:i32 
@@ -728,12 +751,17 @@ main:
     add     s1,a4,a0
                     #      i_70 = i32 temp_55_88 
                     #      jump label: while.head_87 
+    sd      a1,8(sp)
+    sw      a6,24(sp)
+    lw      a0,28(sp)
+    sw      s1,0(sp)
     j       .while.head_87
                     #      label while.exit_87: 
 .while.exit_87:
                     #      ret 0_0 
     ld      ra,168(sp)
     ld      s0,160(sp)
+    sw      a0,28(sp)
     li      a0, 0
     addi    sp,sp,176
     ret

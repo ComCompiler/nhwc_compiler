@@ -61,23 +61,23 @@ deepWhileBr:
 .while.body_22:
                     #      new_var d_23:i32 
                     #      d_23 = i32 42_0 
-    li      a6, 42
+    li      a4, 42
                     #      jump label: L2_0 
     j       .L2_0
                     #      label L2_0: 
 .L2_0:
                     #      new_var temp_2_26:i1 
                     #      temp_2_26 = icmp i32 Slt c_18, 100_0 
-    li      a7, 100
-    slt     s1,a3,a7
+    li      a6, 100
+    slt     a7,a3,a6
                     #      br i1 temp_2_26, label branch_true_27, label branch_false_27 
-    bnez    s1, .branch_true_27
+    bnez    a7, .branch_true_27
     j       .branch_false_27
                     #      label branch_true_27: 
 .branch_true_27:
                     #      new_var temp_3_28:i32 
                     #      temp_3_28 = Add i32 c_18, d_23 
-    add     s2,a3,a6
+    add     a6,a3,a4
                     #      c_18 = i32 temp_3_28 
                     #      jump label: L3_0 
     j       .L3_0
@@ -85,41 +85,42 @@ deepWhileBr:
 .L3_0:
                     #      new_var temp_4_30:i1 
                     #      temp_4_30 = icmp i32 Sgt c_18, 99_0 
-    li      s3, 99
-    slt     s4,s3,a3
+    li      s1, 99
+    slt     s2,s1,a3
                     #      br i1 temp_4_30, label branch_true_31, label branch_false_31 
-    bnez    s4, .branch_true_31
+    bnez    s2, .branch_true_31
     j       .branch_false_31
                     #      label branch_true_31: 
 .branch_true_31:
                     #      new_var e_32:i32 
                     #      new_var temp_5_32:i32 
                     #      temp_5_32 = Mul i32 d_23, 2_0 
-    li      s5, 2
-    mul     s6,a6,s5
+    li      s1, 2
+    mul     s3,a4,s1
                     #      e_32 = i32 temp_5_32 
-    mv      s7, s6
+    mv      s4, s3
                     #      jump label: L4_0 
     j       .L4_0
                     #      label L4_0: 
 .L4_0:
                     #      new_var temp_6_35:i1 
                     #      temp_6_35 = icmp i32 Eq 1_0, 1_0 
-    li      s8, 1
-    li      s9, 1
-    xor     s10,s8,s9
-    seqz    s10, s10
+    li      s1, 1
+    li      s5, 1
+    xor     s6,s1,s5
+    seqz    s6, s6
                     #      br i1 temp_6_35, label branch_true_36, label branch_false_36 
-    bnez    s10, .branch_true_36
+    bnez    s6, .branch_true_36
     j       .branch_false_36
                     #      label branch_true_36: 
 .branch_true_36:
                     #      new_var temp_7_37:i32 
                     #      temp_7_37 = Mul i32 e_32, 2_0 
-                    #found literal reg Some(s5) already exist with 2_0
-    mul     s11,s7,s5
+    li      s1, 2
+    mul     s5,s4,s1
                     #      c_18 = i32 temp_7_37 
                     #      jump label: branch_false_36 
+    sw      s5,4(sp)
     j       .branch_false_36
                     #      label branch_false_36: 
 .branch_false_36:
@@ -128,6 +129,9 @@ deepWhileBr:
                     #      label branch_false_27: 
 .branch_false_27:
                     #      jump label: while.head_22 
+    sw      a4,32(sp)
+    sb      a7,31(sp)
+    sb      a5,39(sp)
     j       .while.head_22
                     #      label while.exit_22: 
 .while.exit_22:
@@ -160,6 +164,8 @@ main:
                     #saved register dumped to mem
                     #arg load start
     sw      a0,4(sp)
+    lw      a0,4(sp)
+    lw      a1,4(sp)
                     #arg load ended
     call    deepWhileBr
     sw      a0,0(sp)
