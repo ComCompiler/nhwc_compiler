@@ -151,8 +151,8 @@ FourWhile:
                     #      jump label: while.head_35 
     sb      s2,39(sp)
     sb      s4,31(sp)
-    sw      s5,20(sp)
     sw      s3,32(sp)
+    sw      s5,20(sp)
     j       .while.head_35
                     #      label while.exit_35: 
 .while.exit_35:
@@ -164,9 +164,9 @@ FourWhile:
     mv      a2, s3
                     #      jump label: while.head_31 
     sb      s2,39(sp)
-    sw      s1,40(sp)
-    sw      s3,16(sp)
     sb      a7,47(sp)
+    sw      s3,16(sp)
+    sw      s1,40(sp)
     j       .while.head_31
                     #      label while.exit_31: 
 .while.exit_31:
@@ -178,9 +178,9 @@ FourWhile:
     mv      a1, s1
                     #      jump label: while.head_27 
     sw      a6,48(sp)
-    sw      s1,12(sp)
-    sb      a5,55(sp)
     sb      a7,47(sp)
+    sb      a5,55(sp)
+    sw      s1,12(sp)
     j       .while.head_27
                     #      label while.exit_27: 
 .while.exit_27:

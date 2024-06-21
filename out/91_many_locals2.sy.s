@@ -154,6 +154,7 @@ main:
     li      a2, 1
     add     a4,a1,a2
                     #      b_18 = i32 temp_2_53 
+    mv      a1, a4
                     #      jump label: while.head_52 
     sb      a3,135(sp)
     sw      a4,128(sp)

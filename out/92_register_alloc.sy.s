@@ -1101,6 +1101,7 @@ func:
     sw      a0,1392(sp)
     sub     a0,a1,a2
                     #      i_50 = i32 temp_102_50 
+    mv      a3, a0
                     #      new_var temp_103_50:i32 
                     #      temp_103_50 = load *a29_0:ptr->i32 
     sw      a0,832(sp)
@@ -1680,6 +1681,7 @@ func:
     sw      a2,500(sp)
     add     a2,a0,a1
                     #      d1_50 = i32 temp_189_50 
+    mv      s6, a2
                     #      new_var temp_190_50:i32 
                     #      temp_190_50 = load *a2_0:ptr->i32 
                     #   load label a2 as ptr to reg
@@ -1698,6 +1700,7 @@ func:
     sw      a2,484(sp)
     add     a2,a0,a1
                     #      d2_50 = i32 temp_192_50 
+    mv      s1, a2
                     #      new_var temp_193_50:i32 
                     #      temp_193_50 = load *a3_0:ptr->i32 
                     #   load label a3 as ptr to reg
@@ -1716,6 +1719,7 @@ func:
     sw      a2,472(sp)
     add     a2,a0,a1
                     #      d3_50 = i32 temp_195_50 
+    mv      s10, a2
                     #      new_var temp_196_50:i32 
                     #      temp_196_50 = load *a4_0:ptr->i32 
                     #   load label a4 as ptr to reg
@@ -1754,6 +1758,7 @@ func:
     sw      a2,448(sp)
     add     a2,a0,a1
                     #      d1_50 = i32 temp_201_50 
+    mv      s6, a2
                     #      new_var temp_202_50:i32 
                     #      temp_202_50 = load *a2_0:ptr->i32 
                     #   load label a2 as ptr to reg
@@ -1772,6 +1777,7 @@ func:
     sw      a2,436(sp)
     add     a2,a0,a1
                     #      d2_50 = i32 temp_204_50 
+    mv      s1, a2
                     #      new_var temp_205_50:i32 
                     #      temp_205_50 = load *a3_0:ptr->i32 
                     #   load label a3 as ptr to reg
@@ -1790,6 +1796,7 @@ func:
     sw      a2,424(sp)
     add     a2,a0,a1
                     #      d3_50 = i32 temp_207_50 
+    mv      s10, a2
                     #      new_var temp_208_50:i32 
                     #      temp_208_50 = load *a4_0:ptr->i32 
                     #   load label a4 as ptr to reg

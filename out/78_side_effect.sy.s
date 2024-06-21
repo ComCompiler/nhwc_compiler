@@ -370,15 +370,15 @@ main:
                     #      k_24 = i32 temp_28_28 
     mv      a0, s2
                     #      jump label: while.head_27 
-    sb      a5,86(sp)
-    sw      s2,20(sp)
     sb      a3,87(sp)
-    sw      a4,92(sp)
-    sw      s3,24(sp)
-    sw      s1,28(sp)
+    sw      s2,20(sp)
     sb      a2,99(sp)
+    sw      a4,92(sp)
     sb      a6,85(sp)
+    sb      a5,86(sp)
+    sw      s3,24(sp)
     sb      a7,79(sp)
+    sw      s1,28(sp)
     j       .while.head_27
                     #      label while.exit_27: 
 .while.exit_27:

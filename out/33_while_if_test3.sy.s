@@ -131,8 +131,8 @@ deepWhileBr:
                     #      label branch_false_27: 
 .branch_false_27:
                     #      jump label: while.head_22 
-    sw      a4,32(sp)
     sb      a7,31(sp)
+    sw      a4,32(sp)
     sb      a5,39(sp)
     j       .while.head_22
                     #      label while.exit_22: 

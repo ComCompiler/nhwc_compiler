@@ -68,8 +68,8 @@ my_memset:
     mv      a3, a7
                     #      jump label: while.head_27 
     sd      a5,8(sp)
-    sw      a7,4(sp)
     sb      a4,19(sp)
+    sw      a7,4(sp)
     j       .while.head_27
                     #      label while.exit_27: 
 .while.exit_27:
@@ -681,30 +681,30 @@ dfs:
                     #      i_44 = i32 temp_56_55 
     mv      a6, s9
                     #      jump label: while.exit_51 
-    li      s5, 4272
-    add     s5,sp,s5
-    sd      s5,0(s5)
-    li      s7, 4211
-    add     s7,sp,s7
-    sb      s7,0(s7)
-    li      s2, 4676
-    add     s2,sp,s2
-    sw      s2,0(s2)
     li      s10, 4264
     add     s10,sp,s10
     sw      s10,0(s10)
     li      s11, 4216
     add     s11,sp,s11
     sd      s11,0(s11)
+    li      s7, 4211
+    add     s7,sp,s7
+    sb      s7,0(s7)
     li      a4, 4212
     add     a4,sp,a4
     sw      a4,0(a4)
-    li      s8, 4268
-    add     s8,sp,s8
-    sw      s8,0(s8)
+    li      s2, 4676
+    add     s2,sp,s2
+    sw      s2,0(s2)
     li      s9, 4204
     add     s9,sp,s9
     sw      s9,0(s9)
+    li      s8, 4268
+    add     s8,sp,s8
+    sw      s8,0(s8)
+    li      s5, 4272
+    add     s5,sp,s5
+    sd      s5,0(s5)
     j       .while.exit_51
                     #      label branch_false_54: 
 .branch_false_54:
@@ -761,57 +761,66 @@ dfs:
                     #      i_44 = i32 temp_61_60 
     mv      a6, a0
                     #      jump label: while.exit_51 
-    li      a2, 3787
-    add     a2,sp,a2
-    sb      a2,0(a2)
-    li      a1, 4756
-    add     a1,sp,a1
-    lw      a2,0(a1)
-    li      a1, 4756
-    add     a1,sp,a1
-    sw      a1,0(a1)
-    li      a0, 3780
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 4760
-    add     a0,sp,a0
-    lw      a1,0(a0)
-    li      s5, 4272
-    add     s5,sp,s5
-    sd      s5,0(s5)
-    li      s7, 4211
-    add     s7,sp,s7
-    sb      s7,0(s7)
-    li      s2, 4676
-    add     s2,sp,s2
-    sw      s2,0(s2)
     li      s10, 4264
     add     s10,sp,s10
     sw      s10,0(s10)
     li      s11, 4216
     add     s11,sp,s11
     sd      s11,0(s11)
+    li      s7, 4211
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    li      a0, 3780
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      a1, 4764
+    add     a1,sp,a1
+    lw      a0,0(a1)
     li      a4, 4212
     add     a4,sp,a4
     sw      a4,0(a4)
-    li      s8, 4268
-    add     s8,sp,s8
-    sw      s8,0(s8)
-    li      a0, 4760
-    add     a0,sp,a0
-    sw      a0,0(a0)
+    li      a2, 3787
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a1, 4764
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 4756
+    add     a1,sp,a1
+    lw      a2,0(a1)
+    li      s2, 4676
+    add     s2,sp,s2
+    sw      s2,0(s2)
+    li      a1, 4756
+    add     a1,sp,a1
+    sw      a1,0(a1)
     li      a3, 4744
     add     a3,sp,a3
     sd      a3,0(a3)
-    li      a3, 4764
+    li      a3, 4760
     add     a3,sp,a3
-    lw      a0,0(a3)
+    lw      a1,0(a3)
     li      s9, 4200
     add     s9,sp,s9
     sw      s9,0(s9)
+    li      s8, 4268
+    add     s8,sp,s8
+    sw      s8,0(s8)
     li      s6, 3792
     add     s6,sp,s6
     sd      s6,0(s6)
+    li      s5, 4272
+    add     s5,sp,s5
+    sd      s5,0(s5)
+    li      a3, 4760
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a5, 4736
+    add     a5,sp,a5
+    sw      a5,0(a5)
+    li      a5, 4744
+    add     a5,sp,a5
+    ld      a3,0(a5)
     j       .while.exit_51
                     #      label branch_false_59: 
 .branch_false_59:
@@ -917,38 +926,38 @@ dfs:
     sd      a0,8(sp)
     mv      a0, a1
                     #      jump label: L9_0 
+    li      a0, 3776
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    sw      a1,4(sp)
+    li      a1, 4756
+    add     a1,sp,a1
+    lw      a0,0(a1)
     li      a2, 4764
     add     a2,sp,a2
     sw      a2,0(a2)
-    li      a0, 3776
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 3363
-    add     a0,sp,a0
-    lb      a2,0(a0)
-    sw      a1,4(sp)
-    li      a0, 3363
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    li      a0, 3776
-    add     a0,sp,a0
-    lw      a1,0(a0)
+    li      a1, 4756
+    add     a1,sp,a1
+    sw      a1,0(a1)
+    li      a1, 3363
+    add     a1,sp,a1
+    lb      a2,0(a1)
+    li      a1, 3363
+    add     a1,sp,a1
+    sb      a1,0(a1)
     sw      a3,416(sp)
-    li      a0, 3776
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 3772
-    add     a0,sp,a0
-    lw      a3,0(a0)
-    li      a0, 3772
-    add     a0,sp,a0
-    sw      a0,0(a0)
+    li      a3, 3776
+    add     a3,sp,a3
+    lw      a1,0(a3)
+    li      a3, 3776
+    add     a3,sp,a3
+    sw      a3,0(a3)
     li      a4, 4212
     add     a4,sp,a4
     sw      a4,0(a4)
-    li      a4, 4756
+    li      a4, 3772
     add     a4,sp,a4
-    lw      a0,0(a4)
+    lw      a3,0(a4)
     j       .L9_0
                     #      label L9_0: 
 .L9_0:
@@ -1286,50 +1295,50 @@ dfs:
                     #      i_44 = i32 temp_93_52 
     mv      a6, s4
                     #      jump label: while.head_51 
-    li      s5, 4756
+    li      a5, 4736
+    add     a5,sp,a5
+    sw      a5,0(a5)
+    li      s3, 2939
+    add     s3,sp,s3
+    sb      s3,0(s3)
+    li      a0, 2944
+    add     a0,sp,a0
+    sw      a0,0(a0)
+    li      s5, 4764
     add     s5,sp,s5
-    lw      a2,0(s5)
+    lw      a0,0(s5)
+    li      a4, 4212
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    li      s6, 4756
+    add     s6,sp,s6
+    lw      a2,0(s6)
+    li      s2, 3776
+    add     s2,sp,s2
+    sw      s2,0(s2)
     li      a1, 2940
     add     a1,sp,a1
     sw      a1,0(a1)
     mv      a1, s1
-    li      s5, 4756
-    add     s5,sp,s5
-    sw      s5,0(s5)
-    li      s2, 3776
-    add     s2,sp,s2
-    sw      s2,0(s2)
-    li      a3, 3356
-    add     a3,sp,a3
-    sw      a3,0(a3)
-    li      s6, 4744
-    add     s6,sp,s6
-    ld      a3,0(s6)
-    li      a5, 4736
-    add     a5,sp,a5
-    sw      a5,0(a5)
-    li      a4, 4212
-    add     a4,sp,a4
-    sw      a4,0(a4)
-    li      s3, 2939
-    add     s3,sp,s3
-    sb      s3,0(s3)
-    sw      s4,420(sp)
-    li      a0, 2944
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      s9, 4764
-    add     s9,sp,s9
-    lw      a0,0(s9)
-    li      s9, 4764
-    add     s9,sp,s9
-    sw      s9,0(s9)
     li      s1, 4760
     add     s1,sp,s1
     sw      s1,0(s1)
-    li      s6, 4744
+    li      s6, 4756
     add     s6,sp,s6
-    sd      s6,0(s6)
+    sw      s6,0(s6)
+    sw      s4,420(sp)
+    li      s5, 4764
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      a3, 3356
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a6, 4740
+    add     a6,sp,a6
+    sw      a6,0(a6)
+    li      a6, 4744
+    add     a6,sp,a6
+    ld      a3,0(a6)
     j       .while.head_51
                     #      label while.exit_51: 
 .while.exit_51:
@@ -1446,12 +1455,12 @@ max_flow:
                     #      jump label: while.head_82 
     sw      a0,12(sp)
     lw      a0,68(sp)
+    sb      a5,59(sp)
+    sb      a3,7(sp)
     sw      a6,0(sp)
+    sw      a4,52(sp)
     sw      a1,8(sp)
     lw      a1,64(sp)
-    sw      a4,52(sp)
-    sb      a3,7(sp)
-    sb      a5,59(sp)
     j       .while.head_82
                     #      label while.exit_82: 
 .while.exit_82:
@@ -1589,9 +1598,9 @@ main:
     mv      a0, a2
                     #      jump label: while.head_97 
     sw      a0,88(sp)
+    sw      a2,8(sp)
     sw      a3,28(sp)
     sw      a5,12(sp)
-    sw      a2,8(sp)
     j       .while.head_97
                     #      label while.exit_97: 
 .while.exit_97:

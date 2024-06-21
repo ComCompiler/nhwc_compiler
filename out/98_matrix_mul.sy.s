@@ -1519,28 +1519,29 @@ main:
                     #found literal reg Some(a3) already exist with 1_0
     add     s9,a4,a3
                     #      i_35 = i32 temp_176_44 
+    mv      a4, s9
                     #      jump label: while.head_43 
-    sw      s6,284(sp)
-    sw      s9,104(sp)
-    sw      a5,332(sp)
-    sw      s8,272(sp)
-    sd      a0,192(sp)
-    sd      s3,144(sp)
-    sd      s7,112(sp)
     sw      a7,320(sp)
+    fsw     fa4,124(sp)
+    sd      a0,192(sp)
+    sw      s6,284(sp)
+    fsw     fa0,188(sp)
+    sd      s1,160(sp)
+    fsw     fa2,156(sp)
+    sw      a1,208(sp)
+    fsw     fa5,108(sp)
+    sb      a2,207(sp)
+    sd      s3,144(sp)
     sw      s4,296(sp)
     sd      a6,176(sp)
-    sw      a1,208(sp)
-    fsw     fa2,156(sp)
-    sd      s1,160(sp)
-    sb      a2,207(sp)
-    fsw     fa3,140(sp)
-    fsw     fa5,108(sp)
-    fsw     fa0,188(sp)
-    sd      s5,128(sp)
+    sw      s9,104(sp)
     sw      s2,308(sp)
-    fsw     fa4,124(sp)
+    sd      s5,128(sp)
+    sw      a5,332(sp)
+    sw      s8,272(sp)
+    sd      s7,112(sp)
     fsw     fa1,172(sp)
+    fsw     fa3,140(sp)
     j       .while.head_43
                     #      label while.exit_43: 
 .while.exit_43:
@@ -1614,15 +1615,16 @@ main:
                     #found literal reg Some(a5) already exist with 1_0
     add     a0,a1,a5
                     #      i_35 = i32 temp_183_56 
+    mv      a1, a0
                     #      jump label: while.head_55 
+    sw      a7,72(sp)
     sw      a0,68(sp)
     lw      a0,100(sp)
-    sw      a7,72(sp)
-    sw      a6,260(sp)
-    sd      a2,80(sp)
-    sw      a3,92(sp)
     fsw     fa0,76(sp)
     sb      a4,91(sp)
+    sd      a2,80(sp)
+    sw      a6,260(sp)
+    sw      a3,92(sp)
     j       .while.head_55
                     #      label while.exit_55: 
 .while.exit_55:
@@ -1670,6 +1672,7 @@ main:
                     #      new_var temp_188_65:i32 
                     #      temp_188_65 = fptosi f32 temp_187_65 to i32 
                     #      x_35 = i32 temp_188_65 
+    mv      a2, s2
                     #       Call void putint_0(x_35) 
                     #saved register dumping to mem
     sw      s1,236(sp)
@@ -1685,11 +1688,12 @@ main:
                     #found literal reg Some(a7) already exist with 1_0
     add     a0,a1,a7
                     #      i_35 = i32 temp_189_65 
+    mv      a1, a0
                     #      jump label: while.head_64 
-    sw      a5,64(sp)
     sw      a0,36(sp)
-    sb      a6,63(sp)
     fsw     fa0,44(sp)
+    sb      a6,63(sp)
+    sw      a5,64(sp)
     j       .while.head_64
                     #      label while.exit_64: 
 .while.exit_64:
@@ -1735,6 +1739,7 @@ main:
                     #      new_var temp_194_74:i32 
                     #      temp_194_74 = fptosi f32 temp_193_74 to i32 
                     #      x_35 = i32 temp_194_74 
+    mv      a2, s4
                     #       Call void putint_0(x_35) 
                     #saved register dumping to mem
     sb      s1,31(sp)
@@ -1751,10 +1756,11 @@ main:
     li      a0, 1
     add     s1,a1,a0
                     #      i_35 = i32 temp_195_74 
+    mv      a1, s1
                     #      jump label: while.head_73 
     sw      a7,32(sp)
-    sw      s1,4(sp)
     fsw     fa0,12(sp)
+    sw      s1,4(sp)
     j       .while.head_73
                     #      label while.exit_73: 
 .while.exit_73:

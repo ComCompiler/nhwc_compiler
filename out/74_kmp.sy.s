@@ -173,27 +173,27 @@ get_next:
     mv      a7, s10
                     #      jump label: L9_0 
     lw      s7,28(sp)
+    sd      s1,8(sp)
     ld      s11,16(sp)
     sw      s10,4(sp)
     lw      s10,24(sp)
-    sd      s1,8(sp)
     j       .L9_0
                     #      label L9_0: 
 .L9_0:
                     #      jump label: while.head_22 
-    sw      s5,36(sp)
     sw      s7,28(sp)
-    sb      s6,35(sp)
-    sb      s8,34(sp)
-    sd      s11,16(sp)
-    sd      s4,40(sp)
-    sb      s9,33(sp)
     sb      s2,67(sp)
-    sw      s3,52(sp)
-    sw      s10,24(sp)
+    sb      s9,33(sp)
+    sd      s4,40(sp)
     sw      a5,68(sp)
-    sd      a4,56(sp)
     sd      a3,72(sp)
+    sw      s3,52(sp)
+    sb      s8,34(sp)
+    sb      s6,35(sp)
+    sd      a4,56(sp)
+    sd      s11,16(sp)
+    sw      s10,24(sp)
+    sw      s5,36(sp)
     j       .while.head_22
                     #      label while.exit_22: 
 .while.exit_22:
@@ -424,28 +424,28 @@ KMP:
                     #      j_33 = i32 temp_34_53 
     mv      a1, s11
                     #      jump label: branch_false_52 
-    sw      s10,12(sp)
     sw      s11,8(sp)
+    sw      s10,12(sp)
     j       .branch_false_52
                     #      label branch_false_52: 
 .branch_false_52:
                     #      label L7_0: 
 .L7_0:
                     #      jump label: while.head_38 
-    sw      s5,60(sp)
+    sw      s3,76(sp)
+    sb      s2,91(sp)
+    sb      s6,59(sp)
+    sw      s8,20(sp)
+    sb      s9,19(sp)
+    sd      s1,24(sp)
+    sw      a5,92(sp)
     li      a4, 16496
     add     a4,sp,a4
     sd      a4,0(a4)
-    sw      s3,76(sp)
-    sb      s9,19(sp)
-    sw      s8,20(sp)
-    sd      s1,24(sp)
-    sb      s6,59(sp)
-    sw      a5,92(sp)
-    sd      s4,64(sp)
     sd      a2,96(sp)
+    sd      s4,64(sp)
     sd      a3,80(sp)
-    sb      s2,91(sp)
+    sw      s5,60(sp)
     j       .while.head_38
                     #      label while.exit_38: 
 .while.exit_38:
@@ -553,13 +553,13 @@ read_str:
                     #      label branch_true_66: 
 .branch_true_66:
                     #      jump label: while.exit_62 
-    sd      a3,24(sp)
-    sd      a6,56(sp)
     sd      a2,40(sp)
     sw      a7,20(sp)
+    sd      a6,56(sp)
+    sd      a3,24(sp)
+    sb      s2,19(sp)
     sw      a0,36(sp)
     ld      a0,56(sp)
-    sb      s2,19(sp)
     j       .while.exit_62
                     #      label while.exit_62: 
 .while.exit_62:
@@ -594,15 +594,15 @@ read_str:
                     #      i_59 = i32 temp_42_63 
     mv      a1, s1
                     #      jump label: while.head_62 
-    sd      a3,24(sp)
-    sd      a6,56(sp)
     sd      a2,40(sp)
     sw      a7,20(sp)
     sw      s1,12(sp)
+    sb      a4,51(sp)
+    sd      a6,56(sp)
+    sd      a3,24(sp)
+    sb      s2,19(sp)
     sw      a0,36(sp)
     ld      a0,56(sp)
-    sb      a4,51(sp)
-    sb      s2,19(sp)
     j       .while.head_62
                     #      Define main_0 [] -> main_ret_0 
     .globl main

@@ -302,13 +302,13 @@ heap_ajust:
     lw      a2,120(sp)
     sw      a0,12(sp)
     ld      a0,128(sp)
-    sw      s1,8(sp)
-    mv      s1, a1
     sw      s3,4(sp)
     sw      a1,112(sp)
     lw      a1,124(sp)
-    sd      a4,40(sp)
+    sw      s1,8(sp)
+    lw      s1,112(sp)
     sw      a6,100(sp)
+    sd      a4,40(sp)
     j       .while.head_33
                     #      label while.exit_33: 
 .while.exit_33:
@@ -400,13 +400,13 @@ heap_sort:
                     #      i_48 = i32 temp_32_54 
     mv      a6, s1
                     #      jump label: while.head_53 
-    sb      a4,43(sp)
-    sw      a1,52(sp)
-    lw      a1,60(sp)
-    sw      a7,36(sp)
     sw      s1,28(sp)
+    sb      a4,43(sp)
     sw      a0,32(sp)
     ld      a0,64(sp)
+    sw      a7,36(sp)
+    sw      a1,52(sp)
+    lw      a1,60(sp)
     j       .while.head_53
                     #      label while.exit_53: 
 .while.exit_53:
@@ -478,11 +478,11 @@ heap_sort:
                     #      i_48 = i32 temp_38_61 
     mv      a6, s1
                     #      jump label: while.head_60 
-    sw      a1,52(sp)
-    lw      a1,60(sp)
     sw      s1,0(sp)
     sw      a0,4(sp)
     ld      a0,64(sp)
+    sw      a1,52(sp)
+    lw      a1,60(sp)
     j       .while.head_60
                     #      label while.exit_60: 
 .while.exit_60:
@@ -761,9 +761,9 @@ main:
                     #      i_70 = i32 temp_55_88 
     mv      a4, s1
                     #      jump label: while.head_87 
-    sw      s1,0(sp)
     sw      a6,24(sp)
     sd      a1,8(sp)
+    sw      s1,0(sp)
     lw      a0,28(sp)
     j       .while.head_87
                     #      label while.exit_87: 

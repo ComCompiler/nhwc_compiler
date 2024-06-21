@@ -89,11 +89,12 @@ func:
     li      s1, 1
     add     s2,a0,s1
                     #      index_18 = i32 temp_3_22 
+    mv      a0, s2
                     #      jump label: while.head_21 
-    mv      s1, a0
     sw      a0,72(sp)
     lw      a0,124(sp)
     sw      s2,48(sp)
+    lw      s1,72(sp)
     j       .while.head_21
                     #      label while.exit_21: 
 .while.exit_21:
@@ -172,19 +173,21 @@ func:
                     #found literal reg Some(s3) already exist with 1_0
     add     s8,a0,s3
                     #      i_16 = i32 temp_10_30 
+    mv      a0, s8
                     #      new_var temp_11_30:i32 
                     #      temp_11_30 = Add i32 h_16, 7_0 
     li      s9, 7
     add     s10,a7,s9
                     #      h_16 = i32 temp_11_30 
+    mv      a7, s10
                     #      jump label: while.head_29 
-    sd      s1,24(sp)
+    sw      s8,12(sp)
     sw      s5,20(sp)
     sw      a0,148(sp)
-    sb      s2,35(sp)
     sw      s10,8(sp)
+    sb      s2,35(sp)
     sw      s7,16(sp)
-    sw      s8,12(sp)
+    sd      s1,24(sp)
     j       .while.head_29
                     #      label while.exit_29: 
 .while.exit_29:
@@ -630,14 +633,15 @@ main:
     li      a0, 1
     sub     s1,a3,a0
                     #      ret_36 = i32 temp_43_52 
+    mv      a3, s1
                     #      jump label: while.head_51 
     sb      a4,19(sp)
+    sw      s1,0(sp)
+    sd      a1,8(sp)
+    lw      a0,24(sp)
     li      a7, 13232
     add     a7,sp,a7
     sw      a7,0(a7)
-    sd      a1,8(sp)
-    lw      a0,24(sp)
-    sw      s1,0(sp)
     j       .while.head_51
                     #      label while.exit_51: 
 .while.exit_51:

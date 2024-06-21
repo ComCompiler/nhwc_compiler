@@ -139,12 +139,12 @@ main:
                     #      k_22 = i32 temp_9_35 
     mv      a7, s6
                     #      jump label: branch_false_30 
-    sw      s6,8(sp)
-    sw      s2,24(sp)
-    sw      s5,12(sp)
     sw      s4,16(sp)
+    sw      s5,12(sp)
+    sw      s6,8(sp)
     sw      s3,20(sp)
     sw      a0,28(sp)
+    sw      s2,24(sp)
     j       .branch_false_30
                     #      label branch_false_30: 
 .branch_false_30:
@@ -163,10 +163,10 @@ main:
                     #arg load ended
     call    putint
                     #      jump label: branch_false_21 
-    sw      a5,48(sp)
-    sw      a2,52(sp)
     sb      a4,43(sp)
     sw      a7,44(sp)
+    sw      a2,52(sp)
+    sw      a5,48(sp)
     j       .branch_false_21
                     #      label branch_false_21: 
 .branch_false_21:

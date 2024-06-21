@@ -147,8 +147,8 @@ hanoi:
     call    hanoi
                     #      jump label: L2_0 
     lw      a2,20(sp)
-    sw      a6,8(sp)
     lw      a3,16(sp)
+    sw      a6,8(sp)
     j       .L2_0
                     #      label L2_0: 
 .L2_0:
@@ -227,10 +227,10 @@ main:
                     #      n_35 = i32 temp_6_39 
     mv      a0, a2
                     #      jump label: while.head_38 
+    mv      a1, a0
     sw      a0,16(sp)
     lw      a0,20(sp)
     sw      a2,4(sp)
-    lw      a1,16(sp)
     j       .while.head_38
                     #      label while.exit_38: 
 .while.exit_38:

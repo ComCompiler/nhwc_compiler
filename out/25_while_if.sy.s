@@ -153,8 +153,8 @@ deepWhileBr:
                     #      c_22 = i32 temp_8_41 
     mv      a3, s4
                     #      jump label: branch_false_40 
-    sw      s1,16(sp)
     sw      s4,0(sp)
+    sw      s1,16(sp)
     j       .branch_false_40
                     #      label branch_false_40: 
 .branch_false_40:

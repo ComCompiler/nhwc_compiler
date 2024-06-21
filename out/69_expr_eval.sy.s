@@ -222,9 +222,9 @@ next_token:
     sw      a0,72(sp)
     sw      a0,64(sp)
                     #      jump label: while.head_44 
+    sw      a1,76(sp)
     sw      a0,64(sp)
     sb      a3,71(sp)
-    sw      a1,76(sp)
     j       .while.head_44
                     #      label while.exit_44: 
 .while.exit_44:
@@ -332,14 +332,14 @@ next_token:
                     #occupy reg s9 with *num_0
     sd      s8,0(s9)
                     #      jump label: while.head_51 
+    sb      a7,35(sp)
+    sw      a0,36(sp)
+    lw      a0,56(sp)
     sw      s1,28(sp)
     lw      s1,44(sp)
     sw      s8,12(sp)
-    sw      s5,20(sp)
-    sw      a0,36(sp)
-    lw      a0,56(sp)
     sw      s7,16(sp)
-    sb      a7,35(sp)
+    sw      s5,20(sp)
     sw      s3,24(sp)
     j       .while.head_51
                     #      label while.exit_51: 
@@ -381,11 +381,11 @@ next_token:
     li      s2, 1
     sd      s2,0(s1)
                     #      jump label: L22_0 
-    sw      a5,4(sp)
-    lw      a5,48(sp)
+    lb      a7,35(sp)
     sw      a0,0(sp)
     lw      a0,36(sp)
-    lb      a7,35(sp)
+    sw      a5,4(sp)
+    lw      a5,48(sp)
     j       .L22_0
                     #      label L22_0: 
 .L22_0:
@@ -1138,11 +1138,11 @@ eval:
                     #      label branch_true_131: 
 .branch_true_131:
                     #      jump label: while.exit_127 
-    sb      s2,126(sp)
-    sb      s1,127(sp)
     sw      a0,128(sp)
     lw      a0,148(sp)
+    sb      s1,127(sp)
     sw      a6,136(sp)
+    sb      s2,126(sp)
     j       .while.exit_127
                     #      label while.exit_127: 
 .while.exit_127:
@@ -1241,9 +1241,9 @@ eval:
                     #arg load ended
     call    stack_push
                     #      jump label: while.head_148 
+    lw      a2,152(sp)
     lw      a0,44(sp)
     sb      a6,39(sp)
-    lw      a2,152(sp)
     j       .while.head_148
                     #      label while.exit_148: 
 .while.exit_148:
@@ -1412,8 +1412,8 @@ eval:
                     #arg load ended
     call    stack_push
                     #      jump label: while.head_135 
-    lw      a0,120(sp)
     lw      a2,152(sp)
+    lw      a0,120(sp)
     j       .while.head_135
                     #      label while.exit_135: 
 .while.exit_135:
@@ -1501,10 +1501,10 @@ eval:
     call    next_token
     sw      a0,48(sp)
                     #      jump label: while.head_127 
-    sb      a7,143(sp)
-    sw      a5,144(sp)
     sw      a0,48(sp)
     lw      a0,148(sp)
+    sw      a5,144(sp)
+    sb      a7,143(sp)
     sw      a6,136(sp)
     j       .while.head_127
                     #      Define main_0 [] -> main_ret_0 

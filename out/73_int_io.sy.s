@@ -98,24 +98,24 @@ my_getint:
                     #      label branch_true_24: 
 .branch_true_24:
                     #      jump label: while.exit_20 
-    sb      a7,26(sp)
-    sw      a4,40(sp)
+    sb      s1,25(sp)
     sw      a0,32(sp)
     lw      a0,44(sp)
-    sb      s1,25(sp)
-    sb      a5,27(sp)
+    sw      a4,40(sp)
     sw      a2,28(sp)
+    sb      a7,26(sp)
+    sb      a5,27(sp)
     j       .while.exit_20
                     #      label branch_false_24: 
 .branch_false_24:
                     #      jump label: while.exit_20 
-    sb      a7,26(sp)
-    sw      a4,40(sp)
+    sb      s1,25(sp)
     sw      a0,32(sp)
     lw      a0,44(sp)
-    sb      s1,25(sp)
-    sb      a5,27(sp)
+    sw      a4,40(sp)
     sw      a2,28(sp)
+    sb      a7,26(sp)
+    sb      a5,27(sp)
     j       .while.exit_20
                     #      label while.exit_20: 
 .while.exit_20:
@@ -185,11 +185,11 @@ my_getint:
                     #      label branch_false_35: 
 .branch_false_35:
                     #      jump label: while.exit_31 
-    sb      s2,13(sp)
-    sw      a4,16(sp)
+    sb      s1,14(sp)
     sw      a0,20(sp)
     lw      a0,44(sp)
-    sb      s1,14(sp)
+    sb      s2,13(sp)
+    sw      a4,16(sp)
     sb      a6,15(sp)
     j       .while.exit_31
                     #      label while.exit_31: 

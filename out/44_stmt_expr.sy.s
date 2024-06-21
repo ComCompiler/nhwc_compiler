@@ -92,11 +92,11 @@ main:
                     #occupy reg s4 with *k_0
     sd      s3,0(s4)
                     #      jump label: while.head_23 
-    sb      a2,35(sp)
-    sw      a3,28(sp)
     sw      a5,24(sp)
     sw      s3,12(sp)
+    sw      a3,28(sp)
     sw      s1,16(sp)
+    sb      a2,35(sp)
     sw      a6,20(sp)
     j       .while.head_23
                     #      label while.exit_23: 

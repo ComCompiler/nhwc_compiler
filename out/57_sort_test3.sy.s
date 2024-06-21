@@ -142,13 +142,13 @@ QuickSort:
                     #      j_22 = i32 temp_10_34 
     mv      a5, s10
                     #      jump label: while.head_33 
-    sw      s10,108(sp)
     sw      s4,132(sp)
-    sw      s6,116(sp)
-    sd      s5,120(sp)
-    sb      s9,113(sp)
     sb      s8,114(sp)
     sb      s7,115(sp)
+    sw      s10,108(sp)
+    sb      s9,113(sp)
+    sw      s6,116(sp)
+    sd      s5,120(sp)
     j       .while.head_33
                     #      label while.exit_33: 
 .while.exit_33:
@@ -195,11 +195,11 @@ QuickSort:
                     #      i_22 = i32 temp_15_38 
     mv      a4, a1
                     #      jump label: branch_false_37 
+    sw      a1,80(sp)
+    lw      a1,172(sp)
     sd      s10,96(sp)
     ld      a0,176(sp)
     sd      s11,88(sp)
-    sw      a1,80(sp)
-    lw      a1,172(sp)
     j       .branch_false_37
                     #      label branch_false_37: 
 .branch_false_37:
@@ -243,13 +243,13 @@ QuickSort:
                     #      i_22 = i32 temp_21_43 
     mv      a4, a1
                     #      jump label: while.head_42 
+    sw      a1,60(sp)
+    lw      a1,172(sp)
     sd      s10,72(sp)
     ld      a0,176(sp)
     sb      a2,65(sp)
     lw      a2,168(sp)
     sw      s11,68(sp)
-    sw      a1,60(sp)
-    lw      a1,172(sp)
     j       .while.head_42
                     #      label while.exit_42: 
 .while.exit_42:
@@ -301,31 +301,31 @@ QuickSort:
                     #      j_22 = i32 temp_26_47 
     mv      a5, a1
                     #      jump label: branch_false_46 
+    sw      a1,32(sp)
+    lb      a1,67(sp)
     lb      a0,59(sp)
     sd      a2,176(sp)
     lb      a2,65(sp)
-    sw      a1,32(sp)
-    lb      a1,67(sp)
     j       .branch_false_46
                     #      label branch_false_46: 
 .branch_false_46:
                     #      jump label: while.head_30 
-    sd      s10,72(sp)
-    sb      a7,139(sp)
     sw      s4,132(sp)
+    sb      s8,114(sp)
+    sb      a7,139(sp)
+    sb      a1,67(sp)
+    lw      a1,172(sp)
+    sb      s7,115(sp)
+    sd      s10,72(sp)
     sb      a0,59(sp)
     ld      a0,176(sp)
+    sb      s9,113(sp)
+    sb      a2,65(sp)
+    lw      a2,168(sp)
     sb      s3,107(sp)
     sw      s6,116(sp)
     sd      s5,120(sp)
-    sb      s9,113(sp)
-    sb      s8,114(sp)
-    sb      a2,65(sp)
-    lw      a2,168(sp)
-    sb      s7,115(sp)
     sw      s11,68(sp)
-    sb      a1,67(sp)
-    lw      a1,172(sp)
     j       .while.head_30
                     #      label while.exit_30: 
 .while.exit_30:
@@ -392,15 +392,15 @@ QuickSort:
                     #      tmp_22 = i32 temp_31_22 
     mv      a1, a0
                     #      jump label: branch_false_21 
-    sd      a6,144(sp)
     sb      a7,139(sp)
+    sw      a1,20(sp)
+    lw      a1,172(sp)
+    sd      a6,144(sp)
     sw      a4,160(sp)
-    sw      a5,156(sp)
     sw      a0,4(sp)
     ld      a0,176(sp)
     lw      a2,168(sp)
-    sw      a1,20(sp)
-    lw      a1,172(sp)
+    sw      a5,156(sp)
     j       .branch_false_21
                     #      label branch_false_21: 
 .branch_false_21:
@@ -679,9 +679,9 @@ main:
                     #      i_58 = i32 temp_47_78 
     mv      a4, s1
                     #      jump label: while.head_77 
-    sw      a2,24(sp)
     sd      a1,8(sp)
     lw      a0,28(sp)
+    sw      a2,24(sp)
     sw      s1,0(sp)
     j       .while.head_77
                     #      label while.exit_77: 

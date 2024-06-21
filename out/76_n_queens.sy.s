@@ -158,11 +158,11 @@ printans:
                     #      i_19 = i32 temp_9_24 
     mv      a5, s1
                     #      jump label: while.head_23 
-    sw      a2,232(sp)
-    sb      a4,231(sp)
-    sw      s1,0(sp)
     sw      a6,224(sp)
+    sb      a4,231(sp)
+    sw      a2,232(sp)
     sd      a7,16(sp)
+    sw      s1,0(sp)
     j       .while.head_23
                     #      label while.exit_23: 
 .while.exit_23:
@@ -395,17 +395,17 @@ f:
                     #arg load ended
     call    printans
                     #      jump label: branch_false_45 
-    lb      s8,570(sp)
-    lb      s6,346(sp)
-    lw      s9,564(sp)
-    lb      s4,347(sp)
-    lw      s2,984(sp)
-    ld      s10,136(sp)
-    lw      s11,560(sp)
-    ld      s3,576(sp)
     lw      s5,572(sp)
+    lb      s8,570(sp)
     lb      s7,571(sp)
+    lw      s11,560(sp)
+    lw      s2,984(sp)
+    lb      s4,347(sp)
+    ld      s3,576(sp)
+    lb      s6,346(sp)
     lw      s1,348(sp)
+    ld      s10,136(sp)
+    lw      s9,564(sp)
     j       .branch_false_45
                     #      label branch_false_45: 
 .branch_false_45:
@@ -564,31 +564,31 @@ f:
                     #      mu line2_0:226 
                     #      line2_0 = chi line2_0:226 
                     #      jump label: branch_false_41 
-    sw      a2,76(sp)
-    lb      a2,131(sp)
-    lb      s8,570(sp)
-    lb      s6,346(sp)
-    sw      s9,24(sp)
-    lw      s9,564(sp)
-    sw      s4,44(sp)
-    lb      s4,347(sp)
-    lw      s2,984(sp)
-    sw      s10,20(sp)
-    ld      s10,136(sp)
-    sd      s11,8(sp)
-    lw      s11,560(sp)
-    ld      s3,576(sp)
     sd      s5,32(sp)
     lw      s5,572(sp)
+    lb      s8,570(sp)
     sw      a1,1012(sp)
     lb      a1,130(sp)
-    lw      a3,1004(sp)
+    sw      a2,76(sp)
+    lb      a2,131(sp)
     sw      s7,28(sp)
     lb      s7,571(sp)
-    sw      s1,1008(sp)
-    lw      s1,348(sp)
+    sd      s11,8(sp)
+    lw      s11,560(sp)
+    lw      s2,984(sp)
+    sw      s4,44(sp)
+    lb      s4,347(sp)
+    ld      s3,576(sp)
+    lw      a3,1004(sp)
+    lb      s6,346(sp)
     sd      a0,48(sp)
     lw      a0,132(sp)
+    sw      s1,1008(sp)
+    lw      s1,348(sp)
+    sw      s10,20(sp)
+    ld      s10,136(sp)
+    sw      s9,24(sp)
+    lw      s9,564(sp)
     j       .branch_false_41
                     #      label branch_false_41: 
 .branch_false_41:
@@ -604,26 +604,26 @@ f:
                     #      i_35 = i32 temp_49_39 
     mv      a0, a2
                     #      jump label: while.head_38 
-    sw      a2,4(sp)
-    sb      s8,570(sp)
-    sb      s6,346(sp)
-    sw      s9,564(sp)
-    sd      a5,352(sp)
-    sw      a6,992(sp)
-    sb      s4,347(sp)
-    sw      s2,984(sp)
-    sd      s10,136(sp)
-    sw      s11,560(sp)
-    sw      a7,988(sp)
-    sd      s3,576(sp)
     sw      s5,572(sp)
+    sw      a7,988(sp)
+    sb      s8,570(sp)
     mv      a1, a0
-    sw      a3,1004(sp)
+    sw      a2,4(sp)
     sb      s7,571(sp)
-    sw      s1,348(sp)
-    sb      a4,1003(sp)
+    sw      s11,560(sp)
+    sd      a5,352(sp)
+    sw      s2,984(sp)
+    sb      s4,347(sp)
+    sw      a6,992(sp)
+    sd      s3,576(sp)
+    sw      a3,1004(sp)
+    sb      s6,346(sp)
     sw      a0,1008(sp)
     lw      a0,1012(sp)
+    sb      a4,1003(sp)
+    sw      s1,348(sp)
+    sd      s10,136(sp)
+    sw      s9,564(sp)
     j       .while.head_38
                     #      label while.exit_38: 
 .while.exit_38:
@@ -696,8 +696,8 @@ main:
                     #      N_56 = i32 temp_53_60 
     mv      a1, a4
                     #      jump label: while.head_59 
-    lw      a0,20(sp)
     sw      a4,4(sp)
+    lw      a0,20(sp)
     sb      a3,15(sp)
     j       .while.head_59
                     #      label while.exit_59: 

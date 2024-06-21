@@ -75,8 +75,8 @@ ifWhile:
                     #      b_17 = i32 temp_2_27 
     mv      a1, a5
                     #      jump label: while.head_26 
-    sb      a4,22(sp)
     sw      a5,16(sp)
+    sb      a4,22(sp)
     j       .while.head_26
                     #      label while.exit_26: 
 .while.exit_26:
@@ -96,9 +96,9 @@ ifWhile:
     slt     a4,a0,a2
                     #      br i1 temp_4_30, label while.body_31, label while.exit_31 
     bnez    a4, .while.body_31
+    lw      a5,12(sp)
     sb      a4,11(sp)
     lb      a4,22(sp)
-    lw      a5,12(sp)
     j       .while.exit_31
                     #      label while.body_31: 
 .while.body_31:
@@ -115,9 +115,9 @@ ifWhile:
                     #      a_17 = i32 temp_6_32 
     mv      a0, a7
                     #      jump label: while.head_31 
-    sw      a7,0(sp)
-    sb      a4,11(sp)
     sw      a5,4(sp)
+    sb      a4,11(sp)
+    sw      a7,0(sp)
     j       .while.head_31
                     #      label while.exit_31: 
 .while.exit_31:

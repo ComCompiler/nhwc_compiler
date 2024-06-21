@@ -91,13 +91,13 @@ putstr:
                     #      iNd__1X_22 = i32 temp_167_27 
     mv      a1, a0
                     #      jump label: while.head_26 
-    sw      a4,20(sp)
-    sb      a6,19(sp)
-    sw      a7,4(sp)
     sw      a0,0(sp)
     ld      a0,40(sp)
-    sd      a2,24(sp)
+    sw      a7,4(sp)
+    sb      a6,19(sp)
     sd      a3,8(sp)
+    sw      a4,20(sp)
+    sd      a2,24(sp)
     j       .while.head_26
                     #      label while.exit_26: 
 .while.exit_26:
@@ -323,12 +323,12 @@ main:
     li      s1, 3060
     add     s1,sp,s1
     sw      s1,0(s1)
-    li      s4, 3036
-    add     s4,sp,s4
-    lw      s1,0(s4)
-    li      s4, 3036
-    add     s4,sp,s4
-    sw      s4,0(s4)
+    li      a1, 3035
+    add     a1,sp,a1
+    sb      a1,0(a1)
+    li      a1, 3036
+    add     a1,sp,a1
+    lw      s1,0(a1)
     j       .branch_false_41
                     #      label branch_false_41: 
 .branch_false_41:
@@ -363,25 +363,25 @@ main:
                     #      label branch_true_49: 
 .branch_true_49:
                     #      jump label: while.exit_36 
+    li      a7, 3040
+    add     a7,sp,a7
+    sw      a7,0(a7)
+    li      a4, 3044
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    sw      s7,8(sp)
+    sw      s5,12(sp)
+    sb      s4,7(sp)
     li      a2, 3048
     add     a2,sp,a2
     sw      a2,0(a2)
     li      a1, 3035
     add     a1,sp,a1
     sb      a1,0(a1)
-    li      a4, 3044
-    add     a4,sp,a4
-    sw      a4,0(a4)
-    sw      s5,12(sp)
-    li      a7, 3040
-    add     a7,sp,a7
-    sw      a7,0(a7)
     sw      s3,16(sp)
-    sw      s7,8(sp)
     li      s1, 3036
     add     s1,sp,s1
     sw      s1,0(s1)
-    sb      s4,7(sp)
     j       .while.exit_36
                     #      label while.exit_36: 
 .while.exit_36:
@@ -403,28 +403,28 @@ main:
                     #      label branch_false_49: 
 .branch_false_49:
                     #      jump label: while.head_36 
+    li      a7, 3040
+    add     a7,sp,a7
+    sw      a7,0(a7)
+    li      a4, 3044
+    add     a4,sp,a4
+    sw      a4,0(a4)
+    sw      s7,8(sp)
+    sw      s5,12(sp)
+    sb      s4,7(sp)
+    li      a3, 3055
+    add     a3,sp,a3
+    sb      a3,0(a3)
     li      a2, 3048
     add     a2,sp,a2
     sw      a2,0(a2)
     li      a1, 3035
     add     a1,sp,a1
     sb      a1,0(a1)
-    li      a4, 3044
-    add     a4,sp,a4
-    sw      a4,0(a4)
-    li      a3, 3055
-    add     a3,sp,a3
-    sb      a3,0(a3)
-    sw      s5,12(sp)
-    li      a7, 3040
-    add     a7,sp,a7
-    sw      a7,0(a7)
     sw      s3,16(sp)
-    sw      s7,8(sp)
     li      s1, 3036
     add     s1,sp,s1
     sw      s1,0(s1)
-    sb      s4,7(sp)
     j       .while.head_36
 .section        .data
     .align 4

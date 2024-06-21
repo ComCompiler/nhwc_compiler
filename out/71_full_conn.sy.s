@@ -4411,11 +4411,11 @@ main:
                     #      j_43 = i32 temp_570_47 
     mv      a4, s2
                     #      jump label: while.head_46 
+    sb      a7,35(sp)
+    sd      a6,24(sp)
     sw      a0,20(sp)
     lw      a0,156(sp)
     sw      s2,16(sp)
-    sb      a7,35(sp)
-    sd      a6,24(sp)
     j       .while.head_46
                     #      label while.exit_46: 
 .while.exit_46:
@@ -4426,10 +4426,10 @@ main:
                     #      i_39 = i32 temp_571_43 
     mv      a2, s1
                     #      jump label: while.head_42 
+    sb      a7,35(sp)
+    sw      s1,12(sp)
     sb      a5,43(sp)
     sw      a4,36(sp)
-    sw      s1,12(sp)
-    sb      a7,35(sp)
     j       .while.head_42
                     #      label while.exit_42: 
 .while.exit_42:
@@ -4530,10 +4530,10 @@ main:
                     #      jump label: while.head_38 
     sb      a5,43(sp)
     sw      a4,0(sp)
-    lw      a0,156(sp)
+    sb      a6,7(sp)
     sw      a2,44(sp)
     sb      a3,51(sp)
-    sb      a6,7(sp)
+    lw      a0,156(sp)
     j       .while.head_38
                     #      label while.exit_38: 
 .while.exit_38:

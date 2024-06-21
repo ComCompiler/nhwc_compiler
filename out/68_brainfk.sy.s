@@ -91,12 +91,12 @@ read_program:
                     #      i_19 = i32 temp_4_23 
     mv      a2, a7
                     #      jump label: while.head_22 
-    sb      a3,27(sp)
-    sw      a0,12(sp)
-    lw      a0,32(sp)
+    sw      a2,36(sp)
     sw      a7,8(sp)
     sd      a4,16(sp)
-    sw      a2,36(sp)
+    sw      a0,12(sp)
+    lw      a0,32(sp)
+    sb      a3,27(sp)
     j       .while.head_22
                     #      label while.exit_22: 
 .while.exit_22:
@@ -754,13 +754,6 @@ interpret:
     li      a3, 1048824
     add     a3,sp,a3
     lw      a0,0(a3)
-    li      a3, 1048824
-    add     a3,sp,a3
-    sw      a3,0(a3)
-    sw      a4,44(sp)
-    li      a4, 1048804
-    add     a4,sp,a4
-    lw      a3,0(a4)
     j       .while.head_64
                     #      label while.exit_64: 
 .while.exit_64:
@@ -785,33 +778,33 @@ interpret:
                     #      i_29 = i32 temp_14_33 
     mv      a5, s4
                     #      jump label: while.head_32 
-    li      s4, 1048772
-    add     s4,sp,s4
-    sw      s4,0(s4)
-    li      a1, 1048808
-    add     a1,sp,a1
-    sd      a1,0(a1)
-    li      a6, 1048803
-    add     a6,sp,a6
-    sb      a6,0(a6)
-    li      a2, 1048792
-    add     a2,sp,a2
-    sd      a2,0(a2)
-    li      s5, 1048776
-    add     s5,sp,s5
-    sw      s5,0(s5)
     li      s2, 1048787
     add     s2,sp,s2
     sb      s2,0(s2)
     li      a7, 1048788
     add     a7,sp,a7
     sw      a7,0(a7)
-    li      s3, 1048780
-    add     s3,sp,s3
-    sw      s3,0(s3)
+    li      a1, 1048808
+    add     a1,sp,a1
+    sd      a1,0(a1)
     li      a3, 1048804
     add     a3,sp,a3
     sw      a3,0(a3)
+    li      s5, 1048776
+    add     s5,sp,s5
+    sw      s5,0(s5)
+    li      a2, 1048792
+    add     a2,sp,a2
+    sd      a2,0(a2)
+    li      a6, 1048803
+    add     a6,sp,a6
+    sb      a6,0(a6)
+    li      s3, 1048780
+    add     s3,sp,s3
+    sw      s3,0(s3)
+    li      s4, 1048772
+    add     s4,sp,s4
+    sw      s4,0(s4)
     li      s1, 1048828
     add     s1,sp,s1
     sw      s1,0(s1)

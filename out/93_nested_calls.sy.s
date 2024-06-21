@@ -538,12 +538,13 @@ main:
     li      s1, 1
     add     s2,a5,s1
                     #      i_75 = i32 temp_25_81 
+    mv      a5, s2
                     #      jump label: while.head_80 
-    sw      a0,436(sp)
-    lw      a0,500(sp)
     sd      a6,440(sp)
     sw      s2,432(sp)
     sb      a7,451(sp)
+    sw      a0,436(sp)
+    lw      a0,500(sp)
     j       .while.head_80
                     #      label while.exit_80: 
 .while.exit_80:

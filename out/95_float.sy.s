@@ -136,7 +136,7 @@ PI_HEX:
                     #      global f32 EPS_0 
     .type EPS,@object
 EPS:
-    .word 0
+    .word 897988541
     .align 4
     .globl PI
                     #      global f32 PI_0 

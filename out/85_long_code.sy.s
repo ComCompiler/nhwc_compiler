@@ -214,15 +214,15 @@ bubblesort:
                     #      mu arr_17:124 
                     #      arr_17 = chi arr_17:124 
                     #      jump label: branch_false_31 
-    sw      a4,44(sp)
-    sd      a0,8(sp)
-    mv      a0, a3
     sd      s11,48(sp)
-    sd      a3,136(sp)
-    lw      a3,124(sp)
-    sw      s10,56(sp)
     sw      a1,60(sp)
     lw      a1,132(sp)
+    sw      a4,44(sp)
+    sw      s10,56(sp)
+    sd      a3,136(sp)
+    lw      a3,124(sp)
+    sd      a0,8(sp)
+    ld      a0,136(sp)
     j       .branch_false_31
                     #      label branch_false_31: 
 .branch_false_31:
@@ -233,18 +233,19 @@ bubblesort:
     li      a4, 1
     add     s10,a2,a4
                     #      j_19 = i32 temp_21_29 
+    mv      a2, s10
                     #      jump label: while.head_28 
+    sw      a7,112(sp)
+    sd      s7,72(sp)
+    sw      s8,68(sp)
+    sb      s4,103(sp)
+    sb      s9,67(sp)
     sw      s6,84(sp)
+    sw      s10,4(sp)
+    sw      s3,104(sp)
     sd      s5,88(sp)
     sw      s2,108(sp)
-    sd      s7,72(sp)
-    sw      s10,4(sp)
-    sw      a7,112(sp)
-    sb      s4,103(sp)
-    sw      s3,104(sp)
-    sb      s9,67(sp)
     sw      s1,96(sp)
-    sw      s8,68(sp)
     j       .while.head_28
                     #      label while.exit_28: 
 .while.exit_28:
@@ -253,16 +254,17 @@ bubblesort:
     li      a4, 1
     add     s1,a1,a4
                     #      i_19 = i32 temp_22_25 
+    mv      a1, s1
                     #      jump label: while.head_24 
+    sw      a7,112(sp)
+    sb      a6,119(sp)
+    sb      s4,103(sp)
     sw      a2,128(sp)
     sw      a5,120(sp)
     sw      a3,124(sp)
-    sw      s2,108(sp)
-    sw      a7,112(sp)
-    sb      s4,103(sp)
     sw      s3,104(sp)
+    sw      s2,108(sp)
     sw      s1,0(sp)
-    sb      a6,119(sp)
     j       .while.head_24
                     #      label while.exit_24: 
 .while.exit_24:
@@ -411,18 +413,19 @@ insertsort:
     sd      a0,112(sp)
     sub     a0,s2,s3
                     #      j_47 = i32 temp_37_54 
+    mv      s2, a0
                     #      jump label: while.head_53 
-    sw      s6,52(sp)
-    sb      s7,58(sp)
-    sw      s11,28(sp)
     sd      a5,64(sp)
-    sb      s5,59(sp)
-    sd      s10,32(sp)
-    sb      s8,57(sp)
     sd      s9,40(sp)
+    sd      s10,32(sp)
+    sb      s7,58(sp)
     sw      a0,24(sp)
     ld      a0,112(sp)
     sw      s4,60(sp)
+    sb      s5,59(sp)
+    sb      s8,57(sp)
+    sw      s6,52(sp)
+    sw      s11,28(sp)
     j       .while.head_53
                     #      label while.exit_53: 
 .while.exit_53:
@@ -447,22 +450,23 @@ insertsort:
                     #found literal reg Some(s3) already exist with 1_0
     add     s10,a1,s3
                     #      i_42 = i32 temp_40_47 
+    mv      a1, s10
                     #      jump label: while.head_46 
-    sw      s6,20(sp)
-    sw      a6,84(sp)
-    sb      a4,103(sp)
-    sb      s7,58(sp)
-    sd      a5,64(sp)
-    sw      a3,104(sp)
     sd      a2,88(sp)
     sw      s1,76(sp)
-    sb      s5,59(sp)
-    sw      s10,4(sp)
-    sw      a7,96(sp)
-    sb      s8,57(sp)
+    sd      a5,64(sp)
     sd      s9,8(sp)
-    sw      s4,60(sp)
+    sw      s10,4(sp)
+    sb      s7,58(sp)
+    sw      a7,96(sp)
     sw      s2,80(sp)
+    sw      s4,60(sp)
+    sb      s5,59(sp)
+    sb      a4,103(sp)
+    sb      s8,57(sp)
+    sw      s6,20(sp)
+    sw      a6,84(sp)
+    sw      a3,104(sp)
     j       .while.head_46
                     #      label while.exit_46: 
 .while.exit_46:
@@ -595,14 +599,15 @@ QuickSort:
     li      s3, 1
     sub     s10,a5,s3
                     #      j_65 = i32 temp_51_77 
+    mv      a5, s10
                     #      jump label: while.head_76 
     sb      s9,113(sp)
-    sd      s5,120(sp)
     sw      s10,108(sp)
+    sw      s6,116(sp)
+    sb      s8,114(sp)
+    sd      s5,120(sp)
     sb      s7,115(sp)
     sw      s4,132(sp)
-    sb      s8,114(sp)
-    sw      s6,116(sp)
     j       .while.head_76
                     #      label while.exit_76: 
 .while.exit_76:
@@ -647,12 +652,13 @@ QuickSort:
     sd      a1,176(sp)
     add     a1,a4,a0
                     #      i_65 = i32 temp_56_81 
+    mv      a4, a1
                     #      jump label: branch_false_80 
     sd      s10,96(sp)
     sw      a1,80(sp)
     lw      a1,172(sp)
-    ld      a0,176(sp)
     sd      s11,88(sp)
+    ld      a0,176(sp)
     j       .branch_false_80
                     #      label branch_false_80: 
 .branch_false_80:
@@ -694,14 +700,15 @@ QuickSort:
     sb      a1,67(sp)
     add     a1,a4,a0
                     #      i_65 = i32 temp_62_86 
+    mv      a4, a1
                     #      jump label: while.head_85 
-    sb      a2,65(sp)
-    lw      a2,168(sp)
     sd      s10,72(sp)
     sw      a1,60(sp)
     lw      a1,172(sp)
-    ld      a0,176(sp)
     sw      s11,68(sp)
+    sb      a2,65(sp)
+    lw      a2,168(sp)
+    ld      a0,176(sp)
     j       .while.head_85
                     #      label while.exit_85: 
 .while.exit_85:
@@ -751,32 +758,33 @@ QuickSort:
     sw      a1,36(sp)
     sub     a1,a5,a0
                     #      j_65 = i32 temp_67_90 
+    mv      a5, a1
                     #      jump label: branch_false_89 
-    sd      a2,176(sp)
-    lb      a2,65(sp)
     sw      a1,32(sp)
     lb      a1,67(sp)
+    sd      a2,176(sp)
+    lb      a2,65(sp)
     lb      a0,59(sp)
     j       .branch_false_89
                     #      label branch_false_89: 
 .branch_false_89:
                     #      jump label: while.head_73 
+    sb      s3,107(sp)
     sb      s9,113(sp)
-    sd      s5,120(sp)
-    sb      a2,65(sp)
-    lw      a2,168(sp)
+    sb      a7,139(sp)
     sd      s10,72(sp)
     sb      a1,67(sp)
     lw      a1,172(sp)
-    sb      s3,107(sp)
+    sw      s6,116(sp)
+    sw      s11,68(sp)
+    sb      a2,65(sp)
+    lw      a2,168(sp)
+    sb      s8,114(sp)
+    sd      s5,120(sp)
     sb      a0,59(sp)
     ld      a0,176(sp)
     sb      s7,115(sp)
     sw      s4,132(sp)
-    sb      a7,139(sp)
-    sb      s8,114(sp)
-    sw      s6,116(sp)
-    sw      s11,68(sp)
     j       .while.head_73
                     #      label while.exit_73: 
 .while.exit_73:
@@ -825,6 +833,7 @@ QuickSort:
     li      a2, 1
     add     s1,a4,a2
                     #      tmp_65 = i32 temp_71_65 
+    mv      a1, s1
                     #      new_var temp_72_65:i32 
                     #      temp_72_65 =  Call i32 QuickSort_0(arr_60, tmp_65, high_60) 
                     #saved register dumping to mem
@@ -842,15 +851,15 @@ QuickSort:
                     #      tmp_65 = i32 temp_72_65 
     mv      a1, a0
                     #      jump label: branch_false_64 
-    lw      a2,168(sp)
+    sw      a4,160(sp)
+    sb      a7,139(sp)
     sw      a1,20(sp)
     lw      a1,172(sp)
-    sw      a0,4(sp)
-    ld      a0,176(sp)
-    sb      a7,139(sp)
-    sw      a4,160(sp)
     sd      a6,144(sp)
     sw      a5,156(sp)
+    lw      a2,168(sp)
+    sw      a0,4(sp)
+    ld      a0,176(sp)
     j       .branch_false_64
                     #      label branch_false_64: 
 .branch_false_64:
@@ -1081,13 +1090,14 @@ getMost:
                     #found literal reg Some(a3) already exist with 1_0
     add     a7,a5,a3
                     #      i_114 = i32 temp_91_120 
+    mv      a5, a7
                     #      jump label: while.head_119 
+    sw      a7,92(sp)
+    sb      a2,107(sp)
+    sd      a1,96(sp)
     li      a4, 4108
     add     a4,sp,a4
     sw      a4,0(a4)
-    sb      a2,107(sp)
-    sd      a1,96(sp)
-    sw      a7,92(sp)
     j       .while.head_119
                     #      label while.exit_119: 
 .while.exit_119:
@@ -1191,6 +1201,7 @@ getMost:
                     #      temp_104_135 = load temp_103_135:ptr->i32 
     lw      s11,0(s8)
                     #      max_114 = i32 temp_104_135 
+    mv      a1, s11
                     #      number_114 = i32 num_129 
     li      a0, 4112
     add     a0,sp,a0
@@ -1198,7 +1209,6 @@ getMost:
     mv      a0, s2
                     #      jump label: branch_false_134 
     sw      s11,4(sp)
-    sd      s8,8(sp)
     sw      a0,84(sp)
     sw      a1,88(sp)
     li      a1, 4112
@@ -1208,6 +1218,7 @@ getMost:
     add     a1,sp,a1
     sd      a1,0(a1)
     lw      a1,88(sp)
+    sd      s8,8(sp)
     j       .branch_false_134
                     #      label branch_false_134: 
 .branch_false_134:
@@ -1218,23 +1229,24 @@ getMost:
     li      s8, 1
     add     s11,a5,s8
                     #      i_114 = i32 temp_105_129 
+    mv      a5, s11
                     #      jump label: while.head_128 
+    sw      s2,72(sp)
+    sd      s3,48(sp)
+    sw      s11,0(sp)
+    sd      a7,24(sp)
+    sd      s5,40(sp)
+    sw      s7,32(sp)
+    sd      a3,64(sp)
+    sw      s6,36(sp)
+    sw      a4,80(sp)
+    sb      s10,19(sp)
+    sb      a6,79(sp)
+    sw      s1,60(sp)
     li      s4, 4108
     add     s4,sp,s4
     sw      s4,0(s4)
-    sw      s11,0(sp)
-    sd      a3,64(sp)
-    sd      s5,40(sp)
-    sw      a4,80(sp)
-    sb      a6,79(sp)
-    sw      s6,36(sp)
     sw      s9,20(sp)
-    sw      s1,60(sp)
-    sd      s3,48(sp)
-    sw      s7,32(sp)
-    sb      s10,19(sp)
-    sw      s2,72(sp)
-    sd      a7,24(sp)
     j       .while.head_128
                     #      label while.exit_128: 
 .while.exit_128:
@@ -1348,22 +1360,24 @@ revert:
                     #found literal reg Some(a5) already exist with 1_0
     add     s5,a1,a5
                     #      i_142 = i32 temp_113_150 
+    mv      a1, s5
                     #      new_var temp_114_150:i32 
                     #      temp_114_150 = Sub i32 j_142, 1_0 
                     #found literal reg Some(a5) already exist with 1_0
     sub     s6,a2,a5
                     #      j_142 = i32 temp_114_150 
+    mv      a2, s6
                     #      jump label: while.head_149 
-    sd      s2,24(sp)
-    sw      a7,68(sp)
-    sw      s3,20(sp)
     sw      s6,0(sp)
-    sw      a6,44(sp)
-    sd      s1,32(sp)
-    sb      a3,59(sp)
     sd      a4,48(sp)
+    sw      s3,20(sp)
+    sd      s2,24(sp)
     sd      s4,8(sp)
+    sb      a3,59(sp)
     sw      s5,4(sp)
+    sd      s1,32(sp)
+    sw      a7,68(sp)
+    sw      a6,44(sp)
     j       .while.head_149
                     #      label while.exit_149: 
 .while.exit_149:
@@ -1443,13 +1457,14 @@ arrCopy:
                     #found literal reg Some(a6) already exist with 1_0
     add     s2,a2,a6
                     #      i_159 = i32 temp_120_164 
+    mv      a2, s2
                     #      jump label: while.head_163 
+    sw      s1,4(sp)
     sb      a5,31(sp)
     sw      s2,0(sp)
-    sw      s1,4(sp)
     sd      a3,16(sp)
-    sw      a4,32(sp)
     sd      a7,8(sp)
+    sw      a4,32(sp)
     j       .while.head_163
                     #      label while.exit_163: 
 .while.exit_163:
@@ -1524,6 +1539,7 @@ calSum:
                     #      temp_125_177 = Add i32 sum_170, temp_124_177 
     add     s2,a2,s1
                     #      sum_170 = i32 temp_125_177 
+    mv      a2, s2
                     #      jump label: L6_0 
     j       .L6_0
                     #      label L6_0: 
@@ -1587,15 +1603,16 @@ calSum:
     li      s6, 1
     add     s7,a3,s6
                     #      i_170 = i32 temp_130_177 
+    mv      a3, s7
                     #      jump label: while.head_176 
-    sb      s5,31(sp)
-    sw      s4,32(sp)
-    sw      a5,64(sp)
-    sw      s7,12(sp)
-    sw      s3,36(sp)
     sw      s2,40(sp)
     sd      a4,48(sp)
+    sw      a5,64(sp)
     sw      s1,44(sp)
+    sw      s3,36(sp)
+    sw      s4,32(sp)
+    sw      s7,12(sp)
+    sb      s5,31(sp)
     sd      a7,16(sp)
     sb      a6,63(sp)
     j       .while.head_176
@@ -1708,6 +1725,7 @@ avgPooling:
                     #      temp_138_201 = Add i32 sum_190, temp_137_201 
     add     s4,a3,s3
                     #      sum_190 = i32 temp_138_201 
+    mv      a3, s4
                     #      jump label: L3_0 
     j       .L3_0
                     #      label branch_false_200: 
@@ -1777,6 +1795,7 @@ avgPooling:
                     #      temp_149_208 = Add i32 sum_190, temp_148_208 
     add     s8,a3,s7
                     #      sum_190 = i32 temp_149_208 
+    mv      a3, s8
                     #      new_var temp_150_208:i32 
                     #      temp_150_208 = Add i32 stride_188, 1_0 
                     #found literal reg Some(s4) already exist with 1_0
@@ -1796,6 +1815,7 @@ avgPooling:
                     #      temp_153_208 = load temp_152_208:ptr->i32 
     lw      s4,0(s11)
                     #      lastnum_190 = i32 temp_153_208 
+    mv      s6, s4
                     #      new_var temp_154_208:i32 
                     #      temp_154_208 = Add i32 stride_188, 1_0 
     sd      a0,200(sp)
@@ -1830,28 +1850,28 @@ avgPooling:
                     #      mu arr_188:765 
                     #      arr_188 = chi arr_188:765 
                     #      jump label: L2_0 
-    sw      a2,36(sp)
-    lw      a2,188(sp)
-    sw      s4,60(sp)
-    sd      a0,40(sp)
-    mv      a0, a3
-    sw      s5,92(sp)
-    sw      a1,192(sp)
-    lw      a1,196(sp)
-    sd      a3,200(sp)
-    lw      a3,192(sp)
+    sd      a4,96(sp)
+    ld      a4,128(sp)
+    sd      s11,64(sp)
     sw      s9,80(sp)
     lw      s9,108(sp)
-    sd      s11,64(sp)
-    sw      s10,76(sp)
+    sd      a3,200(sp)
+    mv      a3, a1
+    sw      s7,88(sp)
+    mv      s7, s6
+    sw      a2,36(sp)
+    lw      a2,188(sp)
+    sw      a1,192(sp)
+    lw      a1,196(sp)
+    sw      s5,92(sp)
     sw      s8,84(sp)
     ld      s8,112(sp)
     sw      s6,184(sp)
     lw      s6,124(sp)
-    sw      s7,88(sp)
-    lw      s7,184(sp)
-    sd      a4,96(sp)
-    ld      a4,128(sp)
+    sw      s4,60(sp)
+    sw      s10,76(sp)
+    sd      a0,40(sp)
+    ld      a0,200(sp)
     j       .L2_0
                     #      label L2_0: 
 .L2_0:
@@ -1864,15 +1884,16 @@ avgPooling:
     li      s2, 1
     add     s5,a2,s2
                     #      i_190 = i32 temp_139_198 
+    mv      a2, s5
                     #      jump label: while.head_197 
-    sw      a7,172(sp)
-    sw      s4,152(sp)
-    sw      s5,148(sp)
-    sw      a5,180(sp)
-    sb      s1,171(sp)
-    sb      a6,179(sp)
-    sw      s3,156(sp)
     sd      a4,160(sp)
+    sw      a5,180(sp)
+    sb      a6,179(sp)
+    sb      s1,171(sp)
+    sw      s5,148(sp)
+    sw      s4,152(sp)
+    sw      a7,172(sp)
+    sw      s3,156(sp)
     j       .while.head_197
                     #      label while.exit_197: 
 .while.exit_197:
@@ -1890,6 +1911,7 @@ avgPooling:
                     #      temp_160_190 = Sub i32 temp_159_190, temp_158_190 
     sub     s3,s2,a7
                     #      i_190 = i32 temp_160_190 
+    mv      a2, s3
                     #      jump label: while.head_215 
     j       .while.head_215
                     #      label while.head_215: 
@@ -1926,11 +1948,12 @@ avgPooling:
                     #found literal reg Some(s5) already exist with 1_0
     add     s7,a2,s5
                     #      i_190 = i32 temp_164_216 
+    mv      a2, s7
                     #      jump label: while.head_215 
-    sb      s4,19(sp)
-    sw      s1,20(sp)
-    sw      s7,4(sp)
     sd      a4,8(sp)
+    sw      s7,4(sp)
+    sw      s1,20(sp)
+    sb      s4,19(sp)
     j       .while.head_215
                     #      label while.exit_215: 
 .while.exit_215:
@@ -2539,6 +2562,7 @@ main:
     call    revert
     sw      a0,220(sp)
                     #      t_221 = i32 temp_198_221 
+    mv      a1, a0
                     #      new_var i_221:i32 
                     #      i_221 = i32 0_0 
     li      s1, 0
@@ -2568,6 +2592,7 @@ main:
                     #      temp_201_264 = load temp_200_264:ptr->i32 
     lw      s6,0(s2)
                     #      t_221 = i32 temp_201_264 
+    mv      a1, s6
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
     sw      s1,216(sp)
@@ -2586,6 +2611,7 @@ main:
     li      s1, 1
     add     s2,a0,s1
                     #      i_221 = i32 temp_202_264 
+    mv      a0, s2
                     #      jump label: while.head_263 
     sw      s2,192(sp)
     sw      a0,216(sp)
@@ -2607,6 +2633,7 @@ main:
     call    bubblesort
     sw      a0,188(sp)
                     #      t_221 = i32 temp_203_221 
+    mv      a1, a0
                     #      i_221 = i32 0_0 
     li      s1, 0
                     #      jump label: while.head_271 
@@ -2635,6 +2662,7 @@ main:
                     #      temp_206_272 = load temp_205_272:ptr->i32 
     lw      s6,0(s2)
                     #      t_221 = i32 temp_206_272 
+    mv      a1, s6
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
     sw      s1,216(sp)
@@ -2653,6 +2681,7 @@ main:
     li      s1, 1
     add     s2,a0,s1
                     #      i_221 = i32 temp_207_272 
+    mv      a0, s2
                     #      jump label: while.head_271 
     sw      s2,168(sp)
     sw      a0,216(sp)
@@ -2674,6 +2703,7 @@ main:
     call    getMid
     sw      a0,164(sp)
                     #      t_221 = i32 temp_208_221 
+    mv      a1, a0
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
                     #saved register dumped to mem
@@ -2692,6 +2722,7 @@ main:
     call    getMost
     sw      a0,160(sp)
                     #      t_221 = i32 temp_209_221 
+    mv      a1, a0
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
                     #saved register dumped to mem
@@ -2724,6 +2755,7 @@ main:
     call    bubblesort
     sw      a0,152(sp)
                     #      t_221 = i32 temp_211_221 
+    mv      a1, a0
                     #      i_221 = i32 0_0 
     li      s1, 0
                     #      jump label: while.head_284 
@@ -2752,6 +2784,7 @@ main:
                     #      temp_214_285 = load temp_213_285:ptr->i32 
     lw      s6,0(s2)
                     #      t_221 = i32 temp_214_285 
+    mv      a1, s6
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
     sw      s1,216(sp)
@@ -2770,6 +2803,7 @@ main:
     li      s1, 1
     add     s2,a0,s1
                     #      i_221 = i32 temp_215_285 
+    mv      a0, s2
                     #      jump label: while.head_284 
     sw      s2,128(sp)
     sw      a0,216(sp)
@@ -2805,6 +2839,7 @@ main:
     call    insertsort
     sw      a0,120(sp)
                     #      t_221 = i32 temp_217_221 
+    mv      a1, a0
                     #      i_221 = i32 0_0 
     li      s1, 0
                     #      jump label: while.head_293 
@@ -2833,6 +2868,7 @@ main:
                     #      temp_220_294 = load temp_219_294:ptr->i32 
     lw      s6,0(s2)
                     #      t_221 = i32 temp_220_294 
+    mv      a1, s6
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
     sw      s1,216(sp)
@@ -2851,6 +2887,7 @@ main:
     li      s1, 1
     add     s2,a0,s1
                     #      i_221 = i32 temp_221_294 
+    mv      a0, s2
                     #      jump label: while.head_293 
     sw      s2,96(sp)
     sw      a0,216(sp)
@@ -2921,6 +2958,7 @@ main:
                     #      temp_226_304 = load temp_225_304:ptr->i32 
     lw      s5,0(s1)
                     #      t_221 = i32 temp_226_304 
+    mv      a1, s5
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
     sd      s1,72(sp)
@@ -2938,6 +2976,7 @@ main:
     li      a0, 1
     add     s1,a2,a0
                     #      i_221 = i32 temp_227_304 
+    mv      a2, s1
                     #      jump label: while.head_303 
     lw      a0,88(sp)
     sw      s1,64(sp)
@@ -3001,6 +3040,7 @@ main:
                     #      temp_232_313 = load temp_231_313:ptr->i32 
     lw      s5,0(s1)
                     #      t_221 = i32 temp_232_313 
+    mv      a1, s5
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
     sd      s1,40(sp)
@@ -3018,6 +3058,7 @@ main:
     li      a0, 1
     add     s1,a2,a0
                     #      i_221 = i32 temp_233_313 
+    mv      a2, s1
                     #      jump label: while.head_312 
     lw      a0,56(sp)
     sw      s1,32(sp)
@@ -3080,6 +3121,7 @@ main:
                     #      temp_238_322 = load temp_237_322:ptr->i32 
     lw      s5,0(s1)
                     #      t_221 = i32 temp_238_322 
+    mv      a1, s5
                     #       Call void putint_0(t_221) 
                     #saved register dumping to mem
     sd      s1,8(sp)
@@ -3097,6 +3139,7 @@ main:
     li      a0, 1
     add     s1,a2,a0
                     #      i_221 = i32 temp_239_322 
+    mv      a2, s1
                     #      jump label: while.head_321 
     lw      a0,24(sp)
     sw      s1,0(sp)

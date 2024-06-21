@@ -83,12 +83,12 @@ main:
                     #      i_19 = i32 temp_11_23 
     mv      a0, s2
                     #      jump label: while.head_22 
+    sw      s2,4(sp)
+    sd      a5,16(sp)
+    sw      a7,12(sp)
     sw      s1,8(sp)
     sw      a4,48(sp)
-    sw      a7,12(sp)
-    sw      s2,4(sp)
     sb      a3,55(sp)
-    sd      a5,16(sp)
     j       .while.head_22
                     #      label while.exit_22: 
 .while.exit_22:

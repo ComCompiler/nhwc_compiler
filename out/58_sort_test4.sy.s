@@ -138,13 +138,13 @@ select_sort:
                     #      j_19 = i32 temp_9_31 
     mv      s1, s8
                     #      jump label: while.head_30 
-    sw      s4,92(sp)
+    sb      s7,75(sp)
     sd      s5,80(sp)
-    sw      s6,76(sp)
-    sd      s2,96(sp)
+    sw      s4,92(sp)
     sb      a6,107(sp)
     sw      s8,68(sp)
-    sb      s7,75(sp)
+    sd      s2,96(sp)
+    sw      s6,76(sp)
     j       .while.head_30
                     #      label while.exit_30: 
 .while.exit_30:
@@ -207,13 +207,13 @@ select_sort:
                     #      mu A_17:103 
                     #      A_17 = chi A_17:103 
                     #      jump label: branch_false_38 
-    sd      s10,8(sp)
     sw      s9,20(sp)
+    sd      s7,32(sp)
     sw      s5,44(sp)
-    sw      s6,60(sp)
+    sd      s10,8(sp)
     sd      s3,48(sp)
     sd      s8,24(sp)
-    sd      s7,32(sp)
+    sw      s6,60(sp)
     j       .branch_false_38
                     #      label branch_false_38: 
 .branch_false_38:
@@ -226,14 +226,14 @@ select_sort:
                     #      i_19 = i32 temp_17_26 
     mv      a2, s4
                     #      jump label: while.head_25 
-    sw      s4,4(sp)
-    sw      a7,108(sp)
-    sb      a5,115(sp)
     sw      a4,116(sp)
-    sb      s2,67(sp)
+    sb      a5,115(sp)
+    sw      s4,4(sp)
     sw      a3,120(sp)
+    sw      a7,108(sp)
     sb      a6,107(sp)
     sw      s1,124(sp)
+    sb      s2,67(sp)
     j       .while.head_25
                     #      label while.exit_25: 
 .while.exit_25:
@@ -512,10 +512,10 @@ main:
                     #      i_47 = i32 temp_34_65 
     mv      a4, s1
                     #      jump label: while.head_64 
-    sw      a6,24(sp)
     sw      s1,0(sp)
-    lw      a0,28(sp)
     sd      a1,8(sp)
+    lw      a0,28(sp)
+    sw      a6,24(sp)
     j       .while.head_64
                     #      label while.exit_64: 
 .while.exit_64:

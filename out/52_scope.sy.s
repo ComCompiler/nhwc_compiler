@@ -143,8 +143,8 @@ main:
                     #      result_28 = i32 temp_6_34 
     mv      a2, a6
                     #      jump label: branch_false_35 
-    sw      a2,28(sp)
     sw      a6,8(sp)
+    sw      a2,28(sp)
     j       .branch_false_35
                     #      label branch_false_35: 
 .branch_false_35:
@@ -157,11 +157,11 @@ main:
                     #      i_28 = i32 temp_7_33 
     mv      a1, a5
                     #      jump label: while.head_32 
+    sw      a0,16(sp)
+    lw      a0,28(sp)
     sb      a4,15(sp)
     sb      a3,23(sp)
     sw      a5,4(sp)
-    sw      a0,16(sp)
-    lw      a0,28(sp)
     j       .while.head_32
                     #      label while.exit_32: 
 .while.exit_32:

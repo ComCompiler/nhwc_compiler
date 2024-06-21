@@ -123,9 +123,9 @@ counting_sort:
     mv      a3, s4
                     #      jump label: while.head_28 
     sd      a6,272(sp)
-    sw      s4,268(sp)
-    sw      s2,336(sp)
     sb      a7,287(sp)
+    sw      s2,336(sp)
+    sw      s4,268(sp)
     j       .while.head_28
                     #      label while.head_33: 
 .while.head_33:
@@ -194,17 +194,17 @@ counting_sort:
                     #      i_19 = i32 temp_12_34 
     mv      a4, s11
                     #      jump label: while.head_33 
-    sw      s10,208(sp)
-    sw      s9,212(sp)
-    sd      s1,256(sp)
-    sw      s5,336(sp)
     sb      a6,267(sp)
-    sd      s4,240(sp)
-    sw      s7,228(sp)
-    sw      s3,252(sp)
     sd      s6,232(sp)
     sw      s11,204(sp)
+    sw      s5,336(sp)
+    sw      s9,212(sp)
+    sw      s10,208(sp)
+    sd      s1,256(sp)
+    sw      s7,228(sp)
     sd      s8,216(sp)
+    sw      s3,252(sp)
+    sd      s4,240(sp)
     j       .while.head_33
                     #      label while.exit_33: 
 .while.exit_33:
@@ -271,16 +271,16 @@ counting_sort:
                     #      k_19 = i32 temp_21_40 
     mv      a3, s11
                     #      jump label: while.head_39 
-    sw      s10,152(sp)
-    sw      s9,156(sp)
-    sd      s1,192(sp)
-    sw      s5,188(sp)
-    sw      s4,336(sp)
-    sw      s7,172(sp)
     sd      s6,176(sp)
     sw      s11,148(sp)
-    sb      s2,203(sp)
+    sw      s5,188(sp)
+    sw      s9,156(sp)
+    sw      s10,152(sp)
+    sd      s1,192(sp)
+    sw      s7,172(sp)
     sd      s8,160(sp)
+    sb      s2,203(sp)
+    sw      s4,336(sp)
     j       .while.head_39
                     #      label while.exit_39: 
 .while.exit_39:
@@ -442,23 +442,23 @@ counting_sort:
                     #      j_19 = i32 temp_42_46 
     mv      a5, a1
                     #      jump label: while.head_45 
-    mv      a0, a3
-    sd      s10,96(sp)
-    sw      s9,108(sp)
-    sd      s1,80(sp)
+    sw      s6,124(sp)
+    sw      s11,92(sp)
     sd      s5,128(sp)
+    sw      s9,108(sp)
     sd      a3,352(sp)
     lw      a3,288(sp)
+    sd      s10,96(sp)
+    sd      s1,80(sp)
     sw      a1,0(sp)
     ld      a1,344(sp)
     sw      a2,20(sp)
     lw      a2,340(sp)
-    sw      s4,140(sp)
+    ld      a0,352(sp)
     sd      s7,112(sp)
-    sb      s3,147(sp)
-    sw      s6,124(sp)
-    sw      s11,92(sp)
     sw      s8,336(sp)
+    sb      s3,147(sp)
+    sw      s4,140(sp)
     j       .while.head_45
                     #      label while.exit_45: 
 .while.exit_45:
@@ -540,7 +540,7 @@ main:
                     #      new_var temp_45_52:ptr->i32 
                     #      temp_45_52 = getelementptr a_52:Array:i32:[Some(10_0)] [Some(2_0)] 
     li      s3, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
     li      s4, 2
     add     s3,s3,a5
     slli s3,s3,2
@@ -554,7 +554,7 @@ main:
                     #      new_var temp_46_52:ptr->i32 
                     #      temp_46_52 = getelementptr a_52:Array:i32:[Some(10_0)] [Some(3_0)] 
     li      s6, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
                     #found literal reg Some(s2) already exist with 3_0
     add     s6,s6,a5
     slli s6,s6,2
@@ -568,7 +568,7 @@ main:
                     #      new_var temp_47_52:ptr->i32 
                     #      temp_47_52 = getelementptr a_52:Array:i32:[Some(10_0)] [Some(4_0)] 
     li      s7, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
                     #found literal reg Some(a6) already exist with 4_0
     add     s7,s7,a5
     slli s7,s7,2
@@ -582,21 +582,21 @@ main:
                     #      new_var temp_48_52:ptr->i32 
                     #      temp_48_52 = getelementptr a_52:Array:i32:[Some(10_0)] [Some(5_0)] 
     li      s8, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
     li      s9, 5
     add     s8,s8,a5
     slli s8,s8,2
     add     s8,s8,sp
     add     s8,s8,s8
                     #      store 1_0:i32 temp_48_52:ptr->i32 
-                    #found literal reg Some(s1) already exist with 1_0
-    sd      s1,0(s8)
+                    #found literal reg Some(a3) already exist with 1_0
+    sd      a3,0(s8)
                     #      mu a_52:239 
                     #      a_52 = chi a_52:239 
                     #      new_var temp_49_52:ptr->i32 
                     #      temp_49_52 = getelementptr a_52:Array:i32:[Some(10_0)] [Some(6_0)] 
     li      s10, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
     li      s11, 6
     add     s10,s10,a5
     slli s10,s10,2
@@ -610,7 +610,7 @@ main:
                     #      new_var temp_50_52:ptr->i32 
                     #      temp_50_52 = getelementptr a_52:Array:i32:[Some(10_0)] [Some(7_0)] 
     li      a0, 0
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(a3) already exist with 1_0
     li      a1, 7
     add     a0,a0,a5
     slli a0,a0,2
@@ -624,8 +624,8 @@ main:
                     #      new_var temp_51_52:ptr->i32 
                     #      temp_51_52 = getelementptr a_52:Array:i32:[Some(10_0)] [Some(8_0)] 
     li      a1, 0
-                    #found literal reg Some(s1) already exist with 1_0
-    li      a3, 8
+                    #found literal reg Some(a3) already exist with 1_0
+    li      a4, 8
     add     a1,a1,a5
     slli a1,a1,2
     add     a1,a1,sp
@@ -645,7 +645,7 @@ main:
     add     a3,a3,sp
     add     a3,a3,a3
                     #      store 8_0:i32 temp_52_52:ptr->i32 
-    li      a4, 8
+                    #found literal reg Some(a4) already exist with 8_0
     sd      a4,0(a3)
                     #      mu a_52:263 
                     #      a_52 = chi a_52:263 
@@ -742,11 +742,11 @@ main:
                     #      i_52 = i32 temp_59_71 
     mv      a4, s1
                     #      jump label: while.head_70 
-    sw      s1,0(sp)
+    sb      a6,23(sp)
     sw      a2,24(sp)
+    sw      s1,0(sp)
     sd      a1,8(sp)
     lw      a0,28(sp)
-    sb      a6,23(sp)
     j       .while.head_70
                     #      label while.exit_70: 
 .while.exit_70:

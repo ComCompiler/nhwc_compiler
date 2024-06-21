@@ -92,8 +92,8 @@ main:
                     #      i_17 = i32 temp_3_24 
     mv      a0, a6
                     #      jump label: while.head_23 
-    sw      a2,8(sp)
-    sb      a3,15(sp)
-    sb      a4,14(sp)
     sw      a6,4(sp)
+    sw      a2,8(sp)
+    sb      a4,14(sp)
+    sb      a3,15(sp)
     j       .while.head_23

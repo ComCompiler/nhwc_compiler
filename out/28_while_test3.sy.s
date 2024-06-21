@@ -364,10 +364,10 @@ EightWhile:
                     #occupy reg s11 with *g_0
     sd      a1,0(s11)
                     #      jump label: while.head_51 
-    sb      a4,131(sp)
-    sw      s9,132(sp)
     sw      a0,76(sp)
     lw      a0,196(sp)
+    sb      a4,131(sp)
+    sw      s9,132(sp)
     sw      a1,72(sp)
     lw      a1,192(sp)
     j       .while.head_51
@@ -391,16 +391,16 @@ EightWhile:
                     #occupy reg s11 with *f_0
     sd      a1,0(s11)
                     #      jump label: while.head_47 
-    sb      a4,131(sp)
-    sw      s9,132(sp)
     sb      s8,147(sp)
-    sw      s6,148(sp)
     sw      s10,136(sp)
-    sw      s7,140(sp)
+    sw      s6,148(sp)
     sw      a0,68(sp)
     lw      a0,196(sp)
+    sb      a4,131(sp)
+    sw      s9,132(sp)
     sw      a1,64(sp)
     lw      a1,192(sp)
+    sw      s7,140(sp)
     j       .while.head_47
                     #      label while.exit_47: 
 .while.exit_47:
@@ -420,12 +420,12 @@ EightWhile:
                     #occupy reg s11 with *e_0
     sd      s10,0(s11)
                     #      jump label: while.head_43 
-    sw      s5,152(sp)
     sb      s8,147(sp)
-    sw      s6,148(sp)
     sw      s10,56(sp)
-    sw      s7,60(sp)
+    sw      s6,148(sp)
+    sw      s5,152(sp)
     sb      s4,159(sp)
+    sw      s7,60(sp)
     j       .while.head_43
                     #      label while.exit_43: 
 .while.exit_43:
@@ -450,10 +450,10 @@ EightWhile:
                     #      c_21 = i32 temp_33_36 
     mv      a2, s3
                     #      jump label: while.head_35 
-    sw      s3,48(sp)
-    sw      s1,168(sp)
-    sb      s2,167(sp)
     sb      a7,175(sp)
+    sw      s1,168(sp)
+    sw      s3,48(sp)
+    sb      s2,167(sp)
     j       .while.head_35
                     #      label while.exit_35: 
 .while.exit_35:
@@ -464,10 +464,10 @@ EightWhile:
                     #      b_21 = i32 temp_34_32 
     mv      a1, s1
                     #      jump label: while.head_31 
-    sw      s1,44(sp)
-    sb      a5,183(sp)
-    sw      a6,176(sp)
     sb      a7,175(sp)
+    sb      a5,183(sp)
+    sw      s1,44(sp)
+    sw      a6,176(sp)
     j       .while.head_31
                     #      label while.exit_31: 
 .while.exit_31:

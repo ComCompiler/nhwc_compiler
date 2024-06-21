@@ -107,8 +107,8 @@ whileIf:
                     #      a_17 = i32 temp_2_24 
     mv      a0, a5
                     #      jump label: while.head_23 
-    sw      a5,8(sp)
     sb      a4,14(sp)
+    sw      a5,8(sp)
     sb      a3,15(sp)
     j       .while.head_23
                     #      label while.exit_23: 
