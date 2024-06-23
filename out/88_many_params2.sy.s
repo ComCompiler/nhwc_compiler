@@ -16,8 +16,10 @@
  tail _sysy_stoptime
 
 
-.section        .text
+.section
+    .text
     .align 4
+                    #regtab 
                     #      Define func_0 [a_16, b_16, c_16, d_16, e_16, f_16, g_16, h_16, i_16] -> func_ret_0 
     .globl func
     .type func,@function
@@ -44,12 +46,14 @@ func:
                     #      alloc i32 temp_10_30 
                     #      alloc i32 temp_11_30 
                     #      alloc i32 temp_12_18 
+                    #regtab     a0:Freed { symidx: a_16, tracked: true } |     a1:Freed { symidx: b_16, tracked: true } |     a2:Freed { symidx: c_16, tracked: true } |     a3:Freed { symidx: d_16, tracked: true } |     a4:Freed { symidx: e_16, tracked: true } |     a5:Freed { symidx: f_16, tracked: true } |     a6:Freed { symidx: g_16, tracked: true } |     a7:Freed { symidx: h_16, tracked: true } | 
                     #      label L1_0: 
 .L1_0:
                     #      index_18 = i32 0_0 
     li      s1, 0
                     #      jump label: while.head_21 
     j       .while.head_21
+                    #regtab     a0:Freed { symidx: a_16, tracked: true } |     a1:Freed { symidx: b_16, tracked: true } |     a2:Freed { symidx: c_16, tracked: true } |     a3:Freed { symidx: d_16, tracked: true } |     a4:Freed { symidx: e_16, tracked: true } |     a5:Freed { symidx: f_16, tracked: true } |     a6:Freed { symidx: g_16, tracked: true } |     a7:Freed { symidx: h_16, tracked: true } |     s1:Freed { symidx: index_18, tracked: true } | 
                     #      label while.head_21: 
 .while.head_21:
                     #      new_var temp_0_20:i1 
@@ -59,6 +63,7 @@ func:
                     #      br i1 temp_0_20, label while.body_21, label while.exit_21 
     bnez    s3, .while.body_21
     j       .while.exit_21
+                    #regtab     a0:Freed { symidx: a_16, tracked: true } |     a1:Freed { symidx: b_16, tracked: true } |     a2:Freed { symidx: c_16, tracked: true } |     a3:Freed { symidx: d_16, tracked: true } |     a4:Freed { symidx: e_16, tracked: true } |     a5:Freed { symidx: f_16, tracked: true } |     a6:Freed { symidx: g_16, tracked: true } |     a7:Freed { symidx: h_16, tracked: true } |     s1:Freed { symidx: index_18, tracked: true } |     s3:Freed { symidx: temp_0_20, tracked: true } | 
                     #      label while.body_21: 
 .while.body_21:
                     #      new_var temp_1_22:ptr->i32 
@@ -91,11 +96,12 @@ func:
                     #      index_18 = i32 temp_3_22 
     mv      a0, s2
                     #      jump label: while.head_21 
+    mv      s1, a0
     sw      a0,72(sp)
     lw      a0,124(sp)
     sw      s2,48(sp)
-    lw      s1,72(sp)
     j       .while.head_21
+                    #regtab     a0:Freed { symidx: a_16, tracked: true } |     a1:Freed { symidx: b_16, tracked: true } |     a2:Freed { symidx: c_16, tracked: true } |     a3:Freed { symidx: d_16, tracked: true } |     a4:Freed { symidx: e_16, tracked: true } |     a5:Freed { symidx: f_16, tracked: true } |     a6:Freed { symidx: g_16, tracked: true } |     a7:Freed { symidx: h_16, tracked: true } |     s1:Freed { symidx: index_18, tracked: true } |     s3:Freed { symidx: temp_0_20, tracked: true } | 
                     #      label while.exit_21: 
 .while.exit_21:
                     #       Call void putch_0(10_0) 
@@ -137,6 +143,7 @@ func:
     call    putch
                     #      jump label: while.head_29 
     j       .while.head_29
+                    #regtab     a1:Freed { symidx: b_16, tracked: true } |     a2:Freed { symidx: c_16, tracked: true } |     a3:Freed { symidx: d_16, tracked: true } |     a4:Freed { symidx: e_16, tracked: true } |     a5:Freed { symidx: f_16, tracked: true } |     a6:Freed { symidx: g_16, tracked: true } |     a7:Freed { symidx: h_16, tracked: true } | 
                     #      label while.head_29: 
 .while.head_29:
                     #      new_var temp_6_28:i1 
@@ -146,6 +153,7 @@ func:
                     #      br i1 temp_6_28, label while.body_29, label while.exit_29 
     bnez    s2, .while.body_29
     j       .while.exit_29
+                    #regtab     a0:Freed { symidx: i_16, tracked: true } |     a1:Freed { symidx: b_16, tracked: true } |     a2:Freed { symidx: c_16, tracked: true } |     a3:Freed { symidx: d_16, tracked: true } |     a4:Freed { symidx: e_16, tracked: true } |     a5:Freed { symidx: f_16, tracked: true } |     a6:Freed { symidx: g_16, tracked: true } |     a7:Freed { symidx: h_16, tracked: true } |     s2:Freed { symidx: temp_6_28, tracked: true } | 
                     #      label while.body_29: 
 .while.body_29:
                     #      new_var temp_7_30:ptr->i32 
@@ -181,14 +189,15 @@ func:
                     #      h_16 = i32 temp_11_30 
     mv      a7, s10
                     #      jump label: while.head_29 
-    sw      s8,12(sp)
-    sw      s5,20(sp)
-    sw      a0,148(sp)
-    sw      s10,8(sp)
-    sb      s2,35(sp)
-    sw      s7,16(sp)
     sd      s1,24(sp)
+    sw      a0,148(sp)
+    sw      s8,12(sp)
+    sw      s7,16(sp)
+    sw      s5,20(sp)
+    sb      s2,35(sp)
+    sw      s10,8(sp)
     j       .while.head_29
+                    #regtab     a0:Freed { symidx: i_16, tracked: true } |     a1:Freed { symidx: b_16, tracked: true } |     a2:Freed { symidx: c_16, tracked: true } |     a3:Freed { symidx: d_16, tracked: true } |     a4:Freed { symidx: e_16, tracked: true } |     a5:Freed { symidx: f_16, tracked: true } |     a6:Freed { symidx: g_16, tracked: true } |     a7:Freed { symidx: h_16, tracked: true } |     s2:Freed { symidx: temp_6_28, tracked: true } | 
                     #      label while.exit_29: 
 .while.exit_29:
                     #      new_var temp_12_18:i32 
@@ -201,6 +210,8 @@ func:
     sw      a0,148(sp)
     addi    sp,sp,152
     ret
+                    #regtab     a0:Freed { symidx: temp_12_18, tracked: true } |     a1:Freed { symidx: b_16, tracked: true } |     a2:Freed { symidx: c_16, tracked: true } |     a3:Freed { symidx: d_16, tracked: true } |     a4:Freed { symidx: e_16, tracked: true } |     a5:Freed { symidx: f_16, tracked: true } |     a6:Freed { symidx: g_16, tracked: true } |     a7:Freed { symidx: h_16, tracked: true } |     s2:Freed { symidx: temp_6_28, tracked: true } | 
+                    #regtab 
                     #      Define main_0 [] -> main_ret_0 
     .globl main
     .type main,@function
@@ -252,6 +263,7 @@ main:
                     #      alloc ptr->i32 temp_41_52 
                     #      alloc i32 temp_42_52 
                     #      alloc i32 temp_43_52 
+                    #regtab     a0:Freed { symidx: -29600_0, tracked: false } |     a1:Freed { symidx: 29592_0, tracked: false } |     a2:Freed { symidx: 29584_0, tracked: false } |     a3:Freed { symidx: 29600_0, tracked: false } | 
                     #      label L0_0: 
 .L0_0:
                     #      new_var a_36:Array:i32:[Some(61_0), Some(67_0)] 
@@ -280,7 +292,7 @@ main:
                     #found literal reg Some(a5) already exist with 67_0
                     #found literal reg Some(a6) already exist with 17_0
     add     s4,s4,a7
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(s2) already exist with 1_0
     li      s5, 3
     add     s4,s4,a7
     slli s4,s4,2
@@ -297,7 +309,7 @@ main:
                     #found literal reg Some(a5) already exist with 67_0
                     #found literal reg Some(a6) already exist with 17_0
     add     s7,s7,a7
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(s2) already exist with 1_0
     li      s8, 4
     add     s7,s7,a7
     slli s7,s7,2
@@ -314,7 +326,7 @@ main:
                     #found literal reg Some(a5) already exist with 67_0
                     #found literal reg Some(a6) already exist with 17_0
     add     s9,s9,a7
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(s2) already exist with 1_0
                     #found literal reg Some(s6) already exist with 7_0
     add     s9,s9,a7
     slli s9,s9,2
@@ -331,7 +343,7 @@ main:
                     #found literal reg Some(a5) already exist with 67_0
                     #found literal reg Some(a6) already exist with 17_0
     add     s11,s11,a7
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(s2) already exist with 1_0
     li      a0, 11
     add     s11,s11,a7
     slli s11,s11,2
@@ -349,15 +361,15 @@ main:
                     #found literal reg Some(s3) already exist with 6_0
     mul     a2,a1,s3
     add     a0,a0,a2
-                    #found literal reg Some(s1) already exist with 1_0
                     #found literal reg Some(s2) already exist with 1_0
+                    #found literal reg Some(s1) already exist with 1_0
     add     a0,a0,a2
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
                     #      store 1_0:i32 temp_18_36:ptr->i32 
-                    #found literal reg Some(s1) already exist with 1_0
-    sd      s1,0(a0)
+                    #found literal reg Some(s2) already exist with 1_0
+    sd      s2,0(a0)
                     #      mu b_36:120 
                     #      b_36 = chi b_36:120 
                     #      new_var temp_19_36:ptr->i32 
@@ -366,7 +378,7 @@ main:
     li      a3, 59
                     #found literal reg Some(s3) already exist with 6_0
     add     a1,a1,a2
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(s2) already exist with 1_0
     li      a3, 2
     add     a1,a1,a2
     slli a1,a1,2
@@ -383,7 +395,7 @@ main:
     li      a5, 59
                     #found literal reg Some(s3) already exist with 6_0
     add     a3,a3,a2
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(s2) already exist with 1_0
                     #found literal reg Some(s5) already exist with 3_0
     add     a3,a3,a2
     slli a3,a3,2
@@ -400,7 +412,7 @@ main:
     li      a6, 59
                     #found literal reg Some(s3) already exist with 6_0
     add     a5,a5,a2
-                    #found literal reg Some(s1) already exist with 1_0
+                    #found literal reg Some(s2) already exist with 1_0
                     #found literal reg Some(s10) already exist with 9_0
     add     a5,a5,a2
     slli a5,a5,2
@@ -585,6 +597,7 @@ main:
     mv      a3, a2
                     #      jump label: while.head_51 
     j       .while.head_51
+                    #regtab     a0:Freed { symidx: temp_38_36, tracked: true } |     a2:Freed { symidx: temp_39_36, tracked: true } |     a3:Freed { symidx: ret_36, tracked: true } | 
                     #      label while.head_51: 
 .while.head_51:
                     #      new_var temp_40_50:i1 
@@ -595,6 +608,7 @@ main:
                     #      br i1 temp_40_50, label while.body_51, label while.exit_51 
     bnez    a4, .while.body_51
     j       .while.exit_51
+                    #regtab     a0:Freed { symidx: temp_38_36, tracked: true } |     a2:Freed { symidx: temp_39_36, tracked: true } |     a3:Freed { symidx: ret_36, tracked: true } |     a4:Freed { symidx: temp_40_50, tracked: true } | 
                     #      label while.body_51: 
 .while.body_51:
                     #      new_var temp_41_52:ptr->i32 
@@ -636,13 +650,14 @@ main:
     mv      a3, s1
                     #      jump label: while.head_51 
     sb      a4,19(sp)
-    sw      s1,0(sp)
-    sd      a1,8(sp)
-    lw      a0,24(sp)
     li      a7, 13232
     add     a7,sp,a7
     sw      a7,0(a7)
+    sw      s1,0(sp)
+    lw      a0,24(sp)
+    sd      a1,8(sp)
     j       .while.head_51
+                    #regtab     a0:Freed { symidx: temp_38_36, tracked: true } |     a2:Freed { symidx: temp_39_36, tracked: true } |     a3:Freed { symidx: ret_36, tracked: true } |     a4:Freed { symidx: temp_40_50, tracked: true } | 
                     #      label while.exit_51: 
 .while.exit_51:
                     #       Call void putch_0(10_0) 
@@ -668,3 +683,4 @@ main:
     li      a5, 29600
     add     sp,a5,sp
     ret
+                    #regtab     a0:Freed { symidx: 0_0, tracked: false } |     a1:Freed { symidx: s0_main_0, tracked: true } |     a2:Freed { symidx: temp_39_36, tracked: true } |     a3:Freed { symidx: ret_36, tracked: true } |     a4:Freed { symidx: temp_40_50, tracked: true } |     a5:Freed { symidx: 29600_0, tracked: false } | 

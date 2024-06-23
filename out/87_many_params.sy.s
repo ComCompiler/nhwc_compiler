@@ -16,8 +16,10 @@
  tail _sysy_stoptime
 
 
-.section        .text
+.section
+    .text
     .align 4
+                    #regtab 
                     #      Define sort_0 [arr_16, len_16] -> sort_ret_0 
     .globl sort
     .type sort,@function
@@ -48,12 +50,14 @@ sort:
                     #      alloc ptr->i32 temp_14_29 
                     #      alloc i32 temp_15_26 
                     #      alloc i32 temp_16_22 
+                    #regtab     a0:Freed { symidx: arr_16, tracked: true } |     a1:Freed { symidx: len_16, tracked: true } | 
                     #      label L5_0: 
 .L5_0:
                     #      i_18 = i32 0_0 
     li      a2, 0
                     #      jump label: while.head_21 
     j       .while.head_21
+                    #regtab     a0:Freed { symidx: arr_16, tracked: true } |     a1:Freed { symidx: len_16, tracked: true } |     a2:Freed { symidx: i_18, tracked: true } | 
                     #      label while.head_21: 
 .while.head_21:
                     #      new_var temp_0_20:i32 
@@ -66,6 +70,7 @@ sort:
                     #      br i1 temp_1_20, label while.body_21, label while.exit_21 
     bnez    a5, .while.body_21
     j       .while.exit_21
+                    #regtab     a0:Freed { symidx: arr_16, tracked: true } |     a1:Freed { symidx: len_16, tracked: true } |     a2:Freed { symidx: i_18, tracked: true } |     a4:Freed { symidx: temp_0_20, tracked: true } |     a5:Freed { symidx: temp_1_20, tracked: true } | 
                     #      label while.body_21: 
 .while.body_21:
                     #      new_var temp_2_22:i32 
@@ -76,6 +81,7 @@ sort:
     mv      a7, a6
                     #      jump label: while.head_25 
     j       .while.head_25
+                    #regtab     a0:Freed { symidx: arr_16, tracked: true } |     a1:Freed { symidx: len_16, tracked: true } |     a2:Freed { symidx: i_18, tracked: true } |     a4:Freed { symidx: temp_0_20, tracked: true } |     a5:Freed { symidx: temp_1_20, tracked: true } |     a6:Freed { symidx: temp_2_22, tracked: true } |     a7:Freed { symidx: j_22, tracked: true } | 
                     #      label while.head_25: 
 .while.head_25:
                     #      new_var temp_3_24:i1 
@@ -84,6 +90,7 @@ sort:
                     #      br i1 temp_3_24, label while.body_25, label while.exit_25 
     bnez    a3, .while.body_25
     j       .while.exit_25
+                    #regtab     a0:Freed { symidx: arr_16, tracked: true } |     a1:Freed { symidx: len_16, tracked: true } |     a2:Freed { symidx: i_18, tracked: true } |     a3:Freed { symidx: temp_3_24, tracked: true } |     a4:Freed { symidx: temp_0_20, tracked: true } |     a5:Freed { symidx: temp_1_20, tracked: true } |     a6:Freed { symidx: temp_2_22, tracked: true } |     a7:Freed { symidx: j_22, tracked: true } | 
                     #      label while.body_25: 
 .while.body_25:
                     #      new_var temp_4_27:ptr->i32 
@@ -114,6 +121,7 @@ sort:
                     #      br i1 temp_8_27, label branch_true_28, label branch_false_28 
     bnez    s6, .branch_true_28
     j       .branch_false_28
+                    #regtab     a0:Freed { symidx: arr_16, tracked: true } |     a1:Freed { symidx: len_16, tracked: true } |     a2:Freed { symidx: i_18, tracked: true } |     a3:Freed { symidx: temp_3_24, tracked: true } |     a4:Freed { symidx: temp_0_20, tracked: true } |     a5:Freed { symidx: temp_1_20, tracked: true } |     a6:Freed { symidx: temp_2_22, tracked: true } |     a7:Freed { symidx: j_22, tracked: true } |     s1:Freed { symidx: temp_4_27, tracked: true } |     s3:Freed { symidx: temp_5_27, tracked: true } |     s4:Freed { symidx: temp_6_27, tracked: true } |     s5:Freed { symidx: temp_7_27, tracked: true } |     s6:Freed { symidx: temp_8_27, tracked: true } | 
                     #      label branch_true_28: 
 .branch_true_28:
                     #      new_var temp_9_29:ptr->i32 
@@ -169,20 +177,22 @@ sort:
                     #      mu arr_16:120 
                     #      arr_16 = chi arr_16:120 
                     #      jump label: branch_false_28 
-    sd      s10,32(sp)
-    sd      s2,48(sp)
-    sw      s8,44(sp)
-    lw      a1,116(sp)
-    sd      a0,8(sp)
-    mv      a0, a2
-    sw      s9,40(sp)
-    sw      s7,20(sp)
-    sd      s11,24(sp)
     sd      a2,120(sp)
     lw      a2,112(sp)
+    sd      s11,24(sp)
+    sd      s10,32(sp)
+    sw      s8,44(sp)
+    sw      s7,20(sp)
+    lw      a1,116(sp)
+    sd      a0,8(sp)
+    ld      a0,120(sp)
+    sd      s2,48(sp)
+    sw      s9,40(sp)
     j       .branch_false_28
+                    #regtab     a0:Freed { symidx: arr_16, tracked: true } |     a1:Freed { symidx: len_16, tracked: true } |     a2:Freed { symidx: i_18, tracked: true } |     a3:Freed { symidx: temp_3_24, tracked: true } |     a4:Freed { symidx: temp_0_20, tracked: true } |     a5:Freed { symidx: temp_1_20, tracked: true } |     a6:Freed { symidx: temp_2_22, tracked: true } |     a7:Freed { symidx: j_22, tracked: true } |     s1:Freed { symidx: temp_4_27, tracked: true } |     s3:Freed { symidx: temp_5_27, tracked: true } |     s4:Freed { symidx: temp_6_27, tracked: true } |     s5:Freed { symidx: temp_7_27, tracked: true } |     s6:Freed { symidx: temp_8_27, tracked: true } | 
                     #      label branch_false_28: 
 .branch_false_28:
+                    #regtab     a0:Freed { symidx: arr_16, tracked: true } |     a1:Freed { symidx: len_16, tracked: true } |     a2:Freed { symidx: i_18, tracked: true } |     a3:Freed { symidx: temp_3_24, tracked: true } |     a4:Freed { symidx: temp_0_20, tracked: true } |     a5:Freed { symidx: temp_1_20, tracked: true } |     a6:Freed { symidx: temp_2_22, tracked: true } |     a7:Freed { symidx: j_22, tracked: true } |     s1:Freed { symidx: temp_4_27, tracked: true } |     s3:Freed { symidx: temp_5_27, tracked: true } |     s4:Freed { symidx: temp_6_27, tracked: true } |     s5:Freed { symidx: temp_7_27, tracked: true } |     s6:Freed { symidx: temp_8_27, tracked: true } | 
                     #      label L6_0: 
 .L6_0:
                     #      new_var temp_15_26:i32 
@@ -192,14 +202,15 @@ sort:
                     #      j_22 = i32 temp_15_26 
     mv      a7, s7
                     #      jump label: while.head_25 
-    sd      s1,80(sp)
     sw      s3,76(sp)
-    sw      s5,60(sp)
-    sd      s4,64(sp)
     sw      s7,4(sp)
+    sd      s1,80(sp)
     sb      a3,95(sp)
+    sd      s4,64(sp)
     sb      s6,59(sp)
+    sw      s5,60(sp)
     j       .while.head_25
+                    #regtab     a0:Freed { symidx: arr_16, tracked: true } |     a1:Freed { symidx: len_16, tracked: true } |     a2:Freed { symidx: i_18, tracked: true } |     a3:Freed { symidx: temp_3_24, tracked: true } |     a4:Freed { symidx: temp_0_20, tracked: true } |     a5:Freed { symidx: temp_1_20, tracked: true } |     a6:Freed { symidx: temp_2_22, tracked: true } |     a7:Freed { symidx: j_22, tracked: true } | 
                     #      label while.exit_25: 
 .while.exit_25:
                     #      new_var temp_16_22:i32 
@@ -209,15 +220,17 @@ sort:
                     #      i_18 = i32 temp_16_22 
     mv      a2, s2
                     #      jump label: while.head_21 
+    sw      a7,96(sp)
+    sb      a5,107(sp)
+    sb      a3,95(sp)
+    sw      a6,100(sp)
     sw      s2,0(sp)
     sw      a4,108(sp)
-    sb      a5,107(sp)
-    sw      a6,100(sp)
-    sw      a7,96(sp)
-    sb      a3,95(sp)
     j       .while.head_21
+                    #regtab     a0:Freed { symidx: arr_16, tracked: true } |     a1:Freed { symidx: len_16, tracked: true } |     a2:Freed { symidx: i_18, tracked: true } |     a4:Freed { symidx: temp_0_20, tracked: true } |     a5:Freed { symidx: temp_1_20, tracked: true } | 
                     #      label while.exit_21: 
 .while.exit_21:
+                    #regtab 
                     #      Define param32_rec_0 [a1_35, a2_35, a3_35, a4_35, a5_35, a6_35, a7_35, a8_35, a9_35, a10_35, a11_35, a12_35, a13_35, a14_35, a15_35, a16_35, a17_35, a18_35, a19_35, a20_35, a21_35, a22_35, a23_35, a24_35, a25_35, a26_35, a27_35, a28_35, a29_35, a30_35, a31_35, a32_35] -> param32_rec_ret_0 
     .globl param32_rec
     .type param32_rec,@function
@@ -232,6 +245,7 @@ param32_rec:
                     #      alloc i32 temp_19_42 
                     #      alloc i32 temp_20_42 
                     #      alloc i32 temp_21_42 
+                    #regtab     a0:Freed { symidx: a1_35, tracked: true } |     a1:Freed { symidx: a2_35, tracked: true } |     a2:Freed { symidx: a3_35, tracked: true } |     a3:Freed { symidx: a4_35, tracked: true } |     a4:Freed { symidx: a5_35, tracked: true } |     a5:Freed { symidx: a6_35, tracked: true } |     a6:Freed { symidx: a7_35, tracked: true } |     a7:Freed { symidx: a8_35, tracked: true } | 
                     #      label L3_0: 
 .L3_0:
                     #      new_var temp_17_38:i1 
@@ -242,6 +256,7 @@ param32_rec:
                     #      br i1 temp_17_38, label branch_true_39, label branch_false_39 
     bnez    s2, .branch_true_39
     j       .branch_false_39
+                    #regtab     a0:Freed { symidx: a1_35, tracked: true } |     a1:Freed { symidx: a2_35, tracked: true } |     a2:Freed { symidx: a3_35, tracked: true } |     a3:Freed { symidx: a4_35, tracked: true } |     a4:Freed { symidx: a5_35, tracked: true } |     a5:Freed { symidx: a6_35, tracked: true } |     a6:Freed { symidx: a7_35, tracked: true } |     a7:Freed { symidx: a8_35, tracked: true } |     s2:Freed { symidx: temp_17_38, tracked: true } | 
                     #      label branch_true_39: 
 .branch_true_39:
                     #      ret a2_35 
@@ -251,6 +266,7 @@ param32_rec:
     sw      a0,52(sp)
     addi    sp,sp,168
     ret
+                    #regtab     a0:Freed { symidx: a1_35, tracked: true } |     a1:Freed { symidx: a2_35, tracked: true } |     a2:Freed { symidx: a3_35, tracked: true } |     a3:Freed { symidx: a4_35, tracked: true } |     a4:Freed { symidx: a5_35, tracked: true } |     a5:Freed { symidx: a6_35, tracked: true } |     a6:Freed { symidx: a7_35, tracked: true } |     a7:Freed { symidx: a8_35, tracked: true } |     s2:Freed { symidx: temp_17_38, tracked: true } | 
                     #      label branch_false_39: 
 .branch_false_39:
                     #      new_var temp_18_42:i32 
@@ -298,8 +314,11 @@ param32_rec:
     sw      a0,4(sp)
     addi    sp,sp,168
     ret
+                    #regtab     a0:Freed { symidx: temp_21_42, tracked: true } | 
                     #      label L4_0: 
 .L4_0:
+                    #regtab     a0:Freed { symidx: temp_21_42, tracked: true } | 
+                    #regtab 
                     #      Define param32_arr_0 [a1_44, a2_44, a3_44, a4_44, a5_44, a6_44, a7_44, a8_44, a9_44, a10_44, a11_44, a12_44, a13_44, a14_44, a15_44, a16_44, a17_44, a18_44, a19_44, a20_44, a21_44, a22_44, a23_44, a24_44, a25_44, a26_44, a27_44, a28_44, a29_44, a30_44, a31_44, a32_44] -> param32_arr_ret_0 
     .globl param32_arr
     .type param32_arr,@function
@@ -533,6 +552,7 @@ param32_arr:
                     #      alloc i32 temp_210_46 
                     #      alloc i32 temp_211_46 
                     #      alloc i32 temp_212_46 
+                    #regtab     a0:Freed { symidx: a1_44, tracked: true } |     a1:Freed { symidx: a2_44, tracked: true } |     a2:Freed { symidx: a3_44, tracked: true } |     a3:Freed { symidx: a4_44, tracked: true } |     a4:Freed { symidx: a5_44, tracked: true } |     a5:Freed { symidx: a6_44, tracked: true } |     a6:Freed { symidx: a7_44, tracked: true } |     a7:Freed { symidx: a8_44, tracked: true } | 
                     #      label L2_0: 
 .L2_0:
                     #      new_var temp_22_46:ptr->i32 
@@ -551,7 +571,7 @@ param32_arr:
                     #      new_var temp_25_46:i32 
                     #      temp_24_46 = getelementptr a1_44:ptr->i32 [Some(0_0)] 
     li      s5, 0
-                    #found literal reg Some(s3) already exist with 1_0
+                    #found literal reg Some(s2) already exist with 1_0
     li      s6, 0
     add     s5,s5,a0
     slli s5,s5,3
@@ -568,8 +588,8 @@ param32_arr:
                     #      new_var temp_28_46:i32 
                     #      temp_27_46 = getelementptr a2_44:ptr->i32 [Some(1_0)] 
     li      s10, 0
-                    #found literal reg Some(s3) already exist with 1_0
                     #found literal reg Some(s2) already exist with 1_0
+                    #found literal reg Some(s3) already exist with 1_0
     add     s10,s10,a1
     slli s10,s10,3
     add     s10,s10,sp
@@ -1826,6 +1846,8 @@ param32_arr:
     sw      a0,4(sp)
     addi    sp,sp,1552
     ret
+                    #regtab     a0:Freed { symidx: sum_46, tracked: true } |     a1:Freed { symidx: temp_208_46, tracked: true } |     a2:Freed { symidx: temp_211_46, tracked: true } |     a3:Freed { symidx: a32_44, tracked: true } |     a4:Freed { symidx: a5_44, tracked: true } |     a5:Freed { symidx: a6_44, tracked: true } |     a6:Freed { symidx: a7_44, tracked: true } |     a7:Freed { symidx: a8_44, tracked: true } |     s10:Freed { symidx: temp_27_46, tracked: true } |     s11:Freed { symidx: temp_28_46, tracked: true } |     s1:Freed { symidx: temp_22_46, tracked: true } |     s2:Freed { symidx: temp_29_46, tracked: true } |     s3:Freed { symidx: temp_30_46, tracked: true } |     s4:Freed { symidx: temp_23_46, tracked: true } |     s5:Freed { symidx: temp_24_46, tracked: true } |     s6:Freed { symidx: temp_31_46, tracked: true } |     s7:Freed { symidx: temp_25_46, tracked: true } |     s8:Freed { symidx: temp_26_46, tracked: true } | 
+                    #regtab 
                     #      Define param16_0 [a1_80, a2_80, a3_80, a4_80, a5_80, a6_80, a7_80, a8_80, a9_80, a10_80, a11_80, a12_80, a13_80, a14_80, a15_80, a16_80] -> param16_ret_0 
     .globl param16
     .type param16,@function
@@ -1885,27 +1907,28 @@ param16:
                     #      alloc ptr->i32 temp_259_82 
                     #      alloc i32 temp_260_82 
                     #      alloc i32 temp_261_82 
+                    #regtab     a0:Freed { symidx: a1_80, tracked: true } |     a1:Freed { symidx: a2_80, tracked: true } |     a2:Freed { symidx: a3_80, tracked: true } |     a3:Freed { symidx: a4_80, tracked: true } |     a4:Freed { symidx: a5_80, tracked: true } |     a5:Freed { symidx: a6_80, tracked: true } |     a6:Freed { symidx: a7_80, tracked: true } |     a7:Freed { symidx: a8_80, tracked: true } | 
                     #      label L1_0: 
 .L1_0:
                     #      new_var arr_82:Array:i32:[Some(16_0)] 
                     #      new_var temp_213_82:ptr->i32 
-                    #      temp_213_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(4_0)] 
+                    #      temp_213_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(1_0)] 
     li      s1, 0
     li      s2, 1
-    li      s3, 4
+    li      s3, 1
     mul     s4,s2,s3
     add     s1,s1,s4
     slli s1,s1,2
     add     s1,s1,sp
     add     s1,s1,s1
-                    #      store a5_80:i32 temp_213_82:ptr->i32 
-    sd      a4,0(s1)
+                    #      store a2_80:i32 temp_213_82:ptr->i32 
+    sd      a1,0(s1)
                     #      mu arr_82:765 
                     #      arr_82 = chi arr_82:765 
                     #      new_var temp_214_82:ptr->i32 
                     #      temp_214_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(6_0)] 
     li      s5, 0
-                    #found literal reg Some(s2) already exist with 1_0
+                    #found literal reg Some(s3) already exist with 1_0
     li      s6, 6
     add     s5,s5,s4
     slli s5,s5,2
@@ -1916,135 +1939,134 @@ param16:
                     #      mu arr_82:771 
                     #      arr_82 = chi arr_82:771 
                     #      new_var temp_215_82:ptr->i32 
-                    #      temp_215_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(8_0)] 
+                    #      temp_215_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(5_0)] 
     li      s7, 0
-                    #found literal reg Some(s2) already exist with 1_0
-    li      s8, 8
+                    #found literal reg Some(s3) already exist with 1_0
+    li      s8, 5
     add     s7,s7,s4
     slli s7,s7,2
     add     s7,s7,sp
     add     s7,s7,s7
-                    #      store a9_80:i32 temp_215_82:ptr->i32 
-    sd      s9,0(s7)
+                    #      store a6_80:i32 temp_215_82:ptr->i32 
+    sd      a5,0(s7)
                     #      mu arr_82:777 
                     #      arr_82 = chi arr_82:777 
                     #      new_var temp_216_82:ptr->i32 
-                    #      temp_216_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(10_0)] 
-    li      s10, 0
-                    #found literal reg Some(s2) already exist with 1_0
-    li      s11, 10
-    add     s10,s10,s4
-    slli s10,s10,2
-    add     s10,s10,sp
-    add     s10,s10,s10
-                    #      store a11_80:i32 temp_216_82:ptr->i32 
-    sd      s2,0(s10)
+                    #      temp_216_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(2_0)] 
+    li      s9, 0
+                    #found literal reg Some(s3) already exist with 1_0
+    li      s10, 2
+    add     s9,s9,s4
+    slli s9,s9,2
+    add     s9,s9,sp
+    add     s9,s9,s9
+                    #      store a3_80:i32 temp_216_82:ptr->i32 
+    sd      a2,0(s9)
                     #      mu arr_82:783 
                     #      arr_82 = chi arr_82:783 
                     #      new_var temp_217_82:ptr->i32 
                     #      temp_217_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(0_0)] 
-    li      s3, 0
-    li      s6, 1
-    li      s8, 0
-    add     s3,s3,s4
-    slli s3,s3,2
-    add     s3,s3,sp
-    add     s3,s3,s3
-                    #      store a1_80:i32 temp_217_82:ptr->i32 
-    sd      a0,0(s3)
-                    #      mu arr_82:789 
-                    #      arr_82 = chi arr_82:789 
-                    #      new_var temp_218_82:ptr->i32 
-                    #      temp_218_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(7_0)] 
-    li      s6, 0
-    li      s8, 1
-    li      s11, 7
-    add     s6,s6,s4
-    slli s6,s6,2
-    add     s6,s6,sp
-    add     s6,s6,s6
-                    #      store a8_80:i32 temp_218_82:ptr->i32 
-    sd      a7,0(s6)
-                    #      mu arr_82:795 
-                    #      arr_82 = chi arr_82:795 
-                    #      new_var temp_219_82:ptr->i32 
-                    #      temp_219_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(3_0)] 
-    li      s8, 0
-    li      s11, 1
-    sw      a0,476(sp)
-    li      a0, 3
-    add     s8,s8,s4
-    slli s8,s8,2
-    add     s8,s8,sp
-    add     s8,s8,s8
-                    #      store a4_80:i32 temp_219_82:ptr->i32 
-    sd      a3,0(s8)
-                    #      mu arr_82:801 
-                    #      arr_82 = chi arr_82:801 
-                    #      new_var temp_220_82:ptr->i32 
-                    #      temp_220_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(5_0)] 
-    li      a0, 0
-                    #found literal reg Some(s11) already exist with 1_0
-    sw      a1,472(sp)
-    li      a1, 5
-    add     a0,a0,s4
-    slli a0,a0,2
-    add     a0,a0,sp
-    add     a0,a0,a0
-                    #      store a6_80:i32 temp_220_82:ptr->i32 
-    sd      a5,0(a0)
-                    #      mu arr_82:807 
-                    #      arr_82 = chi arr_82:807 
-                    #      new_var temp_221_82:ptr->i32 
-                    #      temp_221_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(9_0)] 
-    li      a1, 0
-                    #found literal reg Some(s11) already exist with 1_0
-    sd      a0,384(sp)
-    li      a0, 9
-    add     a1,a1,s4
-    slli a1,a1,2
-    add     a1,a1,sp
-    add     a1,a1,a1
-                    #      store a10_80:i32 temp_221_82:ptr->i32 
-    sd      a0,0(a1)
-                    #      mu arr_82:813 
-                    #      arr_82 = chi arr_82:813 
-                    #      new_var temp_222_82:ptr->i32 
-                    #      temp_222_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(13_0)] 
     li      s11, 0
-    sw      a0,520(sp)
-    li      a0, 1
-    sd      a1,376(sp)
-    li      a1, 13
+                    #found literal reg Some(s3) already exist with 1_0
+    li      s2, 0
     add     s11,s11,s4
     slli s11,s11,2
     add     s11,s11,sp
     add     s11,s11,s11
-                    #      store a14_80:i32 temp_222_82:ptr->i32 
+                    #      store a1_80:i32 temp_217_82:ptr->i32 
     sd      a0,0(s11)
-                    #      mu arr_82:819 
-                    #      arr_82 = chi arr_82:819 
-                    #      new_var temp_223_82:ptr->i32 
-                    #      temp_223_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(14_0)] 
+                    #      mu arr_82:789 
+                    #      arr_82 = chi arr_82:789 
+                    #      new_var temp_218_82:ptr->i32 
+                    #      temp_218_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(10_0)] 
+    li      s2, 0
+                    #found literal reg Some(s3) already exist with 1_0
+    li      s6, 10
+    add     s2,s2,s4
+    slli s2,s2,2
+    add     s2,s2,sp
+    add     s2,s2,s2
+                    #      store a11_80:i32 temp_218_82:ptr->i32 
+    sd      s3,0(s2)
+                    #      mu arr_82:795 
+                    #      arr_82 = chi arr_82:795 
+                    #      new_var temp_219_82:ptr->i32 
+                    #      temp_219_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(7_0)] 
+    li      s6, 0
+    li      s8, 1
+    li      s10, 7
+    add     s6,s6,s4
+    slli s6,s6,2
+    add     s6,s6,sp
+    add     s6,s6,s6
+                    #      store a8_80:i32 temp_219_82:ptr->i32 
+    sd      a7,0(s6)
+                    #      mu arr_82:801 
+                    #      arr_82 = chi arr_82:801 
+                    #      new_var temp_220_82:ptr->i32 
+                    #      temp_220_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(9_0)] 
+    li      s8, 0
+    li      s10, 1
+    sw      a0,476(sp)
+    li      a0, 9
+    add     s8,s8,s4
+    slli s8,s8,2
+    add     s8,s8,sp
+    add     s8,s8,s8
+                    #      store a10_80:i32 temp_220_82:ptr->i32 
+    sd      a0,0(s8)
+                    #      mu arr_82:807 
+                    #      arr_82 = chi arr_82:807 
+                    #      new_var temp_221_82:ptr->i32 
+                    #      temp_221_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(8_0)] 
+    li      s10, 0
+    sw      a0,520(sp)
+    li      a0, 1
+    sw      a1,472(sp)
+    li      a1, 8
+    add     s10,s10,s4
+    slli s10,s10,2
+    add     s10,s10,sp
+    add     s10,s10,s10
+                    #      store a9_80:i32 temp_221_82:ptr->i32 
+    sd      a0,0(s10)
+                    #      mu arr_82:813 
+                    #      arr_82 = chi arr_82:813 
+                    #      new_var temp_222_82:ptr->i32 
+                    #      temp_222_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(3_0)] 
     li      a1, 0
-    sw      a0,504(sp)
+    sw      a0,524(sp)
     li      a0, 1
     sw      a2,468(sp)
-    li      a2, 14
+    li      a2, 3
     add     a1,a1,s4
     slli a1,a1,2
     add     a1,a1,sp
     add     a1,a1,a1
+                    #      store a4_80:i32 temp_222_82:ptr->i32 
+    sd      a3,0(a1)
+                    #      mu arr_82:819 
+                    #      arr_82 = chi arr_82:819 
+                    #      new_var temp_223_82:ptr->i32 
+                    #      temp_223_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(14_0)] 
+    li      a0, 0
+    li      a2, 1
+    sd      a1,368(sp)
+    li      a1, 14
+    add     a0,a0,s4
+    slli a0,a0,2
+    add     a0,a0,sp
+    add     a0,a0,a0
                     #      store a15_80:i32 temp_223_82:ptr->i32 
-    sd      a0,0(a1)
+    sd      a1,0(a0)
                     #      mu arr_82:825 
                     #      arr_82 = chi arr_82:825 
                     #      new_var temp_224_82:ptr->i32 
                     #      temp_224_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(15_0)] 
     li      a2, 0
-    sw      a0,500(sp)
+    sd      a0,360(sp)
     li      a0, 1
-    sd      a1,360(sp)
+    sw      a1,500(sp)
     li      a1, 15
     add     a2,a2,s4
     slli a2,a2,2
@@ -2055,82 +2077,82 @@ param16:
                     #      mu arr_82:831 
                     #      arr_82 = chi arr_82:831 
                     #      new_var temp_225_82:ptr->i32 
-                    #      temp_225_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(1_0)] 
+                    #      temp_225_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(11_0)] 
     li      a1, 0
     sw      a0,496(sp)
     li      a0, 1
     sd      a2,352(sp)
-    li      a2, 1
+    li      a2, 11
     add     a1,a1,s4
     slli a1,a1,2
     add     a1,a1,sp
     add     a1,a1,a1
-                    #      store a2_80:i32 temp_225_82:ptr->i32 
+                    #      store a12_80:i32 temp_225_82:ptr->i32 
     sd      a0,0(a1)
                     #      mu arr_82:837 
                     #      arr_82 = chi arr_82:837 
                     #      new_var temp_226_82:ptr->i32 
-                    #      temp_226_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(11_0)] 
+                    #      temp_226_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(12_0)] 
     li      a2, 0
-    sw      a0,472(sp)
-    li      a0, 1
-    sd      a1,344(sp)
-    li      a1, 11
-    add     a2,a2,s4
-    slli a2,a2,2
-    add     a2,a2,sp
-    add     a2,a2,a2
-                    #      store a12_80:i32 temp_226_82:ptr->i32 
-    sd      a0,0(a2)
-                    #      mu arr_82:843 
-                    #      arr_82 = chi arr_82:843 
-                    #      new_var temp_227_82:ptr->i32 
-                    #      temp_227_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(2_0)] 
-    li      a1, 0
     sw      a0,512(sp)
     li      a0, 1
-    sd      a2,336(sp)
-    li      a2, 2
-    add     a1,a1,s4
-    slli a1,a1,2
-    add     a1,a1,sp
-    add     a1,a1,a1
-                    #      store a3_80:i32 temp_227_82:ptr->i32 
-    sd      a0,0(a1)
-                    #      mu arr_82:849 
-                    #      arr_82 = chi arr_82:849 
-                    #      new_var temp_228_82:ptr->i32 
-                    #      temp_228_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(12_0)] 
-    li      a2, 0
-    sw      a0,468(sp)
-    li      a0, 1
-    sd      a1,328(sp)
+    sd      a1,344(sp)
     li      a1, 12
     add     a2,a2,s4
     slli a2,a2,2
     add     a2,a2,sp
     add     a2,a2,a2
-                    #      store a13_80:i32 temp_228_82:ptr->i32 
+                    #      store a13_80:i32 temp_226_82:ptr->i32 
     sd      a0,0(a2)
+                    #      mu arr_82:843 
+                    #      arr_82 = chi arr_82:843 
+                    #      new_var temp_227_82:ptr->i32 
+                    #      temp_227_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(4_0)] 
+    li      a1, 0
+    sw      a0,508(sp)
+    li      a0, 1
+    sd      a2,336(sp)
+    li      a2, 4
+    add     a1,a1,s4
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
+                    #      store a5_80:i32 temp_227_82:ptr->i32 
+    sd      a4,0(a1)
+                    #      mu arr_82:849 
+                    #      arr_82 = chi arr_82:849 
+                    #      new_var temp_228_82:ptr->i32 
+                    #      temp_228_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(13_0)] 
+    li      a0, 0
+    li      a2, 1
+    sd      a1,328(sp)
+    li      a1, 13
+    add     a0,a0,s4
+    slli a0,a0,2
+    add     a0,a0,sp
+    add     a0,a0,a0
+                    #      store a14_80:i32 temp_228_82:ptr->i32 
+    sd      a1,0(a0)
                     #      mu arr_82:855 
                     #      arr_82 = chi arr_82:855 
                     #       Call void sort_0(arr_82, 16_0) 
                     #saved register dumping to mem
     sd      s1,440(sp)
-    sw      s2,516(sp)
-    sd      s3,408(sp)
+    sd      s2,400(sp)
+    sw      s3,516(sp)
     sw      s4,316(sp)
     sd      s5,432(sp)
-    sd      s6,400(sp)
+    sd      s6,392(sp)
     sd      s7,424(sp)
-    sd      s8,392(sp)
-    sw      s9,524(sp)
-    sd      s10,416(sp)
-    sd      s11,368(sp)
+    sd      s8,384(sp)
+    sd      s9,416(sp)
+    sd      s10,376(sp)
+    sd      s11,408(sp)
                     #saved register dumped to mem
                     #arg load start
-    sw      a0,508(sp)
+    sd      a0,320(sp)
     lw      a0,316(sp)
+    sw      a1,504(sp)
     li      a1, 16
                     #arg load ended
     call    sort
@@ -2138,99 +2160,98 @@ param16:
                     #      new_var temp_230_82:i32 
                     #      temp_229_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(0_0)] 
     li      a0, 0
-    li      a1, 1
-    li      s1, 0
-    mul     s2,a1,s1
-    add     a0,a0,s2
+                    #found literal reg Some(a2) already exist with 1_0
+    li      a1, 0
+    mul     s1,a2,a1
+    add     a0,a0,s1
     slli a0,a0,2
     add     a0,a0,sp
     add     a0,a0,a0
                     #      temp_230_82 = load temp_229_82:ptr->i32 
-    lw      s3,0(a0)
+    lw      s2,0(a0)
                     #      new_var temp_231_82:ptr->i32 
                     #      new_var temp_232_82:i32 
                     #      temp_231_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(1_0)] 
-    li      s4, 0
-                    #found literal reg Some(a1) already exist with 1_0
-    li      s5, 1
-    add     s4,s4,s2
-    slli s4,s4,2
-    add     s4,s4,sp
-    add     s4,s4,s4
+    li      s3, 0
+                    #found literal reg Some(a2) already exist with 1_0
+    li      s4, 1
+    add     s3,s3,s1
+    slli s3,s3,2
+    add     s3,s3,sp
+    add     s3,s3,s3
                     #      temp_232_82 = load temp_231_82:ptr->i32 
-    lw      s6,0(s4)
+    lw      s5,0(s3)
                     #      new_var temp_233_82:ptr->i32 
                     #      new_var temp_234_82:i32 
                     #      temp_233_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(2_0)] 
-    li      s7, 0
-                    #found literal reg Some(s5) already exist with 1_0
-    li      s8, 2
-    add     s7,s7,s2
-    slli s7,s7,2
-    add     s7,s7,sp
-    add     s7,s7,s7
+    li      s6, 0
+                    #found literal reg Some(s4) already exist with 1_0
+    li      s7, 2
+    add     s6,s6,s1
+    slli s6,s6,2
+    add     s6,s6,sp
+    add     s6,s6,s6
                     #      temp_234_82 = load temp_233_82:ptr->i32 
-    lw      s9,0(s7)
+    lw      s8,0(s6)
                     #      new_var temp_235_82:ptr->i32 
                     #      new_var temp_236_82:i32 
                     #      temp_235_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(3_0)] 
-    li      s10, 0
-                    #found literal reg Some(s5) already exist with 1_0
-    li      s11, 3
-    add     s10,s10,s2
-    slli s10,s10,2
-    add     s10,s10,sp
-    add     s10,s10,s10
+    li      s9, 0
+                    #found literal reg Some(s4) already exist with 1_0
+    li      s10, 3
+    add     s9,s9,s1
+    slli s9,s9,2
+    add     s9,s9,sp
+    add     s9,s9,s9
                     #      temp_236_82 = load temp_235_82:ptr->i32 
-    lw      a1,0(s10)
+    lw      s11,0(s9)
                     #      new_var temp_237_82:ptr->i32 
                     #      new_var temp_238_82:i32 
                     #      temp_237_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(4_0)] 
-    li      s1, 0
-                    #found literal reg Some(s5) already exist with 1_0
-    li      s8, 4
-    add     s1,s1,s2
-    slli s1,s1,2
-    add     s1,s1,sp
-    add     s1,s1,s1
+    li      a1, 0
+                    #found literal reg Some(s4) already exist with 1_0
+    li      a2, 4
+    add     a1,a1,s1
+    slli a1,a1,2
+    add     a1,a1,sp
+    add     a1,a1,a1
                     #      temp_238_82 = load temp_237_82:ptr->i32 
-    lw      s5,0(s1)
+    lw      a2,0(a1)
                     #      new_var temp_239_82:ptr->i32 
                     #      new_var temp_240_82:i32 
                     #      temp_239_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(5_0)] 
-    li      s8, 0
-    li      s11, 1
-    sd      a0,248(sp)
-    li      a0, 5
-    add     s8,s8,s2
-    slli s8,s8,2
-    add     s8,s8,sp
-    add     s8,s8,s8
+    li      s4, 0
+    li      s7, 1
+    li      s10, 5
+    add     s4,s4,s1
+    slli s4,s4,2
+    add     s4,s4,sp
+    add     s4,s4,s4
                     #      temp_240_82 = load temp_239_82:ptr->i32 
-    lw      a0,0(s8)
+    lw      s7,0(s4)
                     #      new_var temp_241_82:ptr->i32 
                     #      new_var temp_242_82:i32 
                     #      temp_241_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(6_0)] 
-    li      s11, 0
-    sw      a0,164(sp)
+    li      s10, 0
+    sd      a0,248(sp)
     li      a0, 1
-    sw      a1,196(sp)
+    sd      a1,184(sp)
     li      a1, 6
-    add     s11,s11,s2
-    slli s11,s11,2
-    add     s11,s11,sp
-    add     s11,s11,s11
+    add     s10,s10,s1
+    slli s10,s10,2
+    add     s10,s10,sp
+    add     s10,s10,s10
                     #      temp_242_82 = load temp_241_82:ptr->i32 
-    lw      a0,0(s11)
+    lw      a0,0(s10)
                     #      new_var temp_243_82:ptr->i32 
                     #      new_var temp_244_82:i32 
                     #      temp_243_82 = getelementptr arr_82:Array:i32:[Some(16_0)] [Some(7_0)] 
     li      a1, 0
     sw      a0,148(sp)
     li      a0, 1
-    sd      a2,320(sp)
+    sw      a2,180(sp)
     li      a2, 7
-    add     a1,a1,s2
+    add     a1,a1,s1
     slli a1,a1,2
     add     a1,a1,sp
     add     a1,a1,a1
@@ -2244,7 +2265,7 @@ param16:
     li      a0, 1
     sd      a1,136(sp)
     li      a1, 8
-    add     a2,a2,s2
+    add     a2,a2,s1
     slli a2,a2,2
     add     a2,a2,sp
     add     a2,a2,a2
@@ -2258,7 +2279,7 @@ param16:
     li      a0, 1
     sd      a2,120(sp)
     li      a2, 9
-    add     a1,a1,s2
+    add     a1,a1,s1
     slli a1,a1,2
     add     a1,a1,sp
     add     a1,a1,a1
@@ -2272,7 +2293,7 @@ param16:
     li      a0, 1
     sd      a1,104(sp)
     li      a1, 10
-    add     a2,a2,s2
+    add     a2,a2,s1
     slli a2,a2,2
     add     a2,a2,sp
     add     a2,a2,a2
@@ -2286,7 +2307,7 @@ param16:
     li      a0, 1
     sd      a2,88(sp)
     li      a2, 11
-    add     a1,a1,s2
+    add     a1,a1,s1
     slli a1,a1,2
     add     a1,a1,sp
     add     a1,a1,a1
@@ -2300,7 +2321,7 @@ param16:
     li      a0, 1
     sd      a1,72(sp)
     li      a1, 12
-    add     a2,a2,s2
+    add     a2,a2,s1
     slli a2,a2,2
     add     a2,a2,sp
     add     a2,a2,a2
@@ -2314,7 +2335,7 @@ param16:
     li      a0, 1
     sd      a2,56(sp)
     li      a2, 13
-    add     a1,a1,s2
+    add     a1,a1,s1
     slli a1,a1,2
     add     a1,a1,sp
     add     a1,a1,a1
@@ -2328,7 +2349,7 @@ param16:
     li      a0, 1
     sd      a1,40(sp)
     li      a1, 14
-    add     a2,a2,s2
+    add     a2,a2,s1
     slli a2,a2,2
     add     a2,a2,sp
     add     a2,a2,a2
@@ -2342,7 +2363,7 @@ param16:
     li      a0, 1
     sd      a2,24(sp)
     li      a2, 15
-    add     a1,a1,s2
+    add     a1,a1,s1
     slli a1,a1,2
     add     a1,a1,sp
     add     a1,a1,a1
@@ -2351,17 +2372,17 @@ param16:
                     #      new_var temp_261_82:i32 
                     #      temp_261_82 =  Call i32 param32_rec_0(temp_230_82, temp_232_82, temp_234_82, temp_236_82, temp_238_82, temp_240_82, temp_242_82, temp_244_82, temp_246_82, temp_248_82, temp_250_82, temp_252_82, temp_254_82, temp_256_82, temp_258_82, temp_260_82, a1_80, a2_80, a3_80, a4_80, a5_80, a6_80, a7_80, a8_80, a9_80, a10_80, a11_80, a12_80, a13_80, a14_80, a15_80, a16_80) 
                     #saved register dumping to mem
-    sd      s1,184(sp)
-    sw      s2,316(sp)
-    sw      s3,244(sp)
-    sd      s4,232(sp)
-    sw      s5,180(sp)
-    sw      s6,228(sp)
-    sd      s7,216(sp)
-    sd      s8,168(sp)
-    sw      s9,212(sp)
-    sd      s10,200(sp)
-    sd      s11,152(sp)
+    sw      s1,316(sp)
+    sw      s2,244(sp)
+    sd      s3,232(sp)
+    sd      s4,168(sp)
+    sw      s5,228(sp)
+    sd      s6,216(sp)
+    sw      s7,164(sp)
+    sw      s8,212(sp)
+    sd      s9,200(sp)
+    sd      s10,152(sp)
+    sw      s11,196(sp)
                     #saved register dumped to mem
                     #arg load start
     sw      a0,4(sp)
@@ -2388,6 +2409,8 @@ param16:
     sw      a0,0(sp)
     addi    sp,sp,528
     ret
+                    #regtab     a0:Freed { symidx: temp_261_82, tracked: true } | 
+                    #regtab 
                     #      Define main_0 [] -> main_ret_0 
     .globl main
     .type main,@function
@@ -2495,6 +2518,7 @@ main:
                     #      alloc ptr->i32 temp_355_87 
                     #      alloc Array:i32:[Some(2_0)] temp_356_87 
                     #      alloc i32 temp_357_87 
+                    #regtab 
                     #      label L0_0: 
 .L0_0:
                     #      new_var arr_87:Array:i32:[Some(32_0), Some(2_0)] 
@@ -2659,43 +2683,44 @@ main:
     call    param16
     sw      a0,876(sp)
                     #      new_var temp_279_87:ptr->i32 
-                    #      temp_279_87 = getelementptr arr_87:Array:i32:[Some(32_0), Some(2_0)] [Some(0_0), Some(1_0)] 
+                    #      temp_279_87 = getelementptr arr_87:Array:i32:[Some(32_0), Some(2_0)] [Some(0_0), Some(0_0)] 
     li      a1, 0
     li      a2, 2
     li      a3, 0
     mul     a4,a2,a3
     add     a1,a1,a4
     li      a5, 1
-    li      a6, 1
+                    #found literal reg Some(a3) already exist with 0_0
     add     a1,a1,a4
     slli a1,a1,2
     add     a1,a1,sp
     add     a1,a1,a1
-                    #      store 8848_0:i32 temp_279_87:ptr->Array:i32:[Some(2_0)] 
-    li      a7, 8848
-    sd      a7,0(a1)
+                    #      store temp_278_87:i32 temp_279_87:ptr->Array:i32:[Some(2_0)] 
+    sd      a0,0(a1)
                     #      mu arr_87:1016 
                     #      arr_87 = chi arr_87:1016 
                     #      new_var temp_280_87:ptr->i32 
-                    #      temp_280_87 = getelementptr arr_87:Array:i32:[Some(32_0), Some(2_0)] [Some(0_0), Some(0_0)] 
-    li      s1, 0
+                    #      temp_280_87 = getelementptr arr_87:Array:i32:[Some(32_0), Some(2_0)] [Some(0_0), Some(1_0)] 
+    li      a6, 0
                     #found literal reg Some(a2) already exist with 2_0
                     #found literal reg Some(a3) already exist with 0_0
-    add     s1,s1,a4
+    add     a6,a6,a4
                     #found literal reg Some(a5) already exist with 1_0
-                    #found literal reg Some(a3) already exist with 0_0
-    add     s1,s1,a4
-    slli s1,s1,2
-    add     s1,s1,sp
-    add     s1,s1,s1
-                    #      store temp_278_87:i32 temp_280_87:ptr->Array:i32:[Some(2_0)] 
-    sd      a0,0(s1)
+    li      a7, 1
+    add     a6,a6,a4
+    slli a6,a6,2
+    add     a6,a6,sp
+    add     a6,a6,a6
+                    #      store 8848_0:i32 temp_280_87:ptr->Array:i32:[Some(2_0)] 
+    li      s1, 8848
+    sd      s1,0(a6)
                     #      mu arr_87:1022 
                     #      arr_87 = chi arr_87:1022 
                     #      i_87 = i32 1_0 
     li      s2, 1
                     #      jump label: while.head_90 
     j       .while.head_90
+                    #regtab     a0:Freed { symidx: temp_278_87, tracked: true } |     a1:Freed { symidx: temp_279_87, tracked: true } |     a4:Freed { symidx: arr_87, tracked: true } |     a6:Freed { symidx: temp_280_87, tracked: true } |     s2:Freed { symidx: i_87, tracked: true } | 
                     #      label while.head_90: 
 .while.head_90:
                     #      new_var temp_281_89:i1 
@@ -2705,6 +2730,7 @@ main:
                     #      br i1 temp_281_89, label while.body_90, label while.exit_90 
     bnez    a3, .while.body_90
     j       .while.exit_90
+                    #regtab     a0:Freed { symidx: temp_278_87, tracked: true } |     a1:Freed { symidx: temp_279_87, tracked: true } |     a3:Freed { symidx: temp_281_89, tracked: true } |     a4:Freed { symidx: arr_87, tracked: true } |     a6:Freed { symidx: temp_280_87, tracked: true } |     s2:Freed { symidx: i_87, tracked: true } | 
                     #      label while.body_90: 
 .while.body_90:
                     #      new_var temp_282_91:ptr->i32 
@@ -2712,23 +2738,23 @@ main:
     li      a2, 0
     li      a5, 2
     add     a2,a2,a4
-    li      a6, 1
-    li      a7, 0
+    li      a7, 1
+    li      s1, 0
     add     a2,a2,a4
     slli a2,a2,2
     add     a2,a2,sp
     add     a2,a2,a2
                     #      new_var temp_283_91:i32 
                     #      temp_283_91 = Sub i32 i_87, 1_0 
-                    #found literal reg Some(a6) already exist with 1_0
-    sub     s3,s2,a6
+                    #found literal reg Some(a7) already exist with 1_0
+    sub     s3,s2,a7
                     #      new_var temp_284_91:ptr->i32 
                     #      new_var temp_285_91:i32 
                     #      temp_284_91 = getelementptr arr_87:Array:i32:[Some(32_0), Some(2_0)] [Some(temp_283_91), Some(1_0)] 
     li      s4, 0
                     #found literal reg Some(a5) already exist with 2_0
     add     s4,s4,a4
-                    #found literal reg Some(a6) already exist with 1_0
+                    #found literal reg Some(a7) already exist with 1_0
     li      s5, 1
     add     s4,s4,a4
     slli s4,s4,2
@@ -2738,8 +2764,8 @@ main:
     lw      s6,0(s4)
                     #      new_var temp_286_91:i32 
                     #      temp_286_91 = Sub i32 temp_285_91, 1_0 
-                    #found literal reg Some(s5) already exist with 1_0
-    sub     s7,s6,s5
+                    #found literal reg Some(a7) already exist with 1_0
+    sub     s7,s6,a7
                     #      store temp_286_91:i32 temp_282_91:ptr->i32 
     sd      s7,0(a2)
                     #      mu arr_87:1051 
@@ -2749,24 +2775,24 @@ main:
     li      s8, 0
                     #found literal reg Some(a5) already exist with 2_0
     add     s8,s8,a4
+                    #found literal reg Some(a7) already exist with 1_0
                     #found literal reg Some(s5) already exist with 1_0
-                    #found literal reg Some(a6) already exist with 1_0
     add     s8,s8,a4
     slli s8,s8,2
     add     s8,s8,sp
     add     s8,s8,s8
                     #      new_var temp_288_91:i32 
                     #      temp_288_91 = Sub i32 i_87, 1_0 
-                    #found literal reg Some(s5) already exist with 1_0
-    sub     s9,s2,s5
+                    #found literal reg Some(a7) already exist with 1_0
+    sub     s9,s2,a7
                     #      new_var temp_289_91:ptr->i32 
                     #      new_var temp_290_91:i32 
                     #      temp_289_91 = getelementptr arr_87:Array:i32:[Some(32_0), Some(2_0)] [Some(temp_288_91), Some(0_0)] 
     li      s10, 0
                     #found literal reg Some(a5) already exist with 2_0
     add     s10,s10,a4
-                    #found literal reg Some(s5) already exist with 1_0
-                    #found literal reg Some(a7) already exist with 0_0
+                    #found literal reg Some(a7) already exist with 1_0
+                    #found literal reg Some(s1) already exist with 0_0
     add     s10,s10,a4
     slli s10,s10,2
     add     s10,s10,sp
@@ -2776,9 +2802,9 @@ main:
                     #      new_var temp_291_91:i32 
                     #      temp_291_91 = Sub i32 temp_290_91, 2_0 
                     #found literal reg Some(a5) already exist with 2_0
-    sub     a6,s11,a5
+    sub     a7,s11,a5
                     #      store temp_291_91:i32 temp_287_91:ptr->i32 
-    sd      a6,0(s8)
+    sd      a7,0(s8)
                     #      mu arr_87:1069 
                     #      arr_87 = chi arr_87:1069 
                     #      new_var temp_292_91:i32 
@@ -2788,19 +2814,20 @@ main:
                     #      i_87 = i32 temp_292_91 
     mv      s2, a5
                     #      jump label: while.head_90 
-    sw      s9,548(sp)
-    sb      a3,595(sp)
-    sd      s4,568(sp)
-    sw      a5,524(sp)
-    sd      a2,584(sp)
-    sd      s10,536(sp)
     sw      s11,532(sp)
-    sw      s7,560(sp)
-    sd      s8,552(sp)
-    sw      s6,564(sp)
-    sw      a6,528(sp)
+    sd      s10,536(sp)
+    sw      a5,524(sp)
+    sw      s9,548(sp)
+    sw      a7,528(sp)
     sw      s3,580(sp)
+    sd      s4,568(sp)
+    sd      a2,584(sp)
+    sw      s7,560(sp)
+    sw      s6,564(sp)
+    sd      s8,552(sp)
+    sb      a3,595(sp)
     j       .while.head_90
+                    #regtab     a0:Freed { symidx: temp_278_87, tracked: true } |     a1:Freed { symidx: temp_279_87, tracked: true } |     a3:Freed { symidx: temp_281_89, tracked: true } |     a4:Freed { symidx: arr_87, tracked: true } |     a6:Freed { symidx: temp_280_87, tracked: true } |     s2:Freed { symidx: i_87, tracked: true } | 
                     #      label while.exit_90: 
 .while.exit_90:
                     #      new_var temp_293_87:ptr->i32 
@@ -2808,13 +2835,13 @@ main:
                     #      temp_293_87 = getelementptr arr_87:Array:i32:[Some(32_0), Some(2_0)] [Some(0_0)] 
     li      a2, 0
     li      a5, 2
-    li      a6, 0
+    li      a7, 0
     add     a2,a2,a4
     slli a2,a2,2
     add     a2,a2,sp
     add     a2,a2,a2
                     #      temp_294_87 = load temp_293_87:ptr->i32 
-    lw      a7,0(a2)
+    lw      s1,0(a2)
                     #      new_var temp_295_87:ptr->i32 
                     #      new_var temp_296_87:Array:i32:[Some(2_0)] 
                     #      temp_295_87 = getelementptr arr_87:Array:i32:[Some(32_0), Some(2_0)] [Some(1_0)] 
@@ -2856,13 +2883,13 @@ main:
                     #      temp_301_87 = getelementptr arr_87:Array:i32:[Some(32_0), Some(2_0)] [Some(4_0)] 
     li      a5, 0
                     #found literal reg Some(s7) already exist with 2_0
-    li      a6, 4
+    li      a7, 4
     add     a5,a5,a4
     slli a5,a5,2
     add     a5,a5,sp
     add     a5,a5,a5
                     #      temp_302_87 = load temp_301_87:ptr->i32 
-    lw      a6,0(a5)
+    lw      a7,0(a5)
                     #      new_var temp_303_87:ptr->i32 
                     #      new_var temp_304_87:Array:i32:[Some(2_0)] 
                     #      temp_303_87 = getelementptr arr_87:Array:i32:[Some(32_0), Some(2_0)] [Some(5_0)] 
@@ -3242,7 +3269,7 @@ main:
                     #      new_var temp_357_87:i32 
                     #      temp_357_87 =  Call i32 param32_arr_0(temp_294_87, temp_296_87, temp_298_87, temp_300_87, temp_302_87, temp_304_87, temp_306_87, temp_308_87, temp_310_87, temp_312_87, temp_314_87, temp_316_87, temp_318_87, temp_320_87, temp_322_87, temp_324_87, temp_326_87, temp_328_87, temp_330_87, temp_332_87, temp_334_87, temp_336_87, temp_338_87, temp_340_87, temp_342_87, temp_344_87, temp_346_87, temp_348_87, temp_350_87, temp_352_87, temp_354_87, temp_356_87) 
                     #saved register dumping to mem
-    sd      s1,856(sp)
+    sw      s1,508(sp)
     sw      s2,596(sp)
     sd      s3,496(sp)
     sd      s4,432(sp)
@@ -3256,19 +3283,19 @@ main:
                     #saved register dumped to mem
                     #arg load start
     sw      a0,12(sp)
-    mv      a0, a7
+    lw      a0,508(sp)
     sd      a1,16(sp)
     lw      a1,492(sp)
     lw      a2,476(sp)
     sb      a3,595(sp)
     lw      a3,460(sp)
     sw      a4,852(sp)
-    mv      a4, a6
+    mv      a4, a7
     sd      a5,448(sp)
     lw      a5,428(sp)
-    sw      a6,444(sp)
+    sd      a6,856(sp)
     lw      a6,412(sp)
-    sw      a7,508(sp)
+    sw      a7,444(sp)
     lw      a7,396(sp)
                     #arg load ended
     call    param32_arr
@@ -3294,3 +3321,4 @@ main:
     li      a0, 0
     addi    sp,sp,960
     ret
+                    #regtab     a0:Freed { symidx: 0_0, tracked: false } | 

@@ -16,109 +16,163 @@
  tail _sysy_stoptime
 
 
-.section        .text
+.section
+    .text
     .align 4
+                    #regtab 
+                    #regtab 
                     #      label L32_0: 
 .L32_0:
+                    #regtab 
                     #      label L33_0: 
 .L33_0:
                     #      jump label: L34_0 
     j       .L34_0
+                    #regtab 
                     #      label L34_0: 
 .L34_0:
+                    #regtab 
                     #      label L35_0: 
 .L35_0:
+                    #regtab 
+                    #regtab 
+                    #regtab 
                     #      label L31_0: 
 .L31_0:
+                    #regtab 
+                    #regtab 
+                    #regtab 
                     #      label L27_0: 
 .L27_0:
+                    #regtab 
                     #      label L28_0: 
 .L28_0:
                     #      jump label: L30_0 
     j       .L30_0
+                    #regtab 
                     #      label L29_0: 
 .L29_0:
                     #      jump label: L30_0 
     j       .L30_0
+                    #regtab 
                     #      label L30_0: 
 .L30_0:
+                    #regtab 
+                    #regtab 
+                    #regtab 
                     #      label L26_0: 
 .L26_0:
+                    #regtab 
+                    #regtab 
+                    #regtab 
                     #      label L25_0: 
 .L25_0:
+                    #regtab 
+                    #regtab 
+                    #regtab 
                     #      label L21_0: 
 .L21_0:
+                    #regtab 
                     #      label L22_0: 
 .L22_0:
                     #      jump label: L24_0 
     j       .L24_0
+                    #regtab 
                     #      label L23_0: 
 .L23_0:
                     #      jump label: L24_0 
     j       .L24_0
+                    #regtab 
                     #      label L24_0: 
 .L24_0:
+                    #regtab 
+                    #regtab 
+                    #regtab 
                     #      label L17_0: 
 .L17_0:
+                    #regtab 
                     #      label L18_0: 
 .L18_0:
                     #      jump label: L20_0 
     j       .L20_0
+                    #regtab 
                     #      label L19_0: 
 .L19_0:
                     #      jump label: L20_0 
     j       .L20_0
+                    #regtab 
                     #      label L20_0: 
 .L20_0:
+                    #regtab 
+                    #regtab 
+                    #regtab 
                     #      label L0_0: 
 .L0_0:
                     #      jump label: L1_0 
     j       .L1_0
+                    #regtab 
                     #      label L1_0: 
 .L1_0:
+                    #regtab 
                     #      label L2_0: 
 .L2_0:
                     #      jump label: L3_0 
     j       .L3_0
+                    #regtab 
                     #      label L3_0: 
 .L3_0:
+                    #regtab 
                     #      label L4_0: 
 .L4_0:
+                    #regtab 
                     #      label L5_0: 
 .L5_0:
                     #      jump label: L6_0 
     j       .L6_0
+                    #regtab 
                     #      label L6_0: 
 .L6_0:
+                    #regtab 
                     #      label L7_0: 
 .L7_0:
+                    #regtab 
                     #      label L8_0: 
 .L8_0:
                     #      jump label: L9_0 
     j       .L9_0
+                    #regtab 
                     #      label L9_0: 
 .L9_0:
+                    #regtab 
                     #      label L10_0: 
 .L10_0:
+                    #regtab 
                     #      label L11_0: 
 .L11_0:
                     #      jump label: L12_0 
     j       .L12_0
+                    #regtab 
                     #      label L12_0: 
 .L12_0:
+                    #regtab 
                     #      label L13_0: 
 .L13_0:
                     #      jump label: L14_0 
     j       .L14_0
+                    #regtab 
                     #      label L14_0: 
 .L14_0:
+                    #regtab 
                     #      label L15_0: 
 .L15_0:
                     #      jump label: L14_0 
     j       .L14_0
+                    #regtab 
                     #      label L16_0: 
 .L16_0:
-.section        .data
+                    #regtab 
+.section
+    .data
     .align 4
     .globl HEX2
                     #      global f32 HEX2_0 

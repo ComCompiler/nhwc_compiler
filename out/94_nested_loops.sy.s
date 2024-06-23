@@ -16,8 +16,10 @@
  tail _sysy_stoptime
 
 
-.section        .text
+.section
+    .text
     .align 4
+                    #regtab 
                     #      Define loop1_0 [x_18, y_18] -> loop1_ret_0 
     .globl loop1
     .type loop1,@function
@@ -59,6 +61,7 @@ loop1:
                     #      alloc i32 temp_22_33 
                     #      alloc i32 temp_23_29 
                     #      alloc i32 temp_24_25 
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } | 
                     #      label L10_0: 
 .L10_0:
                     #      new_var a_20:i32 
@@ -72,6 +75,7 @@ loop1:
     li      a2, 0
                     #      jump label: while.head_24 
     j       .while.head_24
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } | 
                     #      label while.head_24: 
 .while.head_24:
                     #      new_var temp_0_23:i1 
@@ -86,12 +90,14 @@ loop1:
                     #      br i1 temp_2_23, label while.body_24, label while.exit_24 
     bnez    a5, .while.body_24
     j       .while.exit_24
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } | 
                     #      label while.body_24: 
 .while.body_24:
                     #      b_20 = i32 0_0 
     li      a6, 0
                     #      jump label: while.head_28 
     j       .while.head_28
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } | 
                     #      label while.head_28: 
 .while.head_28:
                     #      new_var temp_3_27:i1 
@@ -101,12 +107,14 @@ loop1:
                     #      br i1 temp_3_27, label while.body_28, label while.exit_28 
     bnez    s1, .while.body_28
     j       .while.exit_28
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } | 
                     #      label while.body_28: 
 .while.body_28:
                     #      c_20 = i32 0_0 
     li      a7, 0
                     #      jump label: while.head_32 
     j       .while.head_32
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } | 
                     #      label while.head_32: 
 .while.head_32:
                     #      new_var temp_4_31:i1 
@@ -116,12 +124,14 @@ loop1:
                     #      br i1 temp_4_31, label while.body_32, label while.exit_32 
     bnez    s3, .while.body_32
     j       .while.exit_32
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } |     s3:Freed { symidx: temp_4_31, tracked: true } | 
                     #      label while.body_32: 
 .while.body_32:
                     #      d_20 = i32 0_0 
     li      s2, 0
                     #      jump label: while.head_36 
     j       .while.head_36
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } |     s2:Freed { symidx: d_20, tracked: true } |     s3:Freed { symidx: temp_4_31, tracked: true } | 
                     #      label while.head_36: 
 .while.head_36:
                     #      new_var temp_5_35:i1 
@@ -131,12 +141,14 @@ loop1:
                     #      br i1 temp_5_35, label while.body_36, label while.exit_36 
     bnez    s5, .while.body_36
     j       .while.exit_36
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } |     s2:Freed { symidx: d_20, tracked: true } |     s3:Freed { symidx: temp_4_31, tracked: true } |     s5:Freed { symidx: temp_5_35, tracked: true } | 
                     #      label while.body_36: 
 .while.body_36:
                     #      e_20 = i32 0_0 
     li      s4, 0
                     #      jump label: while.head_40 
     j       .while.head_40
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } |     s2:Freed { symidx: d_20, tracked: true } |     s3:Freed { symidx: temp_4_31, tracked: true } |     s4:Freed { symidx: e_20, tracked: true } |     s5:Freed { symidx: temp_5_35, tracked: true } | 
                     #      label while.head_40: 
 .while.head_40:
                     #      new_var temp_6_39:i1 
@@ -146,12 +158,14 @@ loop1:
                     #      br i1 temp_6_39, label while.body_40, label while.exit_40 
     bnez    s7, .while.body_40
     j       .while.exit_40
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } |     s2:Freed { symidx: d_20, tracked: true } |     s3:Freed { symidx: temp_4_31, tracked: true } |     s4:Freed { symidx: e_20, tracked: true } |     s5:Freed { symidx: temp_5_35, tracked: true } |     s7:Freed { symidx: temp_6_39, tracked: true } | 
                     #      label while.body_40: 
 .while.body_40:
                     #      f_20 = i32 0_0 
     li      s6, 0
                     #      jump label: while.head_44 
     j       .while.head_44
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } |     s2:Freed { symidx: d_20, tracked: true } |     s3:Freed { symidx: temp_4_31, tracked: true } |     s4:Freed { symidx: e_20, tracked: true } |     s5:Freed { symidx: temp_5_35, tracked: true } |     s6:Freed { symidx: f_20, tracked: true } |     s7:Freed { symidx: temp_6_39, tracked: true } | 
                     #      label while.head_44: 
 .while.head_44:
                     #      new_var temp_7_43:i1 
@@ -161,12 +175,14 @@ loop1:
                     #      br i1 temp_7_43, label while.body_44, label while.exit_44 
     bnez    s9, .while.body_44
     j       .while.exit_44
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } |     s2:Freed { symidx: d_20, tracked: true } |     s3:Freed { symidx: temp_4_31, tracked: true } |     s4:Freed { symidx: e_20, tracked: true } |     s5:Freed { symidx: temp_5_35, tracked: true } |     s6:Freed { symidx: f_20, tracked: true } |     s7:Freed { symidx: temp_6_39, tracked: true } |     s9:Freed { symidx: temp_7_43, tracked: true } | 
                     #      label while.body_44: 
 .while.body_44:
                     #      g_20 = i32 0_0 
     li      s8, 0
                     #      jump label: while.head_48 
     j       .while.head_48
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } |     s2:Freed { symidx: d_20, tracked: true } |     s3:Freed { symidx: temp_4_31, tracked: true } |     s4:Freed { symidx: e_20, tracked: true } |     s5:Freed { symidx: temp_5_35, tracked: true } |     s6:Freed { symidx: f_20, tracked: true } |     s7:Freed { symidx: temp_6_39, tracked: true } |     s8:Freed { symidx: g_20, tracked: true } |     s9:Freed { symidx: temp_7_43, tracked: true } | 
                     #      label while.head_48: 
 .while.head_48:
                     #      new_var temp_8_47:i1 
@@ -176,6 +192,7 @@ loop1:
                     #      br i1 temp_8_47, label while.body_48, label while.exit_48 
     bnez    s11, .while.body_48
     j       .while.exit_48
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s11:Freed { symidx: temp_8_47, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } |     s2:Freed { symidx: d_20, tracked: true } |     s3:Freed { symidx: temp_4_31, tracked: true } |     s4:Freed { symidx: e_20, tracked: true } |     s5:Freed { symidx: temp_5_35, tracked: true } |     s6:Freed { symidx: f_20, tracked: true } |     s7:Freed { symidx: temp_6_39, tracked: true } |     s8:Freed { symidx: g_20, tracked: true } |     s9:Freed { symidx: temp_7_43, tracked: true } | 
                     #      label while.body_48: 
 .while.body_48:
                     #      new_var temp_9_49:ptr->i32 
@@ -259,14 +276,15 @@ loop1:
                     #      g_20 = i32 temp_18_49 
     mv      s8, a1
                     #      jump label: while.head_48 
-    sw      a1,28(sp)
-    lw      a1,112(sp)
     lw      a0,116(sp)
-    sb      s11,75(sp)
     sd      s10,64(sp)
     sw      a2,32(sp)
     lw      a2,108(sp)
+    sw      a1,28(sp)
+    lw      a1,112(sp)
+    sb      s11,75(sp)
     j       .while.head_48
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s11:Freed { symidx: temp_8_47, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } |     s2:Freed { symidx: d_20, tracked: true } |     s3:Freed { symidx: temp_4_31, tracked: true } |     s4:Freed { symidx: e_20, tracked: true } |     s5:Freed { symidx: temp_5_35, tracked: true } |     s6:Freed { symidx: f_20, tracked: true } |     s7:Freed { symidx: temp_6_39, tracked: true } |     s8:Freed { symidx: g_20, tracked: true } |     s9:Freed { symidx: temp_7_43, tracked: true } | 
                     #      label while.exit_48: 
 .while.exit_48:
                     #      new_var temp_19_45:i32 
@@ -277,12 +295,13 @@ loop1:
                     #      f_20 = i32 temp_19_45 
     mv      s6, a0
                     #      jump label: while.head_44 
-    sb      s9,76(sp)
     sw      a0,24(sp)
     lw      a0,116(sp)
-    sb      s11,75(sp)
     sw      s8,84(sp)
+    sb      s9,76(sp)
+    sb      s11,75(sp)
     j       .while.head_44
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } |     s2:Freed { symidx: d_20, tracked: true } |     s3:Freed { symidx: temp_4_31, tracked: true } |     s4:Freed { symidx: e_20, tracked: true } |     s5:Freed { symidx: temp_5_35, tracked: true } |     s6:Freed { symidx: f_20, tracked: true } |     s7:Freed { symidx: temp_6_39, tracked: true } |     s9:Freed { symidx: temp_7_43, tracked: true } | 
                     #      label while.exit_44: 
 .while.exit_44:
                     #      new_var temp_20_41:i32 
@@ -292,11 +311,12 @@ loop1:
                     #      e_20 = i32 temp_20_41 
     mv      s4, s10
                     #      jump label: while.head_40 
-    sb      s7,77(sp)
-    sb      s9,76(sp)
-    sw      s6,88(sp)
     sw      s10,20(sp)
+    sw      s6,88(sp)
+    sb      s9,76(sp)
+    sb      s7,77(sp)
     j       .while.head_40
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } |     s2:Freed { symidx: d_20, tracked: true } |     s3:Freed { symidx: temp_4_31, tracked: true } |     s4:Freed { symidx: e_20, tracked: true } |     s5:Freed { symidx: temp_5_35, tracked: true } |     s7:Freed { symidx: temp_6_39, tracked: true } | 
                     #      label while.exit_40: 
 .while.exit_40:
                     #      new_var temp_21_37:i32 
@@ -306,11 +326,12 @@ loop1:
                     #      d_20 = i32 temp_21_37 
     mv      s2, s8
                     #      jump label: while.head_36 
-    sb      s7,77(sp)
-    sw      s4,92(sp)
     sw      s8,16(sp)
+    sw      s4,92(sp)
     sb      s5,78(sp)
+    sb      s7,77(sp)
     j       .while.head_36
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } |     s2:Freed { symidx: d_20, tracked: true } |     s3:Freed { symidx: temp_4_31, tracked: true } |     s5:Freed { symidx: temp_5_35, tracked: true } | 
                     #      label while.exit_36: 
 .while.exit_36:
                     #      new_var temp_22_33:i32 
@@ -320,11 +341,12 @@ loop1:
                     #      c_20 = i32 temp_22_33 
     mv      a7, s6
                     #      jump label: while.head_32 
-    sb      s3,79(sp)
     sw      s2,96(sp)
+    sb      s3,79(sp)
     sw      s6,12(sp)
     sb      s5,78(sp)
     j       .while.head_32
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     a7:Freed { symidx: c_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } |     s3:Freed { symidx: temp_4_31, tracked: true } | 
                     #      label while.exit_32: 
 .while.exit_32:
                     #      new_var temp_23_29:i32 
@@ -334,11 +356,12 @@ loop1:
                     #      b_20 = i32 temp_23_29 
     mv      a6, s4
                     #      jump label: while.head_28 
-    sb      s3,79(sp)
     sb      s1,80(sp)
     sw      s4,8(sp)
+    sb      s3,79(sp)
     sw      a7,100(sp)
     j       .while.head_28
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } |     a6:Freed { symidx: b_20, tracked: true } |     s1:Freed { symidx: temp_3_27, tracked: true } | 
                     #      label while.exit_28: 
 .while.exit_28:
                     #      new_var temp_24_25:i32 
@@ -349,14 +372,16 @@ loop1:
     mv      a2, s2
                     #      jump label: while.head_24 
     sw      a6,104(sp)
-    sb      a5,81(sp)
+    sb      s1,80(sp)
     sw      s2,4(sp)
     sb      a4,82(sp)
-    sb      s1,80(sp)
     sb      a3,83(sp)
+    sb      a5,81(sp)
     j       .while.head_24
+                    #regtab     a0:Freed { symidx: x_18, tracked: true } |     a1:Freed { symidx: y_18, tracked: true } |     a2:Freed { symidx: a_20, tracked: true } |     a3:Freed { symidx: temp_0_23, tracked: true } |     a4:Freed { symidx: temp_1_23, tracked: true } |     a5:Freed { symidx: temp_2_23, tracked: true } | 
                     #      label while.exit_24: 
 .while.exit_24:
+                    #regtab 
                     #      Define loop2_0 [] -> loop2_ret_0 
     .globl loop2
     .type loop2,@function
@@ -391,6 +416,7 @@ loop2:
                     #      alloc i32 temp_40_72 
                     #      alloc i32 temp_41_68 
                     #      alloc i32 temp_42_64 
+                    #regtab 
                     #      label L9_0: 
 .L9_0:
                     #      new_var a_59:i32 
@@ -404,6 +430,7 @@ loop2:
     li      a0, 0
                     #      jump label: while.head_63 
     j       .while.head_63
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } | 
                     #      label while.head_63: 
 .while.head_63:
                     #      new_var temp_25_62:i1 
@@ -413,12 +440,14 @@ loop2:
                     #      br i1 temp_25_62, label while.body_63, label while.exit_63 
     bnez    a2, .while.body_63
     j       .while.exit_63
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } | 
                     #      label while.body_63: 
 .while.body_63:
                     #      b_59 = i32 0_0 
     li      a1, 0
                     #      jump label: while.head_67 
     j       .while.head_67
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } | 
                     #      label while.head_67: 
 .while.head_67:
                     #      new_var temp_26_66:i1 
@@ -428,12 +457,14 @@ loop2:
                     #      br i1 temp_26_66, label while.body_67, label while.exit_67 
     bnez    a4, .while.body_67
     j       .while.exit_67
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } | 
                     #      label while.body_67: 
 .while.body_67:
                     #      c_59 = i32 0_0 
     li      a3, 0
                     #      jump label: while.head_71 
     j       .while.head_71
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } | 
                     #      label while.head_71: 
 .while.head_71:
                     #      new_var temp_27_70:i1 
@@ -443,12 +474,14 @@ loop2:
                     #      br i1 temp_27_70, label while.body_71, label while.exit_71 
     bnez    a6, .while.body_71
     j       .while.exit_71
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } |     a6:Freed { symidx: temp_27_70, tracked: true } | 
                     #      label while.body_71: 
 .while.body_71:
                     #      d_59 = i32 0_0 
     li      a5, 0
                     #      jump label: while.head_75 
     j       .while.head_75
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } |     a5:Freed { symidx: d_59, tracked: true } |     a6:Freed { symidx: temp_27_70, tracked: true } | 
                     #      label while.head_75: 
 .while.head_75:
                     #      new_var temp_28_74:i1 
@@ -458,12 +491,14 @@ loop2:
                     #      br i1 temp_28_74, label while.body_75, label while.exit_75 
     bnez    s1, .while.body_75
     j       .while.exit_75
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } |     a5:Freed { symidx: d_59, tracked: true } |     a6:Freed { symidx: temp_27_70, tracked: true } |     s1:Freed { symidx: temp_28_74, tracked: true } | 
                     #      label while.body_75: 
 .while.body_75:
                     #      e_59 = i32 0_0 
     li      a7, 0
                     #      jump label: while.head_79 
     j       .while.head_79
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } |     a5:Freed { symidx: d_59, tracked: true } |     a6:Freed { symidx: temp_27_70, tracked: true } |     a7:Freed { symidx: e_59, tracked: true } |     s1:Freed { symidx: temp_28_74, tracked: true } | 
                     #      label while.head_79: 
 .while.head_79:
                     #      new_var temp_29_78:i1 
@@ -473,12 +508,14 @@ loop2:
                     #      br i1 temp_29_78, label while.body_79, label while.exit_79 
     bnez    s3, .while.body_79
     j       .while.exit_79
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } |     a5:Freed { symidx: d_59, tracked: true } |     a6:Freed { symidx: temp_27_70, tracked: true } |     a7:Freed { symidx: e_59, tracked: true } |     s1:Freed { symidx: temp_28_74, tracked: true } |     s3:Freed { symidx: temp_29_78, tracked: true } | 
                     #      label while.body_79: 
 .while.body_79:
                     #      f_59 = i32 0_0 
     li      s2, 0
                     #      jump label: while.head_83 
     j       .while.head_83
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } |     a5:Freed { symidx: d_59, tracked: true } |     a6:Freed { symidx: temp_27_70, tracked: true } |     a7:Freed { symidx: e_59, tracked: true } |     s1:Freed { symidx: temp_28_74, tracked: true } |     s2:Freed { symidx: f_59, tracked: true } |     s3:Freed { symidx: temp_29_78, tracked: true } | 
                     #      label while.head_83: 
 .while.head_83:
                     #      new_var temp_30_82:i1 
@@ -488,12 +525,14 @@ loop2:
                     #      br i1 temp_30_82, label while.body_83, label while.exit_83 
     bnez    s5, .while.body_83
     j       .while.exit_83
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } |     a5:Freed { symidx: d_59, tracked: true } |     a6:Freed { symidx: temp_27_70, tracked: true } |     a7:Freed { symidx: e_59, tracked: true } |     s1:Freed { symidx: temp_28_74, tracked: true } |     s2:Freed { symidx: f_59, tracked: true } |     s3:Freed { symidx: temp_29_78, tracked: true } |     s5:Freed { symidx: temp_30_82, tracked: true } | 
                     #      label while.body_83: 
 .while.body_83:
                     #      g_59 = i32 0_0 
     li      s4, 0
                     #      jump label: while.head_87 
     j       .while.head_87
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } |     a5:Freed { symidx: d_59, tracked: true } |     a6:Freed { symidx: temp_27_70, tracked: true } |     a7:Freed { symidx: e_59, tracked: true } |     s1:Freed { symidx: temp_28_74, tracked: true } |     s2:Freed { symidx: f_59, tracked: true } |     s3:Freed { symidx: temp_29_78, tracked: true } |     s4:Freed { symidx: g_59, tracked: true } |     s5:Freed { symidx: temp_30_82, tracked: true } | 
                     #      label while.head_87: 
 .while.head_87:
                     #      new_var temp_31_86:i1 
@@ -503,6 +542,7 @@ loop2:
                     #      br i1 temp_31_86, label while.body_87, label while.exit_87 
     bnez    s7, .while.body_87
     j       .while.exit_87
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } |     a5:Freed { symidx: d_59, tracked: true } |     a6:Freed { symidx: temp_27_70, tracked: true } |     a7:Freed { symidx: e_59, tracked: true } |     s1:Freed { symidx: temp_28_74, tracked: true } |     s2:Freed { symidx: f_59, tracked: true } |     s3:Freed { symidx: temp_29_78, tracked: true } |     s4:Freed { symidx: g_59, tracked: true } |     s5:Freed { symidx: temp_30_82, tracked: true } |     s7:Freed { symidx: temp_31_86, tracked: true } | 
                     #      label while.body_87: 
 .while.body_87:
                     #      new_var temp_32_88:ptr->i32 
@@ -559,14 +599,15 @@ loop2:
                     #      g_59 = i32 temp_36_88 
     mv      s4, a0
                     #      jump label: while.head_87 
-    sd      s6,40(sp)
-    sw      s8,36(sp)
     sb      s7,53(sp)
+    sw      s8,36(sp)
+    sd      s6,40(sp)
     sw      s9,32(sp)
     sw      a0,24(sp)
     lw      a0,84(sp)
     sw      s10,28(sp)
     j       .while.head_87
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } |     a5:Freed { symidx: d_59, tracked: true } |     a6:Freed { symidx: temp_27_70, tracked: true } |     a7:Freed { symidx: e_59, tracked: true } |     s1:Freed { symidx: temp_28_74, tracked: true } |     s2:Freed { symidx: f_59, tracked: true } |     s3:Freed { symidx: temp_29_78, tracked: true } |     s4:Freed { symidx: g_59, tracked: true } |     s5:Freed { symidx: temp_30_82, tracked: true } |     s7:Freed { symidx: temp_31_86, tracked: true } | 
                     #      label while.exit_87: 
 .while.exit_87:
                     #      new_var temp_37_84:i32 
@@ -576,11 +617,12 @@ loop2:
                     #      f_59 = i32 temp_37_84 
     mv      s2, s8
                     #      jump label: while.head_83 
+    sb      s7,53(sp)
     sb      s5,54(sp)
     sw      s8,20(sp)
-    sb      s7,53(sp)
     sw      s4,60(sp)
     j       .while.head_83
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } |     a5:Freed { symidx: d_59, tracked: true } |     a6:Freed { symidx: temp_27_70, tracked: true } |     a7:Freed { symidx: e_59, tracked: true } |     s1:Freed { symidx: temp_28_74, tracked: true } |     s2:Freed { symidx: f_59, tracked: true } |     s3:Freed { symidx: temp_29_78, tracked: true } |     s5:Freed { symidx: temp_30_82, tracked: true } | 
                     #      label while.exit_83: 
 .while.exit_83:
                     #      new_var temp_38_80:i32 
@@ -590,11 +632,12 @@ loop2:
                     #      e_59 = i32 temp_38_80 
     mv      a7, s6
                     #      jump label: while.head_79 
-    sb      s5,54(sp)
     sw      s2,64(sp)
+    sb      s5,54(sp)
     sw      s6,16(sp)
     sb      s3,55(sp)
     j       .while.head_79
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } |     a5:Freed { symidx: d_59, tracked: true } |     a6:Freed { symidx: temp_27_70, tracked: true } |     a7:Freed { symidx: e_59, tracked: true } |     s1:Freed { symidx: temp_28_74, tracked: true } |     s3:Freed { symidx: temp_29_78, tracked: true } | 
                     #      label while.exit_79: 
 .while.exit_79:
                     #      new_var temp_39_76:i32 
@@ -604,11 +647,12 @@ loop2:
                     #      d_59 = i32 temp_39_76 
     mv      a5, s4
                     #      jump label: while.head_75 
-    sb      s3,55(sp)
     sb      s1,56(sp)
-    sw      a7,68(sp)
     sw      s4,12(sp)
+    sw      a7,68(sp)
+    sb      s3,55(sp)
     j       .while.head_75
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } |     a5:Freed { symidx: d_59, tracked: true } |     a6:Freed { symidx: temp_27_70, tracked: true } |     s1:Freed { symidx: temp_28_74, tracked: true } | 
                     #      label while.exit_75: 
 .while.exit_75:
                     #      new_var temp_40_72:i32 
@@ -618,11 +662,12 @@ loop2:
                     #      c_59 = i32 temp_40_72 
     mv      a3, s2
                     #      jump label: while.head_71 
-    sw      s2,8(sp)
     sb      s1,56(sp)
-    sb      a6,57(sp)
+    sw      s2,8(sp)
     sw      a5,72(sp)
+    sb      a6,57(sp)
     j       .while.head_71
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a3:Freed { symidx: c_59, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } |     a6:Freed { symidx: temp_27_70, tracked: true } | 
                     #      label while.exit_71: 
 .while.exit_71:
                     #      new_var temp_41_68:i32 
@@ -632,11 +677,12 @@ loop2:
                     #      b_59 = i32 temp_41_68 
     mv      a1, a7
                     #      jump label: while.head_67 
-    sb      a6,57(sp)
-    sb      a4,58(sp)
     sw      a3,76(sp)
     sw      a7,4(sp)
+    sb      a4,58(sp)
+    sb      a6,57(sp)
     j       .while.head_67
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a1:Freed { symidx: b_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } |     a4:Freed { symidx: temp_26_66, tracked: true } | 
                     #      label while.exit_67: 
 .while.exit_67:
                     #      new_var temp_42_64:i32 
@@ -651,8 +697,10 @@ loop2:
     sb      a4,58(sp)
     sw      a5,0(sp)
     j       .while.head_63
+                    #regtab     a0:Freed { symidx: a_59, tracked: true } |     a2:Freed { symidx: temp_25_62, tracked: true } | 
                     #      label while.exit_63: 
 .while.exit_63:
+                    #regtab 
                     #      Define loop3_0 [h_97, i_97, j_97, k_97, l_97, m_97, n_97] -> loop3_ret_0 
     .globl loop3
     .type loop3,@function
@@ -708,6 +756,7 @@ loop3:
                     #      alloc i1 temp_70_152 
                     #      alloc i32 temp_71_105 
                     #      alloc i1 temp_72_156 
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: -165304_0, tracked: false } |     s1:Freed { symidx: 165296_0, tracked: false } |     s2:Freed { symidx: 165288_0, tracked: false } |     s3:Freed { symidx: 165304_0, tracked: false } | 
                     #      label L1_0: 
 .L1_0:
                     #      new_var a_99:i32 
@@ -723,6 +772,7 @@ loop3:
     li      s5, 0
                     #      jump label: while.head_104 
     j       .while.head_104
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } | 
                     #      label while.head_104: 
 .while.head_104:
                     #      new_var temp_43_103:i1 
@@ -732,12 +782,14 @@ loop3:
                     #      br i1 temp_43_103, label while.body_104, label while.exit_104 
     bnez    s1, .while.body_104
     j       .while.exit_104
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } | 
                     #      label while.body_104: 
 .while.body_104:
                     #      b_99 = i32 0_0 
     li      a7, 0
                     #      jump label: while.head_108 
     j       .while.head_108
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } | 
                     #      label while.head_108: 
 .while.head_108:
                     #      new_var temp_44_107:i1 
@@ -747,12 +799,14 @@ loop3:
                     #      br i1 temp_44_107, label while.body_108, label while.exit_108 
     bnez    s3, .while.body_108
     j       .while.exit_108
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } | 
                     #      label while.body_108: 
 .while.body_108:
                     #      c_99 = i32 0_0 
     li      s2, 0
                     #      jump label: while.head_112 
     j       .while.head_112
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } | 
                     #      label while.head_112: 
 .while.head_112:
                     #      new_var temp_45_111:i1 
@@ -762,12 +816,14 @@ loop3:
                     #      br i1 temp_45_111, label while.body_112, label while.exit_112 
     bnez    s7, .while.body_112
     j       .while.exit_112
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } | 
                     #      label while.body_112: 
 .while.body_112:
                     #      d_99 = i32 0_0 
     li      s6, 0
                     #      jump label: while.head_116 
     j       .while.head_116
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } | 
                     #      label while.head_116: 
 .while.head_116:
                     #      new_var temp_46_115:i1 
@@ -777,12 +833,14 @@ loop3:
                     #      br i1 temp_46_115, label while.body_116, label while.exit_116 
     bnez    s9, .while.body_116
     j       .while.exit_116
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label while.body_116: 
 .while.body_116:
                     #      e_99 = i32 0_0 
     li      s8, 0
                     #      jump label: while.head_120 
     j       .while.head_120
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label while.head_120: 
 .while.head_120:
                     #      new_var temp_47_119:i1 
@@ -792,12 +850,14 @@ loop3:
                     #      br i1 temp_47_119, label while.body_120, label while.exit_120 
     bnez    s11, .while.body_120
     j       .while.exit_120
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label while.body_120: 
 .while.body_120:
                     #      f_99 = i32 0_0 
     li      s10, 0
                     #      jump label: while.head_124 
     j       .while.head_124
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label while.head_124: 
 .while.head_124:
                     #      new_var temp_48_123:i1 
@@ -813,12 +873,14 @@ loop3:
                     #      br i1 temp_48_123, label while.body_124, label while.exit_124 
     bnez    a1, .while.body_124
     j       .while.exit_124
+                    #regtab     a1:Freed { symidx: temp_48_123, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label while.body_124: 
 .while.body_124:
                     #      g_99 = i32 0_0 
     li      a0, 0
                     #      jump label: while.head_128 
     j       .while.head_128
+                    #regtab     a0:Freed { symidx: g_99, tracked: true } |     a1:Freed { symidx: temp_48_123, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label while.head_128: 
 .while.head_128:
                     #      new_var temp_49_127:i1 
@@ -834,6 +896,7 @@ loop3:
                     #      br i1 temp_49_127, label while.body_128, label while.exit_128 
     bnez    a2, .while.body_128
     j       .while.exit_128
+                    #regtab     a0:Freed { symidx: g_99, tracked: true } |     a2:Freed { symidx: temp_49_127, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label while.body_128: 
 .while.body_128:
                     #      new_var temp_50_129:Array:i32:[Some(10_0), Some(2_0), Some(3_0), Some(2_0), Some(4_0), Some(8_0), Some(7_0)] 
@@ -962,6 +1025,7 @@ loop3:
     mv      a0, a2
                     #      jump label: L2_0 
     j       .L2_0
+                    #regtab     a0:Freed { symidx: g_99, tracked: true } |     a2:Freed { symidx: temp_59_129, tracked: true } |     a3:Freed { symidx: temp_53_129, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label L2_0: 
 .L2_0:
                     #      new_var temp_60_132:i1 
@@ -971,6 +1035,7 @@ loop3:
                     #      br i1 temp_60_132, label branch_true_133, label branch_false_133 
     bnez    a1, .branch_true_133
     j       .branch_false_133
+                    #regtab     a0:Freed { symidx: g_99, tracked: true } |     a1:Freed { symidx: temp_60_132, tracked: true } |     a2:Freed { symidx: temp_59_129, tracked: true } |     a3:Freed { symidx: temp_53_129, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label branch_true_133: 
 .branch_true_133:
                     #      jump label: while.exit_128 
@@ -991,16 +1056,8 @@ loop3:
     li      a0, 165221
     add     a0,sp,a0
     lb      a2,0(a0)
-    li      a0, 165221
-    add     a0,sp,a0
-    sb      a0,0(a0)
-    li      a4, 165268
-    add     a4,sp,a4
-    sw      a4,0(a4)
-    li      a4, 165232
-    add     a4,sp,a4
-    lw      a0,0(a4)
     j       .while.exit_128
+                    #regtab     a0:Freed { symidx: g_99, tracked: true } |     a2:Freed { symidx: temp_49_127, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label while.exit_128: 
 .while.exit_128:
                     #      new_var temp_61_125:i32 
@@ -1014,6 +1071,7 @@ loop3:
     mv      s10, a0
                     #      jump label: L3_0 
     j       .L3_0
+                    #regtab     a0:Freed { symidx: temp_61_125, tracked: true } |     a2:Freed { symidx: temp_49_127, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label L3_0: 
 .L3_0:
                     #      new_var temp_62_136:i1 
@@ -1023,6 +1081,7 @@ loop3:
                     #      br i1 temp_62_136, label branch_true_137, label branch_false_137 
     bnez    a1, .branch_true_137
     j       .branch_false_137
+                    #regtab     a0:Freed { symidx: temp_61_125, tracked: true } |     a1:Freed { symidx: temp_62_136, tracked: true } |     a2:Freed { symidx: temp_49_127, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label branch_true_137: 
 .branch_true_137:
                     #      jump label: while.exit_128 
@@ -1034,7 +1093,17 @@ loop3:
     li      a2, 165232
     add     a2,sp,a2
     lw      a0,0(a2)
+    li      a2, 165232
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a3, 165272
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 165221
+    add     a3,sp,a3
+    lb      a2,0(a3)
     j       .while.exit_128
+                    #regtab     a0:Freed { symidx: temp_61_125, tracked: true } |     a1:Freed { symidx: temp_62_136, tracked: true } |     a2:Freed { symidx: temp_49_127, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label branch_false_137: 
 .branch_false_137:
                     #      jump label: while.head_124 
@@ -1043,25 +1112,26 @@ loop3:
     li      a0, 165280
     add     a0,sp,a0
     lw      a1,0(a0)
-    li      a2, 165221
-    add     a2,sp,a2
-    sb      a2,0(a2)
     li      a0, 165280
     add     a0,sp,a0
     sw      a0,0(a0)
-    li      a0, 165276
-    add     a0,sp,a0
-    lw      a2,0(a0)
-    li      a0, 165276
-    add     a0,sp,a0
-    sw      a0,0(a0)
+    li      a2, 165221
+    add     a2,sp,a2
+    sb      a2,0(a2)
+    li      a2, 165284
+    add     a2,sp,a2
+    lw      a0,0(a2)
+    li      a2, 165284
+    add     a2,sp,a2
+    sw      a2,0(a2)
     li      a3, 165272
     add     a3,sp,a3
     sw      a3,0(a3)
-    li      a3, 165284
+    li      a3, 165276
     add     a3,sp,a3
-    lw      a0,0(a3)
+    lw      a2,0(a3)
     j       .while.head_124
+                    #regtab     a0:Freed { symidx: g_99, tracked: true } |     a1:Freed { symidx: temp_60_132, tracked: true } |     a2:Freed { symidx: temp_59_129, tracked: true } |     a3:Freed { symidx: temp_53_129, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label branch_false_133: 
 .branch_false_133:
                     #      jump label: while.head_128 
@@ -1072,32 +1142,33 @@ loop3:
     li      a0, 165222
     add     a0,sp,a0
     lb      a1,0(a0)
-    li      a3, 57680
-    add     a3,sp,a3
-    sw      a3,0(a3)
     li      a0, 165222
     add     a0,sp,a0
     sb      a0,0(a0)
-    li      a0, 165272
-    add     a0,sp,a0
-    lw      a3,0(a0)
     sw      a2,52(sp)
-    li      a0, 165272
-    add     a0,sp,a0
-    sw      a0,0(a0)
-    li      a0, 165276
-    add     a0,sp,a0
-    lw      a2,0(a0)
-    li      a0, 165276
-    add     a0,sp,a0
-    sw      a0,0(a0)
+    li      a2, 165232
+    add     a2,sp,a2
+    lw      a0,0(a2)
+    li      a3, 57680
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a2, 165232
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a2, 165272
+    add     a2,sp,a2
+    lw      a3,0(a2)
+    li      a2, 165272
+    add     a2,sp,a2
+    sw      a2,0(a2)
     li      a4, 165268
     add     a4,sp,a4
     sw      a4,0(a4)
-    li      a4, 165232
+    li      a4, 165276
     add     a4,sp,a4
-    lw      a0,0(a4)
+    lw      a2,0(a4)
     j       .while.head_128
+                    #regtab     a1:Freed { symidx: temp_48_123, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label while.exit_124: 
 .while.exit_124:
                     #      new_var temp_63_121:i32 
@@ -1111,6 +1182,7 @@ loop3:
     mv      s8, a1
                     #      jump label: L4_0 
     j       .L4_0
+                    #regtab     a1:Freed { symidx: temp_63_121, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label L4_0: 
 .L4_0:
                     #      new_var temp_64_140:i1 
@@ -1120,6 +1192,7 @@ loop3:
                     #      br i1 temp_64_140, label branch_true_141, label branch_false_141 
     bnez    a0, .branch_true_141
     j       .branch_false_141
+                    #regtab     a0:Freed { symidx: temp_64_140, tracked: true } |     a1:Freed { symidx: temp_63_121, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label branch_true_141: 
 .branch_true_141:
                     #      jump label: while.exit_124 
@@ -1132,12 +1205,10 @@ loop3:
     add     a0,sp,a0
     sb      a0,0(a0)
     j       .while.exit_124
+                    #regtab     a0:Freed { symidx: temp_64_140, tracked: true } |     a1:Freed { symidx: temp_63_121, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: f_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label branch_false_141: 
 .branch_false_141:
                     #      jump label: while.head_120 
-    li      s11, 165223
-    add     s11,sp,s11
-    sb      s11,0(s11)
     sw      a1,36(sp)
     sb      a0,35(sp)
     li      a0, 165280
@@ -1146,6 +1217,9 @@ loop3:
     li      s10, 165236
     add     s10,sp,s10
     sw      s10,0(s10)
+    li      s11, 165223
+    add     s11,sp,s11
+    sb      s11,0(s11)
     li      a0, 165280
     add     a0,sp,a0
     sw      a0,0(a0)
@@ -1155,7 +1229,17 @@ loop3:
     li      a2, 165284
     add     a2,sp,a2
     lw      a0,0(a2)
+    li      a2, 165284
+    add     a2,sp,a2
+    sw      a2,0(a2)
+    li      a3, 165272
+    add     a3,sp,a3
+    sw      a3,0(a3)
+    li      a3, 165276
+    add     a3,sp,a3
+    lw      a2,0(a3)
     j       .while.head_120
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label while.exit_120: 
 .while.exit_120:
                     #      new_var temp_65_117:i32 
@@ -1169,6 +1253,7 @@ loop3:
     mv      s6, a0
                     #      jump label: L5_0 
     j       .L5_0
+                    #regtab     a0:Freed { symidx: temp_65_117, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label L5_0: 
 .L5_0:
                     #      new_var temp_66_144:i1 
@@ -1178,6 +1263,7 @@ loop3:
                     #      br i1 temp_66_144, label branch_true_145, label branch_false_145 
     bnez    s10, .branch_true_145
     j       .branch_false_145
+                    #regtab     a0:Freed { symidx: temp_65_117, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: temp_66_144, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label branch_true_145: 
 .branch_true_145:
                     #      jump label: while.exit_120 
@@ -1190,19 +1276,17 @@ loop3:
     add     a1,sp,a1
     lw      a0,0(a1)
     j       .while.exit_120
+                    #regtab     a0:Freed { symidx: temp_65_117, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: temp_66_144, tracked: true } |     s11:Freed { symidx: temp_47_119, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: e_99, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label branch_false_145: 
 .branch_false_145:
                     #      jump label: while.head_116 
-    li      s9, 165224
-    add     s9,sp,s9
-    sb      s9,0(s9)
+    sb      s10,27(sp)
     li      s11, 165223
     add     s11,sp,s11
     sb      s11,0(s11)
-    li      s8, 165240
-    add     s8,sp,s8
-    sw      s8,0(s8)
-    sb      s10,27(sp)
+    li      s9, 165224
+    add     s9,sp,s9
+    sb      s9,0(s9)
     sw      a0,28(sp)
     li      a1, 165280
     add     a1,sp,a1
@@ -1210,7 +1294,11 @@ loop3:
     li      a1, 165284
     add     a1,sp,a1
     lw      a0,0(a1)
+    li      s8, 165240
+    add     s8,sp,s8
+    sw      s8,0(s8)
     j       .while.head_116
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label while.exit_116: 
 .while.exit_116:
                     #      new_var temp_67_113:i32 
@@ -1221,6 +1309,7 @@ loop3:
     mv      s2, s10
                     #      jump label: L6_0 
     j       .L6_0
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: temp_67_113, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label L6_0: 
 .L6_0:
                     #      new_var temp_68_148:i1 
@@ -1230,27 +1319,30 @@ loop3:
                     #      br i1 temp_68_148, label branch_true_149, label branch_false_149 
     bnez    s8, .branch_true_149
     j       .branch_false_149
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: temp_67_113, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: temp_68_148, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label branch_true_149: 
 .branch_true_149:
                     #      jump label: while.exit_116 
-    sb      s8,19(sp)
     sw      s10,20(sp)
+    sb      s8,19(sp)
     j       .while.exit_116
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s10:Freed { symidx: temp_67_113, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: d_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: temp_68_148, tracked: true } |     s9:Freed { symidx: temp_46_115, tracked: true } | 
                     #      label branch_false_149: 
 .branch_false_149:
                     #      jump label: while.head_112 
-    li      s7, 165225
-    add     s7,sp,s7
-    sb      s7,0(s7)
-    li      s9, 165224
-    add     s9,sp,s9
-    sb      s9,0(s9)
     li      s6, 165244
     add     s6,sp,s6
     sw      s6,0(s6)
-    sb      s8,19(sp)
     sw      s10,20(sp)
+    li      s9, 165224
+    add     s9,sp,s9
+    sb      s9,0(s9)
+    li      s7, 165225
+    add     s7,sp,s7
+    sb      s7,0(s7)
+    sb      s8,19(sp)
     j       .while.head_112
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } | 
                     #      label while.exit_112: 
 .while.exit_112:
                     #      new_var temp_69_109:i32 
@@ -1261,6 +1353,7 @@ loop3:
     mv      a7, s8
                     #      jump label: L7_0 
     j       .L7_0
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: temp_69_109, tracked: true } | 
                     #      label L7_0: 
 .L7_0:
                     #      new_var temp_70_152:i1 
@@ -1270,27 +1363,30 @@ loop3:
                     #      br i1 temp_70_152, label branch_true_153, label branch_false_153 
     bnez    s6, .branch_true_153
     j       .branch_false_153
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: temp_70_152, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: temp_69_109, tracked: true } | 
                     #      label branch_true_153: 
 .branch_true_153:
                     #      jump label: while.exit_112 
     sb      s6,11(sp)
     sw      s8,12(sp)
     j       .while.exit_112
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: c_99, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: temp_70_152, tracked: true } |     s7:Freed { symidx: temp_45_111, tracked: true } |     s8:Freed { symidx: temp_69_109, tracked: true } | 
                     #      label branch_false_153: 
 .branch_false_153:
                     #      jump label: while.head_108 
+    sb      s6,11(sp)
     li      s7, 165225
     add     s7,sp,s7
     sb      s7,0(s7)
-    sb      s6,11(sp)
-    li      s2, 165248
-    add     s2,sp,s2
-    sw      s2,0(s2)
+    sw      s8,12(sp)
     li      s3, 165226
     add     s3,sp,s3
     sb      s3,0(s3)
-    sw      s8,12(sp)
+    li      s2, 165248
+    add     s2,sp,s2
+    sw      s2,0(s2)
     j       .while.head_108
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } | 
                     #      label while.exit_108: 
 .while.exit_108:
                     #      new_var temp_71_105:i32 
@@ -1301,6 +1397,7 @@ loop3:
     mv      s5, s6
                     #      jump label: L8_0 
     j       .L8_0
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: temp_71_105, tracked: true } | 
                     #      label L8_0: 
 .L8_0:
                     #      new_var temp_72_156:i1 
@@ -1310,27 +1407,30 @@ loop3:
                     #      br i1 temp_72_156, label branch_true_157, label branch_false_157 
     bnez    s2, .branch_true_157
     j       .branch_false_157
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: temp_72_156, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: temp_71_105, tracked: true } | 
                     #      label branch_true_157: 
 .branch_true_157:
                     #      jump label: while.exit_108 
     sw      s6,4(sp)
     sb      s2,3(sp)
     j       .while.exit_108
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: b_99, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: temp_72_156, tracked: true } |     s3:Freed { symidx: temp_44_107, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } |     s6:Freed { symidx: temp_71_105, tracked: true } | 
                     #      label branch_false_157: 
 .branch_false_157:
                     #      jump label: while.head_104 
+    sw      s6,4(sp)
     li      s1, 165227
     add     s1,sp,s1
     sb      s1,0(s1)
-    sw      s6,4(sp)
-    sb      s2,3(sp)
-    li      s3, 165226
-    add     s3,sp,s3
-    sb      s3,0(s3)
     li      a7, 165252
     add     a7,sp,a7
     sw      a7,0(a7)
+    li      s3, 165226
+    add     s3,sp,s3
+    sb      s3,0(s3)
+    sb      s2,3(sp)
     j       .while.head_104
+                    #regtab     a0:Freed { symidx: h_97, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s4:Freed { symidx: ans_99, tracked: true } |     s5:Freed { symidx: a_99, tracked: true } | 
                     #      label while.exit_104: 
 .while.exit_104:
                     #      ret ans_99 
@@ -1350,6 +1450,8 @@ loop3:
     li      s4, 165304
     add     sp,s4,sp
     ret
+                    #regtab     a0:Freed { symidx: ans_99, tracked: true } |     a1:Freed { symidx: i_97, tracked: true } |     a2:Freed { symidx: j_97, tracked: true } |     a3:Freed { symidx: k_97, tracked: true } |     a4:Freed { symidx: l_97, tracked: true } |     a5:Freed { symidx: m_97, tracked: true } |     a6:Freed { symidx: n_97, tracked: true } |     a7:Freed { symidx: ra_loop3_0, tracked: true } |     s1:Freed { symidx: temp_43_103, tracked: true } |     s2:Freed { symidx: s0_loop3_0, tracked: true } |     s3:Freed { symidx: 165228_0, tracked: false } |     s4:Freed { symidx: 165304_0, tracked: false } |     s5:Freed { symidx: a_99, tracked: true } | 
+                    #regtab 
                     #      Define main_0 [] -> main_ret_0 
     .globl main
     .type main,@function
@@ -1378,6 +1480,7 @@ main:
                     #      alloc i32 temp_81_161 
                     #      alloc i32 n_161 
                     #      alloc i32 temp_82_161 
+                    #regtab 
                     #      label L0_0: 
 .L0_0:
                     #      new_var temp_73_161:i32 
@@ -1522,7 +1625,9 @@ main:
     sw      a0,4(sp)
     addi    sp,sp,96
     ret
-.section        .data
+                    #regtab     a0:Freed { symidx: temp_82_161, tracked: true } |     a7:Freed { symidx: l_161, tracked: true } | 
+.section
+    .data
     .align 4
     .globl arr2
                     #      global Array:i32:[Some(10_0), Some(2_0), Some(3_0), Some(2_0), Some(4_0), Some(8_0), Some(7_0)] arr2_0 

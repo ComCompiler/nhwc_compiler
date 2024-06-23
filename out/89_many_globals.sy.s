@@ -16,8 +16,10 @@
  tail _sysy_stoptime
 
 
-.section        .text
+.section
+    .text
     .align 4
+                    #regtab 
                     #      Define testParam8_0 [a0_56, a1_56, a2_56, a3_56, a4_56, a5_56, a6_56, a7_56] -> testParam8_ret_0 
     .globl testParam8
     .type testParam8,@function
@@ -34,6 +36,7 @@ testParam8:
                     #      alloc i32 temp_4_58 
                     #      alloc i32 temp_5_58 
                     #      alloc i32 temp_6_58 
+                    #regtab     a0:Freed { symidx: a0_56, tracked: true } |     a1:Freed { symidx: a1_56, tracked: true } |     a2:Freed { symidx: a2_56, tracked: true } |     a3:Freed { symidx: a3_56, tracked: true } |     a4:Freed { symidx: a4_56, tracked: true } |     a5:Freed { symidx: a5_56, tracked: true } |     a6:Freed { symidx: a6_56, tracked: true } |     a7:Freed { symidx: a7_56, tracked: true } | 
                     #      label L3_0: 
 .L3_0:
                     #      new_var temp_0_58:i32 
@@ -64,6 +67,8 @@ testParam8:
     sw      a0,60(sp)
     addi    sp,sp,80
     ret
+                    #regtab     a0:Freed { symidx: temp_6_58, tracked: true } |     a1:Freed { symidx: a1_56, tracked: true } |     a2:Freed { symidx: a2_56, tracked: true } |     a3:Freed { symidx: a3_56, tracked: true } |     a4:Freed { symidx: a4_56, tracked: true } |     a5:Freed { symidx: a5_56, tracked: true } |     a6:Freed { symidx: a6_56, tracked: true } |     a7:Freed { symidx: a7_56, tracked: true } |     s1:Freed { symidx: temp_0_58, tracked: true } |     s2:Freed { symidx: temp_1_58, tracked: true } |     s3:Freed { symidx: temp_2_58, tracked: true } |     s4:Freed { symidx: temp_3_58, tracked: true } |     s5:Freed { symidx: temp_4_58, tracked: true } |     s6:Freed { symidx: temp_5_58, tracked: true } | 
+                    #regtab 
                     #      Define testParam16_0 [a0_60, a1_60, a2_60, a3_60, a4_60, a5_60, a6_60, a7_60, a8_60, a9_60, a10_60, a11_60, a12_60, a13_60, a14_60, a15_60] -> testParam16_ret_0 
     .globl testParam16
     .type testParam16,@function
@@ -88,6 +93,7 @@ testParam16:
                     #      alloc i32 temp_19_62 
                     #      alloc i32 temp_20_62 
                     #      alloc i32 temp_21_62 
+                    #regtab     a0:Freed { symidx: a0_60, tracked: true } |     a1:Freed { symidx: a1_60, tracked: true } |     a2:Freed { symidx: a2_60, tracked: true } |     a3:Freed { symidx: a3_60, tracked: true } |     a4:Freed { symidx: a4_60, tracked: true } |     a5:Freed { symidx: a5_60, tracked: true } |     a6:Freed { symidx: a6_60, tracked: true } |     a7:Freed { symidx: a7_60, tracked: true } | 
                     #      label L2_0: 
 .L2_0:
                     #      new_var temp_7_62:i32 
@@ -158,6 +164,8 @@ testParam16:
     sw      a0,92(sp)
     addi    sp,sp,144
     ret
+                    #regtab     a0:Freed { symidx: temp_21_62, tracked: true } |     a1:Freed { symidx: temp_20_62, tracked: true } |     a3:Freed { symidx: a3_60, tracked: true } |     a4:Freed { symidx: a4_60, tracked: true } |     a5:Freed { symidx: a5_60, tracked: true } |     a6:Freed { symidx: a6_60, tracked: true } |     a7:Freed { symidx: a7_60, tracked: true } |     s10:Freed { symidx: a10_60, tracked: true } |     s11:Freed { symidx: temp_11_62, tracked: true } |     s1:Freed { symidx: a14_60, tracked: true } |     s2:Freed { symidx: a15_60, tracked: true } |     s3:Freed { symidx: temp_7_62, tracked: true } |     s4:Freed { symidx: a13_60, tracked: true } |     s5:Freed { symidx: temp_8_62, tracked: true } |     s6:Freed { symidx: a12_60, tracked: true } |     s7:Freed { symidx: temp_9_62, tracked: true } |     s8:Freed { symidx: a11_60, tracked: true } |     s9:Freed { symidx: temp_10_62, tracked: true } | 
+                    #regtab 
                     #      Define testParam32_0 [a0_64, a1_64, a2_64, a3_64, a4_64, a5_64, a6_64, a7_64, a8_64, a9_64, a10_64, a11_64, a12_64, a13_64, a14_64, a15_64, a16_64, a17_64, a18_64, a19_64, a20_64, a21_64, a22_64, a23_64, a24_64, a25_64, a26_64, a27_64, a28_64, a29_64, a30_64, a31_64] -> testParam32_ret_0 
     .globl testParam32
     .type testParam32,@function
@@ -198,6 +206,7 @@ testParam32:
                     #      alloc i32 temp_50_66 
                     #      alloc i32 temp_51_66 
                     #      alloc i32 temp_52_66 
+                    #regtab     a0:Freed { symidx: a0_64, tracked: true } |     a1:Freed { symidx: a1_64, tracked: true } |     a2:Freed { symidx: a2_64, tracked: true } |     a3:Freed { symidx: a3_64, tracked: true } |     a4:Freed { symidx: a4_64, tracked: true } |     a5:Freed { symidx: a5_64, tracked: true } |     a6:Freed { symidx: a6_64, tracked: true } |     a7:Freed { symidx: a7_64, tracked: true } | 
                     #      label L1_0: 
 .L1_0:
                     #      new_var temp_22_66:i32 
@@ -348,6 +357,8 @@ testParam32:
     sw      a0,156(sp)
     addi    sp,sp,272
     ret
+                    #regtab     a0:Freed { symidx: temp_52_66, tracked: true } |     a1:Freed { symidx: temp_51_66, tracked: true } |     a3:Freed { symidx: a3_64, tracked: true } |     a4:Freed { symidx: a4_64, tracked: true } |     a5:Freed { symidx: a5_64, tracked: true } |     a6:Freed { symidx: a6_64, tracked: true } |     a7:Freed { symidx: a7_64, tracked: true } |     s10:Freed { symidx: a26_64, tracked: true } |     s11:Freed { symidx: temp_26_66, tracked: true } |     s1:Freed { symidx: a30_64, tracked: true } |     s2:Freed { symidx: a31_64, tracked: true } |     s3:Freed { symidx: temp_22_66, tracked: true } |     s4:Freed { symidx: a29_64, tracked: true } |     s5:Freed { symidx: temp_23_66, tracked: true } |     s6:Freed { symidx: a28_64, tracked: true } |     s7:Freed { symidx: temp_24_66, tracked: true } |     s8:Freed { symidx: a27_64, tracked: true } |     s9:Freed { symidx: temp_25_66, tracked: true } | 
+                    #regtab 
                     #      Define main_0 [] -> main_ret_0 
     .globl main
     .type main,@function
@@ -419,6 +430,7 @@ main:
                     #      alloc i32 temp_112_69 
                     #      alloc i32 temp_113_69 
                     #      alloc i32 temp_114_69 
+                    #regtab 
                     #      label L0_0: 
 .L0_0:
                     #      store 0_0:i32 *a0_0:ptr->i32 
@@ -1166,7 +1178,9 @@ main:
     li      a0, 0
     addi    sp,sp,264
     ret
-.section        .data
+                    #regtab     a0:Freed { symidx: 0_0, tracked: false } |     a1:Freed { symidx: *a0_0, tracked: false } |     a2:Freed { symidx: *a0_0, tracked: false } |     a3:Freed { symidx: temp_114_69, tracked: true } | 
+.section
+    .data
     .align 4
     .globl a39
                     #      global i32 a39_0 

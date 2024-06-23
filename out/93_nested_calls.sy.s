@@ -16,8 +16,10 @@
  tail _sysy_stoptime
 
 
-.section        .text
+.section
+    .text
     .align 4
+                    #regtab 
                     #      Define func1_0 [x_16, y_16, z_16] -> func1_ret_0 
     .globl func1
     .type func1,@function
@@ -31,6 +33,7 @@ func1:
                     #      alloc i32 temp_1_21 
                     #      alloc i32 temp_2_23 
                     #      alloc i32 temp_3_23 
+                    #regtab     a0:Freed { symidx: x_16, tracked: true } |     a1:Freed { symidx: y_16, tracked: true } |     a2:Freed { symidx: z_16, tracked: true } | 
                     #      label L12_0: 
 .L12_0:
                     #      new_var temp_0_19:i1 
@@ -41,6 +44,7 @@ func1:
                     #      br i1 temp_0_19, label branch_true_20, label branch_false_20 
     bnez    a4, .branch_true_20
     j       .branch_false_20
+                    #regtab     a0:Freed { symidx: x_16, tracked: true } |     a1:Freed { symidx: y_16, tracked: true } |     a2:Freed { symidx: z_16, tracked: true } |     a4:Freed { symidx: temp_0_19, tracked: true } | 
                     #      label branch_true_20: 
 .branch_true_20:
                     #      new_var temp_1_21:i32 
@@ -53,6 +57,7 @@ func1:
     sw      a0,28(sp)
     addi    sp,sp,48
     ret
+                    #regtab     a0:Freed { symidx: x_16, tracked: true } |     a1:Freed { symidx: y_16, tracked: true } |     a2:Freed { symidx: z_16, tracked: true } |     a4:Freed { symidx: temp_0_19, tracked: true } | 
                     #      label branch_false_20: 
 .branch_false_20:
                     #      new_var temp_2_23:i32 
@@ -78,8 +83,11 @@ func1:
     sw      a0,4(sp)
     addi    sp,sp,48
     ret
+                    #regtab     a0:Freed { symidx: temp_3_23, tracked: true } |     a3:Freed { symidx: temp_2_23, tracked: true } |     a4:Freed { symidx: temp_0_19, tracked: true } | 
                     #      label L13_0: 
 .L13_0:
+                    #regtab     a0:Freed { symidx: temp_3_23, tracked: true } |     a3:Freed { symidx: temp_2_23, tracked: true } |     a4:Freed { symidx: temp_0_19, tracked: true } | 
+                    #regtab 
                     #      Define func2_0 [x_25, y_25] -> func2_ret_0 
     .globl func2
     .type func2,@function
@@ -92,6 +100,7 @@ func2:
                     #      alloc i1 temp_4_250 
                     #      alloc i32 temp_5_30 
                     #      alloc i32 temp_6_30 
+                    #regtab     a0:Freed { symidx: x_25, tracked: true } |     a1:Freed { symidx: y_25, tracked: true } | 
                     #      label L10_0: 
 .L10_0:
                     #      new_var temp_4_250:i1 
@@ -102,6 +111,7 @@ func2:
                     #      br i1 temp_4_250, label branch_true_29, label branch_false_29 
     bnez    a3, .branch_true_29
     j       .branch_false_29
+                    #regtab     a0:Freed { symidx: x_25, tracked: true } |     a1:Freed { symidx: y_25, tracked: true } |     a3:Freed { symidx: temp_4_250, tracked: true } | 
                     #      label branch_true_29: 
 .branch_true_29:
                     #      new_var temp_5_30:i32 
@@ -125,6 +135,7 @@ func2:
     sw      a0,4(sp)
     addi    sp,sp,40
     ret
+                    #regtab     a0:Freed { symidx: x_25, tracked: true } |     a1:Freed { symidx: y_25, tracked: true } |     a3:Freed { symidx: temp_4_250, tracked: true } | 
                     #      label branch_false_29: 
 .branch_false_29:
                     #      ret x_25 
@@ -133,8 +144,11 @@ func2:
     sw      a0,20(sp)
     addi    sp,sp,40
     ret
+                    #regtab     a0:Freed { symidx: x_25, tracked: true } |     a1:Freed { symidx: y_25, tracked: true } |     a3:Freed { symidx: temp_4_250, tracked: true } | 
                     #      label L11_0: 
 .L11_0:
+                    #regtab     a0:Freed { symidx: x_25, tracked: true } |     a1:Freed { symidx: y_25, tracked: true } |     a3:Freed { symidx: temp_4_250, tracked: true } | 
+                    #regtab 
                     #      Define func3_0 [x_34, y_34] -> func3_ret_0 
     .globl func3
     .type func3,@function
@@ -148,6 +162,7 @@ func3:
                     #      alloc i32 temp_8_39 
                     #      alloc i32 temp_9_41 
                     #      alloc i32 temp_10_41 
+                    #regtab     a0:Freed { symidx: x_34, tracked: true } |     a1:Freed { symidx: y_34, tracked: true } | 
                     #      label L8_0: 
 .L8_0:
                     #      new_var temp_7_37:i1 
@@ -158,6 +173,7 @@ func3:
                     #      br i1 temp_7_37, label branch_true_38, label branch_false_38 
     bnez    a3, .branch_true_38
     j       .branch_false_38
+                    #regtab     a0:Freed { symidx: x_34, tracked: true } |     a1:Freed { symidx: y_34, tracked: true } |     a3:Freed { symidx: temp_7_37, tracked: true } | 
                     #      label branch_true_38: 
 .branch_true_38:
                     #      new_var temp_8_39:i32 
@@ -171,6 +187,7 @@ func3:
     sw      a0,20(sp)
     addi    sp,sp,40
     ret
+                    #regtab     a0:Freed { symidx: x_34, tracked: true } |     a1:Freed { symidx: y_34, tracked: true } |     a3:Freed { symidx: temp_7_37, tracked: true } | 
                     #      label branch_false_38: 
 .branch_false_38:
                     #      new_var temp_9_41:i32 
@@ -194,8 +211,11 @@ func3:
     sw      a0,0(sp)
     addi    sp,sp,40
     ret
+                    #regtab     a0:Freed { symidx: temp_10_41, tracked: true } |     a2:Freed { symidx: temp_9_41, tracked: true } |     a3:Freed { symidx: temp_7_37, tracked: true } | 
                     #      label L9_0: 
 .L9_0:
+                    #regtab     a0:Freed { symidx: temp_10_41, tracked: true } |     a2:Freed { symidx: temp_9_41, tracked: true } |     a3:Freed { symidx: temp_7_37, tracked: true } | 
+                    #regtab 
                     #      Define func4_0 [x_43, y_43, z_43] -> func4_ret_0 
     .globl func4
     .type func4,@function
@@ -206,6 +226,7 @@ func4:
     sd      s0,16(sp)
     addi    s0,sp,32
                     #      alloc i1 temp_11_605 
+                    #regtab     a0:Freed { symidx: x_43, tracked: true } |     a1:Freed { symidx: y_43, tracked: true } |     a2:Freed { symidx: z_43, tracked: true } | 
                     #      label L6_0: 
 .L6_0:
                     #      new_var temp_11_605:i1 
@@ -216,6 +237,7 @@ func4:
                     #      br i1 temp_11_605, label branch_true_47, label branch_false_47 
     bnez    a4, .branch_true_47
     j       .branch_false_47
+                    #regtab     a0:Freed { symidx: x_43, tracked: true } |     a1:Freed { symidx: y_43, tracked: true } |     a2:Freed { symidx: z_43, tracked: true } |     a4:Freed { symidx: temp_11_605, tracked: true } | 
                     #      label branch_true_47: 
 .branch_true_47:
                     #      ret y_43 
@@ -225,6 +247,7 @@ func4:
     sw      a0,12(sp)
     addi    sp,sp,32
     ret
+                    #regtab     a0:Freed { symidx: x_43, tracked: true } |     a1:Freed { symidx: y_43, tracked: true } |     a2:Freed { symidx: z_43, tracked: true } |     a4:Freed { symidx: temp_11_605, tracked: true } | 
                     #      label branch_false_47: 
 .branch_false_47:
                     #      ret z_43 
@@ -234,8 +257,11 @@ func4:
     sw      a0,12(sp)
     addi    sp,sp,32
     ret
+                    #regtab     a0:Freed { symidx: z_43, tracked: true } |     a1:Freed { symidx: y_43, tracked: true } |     a4:Freed { symidx: temp_11_605, tracked: true } | 
                     #      label L7_0: 
 .L7_0:
+                    #regtab     a0:Freed { symidx: z_43, tracked: true } |     a1:Freed { symidx: y_43, tracked: true } |     a4:Freed { symidx: temp_11_605, tracked: true } | 
+                    #regtab 
                     #      Define func5_0 [x_52] -> func5_ret_0 
     .globl func5
     .type func5,@function
@@ -246,6 +272,7 @@ func5:
     sd      s0,8(sp)
     addi    s0,sp,24
                     #      alloc i32 temp_12_54 
+                    #regtab     a0:Freed { symidx: x_52, tracked: true } | 
                     #      label L5_0: 
 .L5_0:
                     #      new_var temp_12_54:i32 
@@ -259,6 +286,8 @@ func5:
     sw      a0,4(sp)
     addi    sp,sp,24
     ret
+                    #regtab     a0:Freed { symidx: temp_12_54, tracked: true } |     a1:Freed { symidx: 0_0, tracked: false } | 
+                    #regtab 
                     #      Define func6_0 [x_56, y_56] -> func6_ret_0 
     .globl func6
     .type func6,@function
@@ -271,6 +300,7 @@ func6:
                     #      alloc i1 temp_13_59 
                     #      alloc i1 temp_14_59 
                     #      alloc i1 temp_15_59 
+                    #regtab     a0:Freed { symidx: x_56, tracked: true } |     a1:Freed { symidx: y_56, tracked: true } | 
                     #      label L3_0: 
 .L3_0:
                     #      new_var temp_13_59:i1 
@@ -287,6 +317,7 @@ func6:
                     #      br i1 temp_15_59, label branch_true_60, label branch_false_60 
     bnez    a5, .branch_true_60
     j       .branch_false_60
+                    #regtab     a0:Freed { symidx: x_56, tracked: true } |     a1:Freed { symidx: y_56, tracked: true } |     a3:Freed { symidx: temp_13_59, tracked: true } |     a4:Freed { symidx: temp_14_59, tracked: true } |     a5:Freed { symidx: temp_15_59, tracked: true } | 
                     #      label branch_true_60: 
 .branch_true_60:
                     #      ret 1_0 
@@ -296,6 +327,7 @@ func6:
     li      a0, 1
     addi    sp,sp,32
     ret
+                    #regtab     a0:Freed { symidx: x_56, tracked: true } |     a1:Freed { symidx: y_56, tracked: true } |     a3:Freed { symidx: temp_13_59, tracked: true } |     a4:Freed { symidx: temp_14_59, tracked: true } |     a5:Freed { symidx: temp_15_59, tracked: true } | 
                     #      label branch_false_60: 
 .branch_false_60:
                     #      ret 0_0 
@@ -305,8 +337,11 @@ func6:
     li      a0, 0
     addi    sp,sp,32
     ret
+                    #regtab     a0:Freed { symidx: 0_0, tracked: false } |     a1:Freed { symidx: y_56, tracked: true } |     a3:Freed { symidx: temp_13_59, tracked: true } |     a4:Freed { symidx: temp_14_59, tracked: true } |     a5:Freed { symidx: temp_15_59, tracked: true } | 
                     #      label L4_0: 
 .L4_0:
+                    #regtab     a0:Freed { symidx: 0_0, tracked: false } |     a1:Freed { symidx: y_56, tracked: true } |     a3:Freed { symidx: temp_13_59, tracked: true } |     a4:Freed { symidx: temp_14_59, tracked: true } |     a5:Freed { symidx: temp_15_59, tracked: true } | 
+                    #regtab 
                     #      Define func7_0 [x_65] -> func7_ret_0 
     .globl func7
     .type func7,@function
@@ -318,6 +353,7 @@ func7:
     addi    s0,sp,24
                     #      alloc i1 temp_16_68 
                     #      alloc i1 temp_17_68 
+                    #regtab     a0:Freed { symidx: x_65, tracked: true } | 
                     #      label L1_0: 
 .L1_0:
                     #      new_var temp_16_68:i1 
@@ -331,6 +367,7 @@ func7:
                     #      br i1 temp_17_68, label branch_true_69, label branch_false_69 
     bnez    a3, .branch_true_69
     j       .branch_false_69
+                    #regtab     a0:Freed { symidx: x_65, tracked: true } |     a2:Freed { symidx: temp_16_68, tracked: true } |     a3:Freed { symidx: temp_17_68, tracked: true } | 
                     #      label branch_true_69: 
 .branch_true_69:
                     #      ret 1_0 
@@ -340,6 +377,7 @@ func7:
     li      a0, 1
     addi    sp,sp,24
     ret
+                    #regtab     a0:Freed { symidx: x_65, tracked: true } |     a2:Freed { symidx: temp_16_68, tracked: true } |     a3:Freed { symidx: temp_17_68, tracked: true } | 
                     #      label branch_false_69: 
 .branch_false_69:
                     #      ret 0_0 
@@ -349,8 +387,11 @@ func7:
     li      a0, 0
     addi    sp,sp,24
     ret
+                    #regtab     a0:Freed { symidx: 0_0, tracked: false } |     a2:Freed { symidx: temp_16_68, tracked: true } |     a3:Freed { symidx: temp_17_68, tracked: true } | 
                     #      label L2_0: 
 .L2_0:
+                    #regtab     a0:Freed { symidx: 0_0, tracked: false } |     a2:Freed { symidx: temp_16_68, tracked: true } |     a3:Freed { symidx: temp_17_68, tracked: true } | 
+                    #regtab 
                     #      Define main_0 [] -> main_ret_0 
     .globl main
     .type main,@function
@@ -449,6 +490,7 @@ main:
                     #      alloc i32 temp_98_75 
                     #      alloc i32 temp_99_75 
                     #      alloc i32 a_75 
+                    #regtab 
                     #      label L0_0: 
 .L0_0:
                     #      new_var temp_18_75:i32 
@@ -499,6 +541,7 @@ main:
     li      a5, 0
                     #      jump label: while.head_80 
     j       .while.head_80
+                    #regtab     a0:Freed { symidx: temp_21_75, tracked: true } |     a1:Freed { symidx: i1_75, tracked: true } |     a2:Freed { symidx: i2_75, tracked: true } |     a3:Freed { symidx: i3_75, tracked: true } |     a4:Freed { symidx: i4_75, tracked: true } |     a5:Freed { symidx: i_75, tracked: true } | 
                     #      label while.head_80: 
 .while.head_80:
                     #      new_var temp_22_79:i1 
@@ -508,6 +551,7 @@ main:
                     #      br i1 temp_22_79, label while.body_80, label while.exit_80 
     bnez    a7, .while.body_80
     j       .while.exit_80
+                    #regtab     a0:Freed { symidx: temp_21_75, tracked: true } |     a1:Freed { symidx: i1_75, tracked: true } |     a2:Freed { symidx: i2_75, tracked: true } |     a3:Freed { symidx: i3_75, tracked: true } |     a4:Freed { symidx: i4_75, tracked: true } |     a5:Freed { symidx: i_75, tracked: true } |     a7:Freed { symidx: temp_22_79, tracked: true } | 
                     #      label while.body_80: 
 .while.body_80:
                     #      new_var temp_23_81:ptr->i32 
@@ -540,12 +584,13 @@ main:
                     #      i_75 = i32 temp_25_81 
     mv      a5, s2
                     #      jump label: while.head_80 
-    sd      a6,440(sp)
-    sw      s2,432(sp)
-    sb      a7,451(sp)
     sw      a0,436(sp)
     lw      a0,500(sp)
+    sb      a7,451(sp)
+    sd      a6,440(sp)
+    sw      s2,432(sp)
     j       .while.head_80
+                    #regtab     a0:Freed { symidx: temp_21_75, tracked: true } |     a1:Freed { symidx: i1_75, tracked: true } |     a2:Freed { symidx: i2_75, tracked: true } |     a3:Freed { symidx: i3_75, tracked: true } |     a4:Freed { symidx: i4_75, tracked: true } |     a5:Freed { symidx: i_75, tracked: true } |     a7:Freed { symidx: temp_22_79, tracked: true } | 
                     #      label while.exit_80: 
 .while.exit_80:
                     #      new_var temp_26_75:i32 
@@ -1231,3 +1276,4 @@ main:
     sw      a0,4(sp)
     addi    sp,sp,544
     ret
+                    #regtab     a0:Freed { symidx: a_75, tracked: true } |     a3:Freed { symidx: i3_75, tracked: true } |     a4:Freed { symidx: i4_75, tracked: true } |     a5:Freed { symidx: i_75, tracked: true } |     a6:Freed { symidx: 1_0, tracked: false } |     a7:Freed { symidx: temp_22_79, tracked: true } | 

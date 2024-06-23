@@ -16,8 +16,10 @@
  tail _sysy_stoptime
 
 
-.section        .text
+.section
+    .text
     .align 4
+                    #regtab 
                     #      Define main_0 [] -> main_ret_0 
     .globl main
     .type main,@function
@@ -92,6 +94,7 @@ main:
                     #      alloc i32 temp_31_18 
                     #      alloc i32 t_18 
                     #      alloc i32 newline_18 
+                    #regtab 
                     #      label L0_0: 
 .L0_0:
                     #      new_var a0_18:i32 
@@ -137,6 +140,7 @@ main:
     mv      a1, a0
                     #      jump label: while.head_52 
     j       .while.head_52
+                    #regtab     a0:Freed { symidx: temp_0_18, tracked: true } |     a1:Freed { symidx: b_18, tracked: true } | 
                     #      label while.head_52: 
 .while.head_52:
                     #      new_var temp_1_51:i1 
@@ -147,6 +151,7 @@ main:
                     #      br i1 temp_1_51, label while.body_52, label while.exit_52 
     bnez    a3, .while.body_52
     j       .while.exit_52
+                    #regtab     a0:Freed { symidx: temp_0_18, tracked: true } |     a1:Freed { symidx: b_18, tracked: true } |     a3:Freed { symidx: temp_1_51, tracked: true } | 
                     #      label while.body_52: 
 .while.body_52:
                     #      new_var temp_2_53:i32 
@@ -156,9 +161,10 @@ main:
                     #      b_18 = i32 temp_2_53 
     mv      a1, a4
                     #      jump label: while.head_52 
-    sb      a3,135(sp)
     sw      a4,128(sp)
+    sb      a3,135(sp)
     j       .while.head_52
+                    #regtab     a0:Freed { symidx: temp_0_18, tracked: true } |     a1:Freed { symidx: b_18, tracked: true } |     a3:Freed { symidx: temp_1_51, tracked: true } | 
                     #      label while.exit_52: 
 .while.exit_52:
                     #      a0_18 = i32 0_0 
@@ -633,7 +639,9 @@ main:
     ld      s0,264(sp)
     addi    sp,sp,280
     ret
-.section        .data
+                    #regtab     a0:Freed { symidx: a25_18, tracked: true } |     a1:Freed { symidx: a28_18, tracked: true } |     a2:Freed { symidx: temp_31_18, tracked: true } |     a3:Freed { symidx: temp_1_51, tracked: true } |     a4:Freed { symidx: a8_18, tracked: true } |     a5:Freed { symidx: temp_3_18, tracked: true } |     a6:Freed { symidx: a1_18, tracked: true } |     a7:Freed { symidx: temp_4_18, tracked: true } | 
+.section
+    .data
     .align 4
     .globl n
                     #      global i32 n_0 

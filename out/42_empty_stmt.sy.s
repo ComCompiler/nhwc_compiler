@@ -16,36 +16,68 @@
  tail _sysy_stoptime
 
 
-.section        .text
+.section ___func
+    .text
     .align 4
-                    #      Define main_0 [] -> main_ret_0 
+              #                    regtab 
+              #                          Define main_0 [] -> main_ret_0 
     .globl main
     .type main,@function
 main:
-                    #mem layout:|ra_main:8|s0_main:8|a:4|temp_0:4|temp_1:4|none:4
+              #                    mem layout:|ra_main:8 at 24|s0_main:8 at 16|a:4 at 12|temp_0_arithop:4 at 8|temp_1_arithop:4 at 4|none:4 at 0
     addi    sp,sp,-32
+              #                    store to ra_main_0 in mem offset legal
     sd      ra,24(sp)
+              #                    store to s0_main_0 in mem offset legal
     sd      s0,16(sp)
     addi    s0,sp,32
-                    #      alloc i32 a_17 
-                    #      alloc i32 temp_0_17 
-                    #      alloc i32 temp_1_17 
-                    #      label L0_0: 
+              #                          alloc i32 a_17 
+              #                          alloc i32 temp_0_arithop_17 
+              #                          alloc i32 temp_1_arithop_17 
+              #                    regtab 
+              #                          label L0_0: 
 .L0_0:
-                    #      a_17 = i32 10_0 
+              #                          a_17 = i32 10_0 
+              #                    occupy a0 with a_17
     li      a0, 10
-                    #      new_var temp_0_17:i32 
-                    #      temp_0_17 = Mul i32 a_17, 2_0 
+              #                    free a0
+              #                          new_var temp_0_arithop_17:i32 
+              #                          temp_0_arithop_17 = Mul i32 a_17, 2_0 
+              #                    occupy a0 with a_17
+              #                    occupy a1 with 2_0
     li      a1, 2
+              #                    occupy a2 with temp_0_arithop_17
     mul     a2,a0,a1
-                    #      new_var temp_1_17:i32 
-                    #      temp_1_17 = Add i32 temp_0_17, 1_0 
+              #                    free a0
+              #                    free a1
+              #                    free a2
+              #                          new_var temp_1_arithop_17:i32 
+              #                          temp_1_arithop_17 = Add i32 temp_0_arithop_17, 1_0 
+              #                    occupy a2 with temp_0_arithop_17
+              #                    occupy a3 with 1_0
     li      a3, 1
+              #                    occupy a4 with temp_1_arithop_17
     add     a4,a2,a3
-                    #      ret temp_1_17 
+              #                    free a2
+              #                    free a3
+              #                    free a4
+              #                          ret temp_1_arithop_17 
+              #                    load from ra_main_0 in mem
     ld      ra,24(sp)
+              #                    load from s0_main_0 in mem
     ld      s0,16(sp)
+              #                    store to temp_1_arithop_17 in mem offset legal
     sw      a4,4(sp)
+              #                    release a4 with temp_1_arithop_17
+              #                    store to a_17 in mem offset legal
     sw      a0,12(sp)
+              #                    release a0 with a_17
+              #                    occupy a0 with temp_1_arithop_17
+              #                    load from temp_1_arithop_17 in mem
+
+
+    lw      a0,4(sp)
     addi    sp,sp,32
+              #                    free a0
     ret
+              #                    regtab     a2:Freed { symidx: temp_0_arithop_17, tracked: true } | 

@@ -16,8 +16,10 @@
  tail _sysy_stoptime
 
 
-.section        .text
+.section
+    .text
     .align 4
+                    #regtab 
                     #      Define func_0 [a_48, b_48] -> func_ret_0 
     .globl func
     .type func,@function
@@ -375,6 +377,7 @@ func:
                     #      alloc i32 temp_308_50 
                     #      alloc i32 temp_309_50 
                     #      alloc i32 temp_310_50 
+                    #regtab     a0:Freed { symidx: a_48, tracked: true } |     a1:Freed { symidx: b_48, tracked: true } | 
                     #      label L1_0: 
 .L1_0:
                     #      new_var i_50:i32 
@@ -2364,6 +2367,8 @@ func:
     sw      a0,4(sp)
     addi    sp,sp,1416
     ret
+                    #regtab     a0:Freed { symidx: temp_310_50, tracked: true } |     a2:Freed { symidx: temp_301_50, tracked: true } |     a3:Freed { symidx: i_50, tracked: true } |     a4:Freed { symidx: c1_50, tracked: true } |     a5:Freed { symidx: c2_50, tracked: true } |     a6:Freed { symidx: c3_50, tracked: true } |     a7:Freed { symidx: c4_50, tracked: true } |     s10:Freed { symidx: d3_50, tracked: true } |     s11:Freed { symidx: temp_10_50, tracked: true } |     s1:Freed { symidx: d2_50, tracked: true } |     s2:Freed { symidx: temp_5_50, tracked: true } |     s3:Freed { symidx: temp_6_50, tracked: true } |     s4:Freed { symidx: temp_12_50, tracked: true } |     s5:Freed { symidx: temp_7_50, tracked: true } |     s6:Freed { symidx: d1_50, tracked: true } |     s7:Freed { symidx: temp_11_50, tracked: true } |     s8:Freed { symidx: temp_8_50, tracked: true } |     s9:Freed { symidx: temp_9_50, tracked: true } | 
+                    #regtab 
                     #      Define main_0 [] -> main_ret_0 
     .globl main
     .type main,@function
@@ -2378,6 +2383,7 @@ main:
                     #      alloc i32 temp_311_164 
                     #      alloc i32 temp_312_164 
                     #      alloc i32 temp_313_164 
+                    #regtab 
                     #      label L0_0: 
 .L0_0:
                     #      new_var a_164:i32 
@@ -2426,7 +2432,9 @@ main:
     sw      a1,20(sp)
     addi    sp,sp,40
     ret
-.section        .data
+                    #regtab     a0:Freed { symidx: a_164, tracked: true } |     a2:Freed { symidx: 18_0, tracked: false } |     a3:Freed { symidx: temp_312_164, tracked: true } |     a4:Freed { symidx: b_164, tracked: true } | 
+.section
+    .data
     .align 4
     .globl a32
                     #      global i32 a32_0 
