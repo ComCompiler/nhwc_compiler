@@ -492,9 +492,24 @@ impl Type {
             Type::Array { dims: _, ele_ty } => {
                 ele_ty.get_mem_len()
             },
-            _ => {
-                self.get_mem_len()
+            Type::Ptr64 { ty } => {
+                ty.get_ele_size()
             }
+            _ => self.get_mem_len(),
+        }
+    }
+    pub fn get_size(&self) -> Result<usize>{
+        match &self{
+            Type::I32 => Ok(4),
+            Type::F32 => Ok(4),
+            Type::I1 => Ok(1),
+            Type::Void => Err(anyhow!("can't get alignment of void type {:?}",self)),
+            Type::Label => Err(anyhow!("can't get alignment of label type {:?}",self)),
+            Type::Array { dims: _, ele_ty: ty } => Ok(ty.get_align()?),
+            Type::Fn { arg_syms: _, ret_sym: _ } =>Err(anyhow!("can't get alignment of func type {:?}",self)),
+            Type::Ptr64 { ty: _ } => Ok(8),
+            Type::Ref => Err(anyhow!("can't get align of Ref ty")),
+            Type::Unknown => Err(anyhow!("can't get align of unknown")),
         }
     }
     pub fn get_ele_ty(&self) -> Type{
@@ -570,6 +585,16 @@ impl Type {
             _ => {
                 Err(anyhow!(("you can only transform a ptr 2 arr")))
             }
+        }
+    }
+    pub fn arr2ptr(&self) -> Result<Type>{
+        match self{
+            Type::Array { dims, ele_ty } => {
+                let mut ty = self.clone();
+                ty.pop_dim()?;
+                Ok(Self::Ptr64 { ty:Box::new(ty)  })
+            },
+            _ => panic!()
         }
     }
 

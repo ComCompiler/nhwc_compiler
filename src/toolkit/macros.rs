@@ -746,3 +746,11 @@ macro_rules! debug_info_red{
         warn!("{}",format!($($t)*))
     }};
 }
+
+#[macro_export]
+macro_rules! code_pos {
+    ($msg:expr) => {
+        format!("{}:{}:{} - {}", file!(), line!(), column!())
+        
+    };
+}

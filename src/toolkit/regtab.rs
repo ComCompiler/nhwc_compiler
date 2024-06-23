@@ -107,10 +107,11 @@ impl RegTab{
     // }
     /// occupy reg by a symidx non-temp you can only occupy a released reg 
     /// you should release freed reg before occupy it
-    pub fn occupy_reg(&mut self, reg:Register, symidx:&SymIdx, symtab:&mut SymTab, tracked:bool ) -> Result<()>{
+    pub fn occupy_reg(&mut self, reg:Register, symidx:&SymIdx, symtab:&mut SymTab, asm_sect:&mut AsmSection,tracked:bool ) -> Result<()>{
         // if symidx.symbol_name == "ra_intpop"{
         //     return  Err(anyhow!("ra_int"));
         // }
+        asm_sect.annotate(format!("occupy {:?} with {:?}",reg,symidx));
         debug_info_blue!("occupy reg {:?} with {:?}",reg,symidx);
         match self.reg_symidx_map.get_mut(&reg){
             Some(regstat) => {
@@ -147,7 +148,7 @@ impl RegTab{
         store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
         load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,) -> Result<Register>{
         let reg = self.find_avail_reg_for_ty_and_try_release(sym_ty, symtab, asm_sect, store_f)?;
-        self.occupy_reg(reg.clone(), &SymIdx::from_str(format!("_anonymous_of_{:?}",symidx).as_str()), symtab, false)?;
+        self.occupy_reg(reg.clone(), &SymIdx::from_str(format!("_anonymous_of_{:?}",symidx).as_str()), symtab,asm_sect, false)?;
         load_f(symidx.clone(),reg.clone(),symtab,asm_sect,self)?;
         Ok(reg)
     }
@@ -174,14 +175,14 @@ impl RegTab{
             // when symidx is already in regtab
             let reg = symtab.get(symidx)?.get_cur_reg()?.clone().unwrap();
             debug_info_blue!("symidx {symidx:?} already in regtab with {reg:?}");
-            self.occupy_reg(reg.clone(), symidx, symtab, should_track)?;
+            self.occupy_reg(reg.clone(), symidx, symtab, asm_sect, should_track)?;
             Ok(reg)
         }else if !should_track && !symidx.is_literal(){
             // temp but not literal
             let reg = self.find_avail_reg_for_ty_and_try_release(sym_ty, symtab, asm_sect, store_f)?;
-            self.occupy_reg(reg.clone(), symidx, symtab, should_track)?;
+            self.occupy_reg(reg.clone(), symidx, symtab, asm_sect,should_track)?;
             load_f(symidx.clone(),reg.clone(),symtab, asm_sect, self)?;
-            asm_sect.annotation(format!("occupy reg {:?} with {:?}",reg,symidx));
+            asm_sect.annotate(format!("occupy reg {:?} with {:?}",reg,symidx));
             Ok(reg)
         } else if !should_track && symidx.is_literal(){ 
             // is_literal 
@@ -191,7 +192,7 @@ impl RegTab{
                     RegState::Freed { symidx: symidx_freed, tracked: reg_is_tracked } => {
                         if symidx_freed == symidx && *reg_is_tracked == should_track {
                             op_literal_reg = Some(reg.clone());
-                            asm_sect.annotation(format!("found literal reg {:?} already exist with {:?}",op_literal_reg,symidx_freed));
+                            asm_sect.annotate(format!("found literal reg {:?} already exist with {:?}",op_literal_reg,symidx_freed));
                             break;
                         }
                     },
@@ -200,19 +201,19 @@ impl RegTab{
             };
             Ok(if let Some(reg) = op_literal_reg{
                 self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
-                self.occupy_reg(reg.clone(), symidx, symtab, should_track)?;
+                self.occupy_reg(reg.clone(), symidx, symtab,asm_sect, should_track)?;
                 reg
             }else {
                 // if not found in regtab , than alloc a reg normally
                 let reg = self.find_avail_reg_for_ty_and_try_release(sym_ty, symtab, asm_sect, store_f)?;
-                self.occupy_reg(reg.clone(), symidx, symtab, should_track)?;
+                self.occupy_reg(reg.clone(), symidx, symtab, asm_sect, should_track)?;
                 load_f(symidx.clone(),reg.clone(),symtab, asm_sect, self)?;
                 reg
             })
         }else{
             // has symbol in symtab but alloc temp 
             let reg = self.find_avail_reg_for_ty_and_try_release(sym_ty, symtab, asm_sect, store_f)?;
-            self.occupy_reg(reg.clone(), symidx, symtab, should_track)?;
+            self.occupy_reg(reg.clone(), symidx, symtab, asm_sect, should_track)?;
             load_f(symidx.clone(),reg.clone(),symtab, asm_sect, self)?;
             Ok(reg)
         }
@@ -254,6 +255,7 @@ impl RegTab{
         }
 
     }
+    // garantee the reg is immediately released
     pub fn try_release_reg(&mut self, reg:Register, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>)-> Result<()>{
         if self.is_freed(&reg){
             self.release_reg(reg.clone(), symtab,asm_sect, store_f)?;
@@ -268,13 +270,17 @@ impl RegTab{
         debug_info_blue!("release {:?}",reg);
         let regstat = self.reg_symidx_map.get_mut(&reg).unwrap();
         match regstat{
-            RegState::Freed { symidx, tracked } => {
-                if *tracked {
+            RegState::Freed { symidx, tracked} => {
+                let tracked = *tracked;
+                if tracked {
                     // take func will leave a None in place 
                     let reg = symtab.get_mut(symidx)?.get_mut_cur_reg()?.take().with_context(||format!("symbol {:?} must has cur_reg field Some(reg)",symidx))?;
                     let symidx = symidx.clone();
                     *regstat = RegState::new_released();
-                    store_f(symidx,reg, symtab ,asm_sect, self)?;
+                    store_f(symidx.clone(),reg.clone(), symtab ,asm_sect, self)?;
+                    // this will recursively try release reg until released 
+                    self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
+                    asm_sect.annotate(format!("release {:?} with {:?}",reg,symidx));
                     Ok(())
                 }else{
                     *regstat = RegState::new_released();
@@ -282,7 +288,7 @@ impl RegTab{
                 }
             },
             _ => {
-                asm_sect.annotation(format!("you can't release reg {:?}",reg));
+                asm_sect.annotate(format!("you can't release reg {:?}",reg));
                 Err(anyhow!("you can't release reg {:?}",reg))
             }
         }
@@ -299,15 +305,14 @@ impl RegTab{
         Ok(())
     }
 
-    pub fn free_reg(&mut self, reg:Register) -> Result<()>{
+    pub fn free_reg(&mut self, reg:Register,asm_sect:&mut AsmSection) -> Result<()>{
+        asm_sect.annotate(format!("free {:?}",reg));
         let regstat = self.reg_symidx_map.get_mut(&reg).unwrap();
         debug_info_blue!("free reg {:?} ",reg);
         regstat.free_once()
     }
     pub fn find_avail_reg_for_ty_and_try_release(&mut self, sym_ty:&Type, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self)-> Result<()>) -> Result<Register>{
         let reg = self.find_avail_reg_for_ty(sym_ty)?;
-        self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
-        // try release more than one time because there may be a offset in this reg(try_release_reg may also use the reg)
         self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
         Ok(reg)
     }
@@ -333,8 +338,7 @@ impl RegTab{
             for i in REG_A_RANGE.clone(){ if self.is_freed(&Register::new_a(i)){ return Ok(Register::new_a(i)) } }
             for i in REG_S_RANGE.clone(){ if self.is_freed(&Register::new_s(i)){ return Ok(Register::new_s(i)) } }
 
-
-            return Err(anyhow!("no avail(released or freed) reg fo ty {:?}",sym_ty));
+            return Err(anyhow!("no avail(released or freed) reg fo ty {:?},{:?}",sym_ty,self));
         }else if sym_ty.is_f_32(){
             for i in REG_FA_RANGE.clone(){ if self.is_released(&Register::new_fa(i)){ return Ok(Register::new_fa(i)) } }
             for i in REG_FS_RANGE.clone(){ if self.is_released(&Register::new_fs(i)){ return Ok(Register::new_fs(i)) } }
@@ -391,10 +395,33 @@ impl RegTab{
         Ok(())
     }
     /// set the regtab to target_regtab by exec load_f and store_f 
+    /// release all freed reg in priority
     pub fn suit(&mut self,target_regtab:&RegTab,asm_sect:&mut AsmSection,symtab:&mut SymTab,
         store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
         load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
-    )->Result<()>{
+    )->Result<()>{ let mut reg_vec = self.reg_symidx_map.keys().cloned().collect_vec();
+        // select all freed register that need to be suit and first release them 
+        debug_info_blue!("before suit {:?}",self);
+        debug_info_blue!("target suit {:?}",target_regtab);
+        for reg in self.reg_symidx_map.keys().cloned().collect_vec(){
+            let target_regstat = target_regtab.reg_symidx_map.get(&reg).unwrap();
+            let regstat = self.reg_symidx_map.get(&reg).unwrap();
+            match (regstat,target_regstat){
+                (RegState::Freed { symidx:symidx1, tracked:tracked1 },RegState::Freed { symidx:symidx2, tracked:tracked2 }) => {
+                    if symidx1 == symidx2{
+                        // do nothing 
+                    }else{
+                        self.release_reg(reg.clone(), symtab, asm_sect, store_f)?;
+                    }
+                },
+                (RegState::Freed { symidx, tracked },RegState::Released) => {
+                    self.release_reg(reg.clone(), symtab, asm_sect, store_f)?;
+                },
+                _ => {}
+            }
+        }
+
+        // and then release the second time and lock them 
         for reg in self.reg_symidx_map.keys().cloned().collect_vec(){
             let target_regstat = target_regtab.reg_symidx_map.get(&reg).unwrap();
             let regstat = self.reg_symidx_map.get(&reg).unwrap().clone();
@@ -410,7 +437,7 @@ impl RegTab{
                         if *tracked2{
                             let ty = symtab.get(&symidx2)?.get_type()?.clone();
                             // placeholder 
-                            self.anonymous_load_into(reg, &symidx2, &ty, symtab, asm_sect, store_f, load_f)?;
+                            self.anonymous_load_into(reg.clone(), &symidx2, &ty, symtab, asm_sect, store_f, load_f)?;
                         }else {
                             return Err(anyhow!("target regtab should have no temp variable in suit"))
                         }
@@ -420,12 +447,9 @@ impl RegTab{
                     if tracked {assert!(symtab.get(&symidx)?.get_cur_reg()?.is_some());}
                     self.release_reg(reg.clone(), symtab, asm_sect, store_f)?;
                     // placeholder 
-                    self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
-                    self.occupy_reg(reg, &SymIdx::from_str("placeholder"), symtab, false)?;
                 },
                 (RegState::Released,RegState::Freed { symidx, tracked }) => {
                     if *tracked{
-                        assert!(symtab.get(&symidx)?.get_cur_reg()?.is_none());
                         let ty = symtab.get(symidx)?.get_type()?.clone();
                         self.anonymous_load_into(reg.clone(), &symidx, &ty, symtab, asm_sect, store_f, load_f)?;
                     }else {
@@ -433,7 +457,6 @@ impl RegTab{
                     }
                 },
                 (RegState::Released,RegState::Released) => {
-                    self.occupy_reg(reg, &SymIdx::from_str("placeholder"), symtab, false)?;
                 },
                 _=> {
                     return Err(anyhow!("regtab can't suit because still has occupied register \nsrc:{:?} \ntarget:{:?} \n {:?}",self,target_regtab,reg))
@@ -443,12 +466,36 @@ impl RegTab{
         *self = target_regtab.clone();
         Ok(())
     }
-    pub fn forget_all_temp(&mut self){
+    pub fn forget_all_temp(&mut self, asm_sect:&mut AsmSection,symtab:&mut SymTab, 
+        store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>)-> Result<()>{
+        let mut has_released_reg = false;
         for (reg,regstat) in self.reg_symidx_map.iter_mut(){
             if matches!(regstat,RegState::Freed { symidx, tracked:false }){
                 *regstat =RegState::Released;
+                if reg.is_arg()|| reg.is_saved(){
+                    debug_info_red!("find released {:?} {:?}!!!",reg,regstat);
+                    has_released_reg = true;
+                }
+            }
+            if matches!(regstat,RegState::Released {}){
+                if reg.is_arg()|| reg.is_saved(){
+                    debug_info_red!("find released {:?} {:?}!!!",reg,regstat);
+                    has_released_reg = true;
+                }
             }
         }
+        // if have no released reg in regtab, just release one to prepare for suit func
+        if !has_released_reg{
+            for (reg,regstat) in self.reg_symidx_map.iter(){
+                if matches!(regstat,RegState::Freed { symidx, tracked:true }) && (reg.is_arg()|| reg.is_saved()){
+                    debug_info_red!("release {:?} for processing conflict {:?}",reg,regstat);
+                    self.release_reg(reg.clone(), symtab, asm_sect, store_f)?;
+                    break;
+                }
+            }
+        }
+        debug_info_blue!("after forget_all_temp {:?}",self);
+        Ok(())
     }
     /// reset the symtab's *cur_reg* field and drop it self 
     /// the reverse operation of apply
@@ -468,7 +515,7 @@ impl RegTab{
         }
         Ok(())
     }
-    // load a symbol into specified register 
+    // load a symbol into specified register untracked
     pub fn load_into(&mut self,reg:Register,symidx:&SymIdx,sym_ty:&Type,symtab:&mut SymTab,asm_sect:&mut AsmSection,
         store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
         load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>
@@ -481,10 +528,8 @@ impl RegTab{
         }
         self.try_release_symidx(symidx, symtab, asm_sect, store_f)?;
         self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
-        let tracked= RegTab::symidx_should_track(symidx, symtab)?;
-        self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
         // self.try_release_reg(reg.clone(), symtab, asm_sect, store_reg_f)?;
-        self.occupy_reg(reg.clone(), symidx, symtab, tracked)?;
+        self.occupy_reg(reg.clone(), symidx, symtab, asm_sect, false)?;
         load_f(symidx.clone(),reg.clone(),symtab,asm_sect,self)?;
         Ok(reg)
     }
@@ -499,9 +544,7 @@ impl RegTab{
             _ => {}
         }
         self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
-        self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
-        // self.try_release_reg(reg.clone(), symtab, asm_sect, store_reg_f)?;
-        self.occupy_reg(reg.clone(), &SymIdx::from_str(format!("_anonymous_of_{:?}",symidx).as_str()), symtab, false)?;
+        self.occupy_reg(reg.clone(), &SymIdx::from_str(format!("_anonymous_of_{:?}",symidx).as_str()), symtab, asm_sect, false)?;
         load_f(symidx.clone(),reg.clone(),symtab,asm_sect,self)?;
         Ok(reg)
     }
@@ -560,10 +603,11 @@ impl SymTab{
             Ok(None)
         }
     }
-
 }
 impl Debug for RegTab{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("RegTab").field("reg_symidx_map", &self.reg_symidx_map).finish()
+        let s:String = self.reg_symidx_map.iter().filter(|(r,s)|!s.is_released()).
+            map(|(r,s)|format!("    {:?}:{:?} | ",r,s)).sorted().collect();
+        write!(f,"{}",s)
     }
 }

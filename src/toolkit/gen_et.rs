@@ -502,24 +502,29 @@ fn process_additive_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Sco
         }
     };
 
-    let mut op_last_et_op_node = None;
+    let mut op_last_ep_multi_node = None;
     if multiplicative_expr_nodes.len() > 1 {
-        for (index, &multiplicative_node) in multiplicative_expr_nodes.iter().enumerate() {
-            if index != multiplicative_expr_nodes.len() - 1 {
-                if op_last_et_op_node.is_none() {
-                    // 由于是第一个节点，我们需要基于第一个操作符创建节点
-                    op_last_et_op_node = Some(add_node_with_edge!({get_expr_node_of_op_node(index)} with_edge {EtEdgeType::Direct.into()} from parent_et_node in et_tree));
-                } else {
-                    let last_ep_multiplicative_node = op_last_et_op_node.unwrap();
-                    // 注意：每个操作符对应一个操作节点，索引应调整为基于操作符的实际位置
-                    op_last_et_op_node = Some(add_node_with_edge!({get_expr_node_of_op_node(index)} with_edge {EtEdgeType::Direct.into()} from last_ep_multiplicative_node in et_tree));
-                }
-                process_multiplicative_expr(et_tree, ast_tree, scope_tree, multiplicative_node, scope_node, op_last_et_op_node.unwrap());
+        for (index, &multi_node) in multiplicative_expr_nodes.iter().enumerate() {
+            if index == 0 {
+                // first et_node should 
+                op_last_ep_multi_node = Some(add_node!({get_expr_node_of_op_node(0)} to et_tree));
+                process_multiplicative_expr(et_tree, ast_tree, scope_tree, multi_node, scope_node, op_last_ep_multi_node.unwrap());
             } else {
-                // 最后一个节点使用同样的方法连接
-                process_multiplicative_expr(et_tree, ast_tree, scope_tree, multiplicative_node, scope_node, op_last_et_op_node.unwrap());
+                // 第一个 castExpression，基于第一个操作符创建节点
+                // op_last_ep_cast_node = Some(add_node!({get_expr_node_of_op_node(0)} with_edge {EtEdgeType::Direct.into()} from parent_et_node in et_tree));
+                process_multiplicative_expr(et_tree, ast_tree, scope_tree, multi_node, scope_node, op_last_ep_multi_node.unwrap());
+                let last_ep_cast_node = op_last_ep_multi_node.unwrap();
+                // 注意：每个操作符对应一个操作节点，索引应调整为基于操作符的实际位置
+                if index != multiplicative_expr_nodes.len()-1{
+                    let added_cast_node = add_node!({get_expr_node_of_op_node(index)} to et_tree);
+                    // op_last_ep_cast_node = Some(add_node_with_edge!({get_expr_node_of_op_node(index)} with_edge {EtEdgeType::Direct.into()} from last_ep_cast_node in et_tree));
+                    add_edge!({EtEdgeType::Direct.into()} from  added_cast_node to last_ep_cast_node in et_tree);
+                    op_last_ep_multi_node =Some(added_cast_node);
+                }
             }
         }
+        let last_ep_cast_node = op_last_ep_multi_node.unwrap();
+        add_edge!({EtEdgeType::Direct.into()} from parent_et_node to last_ep_cast_node in et_tree);
     } else if multiplicative_expr_nodes.len() == 1 {
         // 只有一个 multiplicativeExpression，直接处理这个表达式，不需要创建操作符节点
         process_multiplicative_expr(et_tree, ast_tree, scope_tree, multiplicative_expr_nodes[0], scope_node, parent_et_node);

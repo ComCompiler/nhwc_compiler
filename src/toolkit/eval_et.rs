@@ -179,8 +179,8 @@ fn match_x_add_x(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree)->bool{
         // delete parent to cur et_node
         let et_node_mul2x = et_tree.find_edge(NodeIndex::new(et_node as usize), NodeIndex::new(l_node as usize)).unwrap();
         et_tree.edge_weight_mut(et_node_mul2x).unwrap().et_edge_type = EtEdgeType::Deleted;
-        let et_node_mul2x = et_tree.find_edge(NodeIndex::new(et_node as usize), NodeIndex::new(r_node as usize)).unwrap();
-        et_tree.edge_weight_mut(et_node_mul2x).unwrap().et_edge_type = EtEdgeType::Deleted;
+        // let et_node_mul2x = et_tree.find_edge(NodeIndex::new(et_node as usize), NodeIndex::new(r_node as usize)).unwrap();
+        // et_tree.edge_weight_mut(et_node_mul2x).unwrap().et_edge_type = EtEdgeType::Deleted;
         *node_mut!(at et_node in et_tree) = EtNodeType::new_op_mul(0).into();
         // add_edge!({EtEdgeType::Direct.into()} from et_node to l_node in et_tree);
         true
@@ -375,10 +375,10 @@ pub fn compress_et(et_tree:&mut EtTree, et_sep_node:u32, symtab:&SymTab, scope_n
     recursive_replace_const_symbol(et_tree, et_sep_node, symtab, scope_node, scope_tree)?;
     eval_et(et_tree, et_sep_node);
     let dfs_nodes = dfs_with_predicate(&et_tree, et_sep_node, |e|!e.weight().et_edge_type.is_deleted());
-    for et_node in direct_et_child_nodes!(at et_sep_node in et_tree ){
-        debug_info_blue!("hash expr eliminate on {}",et_node);
-        hash_expr_elimination(et_node, et_tree);
-    }
+    // for et_node in direct_et_child_nodes!(at et_sep_node in et_tree ){
+    //     debug_info_blue!("hash expr eliminate on {}",et_node);
+    //     hash_expr_elimination(et_node, et_tree);
+    // }
     for et_node in dfs_nodes{
         reducation(et_node, et_tree);
     }

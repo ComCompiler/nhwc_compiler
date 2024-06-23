@@ -609,8 +609,8 @@ impl Simulator{
                     );
                 }
                 // add its global ptr to simu_symtab
-                if !simu_symtab.has_symbol(&src_var_symidx.to_global_ptr()?){
-                    add_symbol!({src_var_symidx.clone().to_global_ptr()?.into_symbol()}
+                if !simu_symtab.has_symbol(&src_var_symidx.to_ptr()?){
+                    add_symbol!({src_var_symidx.clone().to_ptr()?.into_symbol()}
                         with_field SIMU_VAL:{Value::new_ptr64_to_variable(src_var_symidx.clone(),vartype.clone())}
                         with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
                         to simu_symtab

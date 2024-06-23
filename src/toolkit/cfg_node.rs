@@ -132,7 +132,9 @@ impl CfgNode {
     pub fn push_nhwc_instr(&mut self,instr:NhwcInstr,instr_slab:&mut InstrSlab<NhwcInstr>) -> Result<usize>{
         let instr = instr_slab.insert_instr(instr);
         match &instr!(at instr in instr_slab)?.instr_type{
-            NhwcInstrType::Label { label_symidx: _ } => self.op_label_instr = Some(instr),
+            NhwcInstrType::Label { label_symidx: _ } => if self.op_label_instr.is_none(){ self.op_label_instr = Some(instr)} else {
+                Err(anyhow!("label has been added, can't add {:?}",instr!(at instr in instr_slab)?))?
+            },
             NhwcInstrType::Phi { lhs: _, rhs: _ } => self.phi_instrs.push(instr),
             NhwcInstrType::Jump { jump_op: _ } => self.op_jump_instr = Some(instr),
             _ => self.instrs.push(instr),

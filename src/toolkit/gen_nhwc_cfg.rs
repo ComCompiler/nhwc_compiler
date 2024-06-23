@@ -5,7 +5,7 @@ use petgraph::{
 };
 use core::panic;
 use std::collections::HashMap;
-use std::f64::consts::E;
+use crate::instr;
 
 use super::cfg_node::CFG_ROOT;
 use super::et_node::{EtNode, ExprOp};
@@ -21,11 +21,8 @@ use super::{
 use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_instr::InstrSlab};
 use crate::antlr_parser::clexer::{Identifier, LeftParen};
 use crate::antlr_parser::cparser::{RULE_breakStatement, RULE_breakpointArg, RULE_breakpointStatement, RULE_continueStatement, RULE_initDeclarator, RULE_initDeclaratorList, RULE_returnStatement};
-use crate::toolkit::dot::Config;
-use crate::toolkit::etc::generate_png_by_graph;
 use crate::toolkit::nhwc_instr::BreakpointArg;
 use crate::toolkit::scope_node::ST_ROOT;
-use crate::toolkit::symtab;
 use crate::{debug_info_blue, debug_info_green, debug_info_red, direct_parent_node};
 use crate::{
     add_edge, add_node_with_edge, add_symbol, antlr_parser::cparser::{
@@ -214,7 +211,10 @@ fn parse_bb2nhwc(
                             // cfg_graph.remove_edge(cfg_edge_to_removed);
                         },
                         (RULE_breakStatement,break_ast) => {
-                            let while_or_for_node = get_while_or_for_node_of_cfg_node(cfg_bb, cfg_graph)?;
+                            let while_or_for_node = match get_while_or_for_node_of_cfg_node(cfg_bb, cfg_graph){
+                                anyhow::Result::Ok(while_or_for_node ) => while_or_for_node ,
+                                Err(e) => {debug_info_blue!("{}",e);continue;},
+                            };
                             let body_exit_node = get_exit_node_of_while_or_for_node(while_or_for_node, cfg_graph)?;
                             let jump_label = node!(at body_exit_node in cfg_graph).op_label_instr.unwrap();
                             let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
@@ -236,7 +236,10 @@ fn parse_bb2nhwc(
                             add_edge!({CfgEdge::new_direct()} from cfg_bb to body_exit_node in cfg_graph);
                         },
                         (RULE_continueStatement,ctn_ast) => {
-                            let while_or_for_node = get_while_or_for_node_of_cfg_node(cfg_bb, cfg_graph)?;
+                            let while_or_for_node = match get_while_or_for_node_of_cfg_node(cfg_bb, cfg_graph){
+                                anyhow::Result::Ok(while_or_for_node ) => while_or_for_node ,
+                                Err(e) => {debug_info_blue!("{}",e);continue;},
+                            };
                             let body_exit_node = get_exit_node_of_while_or_for_node(while_or_for_node, cfg_graph)?;
                             let jump_label = node!(at body_exit_node in cfg_graph).op_label_instr.unwrap();
                             let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
@@ -279,19 +282,9 @@ fn parse_whileloop2nhwc(
             let cfg_exit_node = get_exit_node_of_while_or_for_node(cfg_whileloop, cfg_graph)?;
             let cfg_body_tail_node = direct_parent_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_tail() });
 
-            let while_head_symidx = process_label_symbol(cfg_whileloop,*ast2scope.get(&ast_expr_node).unwrap(), "while.head".to_string(), symtab)?;
-            let while_body_symidx = process_label_symbol(cfg_body_head_node,*ast2scope.get(&ast_expr_node).unwrap(), "while.body".to_string(), symtab)?;
-            let while_exit_symidx = process_label_symbol(cfg_exit_node,*ast2scope.get(&ast_expr_node).unwrap(), "while.exit".to_string(), symtab)?;
-
-            let label_body_instr_struct = NhwcInstrType::new_label(while_body_symidx.clone()).into();
-            node_mut!(at cfg_body_head_node in cfg_graph).push_nhwc_instr(label_body_instr_struct, instr_slab)?;
-
-            let label_head_instr_struct = NhwcInstrType::new_label(while_head_symidx.clone()).into();
-            node_mut!(at cfg_whileloop in cfg_graph).push_nhwc_instr(label_head_instr_struct, instr_slab)?;
-
-            let label_exit_instr_struct = NhwcInstrType::new_label(while_exit_symidx.clone()).into();
-            node_mut!(at cfg_exit_node in cfg_graph).push_nhwc_instr(label_exit_instr_struct, instr_slab)?;
-
+            let while_head_symidx = find_or_new_label_to_cfg_node(cfg_whileloop,*ast2scope.get(&ast_expr_node).unwrap(), "while.head".to_string(), symtab,cfg_graph,instr_slab)?;
+            let while_body_symidx = find_or_new_label_to_cfg_node(cfg_body_head_node,*ast2scope.get(&ast_expr_node).unwrap(), "while.body".to_string(), symtab,cfg_graph, instr_slab)?;
+            let while_exit_symidx = find_or_new_label_to_cfg_node(cfg_exit_node,*ast2scope.get(&ast_expr_node).unwrap(), "while.exit".to_string(), symtab,cfg_graph,instr_slab)?;
 
             if let Some(&expr_scope) = ast2scope.get(&expr_ast) {
                 let expr_parent_scope = direct_parent_node!(at expr_scope in scope_tree);
@@ -331,6 +324,24 @@ pub fn process_label_symbol(cfg_node:u32,scope_node:u32,label_name:String,symtab
         with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
     to symtab);
     Ok(label_symidx)
+}
+pub fn find_or_new_label_to_cfg_node(cfg_node:u32,scope_node:u32,label_name:String,symtab:&mut SymTab,cfg_graph:&mut CfgGraph, instr_slab:&mut InstrSlab<NhwcInstr>) -> Result<SymIdx>{
+    match &node!(at cfg_node in cfg_graph).op_label_instr{
+        Some(instr) => {
+            let instr = *instr;
+            match &instr!(at instr in instr_slab)?.instr_type{
+                NhwcInstrType::Label { label_symidx } => {
+                    Ok(label_symidx.clone())
+                },
+                _ => panic!()
+            }},
+        None => {
+            let label_symidx = process_label_symbol(cfg_node, scope_node, label_name, symtab)?;
+            let label_body_instr_struct = NhwcInstrType::new_label(label_symidx.clone()).into();
+            node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(label_body_instr_struct, instr_slab)?;
+            Ok(label_symidx)
+        },
+    }
 }
 fn parse_forloop2nhwc(
     ast_tree:&AstTree, cfg_graph:&mut CfgGraph, scope_tree:&ScopeTree, et_tree:&mut EtTree, symtab:&mut SymTab, ast2scope:&HashMap<u32, u32>, ast_before_node:u32, ast_mid_node:u32,
@@ -412,14 +423,8 @@ fn parse_branch2nhwc(
     let cfg_true_node = direct_child_node!(at cfg_branch_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_true()});
     let cfg_false_node = direct_child_node!(at cfg_branch_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_false()});
 
-    let label_true_symidx = process_label_symbol(cfg_true_node,*ast2scope.get(&ast_expr_node).unwrap(), "branch_true".to_string(), symtab)?;
-    let label_false_symidx = process_label_symbol(cfg_false_node,*ast2scope.get(&ast_expr_node).unwrap(), "branch_false".to_string(), symtab)?;
-
-    let label_true_instr = NhwcInstrType::new_label(label_true_symidx.clone()).into();
-    let label_false_instr = NhwcInstrType::new_label(label_false_symidx.clone()).into();
-
-    node_mut!(at cfg_true_node in cfg_graph).push_nhwc_instr(label_true_instr, instr_slab)?;
-    node_mut!(at cfg_false_node in cfg_graph).push_nhwc_instr(label_false_instr, instr_slab)?;
+    let label_true_symidx = find_or_new_label_to_cfg_node(cfg_true_node,*ast2scope.get(&ast_expr_node).unwrap(), "branch_true".to_string(), symtab,cfg_graph,instr_slab)?;
+    let label_false_symidx = find_or_new_label_to_cfg_node(cfg_false_node,*ast2scope.get(&ast_expr_node).unwrap(), "branch_false".to_string(), symtab,cfg_graph,instr_slab)?;
 
     match (rule_id!(at ast_expr_node in ast_tree), ast_expr_node) {
         (RULE_expression, expr_node) => {
@@ -437,8 +442,13 @@ fn parse_branch2nhwc(
                     return Err(anyhow!("条件表达式错误，返回类型不能转为bool"))
                 }
 
-                let br_branch_instr_struct = NhwcInstrType::new_br(r2bool_symidx.clone(),label_true_symidx,label_false_symidx).into();
-                node_mut!(at cfg_branch_node in cfg_graph).push_nhwc_instr(br_branch_instr_struct, instr_slab)?;
+                if cfg_true_node != cfg_false_node{
+                    let br_branch_instr_struct = NhwcInstrType::new_br(r2bool_symidx.clone(),label_true_symidx,label_false_symidx).into();
+                    node_mut!(at cfg_branch_node in cfg_graph).push_nhwc_instr(br_branch_instr_struct, instr_slab)?;
+                }else {
+                    let jump_instr_struct = NhwcInstrType::new_jump(label_false_symidx).into();
+                    node_mut!(at cfg_branch_node in cfg_graph).push_nhwc_instr(jump_instr_struct, instr_slab)?;
+                }
 
                 node_mut!(at cfg_branch_node in cfg_graph).add_jump_det(r2bool_symidx);
             } else {
@@ -531,7 +541,7 @@ fn process_symbol(
             to symtab debug op_symtab_graph);
             // if it is global then add global ptr to this global variable
             if is_global{
-                let _global_ptr_symidx = add_symbol!({symidx.to_global_ptr()?.into_symbol()}
+                let _global_ptr_symidx = add_symbol!({symidx.to_ptr()?.into_symbol()}
                     with_field TYPE:{var_type.to_ref_ptr_type()?}
                     with_field DEF_CFG_NODE_VEC:{vec![cfg_node]}
                     with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
@@ -567,10 +577,10 @@ fn process_symbol(
             }
             if *symtab.get(&symidx)?.get_is_global()?{
                 let temp_type = symtab.get(&symidx)?.get_type()?.clone();
-                let ptr_type = symtab.get(&symidx.to_global_ptr()?)?.get_type()?.clone();
-                let temp_symidx = process_temp_symbol(cfg_graph, symtab, &temp_type, scope_parent_node, cfg_node, instr_slab, &mut None, op_et_node, et_tree)?;
+                let ptr_type = symtab.get(&symidx.to_ptr()?)?.get_type()?.clone();
+                let temp_symidx = process_temp_symbol(cfg_graph, symtab, &temp_type, scope_parent_node, cfg_node, instr_slab, &mut None, op_et_node, et_tree, "ptr2globl")?;
 
-                node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_load(temp_symidx.clone(), symidx.to_global_ptr()?, ptr_type.clone()).into(), instr_slab)?;
+                node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_load(temp_symidx.clone(), symidx.to_ptr()?, ptr_type.clone()).into(), instr_slab)?;
                 Ok(temp_symidx)
             }else{
                 Ok(symidx)
@@ -594,8 +604,8 @@ fn process_symbol(
 }
 fn process_temp_symbol(
     cfg_graph:&mut CfgGraph, symtab:&mut SymTab, temp_type:&Type,  scope_node:u32, cfg_node:u32,  instr_slab:&mut InstrSlab<NhwcInstr>,
-    symtab_graph:&mut Option<&mut SymTabGraph>,op_et_node:Option<u32>,et_tree:&mut EtTree,)->Result<SymIdx>{
-        let temp_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}",symtab.get_global_info().get_temp_counter()?))} 
+    symtab_graph:&mut Option<&mut SymTabGraph>,op_et_node:Option<u32>,et_tree:&mut EtTree,annotation:&str)->Result<SymIdx>{
+        let temp_symidx = add_symbol!({Symbol::new(scope_node,format!("temp_{}_{}",symtab.get_global_info().get_temp_counter()?,annotation))} 
             with_field TYPE:{temp_type.clone()} 
             with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
             with_field IS_TEMP:{true} 
@@ -640,14 +650,14 @@ fn force_trans_type(
     match (type_be_transed, type_to_trans_to) {
         (Type::I32, Type::F32) => {
             //创建f32类型的临时变量
-            let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let i2f_instr = NhwcInstrType::new_int2float(symidx.clone(), ftmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(i2f_instr, instr_slab)?;
             return Ok(ftmp_type_symidx);
         }
         (Type::I32, Type::I1) => {
             //创建i1类型的变临时量
-            let btmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let btmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
             let i2b_instr = NhwcInstrType::new_icmp(btmp_type_symidx.clone(), IcmpPlan::Ne, symidx.clone(), izero_symidx, Type::I32).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(i2b_instr, instr_slab)?;
@@ -655,14 +665,14 @@ fn force_trans_type(
         }
         (Type::F32, Type::I32) => {
             //创建i32类型的临时变量
-            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let f2i_instr = NhwcInstrType::new_float2int(symidx.clone(), itmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(f2i_instr, instr_slab)?;
             return Ok(itmp_type_symidx);
         }
         (Type::F32, Type::I1) => {
             //创建i1类型临时变量
-            let btmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let btmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), symtab_graph)?;
             let f2b_instr = NhwcInstrType::new_fcmp(btmp_type_symidx.clone(), FcmpPlan::One, symidx.clone(), fzero_symidx, Type::F32).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(f2b_instr, instr_slab)?;
@@ -670,7 +680,7 @@ fn force_trans_type(
         }
         (Type::I1, Type::I32) => {
             //创建i1类型临时变量
-            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;            
+            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;            
             let b2i_instr = NhwcInstrType::new_bool2int(symidx.clone(), itmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(b2i_instr, instr_slab)?;
             return Ok(itmp_type_symidx);
@@ -678,11 +688,11 @@ fn force_trans_type(
         (Type::I1, Type::F32) => {
             //i1转f32分两步，第一步i1转i32，第二步i32转f32
             //第一步
-            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let b2i_instr = NhwcInstrType::new_bool2int(symidx.clone(), itmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(b2i_instr, instr_slab)?;
             //第二步
-            let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let i2f_instr = NhwcInstrType::new_int2float(itmp_type_symidx.clone(), ftmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(i2f_instr, instr_slab)?;
             return Ok(ftmp_type_symidx);
@@ -705,50 +715,50 @@ fn autotrans_arith_type(
     match (l_type.clone(), r_type.clone()) {
         (Type::I32, Type::F32) => {
             //i32自动转换为f32
-            let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let i2f_instr = NhwcInstrType::new_int2float(l_symidx.clone(), ftmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(i2f_instr, instr_slab)?;
             return Ok((ftmp_type_symidx, r_symidx.clone()));
         }
         (Type::F32, Type::I32) => {
             //i32转f32
-            let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab,&Type::F32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab,&Type::F32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let i2f_instr = NhwcInstrType::new_int2float(r_symidx.clone(), ftmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(i2f_instr, instr_slab)?;
             return Ok((l_symidx.clone(), ftmp_type_symidx));
         }
         (Type::I1, Type::I32) => {
             //i1转i32
-            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let b2i_instr = NhwcInstrType::new_bool2int(l_symidx.clone(), itmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(b2i_instr, instr_slab)?;
             return Ok((itmp_type_symidx, r_symidx.clone()));
         }
         (Type::I32, Type::I1) => {
             //i1转i32
-            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let b2i_instr = NhwcInstrType::new_bool2int(r_symidx.clone(), itmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(b2i_instr, instr_slab)?;
             return Ok((l_symidx.clone(), itmp_type_symidx));
         }
         (Type::I1, Type::F32) => {
             //先i1转i32
-            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let b2i_instr = NhwcInstrType::new_bool2int(l_symidx.clone(), itmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(b2i_instr, instr_slab)?;
             //再i32转f32
-            let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let i2f_instr = NhwcInstrType::new_int2float(itmp_type_symidx, ftmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2f_instr, instr_slab)?;
             return Ok((ftmp_type_symidx, r_symidx.clone()));
         }
         (Type::F32, Type::I1) => {
             //i1转i32
-            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let b2i_instr = NhwcInstrType::new_bool2int(r_symidx.clone(), itmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(b2i_instr, instr_slab)?;
             //i32转f32
-            let ftmp2_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let ftmp2_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let i2f_instr = NhwcInstrType::new_int2float(itmp_type_symidx, ftmp2_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2f_instr, instr_slab)?;
             return Ok((l_symidx.clone(), ftmp2_type_symidx));
@@ -771,13 +781,13 @@ fn autotrans_logic_type(
             //i32转i1
             //由于除了i1都要转为i1，这里变量名中ltmp指左操作符转换后的临时symidx，rtmp指右操作符
             //处理左操作数，i32转i1
-            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             //转i1相当于和0进行不等比较，这里调用常数处理函数处理0
             let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
             let i2b_instr = NhwcInstrType::new_icmp(ltmp_type_symidx.clone(), IcmpPlan::Ne, l_symidx.clone(), izero_symidx, Type::I1).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
             //处理右操作数，f32转i1
-            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), symtab_graph)?;
             let f2b_instr = NhwcInstrType::new_fcmp(rtmp_type_symidx.clone(), FcmpPlan::One, r_symidx.clone(), fzero_symidx, Type::F32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(f2b_instr, instr_slab)?;
@@ -785,12 +795,12 @@ fn autotrans_logic_type(
         }
         (Type::F32, Type::I32) => {
             //左操作数f32转i1
-            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), symtab_graph)?;
             let f2b_instr = NhwcInstrType::new_fcmp(ltmp_type_symidx.clone(), FcmpPlan::One, l_symidx.clone(), fzero_symidx, Type::F32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(f2b_instr, instr_slab)?;
             //右操作数i32转i1
-            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
             let i2b_instr = NhwcInstrType::new_icmp(rtmp_type_symidx.clone(), IcmpPlan::Ne, r_symidx.clone(), izero_symidx, Type::I32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
@@ -798,7 +808,7 @@ fn autotrans_logic_type(
         }
         (Type::I1, Type::I32) => {
             //处理右操作数i32转i1
-            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
             let i2b_instr = NhwcInstrType::new_icmp(rtmp_type_symidx.clone(), IcmpPlan::Ne, r_symidx.clone(), izero_symidx, Type::I32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
@@ -806,7 +816,7 @@ fn autotrans_logic_type(
         }
         (Type::I32, Type::I1) => {
             //处理左操作数i32转i1
-            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
             let i2b_instr = NhwcInstrType::new_icmp(ltmp_type_symidx.clone(), IcmpPlan::Ne, l_symidx.clone(), izero_symidx, Type::I32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
@@ -814,7 +824,7 @@ fn autotrans_logic_type(
         }
         (Type::I1, Type::F32) => {
             //处理右操作数f32转i1
-            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), symtab_graph)?;
             let i2b_instr = NhwcInstrType::new_fcmp(rtmp_type_symidx.clone(), FcmpPlan::One, r_symidx.clone(), fzero_symidx, Type::F32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
@@ -822,7 +832,7 @@ fn autotrans_logic_type(
         }
         (Type::F32, Type::I1) => {
             //左操作数f32转i1
-            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), symtab_graph)?;
             let i2b_instr = NhwcInstrType::new_fcmp(ltmp_type_symidx.clone(), FcmpPlan::One, l_symidx.clone(), fzero_symidx, Type::F32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
@@ -830,24 +840,24 @@ fn autotrans_logic_type(
         }
         (Type::F32, Type::F32) => {
             //左操作数f32转i1
-            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), symtab_graph)?;
             let lf2b_instr = NhwcInstrType::new_fcmp(ltmp_type_symidx.clone(), FcmpPlan::One, l_symidx.clone(), fzero_symidx.clone(), Type::F32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(lf2b_instr, instr_slab)?;
             //右操作数f32转i1
-            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let rf2b_instr = NhwcInstrType::new_fcmp(ltmp_type_symidx.clone(), FcmpPlan::One, r_symidx.clone(), fzero_symidx.clone(), Type::F32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(rf2b_instr, instr_slab)?;
             return Ok((ltmp_type_symidx, rtmp_type_symidx));
         }
         (Type::I32, Type::I32) => {
             //左操作数i32转i1
-            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
             let li2b_instr = NhwcInstrType::new_icmp(ltmp_type_symidx.clone(), IcmpPlan::Ne, l_symidx.clone(), izero_symidx.clone(), Type::I32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(li2b_instr, instr_slab)?;
             //右操作数i32转i1
-            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree)?;
+            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
             let ri2b_instr = NhwcInstrType::new_icmp(ltmp_type_symidx.clone(), IcmpPlan::Ne, r_symidx.clone(), izero_symidx.clone(), Type::I32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(ri2b_instr, instr_slab)?;
             return Ok((ltmp_type_symidx, rtmp_type_symidx));
@@ -865,11 +875,11 @@ fn process_self_increment(
     let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb,  instr_slab, symtab_graph)?.unwrap();
     let var_type = symtab.get(&var_symidx)?.get_type()?.clone();
     //读取变量的instr
-    let tmp_loadvar_symidx = process_temp_symbol(cfg_graph, symtab, &var_type, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree)?;
+    let tmp_loadvar_symidx = process_temp_symbol(cfg_graph, symtab, &var_type, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree, "")?;
     let load_instr = NhwcInstrType::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone(),var_type.clone()).into();
     node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(load_instr, instr_slab)?;
     //自增的instr，以及类型转换
-    let tmp_addvar_symidx = process_temp_symbol(cfg_graph, symtab, &var_type, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree)?;
+    let tmp_addvar_symidx = process_temp_symbol(cfg_graph, symtab, &var_type, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree, "self_incremenet")?;
     match &var_type {
         Type::F32 => {
             let fone_symidx = process_literal(symtab, &"1.0".to_string(), symtab_graph)?;
@@ -898,11 +908,11 @@ fn process_self_attennuation(
     let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb,  instr_slab, symtab_graph)?.unwrap();
     let var_type = symtab.get(&var_symidx)?.get_type()?.clone();
     //读取变量的instr
-    let tmp_loadvar_symidx = process_temp_symbol(cfg_graph, symtab, &var_type, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree)?;
+    let tmp_loadvar_symidx = process_temp_symbol(cfg_graph, symtab, &var_type, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree, "")?;
     let load_instr = NhwcInstrType::new_assign(tmp_loadvar_symidx.clone(), var_symidx.clone(),var_type.clone()).into();
     node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(load_instr, instr_slab)?;
     //自减的instr
-    let tmp_subvar_symidx = process_temp_symbol(cfg_graph, symtab, &var_type.clone(), scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree)?;
+    let tmp_subvar_symidx = process_temp_symbol(cfg_graph, symtab, &var_type.clone(), scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree, "")?;
     match &var_type {
         Type::F32 => {
             let fone_symidx = process_literal(symtab, &"1.0".to_string(), symtab_graph)?;
@@ -941,7 +951,7 @@ fn process_arithop(
     //将左右操作数进行类型自动转换
     let (l_symidx, r_symidx) = autotrans_arith_type(cfg_graph, symtab, &l_type, &l_symidx, &r_type, &r_symidx, scope_node, cfg_bb, instr_slab, symtab_graph,Some(et_node),et_tree)?;
     let var_type = symtab.get(&l_symidx)?.get_type()?.clone();
-    let tmp_var_symidx = process_temp_symbol(cfg_graph, symtab,&var_type, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree)?;
+    let tmp_var_symidx = process_temp_symbol(cfg_graph, symtab,&var_type, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree, "arithop")?;
 
 
     //在复合操作符如+=这类操作符在类型转换后需要返回左操作数（即变量）的类型
@@ -963,7 +973,7 @@ fn process_logicop(
 
     //左右操作数自动逻辑类型转换
     let (l_symidx, r_symidx) = autotrans_logic_type(cfg_graph, symtab, &l_type, &l_symidx, &r_type, &r_symidx, scope_node, cfg_bb, instr_slab, symtab_graph,Some(et_node),et_tree)?;
-    let tmp_var_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree)?;
+    let tmp_var_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree, "logic")?;
 
     Ok((tmp_var_symidx, l_symidx, r_symidx))
 }
@@ -984,7 +994,7 @@ fn process_cmp_op(
 
     //将左右操作数进行类型自动转换
     let (transed_l_symidx, transed_r_symidx) = autotrans_arith_type(cfg_graph, symtab, &l_type, &l_symidx, &r_type, &r_symidx, scope_node, cfg_bb, instr_slab, symtab_graph,Some(et_node),et_tree)?;
-    let tmp_var_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree)?;
+    let tmp_var_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree, "cmp")?;
     //做instr
     assert!(symtab.get(&transed_l_symidx)?.get_type()?.is_f_32() == symtab.get(&transed_r_symidx)?.get_type()?.is_f_32());
     let ty = symtab.get(&transed_l_symidx)?.get_type()?.clone();
@@ -1016,7 +1026,7 @@ fn process_call(
             return Err(anyhow!("et生成错误，call节点下第一个不是函数名"))
         }
     }
-    let func_name_symidx = SymIdx::new(0, func_name_str);
+    let func_name_symidx = SymIdx::new(0, func_name_str.clone());
     // 给func call节点的field中添加cor symidx信息
     let func_symidx = node_mut!(at cfg_bb in cfg_graph).get_func_cor_symidx()?.clone();
     // 
@@ -1025,7 +1035,21 @@ fn process_call(
     // 实参
     let mut para_symidxs = vec![];
     for &para_et_node in func_name_and_args[1..].iter() {
-        para_symidxs.push(process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, para_et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?.unwrap());
+        let para_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, para_et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?.unwrap();
+        let para_symidx = match &symtab.get(&para_symidx)?.get_type()?{
+            Type::Array { dims, ele_ty } => {
+                // let ty = symtab.get(&para_symidx)?.get_type()?.clone();
+                // let temp_symidx = process_temp_symbol(cfg_graph, symtab, &ty.arr2ptr()?, scope_node, cfg_bb, instr_slab, symtab_graph, None, et_tree, "array_ele_ptr")?;
+                // let instr_struct = NhwcInstrType::new_get_element_ptr(temp_symidx.clone()
+                //     ,para_symidx,ty,vec![]
+                // ).into();
+                // let getelementptr_instr = node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(instr_struct, instr_slab)?;
+                // temp_symidx
+                para_symidx
+            },
+            _ => para_symidx,
+        };
+        para_symidxs.push(para_symidx);
     }
     let ret_type = if let Type::Fn { arg_syms, ret_sym } = symtab.get(&func_name_symidx)?.get_type()?.clone(){
         //检查形参和实参是否一致
@@ -1046,7 +1070,7 @@ fn process_call(
         let call_instr = NhwcInstrType::new_func_call(None, func_name_symidx, para_symidxs, ret_type).into();
         Ok((None,node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(call_instr, instr_slab)?))
     }else{
-        let tmp_symidx = process_temp_symbol(cfg_graph, symtab, &ret_type, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree)?;
+        let tmp_symidx = process_temp_symbol(cfg_graph, symtab, &ret_type, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree, format!("ret_of_{}",func_name_str).as_str())?;
         let call_instr = NhwcInstrType::new_func_call(Some(tmp_symidx.clone()), func_name_symidx, para_symidxs, ret_type).into();
         Ok((Some(tmp_symidx),node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(call_instr, instr_slab)?))
     }
@@ -1157,7 +1181,7 @@ fn process_et(
                             let symbol_type = symtab.get(&symbol_symidx)?.get_type()?.clone();
 
                             //将数字类型操作数转换为bool类型，bool类型不需要转换
-                            let num2bool_tmp_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree)?;
+                            let num2bool_tmp_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree, "booltrans")?;
                             match symbol_type {
                                 Type::F32 => {
                                     let fzero_symidx = process_literal(symtab, &"0.0".to_string(), symtab_graph)?;
@@ -1172,7 +1196,7 @@ fn process_et(
                                 Type::I1 => {}
                                 _ => return Err(anyhow!("类型{:?}不能进行逻辑运算", symbol_type)),
                             }
-                            let tmp_var_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node,cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree)?;
+                            let tmp_var_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node,cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree, "logicnot")?;
                             let logicnot_instr = NhwcInstrType::new_logic_not(tmp_var_symidx.clone(), num2bool_tmp_symidx, Type::I1).into();
                             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(logicnot_instr, instr_slab)?;
 
@@ -1239,7 +1263,7 @@ fn process_et(
                         if let Some(abs_symbol) = direct_child_node!(at et_node in et_tree ret_option){
                             if let Some(symbol_symidx) = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, abs_symbol, scope_node, cfg_bb, instr_slab, symtab_graph)?{
                                 let symbol_type = symtab.get(&symbol_symidx)?.get_type()?.clone();
-                                let neg_tmp_symidx = process_temp_symbol(cfg_graph, symtab, &symbol_type, scope_node, cfg_bb, instr_slab, symtab_graph, Some(et_node), et_tree)?;
+                                let neg_tmp_symidx = process_temp_symbol(cfg_graph, symtab, &symbol_type, scope_node, cfg_bb, instr_slab, symtab_graph, Some(et_node), et_tree, "")?;
                                 let zero_symidx = 
                                 match symbol_type{
                                     Type::I32 => {
@@ -1376,7 +1400,7 @@ fn process_et(
 
                                 node_mut!(at et_node in et_tree).add_type(infered_ty.clone());
                                 debug_info_green!("all pops finish : {:?} at {et_node}",infered_ty);
-                                let temp_ptr_symidx = process_temp_symbol(cfg_graph, symtab, &infered_ty.to_ref_ptr_type()?, scope_node, cfg_bb,  instr_slab, symtab_graph, Some(et_node), et_tree)?;
+                                let temp_ptr_symidx = process_temp_symbol(cfg_graph, symtab, &infered_ty.to_ref_ptr_type()?, scope_node, cfg_bb,  instr_slab, symtab_graph, Some(et_node), et_tree,"index_ptr")?;
                                 debug_info_red!("temp ptr_syidx is {:?}",temp_ptr_symidx);
                                 let get_ele_ptr_instr_struct = NhwcInstrType::new_get_element_ptr(temp_ptr_symidx.clone(), array_symidx.clone(), array_ty, l_child_dims).into();
                                 node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(get_ele_ptr_instr_struct, instr_slab)?;
@@ -1404,17 +1428,23 @@ fn process_et(
                                 node_mut!(at et_node in et_tree).add_type(infered_ty.clone());
                                 debug_info_green!("all pops finish : {:?} at {et_node}",infered_ty);
 
-                                let temp_ptr_symidx = process_temp_symbol(cfg_graph, symtab, &infered_ty.to_ref_ptr_type()?, scope_node, cfg_bb,  instr_slab, symtab_graph, Some(et_node), et_tree)?;
-                                let temp_symidx = process_temp_symbol(cfg_graph, symtab, &infered_ty, scope_node, cfg_bb,  instr_slab, symtab_graph, Some(et_node), et_tree)?;
+                                let temp_ptr_symidx = process_temp_symbol(cfg_graph, symtab, &infered_ty.to_ref_ptr_type()?, scope_node, cfg_bb,  instr_slab, symtab_graph, Some(et_node), et_tree,"array_ptr")?;
                                 let get_ele_ptr_instr_struct = NhwcInstrType::new_get_element_ptr(temp_ptr_symidx.clone(), array_symidx.clone(), array_ty, l_child_dims).into();
-                                let load_ele_instr_struct = NhwcInstrType::new_load(temp_symidx.clone(), temp_ptr_symidx.clone(), infered_ty.to_ref_ptr_type()?).into();
                                 node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(get_ele_ptr_instr_struct, instr_slab)?;
-                                node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(load_ele_instr_struct, instr_slab)?;
-                                
+
                                 debug_info_red!("temp ptr_syidx is {:?} while array_symidx is {:?}",temp_ptr_symidx,array_symidx);
                                 symtab.get_mut(&temp_ptr_symidx)?.add_pointed_symidx(array_symidx);
 
-                                Some(temp_symidx)
+                                // 这里要分情况，如果不是寻求变量而是寻求它的某个维度的指针，就不能用这个，只有索引维度恰好等于数组维度的时候才需要用load 
+                                if !infered_ty.is_array() && !infered_ty.is_ptr_64(){
+                                    let temp_symidx = process_temp_symbol(cfg_graph, symtab, &infered_ty, scope_node, cfg_bb,  instr_slab, symtab_graph, Some(et_node), et_tree,"array_ele")?;
+                                    let load_ele_instr_struct = NhwcInstrType::new_load(temp_symidx.clone(), temp_ptr_symidx.clone(), infered_ty.to_ref_ptr_type()?).into();
+                                    node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(load_ele_instr_struct, instr_slab)?;
+                                    Some(temp_symidx)
+                                }else {
+                                    Some(temp_ptr_symidx)
+                                }
+                                
                             },
                             EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, decldef_def_or_use:DeclOrDefOrUse::DeclDef { type_ast_node: _, is_const } } => {
                                 // 可删此段
@@ -1546,7 +1576,7 @@ fn process_et(
                                         process_literal(symtab, &array_idx.to_string(), symtab_graph)?;
                                     }
 
-                                    let temp_ptr_symidx = process_temp_symbol(cfg_graph, symtab, &l_ele_ty.to_ref_ptr_type()?, scope_node, cfg_bb,  instr_slab, symtab_graph, Some(et_node), et_tree)?;
+                                    let temp_ptr_symidx = process_temp_symbol(cfg_graph, symtab, &l_ele_ty.to_ref_ptr_type()?, scope_node, cfg_bb,  instr_slab, symtab_graph, Some(et_node), et_tree,"array_init_ptr")?;
                                     let get_ele_ptr_instr_struct = NhwcInstrType::new_get_element_ptr(temp_ptr_symidx.clone(), l_symidx.clone(), l_type.clone(), array_idx_vec.iter().map(|idx| Some(SymIdx::from_str(idx.to_string().as_str()))).collect_vec()).into();
                                     node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(get_ele_ptr_instr_struct, instr_slab)?;
 
@@ -1565,7 +1595,7 @@ fn process_et(
                             _ => {
                                 if *symtab.get(&l_symidx)?.get_is_global()?{
                                     let new_value_symidx = force_trans_type(cfg_graph, symtab, &l_type, &r_type, &r_symidx, scope_node, cfg_bb, instr_slab, symtab_graph,Some(et_node),et_tree)?;
-                                    let l_ptr_symidx = l_symidx.to_global_ptr()?;
+                                    let l_ptr_symidx = l_symidx.to_ptr()?;
                                     let l_ptr_type = symtab.get(&l_ptr_symidx)?.get_type()?.clone();
                                     let store_instr_struct = NhwcInstrType::new_store(l_ptr_symidx,l_ptr_type.clone(),new_value_symidx,r_type).into();
                                     node_mut!(at et_node in et_tree).add_type(l_ptr_type);
@@ -2023,7 +2053,7 @@ pub fn get_while_or_for_node_of_cfg_node(cfg_node:u32, cfg_graph:&mut CfgGraph) 
             return Ok(cfg_node)
         }
     }
-    Err(anyhow!("can't find corresponding while block's while node of the cfg_node"))
+    Err(anyhow!("can't find corresponding while block's while node of the cfg_node {}",cfg_node))
 }
 
 pub fn find_gather_of_branch_downward(cfg_branch_node:u32,cfg_graph:&CfgGraph)-> Result<u32>{

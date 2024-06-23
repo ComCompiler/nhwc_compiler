@@ -114,7 +114,7 @@ impl Pass for MemAllocPass {
 }
 pub fn calculate_mem_offset2sp(cfg_graph:&mut CfgGraph,cfg_entry:u32,symtab:&mut SymTab,symidx:&SymIdx) -> Result<()>{
     let mem_layout = node!(at cfg_entry in cfg_graph).get_mem_layout()?;
-    let mem_offset2sp = (mem_layout.get_mem_len() - *symtab.get(symidx)?.get_mem_offset2s0()? as usize - symtab.get(symidx)?.get_type()?.get_ele_size()?) as isize;
+    let mem_offset2sp = (mem_layout.get_mem_len() - *symtab.get(symidx)?.get_mem_offset2s0()? as usize - symtab.get(symidx)?.get_type()?.get_mem_len()?) as isize;
     symtab.get_mut(symidx)?.add_mem_offset2sp(mem_offset2sp);
     Ok(())
 }

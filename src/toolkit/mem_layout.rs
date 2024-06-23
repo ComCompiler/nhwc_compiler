@@ -134,11 +134,23 @@ impl MemLayout{
 impl Debug for MemLayout{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        for mem_seg in self.mem.iter(){
-            s += format!("|{}:{}\n",{match &mem_seg.op_symidx{
+        let mut offset2sp_vec = vec![];
+        offset2sp_vec.push(0);
+        for (idx,mem_seg) in self.mem.iter().rev().enumerate(){
+            offset2sp_vec.push(mem_seg.len + match offset2sp_vec.get(idx).clone(){
+                Some(&last_offset) => {
+                    last_offset
+                },
+                None => {
+                    panic!()
+                },
+            })
+        };
+        for (idx,mem_seg) in self.mem.iter().enumerate(){
+            s += format!("|{}:{} at {}",{match &mem_seg.op_symidx{
                 Some(symidx) => symidx.to_string(),
                 None => "none".to_string(),
-            }},mem_seg.len).as_str();
+            }},mem_seg.len,offset2sp_vec[self.mem.len()-idx-1]).as_str();
         }
         write!(f,"{}",s)
     }

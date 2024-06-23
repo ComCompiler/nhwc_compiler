@@ -1,8 +1,9 @@
 use std::fmt::Debug;
 use anyhow::*;
 use itertools::Itertools;
+use strum_macros::EnumIs;
 
-use crate::debug_info_red;
+use crate::{debug_info_blue, debug_info_red};
 
 use super::{field::Value, rv64_instr::{Imm, RV64Instr}, symtab::SymIdx};
 
@@ -25,13 +26,13 @@ impl AsmStructure{
     }
 }
 impl AsmSection{
-    pub fn new() -> Self{
+    pub fn new(name:String) -> Self{
         Self{
             stmts: vec![],
+            sect_name: name,
         }
     }
-    pub fn annotation(&mut self, mut annotation:String){
-        annotation = annotation.replace("\n", "");
+    pub fn annotate(&mut self, annotation:String){
         self.stmts.push(AsmAttr::Annotation { annotation }.into())
     }
     pub fn global(&mut self, imm:Imm){
@@ -73,6 +74,7 @@ impl AsmSection{
         self.stmts.push(AsmAttr::Text {  } .into())
     }
     pub fn asm(&mut self, riscv_instr:RV64Instr){
+        debug_info_blue!("asm:{:?}", riscv_instr);
         self.stmts.push(Asm::Riscv { instr: riscv_instr })
     }
 
@@ -118,6 +120,7 @@ impl AsmSection{
 
 /// a section contains several attributes and then asm instrs
 pub struct AsmSection{
+    pub sect_name:String,
     pub stmts:Vec<Asm>
 }
 
@@ -167,7 +170,7 @@ impl Debug for Asm{
                         writeln!(f,"    .type {:?},{:?}",symidx, attr_ty)
                     },
                     AsmAttr::Annotation { annotation } => {
-                        writeln!(f,"                    #{}",annotation, )
+                        write!(f,"                   {}\n",annotation )
                     },
                 }
             },
@@ -178,6 +181,7 @@ impl Debug for Asm{
     }
 }
 
+#[derive(EnumIs)]
 pub enum AsmAttr{
     Annotation{
         annotation:String
@@ -237,20 +241,36 @@ impl Into<Asm> for RV64Instr{
 impl AsmSection{
     pub fn dump(&self, enable_annotation:bool) -> String{
         let mut s = String::new();
-        for asm_attr in &self.stmts{
+        let mut i =0;
+        while i < self.stmts.len(){
+            let asm_attr = self.stmts.get(i).unwrap();
             if !enable_annotation{
                 match asm_attr{
                     Asm::Attr { attr:AsmAttr::Annotation { annotation } } => {
-
+                        
                     },
                     _ => {
                         s += format!("{:?}",asm_attr).as_str();
                     }
                 }
             }else{
-                s += format!("{:?}",asm_attr).as_str();
+                match asm_attr{
+                    Asm::Attr { attr: AsmAttr::Annotation { annotation } } => {
+                        let attr = self.stmts.get(i+1);
+                        if !matches!(attr,Some(Asm::Attr { attr: AsmAttr::Annotation { annotation } })) && annotation.ends_with("\n"){
+                            // next is not annotation so you should add \n
+                            s += format!("              # {:?}\n",asm_attr).as_str();
+                        }else {
+                            s += format!("              # {:?}",asm_attr).as_str();
+                        }
+                    },
+                    _ => {
+                        s += format!("{:?}",asm_attr).as_str();
+                    }
+                }
             }
+            i += 1;
         }
-        format!(".section    {}",s)
+        format!(".section {}\n{}",self.sect_name,s)
     }
 }

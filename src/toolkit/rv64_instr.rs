@@ -3,6 +3,7 @@ use anyhow::*;
 
 
 use derive_new::new;
+use strum_macros::EnumIs;
 
 use crate::{passes::ast2st_pass::Ast2StPass, toolkit::field::Type};
 
@@ -364,7 +365,7 @@ pub static REG_FA_RANGE:Range<u8> = 0..8;
 pub static REG_S_RANGE:Range<u8> = 1..12;
 pub static REG_FS_RANGE:Range<u8> = 0..16;
 pub static REG_T_RANGE:Range<u8> = 0..7;
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash,EnumIs)]
 pub enum  Register {
     Zero,
     RA,
@@ -823,7 +824,7 @@ impl Stores{
                 Stores::new_sb(reg1, reg2, Imm::new_literal_isize(offset))
             },
             (_,false)=> {
-                return Err(anyhow!("unexpected store size"))
+                return Err(anyhow!("unexpected store size {}",size))
             },
             (8,true)=> {
                 Stores::new_fsd(reg1, reg2, Imm::new_literal_isize(offset))
@@ -832,7 +833,7 @@ impl Stores{
                 Stores::new_fsw(reg1, reg2, Imm::new_literal_isize(offset))
             },
             (_,true)=> {
-                return Err(anyhow!("unexpected store size"))
+                return Err(anyhow!("unexpected store size {}",size))
             }
         })
     }
