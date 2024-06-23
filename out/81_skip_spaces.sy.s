@@ -111,7 +111,7 @@ main:
 
 
     lw      a4,60(sp)
-              #                    occupy a5 with _anonymous_of_arr_17_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a3,a4
               #                    free a3
               #                    free a4
@@ -175,28 +175,28 @@ main:
               #                    free a4
               #                    free a2
               #                          jump label: while.head_20 
-              #                    store to temp_2_index_ptr_21 in mem offset legal
-    sd      a1,40(sp)
-              #                    release a1 with temp_2_index_ptr_21
-              #                    store to i_17 in mem offset legal
-    sw      a2,60(sp)
-              #                    release a2 with i_17
               #                    store to temp_3_ret_of_getint_21 in mem offset legal
     sw      a0,36(sp)
               #                    release a0 with temp_3_ret_of_getint_21
+              #                    store to i_17 in mem offset legal
+    sw      a2,60(sp)
+              #                    release a2 with i_17
+              #                    store to temp_2_index_ptr_21 in mem offset legal
+    sd      a1,40(sp)
+              #                    release a1 with temp_2_index_ptr_21
               #                    store to temp_4_arithop_21 in mem offset legal
     sw      a4,32(sp)
               #                    release a4 with temp_4_arithop_21
-              #                    occupy a1 with _anonymous_of_sum_17_0
-              #                    load from sum_17 in mem
-
-
-    lw      a1,56(sp)
               #                    occupy a0 with _anonymous_of_i_17_0
               #                    load from i_17 in mem
 
 
     lw      a0,60(sp)
+              #                    occupy a1 with _anonymous_of_sum_17_0
+              #                    load from sum_17 in mem
+
+
+    lw      a1,56(sp)
     j       .while.head_20
               #                    regtab     a0:Freed { symidx: temp_0_ret_of_getint_19, tracked: true } |     a2:Freed { symidx: temp_1__103, tracked: true } | 
               #                          label while.exit_20: 
@@ -252,7 +252,7 @@ main:
               #                    found literal reg Some(a3) already exist with 1_0
               #                    occupy a3 with 1_0
               #                    occupy a1 with i_17
-              #                    occupy a7 with _anonymous_of_arr_17_0
+              #                    occupy a7 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a7,a3,a1
               #                    free a3
               #                    free a1
@@ -289,12 +289,6 @@ main:
               #                    free s3
               #                    free s2
               #                          jump label: while.exit_20 
-              #                    store to temp_9_arithop_26 in mem offset legal
-    sw      s3,8(sp)
-              #                    release s3 with temp_9_arithop_26
-              #                    store to i_17 in mem offset legal
-    sw      a1,60(sp)
-              #                    release a1 with i_17
               #                    store to sum_17 in mem offset legal
     sw      s2,56(sp)
               #                    release s2 with sum_17
@@ -304,9 +298,15 @@ main:
               #                    store to temp_6_arithop_26 in mem offset legal
     sw      a5,24(sp)
               #                    release a5 with temp_6_arithop_26
+              #                    store to i_17 in mem offset legal
+    sw      a1,60(sp)
+              #                    release a1 with i_17
               #                    store to temp_8_array_ele_26 in mem offset legal
     sw      s1,12(sp)
               #                    release s1 with temp_8_array_ele_26
+              #                    store to temp_9_arithop_26 in mem offset legal
+    sw      s3,8(sp)
+              #                    release s3 with temp_9_arithop_26
               #                    store to temp_5__227 in mem offset legal
     sb      a4,31(sp)
               #                    release a4 with temp_5__227

@@ -108,21 +108,37 @@ main:
               #                    free a5
               #                    free a6
               #                          new_var temp_4_booltrans_22:i1 
+              #                          temp_4_booltrans_22 = icmp i1 Ne temp_3_logicnot_22, 0_0 
+              #                    occupy a6 with temp_3_logicnot_22
+              #                    found literal reg Some(a2) already exist with 0_0
+              #                    occupy a2 with 0_0
+              #                    occupy a7 with temp_4_booltrans_22
+    xor     a7,a6,a2
+    snez    a7, a7
+              #                    free a6
+              #                    free a2
+              #                    free a7
               #                          new_var temp_5_logicnot_22:i1 
               #                          temp_5_logicnot_22 = xor i1 temp_4_booltrans_22, true 
               #                    occupy a7 with temp_4_booltrans_22
-              #                    load from temp_4_booltrans_22 in mem
-    lb      a7,13(sp)
               #                    occupy s1 with temp_5_logicnot_22
     seqz    s1, a7
               #                    free a7
               #                    free s1
               #                          new_var temp_6_booltrans_22:i1 
+              #                          temp_6_booltrans_22 = icmp i1 Ne temp_5_logicnot_22, 0_0 
+              #                    occupy s1 with temp_5_logicnot_22
+              #                    found literal reg Some(a2) already exist with 0_0
+              #                    occupy a2 with 0_0
+              #                    occupy s2 with temp_6_booltrans_22
+    xor     s2,s1,a2
+    snez    s2, s2
+              #                    free s1
+              #                    free a2
+              #                    free s2
               #                          new_var temp_7_logicnot_22:i1 
               #                          temp_7_logicnot_22 = xor i1 temp_6_booltrans_22, true 
               #                    occupy s2 with temp_6_booltrans_22
-              #                    load from temp_6_booltrans_22 in mem
-    lb      s2,11(sp)
               #                    occupy s3 with temp_7_logicnot_22
     seqz    s3, s2
               #                    free s2

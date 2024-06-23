@@ -67,10 +67,10 @@ dfs:
 	li	a1, -1
 	bne	a0, a1, .LBB1_14.80
 .LBB1_2.15:
-	addw	a0, s3, s7
+	addw	a0, s7, s6
 	addw	a0, a0, s4
-	addw	a0, a0, s6
-	addw	a1, a0, s5
+	addw	a0, a0, s5
+	addw	a1, a0, s3
 	li	a0, 1
 	beq	a1, zero, .LBB1_14.80
 .LBB1_3.21:

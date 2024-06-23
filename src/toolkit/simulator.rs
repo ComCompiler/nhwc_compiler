@@ -268,6 +268,8 @@ impl Simulator{
                     self.simu_add_value(formal_arg_symidx, value)?;
                 }
             }
+        }else {
+            debug_info_red!("func {:?} is external can't exec in simulator",func_symidx);
         }
         Ok(())
     }
@@ -609,8 +611,8 @@ impl Simulator{
                     );
                 }
                 // add its global ptr to simu_symtab
-                if !simu_symtab.has_symbol(&src_var_symidx.to_ptr()?){
-                    add_symbol!({src_var_symidx.clone().to_ptr()?.into_symbol()}
+                if !simu_symtab.has_symbol(&src_var_symidx.to_globl_ptr()?){
+                    add_symbol!({src_var_symidx.clone().to_globl_ptr()?.into_symbol()}
                         with_field SIMU_VAL:{Value::new_ptr64_to_variable(src_var_symidx.clone(),vartype.clone())}
                         with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
                         to simu_symtab
@@ -679,18 +681,24 @@ impl Simulator{
             GetElementPtr { lhs, array_ty, array_symidx, idx_vec } => {
                 match array_ty{
                     Type::Array { dims, ele_ty } => {
-                        if dims.len() != idx_vec.len(){
-                            return Err(anyhow!("getelementptr 中数组shape 和 idx_vec 维度应该相同 {:?} {:?}",dims,idx_vec))
-                        }
+                        // if dims.len() != idx_vec.len(){
+                        //     return Err(anyhow!("getelementptr 中数组shape 和 idx_vec 维度应该相同 {:?} {:?}",dims,idx_vec))
+                        // }
                         let simu_symtab = &mut self.simu_symtab;
                         let weights = array_ty.get_array_dim_weight_vec()?;
                         let mut offset = Value::new_i32(0);
                         for (weight_symidx,idx_symidx) in weights.iter().zip(idx_vec.iter()){
-                            let idx_symidx = idx_symidx.as_ref().unwrap();
-                            let weight_val = Value::from_string_with_specific_type(&weight_symidx.symbol_name, &Type::I32)?;
-                            // 两种情况，一种是 idx_symidx 直接是常量 一种是 普通变量
-                            // let idx_val = Value::from_string_with_specific_type(&idx_vec.symbol_name, &Type::I32)?;
-                            offset = (offset + (weight_val * simu_symtab.get(idx_symidx)?.get_simu_val()?.clone())?)?;
+                            match idx_symidx.as_ref(){
+                                Some(idx_symidx) => {
+                                    let weight_val = Value::from_string_with_specific_type(&weight_symidx.symbol_name, &Type::I32)?;
+                                    // 两种情况，一种是 idx_symidx 直接是常量 一种是 普通变量
+                                    // let idx_val = Value::from_string_with_specific_type(&idx_vec.symbol_name, &Type::I32)?;
+                                    offset = (offset + (weight_val * simu_symtab.get(idx_symidx)?.get_simu_val()?.clone())?)?;
+                                },
+                                None => {
+                                    // do nothing
+                                },
+                            }
                         }
                         if !simu_symtab.has_symbol(lhs){
                             add_symbol!({lhs.clone().into_symbol()}

@@ -57,9 +57,9 @@ FourWhile:
 	addiw	a3, a3, -2
 	j	.LBB1_2.1
 .LBB1_10.30:
-	addw	a0, a2, a3
-	addw	a0, a0, a4
-	addw	a0, a0, a1
+	addw	a0, a1, a4
+	addw	a0, a0, a2
+	addw	a0, a0, a3
 	ret
 
 	.section	.text

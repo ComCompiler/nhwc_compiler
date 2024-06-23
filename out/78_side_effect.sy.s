@@ -396,15 +396,15 @@ main:
 
 
     lw      a0,80(sp)
-              #                    occupy a4 with _anonymous_of_temp_11_logic_29_0
-              #                    load from temp_11_logic_29 in mem
-    lb      a4,78(sp)
               #                    occupy a2 with _anonymous_of_temp_10__29_0
               #                    load from temp_10__29 in mem
     lb      a2,79(sp)
               #                    occupy a3 with _anonymous_of_temp_8_logic_29_0
               #                    load from temp_8_logic_29 in mem
     lb      a3,85(sp)
+              #                    occupy a4 with _anonymous_of_temp_11_logic_29_0
+              #                    load from temp_11_logic_29 in mem
+    lb      a4,78(sp)
     j       .branch_false_30
               #                    regtab     a0:Freed { symidx: temp_9_ret_of_inc_a_29, tracked: true } |     a2:Freed { symidx: temp_10__29, tracked: true } |     a3:Freed { symidx: temp_8_logic_29, tracked: true } |     a4:Freed { symidx: temp_11_logic_29, tracked: true } | 
               #                          label branch_false_30: 
@@ -741,15 +741,15 @@ main:
               #                    free a4
               #                    free a0
               #                          jump label: while.head_27 
-              #                    store to temp_28_arithop_28 in mem offset legal
-    sw      a4,20(sp)
-              #                    release a4 with temp_28_arithop_28
               #                    store to temp_26_ptr2globl_38 in mem offset legal
     sw      a1,28(sp)
               #                    release a1 with temp_26_ptr2globl_38
               #                    store to temp_27_arithop_38 in mem offset legal
     sw      a3,24(sp)
               #                    release a3 with temp_27_arithop_38
+              #                    store to temp_28_arithop_28 in mem offset legal
+    sw      a4,20(sp)
+              #                    release a4 with temp_28_arithop_28
     j       .while.head_27
               #                    regtab     a0:Freed { symidx: k_24, tracked: true } |     a2:Freed { symidx: temp_3_cmp_26, tracked: true } | 
               #                          label while.exit_27: 

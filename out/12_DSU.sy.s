@@ -200,6 +200,11 @@ quick_read:
               #                    store to temp_5_ret_of_getch_23 in mem offset legal
     sw      a0,32(sp)
               #                    release a0 with temp_5_ret_of_getch_23
+              #                    occupy a0 with _anonymous_of_temp_0_ret_of_getch_18_0
+              #                    load from temp_0_ret_of_getch_18 in mem
+
+
+    lw      a0,52(sp)
               #                    occupy a2 with _anonymous_of_x_18_0
               #                    load from x_18 in mem
 
@@ -210,11 +215,6 @@ quick_read:
 
 
     lw      a3,40(sp)
-              #                    occupy a0 with _anonymous_of_temp_0_ret_of_getch_18_0
-              #                    load from temp_0_ret_of_getch_18 in mem
-
-
-    lw      a0,52(sp)
     j       .while.head_22
               #                    regtab     a0:Freed { symidx: temp_0_ret_of_getch_18, tracked: true } |     a1:Freed { symidx: ch_18, tracked: true } |     a2:Freed { symidx: x_18, tracked: true } |     a3:Freed { symidx: f_18, tracked: true } |     a5:Freed { symidx: temp_1_cmp_21, tracked: true } |     a7:Freed { symidx: temp_2_cmp_21, tracked: true } |     s1:Freed { symidx: temp_3_logic_21, tracked: true } | 
               #                          label while.exit_22: 
@@ -358,30 +358,30 @@ quick_read:
               #                    store to temp_12_ret_of_getch_30 in mem offset legal
     sw      a0,12(sp)
               #                    release a0 with temp_12_ret_of_getch_30
-              #                    occupy a2 with _anonymous_of_x_18_0
-              #                    load from x_18 in mem
-
-
-    lw      a2,44(sp)
-              #                    occupy s1 with _anonymous_of_temp_3_logic_21_0
-              #                    load from temp_3_logic_21 in mem
-    lb      s1,37(sp)
-              #                    occupy a3 with _anonymous_of_f_18_0
-              #                    load from f_18 in mem
-
-
-    lw      a3,40(sp)
+              #                    occupy a7 with _anonymous_of_temp_2_cmp_21_0
+              #                    load from temp_2_cmp_21 in mem
+    lb      a7,38(sp)
               #                    occupy a5 with _anonymous_of_temp_1_cmp_21_0
               #                    load from temp_1_cmp_21 in mem
     lb      a5,39(sp)
+              #                    occupy s1 with _anonymous_of_temp_3_logic_21_0
+              #                    load from temp_3_logic_21 in mem
+    lb      s1,37(sp)
               #                    occupy a0 with _anonymous_of_temp_0_ret_of_getch_18_0
               #                    load from temp_0_ret_of_getch_18 in mem
 
 
     lw      a0,52(sp)
-              #                    occupy a7 with _anonymous_of_temp_2_cmp_21_0
-              #                    load from temp_2_cmp_21 in mem
-    lb      a7,38(sp)
+              #                    occupy a2 with _anonymous_of_x_18_0
+              #                    load from x_18 in mem
+
+
+    lw      a2,44(sp)
+              #                    occupy a3 with _anonymous_of_f_18_0
+              #                    load from f_18 in mem
+
+
+    lw      a3,40(sp)
     j       .while.exit_22
               #                    regtab     a0:Freed { symidx: temp_0_ret_of_getch_18, tracked: true } |     a1:Freed { symidx: ch_18, tracked: true } |     a2:Freed { symidx: x_18, tracked: true } |     a3:Freed { symidx: f_18, tracked: true } |     a5:Freed { symidx: temp_1_cmp_21, tracked: true } |     a6:Freed { symidx: temp_6_cmp_28, tracked: true } |     a7:Freed { symidx: temp_2_cmp_21, tracked: true } |     s1:Freed { symidx: temp_3_logic_21, tracked: true } |     s3:Freed { symidx: temp_7_cmp_28, tracked: true } |     s4:Freed { symidx: temp_8_logic_28, tracked: true } | 
               #                          label while.exit_29: 
@@ -525,21 +525,23 @@ init:
               #                          label while.body_41: 
 .while.body_41:
               #                          new_var temp_17_index_ptr_42:ptr->i32 
-              #                          temp_17_index_ptr_42 = getelementptr fa_0:Array:i32:[Some(100005_0)] [Some(i_38)] 
+              #                          temp_17_index_ptr_42 = getelementptr *fa_0:ptr->i32 [Some(i_38)] 
               #                    occupy a1 with temp_17_index_ptr_42
     li      a1, 0
               #                    occupy a4 with 1_0
     li      a4, 1
               #                    occupy a0 with i_38
-              #                    occupy a5 with _anonymous_of_fa_0_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a4,a0
               #                    free a4
               #                    free a0
     add     a1,a1,a5
               #                    free a5
     slli a1,a1,2
-              #                    occupy a6 with _anonymous_of_fa_0_0
+              #                    occupy a6 with *fa_0
+              #                       load label fa as ptr to reg
     la      a6, fa
+              #                    occupy reg a6 with *fa_0
     add     a1,a1,a6
               #                    free a6
               #                    free a1
@@ -549,8 +551,8 @@ init:
     sw      a0,0(a1)
               #                    free a0
               #                    free a1
-              #                          mu fa_0:114 
-              #                          fa_0 = chi fa_0:114 
+              #                          mu *fa_0:114 
+              #                          *fa_0 = chi *fa_0:114 
               #                          new_var temp_18_arithop_42:i32 
               #                          temp_18_arithop_42 = Add i32 i_38, 1_0 
               #                    occupy a0 with i_38
@@ -568,15 +570,15 @@ init:
               #                    free a7
               #                    free a0
               #                          jump label: while.head_41 
+              #                    store to temp_17_index_ptr_42 in mem offset legal
+    sd      a1,8(sp)
+              #                    release a1 with temp_17_index_ptr_42
               #                    store to temp_18_arithop_42 in mem offset legal
     sw      a7,4(sp)
               #                    release a7 with temp_18_arithop_42
               #                    store to temp_15_ptr2globl_40 in mem offset legal
     sw      a2,24(sp)
               #                    release a2 with temp_15_ptr2globl_40
-              #                    store to temp_17_index_ptr_42 in mem offset legal
-    sd      a1,8(sp)
-              #                    release a1 with temp_17_index_ptr_42
               #                    store to temp_16_cmp_40 in mem offset legal
     sb      a3,23(sp)
               #                    release a3 with temp_16_cmp_40
@@ -589,223 +591,144 @@ init:
     .globl find
     .type find,@function
 find:
-              #                    mem layout:|ra_find:8 at 800104|s0_find:8 at 800096|x:4 at 800092|temp_19_ptr2globl:400020 at 400072|temp_20_array_ptr:8 at 400064|temp_21_array_ele:4 at 400060|temp_22_cmp:1 at 400059|none:3 at 400056|temp_23_ptr2globl:400020 at 36|none:4 at 32|temp_24_array_ptr:8 at 24|temp_25_array_ele:4 at 20|temp_26_ret_of_find:4 at 16|pa:4 at 12|none:4 at 8|temp_27_index_ptr:8 at 0
-              #                    occupy a1 with -800112_0
-    li      a1, -800112
-    li      a1, -800112
-    add     sp,a1,sp
-              #                    free a1
-              #                    store to ra_find_0 in mem offset_illegal
-              #                    occupy a2 with 800104_0
-    li      a2, 800104
-    add     a2,sp,a2
-    sd      ra,0(a2)
-              #                    free a2
-              #                    store to s0_find_0 in mem offset_illegal
-              #                    occupy a3 with 800096_0
-    li      a3, 800096
-    add     a3,sp,a3
-    sd      s0,0(a3)
-              #                    free a3
-              #                    occupy a4 with 800112_0
-    li      a4, 800112
-    li      a4, 800112
-    add     s0,a4,sp
-              #                    free a4
-              #                          alloc Array:i32:[Some(100005_0)] temp_19_ptr2globl_48 
-              #                          alloc ptr->i32 temp_20_array_ptr_48 
-              #                          alloc i32 temp_21_array_ele_48 
-              #                          alloc i1 temp_22_cmp_48 
-              #                          alloc Array:i32:[Some(100005_0)] temp_23_ptr2globl_51 
-              #                          alloc ptr->i32 temp_24_array_ptr_51 
-              #                          alloc i32 temp_25_array_ele_51 
-              #                          alloc i32 temp_26_ret_of_find_51 
+              #                    mem layout:|ra_find:8 at 64|s0_find:8 at 56|x:4 at 52|none:4 at 48|temp_19_array_ptr:8 at 40|temp_20_array_ele:4 at 36|temp_21_cmp:1 at 35|none:3 at 32|temp_22_array_ptr:8 at 24|temp_23_array_ele:4 at 20|temp_24_ret_of_find:4 at 16|pa:4 at 12|none:4 at 8|temp_25_index_ptr:8 at 0
+    addi    sp,sp,-72
+              #                    store to ra_find_0 in mem offset legal
+    sd      ra,64(sp)
+              #                    store to s0_find_0 in mem offset legal
+    sd      s0,56(sp)
+    addi    s0,sp,72
+              #                          alloc ptr->i32 temp_19_array_ptr_48 
+              #                          alloc i32 temp_20_array_ele_48 
+              #                          alloc i1 temp_21_cmp_48 
+              #                          alloc ptr->i32 temp_22_array_ptr_51 
+              #                          alloc i32 temp_23_array_ele_51 
+              #                          alloc i32 temp_24_ret_of_find_51 
               #                          alloc i32 pa_51 
-              #                          alloc ptr->i32 temp_27_index_ptr_51 
+              #                          alloc ptr->i32 temp_25_index_ptr_51 
               #                    regtab     a0:Freed { symidx: x_45, tracked: true } | 
               #                          label L5_0: 
 .L5_0:
-              #                          new_var temp_19_ptr2globl_48:Array:i32:[Some(100005_0)] 
-              #                          temp_19_ptr2globl_48 = load *fa_0:ptr->i32 
-              #                    occupy a1 with *fa_0
-              #                       load label fa as ptr to reg
-    la      a1, fa
-              #                    occupy reg a1 with *fa_0
-              #                    occupy a2 with temp_19_ptr2globl_48
-    lw      a2,0(a1)
+              #                          new_var temp_19_array_ptr_48:ptr->i32 
+              #                          temp_19_array_ptr_48 = getelementptr *fa_0:ptr->i32 [Some(x_45)] 
+              #                    occupy a1 with temp_19_array_ptr_48
+    li      a1, 0
+              #                    occupy a2 with 1_0
+    li      a2, 1
+              #                    occupy a0 with x_45
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
+    mul     a3,a2,a0
               #                    free a2
-              #                    free a1
-              #                          new_var temp_20_array_ptr_48:ptr->i32 
-              #                          temp_20_array_ptr_48 = getelementptr temp_19_ptr2globl_48:Array:i32:[Some(100005_0)] [Some(x_45)] 
-              #                    occupy a3 with temp_20_array_ptr_48
-    li      a3, 0
-              #                    occupy a4 with 1_0
-    li      a4, 1
-              #                    occupy a0 with x_45
-              #                    occupy a5 with _anonymous_of_temp_19_ptr2globl_48_0
-    mul     a5,a4,a0
+              #                    free a0
+    add     a1,a1,a3
+              #                    free a3
+    slli a1,a1,2
+              #                    occupy a4 with *fa_0
+              #                       load label fa as ptr to reg
+    la      a4, fa
+              #                    occupy reg a4 with *fa_0
+    add     a1,a1,a4
               #                    free a4
-              #                    free a0
-    add     a3,a3,a5
+              #                    free a1
+              #                          new_var temp_20_array_ele_48:i32 
+              #                          temp_20_array_ele_48 = load temp_19_array_ptr_48:ptr->i32 
+              #                    occupy a1 with temp_19_array_ptr_48
+              #                    occupy a5 with temp_20_array_ele_48
+    lw      a5,0(a1)
               #                    free a5
-    slli a3,a3,2
-    add     a3,a3,sp
-              #                    occupy a6 with 400072_0
-    li      a6, 400072
-    li      a6, 400072
-    add     a3,a6,a3
-              #                    free a6
-              #                    free a3
-              #                          new_var temp_21_array_ele_48:i32 
-              #                          temp_21_array_ele_48 = load temp_20_array_ptr_48:ptr->i32 
-              #                    occupy a3 with temp_20_array_ptr_48
-              #                    occupy a7 with temp_21_array_ele_48
-    lw      a7,0(a3)
-              #                    free a7
-              #                    free a3
-              #                          new_var temp_22_cmp_48:i1 
-              #                          temp_22_cmp_48 = icmp i32 Eq temp_21_array_ele_48, x_45 
-              #                    occupy a7 with temp_21_array_ele_48
+              #                    free a1
+              #                          new_var temp_21_cmp_48:i1 
+              #                          temp_21_cmp_48 = icmp i32 Eq temp_20_array_ele_48, x_45 
+              #                    occupy a5 with temp_20_array_ele_48
               #                    occupy a0 with x_45
-              #                    occupy s1 with temp_22_cmp_48
-    xor     s1,a7,a0
-    seqz    s1, s1
-              #                    free a7
+              #                    occupy a6 with temp_21_cmp_48
+    xor     a6,a5,a0
+    seqz    a6, a6
+              #                    free a5
               #                    free a0
-              #                    free s1
-              #                          br i1 temp_22_cmp_48, label branch_true_49, label branch_false_49 
-              #                    occupy s1 with temp_22_cmp_48
-              #                    free s1
-              #                    occupy s1 with temp_22_cmp_48
-    bnez    s1, .branch_true_49
-              #                    free s1
+              #                    free a6
+              #                          br i1 temp_21_cmp_48, label branch_true_49, label branch_false_49 
+              #                    occupy a6 with temp_21_cmp_48
+              #                    free a6
+              #                    occupy a6 with temp_21_cmp_48
+    bnez    a6, .branch_true_49
+              #                    free a6
     j       .branch_false_49
-              #                    regtab     a0:Freed { symidx: x_45, tracked: true } |     a2:Freed { symidx: temp_19_ptr2globl_48, tracked: true } |     a3:Freed { symidx: temp_20_array_ptr_48, tracked: true } |     a7:Freed { symidx: temp_21_array_ele_48, tracked: true } |     s1:Freed { symidx: temp_22_cmp_48, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: x_45, tracked: true } |     a1:Freed { symidx: temp_19_array_ptr_48, tracked: true } |     a5:Freed { symidx: temp_20_array_ele_48, tracked: true } |     a6:Freed { symidx: temp_21_cmp_48, tracked: true } | 
               #                          label branch_true_49: 
 .branch_true_49:
               #                          ret x_45 
               #                    load from ra_find_0 in mem
-              #                    occupy a1 with ra_find_0
-    li      a1, 800104
-    add     a1,sp,a1
-    ld      ra,0(a1)
-              #                    free a1
+    ld      ra,64(sp)
               #                    load from s0_find_0 in mem
-              #                    occupy a4 with s0_find_0
-    li      a4, 800096
-    add     a4,sp,a4
-    ld      s0,0(a4)
-              #                    free a4
-              #                    store to x_45 in mem offset_illegal
-              #                    occupy a0 with 800092_0
-    li      a0, 800092
-    add     a0,sp,a0
-    sw      a0,0(a0)
-              #                    free a0
+    ld      s0,56(sp)
+              #                    store to x_45 in mem offset legal
+    sw      a0,52(sp)
               #                    release a0 with x_45
               #                    occupy a0 with x_45
               #                    load from x_45 in mem
 
-              #                    occupy a5 with x_45
-    li      a5, 800092
-    add     a5,sp,a5
-    lw      a0,0(a5)
-              #                    free a5
-              #                    occupy a6 with 800112_0
-    li      a6, 800112
-    li      a6, 800112
-    add     sp,a6,sp
-              #                    free a6
+
+    lw      a0,52(sp)
+    addi    sp,sp,72
               #                    free a0
     ret
-              #                    regtab     a0:Freed { symidx: x_45, tracked: true } |     a2:Freed { symidx: temp_19_ptr2globl_48, tracked: true } |     a3:Freed { symidx: temp_20_array_ptr_48, tracked: true } |     a7:Freed { symidx: temp_21_array_ele_48, tracked: true } |     s1:Freed { symidx: temp_22_cmp_48, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: x_45, tracked: true } |     a1:Freed { symidx: temp_19_array_ptr_48, tracked: true } |     a5:Freed { symidx: temp_20_array_ele_48, tracked: true } |     a6:Freed { symidx: temp_21_cmp_48, tracked: true } | 
               #                          label branch_false_49: 
 .branch_false_49:
-              #                          new_var temp_23_ptr2globl_51:Array:i32:[Some(100005_0)] 
-              #                          temp_23_ptr2globl_51 = load *fa_0:ptr->i32 
-              #                    occupy a1 with *fa_0
-              #                       load label fa as ptr to reg
-    la      a1, fa
-              #                    occupy reg a1 with *fa_0
-              #                    occupy a4 with temp_23_ptr2globl_51
-    lw      a4,0(a1)
-              #                    free a4
-              #                    free a1
-              #                          new_var temp_24_array_ptr_51:ptr->i32 
-              #                          temp_24_array_ptr_51 = getelementptr temp_23_ptr2globl_51:Array:i32:[Some(100005_0)] [Some(x_45)] 
-              #                    occupy a5 with temp_24_array_ptr_51
-    li      a5, 0
-              #                    occupy a6 with 1_0
-    li      a6, 1
+              #                          new_var temp_22_array_ptr_51:ptr->i32 
+              #                          temp_22_array_ptr_51 = getelementptr *fa_0:ptr->i32 [Some(x_45)] 
+              #                    occupy a2 with temp_22_array_ptr_51
+    li      a2, 0
+              #                    occupy a3 with 1_0
+    li      a3, 1
               #                    occupy a0 with x_45
-              #                    occupy s2 with _anonymous_of_temp_23_ptr2globl_51_0
-    mul     s2,a6,a0
-              #                    free a6
+              #                    occupy a4 with _anonymous_of_temp_idx_mul_weight_reg_0_0
+    mul     a4,a3,a0
+              #                    free a3
               #                    free a0
-    add     a5,a5,s2
-              #                    free s2
-    slli a5,a5,2
-    add     a5,a5,sp
-    addi    a5,a5,36
-              #                    free a5
-              #                          new_var temp_25_array_ele_51:i32 
-              #                          temp_25_array_ele_51 = load temp_24_array_ptr_51:ptr->i32 
-              #                    occupy a5 with temp_24_array_ptr_51
-              #                    occupy s3 with temp_25_array_ele_51
-    lw      s3,0(a5)
-              #                    free s3
-              #                    free a5
-              #                          new_var temp_26_ret_of_find_51:i32 
-              #                          temp_26_ret_of_find_51 =  Call i32 find_0(temp_25_array_ele_51) 
-              #                    saved register dumping to mem
-              #                    store to temp_22_cmp_48 in mem offset_illegal
-              #                    occupy s1 with 400059_0
-    li      s1, 400059
-    add     s1,sp,s1
-    sb      s1,0(s1)
-              #                    free s1
-              #                    release s1 with temp_22_cmp_48
-              #                    store to temp_25_array_ele_51 in mem offset legal
-    sw      s3,20(sp)
-              #                    release s3 with temp_25_array_ele_51
-              #                    store to x_45 in mem offset_illegal
-              #                    occupy a0 with 800092_0
-    li      a0, 800092
-    add     a0,sp,a0
-    sw      a0,0(a0)
-              #                    free a0
-              #                    release a0 with x_45
-              #                    store to temp_19_ptr2globl_48 in mem offset_illegal
-              #                    occupy a0 with 400072_0
-    li      a0, 400072
-    add     a0,sp,a0
-    sw      a2,0(a0)
-              #                    free a0
-              #                    release a2 with temp_19_ptr2globl_48
-              #                    store to temp_20_array_ptr_48 in mem offset_illegal
-              #                    occupy a1 with 400064_0
-    li      a1, 400064
-    add     a1,sp,a1
-    sd      a3,0(a1)
-              #                    free a1
-              #                    release a3 with temp_20_array_ptr_48
-              #                    store to temp_23_ptr2globl_51 in mem offset legal
-    sw      a4,36(sp)
-              #                    release a4 with temp_23_ptr2globl_51
-              #                    store to temp_24_array_ptr_51 in mem offset legal
-    sd      a5,24(sp)
-              #                    release a5 with temp_24_array_ptr_51
-              #                    store to temp_21_array_ele_48 in mem offset_illegal
-              #                    occupy a2 with 400060_0
-    li      a2, 400060
-    add     a2,sp,a2
-    sw      a7,0(a2)
+    add     a2,a2,a4
+              #                    free a4
+    slli a2,a2,2
+              #                    occupy a7 with *fa_0
+              #                       load label fa as ptr to reg
+    la      a7, fa
+              #                    occupy reg a7 with *fa_0
+    add     a2,a2,a7
+              #                    free a7
               #                    free a2
-              #                    release a7 with temp_21_array_ele_48
+              #                          new_var temp_23_array_ele_51:i32 
+              #                          temp_23_array_ele_51 = load temp_22_array_ptr_51:ptr->i32 
+              #                    occupy a2 with temp_22_array_ptr_51
+              #                    occupy s1 with temp_23_array_ele_51
+    lw      s1,0(a2)
+              #                    free s1
+              #                    free a2
+              #                          new_var temp_24_ret_of_find_51:i32 
+              #                          temp_24_ret_of_find_51 =  Call i32 find_0(temp_23_array_ele_51) 
+              #                    saved register dumping to mem
+              #                    store to temp_23_array_ele_51 in mem offset legal
+    sw      s1,20(sp)
+              #                    release s1 with temp_23_array_ele_51
+              #                    store to x_45 in mem offset legal
+    sw      a0,52(sp)
+              #                    release a0 with x_45
+              #                    store to temp_19_array_ptr_48 in mem offset legal
+    sd      a1,40(sp)
+              #                    release a1 with temp_19_array_ptr_48
+              #                    store to temp_22_array_ptr_51 in mem offset legal
+    sd      a2,24(sp)
+              #                    release a2 with temp_22_array_ptr_51
+              #                    store to temp_20_array_ele_48 in mem offset legal
+    sw      a5,36(sp)
+              #                    release a5 with temp_20_array_ele_48
+              #                    store to temp_21_cmp_48 in mem offset legal
+    sb      a6,35(sp)
+              #                    release a6 with temp_21_cmp_48
               #                    caller-saved register dumped to mem
               #                    arg load start
-              #                    occupy a0 with _anonymous_of_temp_25_array_ele_51_0
-              #                    load from temp_25_array_ele_51 in mem
+              #                    occupy a0 with _anonymous_of_temp_23_array_ele_51_0
+              #                    load from temp_23_array_ele_51 in mem
 
 
     lw      a0,20(sp)
@@ -813,102 +736,90 @@ find:
 
 
     call    find
-              #                    store to temp_26_ret_of_find_51 in mem offset legal
+              #                    store to temp_24_ret_of_find_51 in mem offset legal
     sw      a0,16(sp)
-              #                          pa_51 = i32 temp_26_ret_of_find_51 
-              #                    occupy a0 with temp_26_ret_of_find_51
-              #                    occupy a3 with pa_51
-    mv      a3, a0
+              #                          pa_51 = i32 temp_24_ret_of_find_51 
+              #                    occupy a0 with temp_24_ret_of_find_51
+              #                    occupy a1 with pa_51
+    mv      a1, a0
               #                    free a0
-              #                    free a3
-              #                          new_var temp_27_index_ptr_51:ptr->i32 
-              #                          temp_27_index_ptr_51 = getelementptr fa_0:Array:i32:[Some(100005_0)] [Some(x_45)] 
-              #                    occupy a4 with temp_27_index_ptr_51
-    li      a4, 0
-              #                    occupy a5 with 1_0
-    li      a5, 1
-              #                    occupy a6 with x_45
+              #                    free a1
+              #                          new_var temp_25_index_ptr_51:ptr->i32 
+              #                          temp_25_index_ptr_51 = getelementptr *fa_0:ptr->i32 [Some(x_45)] 
+              #                    occupy a2 with temp_25_index_ptr_51
+    li      a2, 0
+              #                    occupy a3 with 1_0
+    li      a3, 1
+              #                    occupy a4 with x_45
               #                    load from x_45 in mem
 
-              #                    occupy a6 with x_45
-    add     a6,sp,a6
-    lw      a6,0(a6)
-              #                    free a6
-              #                    occupy a7 with _anonymous_of_fa_0_0
-    mul     a7,a5,a6
-              #                    free a5
-              #                    free a6
-    add     a4,a4,a7
-              #                    free a7
-    slli a4,a4,2
-              #                    occupy s1 with _anonymous_of_fa_0_0
-    la      s1, fa
-    add     a4,a4,s1
-              #                    free s1
-              #                    free a4
-              #                          store pa_51:i32 temp_27_index_ptr_51:ptr->i32 
-              #                    occupy a4 with temp_27_index_ptr_51
-              #                    occupy a3 with pa_51
-    sw      a3,0(a4)
+
+    lw      a4,52(sp)
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
+    mul     a5,a3,a4
               #                    free a3
               #                    free a4
-              #                          mu fa_0:155 
-              #                          fa_0 = chi fa_0:155 
+    add     a2,a2,a5
+              #                    free a5
+    slli a2,a2,2
+              #                    occupy a6 with *fa_0
+              #                       load label fa as ptr to reg
+    la      a6, fa
+              #                    occupy reg a6 with *fa_0
+    add     a2,a2,a6
+              #                    free a6
+              #                    free a2
+              #                          store pa_51:i32 temp_25_index_ptr_51:ptr->i32 
+              #                    occupy a2 with temp_25_index_ptr_51
+              #                    occupy a1 with pa_51
+    sw      a1,0(a2)
+              #                    free a1
+              #                    free a2
+              #                          mu *fa_0:149 
+              #                          *fa_0 = chi *fa_0:149 
               #                          ret pa_51 
               #                    load from ra_find_0 in mem
-              #                    occupy s2 with ra_find_0
-    li      s2, 800104
-    add     s2,sp,s2
-    ld      ra,0(s2)
-              #                    free s2
+    ld      ra,64(sp)
               #                    load from s0_find_0 in mem
-              #                    occupy s3 with s0_find_0
-    li      s3, 800096
-    add     s3,sp,s3
-    ld      s0,0(s3)
-              #                    free s3
+    ld      s0,56(sp)
               #                    store to pa_51 in mem offset legal
-    sw      a3,12(sp)
-              #                    release a3 with pa_51
-              #                    store to temp_26_ret_of_find_51 in mem offset legal
+    sw      a1,12(sp)
+              #                    release a1 with pa_51
+              #                    store to temp_24_ret_of_find_51 in mem offset legal
     sw      a0,16(sp)
-              #                    release a0 with temp_26_ret_of_find_51
+              #                    release a0 with temp_24_ret_of_find_51
               #                    occupy a0 with pa_51
               #                    load from pa_51 in mem
 
 
     lw      a0,12(sp)
-              #                    occupy a3 with 800112_0
-    li      a3, 800112
-    li      a3, 800112
-    add     sp,a3,sp
-              #                    free a3
+    addi    sp,sp,72
               #                    free a0
     ret
-              #                    regtab     a4:Freed { symidx: temp_27_index_ptr_51, tracked: true } |     a6:Freed { symidx: x_45, tracked: true } |     s2:Freed { symidx: ra_find_0, tracked: true } |     s3:Freed { symidx: s0_find_0, tracked: true } | 
+              #                    regtab     a2:Freed { symidx: temp_25_index_ptr_51, tracked: true } |     a4:Freed { symidx: x_45, tracked: true } | 
               #                          label L6_0: 
 .L6_0:
-              #                    regtab     a4:Freed { symidx: temp_27_index_ptr_51, tracked: true } |     a6:Freed { symidx: x_45, tracked: true } |     s2:Freed { symidx: ra_find_0, tracked: true } |     s3:Freed { symidx: s0_find_0, tracked: true } | 
+              #                    regtab     a2:Freed { symidx: temp_25_index_ptr_51, tracked: true } |     a4:Freed { symidx: x_45, tracked: true } | 
               #                    regtab 
               #                          Define same_0 [x_55, y_55] -> same_ret_0 
     .globl same
     .type same,@function
 same:
-              #                    mem layout:|ra_same:8 at 32|s0_same:8 at 24|x:4 at 20|y:4 at 16|temp_28_ret_of_find:4 at 12|temp_29_ret_of_find:4 at 8|temp_30_cmp:1 at 7|none:7 at 0
+              #                    mem layout:|ra_same:8 at 32|s0_same:8 at 24|x:4 at 20|y:4 at 16|temp_26_ret_of_find:4 at 12|temp_27_ret_of_find:4 at 8|temp_28_cmp:1 at 7|none:7 at 0
     addi    sp,sp,-40
               #                    store to ra_same_0 in mem offset legal
     sd      ra,32(sp)
               #                    store to s0_same_0 in mem offset legal
     sd      s0,24(sp)
     addi    s0,sp,40
-              #                          alloc i32 temp_28_ret_of_find_58 
-              #                          alloc i32 temp_29_ret_of_find_58 
-              #                          alloc i1 temp_30_cmp_58 
+              #                          alloc i32 temp_26_ret_of_find_58 
+              #                          alloc i32 temp_27_ret_of_find_58 
+              #                          alloc i1 temp_28_cmp_58 
               #                    regtab     a0:Freed { symidx: x_55, tracked: true } |     a1:Freed { symidx: y_55, tracked: true } | 
               #                          label L3_0: 
 .L3_0:
-              #                          new_var temp_28_ret_of_find_58:i32 
-              #                          temp_28_ret_of_find_58 =  Call i32 find_0(y_55) 
+              #                          new_var temp_26_ret_of_find_58:i32 
+              #                          temp_26_ret_of_find_58 =  Call i32 find_0(y_55) 
               #                    saved register dumping to mem
               #                    store to x_55 in mem offset legal
     sw      a0,20(sp)
@@ -927,14 +838,14 @@ same:
 
 
     call    find
-              #                    store to temp_28_ret_of_find_58 in mem offset legal
+              #                    store to temp_26_ret_of_find_58 in mem offset legal
     sw      a0,12(sp)
-              #                          new_var temp_29_ret_of_find_58:i32 
-              #                          temp_29_ret_of_find_58 =  Call i32 find_0(x_55) 
+              #                          new_var temp_27_ret_of_find_58:i32 
+              #                          temp_27_ret_of_find_58 =  Call i32 find_0(x_55) 
               #                    saved register dumping to mem
-              #                    store to temp_28_ret_of_find_58 in mem offset legal
+              #                    store to temp_26_ret_of_find_58 in mem offset legal
     sw      a0,12(sp)
-              #                    release a0 with temp_28_ret_of_find_58
+              #                    release a0 with temp_26_ret_of_find_58
               #                    caller-saved register dumped to mem
               #                    arg load start
               #                    occupy a0 with _anonymous_of_x_55_0
@@ -946,30 +857,30 @@ same:
 
 
     call    find
-              #                    store to temp_29_ret_of_find_58 in mem offset legal
+              #                    store to temp_27_ret_of_find_58 in mem offset legal
     sw      a0,8(sp)
-              #                          new_var temp_30_cmp_58:i1 
-              #                          temp_30_cmp_58 = icmp i32 Eq temp_29_ret_of_find_58, temp_28_ret_of_find_58 
-              #                    occupy a0 with temp_29_ret_of_find_58
-              #                    occupy a1 with temp_28_ret_of_find_58
-              #                    load from temp_28_ret_of_find_58 in mem
+              #                          new_var temp_28_cmp_58:i1 
+              #                          temp_28_cmp_58 = icmp i32 Eq temp_27_ret_of_find_58, temp_26_ret_of_find_58 
+              #                    occupy a0 with temp_27_ret_of_find_58
+              #                    occupy a1 with temp_26_ret_of_find_58
+              #                    load from temp_26_ret_of_find_58 in mem
 
 
     lw      a1,12(sp)
-              #                    occupy a2 with temp_30_cmp_58
+              #                    occupy a2 with temp_28_cmp_58
     xor     a2,a0,a1
     seqz    a2, a2
               #                    free a0
               #                    free a1
               #                    free a2
-              #                          br i1 temp_30_cmp_58, label branch_true_59, label branch_false_59 
-              #                    occupy a2 with temp_30_cmp_58
+              #                          br i1 temp_28_cmp_58, label branch_true_59, label branch_false_59 
+              #                    occupy a2 with temp_28_cmp_58
               #                    free a2
-              #                    occupy a2 with temp_30_cmp_58
+              #                    occupy a2 with temp_28_cmp_58
     bnez    a2, .branch_true_59
               #                    free a2
     j       .branch_false_59
-              #                    regtab     a0:Freed { symidx: temp_29_ret_of_find_58, tracked: true } |     a1:Freed { symidx: temp_28_ret_of_find_58, tracked: true } |     a2:Freed { symidx: temp_30_cmp_58, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_27_ret_of_find_58, tracked: true } |     a1:Freed { symidx: temp_26_ret_of_find_58, tracked: true } |     a2:Freed { symidx: temp_28_cmp_58, tracked: true } | 
               #                          label branch_true_59: 
 .branch_true_59:
               #                          ret 1_0 
@@ -977,18 +888,18 @@ same:
     ld      ra,32(sp)
               #                    load from s0_same_0 in mem
     ld      s0,24(sp)
-              #                    store to temp_29_ret_of_find_58 in mem offset legal
+              #                    store to temp_27_ret_of_find_58 in mem offset legal
     sw      a0,8(sp)
-              #                    release a0 with temp_29_ret_of_find_58
+              #                    release a0 with temp_27_ret_of_find_58
               #                    occupy a0 with 1_0
     li      a0, 1
     addi    sp,sp,40
               #                    free a0
     ret
-              #                    regtab     a0:Freed { symidx: temp_29_ret_of_find_58, tracked: true } |     a1:Freed { symidx: temp_28_ret_of_find_58, tracked: true } |     a2:Freed { symidx: temp_30_cmp_58, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_27_ret_of_find_58, tracked: true } |     a1:Freed { symidx: temp_26_ret_of_find_58, tracked: true } |     a2:Freed { symidx: temp_28_cmp_58, tracked: true } | 
               #                          label branch_false_59: 
 .branch_false_59:
-              #                    regtab     a0:Freed { symidx: temp_29_ret_of_find_58, tracked: true } |     a1:Freed { symidx: temp_28_ret_of_find_58, tracked: true } |     a2:Freed { symidx: temp_30_cmp_58, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_27_ret_of_find_58, tracked: true } |     a1:Freed { symidx: temp_26_ret_of_find_58, tracked: true } |     a2:Freed { symidx: temp_28_cmp_58, tracked: true } | 
               #                          label L4_0: 
 .L4_0:
               #                          ret 0_0 
@@ -996,57 +907,57 @@ same:
     ld      ra,32(sp)
               #                    load from s0_same_0 in mem
     ld      s0,24(sp)
-              #                    store to temp_29_ret_of_find_58 in mem offset legal
+              #                    store to temp_27_ret_of_find_58 in mem offset legal
     sw      a0,8(sp)
-              #                    release a0 with temp_29_ret_of_find_58
+              #                    release a0 with temp_27_ret_of_find_58
               #                    occupy a0 with 0_0
     li      a0, 0
     addi    sp,sp,40
               #                    free a0
     ret
-              #                    regtab     a1:Freed { symidx: temp_28_ret_of_find_58, tracked: true } |     a2:Freed { symidx: temp_30_cmp_58, tracked: true } | 
+              #                    regtab     a1:Freed { symidx: temp_26_ret_of_find_58, tracked: true } |     a2:Freed { symidx: temp_28_cmp_58, tracked: true } | 
               #                    regtab 
               #                          Define main_0 [] -> main_ret_0 
     .globl main
     .type main,@function
 main:
-              #                    mem layout:|ra_main:8 at 104|s0_main:8 at 96|temp_31_ret_of_quick_read:4 at 92|temp_32_ret_of_quick_read:4 at 88|temp_33_ptr2globl:4 at 84|temp_34_:1 at 83|none:3 at 80|temp_35_ret_of_getch:4 at 76|ch:4 at 72|temp_36_cmp:1 at 71|temp_37_cmp:1 at 70|temp_38_logic:1 at 69|none:1 at 68|temp_39_ret_of_getch:4 at 64|temp_40_cmp:1 at 63|none:3 at 60|temp_41_ret_of_quick_read:4 at 56|x:4 at 52|temp_42_ret_of_quick_read:4 at 48|y:4 at 44|temp_43_ret_of_same:4 at 40|temp_44_ptr2globl:4 at 36|temp_45_arithop:4 at 32|temp_46_ret_of_quick_read:4 at 28|temp_47_ret_of_find:4 at 24|x:4 at 20|temp_48_ret_of_quick_read:4 at 16|temp_49_ret_of_find:4 at 12|y:4 at 8|temp_50_index_ptr:8 at 0
+              #                    mem layout:|ra_main:8 at 104|s0_main:8 at 96|temp_29_ret_of_quick_read:4 at 92|temp_30_ret_of_quick_read:4 at 88|temp_31_ptr2globl:4 at 84|temp_32_:1 at 83|none:3 at 80|temp_33_ret_of_getch:4 at 76|ch:4 at 72|temp_34_cmp:1 at 71|temp_35_cmp:1 at 70|temp_36_logic:1 at 69|none:1 at 68|temp_37_ret_of_getch:4 at 64|temp_38_cmp:1 at 63|none:3 at 60|temp_39_ret_of_quick_read:4 at 56|x:4 at 52|temp_40_ret_of_quick_read:4 at 48|y:4 at 44|temp_41_ret_of_same:4 at 40|temp_42_ptr2globl:4 at 36|temp_43_arithop:4 at 32|temp_44_ret_of_quick_read:4 at 28|temp_45_ret_of_find:4 at 24|x:4 at 20|temp_46_ret_of_quick_read:4 at 16|temp_47_ret_of_find:4 at 12|y:4 at 8|temp_48_index_ptr:8 at 0
     addi    sp,sp,-112
               #                    store to ra_main_0 in mem offset legal
     sd      ra,104(sp)
               #                    store to s0_main_0 in mem offset legal
     sd      s0,96(sp)
     addi    s0,sp,112
-              #                          alloc i32 temp_31_ret_of_quick_read_63 
-              #                          alloc i32 temp_32_ret_of_quick_read_63 
-              #                          alloc i32 temp_33_ptr2globl_67 
-              #                          alloc i1 temp_34__1231 
-              #                          alloc i32 temp_35_ret_of_getch_69 
+              #                          alloc i32 temp_29_ret_of_quick_read_63 
+              #                          alloc i32 temp_30_ret_of_quick_read_63 
+              #                          alloc i32 temp_31_ptr2globl_67 
+              #                          alloc i1 temp_32__1231 
+              #                          alloc i32 temp_33_ret_of_getch_69 
               #                          alloc i32 ch_69 
-              #                          alloc i1 temp_36_cmp_71 
-              #                          alloc i1 temp_37_cmp_71 
-              #                          alloc i1 temp_38_logic_71 
-              #                          alloc i32 temp_39_ret_of_getch_73 
-              #                          alloc i1 temp_40_cmp_75 
-              #                          alloc i32 temp_41_ret_of_quick_read_77 
+              #                          alloc i1 temp_34_cmp_71 
+              #                          alloc i1 temp_35_cmp_71 
+              #                          alloc i1 temp_36_logic_71 
+              #                          alloc i32 temp_37_ret_of_getch_73 
+              #                          alloc i1 temp_38_cmp_75 
+              #                          alloc i32 temp_39_ret_of_quick_read_77 
               #                          alloc i32 x_77 
-              #                          alloc i32 temp_42_ret_of_quick_read_77 
+              #                          alloc i32 temp_40_ret_of_quick_read_77 
               #                          alloc i32 y_77 
-              #                          alloc i32 temp_43_ret_of_same_77 
-              #                          alloc i32 temp_44_ptr2globl_69 
-              #                          alloc i32 temp_45_arithop_69 
+              #                          alloc i32 temp_41_ret_of_same_77 
+              #                          alloc i32 temp_42_ptr2globl_69 
+              #                          alloc i32 temp_43_arithop_69 
+              #                          alloc i32 temp_44_ret_of_quick_read_81 
+              #                          alloc i32 temp_45_ret_of_find_81 
+              #                          alloc i32 x_81 
               #                          alloc i32 temp_46_ret_of_quick_read_81 
               #                          alloc i32 temp_47_ret_of_find_81 
-              #                          alloc i32 x_81 
-              #                          alloc i32 temp_48_ret_of_quick_read_81 
-              #                          alloc i32 temp_49_ret_of_find_81 
               #                          alloc i32 y_81 
-              #                          alloc ptr->i32 temp_50_index_ptr_81 
+              #                          alloc ptr->i32 temp_48_index_ptr_81 
               #                    regtab 
               #                          label L0_0: 
 .L0_0:
-              #                          new_var temp_31_ret_of_quick_read_63:i32 
-              #                          temp_31_ret_of_quick_read_63 =  Call i32 quick_read_0() 
+              #                          new_var temp_29_ret_of_quick_read_63:i32 
+              #                          temp_29_ret_of_quick_read_63 =  Call i32 quick_read_0() 
               #                    saved register dumping to mem
               #                    caller-saved register dumped to mem
               #                    arg load start
@@ -1054,45 +965,45 @@ main:
 
 
     call    quick_read
-              #                    store to temp_31_ret_of_quick_read_63 in mem offset legal
+              #                    store to temp_29_ret_of_quick_read_63 in mem offset legal
     sw      a0,92(sp)
-              #                          store temp_31_ret_of_quick_read_63:i32 *n_0:ptr->i32 
+              #                          store temp_29_ret_of_quick_read_63:i32 *n_0:ptr->i32 
               #                    occupy a1 with *n_0
               #                       load label n as ptr to reg
     la      a1, n
               #                    occupy reg a1 with *n_0
-              #                    occupy a0 with temp_31_ret_of_quick_read_63
+              #                    occupy a0 with temp_29_ret_of_quick_read_63
     sw      a0,0(a1)
               #                    free a0
               #                    free a1
-              #                          new_var temp_32_ret_of_quick_read_63:i32 
-              #                          temp_32_ret_of_quick_read_63 =  Call i32 quick_read_0() 
+              #                          new_var temp_30_ret_of_quick_read_63:i32 
+              #                          temp_30_ret_of_quick_read_63 =  Call i32 quick_read_0() 
               #                    saved register dumping to mem
-              #                    store to temp_31_ret_of_quick_read_63 in mem offset legal
+              #                    store to temp_29_ret_of_quick_read_63 in mem offset legal
     sw      a0,92(sp)
-              #                    release a0 with temp_31_ret_of_quick_read_63
+              #                    release a0 with temp_29_ret_of_quick_read_63
               #                    caller-saved register dumped to mem
               #                    arg load start
               #                    arg load ended
 
 
     call    quick_read
-              #                    store to temp_32_ret_of_quick_read_63 in mem offset legal
+              #                    store to temp_30_ret_of_quick_read_63 in mem offset legal
     sw      a0,88(sp)
-              #                          store temp_32_ret_of_quick_read_63:i32 *m_0:ptr->i32 
+              #                          store temp_30_ret_of_quick_read_63:i32 *m_0:ptr->i32 
               #                    occupy a1 with *m_0
               #                       load label m as ptr to reg
     la      a1, m
               #                    occupy reg a1 with *m_0
-              #                    occupy a0 with temp_32_ret_of_quick_read_63
+              #                    occupy a0 with temp_30_ret_of_quick_read_63
     sw      a0,0(a1)
               #                    free a0
               #                    free a1
               #                           Call void init_0() 
               #                    saved register dumping to mem
-              #                    store to temp_32_ret_of_quick_read_63 in mem offset legal
+              #                    store to temp_30_ret_of_quick_read_63 in mem offset legal
     sw      a0,88(sp)
-              #                    release a0 with temp_32_ret_of_quick_read_63
+              #                    release a0 with temp_30_ret_of_quick_read_63
               #                    caller-saved register dumped to mem
               #                    arg load start
               #                    arg load ended
@@ -1104,213 +1015,213 @@ main:
               #                    regtab 
               #                          label while.head_68: 
 .while.head_68:
-              #                          new_var temp_33_ptr2globl_67:i32 
-              #                          temp_33_ptr2globl_67 = load *m_0:ptr->i32 
+              #                          new_var temp_31_ptr2globl_67:i32 
+              #                          temp_31_ptr2globl_67 = load *m_0:ptr->i32 
               #                    occupy a0 with *m_0
               #                       load label m as ptr to reg
     la      a0, m
               #                    occupy reg a0 with *m_0
-              #                    occupy a1 with temp_33_ptr2globl_67
+              #                    occupy a1 with temp_31_ptr2globl_67
     lw      a1,0(a0)
               #                    free a1
               #                    free a0
-              #                          new_var temp_34__1231:i1 
-              #                          temp_34__1231 = icmp i32 Ne temp_33_ptr2globl_67, 0_0 
-              #                    occupy a1 with temp_33_ptr2globl_67
+              #                          new_var temp_32__1231:i1 
+              #                          temp_32__1231 = icmp i32 Ne temp_31_ptr2globl_67, 0_0 
+              #                    occupy a1 with temp_31_ptr2globl_67
               #                    occupy a2 with 0_0
     li      a2, 0
-              #                    occupy a3 with temp_34__1231
+              #                    occupy a3 with temp_32__1231
     xor     a3,a1,a2
     snez    a3, a3
               #                    free a1
               #                    free a2
               #                    free a3
-              #                          br i1 temp_34__1231, label while.body_68, label while.exit_68 
-              #                    occupy a3 with temp_34__1231
+              #                          br i1 temp_32__1231, label while.body_68, label while.exit_68 
+              #                    occupy a3 with temp_32__1231
               #                    free a3
-              #                    occupy a3 with temp_34__1231
+              #                    occupy a3 with temp_32__1231
     bnez    a3, .while.body_68
               #                    free a3
     j       .while.exit_68
-              #                    regtab     a1:Freed { symidx: temp_33_ptr2globl_67, tracked: true } |     a3:Freed { symidx: temp_34__1231, tracked: true } | 
+              #                    regtab     a1:Freed { symidx: temp_31_ptr2globl_67, tracked: true } |     a3:Freed { symidx: temp_32__1231, tracked: true } | 
               #                          label while.body_68: 
 .while.body_68:
-              #                          new_var temp_35_ret_of_getch_69:i32 
-              #                          temp_35_ret_of_getch_69 =  Call i32 getch_0() 
+              #                          new_var temp_33_ret_of_getch_69:i32 
+              #                          temp_33_ret_of_getch_69 =  Call i32 getch_0() 
               #                    saved register dumping to mem
-              #                    store to temp_33_ptr2globl_67 in mem offset legal
+              #                    store to temp_31_ptr2globl_67 in mem offset legal
     sw      a1,84(sp)
-              #                    release a1 with temp_33_ptr2globl_67
-              #                    store to temp_34__1231 in mem offset legal
+              #                    release a1 with temp_31_ptr2globl_67
+              #                    store to temp_32__1231 in mem offset legal
     sb      a3,83(sp)
-              #                    release a3 with temp_34__1231
+              #                    release a3 with temp_32__1231
               #                    caller-saved register dumped to mem
               #                    arg load start
               #                    arg load ended
 
 
     call    getch
-              #                    store to temp_35_ret_of_getch_69 in mem offset legal
+              #                    store to temp_33_ret_of_getch_69 in mem offset legal
     sw      a0,76(sp)
-              #                          ch_69 = i32 temp_35_ret_of_getch_69 
-              #                    occupy a0 with temp_35_ret_of_getch_69
+              #                          ch_69 = i32 temp_33_ret_of_getch_69 
+              #                    occupy a0 with temp_33_ret_of_getch_69
               #                    occupy a1 with ch_69
     mv      a1, a0
               #                    free a0
               #                    free a1
               #                          jump label: while.head_72 
     j       .while.head_72
-              #                    regtab     a0:Freed { symidx: temp_35_ret_of_getch_69, tracked: true } |     a1:Freed { symidx: ch_69, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_33_ret_of_getch_69, tracked: true } |     a1:Freed { symidx: ch_69, tracked: true } | 
               #                          label while.head_72: 
 .while.head_72:
-              #                          new_var temp_36_cmp_71:i1 
-              #                          temp_36_cmp_71 = icmp i32 Ne ch_69, 85_0 
+              #                          new_var temp_34_cmp_71:i1 
+              #                          temp_34_cmp_71 = icmp i32 Ne ch_69, 85_0 
               #                    occupy a1 with ch_69
               #                    occupy a2 with 85_0
     li      a2, 85
-              #                    occupy a3 with temp_36_cmp_71
+              #                    occupy a3 with temp_34_cmp_71
     xor     a3,a1,a2
     snez    a3, a3
               #                    free a1
               #                    free a2
               #                    free a3
-              #                          new_var temp_37_cmp_71:i1 
-              #                          temp_37_cmp_71 = icmp i32 Ne ch_69, 81_0 
+              #                          new_var temp_35_cmp_71:i1 
+              #                          temp_35_cmp_71 = icmp i32 Ne ch_69, 81_0 
               #                    occupy a1 with ch_69
               #                    occupy a4 with 81_0
     li      a4, 81
-              #                    occupy a5 with temp_37_cmp_71
+              #                    occupy a5 with temp_35_cmp_71
     xor     a5,a1,a4
     snez    a5, a5
               #                    free a1
               #                    free a4
               #                    free a5
-              #                          new_var temp_38_logic_71:i1 
-              #                          temp_38_logic_71 = And i1 temp_37_cmp_71, temp_36_cmp_71 
-              #                    occupy a5 with temp_37_cmp_71
-              #                    occupy a3 with temp_36_cmp_71
-              #                    occupy a6 with temp_38_logic_71
+              #                          new_var temp_36_logic_71:i1 
+              #                          temp_36_logic_71 = And i1 temp_35_cmp_71, temp_34_cmp_71 
+              #                    occupy a5 with temp_35_cmp_71
+              #                    occupy a3 with temp_34_cmp_71
+              #                    occupy a6 with temp_36_logic_71
     and     a6,a5,a3
               #                    free a5
               #                    free a3
               #                    free a6
-              #                          br i1 temp_38_logic_71, label while.body_72, label while.exit_72 
-              #                    occupy a6 with temp_38_logic_71
+              #                          br i1 temp_36_logic_71, label while.body_72, label while.exit_72 
+              #                    occupy a6 with temp_36_logic_71
               #                    free a6
-              #                    occupy a6 with temp_38_logic_71
+              #                    occupy a6 with temp_36_logic_71
     bnez    a6, .while.body_72
               #                    free a6
     j       .while.exit_72
-              #                    regtab     a0:Freed { symidx: temp_35_ret_of_getch_69, tracked: true } |     a1:Freed { symidx: ch_69, tracked: true } |     a3:Freed { symidx: temp_36_cmp_71, tracked: true } |     a5:Freed { symidx: temp_37_cmp_71, tracked: true } |     a6:Freed { symidx: temp_38_logic_71, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_33_ret_of_getch_69, tracked: true } |     a1:Freed { symidx: ch_69, tracked: true } |     a3:Freed { symidx: temp_34_cmp_71, tracked: true } |     a5:Freed { symidx: temp_35_cmp_71, tracked: true } |     a6:Freed { symidx: temp_36_logic_71, tracked: true } | 
               #                          label while.body_72: 
 .while.body_72:
-              #                          new_var temp_39_ret_of_getch_73:i32 
-              #                          temp_39_ret_of_getch_73 =  Call i32 getch_0() 
+              #                          new_var temp_37_ret_of_getch_73:i32 
+              #                          temp_37_ret_of_getch_73 =  Call i32 getch_0() 
               #                    saved register dumping to mem
-              #                    store to temp_35_ret_of_getch_69 in mem offset legal
+              #                    store to temp_33_ret_of_getch_69 in mem offset legal
     sw      a0,76(sp)
-              #                    release a0 with temp_35_ret_of_getch_69
+              #                    release a0 with temp_33_ret_of_getch_69
               #                    store to ch_69 in mem offset legal
     sw      a1,72(sp)
               #                    release a1 with ch_69
-              #                    store to temp_36_cmp_71 in mem offset legal
+              #                    store to temp_34_cmp_71 in mem offset legal
     sb      a3,71(sp)
-              #                    release a3 with temp_36_cmp_71
-              #                    store to temp_37_cmp_71 in mem offset legal
+              #                    release a3 with temp_34_cmp_71
+              #                    store to temp_35_cmp_71 in mem offset legal
     sb      a5,70(sp)
-              #                    release a5 with temp_37_cmp_71
-              #                    store to temp_38_logic_71 in mem offset legal
+              #                    release a5 with temp_35_cmp_71
+              #                    store to temp_36_logic_71 in mem offset legal
     sb      a6,69(sp)
-              #                    release a6 with temp_38_logic_71
+              #                    release a6 with temp_36_logic_71
               #                    caller-saved register dumped to mem
               #                    arg load start
               #                    arg load ended
 
 
     call    getch
-              #                    store to temp_39_ret_of_getch_73 in mem offset legal
+              #                    store to temp_37_ret_of_getch_73 in mem offset legal
     sw      a0,64(sp)
-              #                          ch_69 = i32 temp_39_ret_of_getch_73 
-              #                    occupy a0 with temp_39_ret_of_getch_73
+              #                          ch_69 = i32 temp_37_ret_of_getch_73 
+              #                    occupy a0 with temp_37_ret_of_getch_73
               #                    occupy a1 with ch_69
     mv      a1, a0
               #                    free a0
               #                    free a1
               #                          jump label: while.head_72 
-              #                    store to temp_39_ret_of_getch_73 in mem offset legal
+              #                    store to temp_37_ret_of_getch_73 in mem offset legal
     sw      a0,64(sp)
-              #                    release a0 with temp_39_ret_of_getch_73
-              #                    occupy a0 with _anonymous_of_temp_35_ret_of_getch_69_0
-              #                    load from temp_35_ret_of_getch_69 in mem
+              #                    release a0 with temp_37_ret_of_getch_73
+              #                    occupy a0 with _anonymous_of_temp_33_ret_of_getch_69_0
+              #                    load from temp_33_ret_of_getch_69 in mem
 
 
     lw      a0,76(sp)
     j       .while.head_72
-              #                    regtab     a0:Freed { symidx: temp_35_ret_of_getch_69, tracked: true } |     a1:Freed { symidx: ch_69, tracked: true } |     a3:Freed { symidx: temp_36_cmp_71, tracked: true } |     a5:Freed { symidx: temp_37_cmp_71, tracked: true } |     a6:Freed { symidx: temp_38_logic_71, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_33_ret_of_getch_69, tracked: true } |     a1:Freed { symidx: ch_69, tracked: true } |     a3:Freed { symidx: temp_34_cmp_71, tracked: true } |     a5:Freed { symidx: temp_35_cmp_71, tracked: true } |     a6:Freed { symidx: temp_36_logic_71, tracked: true } | 
               #                          label while.exit_72: 
 .while.exit_72:
-              #                          new_var temp_40_cmp_75:i1 
-              #                          temp_40_cmp_75 = icmp i32 Eq ch_69, 81_0 
+              #                          new_var temp_38_cmp_75:i1 
+              #                          temp_38_cmp_75 = icmp i32 Eq ch_69, 81_0 
               #                    occupy a1 with ch_69
               #                    occupy a2 with 81_0
     li      a2, 81
-              #                    occupy a4 with temp_40_cmp_75
+              #                    occupy a4 with temp_38_cmp_75
     xor     a4,a1,a2
     seqz    a4, a4
               #                    free a1
               #                    free a2
               #                    free a4
-              #                          br i1 temp_40_cmp_75, label branch_true_76, label branch_false_76 
-              #                    occupy a4 with temp_40_cmp_75
+              #                          br i1 temp_38_cmp_75, label branch_true_76, label branch_false_76 
+              #                    occupy a4 with temp_38_cmp_75
               #                    free a4
-              #                    occupy a4 with temp_40_cmp_75
+              #                    occupy a4 with temp_38_cmp_75
     bnez    a4, .branch_true_76
               #                    free a4
     j       .branch_false_76
-              #                    regtab     a0:Freed { symidx: temp_35_ret_of_getch_69, tracked: true } |     a1:Freed { symidx: ch_69, tracked: true } |     a3:Freed { symidx: temp_36_cmp_71, tracked: true } |     a4:Freed { symidx: temp_40_cmp_75, tracked: true } |     a5:Freed { symidx: temp_37_cmp_71, tracked: true } |     a6:Freed { symidx: temp_38_logic_71, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_33_ret_of_getch_69, tracked: true } |     a1:Freed { symidx: ch_69, tracked: true } |     a3:Freed { symidx: temp_34_cmp_71, tracked: true } |     a4:Freed { symidx: temp_38_cmp_75, tracked: true } |     a5:Freed { symidx: temp_35_cmp_71, tracked: true } |     a6:Freed { symidx: temp_36_logic_71, tracked: true } | 
               #                          label branch_true_76: 
 .branch_true_76:
-              #                          new_var temp_41_ret_of_quick_read_77:i32 
-              #                          temp_41_ret_of_quick_read_77 =  Call i32 quick_read_0() 
+              #                          new_var temp_39_ret_of_quick_read_77:i32 
+              #                          temp_39_ret_of_quick_read_77 =  Call i32 quick_read_0() 
               #                    saved register dumping to mem
-              #                    store to temp_35_ret_of_getch_69 in mem offset legal
+              #                    store to temp_33_ret_of_getch_69 in mem offset legal
     sw      a0,76(sp)
-              #                    release a0 with temp_35_ret_of_getch_69
+              #                    release a0 with temp_33_ret_of_getch_69
               #                    store to ch_69 in mem offset legal
     sw      a1,72(sp)
               #                    release a1 with ch_69
-              #                    store to temp_36_cmp_71 in mem offset legal
+              #                    store to temp_34_cmp_71 in mem offset legal
     sb      a3,71(sp)
-              #                    release a3 with temp_36_cmp_71
-              #                    store to temp_40_cmp_75 in mem offset legal
+              #                    release a3 with temp_34_cmp_71
+              #                    store to temp_38_cmp_75 in mem offset legal
     sb      a4,63(sp)
-              #                    release a4 with temp_40_cmp_75
-              #                    store to temp_37_cmp_71 in mem offset legal
+              #                    release a4 with temp_38_cmp_75
+              #                    store to temp_35_cmp_71 in mem offset legal
     sb      a5,70(sp)
-              #                    release a5 with temp_37_cmp_71
-              #                    store to temp_38_logic_71 in mem offset legal
+              #                    release a5 with temp_35_cmp_71
+              #                    store to temp_36_logic_71 in mem offset legal
     sb      a6,69(sp)
-              #                    release a6 with temp_38_logic_71
+              #                    release a6 with temp_36_logic_71
               #                    caller-saved register dumped to mem
               #                    arg load start
               #                    arg load ended
 
 
     call    quick_read
-              #                    store to temp_41_ret_of_quick_read_77 in mem offset legal
+              #                    store to temp_39_ret_of_quick_read_77 in mem offset legal
     sw      a0,56(sp)
-              #                          x_77 = i32 temp_41_ret_of_quick_read_77 
-              #                    occupy a0 with temp_41_ret_of_quick_read_77
+              #                          x_77 = i32 temp_39_ret_of_quick_read_77 
+              #                    occupy a0 with temp_39_ret_of_quick_read_77
               #                    occupy a1 with x_77
     mv      a1, a0
               #                    free a0
               #                    free a1
-              #                          new_var temp_42_ret_of_quick_read_77:i32 
-              #                          temp_42_ret_of_quick_read_77 =  Call i32 quick_read_0() 
+              #                          new_var temp_40_ret_of_quick_read_77:i32 
+              #                          temp_40_ret_of_quick_read_77 =  Call i32 quick_read_0() 
               #                    saved register dumping to mem
-              #                    store to temp_41_ret_of_quick_read_77 in mem offset legal
+              #                    store to temp_39_ret_of_quick_read_77 in mem offset legal
     sw      a0,56(sp)
-              #                    release a0 with temp_41_ret_of_quick_read_77
+              #                    release a0 with temp_39_ret_of_quick_read_77
               #                    store to x_77 in mem offset legal
     sw      a1,52(sp)
               #                    release a1 with x_77
@@ -1320,20 +1231,20 @@ main:
 
 
     call    quick_read
-              #                    store to temp_42_ret_of_quick_read_77 in mem offset legal
+              #                    store to temp_40_ret_of_quick_read_77 in mem offset legal
     sw      a0,48(sp)
-              #                          y_77 = i32 temp_42_ret_of_quick_read_77 
-              #                    occupy a0 with temp_42_ret_of_quick_read_77
+              #                          y_77 = i32 temp_40_ret_of_quick_read_77 
+              #                    occupy a0 with temp_40_ret_of_quick_read_77
               #                    occupy a1 with y_77
     mv      a1, a0
               #                    free a0
               #                    free a1
-              #                          new_var temp_43_ret_of_same_77:i32 
-              #                          temp_43_ret_of_same_77 =  Call i32 same_0(x_77, y_77) 
+              #                          new_var temp_41_ret_of_same_77:i32 
+              #                          temp_41_ret_of_same_77 =  Call i32 same_0(x_77, y_77) 
               #                    saved register dumping to mem
-              #                    store to temp_42_ret_of_quick_read_77 in mem offset legal
+              #                    store to temp_40_ret_of_quick_read_77 in mem offset legal
     sw      a0,48(sp)
-              #                    release a0 with temp_42_ret_of_quick_read_77
+              #                    release a0 with temp_40_ret_of_quick_read_77
               #                    store to y_77 in mem offset legal
     sw      a1,44(sp)
               #                    release a1 with y_77
@@ -1353,17 +1264,17 @@ main:
 
 
     call    same
-              #                    store to temp_43_ret_of_same_77 in mem offset legal
+              #                    store to temp_41_ret_of_same_77 in mem offset legal
     sw      a0,40(sp)
-              #                           Call void putint_0(temp_43_ret_of_same_77) 
+              #                           Call void putint_0(temp_41_ret_of_same_77) 
               #                    saved register dumping to mem
-              #                    store to temp_43_ret_of_same_77 in mem offset legal
+              #                    store to temp_41_ret_of_same_77 in mem offset legal
     sw      a0,40(sp)
-              #                    release a0 with temp_43_ret_of_same_77
+              #                    release a0 with temp_41_ret_of_same_77
               #                    caller-saved register dumped to mem
               #                    arg load start
-              #                    occupy a0 with _anonymous_of_temp_43_ret_of_same_77_0
-              #                    load from temp_43_ret_of_same_77 in mem
+              #                    occupy a0 with _anonymous_of_temp_41_ret_of_same_77_0
+              #                    load from temp_41_ret_of_same_77 in mem
 
 
     lw      a0,40(sp)
@@ -1383,48 +1294,48 @@ main:
     call    putch
               #                          jump label: L1_0 
     j       .L1_0
-              #                    regtab     a0:Freed { symidx: temp_35_ret_of_getch_69, tracked: true } |     a1:Freed { symidx: ch_69, tracked: true } |     a3:Freed { symidx: temp_36_cmp_71, tracked: true } |     a4:Freed { symidx: temp_40_cmp_75, tracked: true } |     a5:Freed { symidx: temp_37_cmp_71, tracked: true } |     a6:Freed { symidx: temp_38_logic_71, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_33_ret_of_getch_69, tracked: true } |     a1:Freed { symidx: ch_69, tracked: true } |     a3:Freed { symidx: temp_34_cmp_71, tracked: true } |     a4:Freed { symidx: temp_38_cmp_75, tracked: true } |     a5:Freed { symidx: temp_35_cmp_71, tracked: true } |     a6:Freed { symidx: temp_36_logic_71, tracked: true } | 
               #                          label branch_false_76: 
 .branch_false_76:
-              #                          new_var temp_46_ret_of_quick_read_81:i32 
-              #                          temp_46_ret_of_quick_read_81 =  Call i32 quick_read_0() 
+              #                          new_var temp_44_ret_of_quick_read_81:i32 
+              #                          temp_44_ret_of_quick_read_81 =  Call i32 quick_read_0() 
               #                    saved register dumping to mem
-              #                    store to temp_35_ret_of_getch_69 in mem offset legal
+              #                    store to temp_33_ret_of_getch_69 in mem offset legal
     sw      a0,76(sp)
-              #                    release a0 with temp_35_ret_of_getch_69
+              #                    release a0 with temp_33_ret_of_getch_69
               #                    store to ch_69 in mem offset legal
     sw      a1,72(sp)
               #                    release a1 with ch_69
-              #                    store to temp_36_cmp_71 in mem offset legal
+              #                    store to temp_34_cmp_71 in mem offset legal
     sb      a3,71(sp)
-              #                    release a3 with temp_36_cmp_71
-              #                    store to temp_40_cmp_75 in mem offset legal
+              #                    release a3 with temp_34_cmp_71
+              #                    store to temp_38_cmp_75 in mem offset legal
     sb      a4,63(sp)
-              #                    release a4 with temp_40_cmp_75
-              #                    store to temp_37_cmp_71 in mem offset legal
+              #                    release a4 with temp_38_cmp_75
+              #                    store to temp_35_cmp_71 in mem offset legal
     sb      a5,70(sp)
-              #                    release a5 with temp_37_cmp_71
-              #                    store to temp_38_logic_71 in mem offset legal
+              #                    release a5 with temp_35_cmp_71
+              #                    store to temp_36_logic_71 in mem offset legal
     sb      a6,69(sp)
-              #                    release a6 with temp_38_logic_71
+              #                    release a6 with temp_36_logic_71
               #                    caller-saved register dumped to mem
               #                    arg load start
               #                    arg load ended
 
 
     call    quick_read
-              #                    store to temp_46_ret_of_quick_read_81 in mem offset legal
+              #                    store to temp_44_ret_of_quick_read_81 in mem offset legal
     sw      a0,28(sp)
-              #                          new_var temp_47_ret_of_find_81:i32 
-              #                          temp_47_ret_of_find_81 =  Call i32 find_0(temp_46_ret_of_quick_read_81) 
+              #                          new_var temp_45_ret_of_find_81:i32 
+              #                          temp_45_ret_of_find_81 =  Call i32 find_0(temp_44_ret_of_quick_read_81) 
               #                    saved register dumping to mem
-              #                    store to temp_46_ret_of_quick_read_81 in mem offset legal
+              #                    store to temp_44_ret_of_quick_read_81 in mem offset legal
     sw      a0,28(sp)
-              #                    release a0 with temp_46_ret_of_quick_read_81
+              #                    release a0 with temp_44_ret_of_quick_read_81
               #                    caller-saved register dumped to mem
               #                    arg load start
-              #                    occupy a0 with _anonymous_of_temp_46_ret_of_quick_read_81_0
-              #                    load from temp_46_ret_of_quick_read_81 in mem
+              #                    occupy a0 with _anonymous_of_temp_44_ret_of_quick_read_81_0
+              #                    load from temp_44_ret_of_quick_read_81 in mem
 
 
     lw      a0,28(sp)
@@ -1432,20 +1343,20 @@ main:
 
 
     call    find
-              #                    store to temp_47_ret_of_find_81 in mem offset legal
+              #                    store to temp_45_ret_of_find_81 in mem offset legal
     sw      a0,24(sp)
-              #                          x_81 = i32 temp_47_ret_of_find_81 
-              #                    occupy a0 with temp_47_ret_of_find_81
+              #                          x_81 = i32 temp_45_ret_of_find_81 
+              #                    occupy a0 with temp_45_ret_of_find_81
               #                    occupy a1 with x_81
     mv      a1, a0
               #                    free a0
               #                    free a1
-              #                          new_var temp_48_ret_of_quick_read_81:i32 
-              #                          temp_48_ret_of_quick_read_81 =  Call i32 quick_read_0() 
+              #                          new_var temp_46_ret_of_quick_read_81:i32 
+              #                          temp_46_ret_of_quick_read_81 =  Call i32 quick_read_0() 
               #                    saved register dumping to mem
-              #                    store to temp_47_ret_of_find_81 in mem offset legal
+              #                    store to temp_45_ret_of_find_81 in mem offset legal
     sw      a0,24(sp)
-              #                    release a0 with temp_47_ret_of_find_81
+              #                    release a0 with temp_45_ret_of_find_81
               #                    store to x_81 in mem offset legal
     sw      a1,20(sp)
               #                    release a1 with x_81
@@ -1455,18 +1366,18 @@ main:
 
 
     call    quick_read
-              #                    store to temp_48_ret_of_quick_read_81 in mem offset legal
+              #                    store to temp_46_ret_of_quick_read_81 in mem offset legal
     sw      a0,16(sp)
-              #                          new_var temp_49_ret_of_find_81:i32 
-              #                          temp_49_ret_of_find_81 =  Call i32 find_0(temp_48_ret_of_quick_read_81) 
+              #                          new_var temp_47_ret_of_find_81:i32 
+              #                          temp_47_ret_of_find_81 =  Call i32 find_0(temp_46_ret_of_quick_read_81) 
               #                    saved register dumping to mem
-              #                    store to temp_48_ret_of_quick_read_81 in mem offset legal
+              #                    store to temp_46_ret_of_quick_read_81 in mem offset legal
     sw      a0,16(sp)
-              #                    release a0 with temp_48_ret_of_quick_read_81
+              #                    release a0 with temp_46_ret_of_quick_read_81
               #                    caller-saved register dumped to mem
               #                    arg load start
-              #                    occupy a0 with _anonymous_of_temp_48_ret_of_quick_read_81_0
-              #                    load from temp_48_ret_of_quick_read_81 in mem
+              #                    occupy a0 with _anonymous_of_temp_46_ret_of_quick_read_81_0
+              #                    load from temp_46_ret_of_quick_read_81 in mem
 
 
     lw      a0,16(sp)
@@ -1474,17 +1385,17 @@ main:
 
 
     call    find
-              #                    store to temp_49_ret_of_find_81 in mem offset legal
+              #                    store to temp_47_ret_of_find_81 in mem offset legal
     sw      a0,12(sp)
-              #                          y_81 = i32 temp_49_ret_of_find_81 
-              #                    occupy a0 with temp_49_ret_of_find_81
+              #                          y_81 = i32 temp_47_ret_of_find_81 
+              #                    occupy a0 with temp_47_ret_of_find_81
               #                    occupy a1 with y_81
     mv      a1, a0
               #                    free a0
               #                    free a1
-              #                          new_var temp_50_index_ptr_81:ptr->i32 
-              #                          temp_50_index_ptr_81 = getelementptr fa_0:Array:i32:[Some(100005_0)] [Some(x_81)] 
-              #                    occupy a2 with temp_50_index_ptr_81
+              #                          new_var temp_48_index_ptr_81:ptr->i32 
+              #                          temp_48_index_ptr_81 = getelementptr *fa_0:ptr->i32 [Some(x_81)] 
+              #                    occupy a2 with temp_48_index_ptr_81
     li      a2, 0
               #                    occupy a3 with 1_0
     li      a3, 1
@@ -1493,39 +1404,41 @@ main:
 
 
     lw      a4,20(sp)
-              #                    occupy a5 with _anonymous_of_fa_0_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a3,a4
               #                    free a3
               #                    free a4
     add     a2,a2,a5
               #                    free a5
     slli a2,a2,2
-              #                    occupy a6 with _anonymous_of_fa_0_0
+              #                    occupy a6 with *fa_0
+              #                       load label fa as ptr to reg
     la      a6, fa
+              #                    occupy reg a6 with *fa_0
     add     a2,a2,a6
               #                    free a6
               #                    free a2
-              #                          store y_81:i32 temp_50_index_ptr_81:ptr->i32 
-              #                    occupy a2 with temp_50_index_ptr_81
+              #                          store y_81:i32 temp_48_index_ptr_81:ptr->i32 
+              #                    occupy a2 with temp_48_index_ptr_81
               #                    occupy a1 with y_81
     sw      a1,0(a2)
               #                    free a1
               #                    free a2
-              #                          mu fa_0:266 
-              #                          fa_0 = chi fa_0:266 
+              #                          mu *fa_0:260 
+              #                          *fa_0 = chi *fa_0:260 
               #                          jump label: L1_0 
-              #                    store to temp_49_ret_of_find_81 in mem offset legal
-    sw      a0,12(sp)
-              #                    release a0 with temp_49_ret_of_find_81
-              #                    store to y_81 in mem offset legal
-    sw      a1,8(sp)
-              #                    release a1 with y_81
-              #                    store to temp_50_index_ptr_81 in mem offset legal
-    sd      a2,0(sp)
-              #                    release a2 with temp_50_index_ptr_81
               #                    store to x_81 in mem offset legal
     sw      a4,20(sp)
               #                    release a4 with x_81
+              #                    store to y_81 in mem offset legal
+    sw      a1,8(sp)
+              #                    release a1 with y_81
+              #                    store to temp_48_index_ptr_81 in mem offset legal
+    sd      a2,0(sp)
+              #                    release a2 with temp_48_index_ptr_81
+              #                    store to temp_47_ret_of_find_81 in mem offset legal
+    sw      a0,12(sp)
+              #                    release a0 with temp_47_ret_of_find_81
     j       .L1_0
               #                    regtab 
               #                          label L1_0: 
@@ -1533,47 +1446,47 @@ main:
               #                    regtab 
               #                          label L2_0: 
 .L2_0:
-              #                          new_var temp_44_ptr2globl_69:i32 
-              #                          temp_44_ptr2globl_69 = load *m_0:ptr->i32 
+              #                          new_var temp_42_ptr2globl_69:i32 
+              #                          temp_42_ptr2globl_69 = load *m_0:ptr->i32 
               #                    occupy a0 with *m_0
               #                       load label m as ptr to reg
     la      a0, m
               #                    occupy reg a0 with *m_0
-              #                    occupy a1 with temp_44_ptr2globl_69
+              #                    occupy a1 with temp_42_ptr2globl_69
     lw      a1,0(a0)
               #                    free a1
               #                    free a0
-              #                          new_var temp_45_arithop_69:i32 
-              #                          temp_45_arithop_69 = Sub i32 temp_44_ptr2globl_69, 1_0 
-              #                    occupy a1 with temp_44_ptr2globl_69
+              #                          new_var temp_43_arithop_69:i32 
+              #                          temp_43_arithop_69 = Sub i32 temp_42_ptr2globl_69, 1_0 
+              #                    occupy a1 with temp_42_ptr2globl_69
               #                    occupy a2 with 1_0
     li      a2, 1
-              #                    occupy a3 with temp_45_arithop_69
-              #                    regtab:    a0:Freed { symidx: *m_0, tracked: false } |     a1:Occupied { symidx: temp_44_ptr2globl_69, tracked: true, occupy_count: 1 } |     a2:Occupied { symidx: 1_0, tracked: false, occupy_count: 1 } |     a3:Occupied { symidx: temp_45_arithop_69, tracked: true, occupy_count: 1 } | 
+              #                    occupy a3 with temp_43_arithop_69
+              #                    regtab:    a0:Freed { symidx: *m_0, tracked: false } |     a1:Occupied { symidx: temp_42_ptr2globl_69, tracked: true, occupy_count: 1 } |     a2:Occupied { symidx: 1_0, tracked: false, occupy_count: 1 } |     a3:Occupied { symidx: temp_43_arithop_69, tracked: true, occupy_count: 1 } | 
 
 
     sub     a3,a1,a2
               #                    free a1
               #                    free a2
               #                    free a3
-              #                          store temp_45_arithop_69:i32 *m_0:ptr->i32 
+              #                          store temp_43_arithop_69:i32 *m_0:ptr->i32 
               #                    occupy a4 with *m_0
               #                       load label m as ptr to reg
     la      a4, m
               #                    occupy reg a4 with *m_0
-              #                    occupy a3 with temp_45_arithop_69
+              #                    occupy a3 with temp_43_arithop_69
     sw      a3,0(a4)
               #                    free a3
               #                    free a4
               #                          jump label: while.head_68 
-              #                    store to temp_44_ptr2globl_69 in mem offset legal
+              #                    store to temp_42_ptr2globl_69 in mem offset legal
     sw      a1,36(sp)
-              #                    release a1 with temp_44_ptr2globl_69
-              #                    store to temp_45_arithop_69 in mem offset legal
+              #                    release a1 with temp_42_ptr2globl_69
+              #                    store to temp_43_arithop_69 in mem offset legal
     sw      a3,32(sp)
-              #                    release a3 with temp_45_arithop_69
+              #                    release a3 with temp_43_arithop_69
     j       .while.head_68
-              #                    regtab     a1:Freed { symidx: temp_33_ptr2globl_67, tracked: true } |     a3:Freed { symidx: temp_34__1231, tracked: true } | 
+              #                    regtab     a1:Freed { symidx: temp_31_ptr2globl_67, tracked: true } |     a3:Freed { symidx: temp_32__1231, tracked: true } | 
               #                          label while.exit_68: 
 .while.exit_68:
               #                          ret 0_0 
@@ -1586,7 +1499,7 @@ main:
     addi    sp,sp,112
               #                    free a0
     ret
-              #                    regtab     a1:Freed { symidx: temp_33_ptr2globl_67, tracked: true } |     a3:Freed { symidx: temp_34__1231, tracked: true } | 
+              #                    regtab     a1:Freed { symidx: temp_31_ptr2globl_67, tracked: true } |     a3:Freed { symidx: temp_32__1231, tracked: true } | 
 .section ___var
     .data
     .align 4

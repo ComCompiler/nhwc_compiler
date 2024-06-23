@@ -541,7 +541,7 @@ fn process_symbol(
             to symtab debug op_symtab_graph);
             // if it is global then add global ptr to this global variable
             if is_global{
-                let _global_ptr_symidx = add_symbol!({symidx.to_ptr()?.into_symbol()}
+                let _global_ptr_symidx = add_symbol!({symidx.to_globl_ptr()?.into_symbol()}
                     with_field TYPE:{var_type.to_ref_ptr_type()?}
                     with_field DEF_CFG_NODE_VEC:{vec![cfg_node]}
                     with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
@@ -575,13 +575,24 @@ fn process_symbol(
                 node_mut!(at et_node in et_tree).add_type(symtab.get(&symidx)?.get_type()?.clone());
                 // node_mut!(at et_node in et_tree).add_scope_node(scope_parent_node);
             }
-            if *symtab.get(&symidx)?.get_is_global()?{
-                let temp_type = symtab.get(&symidx)?.get_type()?.clone();
-                let ptr_type = symtab.get(&symidx.to_ptr()?)?.get_type()?.clone();
-                let temp_symidx = process_temp_symbol(cfg_graph, symtab, &temp_type, scope_parent_node, cfg_node, instr_slab, &mut None, op_et_node, et_tree, "ptr2globl")?;
-
-                node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_load(temp_symidx.clone(), symidx.to_ptr()?, ptr_type.clone()).into(), instr_slab)?;
-                Ok(temp_symidx)
+            // non-array local variable
+            if *symtab.get(&symidx)?.get_is_global()? {
+                match symtab.get(&symidx)?.get_type()?{
+                    Type::Array { dims, ele_ty } => {
+                        let temp_type = symtab.get(&symidx)?.get_type()?.clone();
+                        let ptr_type = symtab.get(&symidx.to_globl_ptr()?)?.get_type()?.clone();
+                        // let temp_symidx = process_temp_symbol(cfg_graph, symtab, &temp_type, scope_parent_node, cfg_node, instr_slab, &mut None, op_et_node, et_tree, "ptr2globl")?;
+                        // node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_assign(temp_symidx.clone(), symidx.to_globl_ptr()?, ptr_type.clone()).into(), instr_slab)?;
+                        Ok(symidx.to_globl_ptr()?)
+                    },
+                    _ => {
+                        let temp_type = symtab.get(&symidx)?.get_type()?.clone();
+                        let ptr_type = symtab.get(&symidx.to_globl_ptr()?)?.get_type()?.clone();
+                        let temp_symidx = process_temp_symbol(cfg_graph, symtab, &temp_type, scope_parent_node, cfg_node, instr_slab, &mut None, op_et_node, et_tree, "ptr2globl")?;
+                        node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_load(temp_symidx.clone(), symidx.to_globl_ptr()?, ptr_type.clone()).into(), instr_slab)?;
+                        Ok(temp_symidx)
+                    }
+                }
             }else{
                 Ok(symidx)
             }
@@ -598,7 +609,22 @@ fn process_symbol(
             if let Some(et_node) = op_et_node.clone(){
                 node_mut!(at et_node in et_tree).add_type(symtab.get(&symidx)?.get_type()?.clone());
             }
-            Ok(symidx)
+            if *symtab.get(&symidx)?.get_is_global()? {
+                match symtab.get(&symidx)?.get_type()?{
+                    Type::Array { dims, ele_ty } => {
+                        // let temp_type = symtab.get(&symidx)?.get_type()?.clone();
+                        // let ptr_type = symtab.get(&symidx.to_globl_ptr()?)?.get_type()?.clone();
+                        // let temp_symidx = process_temp_symbol(cfg_graph, symtab, &temp_type, scope_parent_node, cfg_node, instr_slab, &mut None, op_et_node, et_tree, "ptr2globl")?;
+                        // node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_assign(temp_symidx.clone(), symidx.to_globl_ptr()?, ptr_type.clone()).into(), instr_slab)?;
+                        Ok(symidx.to_globl_ptr()?)
+                    },
+                    _ => {
+                        Ok(symidx)
+                    }
+                }
+            }else{
+                Ok(symidx)
+            }
         },
     }
 }
@@ -1193,7 +1219,11 @@ fn process_et(
                                     let i2b_instr = NhwcInstrType::new_icmp(num2bool_tmp_symidx.clone(), IcmpPlan::Ne, symbol_symidx, izero_symidx, Type::I1).into();
                                     node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
                                 }
-                                Type::I1 => {}
+                                Type::I1 => {
+                                    let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
+                                    let i2b_instr = NhwcInstrType::new_icmp(num2bool_tmp_symidx.clone(), IcmpPlan::Ne, symbol_symidx, izero_symidx, Type::I1).into();
+                                    node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
+                                }
                                 _ => return Err(anyhow!("类型{:?}不能进行逻辑运算", symbol_type)),
                             }
                             let tmp_var_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node,cfg_bb,  instr_slab, symtab_graph,Some(et_node),et_tree, "logicnot")?;
@@ -1568,6 +1598,15 @@ fn process_et(
                                     Value::Array { value_map, dims: _, ele_ty: _ } => {value_map},
                                     _ => {return Err(anyhow!("右边必须是 array 类型"))}
                                 };
+                                let temp_ptr_symidx = process_temp_symbol(cfg_graph, symtab, &l_ele_ty.to_ref_ptr_type()?, scope_node, cfg_bb,  instr_slab, symtab_graph, Some(et_node), et_tree,"array_init_ptr")?;
+                                let get_ele_ptr_instr_struct = NhwcInstrType::new_get_element_ptr(temp_ptr_symidx.clone(), l_symidx.clone(), l_type.clone(), vec![]).into();
+                                node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(get_ele_ptr_instr_struct, instr_slab)?;
+                                let array_len = l_type.get_mem_len()?;
+                                process_literal(symtab, &array_len.to_string(), symtab_graph)?;
+                                let func_call_instr_struct = NhwcInstrType::new_func_call(None, 
+                                    SymIdx::new(0, "memset".to_string()), 
+                                    vec![temp_ptr_symidx,SymIdx::new(0, "0".to_string()),array_len.into()], Type::Void).into();
+                                let func_call_instr = node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(func_call_instr_struct, instr_slab)?;
                                 for (&offset,value) in value_map.iter(){
                                     let value_symidx = value.to_symidx()?;
                                     process_literal(symtab, &value_symidx.symbol_name, symtab_graph)?;
@@ -1595,7 +1634,7 @@ fn process_et(
                             _ => {
                                 if *symtab.get(&l_symidx)?.get_is_global()?{
                                     let new_value_symidx = force_trans_type(cfg_graph, symtab, &l_type, &r_type, &r_symidx, scope_node, cfg_bb, instr_slab, symtab_graph,Some(et_node),et_tree)?;
-                                    let l_ptr_symidx = l_symidx.to_ptr()?;
+                                    let l_ptr_symidx = l_symidx.to_globl_ptr()?;
                                     let l_ptr_type = symtab.get(&l_ptr_symidx)?.get_type()?.clone();
                                     let store_instr_struct = NhwcInstrType::new_store(l_ptr_symidx,l_ptr_type.clone(),new_value_symidx,r_type).into();
                                     node_mut!(at et_node in et_tree).add_type(l_ptr_type);

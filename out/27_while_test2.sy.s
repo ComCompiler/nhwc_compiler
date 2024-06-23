@@ -271,15 +271,15 @@ FourWhile:
               #                    free s5
               #                    free a3
               #                          jump label: while.head_35 
+              #                    store to temp_4_cmp_34 in mem offset legal
+    sb      s2,39(sp)
+              #                    release s2 with temp_4_cmp_34
               #                    store to temp_5_arithop_36 in mem offset legal
     sw      s3,32(sp)
               #                    release s3 with temp_5_arithop_36
               #                    store to temp_6_cmp_38 in mem offset legal
     sb      s4,31(sp)
               #                    release s4 with temp_6_cmp_38
-              #                    store to temp_4_cmp_34 in mem offset legal
-    sb      s2,39(sp)
-              #                    release s2 with temp_4_cmp_34
               #                    store to temp_8_arithop_36 in mem offset legal
     sw      s5,20(sp)
               #                    release s5 with temp_8_arithop_36
@@ -304,18 +304,18 @@ FourWhile:
               #                    free s3
               #                    free a2
               #                          jump label: while.head_31 
-              #                    store to temp_3_arithop_32 in mem offset legal
-    sw      s1,40(sp)
-              #                    release s1 with temp_3_arithop_32
-              #                    store to temp_2_cmp_30 in mem offset legal
-    sb      a7,47(sp)
-              #                    release a7 with temp_2_cmp_30
-              #                    store to temp_9_arithop_32 in mem offset legal
-    sw      s3,16(sp)
-              #                    release s3 with temp_9_arithop_32
               #                    store to temp_4_cmp_34 in mem offset legal
     sb      s2,39(sp)
               #                    release s2 with temp_4_cmp_34
+              #                    store to temp_9_arithop_32 in mem offset legal
+    sw      s3,16(sp)
+              #                    release s3 with temp_9_arithop_32
+              #                    store to temp_2_cmp_30 in mem offset legal
+    sb      a7,47(sp)
+              #                    release a7 with temp_2_cmp_30
+              #                    store to temp_3_arithop_32 in mem offset legal
+    sw      s1,40(sp)
+              #                    release s1 with temp_3_arithop_32
     j       .while.head_31
               #                    regtab     a0:Freed { symidx: a_17, tracked: true } |     a1:Freed { symidx: b_17, tracked: true } |     a2:Freed { symidx: c_17, tracked: true } |     a3:Freed { symidx: d_17, tracked: true } |     a5:Freed { symidx: temp_0_cmp_26, tracked: true } |     a6:Freed { symidx: temp_1_arithop_28, tracked: true } |     a7:Freed { symidx: temp_2_cmp_30, tracked: true } | 
               #                          label while.exit_31: 
@@ -340,18 +340,18 @@ FourWhile:
               #                    free s1
               #                    free a1
               #                          jump label: while.head_27 
-              #                    store to temp_10_arithop_28 in mem offset legal
-    sw      s1,12(sp)
-              #                    release s1 with temp_10_arithop_28
-              #                    store to temp_2_cmp_30 in mem offset legal
-    sb      a7,47(sp)
-              #                    release a7 with temp_2_cmp_30
-              #                    store to temp_0_cmp_26 in mem offset legal
-    sb      a5,55(sp)
-              #                    release a5 with temp_0_cmp_26
               #                    store to temp_1_arithop_28 in mem offset legal
     sw      a6,48(sp)
               #                    release a6 with temp_1_arithop_28
+              #                    store to temp_2_cmp_30 in mem offset legal
+    sb      a7,47(sp)
+              #                    release a7 with temp_2_cmp_30
+              #                    store to temp_10_arithop_28 in mem offset legal
+    sw      s1,12(sp)
+              #                    release s1 with temp_10_arithop_28
+              #                    store to temp_0_cmp_26 in mem offset legal
+    sb      a5,55(sp)
+              #                    release a5 with temp_0_cmp_26
     j       .while.head_27
               #                    regtab     a0:Freed { symidx: a_17, tracked: true } |     a1:Freed { symidx: b_17, tracked: true } |     a2:Freed { symidx: c_17, tracked: true } |     a3:Freed { symidx: d_17, tracked: true } |     a5:Freed { symidx: temp_0_cmp_26, tracked: true } | 
               #                          label while.exit_27: 

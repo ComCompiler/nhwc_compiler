@@ -257,60 +257,60 @@ main:
               #                    occupy s8 with _anonymous_of_temp_7_cmp_28_0
               #                    load from temp_7_cmp_28 in mem
     lb      s8,35(sp)
-              #                    occupy a3 with _anonymous_of_d_17_0
-              #                    load from d_17 in mem
-
-
-    lw      a3,64(sp)
-              #                    occupy s1 with _anonymous_of_temp_1_arithop_28_0
-              #                    load from temp_1_arithop_28 in mem
-
-
-    lw      s1,52(sp)
-              #                    occupy a4 with _anonymous_of_result_17_0
-              #                    load from result_17 in mem
-
-
-    lw      a4,60(sp)
-              #                    occupy s5 with _anonymous_of_temp_4_cmp_28_0
-              #                    load from temp_4_cmp_28 in mem
-    lb      s5,43(sp)
-              #                    occupy a6 with _anonymous_of_temp_0_arithop_28_0
-              #                    load from temp_0_arithop_28 in mem
-
-
-    lw      a6,56(sp)
-              #                    occupy s6 with _anonymous_of_temp_5_logic_28_0
-              #                    load from temp_5_logic_28 in mem
-    lb      s6,42(sp)
-              #                    occupy a1 with _anonymous_of_b_17_0
-              #                    load from b_17 in mem
-
-
-    lw      a1,72(sp)
-              #                    occupy a0 with _anonymous_of_a_17_0
-              #                    load from a_17 in mem
-
-
-    lw      a0,76(sp)
-              #                    occupy s9 with _anonymous_of_temp_8_logic_28_0
-              #                    load from temp_8_logic_28 in mem
-    lb      s9,34(sp)
-              #                    occupy s7 with _anonymous_of_temp_6_arithop_28_0
-              #                    load from temp_6_arithop_28 in mem
-
-
-    lw      s7,36(sp)
               #                    occupy s4 with _anonymous_of_temp_3_arithop_28_0
               #                    load from temp_3_arithop_28 in mem
 
 
     lw      s4,44(sp)
+              #                    occupy a0 with _anonymous_of_a_17_0
+              #                    load from a_17 in mem
+
+
+    lw      a0,76(sp)
+              #                    occupy a3 with _anonymous_of_d_17_0
+              #                    load from d_17 in mem
+
+
+    lw      a3,64(sp)
+              #                    occupy s9 with _anonymous_of_temp_8_logic_28_0
+              #                    load from temp_8_logic_28 in mem
+    lb      s9,34(sp)
+              #                    occupy s1 with _anonymous_of_temp_1_arithop_28_0
+              #                    load from temp_1_arithop_28 in mem
+
+
+    lw      s1,52(sp)
+              #                    occupy a1 with _anonymous_of_b_17_0
+              #                    load from b_17 in mem
+
+
+    lw      a1,72(sp)
               #                    occupy a2 with _anonymous_of_c_17_0
               #                    load from c_17 in mem
 
 
     lw      a2,68(sp)
+              #                    occupy a4 with _anonymous_of_result_17_0
+              #                    load from result_17 in mem
+
+
+    lw      a4,60(sp)
+              #                    occupy s6 with _anonymous_of_temp_5_logic_28_0
+              #                    load from temp_5_logic_28 in mem
+    lb      s6,42(sp)
+              #                    occupy s7 with _anonymous_of_temp_6_arithop_28_0
+              #                    load from temp_6_arithop_28 in mem
+
+
+    lw      s7,36(sp)
+              #                    occupy a6 with _anonymous_of_temp_0_arithop_28_0
+              #                    load from temp_0_arithop_28 in mem
+
+
+    lw      a6,56(sp)
+              #                    occupy s5 with _anonymous_of_temp_4_cmp_28_0
+              #                    load from temp_4_cmp_28 in mem
+    lb      s5,43(sp)
     j       .branch_false_29
               #                    regtab     a0:Freed { symidx: a_17, tracked: true } |     a1:Freed { symidx: b_17, tracked: true } |     a2:Freed { symidx: c_17, tracked: true } |     a3:Freed { symidx: d_17, tracked: true } |     a4:Freed { symidx: result_17, tracked: true } |     a6:Freed { symidx: temp_0_arithop_28, tracked: true } |     s1:Freed { symidx: temp_1_arithop_28, tracked: true } |     s3:Freed { symidx: temp_2_cmp_28, tracked: true } |     s4:Freed { symidx: temp_3_arithop_28, tracked: true } |     s5:Freed { symidx: temp_4_cmp_28, tracked: true } |     s6:Freed { symidx: temp_5_logic_28, tracked: true } |     s7:Freed { symidx: temp_6_arithop_28, tracked: true } |     s8:Freed { symidx: temp_7_cmp_28, tracked: true } |     s9:Freed { symidx: temp_8_logic_28, tracked: true } | 
               #                          label branch_false_29: 
@@ -447,14 +447,14 @@ main:
               #                    load from temp_18_logic_32 in mem
     lb      a0,2(sp)
               #                    free a0
-              #                    store to temp_2_cmp_28 in mem offset legal
-    sb      s3,51(sp)
-              #                    release s3 with temp_2_cmp_28
+              #                    store to temp_14_logic_32 in mem offset legal
+    sb      s10,14(sp)
+              #                    release s10 with temp_14_logic_32
               #                    occupy a0 with temp_18_logic_32
     bnez    a0, .branch_true_33
               #                    free a0
     j       .branch_false_33
-              #                    regtab     a0:Freed { symidx: temp_18_logic_32, tracked: true } |     a1:Freed { symidx: temp_17_cmp_32, tracked: true } |     a2:Freed { symidx: temp_16_arithop_32, tracked: true } |     a3:Freed { symidx: d_17, tracked: true } |     a4:Freed { symidx: result_17, tracked: true } |     a5:Freed { symidx: temp_12_arithop_32, tracked: true } |     a6:Freed { symidx: temp_0_arithop_28, tracked: true } |     a7:Freed { symidx: temp_9_arithop_32, tracked: true } |     s10:Freed { symidx: temp_14_logic_32, tracked: true } |     s11:Freed { symidx: temp_11_cmp_32, tracked: true } |     s1:Freed { symidx: temp_1_arithop_28, tracked: true } |     s2:Freed { symidx: temp_10_arithop_32, tracked: true } |     s4:Freed { symidx: temp_3_arithop_28, tracked: true } |     s5:Freed { symidx: temp_4_cmp_28, tracked: true } |     s6:Freed { symidx: temp_5_logic_28, tracked: true } |     s7:Freed { symidx: temp_6_arithop_28, tracked: true } |     s8:Freed { symidx: temp_7_cmp_28, tracked: true } |     s9:Freed { symidx: temp_8_logic_28, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_18_logic_32, tracked: true } |     a1:Freed { symidx: temp_17_cmp_32, tracked: true } |     a2:Freed { symidx: temp_16_arithop_32, tracked: true } |     a3:Freed { symidx: d_17, tracked: true } |     a4:Freed { symidx: result_17, tracked: true } |     a5:Freed { symidx: temp_12_arithop_32, tracked: true } |     a6:Freed { symidx: temp_0_arithop_28, tracked: true } |     a7:Freed { symidx: temp_9_arithop_32, tracked: true } |     s11:Freed { symidx: temp_11_cmp_32, tracked: true } |     s1:Freed { symidx: temp_1_arithop_28, tracked: true } |     s2:Freed { symidx: temp_10_arithop_32, tracked: true } |     s3:Freed { symidx: temp_2_cmp_28, tracked: true } |     s4:Freed { symidx: temp_3_arithop_28, tracked: true } |     s5:Freed { symidx: temp_4_cmp_28, tracked: true } |     s6:Freed { symidx: temp_5_logic_28, tracked: true } |     s7:Freed { symidx: temp_6_arithop_28, tracked: true } |     s8:Freed { symidx: temp_7_cmp_28, tracked: true } |     s9:Freed { symidx: temp_8_logic_28, tracked: true } | 
               #                          label branch_true_33: 
 .branch_true_33:
               #                          result_17 = i32 4_0 
@@ -469,6 +469,9 @@ main:
               #                    store to temp_10_arithop_32 in mem offset legal
     sw      s2,24(sp)
               #                    release s2 with temp_10_arithop_32
+              #                    store to temp_2_cmp_28 in mem offset legal
+    sb      s3,51(sp)
+              #                    release s3 with temp_2_cmp_28
               #                    store to temp_3_arithop_28 in mem offset legal
     sw      s4,44(sp)
               #                    release s4 with temp_3_arithop_28
@@ -487,9 +490,6 @@ main:
               #                    store to temp_8_logic_28 in mem offset legal
     sb      s9,34(sp)
               #                    release s9 with temp_8_logic_28
-              #                    store to temp_14_logic_32 in mem offset legal
-    sb      s10,14(sp)
-              #                    release s10 with temp_14_logic_32
               #                    store to temp_11_cmp_32 in mem offset legal
     sb      s11,23(sp)
               #                    release s11 with temp_11_cmp_32
@@ -529,85 +529,85 @@ main:
 
     call    putint
               #                          jump label: branch_false_33 
-              #                    occupy s10 with _anonymous_of_temp_14_logic_32_0
-              #                    load from temp_14_logic_32 in mem
-    lb      s10,14(sp)
-              #                    occupy s8 with _anonymous_of_temp_7_cmp_28_0
-              #                    load from temp_7_cmp_28 in mem
-    lb      s8,35(sp)
-              #                    occupy a3 with _anonymous_of_d_17_0
-              #                    load from d_17 in mem
-
-
-    lw      a3,64(sp)
-              #                    occupy s1 with _anonymous_of_temp_1_arithop_28_0
-              #                    load from temp_1_arithop_28 in mem
-
-
-    lw      s1,52(sp)
               #                    occupy s2 with _anonymous_of_temp_10_arithop_32_0
               #                    load from temp_10_arithop_32 in mem
 
 
     lw      s2,24(sp)
-              #                    occupy a4 with _anonymous_of_result_17_0
-              #                    load from result_17 in mem
-
-
-    lw      a4,60(sp)
+              #                    occupy s3 with _anonymous_of_temp_2_cmp_28_0
+              #                    load from temp_2_cmp_28 in mem
+    lb      s3,51(sp)
+              #                    occupy s8 with _anonymous_of_temp_7_cmp_28_0
+              #                    load from temp_7_cmp_28 in mem
+    lb      s8,35(sp)
               #                    occupy a5 with _anonymous_of_temp_12_arithop_32_0
               #                    load from temp_12_arithop_32 in mem
 
 
     lw      a5,16(sp)
-              #                    occupy s5 with _anonymous_of_temp_4_cmp_28_0
-              #                    load from temp_4_cmp_28 in mem
-    lb      s5,43(sp)
-              #                    occupy a6 with _anonymous_of_temp_0_arithop_28_0
-              #                    load from temp_0_arithop_28 in mem
+              #                    occupy s4 with _anonymous_of_temp_3_arithop_28_0
+              #                    load from temp_3_arithop_28 in mem
 
 
-    lw      a6,56(sp)
-              #                    occupy s6 with _anonymous_of_temp_5_logic_28_0
-              #                    load from temp_5_logic_28 in mem
-    lb      s6,42(sp)
-              #                    occupy a1 with _anonymous_of_temp_17_cmp_32_0
-              #                    load from temp_17_cmp_32 in mem
-    lb      a1,3(sp)
-              #                    occupy a7 with _anonymous_of_temp_9_arithop_32_0
-              #                    load from temp_9_arithop_32 in mem
-
-
-    lw      a7,28(sp)
+    lw      s4,44(sp)
               #                    occupy a0 with _anonymous_of_temp_18_logic_32_0
               #                    load from temp_18_logic_32 in mem
     lb      a0,2(sp)
               #                    occupy s11 with _anonymous_of_temp_11_cmp_32_0
               #                    load from temp_11_cmp_32 in mem
     lb      s11,23(sp)
+              #                    occupy a3 with _anonymous_of_d_17_0
+              #                    load from d_17 in mem
+
+
+    lw      a3,64(sp)
               #                    occupy s9 with _anonymous_of_temp_8_logic_28_0
               #                    load from temp_8_logic_28 in mem
     lb      s9,34(sp)
-              #                    occupy s7 with _anonymous_of_temp_6_arithop_28_0
-              #                    load from temp_6_arithop_28 in mem
+              #                    occupy s1 with _anonymous_of_temp_1_arithop_28_0
+              #                    load from temp_1_arithop_28 in mem
 
 
-    lw      s7,36(sp)
-              #                    occupy s4 with _anonymous_of_temp_3_arithop_28_0
-              #                    load from temp_3_arithop_28 in mem
-
-
-    lw      s4,44(sp)
+    lw      s1,52(sp)
+              #                    occupy a1 with _anonymous_of_temp_17_cmp_32_0
+              #                    load from temp_17_cmp_32 in mem
+    lb      a1,3(sp)
               #                    occupy a2 with _anonymous_of_temp_16_arithop_32_0
               #                    load from temp_16_arithop_32 in mem
 
 
     lw      a2,4(sp)
+              #                    occupy a4 with _anonymous_of_result_17_0
+              #                    load from result_17 in mem
+
+
+    lw      a4,60(sp)
+              #                    occupy a7 with _anonymous_of_temp_9_arithop_32_0
+              #                    load from temp_9_arithop_32 in mem
+
+
+    lw      a7,28(sp)
+              #                    occupy s6 with _anonymous_of_temp_5_logic_28_0
+              #                    load from temp_5_logic_28 in mem
+    lb      s6,42(sp)
+              #                    occupy s7 with _anonymous_of_temp_6_arithop_28_0
+              #                    load from temp_6_arithop_28 in mem
+
+
+    lw      s7,36(sp)
+              #                    occupy a6 with _anonymous_of_temp_0_arithop_28_0
+              #                    load from temp_0_arithop_28 in mem
+
+
+    lw      a6,56(sp)
+              #                    occupy s5 with _anonymous_of_temp_4_cmp_28_0
+              #                    load from temp_4_cmp_28 in mem
+    lb      s5,43(sp)
     j       .branch_false_33
-              #                    regtab     a0:Freed { symidx: temp_18_logic_32, tracked: true } |     a1:Freed { symidx: temp_17_cmp_32, tracked: true } |     a2:Freed { symidx: temp_16_arithop_32, tracked: true } |     a3:Freed { symidx: d_17, tracked: true } |     a4:Freed { symidx: result_17, tracked: true } |     a5:Freed { symidx: temp_12_arithop_32, tracked: true } |     a6:Freed { symidx: temp_0_arithop_28, tracked: true } |     a7:Freed { symidx: temp_9_arithop_32, tracked: true } |     s10:Freed { symidx: temp_14_logic_32, tracked: true } |     s11:Freed { symidx: temp_11_cmp_32, tracked: true } |     s1:Freed { symidx: temp_1_arithop_28, tracked: true } |     s2:Freed { symidx: temp_10_arithop_32, tracked: true } |     s4:Freed { symidx: temp_3_arithop_28, tracked: true } |     s5:Freed { symidx: temp_4_cmp_28, tracked: true } |     s6:Freed { symidx: temp_5_logic_28, tracked: true } |     s7:Freed { symidx: temp_6_arithop_28, tracked: true } |     s8:Freed { symidx: temp_7_cmp_28, tracked: true } |     s9:Freed { symidx: temp_8_logic_28, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_18_logic_32, tracked: true } |     a1:Freed { symidx: temp_17_cmp_32, tracked: true } |     a2:Freed { symidx: temp_16_arithop_32, tracked: true } |     a3:Freed { symidx: d_17, tracked: true } |     a4:Freed { symidx: result_17, tracked: true } |     a5:Freed { symidx: temp_12_arithop_32, tracked: true } |     a6:Freed { symidx: temp_0_arithop_28, tracked: true } |     a7:Freed { symidx: temp_9_arithop_32, tracked: true } |     s11:Freed { symidx: temp_11_cmp_32, tracked: true } |     s1:Freed { symidx: temp_1_arithop_28, tracked: true } |     s2:Freed { symidx: temp_10_arithop_32, tracked: true } |     s3:Freed { symidx: temp_2_cmp_28, tracked: true } |     s4:Freed { symidx: temp_3_arithop_28, tracked: true } |     s5:Freed { symidx: temp_4_cmp_28, tracked: true } |     s6:Freed { symidx: temp_5_logic_28, tracked: true } |     s7:Freed { symidx: temp_6_arithop_28, tracked: true } |     s8:Freed { symidx: temp_7_cmp_28, tracked: true } |     s9:Freed { symidx: temp_8_logic_28, tracked: true } | 
               #                          label branch_false_33: 
 .branch_false_33:
-              #                    regtab     a0:Freed { symidx: temp_18_logic_32, tracked: true } |     a1:Freed { symidx: temp_17_cmp_32, tracked: true } |     a2:Freed { symidx: temp_16_arithop_32, tracked: true } |     a3:Freed { symidx: d_17, tracked: true } |     a4:Freed { symidx: result_17, tracked: true } |     a5:Freed { symidx: temp_12_arithop_32, tracked: true } |     a6:Freed { symidx: temp_0_arithop_28, tracked: true } |     a7:Freed { symidx: temp_9_arithop_32, tracked: true } |     s10:Freed { symidx: temp_14_logic_32, tracked: true } |     s11:Freed { symidx: temp_11_cmp_32, tracked: true } |     s1:Freed { symidx: temp_1_arithop_28, tracked: true } |     s2:Freed { symidx: temp_10_arithop_32, tracked: true } |     s4:Freed { symidx: temp_3_arithop_28, tracked: true } |     s5:Freed { symidx: temp_4_cmp_28, tracked: true } |     s6:Freed { symidx: temp_5_logic_28, tracked: true } |     s7:Freed { symidx: temp_6_arithop_28, tracked: true } |     s8:Freed { symidx: temp_7_cmp_28, tracked: true } |     s9:Freed { symidx: temp_8_logic_28, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_18_logic_32, tracked: true } |     a1:Freed { symidx: temp_17_cmp_32, tracked: true } |     a2:Freed { symidx: temp_16_arithop_32, tracked: true } |     a3:Freed { symidx: d_17, tracked: true } |     a4:Freed { symidx: result_17, tracked: true } |     a5:Freed { symidx: temp_12_arithop_32, tracked: true } |     a6:Freed { symidx: temp_0_arithop_28, tracked: true } |     a7:Freed { symidx: temp_9_arithop_32, tracked: true } |     s11:Freed { symidx: temp_11_cmp_32, tracked: true } |     s1:Freed { symidx: temp_1_arithop_28, tracked: true } |     s2:Freed { symidx: temp_10_arithop_32, tracked: true } |     s3:Freed { symidx: temp_2_cmp_28, tracked: true } |     s4:Freed { symidx: temp_3_arithop_28, tracked: true } |     s5:Freed { symidx: temp_4_cmp_28, tracked: true } |     s6:Freed { symidx: temp_5_logic_28, tracked: true } |     s7:Freed { symidx: temp_6_arithop_28, tracked: true } |     s8:Freed { symidx: temp_7_cmp_28, tracked: true } |     s9:Freed { symidx: temp_8_logic_28, tracked: true } | 
               #                          label L3_0: 
 .L3_0:
               #                          ret 0_0 
@@ -623,4 +623,4 @@ main:
     addi    sp,sp,96
               #                    free a0
     ret
-              #                    regtab     a1:Freed { symidx: temp_17_cmp_32, tracked: true } |     a2:Freed { symidx: temp_16_arithop_32, tracked: true } |     a3:Freed { symidx: d_17, tracked: true } |     a4:Freed { symidx: result_17, tracked: true } |     a5:Freed { symidx: temp_12_arithop_32, tracked: true } |     a6:Freed { symidx: temp_0_arithop_28, tracked: true } |     a7:Freed { symidx: temp_9_arithop_32, tracked: true } |     s10:Freed { symidx: temp_14_logic_32, tracked: true } |     s11:Freed { symidx: temp_11_cmp_32, tracked: true } |     s1:Freed { symidx: temp_1_arithop_28, tracked: true } |     s2:Freed { symidx: temp_10_arithop_32, tracked: true } |     s4:Freed { symidx: temp_3_arithop_28, tracked: true } |     s5:Freed { symidx: temp_4_cmp_28, tracked: true } |     s6:Freed { symidx: temp_5_logic_28, tracked: true } |     s7:Freed { symidx: temp_6_arithop_28, tracked: true } |     s8:Freed { symidx: temp_7_cmp_28, tracked: true } |     s9:Freed { symidx: temp_8_logic_28, tracked: true } | 
+              #                    regtab     a1:Freed { symidx: temp_17_cmp_32, tracked: true } |     a2:Freed { symidx: temp_16_arithop_32, tracked: true } |     a3:Freed { symidx: d_17, tracked: true } |     a4:Freed { symidx: result_17, tracked: true } |     a5:Freed { symidx: temp_12_arithop_32, tracked: true } |     a6:Freed { symidx: temp_0_arithop_28, tracked: true } |     a7:Freed { symidx: temp_9_arithop_32, tracked: true } |     s11:Freed { symidx: temp_11_cmp_32, tracked: true } |     s1:Freed { symidx: temp_1_arithop_28, tracked: true } |     s2:Freed { symidx: temp_10_arithop_32, tracked: true } |     s3:Freed { symidx: temp_2_cmp_28, tracked: true } |     s4:Freed { symidx: temp_3_arithop_28, tracked: true } |     s5:Freed { symidx: temp_4_cmp_28, tracked: true } |     s6:Freed { symidx: temp_5_logic_28, tracked: true } |     s7:Freed { symidx: temp_6_arithop_28, tracked: true } |     s8:Freed { symidx: temp_7_cmp_28, tracked: true } |     s9:Freed { symidx: temp_8_logic_28, tracked: true } | 

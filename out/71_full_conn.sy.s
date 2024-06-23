@@ -1191,7 +1191,7 @@ model:
     li      a2, 1
               #                    occupy a3 with 4_0
     li      a3, 4
-              #                    occupy a4 with _anonymous_of_a_26_0
+              #                    occupy a4 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a4,a2,a3
               #                    free a2
               #                    free a3
@@ -1227,7 +1227,7 @@ model:
               #                    occupy a2 with 1_0
               #                    found literal reg Some(a3) already exist with 4_0
               #                    occupy a3 with 4_0
-              #                    occupy s2 with _anonymous_of_a_26_0
+              #                    occupy s2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s2,a2,a3
               #                    free a2
               #                    free a3
@@ -1263,7 +1263,7 @@ model:
               #                    occupy a2 with 1_0
               #                    found literal reg Some(a3) already exist with 4_0
               #                    occupy a3 with 4_0
-              #                    occupy s7 with _anonymous_of_a_26_0
+              #                    occupy s7 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s7,a2,a3
               #                    free a2
               #                    free a3
@@ -1299,7 +1299,7 @@ model:
               #                    occupy a2 with 1_0
               #                    found literal reg Some(a3) already exist with 4_0
               #                    occupy a3 with 4_0
-              #                    occupy a4 with _anonymous_of_a_26_0
+              #                    occupy a4 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a4,a2,a3
               #                    free a2
               #                    free a3
@@ -1335,7 +1335,7 @@ model:
     li      a6, 1
               #                    occupy s2 with 4_0
     li      s2, 4
-              #                    occupy s4 with _anonymous_of_a_26_0
+              #                    occupy s4 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s4,a6,s2
               #                    free a6
               #                    free s2
@@ -1378,7 +1378,7 @@ model:
     sd      a0,0(a0)
               #                    free a0
               #                    release a0 with a_26
-              #                    occupy a0 with _anonymous_of_a_26_0
+              #                    occupy a0 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a0,s7,s9
               #                    free s7
               #                    free s9
@@ -1447,7 +1447,7 @@ model:
     sw      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_12_array_ele_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -1516,7 +1516,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_14_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -1585,7 +1585,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_23_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -1654,7 +1654,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_26_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -1723,7 +1723,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_29_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -1792,7 +1792,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_32_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -1861,7 +1861,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_35_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -1930,7 +1930,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_38_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -1999,7 +1999,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_41_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -2068,7 +2068,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_44_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -2137,7 +2137,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_47_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -2206,7 +2206,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_50_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -2275,7 +2275,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_53_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -2344,7 +2344,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_56_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -2413,7 +2413,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_59_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -2482,7 +2482,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_62_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -2551,7 +2551,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_65_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -2620,7 +2620,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_68_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -2689,7 +2689,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_71_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -3527,7 +3527,7 @@ model:
     li      a3, 1
               #                    occupy a4 with 4_0
     li      a4, 4
-              #                    occupy a5 with _anonymous_of_a_26_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a3,a4
               #                    free a3
               #                    free a4
@@ -3568,7 +3568,7 @@ model:
     li      s1, 1
               #                    occupy s2 with 4_0
     li      s2, 4
-              #                    occupy s3 with _anonymous_of_a_26_0
+              #                    occupy s3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s3,s1,s2
               #                    free s1
               #                    free s2
@@ -3604,7 +3604,7 @@ model:
     li      s4, 1
               #                    occupy s5 with 4_0
     li      s5, 4
-              #                    occupy s6 with _anonymous_of_a_26_0
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s6,s4,s5
               #                    free s4
               #                    free s5
@@ -3640,7 +3640,7 @@ model:
     li      s7, 1
               #                    occupy s8 with 4_0
     li      s8, 4
-              #                    occupy s9 with _anonymous_of_a_26_0
+              #                    occupy s9 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s9,s7,s8
               #                    free s7
               #                    free s8
@@ -3683,7 +3683,7 @@ model:
     sw      a0,0(a0)
               #                    free a0
               #                    release a0 with temp_101_ret_of_relu_reg_29
-              #                    occupy a0 with _anonymous_of_a_26_0
+              #                    occupy a0 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a0,s10,s11
               #                    free s10
               #                    free s11
@@ -3740,7 +3740,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_103_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -3797,7 +3797,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with a_26
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -3866,7 +3866,7 @@ model:
     sw      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_122_array_ele_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -3935,7 +3935,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_124_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -4004,7 +4004,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_127_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -4073,7 +4073,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_130_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -4142,7 +4142,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_133_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -4211,7 +4211,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_136_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -4280,7 +4280,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_139_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -4349,7 +4349,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_142_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -4418,7 +4418,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_145_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -4487,7 +4487,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_148_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -4556,7 +4556,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_151_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -4625,7 +4625,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_154_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -4694,7 +4694,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_157_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -4763,7 +4763,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_160_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -4832,7 +4832,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_163_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -4901,7 +4901,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_166_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -4970,7 +4970,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_169_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -5039,7 +5039,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_172_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -5877,7 +5877,7 @@ model:
     li      a3, 1
               #                    occupy a4 with 4_0
     li      a4, 4
-              #                    occupy a5 with _anonymous_of_a_26_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a3,a4
               #                    free a3
               #                    free a4
@@ -5918,7 +5918,7 @@ model:
     li      s1, 1
               #                    occupy s2 with 4_0
     li      s2, 4
-              #                    occupy s3 with _anonymous_of_a_26_0
+              #                    occupy s3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s3,s1,s2
               #                    free s1
               #                    free s2
@@ -5954,7 +5954,7 @@ model:
     li      s4, 1
               #                    occupy s5 with 4_0
     li      s5, 4
-              #                    occupy s6 with _anonymous_of_a_26_0
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s6,s4,s5
               #                    free s4
               #                    free s5
@@ -5990,7 +5990,7 @@ model:
     li      s7, 1
               #                    occupy s8 with 4_0
     li      s8, 4
-              #                    occupy s9 with _anonymous_of_a_26_0
+              #                    occupy s9 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s9,s7,s8
               #                    free s7
               #                    free s8
@@ -6033,7 +6033,7 @@ model:
     sw      a0,0(a0)
               #                    free a0
               #                    release a0 with temp_202_ret_of_relu_reg_29
-              #                    occupy a0 with _anonymous_of_a_26_0
+              #                    occupy a0 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a0,s10,s11
               #                    free s10
               #                    free s11
@@ -6090,7 +6090,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_204_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -6147,7 +6147,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with a_26
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -6216,7 +6216,7 @@ model:
     sw      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_223_array_ele_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -6285,7 +6285,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_225_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -6354,7 +6354,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_228_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -6423,7 +6423,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_231_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -6492,7 +6492,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_234_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -6561,7 +6561,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_237_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -6630,7 +6630,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_240_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -6699,7 +6699,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_243_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -6768,7 +6768,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_246_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -6837,7 +6837,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_249_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -6906,7 +6906,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_252_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -6975,7 +6975,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_255_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -7044,7 +7044,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_258_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -7113,7 +7113,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_261_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -7182,7 +7182,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_264_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -7251,7 +7251,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_267_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -7320,7 +7320,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_270_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -7389,7 +7389,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_273_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -8227,7 +8227,7 @@ model:
     li      a3, 1
               #                    occupy a4 with 4_0
     li      a4, 4
-              #                    occupy a5 with _anonymous_of_a_26_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a3,a4
               #                    free a3
               #                    free a4
@@ -8268,7 +8268,7 @@ model:
     li      s1, 1
               #                    occupy s2 with 4_0
     li      s2, 4
-              #                    occupy s3 with _anonymous_of_a_26_0
+              #                    occupy s3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s3,s1,s2
               #                    free s1
               #                    free s2
@@ -8304,7 +8304,7 @@ model:
     li      s4, 1
               #                    occupy s5 with 4_0
     li      s5, 4
-              #                    occupy s6 with _anonymous_of_a_26_0
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s6,s4,s5
               #                    free s4
               #                    free s5
@@ -8340,7 +8340,7 @@ model:
     li      s7, 1
               #                    occupy s8 with 4_0
     li      s8, 4
-              #                    occupy s9 with _anonymous_of_a_26_0
+              #                    occupy s9 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s9,s7,s8
               #                    free s7
               #                    free s8
@@ -8383,7 +8383,7 @@ model:
     sw      a0,0(a0)
               #                    free a0
               #                    release a0 with temp_303_ret_of_relu_reg_29
-              #                    occupy a0 with _anonymous_of_a_26_0
+              #                    occupy a0 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a0,s10,s11
               #                    free s10
               #                    free s11
@@ -8440,7 +8440,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_305_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -8497,7 +8497,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with a_26
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -8566,7 +8566,7 @@ model:
     sw      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_324_array_ele_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -8635,7 +8635,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_326_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -8704,7 +8704,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_329_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -8773,7 +8773,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_332_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -8842,7 +8842,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_335_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -8911,7 +8911,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_338_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -8980,7 +8980,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_341_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -9049,7 +9049,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_344_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -9118,7 +9118,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_347_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -9187,7 +9187,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_350_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -9256,7 +9256,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_353_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -9325,7 +9325,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_356_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -9394,7 +9394,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_359_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -9463,7 +9463,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_362_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -9532,7 +9532,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_365_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -9601,7 +9601,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_368_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -9670,7 +9670,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_371_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -9739,7 +9739,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_374_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -10577,7 +10577,7 @@ model:
     li      a3, 1
               #                    occupy a4 with 4_0
     li      a4, 4
-              #                    occupy a5 with _anonymous_of_a_26_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a3,a4
               #                    free a3
               #                    free a4
@@ -10618,7 +10618,7 @@ model:
     li      s1, 1
               #                    occupy s2 with 4_0
     li      s2, 4
-              #                    occupy s3 with _anonymous_of_a_26_0
+              #                    occupy s3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s3,s1,s2
               #                    free s1
               #                    free s2
@@ -10654,7 +10654,7 @@ model:
     li      s4, 1
               #                    occupy s5 with 4_0
     li      s5, 4
-              #                    occupy s6 with _anonymous_of_a_26_0
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s6,s4,s5
               #                    free s4
               #                    free s5
@@ -10690,7 +10690,7 @@ model:
     li      s7, 1
               #                    occupy s8 with 4_0
     li      s8, 4
-              #                    occupy s9 with _anonymous_of_a_26_0
+              #                    occupy s9 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s9,s7,s8
               #                    free s7
               #                    free s8
@@ -10733,7 +10733,7 @@ model:
     sw      a0,0(a0)
               #                    free a0
               #                    release a0 with temp_404_ret_of_relu_reg_29
-              #                    occupy a0 with _anonymous_of_a_26_0
+              #                    occupy a0 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a0,s10,s11
               #                    free s10
               #                    free s11
@@ -10790,7 +10790,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_406_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -10847,7 +10847,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with a_26
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -10916,7 +10916,7 @@ model:
     sw      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_425_array_ele_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -10985,7 +10985,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_427_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -11054,7 +11054,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_430_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -11123,7 +11123,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_433_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -11192,7 +11192,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_436_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -11261,7 +11261,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_439_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -11330,7 +11330,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_442_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -11399,7 +11399,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_445_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -11468,7 +11468,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_448_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -11537,7 +11537,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_451_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -11606,7 +11606,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_454_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -11675,7 +11675,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_457_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -11744,7 +11744,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_460_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -11813,7 +11813,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_463_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -11882,7 +11882,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_466_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -11951,7 +11951,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_469_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -12020,7 +12020,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_472_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -12089,7 +12089,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_475_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -12927,7 +12927,7 @@ model:
     li      a3, 1
               #                    occupy a4 with 4_0
     li      a4, 4
-              #                    occupy a5 with _anonymous_of_a_26_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a3,a4
               #                    free a3
               #                    free a4
@@ -12968,7 +12968,7 @@ model:
     li      s1, 1
               #                    occupy s2 with 4_0
     li      s2, 4
-              #                    occupy s3 with _anonymous_of_a_26_0
+              #                    occupy s3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s3,s1,s2
               #                    free s1
               #                    free s2
@@ -13004,7 +13004,7 @@ model:
     li      s4, 1
               #                    occupy s5 with 4_0
     li      s5, 4
-              #                    occupy s6 with _anonymous_of_a_26_0
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s6,s4,s5
               #                    free s4
               #                    free s5
@@ -13040,7 +13040,7 @@ model:
     li      s7, 1
               #                    occupy s8 with 4_0
     li      s8, 4
-              #                    occupy s9 with _anonymous_of_a_26_0
+              #                    occupy s9 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s9,s7,s8
               #                    free s7
               #                    free s8
@@ -13083,7 +13083,7 @@ model:
     sw      a0,0(a0)
               #                    free a0
               #                    release a0 with temp_505_ret_of_relu_reg_29
-              #                    occupy a0 with _anonymous_of_a_26_0
+              #                    occupy a0 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a0,s10,s11
               #                    free s10
               #                    free s11
@@ -13140,7 +13140,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_507_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -13197,7 +13197,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with a_26
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -13266,7 +13266,7 @@ model:
     sw      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_526_array_ele_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -13335,7 +13335,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_528_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -13404,7 +13404,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_531_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -13473,7 +13473,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_534_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -13542,7 +13542,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_537_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -13611,7 +13611,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_540_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -13680,7 +13680,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_543_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -13749,7 +13749,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_546_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -13818,7 +13818,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_549_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -13887,7 +13887,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_552_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -13956,7 +13956,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_555_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -14025,7 +14025,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_558_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -14094,7 +14094,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_561_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -14163,7 +14163,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_564_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -14232,7 +14232,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_567_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -14301,7 +14301,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_570_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -14370,7 +14370,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_573_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -14439,7 +14439,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with temp_576_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -15277,7 +15277,7 @@ model:
     li      a3, 1
               #                    occupy a4 with 4_0
     li      a4, 4
-              #                    occupy a5 with _anonymous_of_a_26_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a3,a4
               #                    free a3
               #                    free a4
@@ -15318,7 +15318,7 @@ model:
     li      s1, 1
               #                    occupy s2 with 4_0
     li      s2, 4
-              #                    occupy s3 with _anonymous_of_a_26_0
+              #                    occupy s3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s3,s1,s2
               #                    free s1
               #                    free s2
@@ -15354,7 +15354,7 @@ model:
     li      s4, 1
               #                    occupy s5 with 4_0
     li      s5, 4
-              #                    occupy s6 with _anonymous_of_a_26_0
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s6,s4,s5
               #                    free s4
               #                    free s5
@@ -15390,7 +15390,7 @@ model:
     li      s7, 1
               #                    occupy s8 with 4_0
     li      s8, 4
-              #                    occupy s9 with _anonymous_of_a_26_0
+              #                    occupy s9 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s9,s7,s8
               #                    free s7
               #                    free s8
@@ -15433,7 +15433,7 @@ model:
     sw      a0,0(a0)
               #                    free a0
               #                    release a0 with temp_606_ret_of_relu_reg_29
-              #                    occupy a0 with _anonymous_of_a_26_0
+              #                    occupy a0 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a0,s10,s11
               #                    free s10
               #                    free s11
@@ -15486,7 +15486,7 @@ model:
     sd      a2,0(a2)
               #                    free a2
               #                    release a2 with temp_608_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -15535,7 +15535,7 @@ model:
     sd      a3,0(a3)
               #                    free a3
               #                    release a3 with a_26
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -15592,7 +15592,7 @@ model:
               #                    store to temp_627_array_ele_29 in mem offset legal
     sw      a2,1948(sp)
               #                    release a2 with temp_627_array_ele_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -15649,7 +15649,7 @@ model:
               #                    store to temp_629_array_ptr_29 in mem offset legal
     sd      a3,1936(sp)
               #                    release a3 with temp_629_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -15706,7 +15706,7 @@ model:
               #                    store to temp_632_array_ptr_29 in mem offset legal
     sd      a2,1920(sp)
               #                    release a2 with temp_632_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -15763,7 +15763,7 @@ model:
               #                    store to temp_635_array_ptr_29 in mem offset legal
     sd      a3,1904(sp)
               #                    release a3 with temp_635_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -15820,7 +15820,7 @@ model:
               #                    store to temp_638_array_ptr_29 in mem offset legal
     sd      a2,1888(sp)
               #                    release a2 with temp_638_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -15877,7 +15877,7 @@ model:
               #                    store to temp_641_array_ptr_29 in mem offset legal
     sd      a3,1872(sp)
               #                    release a3 with temp_641_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -15934,7 +15934,7 @@ model:
               #                    store to temp_644_array_ptr_29 in mem offset legal
     sd      a2,1856(sp)
               #                    release a2 with temp_644_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -15991,7 +15991,7 @@ model:
               #                    store to temp_647_array_ptr_29 in mem offset legal
     sd      a3,1840(sp)
               #                    release a3 with temp_647_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -16048,7 +16048,7 @@ model:
               #                    store to temp_650_array_ptr_29 in mem offset legal
     sd      a2,1824(sp)
               #                    release a2 with temp_650_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -16105,7 +16105,7 @@ model:
               #                    store to temp_653_array_ptr_29 in mem offset legal
     sd      a3,1808(sp)
               #                    release a3 with temp_653_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -16162,7 +16162,7 @@ model:
               #                    store to temp_656_array_ptr_29 in mem offset legal
     sd      a2,1792(sp)
               #                    release a2 with temp_656_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -16219,7 +16219,7 @@ model:
               #                    store to temp_659_array_ptr_29 in mem offset legal
     sd      a3,1776(sp)
               #                    release a3 with temp_659_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -16276,7 +16276,7 @@ model:
               #                    store to temp_662_array_ptr_29 in mem offset legal
     sd      a2,1760(sp)
               #                    release a2 with temp_662_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -16333,7 +16333,7 @@ model:
               #                    store to temp_665_array_ptr_29 in mem offset legal
     sd      a3,1744(sp)
               #                    release a3 with temp_665_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -16390,7 +16390,7 @@ model:
               #                    store to temp_668_array_ptr_29 in mem offset legal
     sd      a2,1728(sp)
               #                    release a2 with temp_668_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -16447,7 +16447,7 @@ model:
               #                    store to temp_671_array_ptr_29 in mem offset legal
     sd      a3,1712(sp)
               #                    release a3 with temp_671_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -16504,7 +16504,7 @@ model:
               #                    store to temp_674_array_ptr_29 in mem offset legal
     sd      a2,1696(sp)
               #                    release a2 with temp_674_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -16561,7 +16561,7 @@ model:
               #                    store to temp_677_array_ptr_29 in mem offset legal
     sd      a3,1680(sp)
               #                    release a3 with temp_677_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -17146,7 +17146,7 @@ model:
     li      a7, 1
               #                    occupy s5 with 4_0
     li      s5, 4
-              #                    occupy s6 with _anonymous_of_a_26_0
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s6,a7,s5
               #                    free a7
               #                    free s5
@@ -17187,7 +17187,7 @@ model:
               #                    occupy a7 with 1_0
               #                    found literal reg Some(s5) already exist with 4_0
               #                    occupy s5 with 4_0
-              #                    occupy a1 with _anonymous_of_a_26_0
+              #                    occupy a1 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a1,a7,s5
               #                    free a7
               #                    free s5
@@ -17223,7 +17223,7 @@ model:
               #                    occupy a7 with 1_0
               #                    found literal reg Some(s5) already exist with 4_0
               #                    occupy s5 with 4_0
-              #                    occupy a4 with _anonymous_of_a_26_0
+              #                    occupy a4 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a4,a7,s5
               #                    free a7
               #                    free s5
@@ -17259,7 +17259,7 @@ model:
     li      s2, 1
               #                    found literal reg Some(s5) already exist with 4_0
               #                    occupy s5 with 4_0
-              #                    occupy s3 with _anonymous_of_a_26_0
+              #                    occupy s3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s3,s2,s5
               #                    free s2
               #                    free s5
@@ -17295,7 +17295,7 @@ model:
     li      s5, 1
               #                    occupy s6 with 4_0
     li      s6, 4
-              #                    occupy s9 with _anonymous_of_a_26_0
+              #                    occupy s9 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s9,s5,s6
               #                    free s5
               #                    free s6
@@ -17340,7 +17340,7 @@ model:
               #                    store to temp_715_array_ptr_29 in mem offset legal
     sd      a2,1512(sp)
               #                    release a2 with temp_715_array_ptr_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -17385,7 +17385,7 @@ model:
               #                    store to temp_714_arithop_29 in mem offset legal
     sw      a3,1520(sp)
               #                    release a3 with temp_714_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -17430,7 +17430,7 @@ model:
               #                    store to temp_729_arithop_29 in mem offset legal
     sw      a3,1440(sp)
               #                    release a3 with temp_729_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -17475,7 +17475,7 @@ model:
               #                    store to temp_732_arithop_29 in mem offset legal
     sw      a3,1424(sp)
               #                    release a3 with temp_732_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -17520,7 +17520,7 @@ model:
               #                    store to temp_735_arithop_29 in mem offset legal
     sw      a3,1408(sp)
               #                    release a3 with temp_735_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -17565,7 +17565,7 @@ model:
               #                    store to temp_738_arithop_29 in mem offset legal
     sw      a3,1392(sp)
               #                    release a3 with temp_738_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -17610,7 +17610,7 @@ model:
               #                    store to temp_741_arithop_29 in mem offset legal
     sw      a3,1376(sp)
               #                    release a3 with temp_741_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -17655,7 +17655,7 @@ model:
               #                    store to temp_744_arithop_29 in mem offset legal
     sw      a3,1360(sp)
               #                    release a3 with temp_744_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -17700,7 +17700,7 @@ model:
               #                    store to temp_747_arithop_29 in mem offset legal
     sw      a3,1344(sp)
               #                    release a3 with temp_747_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -17745,7 +17745,7 @@ model:
               #                    store to temp_750_arithop_29 in mem offset legal
     sw      a3,1328(sp)
               #                    release a3 with temp_750_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -17790,7 +17790,7 @@ model:
               #                    store to temp_753_arithop_29 in mem offset legal
     sw      a3,1312(sp)
               #                    release a3 with temp_753_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -17835,7 +17835,7 @@ model:
               #                    store to temp_756_arithop_29 in mem offset legal
     sw      a3,1296(sp)
               #                    release a3 with temp_756_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -17880,7 +17880,7 @@ model:
               #                    store to temp_759_arithop_29 in mem offset legal
     sw      a3,1280(sp)
               #                    release a3 with temp_759_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -17925,7 +17925,7 @@ model:
               #                    store to temp_762_arithop_29 in mem offset legal
     sw      a3,1264(sp)
               #                    release a3 with temp_762_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -17970,7 +17970,7 @@ model:
               #                    store to temp_765_arithop_29 in mem offset legal
     sw      a3,1248(sp)
               #                    release a3 with temp_765_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -18015,7 +18015,7 @@ model:
               #                    store to temp_768_arithop_29 in mem offset legal
     sw      a3,1232(sp)
               #                    release a3 with temp_768_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -18060,7 +18060,7 @@ model:
               #                    store to temp_771_arithop_29 in mem offset legal
     sw      a3,1216(sp)
               #                    release a3 with temp_771_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -18105,7 +18105,7 @@ model:
               #                    store to temp_774_arithop_29 in mem offset legal
     sw      a3,1200(sp)
               #                    release a3 with temp_774_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -18150,7 +18150,7 @@ model:
               #                    store to temp_777_arithop_29 in mem offset legal
     sw      a3,1184(sp)
               #                    release a3 with temp_777_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -18195,7 +18195,7 @@ model:
               #                    store to temp_780_arithop_29 in mem offset legal
     sw      a3,1168(sp)
               #                    release a3 with temp_780_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -18743,7 +18743,7 @@ model:
     li      a4, 1
               #                    occupy a5 with 4_0
     li      a5, 4
-              #                    occupy a6 with _anonymous_of_a_26_0
+              #                    occupy a6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a6,a4,a5
               #                    free a4
               #                    free a5
@@ -18784,7 +18784,7 @@ model:
               #                    occupy a4 with 1_0
               #                    found literal reg Some(a5) already exist with 4_0
               #                    occupy a5 with 4_0
-              #                    occupy s6 with _anonymous_of_a_26_0
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s6,a4,a5
               #                    free a4
               #                    free a5
@@ -18820,7 +18820,7 @@ model:
               #                    occupy a4 with 1_0
               #                    found literal reg Some(a5) already exist with 4_0
               #                    occupy a5 with 4_0
-              #                    occupy s11 with _anonymous_of_a_26_0
+              #                    occupy s11 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s11,a4,a5
               #                    free a4
               #                    free a5
@@ -18856,7 +18856,7 @@ model:
     li      a6, 1
               #                    occupy s1 with 4_0
     li      s1, 4
-              #                    occupy s3 with _anonymous_of_a_26_0
+              #                    occupy s3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s3,a6,s1
               #                    free a6
               #                    free s1
@@ -18892,7 +18892,7 @@ model:
     li      s6, 1
               #                    occupy s8 with 4_0
     li      s8, 4
-              #                    occupy s11 with _anonymous_of_a_26_0
+              #                    occupy s11 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s11,s6,s8
               #                    free s6
               #                    free s8
@@ -18937,7 +18937,7 @@ model:
               #                    store to temp_809_arithop_29 in mem offset legal
     sw      a2,1048(sp)
               #                    release a2 with temp_809_arithop_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -18982,7 +18982,7 @@ model:
               #                    store to temp_810_array_ptr_29 in mem offset legal
     sd      a3,1040(sp)
               #                    release a3 with temp_810_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -19027,7 +19027,7 @@ model:
               #                    store to temp_830_arithop_29 in mem offset legal
     sw      a3,936(sp)
               #                    release a3 with temp_830_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -19072,7 +19072,7 @@ model:
               #                    store to temp_833_arithop_29 in mem offset legal
     sw      a3,920(sp)
               #                    release a3 with temp_833_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -19117,7 +19117,7 @@ model:
               #                    store to temp_836_arithop_29 in mem offset legal
     sw      a3,904(sp)
               #                    release a3 with temp_836_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -19162,7 +19162,7 @@ model:
               #                    store to temp_839_arithop_29 in mem offset legal
     sw      a3,888(sp)
               #                    release a3 with temp_839_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -19207,7 +19207,7 @@ model:
               #                    store to temp_842_arithop_29 in mem offset legal
     sw      a3,872(sp)
               #                    release a3 with temp_842_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -19252,7 +19252,7 @@ model:
               #                    store to temp_845_arithop_29 in mem offset legal
     sw      a3,856(sp)
               #                    release a3 with temp_845_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -19297,7 +19297,7 @@ model:
               #                    store to temp_848_arithop_29 in mem offset legal
     sw      a3,840(sp)
               #                    release a3 with temp_848_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -19342,7 +19342,7 @@ model:
               #                    store to temp_851_arithop_29 in mem offset legal
     sw      a3,824(sp)
               #                    release a3 with temp_851_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -19387,7 +19387,7 @@ model:
               #                    store to temp_854_arithop_29 in mem offset legal
     sw      a3,808(sp)
               #                    release a3 with temp_854_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -19432,7 +19432,7 @@ model:
               #                    store to temp_857_arithop_29 in mem offset legal
     sw      a3,792(sp)
               #                    release a3 with temp_857_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -19477,7 +19477,7 @@ model:
               #                    store to temp_860_arithop_29 in mem offset legal
     sw      a3,776(sp)
               #                    release a3 with temp_860_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -19522,7 +19522,7 @@ model:
               #                    store to temp_863_arithop_29 in mem offset legal
     sw      a3,760(sp)
               #                    release a3 with temp_863_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -19567,7 +19567,7 @@ model:
               #                    store to temp_866_arithop_29 in mem offset legal
     sw      a3,744(sp)
               #                    release a3 with temp_866_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -19612,7 +19612,7 @@ model:
               #                    store to temp_869_arithop_29 in mem offset legal
     sw      a3,728(sp)
               #                    release a3 with temp_869_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -19657,7 +19657,7 @@ model:
               #                    store to temp_872_arithop_29 in mem offset legal
     sw      a3,712(sp)
               #                    release a3 with temp_872_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -19702,7 +19702,7 @@ model:
               #                    store to temp_875_arithop_29 in mem offset legal
     sw      a3,696(sp)
               #                    release a3 with temp_875_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -19747,7 +19747,7 @@ model:
               #                    store to temp_878_arithop_29 in mem offset legal
     sw      a3,680(sp)
               #                    release a3 with temp_878_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -19792,7 +19792,7 @@ model:
               #                    store to temp_881_arithop_29 in mem offset legal
     sw      a3,664(sp)
               #                    release a3 with temp_881_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -20333,7 +20333,7 @@ model:
     li      a4, 1
               #                    occupy a5 with 4_0
     li      a5, 4
-              #                    occupy a6 with _anonymous_of_a_26_0
+              #                    occupy a6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a6,a4,a5
               #                    free a4
               #                    free a5
@@ -20374,7 +20374,7 @@ model:
               #                    occupy a4 with 1_0
               #                    found literal reg Some(a5) already exist with 4_0
               #                    occupy a5 with 4_0
-              #                    occupy s5 with _anonymous_of_a_26_0
+              #                    occupy s5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s5,a4,a5
               #                    free a4
               #                    free a5
@@ -20410,7 +20410,7 @@ model:
               #                    occupy a4 with 1_0
               #                    found literal reg Some(a5) already exist with 4_0
               #                    occupy a5 with 4_0
-              #                    occupy s10 with _anonymous_of_a_26_0
+              #                    occupy s10 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s10,a4,a5
               #                    free a4
               #                    free a5
@@ -20446,7 +20446,7 @@ model:
     li      a5, 1
               #                    occupy a6 with 4_0
     li      a6, 4
-              #                    occupy s2 with _anonymous_of_a_26_0
+              #                    occupy s2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s2,a5,a6
               #                    free a5
               #                    free a6
@@ -20482,7 +20482,7 @@ model:
     li      s5, 1
               #                    occupy s7 with 4_0
     li      s7, 4
-              #                    occupy s10 with _anonymous_of_a_26_0
+              #                    occupy s10 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s10,s5,s7
               #                    free s5
               #                    free s7
@@ -20527,7 +20527,7 @@ model:
               #                    store to temp_910_arithop_29 in mem offset legal
     sw      a2,544(sp)
               #                    release a2 with temp_910_arithop_29
-              #                    occupy a2 with _anonymous_of_a_26_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -20572,7 +20572,7 @@ model:
               #                    store to temp_911_array_ptr_29 in mem offset legal
     sd      a3,536(sp)
               #                    release a3 with temp_911_array_ptr_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -20617,7 +20617,7 @@ model:
               #                    store to temp_931_arithop_29 in mem offset legal
     sw      a3,432(sp)
               #                    release a3 with temp_931_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -20662,7 +20662,7 @@ model:
               #                    store to temp_934_arithop_29 in mem offset legal
     sw      a3,416(sp)
               #                    release a3 with temp_934_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -20707,7 +20707,7 @@ model:
               #                    store to temp_937_arithop_29 in mem offset legal
     sw      a3,400(sp)
               #                    release a3 with temp_937_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -20752,7 +20752,7 @@ model:
               #                    store to temp_940_arithop_29 in mem offset legal
     sw      a3,384(sp)
               #                    release a3 with temp_940_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -20797,7 +20797,7 @@ model:
               #                    store to temp_943_arithop_29 in mem offset legal
     sw      a3,368(sp)
               #                    release a3 with temp_943_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -20842,7 +20842,7 @@ model:
               #                    store to temp_946_arithop_29 in mem offset legal
     sw      a3,352(sp)
               #                    release a3 with temp_946_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -20887,7 +20887,7 @@ model:
               #                    store to temp_949_arithop_29 in mem offset legal
     sw      a3,336(sp)
               #                    release a3 with temp_949_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -20932,7 +20932,7 @@ model:
               #                    store to temp_952_arithop_29 in mem offset legal
     sw      a3,320(sp)
               #                    release a3 with temp_952_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -20977,7 +20977,7 @@ model:
               #                    store to temp_955_arithop_29 in mem offset legal
     sw      a3,304(sp)
               #                    release a3 with temp_955_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -21022,7 +21022,7 @@ model:
               #                    store to temp_958_arithop_29 in mem offset legal
     sw      a3,288(sp)
               #                    release a3 with temp_958_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -21067,7 +21067,7 @@ model:
               #                    store to temp_961_arithop_29 in mem offset legal
     sw      a3,272(sp)
               #                    release a3 with temp_961_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -21112,7 +21112,7 @@ model:
               #                    store to temp_964_arithop_29 in mem offset legal
     sw      a3,256(sp)
               #                    release a3 with temp_964_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -21157,7 +21157,7 @@ model:
               #                    store to temp_967_arithop_29 in mem offset legal
     sw      a3,240(sp)
               #                    release a3 with temp_967_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -21202,7 +21202,7 @@ model:
               #                    store to temp_970_arithop_29 in mem offset legal
     sw      a3,224(sp)
               #                    release a3 with temp_970_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -21247,7 +21247,7 @@ model:
               #                    store to temp_973_arithop_29 in mem offset legal
     sw      a3,208(sp)
               #                    release a3 with temp_973_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -21292,7 +21292,7 @@ model:
               #                    store to temp_976_arithop_29 in mem offset legal
     sw      a3,192(sp)
               #                    release a3 with temp_976_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -21337,7 +21337,7 @@ model:
               #                    store to temp_979_arithop_29 in mem offset legal
     sw      a3,176(sp)
               #                    release a3 with temp_979_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -21382,7 +21382,7 @@ model:
               #                    store to temp_982_arithop_29 in mem offset legal
     sw      a3,160(sp)
               #                    release a3 with temp_982_arithop_29
-              #                    occupy a3 with _anonymous_of_a_26_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a2
               #                    free a0
               #                    free a2
@@ -22300,7 +22300,7 @@ main:
               #                    occupy s1 with 5_0
     li      s1, 5
               #                    occupy a2 with i_39
-              #                    occupy s2 with _anonymous_of_a_34_0
+              #                    occupy s2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s2,s1,a2
               #                    free s1
               #                    free a2
@@ -22309,7 +22309,7 @@ main:
               #                    occupy s3 with 1_0
     li      s3, 1
               #                    occupy a4 with j_43
-              #                    occupy s4 with _anonymous_of_a_34_0
+              #                    occupy s4 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s4,s3,a4
               #                    free s3
               #                    free a4
@@ -22385,28 +22385,31 @@ main:
               #                    free a4
               #                    free a2
               #                          jump label: while.head_46 
-              #                    store to temp_1027_ret_of_getint_47 in mem offset legal
-    sw      a0,20(sp)
-              #                    release a0 with temp_1027_ret_of_getint_47
               #                    store to temp_1028_arithop_47 in mem offset legal
     sw      a4,16(sp)
               #                    release a4 with temp_1028_arithop_47
+              #                    store to temp_1027_ret_of_getint_47 in mem offset legal
+    sw      a0,20(sp)
+              #                    release a0 with temp_1027_ret_of_getint_47
               #                    store to temp_1026_index_ptr_47 in mem offset legal
     sd      a1,24(sp)
               #                    release a1 with temp_1026_index_ptr_47
               #                    store to j_43 in mem offset legal
     sw      a2,36(sp)
               #                    release a2 with j_43
-              #                    occupy a0 with _anonymous_of_temp_1022_ret_of_getint_34_0
-              #                    load from temp_1022_ret_of_getint_34 in mem
-
-
-    lw      a0,156(sp)
               #                    occupy a4 with _anonymous_of_j_43_0
               #                    load from j_43 in mem
 
 
     lw      a4,36(sp)
+              #                    occupy a0 with _anonymous_of_temp_1022_ret_of_getint_34_0
+              #                    load from temp_1022_ret_of_getint_34 in mem
+
+
+    lw      a0,156(sp)
+              #                    occupy a5 with _anonymous_of_temp_1024_cmp_41_0
+              #                    load from temp_1024_cmp_41 in mem
+    lb      a5,43(sp)
               #                    occupy a1 with _anonymous_of_N_34_0
               #                    load from N_34 in mem
 
@@ -22415,9 +22418,6 @@ main:
               #                    occupy a3 with _anonymous_of_temp_1023_cmp_37_0
               #                    load from temp_1023_cmp_37 in mem
     lb      a3,51(sp)
-              #                    occupy a5 with _anonymous_of_temp_1024_cmp_41_0
-              #                    load from temp_1024_cmp_41 in mem
-    lb      a5,43(sp)
               #                    occupy a2 with _anonymous_of_i_39_0
               #                    load from i_39 in mem
 
@@ -22447,15 +22447,15 @@ main:
               #                    store to j_43 in mem offset legal
     sw      a4,36(sp)
               #                    release a4 with j_43
-              #                    store to temp_1025_cmp_45 in mem offset legal
-    sb      a7,35(sp)
-              #                    release a7 with temp_1025_cmp_45
-              #                    store to temp_1029_arithop_43 in mem offset legal
-    sw      s1,12(sp)
-              #                    release s1 with temp_1029_arithop_43
               #                    store to temp_1024_cmp_41 in mem offset legal
     sb      a5,43(sp)
               #                    release a5 with temp_1024_cmp_41
+              #                    store to temp_1029_arithop_43 in mem offset legal
+    sw      s1,12(sp)
+              #                    release s1 with temp_1029_arithop_43
+              #                    store to temp_1025_cmp_45 in mem offset legal
+    sb      a7,35(sp)
+              #                    release a7 with temp_1025_cmp_45
     j       .while.head_42
               #                    regtab     a0:Freed { symidx: temp_1022_ret_of_getint_34, tracked: true } |     a1:Freed { symidx: N_34, tracked: true } |     a2:Freed { symidx: i_39, tracked: true } |     a3:Freed { symidx: temp_1023_cmp_37, tracked: true } |     a5:Freed { symidx: temp_1024_cmp_41, tracked: true } | 
               #                          label while.exit_42: 

@@ -149,24 +149,24 @@ main:
               #                    free s3
               #                    free s4
               #                          jump label: while.head_23 
-              #                    store to temp_0_cmp_22 in mem offset legal
-    sb      a2,35(sp)
-              #                    release a2 with temp_0_cmp_22
-              #                    store to temp_3_arithop_24 in mem offset legal
-    sw      a6,20(sp)
-              #                    release a6 with temp_3_arithop_24
-              #                    store to temp_5_arithop_24 in mem offset legal
-    sw      s3,12(sp)
-              #                    release s3 with temp_5_arithop_24
-              #                    store to temp_2_ptr2globl_24 in mem offset legal
-    sw      a5,24(sp)
-              #                    release a5 with temp_2_ptr2globl_24
               #                    store to temp_1_arithop_24 in mem offset legal
     sw      a3,28(sp)
               #                    release a3 with temp_1_arithop_24
+              #                    store to temp_2_ptr2globl_24 in mem offset legal
+    sw      a5,24(sp)
+              #                    release a5 with temp_2_ptr2globl_24
+              #                    store to temp_5_arithop_24 in mem offset legal
+    sw      s3,12(sp)
+              #                    release s3 with temp_5_arithop_24
+              #                    store to temp_0_cmp_22 in mem offset legal
+    sb      a2,35(sp)
+              #                    release a2 with temp_0_cmp_22
               #                    store to temp_4_ptr2globl_24 in mem offset legal
     sw      s1,16(sp)
               #                    release s1 with temp_4_ptr2globl_24
+              #                    store to temp_3_arithop_24 in mem offset legal
+    sw      a6,20(sp)
+              #                    release a6 with temp_3_arithop_24
     j       .while.head_23
               #                    regtab     a0:Freed { symidx: i_19, tracked: true } |     a2:Freed { symidx: temp_0_cmp_22, tracked: true } | 
               #                          label while.exit_23: 

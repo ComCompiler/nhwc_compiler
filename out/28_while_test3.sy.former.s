@@ -111,14 +111,14 @@ EightWhile:
 	addiw	a7, a7, -2
 	j	.LBB1_2.1
 .LBB1_21.57:
-	addw	a2, a7, s1
-	addw	a2, a2, a6
+	lw	a2, 0(a3)
+	subw	a2, a7, a2
+	lw	a1, 0(a1)
+	addw	a1, a2, a1
 	lw	a0, 0(a0)
-	subw	a2, a2, a0
-	lw	a0, 0(a1)
-	addw	a1, a2, a0
-	lw	a0, 0(a3)
 	subw	a0, a1, a0
+	addw	a0, a0, a6
+	addw	a0, a0, s1
 	ld	s1, 8(sp)
 	ld	s2, 0(sp)
 	addi	sp, sp, 16

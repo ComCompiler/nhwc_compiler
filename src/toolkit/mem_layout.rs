@@ -24,7 +24,6 @@ make_field_trait_for_struct!{
     isize
 }
 
-pub type SymIdxRc = Rc<SymIdx>;
 /// 用于进行 栈内存对齐计算
 /// ```
 /// let mut mem_layout = MemLayout::new();  

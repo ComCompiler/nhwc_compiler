@@ -446,12 +446,12 @@ main:
               #                    free a2
               #                    free a0
               #                          jump label: while.head_38 
-              #                    store to n_35 in mem offset legal
-    sw      a0,16(sp)
-              #                    release a0 with n_35
               #                    store to temp_6_arithop_39 in mem offset legal
     sw      a2,4(sp)
               #                    release a2 with temp_6_arithop_39
+              #                    store to n_35 in mem offset legal
+    sw      a0,16(sp)
+              #                    release a0 with n_35
               #                    occupy a1 with _anonymous_of_n_35_0
               #                    load from n_35 in mem
 

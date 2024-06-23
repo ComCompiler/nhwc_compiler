@@ -29,29 +29,25 @@ f1:
 	sd	s3, 8(sp)
 	sd	s4, 0(sp)
 .Lf1$ENTRY:
-	mv	s2, a0
 	la	s1, sum
-	lw	s4, 0(s1)
-	addw	a0, s4, s2
-	sw	a0, 0(s1)
+	lw	a1, 0(s1)
+	addw	s4, a1, a0
+	sw	s4, 0(s1)
 	call	getA
 	mv	s3, a0
-	addw	a0, s4, s3
-	addw	a0, a0, s2
-	sw	a0, 0(s1)
+	addw	s2, s4, s3
+	sw	s2, 0(s1)
 	call	getA
-	addw	a2, s4, a0
-	addw	a1, a2, s3
-	addw	a1, a1, s2
+	addw	a1, s2, a0
 	sw	a1, 0(s1)
 	slliw	a1, s3, 1
-	addw	a1, a2, a1
-	addw	a1, a1, s2
+	addw	a1, s4, a1
+	addw	a1, a1, a0
 	sw	a1, 0(s1)
 	li	a1, 3
 	mulw	a1, s3, a1
-	addw	a1, a2, a1
-	addw	a1, a1, s2
+	addw	a1, s4, a1
+	addw	a1, a1, a0
 	sw	a1, 0(s1)
 	ld	s1, 24(sp)
 	ld	s2, 16(sp)
@@ -83,7 +79,7 @@ f2:
 	sw	a0, 0(s1)
 	call	getA
 	slliw	a1, s2, 1
-	addw	a1, a1, s3
+	addw	a1, s3, a1
 	sw	a1, 0(s1)
 	ld	s1, 24(sp)
 	ld	s2, 16(sp)
@@ -115,13 +111,13 @@ f3:
 	sw	a0, 0(s1)
 	call	getA
 	mv	s2, a0
-	addw	a0, s2, s3
-	addw	a0, a0, s4
+	addw	a0, s4, s2
+	addw	a0, a0, s3
 	sw	a0, 0(s1)
 	call	getA
 	slliw	a1, s2, 1
+	addw	a1, s4, a1
 	addw	a1, a1, s3
-	addw	a1, a1, s4
 	sw	a1, 0(s1)
 	ld	s1, 24(sp)
 	ld	s2, 16(sp)

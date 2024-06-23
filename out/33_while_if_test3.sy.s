@@ -231,15 +231,15 @@ deepWhileBr:
               #                          label branch_false_27: 
 .branch_false_27:
               #                          jump label: while.head_22 
-              #                    store to temp_2_cmp_26 in mem offset legal
-    sb      a7,31(sp)
-              #                    release a7 with temp_2_cmp_26
               #                    store to d_23 in mem offset legal
     sw      a4,32(sp)
               #                    release a4 with d_23
               #                    store to temp_1_cmp_21 in mem offset legal
     sb      a5,39(sp)
               #                    release a5 with temp_1_cmp_21
+              #                    store to temp_2_cmp_26 in mem offset legal
+    sb      a7,31(sp)
+              #                    release a7 with temp_2_cmp_26
     j       .while.head_22
               #                    regtab     a0:Freed { symidx: a_16, tracked: true } |     a1:Freed { symidx: b_16, tracked: true } |     a2:Freed { symidx: temp_0_arithop_18, tracked: true } |     a3:Freed { symidx: c_18, tracked: true } |     a5:Freed { symidx: temp_1_cmp_21, tracked: true } | 
               #                          label while.exit_22: 

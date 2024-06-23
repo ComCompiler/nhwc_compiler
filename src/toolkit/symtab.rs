@@ -80,7 +80,7 @@ impl SymIdx {
         }
         Ok(cloned)
     }
-    pub fn to_ptr(&self) -> Result<Self>{
+    pub fn to_globl_ptr(&self) -> Result<Self>{
         let mut cloned = self.clone();
         if cloned.symbol_name.starts_with('*'){
             return Err(anyhow!("can't transform symbol_name to be global ptr twice"))

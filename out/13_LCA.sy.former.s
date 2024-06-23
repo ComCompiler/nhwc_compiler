@@ -271,10 +271,10 @@ quick_read:
 	j	.LBB5_10.25
 .LBB5_9.20:
 	call	getch
+	addiw	a2, s3, -48
 	li	a1, 10
 	mulw	a1, s1, a1
-	addiw	a1, a1, -48
-	addw	s1, a1, s3
+	addw	s1, a2, a1
 	mv	s3, a0
 	j	.LBB5_7.14
 .LBB5_10.25:

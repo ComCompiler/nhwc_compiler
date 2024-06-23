@@ -20,29 +20,30 @@ stoptime:
 	.globl	main
 	.type	main, @function
 main:
-	addi	sp, sp, -80
-	sd	ra, 72(sp)
-	sd	s0, 64(sp)
-	addi	s0, sp, 80
-	sd	s1, 56(sp)
-	sd	s2, 48(sp)
-	sd	s3, 40(sp)
+	addi	sp, sp, -304
+	sd	ra, 296(sp)
+	sd	s0, 288(sp)
+	addi	s0, sp, 304
+	sd	s1, 280(sp)
+	sd	s2, 272(sp)
+	sd	s3, 264(sp)
 .Lmain$ENTRY:
 	la	a1, __const_init.b.30
 	addi	a0, sp, 0
 	addi	a1, a1, 0
-	li	a2, 32
+	li	a2, 256
 	call	memcpy
 	li	s3, 0
 .LBB1_2.4:
-	li	a1, 4
-	addi	a0, sp, 0
-	.word	0x20a9e4b3
+	li	a2, 4
+	addi	a1, sp, 0
+	slli	a0, s3, 6
+	add	s1, a1, a0
 	li	s2, 0
-	blt	s3, a1, .LBB1_3.8
+	blt	s3, a2, .LBB1_3.8
 	j	.LBB1_6.17
 .LBB1_3.8:
-	li	a0, 2
+	li	a0, 16
 	blt	s2, a0, .LBB1_4.11
 	j	.LBB1_5.15
 .LBB1_4.11:
@@ -61,12 +62,12 @@ main:
 	j	.LBB1_2.4
 .LBB1_6.17:
 	mv	a0, zero
-	ld	s1, 56(sp)
-	ld	s2, 48(sp)
-	ld	s3, 40(sp)
-	ld	s0, 64(sp)
-	ld	ra, 72(sp)
-	addi	sp, sp, 80
+	ld	s1, 280(sp)
+	ld	s2, 272(sp)
+	ld	s3, 264(sp)
+	ld	s0, 288(sp)
+	ld	ra, 296(sp)
+	addi	sp, sp, 304
 	ret
 
 	.section	.data
@@ -78,6 +79,5 @@ __const_init.b.30:
 	.word	4
 	.word	5
 	.word	6
-	.word	7
-	.word	8
+	.zero	232
 

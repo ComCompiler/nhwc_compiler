@@ -114,12 +114,12 @@ main:
               #                    free a5
               #                    free a0
               #                          jump label: while.exit_23 
-              #                    store to temp_1_cmp_25 in mem offset legal
-    sb      a4,14(sp)
-              #                    release a4 with temp_1_cmp_25
               #                    store to temp_2_arithop_27 in mem offset legal
     sw      a5,8(sp)
               #                    release a5 with temp_2_arithop_27
+              #                    store to temp_1_cmp_25 in mem offset legal
+    sb      a4,14(sp)
+              #                    release a4 with temp_1_cmp_25
     j       .while.exit_23
               #                    regtab     a0:Freed { symidx: i_17, tracked: true } |     a1:Freed { symidx: sum_17, tracked: true } |     a3:Freed { symidx: temp_0_cmp_22, tracked: true } |     a4:Freed { symidx: temp_1_cmp_25, tracked: true } | 
               #                          label branch_false_26: 
@@ -159,15 +159,15 @@ main:
               #                    free a6
               #                    free a0
               #                          jump label: while.head_23 
+              #                    store to temp_4_arithop_24 in mem offset legal
+    sw      a6,0(sp)
+              #                    release a6 with temp_4_arithop_24
               #                    store to temp_3_arithop_24 in mem offset legal
     sw      a2,4(sp)
               #                    release a2 with temp_3_arithop_24
               #                    store to temp_1_cmp_25 in mem offset legal
     sb      a4,14(sp)
               #                    release a4 with temp_1_cmp_25
-              #                    store to temp_4_arithop_24 in mem offset legal
-    sw      a6,0(sp)
-              #                    release a6 with temp_4_arithop_24
               #                    store to temp_0_cmp_22 in mem offset legal
     sb      a3,15(sp)
               #                    release a3 with temp_0_cmp_22

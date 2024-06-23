@@ -482,29 +482,29 @@ main:
               #                    load from temp_32_logic_24 in mem
     lb      a0,1(sp)
               #                    free a0
-              #                    store to temp_10_cmp_24 in mem offset legal
-    sb      s10,83(sp)
-              #                    release s10 with temp_10_cmp_24
+              #                    store to temp_17_arithop_24 in mem offset legal
+    sw      s2,52(sp)
+              #                    release s2 with temp_17_arithop_24
               #                    occupy a0 with temp_32_logic_24
     bnez    a0, .branch_true_25
               #                    free a0
     j       .branch_false_25
-              #                    regtab     a0:Freed { symidx: temp_32_logic_24, tracked: true } |     a1:Freed { symidx: temp_31_logic_24, tracked: true } |     a2:Freed { symidx: temp_30_cmp_24, tracked: true } |     a3:Freed { symidx: temp_13_arithop_24, tracked: true } |     a4:Freed { symidx: temp_1_ptr2globl_24, tracked: true } |     a5:Freed { symidx: temp_2_arithop_24, tracked: true } |     a6:Freed { symidx: temp_12_ptr2globl_24, tracked: true } |     a7:Freed { symidx: temp_3_ptr2globl_24, tracked: true } |     s11:Freed { symidx: temp_16_ptr2globl_24, tracked: true } |     s1:Freed { symidx: temp_4_arithop_24, tracked: true } |     s2:Freed { symidx: temp_17_arithop_24, tracked: true } |     s3:Freed { symidx: temp_5_ptr2globl_24, tracked: true } |     s4:Freed { symidx: temp_14_ptr2globl_24, tracked: true } |     s5:Freed { symidx: temp_6_ptr2globl_24, tracked: true } |     s6:Freed { symidx: temp_7_arithop_24, tracked: true } |     s7:Freed { symidx: temp_15_ptr2globl_24, tracked: true } |     s8:Freed { symidx: temp_8_ptr2globl_24, tracked: true } |     s9:Freed { symidx: temp_9_arithop_24, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_32_logic_24, tracked: true } |     a1:Freed { symidx: temp_31_logic_24, tracked: true } |     a2:Freed { symidx: temp_30_cmp_24, tracked: true } |     a3:Freed { symidx: temp_13_arithop_24, tracked: true } |     a4:Freed { symidx: temp_1_ptr2globl_24, tracked: true } |     a5:Freed { symidx: temp_2_arithop_24, tracked: true } |     a6:Freed { symidx: temp_12_ptr2globl_24, tracked: true } |     a7:Freed { symidx: temp_3_ptr2globl_24, tracked: true } |     s10:Freed { symidx: temp_10_cmp_24, tracked: true } |     s11:Freed { symidx: temp_16_ptr2globl_24, tracked: true } |     s1:Freed { symidx: temp_4_arithop_24, tracked: true } |     s3:Freed { symidx: temp_5_ptr2globl_24, tracked: true } |     s4:Freed { symidx: temp_14_ptr2globl_24, tracked: true } |     s5:Freed { symidx: temp_6_ptr2globl_24, tracked: true } |     s6:Freed { symidx: temp_7_arithop_24, tracked: true } |     s7:Freed { symidx: temp_15_ptr2globl_24, tracked: true } |     s8:Freed { symidx: temp_8_ptr2globl_24, tracked: true } |     s9:Freed { symidx: temp_9_arithop_24, tracked: true } | 
               #                          label branch_true_25: 
 .branch_true_25:
               #                          flag_22 = i32 1_0 
-              #                    occupy s10 with flag_22
-    li      s10, 1
-              #                    free s10
+              #                    occupy s2 with flag_22
+    li      s2, 1
+              #                    free s2
               #                          jump label: branch_false_25 
               #                    store to flag_22 in mem offset legal
-    sw      s10,124(sp)
-              #                    release s10 with flag_22
+    sw      s2,124(sp)
+              #                    release s2 with flag_22
     j       .branch_false_25
-              #                    regtab     a0:Freed { symidx: temp_32_logic_24, tracked: true } |     a1:Freed { symidx: temp_31_logic_24, tracked: true } |     a2:Freed { symidx: temp_30_cmp_24, tracked: true } |     a3:Freed { symidx: temp_13_arithop_24, tracked: true } |     a4:Freed { symidx: temp_1_ptr2globl_24, tracked: true } |     a5:Freed { symidx: temp_2_arithop_24, tracked: true } |     a6:Freed { symidx: temp_12_ptr2globl_24, tracked: true } |     a7:Freed { symidx: temp_3_ptr2globl_24, tracked: true } |     s11:Freed { symidx: temp_16_ptr2globl_24, tracked: true } |     s1:Freed { symidx: temp_4_arithop_24, tracked: true } |     s2:Freed { symidx: temp_17_arithop_24, tracked: true } |     s3:Freed { symidx: temp_5_ptr2globl_24, tracked: true } |     s4:Freed { symidx: temp_14_ptr2globl_24, tracked: true } |     s5:Freed { symidx: temp_6_ptr2globl_24, tracked: true } |     s6:Freed { symidx: temp_7_arithop_24, tracked: true } |     s7:Freed { symidx: temp_15_ptr2globl_24, tracked: true } |     s8:Freed { symidx: temp_8_ptr2globl_24, tracked: true } |     s9:Freed { symidx: temp_9_arithop_24, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_32_logic_24, tracked: true } |     a1:Freed { symidx: temp_31_logic_24, tracked: true } |     a2:Freed { symidx: temp_30_cmp_24, tracked: true } |     a3:Freed { symidx: temp_13_arithop_24, tracked: true } |     a4:Freed { symidx: temp_1_ptr2globl_24, tracked: true } |     a5:Freed { symidx: temp_2_arithop_24, tracked: true } |     a6:Freed { symidx: temp_12_ptr2globl_24, tracked: true } |     a7:Freed { symidx: temp_3_ptr2globl_24, tracked: true } |     s10:Freed { symidx: temp_10_cmp_24, tracked: true } |     s11:Freed { symidx: temp_16_ptr2globl_24, tracked: true } |     s1:Freed { symidx: temp_4_arithop_24, tracked: true } |     s3:Freed { symidx: temp_5_ptr2globl_24, tracked: true } |     s4:Freed { symidx: temp_14_ptr2globl_24, tracked: true } |     s5:Freed { symidx: temp_6_ptr2globl_24, tracked: true } |     s6:Freed { symidx: temp_7_arithop_24, tracked: true } |     s7:Freed { symidx: temp_15_ptr2globl_24, tracked: true } |     s8:Freed { symidx: temp_8_ptr2globl_24, tracked: true } |     s9:Freed { symidx: temp_9_arithop_24, tracked: true } | 
               #                          label branch_false_25: 
 .branch_false_25:
-              #                    regtab     a0:Freed { symidx: temp_32_logic_24, tracked: true } |     a1:Freed { symidx: temp_31_logic_24, tracked: true } |     a2:Freed { symidx: temp_30_cmp_24, tracked: true } |     a3:Freed { symidx: temp_13_arithop_24, tracked: true } |     a4:Freed { symidx: temp_1_ptr2globl_24, tracked: true } |     a5:Freed { symidx: temp_2_arithop_24, tracked: true } |     a6:Freed { symidx: temp_12_ptr2globl_24, tracked: true } |     a7:Freed { symidx: temp_3_ptr2globl_24, tracked: true } |     s11:Freed { symidx: temp_16_ptr2globl_24, tracked: true } |     s1:Freed { symidx: temp_4_arithop_24, tracked: true } |     s2:Freed { symidx: temp_17_arithop_24, tracked: true } |     s3:Freed { symidx: temp_5_ptr2globl_24, tracked: true } |     s4:Freed { symidx: temp_14_ptr2globl_24, tracked: true } |     s5:Freed { symidx: temp_6_ptr2globl_24, tracked: true } |     s6:Freed { symidx: temp_7_arithop_24, tracked: true } |     s7:Freed { symidx: temp_15_ptr2globl_24, tracked: true } |     s8:Freed { symidx: temp_8_ptr2globl_24, tracked: true } |     s9:Freed { symidx: temp_9_arithop_24, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_32_logic_24, tracked: true } |     a1:Freed { symidx: temp_31_logic_24, tracked: true } |     a2:Freed { symidx: temp_30_cmp_24, tracked: true } |     a3:Freed { symidx: temp_13_arithop_24, tracked: true } |     a4:Freed { symidx: temp_1_ptr2globl_24, tracked: true } |     a5:Freed { symidx: temp_2_arithop_24, tracked: true } |     a6:Freed { symidx: temp_12_ptr2globl_24, tracked: true } |     a7:Freed { symidx: temp_3_ptr2globl_24, tracked: true } |     s10:Freed { symidx: temp_10_cmp_24, tracked: true } |     s11:Freed { symidx: temp_16_ptr2globl_24, tracked: true } |     s1:Freed { symidx: temp_4_arithop_24, tracked: true } |     s3:Freed { symidx: temp_5_ptr2globl_24, tracked: true } |     s4:Freed { symidx: temp_14_ptr2globl_24, tracked: true } |     s5:Freed { symidx: temp_6_ptr2globl_24, tracked: true } |     s6:Freed { symidx: temp_7_arithop_24, tracked: true } |     s7:Freed { symidx: temp_15_ptr2globl_24, tracked: true } |     s8:Freed { symidx: temp_8_ptr2globl_24, tracked: true } |     s9:Freed { symidx: temp_9_arithop_24, tracked: true } | 
               #                          label L2_0: 
 .L2_0:
               #                           Call void putint_0(flag_22) 
@@ -512,9 +512,6 @@ main:
               #                    store to temp_4_arithop_24 in mem offset legal
     sw      s1,104(sp)
               #                    release s1 with temp_4_arithop_24
-              #                    store to temp_17_arithop_24 in mem offset legal
-    sw      s2,52(sp)
-              #                    release s2 with temp_17_arithop_24
               #                    store to temp_5_ptr2globl_24 in mem offset legal
     sw      s3,100(sp)
               #                    release s3 with temp_5_ptr2globl_24
@@ -536,6 +533,9 @@ main:
               #                    store to temp_9_arithop_24 in mem offset legal
     sw      s9,84(sp)
               #                    release s9 with temp_9_arithop_24
+              #                    store to temp_10_cmp_24 in mem offset legal
+    sb      s10,83(sp)
+              #                    release s10 with temp_10_cmp_24
               #                    store to temp_16_ptr2globl_24 in mem offset legal
     sw      s11,56(sp)
               #                    release s11 with temp_16_ptr2globl_24

@@ -57,7 +57,7 @@ i:
     .word 3
     .word 4
     .word 5
-    .zero 92
+    .zero 80
     .align 4
     .globl h
               #                          global Array:i32:[Some(3_0)] h_0 
@@ -77,7 +77,7 @@ g:
     .word 10
     .word 11
     .word 12
-    .zero 53
+    .zero 32
     .align 4
     .globl f
               #                          global Array:i32:[Some(5_0)] f_0 
@@ -104,7 +104,7 @@ e:
     .word 13
     .word 14
     .word 15
-    .zero 46
+    .zero 4
     .align 4
     .globl d
               #                          global Array:i32:[Some(5_0), Some(3_0)] d_0 
@@ -125,7 +125,7 @@ d:
     .word 13
     .word 14
     .word 15
-    .zero 46
+    .zero 4
     .align 4
     .globl c
               #                          global Array:i32:[Some(5_0), Some(3_0)] c_0 
@@ -146,7 +146,7 @@ c:
     .word 13
     .word 14
     .word 15
-    .zero 46
+    .zero 4
     .align 4
     .globl b
               #                          global Array:i32:[Some(5_0), Some(3_0)] b_0 
@@ -168,7 +168,7 @@ g0:
     .word 0
     .word 1
     .word 29
-    .zero 33
+    .zero 24
     .align 4
     .globl f0
               #                          global Array:i32:[Some(6_0)] f0_0 
@@ -182,7 +182,7 @@ f0:
 e0:
     .word 22
     .word 33
-    .zero 7
+    .zero 4
     .align 4
     .globl d0
               #                          global Array:i32:[Some(11_0)] d0_0 
@@ -201,7 +201,7 @@ c0:
     .word 9
     .word 1
     .word 5
-    .zero 22
+    .zero 4
     .align 4
     .globl b0
               #                          global Array:i32:[Some(4_0)] b0_0 
@@ -209,7 +209,7 @@ c0:
 b0:
     .word 0
     .word 1
-    .zero 15
+    .zero 12
     .align 4
     .globl a0
               #                          global Array:i32:[Some(3_0)] a0_0 

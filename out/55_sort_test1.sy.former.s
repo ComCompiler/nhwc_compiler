@@ -22,41 +22,37 @@ stoptime:
 bubblesort:
 	addi	sp, sp, -16
 	sd	s1, 8(sp)
-	sd	s2, 0(sp)
 .Lbubblesort$ENTRY:
 	la	a1, n
-	lw	s2, 0(a1)
-	addiw	s1, s2, -1
+	lw	a1, 0(a1)
+	addiw	s1, a1, -1
 	li	a7, 0
 .LBB1_2.4:
-	subw	a1, zero, a7
-	addiw	a1, a1, -1
-	addw	a6, a1, s2
+	subw	a6, s1, a7
 	li	a5, 0
-	blt	a7, s1, .LBB1_3.10
-	j	.LBB1_7.23
-.LBB1_3.10:
-	blt	a5, a6, .LBB1_4.13
-	j	.LBB1_6.21
-.LBB1_4.13:
+	blt	a7, s1, .LBB1_3.8
+	j	.LBB1_7.21
+.LBB1_3.8:
+	blt	a5, a6, .LBB1_4.11
+	j	.LBB1_6.19
+.LBB1_4.11:
 	.word	0x20a7c633	# sh2add	a2, a5, a0
 	lw	a4, 0(a2)
 	addiw	a5, a5, 1
 	.word	0x20a7c5b3	# sh2add	a1, a5, a0
 	lw	a3, 0(a1)
-	blt	a3, a4, .LBB1_5.20
-	j	.LBB1_3.10
-.LBB1_5.20:
+	blt	a3, a4, .LBB1_5.18
+	j	.LBB1_3.8
+.LBB1_5.18:
 	sw	a4, 0(a1)
 	sw	a3, 0(a2)
-	j	.LBB1_3.10
-.LBB1_6.21:
+	j	.LBB1_3.8
+.LBB1_6.19:
 	addiw	a7, a7, 1
 	j	.LBB1_2.4
-.LBB1_7.23:
+.LBB1_7.21:
 	mv	a0, zero
 	ld	s1, 8(sp)
-	ld	s2, 0(sp)
 	addi	sp, sp, 16
 	ret
 

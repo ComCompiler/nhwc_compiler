@@ -162,16 +162,16 @@ main:
               #                    free a6
               #                    free a0
               #                          jump label: while.head_23 
-              #                    store to temp_1_cmp_25 in mem offset legal
-    sb      a4,14(sp)
-              #                    release a4 with temp_1_cmp_25
-              #                    store to temp_2_arithop_24 in mem offset legal
-    sw      a2,8(sp)
-              #                    release a2 with temp_2_arithop_24
-              #                    store to temp_3_arithop_24 in mem offset legal
-    sw      a6,4(sp)
-              #                    release a6 with temp_3_arithop_24
               #                    store to temp_0_cmp_22 in mem offset legal
     sb      a3,15(sp)
               #                    release a3 with temp_0_cmp_22
+              #                    store to temp_2_arithop_24 in mem offset legal
+    sw      a2,8(sp)
+              #                    release a2 with temp_2_arithop_24
+              #                    store to temp_1_cmp_25 in mem offset legal
+    sb      a4,14(sp)
+              #                    release a4 with temp_1_cmp_25
+              #                    store to temp_3_arithop_24 in mem offset legal
+    sw      a6,4(sp)
+              #                    release a6 with temp_3_arithop_24
     j       .while.head_23

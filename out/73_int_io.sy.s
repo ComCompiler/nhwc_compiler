@@ -164,63 +164,63 @@ my_getint:
               #                          label branch_true_24: 
 .branch_true_24:
               #                          jump label: while.exit_20 
-              #                    store to temp_2_arithop_21 in mem offset legal
-    sw      a2,28(sp)
-              #                    release a2 with temp_2_arithop_21
-              #                    store to temp_5_logic_23 in mem offset legal
-    sb      a7,25(sp)
-              #                    release a7 with temp_5_logic_23
               #                    store to temp_4_cmp_23 in mem offset legal
     sb      a6,26(sp)
               #                    release a6 with temp_4_cmp_23
-              #                    store to temp_1_ret_of_getch_21 in mem offset legal
-    sw      a0,32(sp)
-              #                    release a0 with temp_1_ret_of_getch_21
-              #                    store to c_17 in mem offset legal
-    sw      a3,40(sp)
-              #                    release a3 with c_17
               #                    store to temp_3_cmp_23 in mem offset legal
     sb      a4,27(sp)
               #                    release a4 with temp_3_cmp_23
+              #                    store to c_17 in mem offset legal
+    sw      a3,40(sp)
+              #                    release a3 with c_17
+              #                    store to temp_5_logic_23 in mem offset legal
+    sb      a7,25(sp)
+              #                    release a7 with temp_5_logic_23
+              #                    store to temp_2_arithop_21 in mem offset legal
+    sw      a2,28(sp)
+              #                    release a2 with temp_2_arithop_21
+              #                    store to temp_1_ret_of_getch_21 in mem offset legal
+    sw      a0,32(sp)
+              #                    release a0 with temp_1_ret_of_getch_21
+              #                    occupy a3 with _anonymous_of_temp_0__93_0
+              #                    load from temp_0__93 in mem
+    lb      a3,39(sp)
               #                    occupy a0 with _anonymous_of_sum_17_0
               #                    load from sum_17 in mem
 
 
     lw      a0,44(sp)
-              #                    occupy a3 with _anonymous_of_temp_0__93_0
-              #                    load from temp_0__93 in mem
-    lb      a3,39(sp)
     j       .while.exit_20
               #                    regtab     a0:Freed { symidx: temp_1_ret_of_getch_21, tracked: true } |     a2:Freed { symidx: temp_2_arithop_21, tracked: true } |     a3:Freed { symidx: c_17, tracked: true } |     a4:Freed { symidx: temp_3_cmp_23, tracked: true } |     a6:Freed { symidx: temp_4_cmp_23, tracked: true } |     a7:Freed { symidx: temp_5_logic_23, tracked: true } | 
               #                          label branch_false_24: 
 .branch_false_24:
               #                          jump label: while.exit_20 
-              #                    store to temp_2_arithop_21 in mem offset legal
-    sw      a2,28(sp)
-              #                    release a2 with temp_2_arithop_21
-              #                    store to temp_5_logic_23 in mem offset legal
-    sb      a7,25(sp)
-              #                    release a7 with temp_5_logic_23
               #                    store to temp_4_cmp_23 in mem offset legal
     sb      a6,26(sp)
               #                    release a6 with temp_4_cmp_23
-              #                    store to temp_1_ret_of_getch_21 in mem offset legal
-    sw      a0,32(sp)
-              #                    release a0 with temp_1_ret_of_getch_21
-              #                    store to c_17 in mem offset legal
-    sw      a3,40(sp)
-              #                    release a3 with c_17
               #                    store to temp_3_cmp_23 in mem offset legal
     sb      a4,27(sp)
               #                    release a4 with temp_3_cmp_23
+              #                    store to c_17 in mem offset legal
+    sw      a3,40(sp)
+              #                    release a3 with c_17
+              #                    store to temp_5_logic_23 in mem offset legal
+    sb      a7,25(sp)
+              #                    release a7 with temp_5_logic_23
+              #                    store to temp_2_arithop_21 in mem offset legal
+    sw      a2,28(sp)
+              #                    release a2 with temp_2_arithop_21
+              #                    store to temp_1_ret_of_getch_21 in mem offset legal
+    sw      a0,32(sp)
+              #                    release a0 with temp_1_ret_of_getch_21
+              #                    occupy a3 with _anonymous_of_temp_0__93_0
+              #                    load from temp_0__93 in mem
+    lb      a3,39(sp)
               #                    occupy a0 with _anonymous_of_sum_17_0
               #                    load from sum_17 in mem
 
 
     lw      a0,44(sp)
-              #                    occupy a3 with _anonymous_of_temp_0__93_0
-              #                    load from temp_0__93 in mem
-    lb      a3,39(sp)
     j       .while.exit_20
               #                    regtab     a0:Freed { symidx: sum_17, tracked: true } |     a3:Freed { symidx: temp_0__93, tracked: true } | 
               #                          label while.exit_20: 
@@ -383,24 +383,30 @@ my_getint:
               #                          label branch_false_35: 
 .branch_false_35:
               #                          jump label: while.exit_31 
-              #                    store to temp_8_arithop_32 in mem offset legal
-    sw      a2,16(sp)
-              #                    release a2 with temp_8_arithop_32
-              #                    store to temp_11_logic_34 in mem offset legal
-    sb      a7,13(sp)
-              #                    release a7 with temp_11_logic_34
               #                    store to temp_10_cmp_34 in mem offset legal
     sb      a6,14(sp)
               #                    release a6 with temp_10_cmp_34
-              #                    store to temp_7_ret_of_getch_32 in mem offset legal
-    sw      a0,20(sp)
-              #                    release a0 with temp_7_ret_of_getch_32
-              #                    store to c_17 in mem offset legal
-    sw      a3,40(sp)
-              #                    release a3 with c_17
               #                    store to temp_9_cmp_34 in mem offset legal
     sb      a4,15(sp)
               #                    release a4 with temp_9_cmp_34
+              #                    store to c_17 in mem offset legal
+    sw      a3,40(sp)
+              #                    release a3 with c_17
+              #                    store to temp_11_logic_34 in mem offset legal
+    sb      a7,13(sp)
+              #                    release a7 with temp_11_logic_34
+              #                    store to temp_8_arithop_32 in mem offset legal
+    sw      a2,16(sp)
+              #                    release a2 with temp_8_arithop_32
+              #                    store to temp_7_ret_of_getch_32 in mem offset legal
+    sw      a0,20(sp)
+              #                    release a0 with temp_7_ret_of_getch_32
+              #                    occupy a3 with _anonymous_of_temp_0__93_0
+              #                    load from temp_0__93 in mem
+    lb      a3,39(sp)
+              #                    occupy a5 with _anonymous_of_temp_6__273_0
+              #                    load from temp_6__273 in mem
+    lb      a5,24(sp)
               #                    occupy a0 with _anonymous_of_sum_17_0
               #                    load from sum_17 in mem
 
@@ -411,12 +417,6 @@ my_getint:
 
 
     lw      a1,40(sp)
-              #                    occupy a3 with _anonymous_of_temp_0__93_0
-              #                    load from temp_0__93 in mem
-    lb      a3,39(sp)
-              #                    occupy a5 with _anonymous_of_temp_6__273_0
-              #                    load from temp_6__273 in mem
-    lb      a5,24(sp)
     j       .while.exit_31
               #                    regtab     a0:Freed { symidx: sum_17, tracked: true } |     a1:Freed { symidx: c_17, tracked: true } |     a3:Freed { symidx: temp_0__93, tracked: true } |     a5:Freed { symidx: temp_6__273, tracked: true } | 
               #                          label while.exit_31: 

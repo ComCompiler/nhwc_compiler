@@ -60,8 +60,8 @@ main:
 	addw	a2, a0, a2
 	beq	a1, a2, .LBB1_4.24
 .LBB1_3.20:
-	addw	a0, a6, a5
-	addw	a1, a0, a4
+	addw	a0, a4, a5
+	addw	a1, a0, a6
 	li	a0, 0
 	beq	a1, a2, .LBB1_4.24
 	j	.LBB1_5.25

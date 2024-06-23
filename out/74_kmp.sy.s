@@ -62,7 +62,7 @@ get_next:
     li      a3, 1
               #                    occupy a4 with 0_0
     li      a4, 0
-              #                    occupy a5 with _anonymous_of_next_16_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a3,a4
               #                    free a3
               #                    free a4
@@ -102,7 +102,7 @@ get_next:
               #                    occupy a4 with 1_0
     li      a4, 1
               #                    occupy a7 with i_18
-              #                    occupy a5 with _anonymous_of_str_16_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a4,a7
               #                    free a4
               #                    free a7
@@ -148,7 +148,7 @@ get_next:
               #                    occupy a5 with 1_0
     li      a5, 1
               #                    occupy s1 with j_18
-              #                    occupy s2 with _anonymous_of_str_16_0
+              #                    occupy s2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s2,a5,s1
               #                    free a5
               #                    free s1
@@ -173,7 +173,7 @@ get_next:
               #                    found literal reg Some(a5) already exist with 1_0
               #                    occupy a5 with 1_0
               #                    occupy a7 with i_18
-              #                    occupy s6 with _anonymous_of_str_16_0
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s6,a5,a7
               #                    free a5
               #                    free a7
@@ -274,7 +274,7 @@ get_next:
               #                    store to str_16 in mem offset legal
     sd      a0,104(sp)
               #                    release a0 with str_16
-              #                    occupy a0 with _anonymous_of_next_16_0
+              #                    occupy a0 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a0,a5,a7
               #                    free a5
               #                    free a7
@@ -305,7 +305,7 @@ get_next:
               #                    occupy s2 with 1_0
     li      s2, 1
               #                    occupy s1 with j_18
-              #                    occupy s6 with _anonymous_of_next_16_0
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s6,s2,s1
               #                    free s2
               #                    free s1
@@ -330,20 +330,15 @@ get_next:
               #                    free s9
               #                    free s1
               #                          jump label: L9_0 
-              #                    store to str_16 in mem offset legal
-    sd      a0,104(sp)
-              #                    release a0 with str_16
               #                    store to temp_14_array_ptr_24 in mem offset legal
     sd      a5,8(sp)
               #                    release a5 with temp_14_array_ptr_24
               #                    store to temp_15_array_ele_24 in mem offset legal
     sw      s9,4(sp)
               #                    release s9 with temp_15_array_ele_24
-              #                    occupy s2 with _anonymous_of_temp_11_arithop_26_0
-              #                    load from temp_11_arithop_26 in mem
-
-
-    lw      s2,28(sp)
+              #                    store to str_16 in mem offset legal
+    sd      a0,104(sp)
+              #                    release a0 with str_16
               #                    occupy s6 with _anonymous_of_temp_12_arithop_26_0
               #                    load from temp_12_arithop_26 in mem
 
@@ -352,6 +347,11 @@ get_next:
               #                    occupy s9 with _anonymous_of_temp_13_index_ptr_26_0
               #                    load from temp_13_index_ptr_26 in mem
     ld      s9,16(sp)
+              #                    occupy s2 with _anonymous_of_temp_11_arithop_26_0
+              #                    load from temp_11_arithop_26 in mem
+
+
+    lw      s2,28(sp)
     j       .L9_0
               #                    regtab     a1:Freed { symidx: next_16, tracked: true } |     a2:Freed { symidx: temp_0_index_ptr_18, tracked: true } |     a3:Freed { symidx: temp_1_array_ptr_21, tracked: true } |     a4:Freed { symidx: temp_4_array_ptr_24, tracked: true } |     a6:Freed { symidx: temp_2_array_ele_21, tracked: true } |     a7:Freed { symidx: i_18, tracked: true } |     s10:Freed { symidx: temp_9_cmp_24, tracked: true } |     s11:Freed { symidx: temp_10_logic_24, tracked: true } |     s1:Freed { symidx: j_18, tracked: true } |     s2:Freed { symidx: temp_11_arithop_26, tracked: true } |     s3:Freed { symidx: temp_3__161, tracked: true } |     s4:Freed { symidx: temp_5_array_ele_24, tracked: true } |     s5:Freed { symidx: temp_6_array_ptr_24, tracked: true } |     s6:Freed { symidx: temp_12_arithop_26, tracked: true } |     s7:Freed { symidx: temp_7_array_ele_24, tracked: true } |     s8:Freed { symidx: temp_8_cmp_24, tracked: true } |     s9:Freed { symidx: temp_13_index_ptr_26, tracked: true } | 
               #                          label L9_0: 
@@ -360,42 +360,42 @@ get_next:
               #                    store to temp_9_cmp_24 in mem offset legal
     sb      s10,34(sp)
               #                    release s10 with temp_9_cmp_24
-              #                    store to temp_5_array_ele_24 in mem offset legal
-    sw      s4,52(sp)
-              #                    release s4 with temp_5_array_ele_24
-              #                    store to temp_10_logic_24 in mem offset legal
-    sb      s11,33(sp)
-              #                    release s11 with temp_10_logic_24
-              #                    store to temp_11_arithop_26 in mem offset legal
-    sw      s2,28(sp)
-              #                    release s2 with temp_11_arithop_26
-              #                    store to temp_12_arithop_26 in mem offset legal
-    sw      s6,24(sp)
-              #                    release s6 with temp_12_arithop_26
-              #                    store to temp_8_cmp_24 in mem offset legal
-    sb      s8,35(sp)
-              #                    release s8 with temp_8_cmp_24
-              #                    store to temp_7_array_ele_24 in mem offset legal
-    sw      s7,36(sp)
-              #                    release s7 with temp_7_array_ele_24
-              #                    store to temp_4_array_ptr_24 in mem offset legal
-    sd      a4,56(sp)
-              #                    release a4 with temp_4_array_ptr_24
-              #                    store to temp_6_array_ptr_24 in mem offset legal
-    sd      s5,40(sp)
-              #                    release s5 with temp_6_array_ptr_24
-              #                    store to temp_13_index_ptr_26 in mem offset legal
-    sd      s9,16(sp)
-              #                    release s9 with temp_13_index_ptr_26
-              #                    store to temp_2_array_ele_21 in mem offset legal
-    sw      a6,68(sp)
-              #                    release a6 with temp_2_array_ele_21
               #                    store to temp_1_array_ptr_21 in mem offset legal
     sd      a3,72(sp)
               #                    release a3 with temp_1_array_ptr_21
+              #                    store to temp_12_arithop_26 in mem offset legal
+    sw      s6,24(sp)
+              #                    release s6 with temp_12_arithop_26
+              #                    store to temp_2_array_ele_21 in mem offset legal
+    sw      a6,68(sp)
+              #                    release a6 with temp_2_array_ele_21
+              #                    store to temp_6_array_ptr_24 in mem offset legal
+    sd      s5,40(sp)
+              #                    release s5 with temp_6_array_ptr_24
+              #                    store to temp_4_array_ptr_24 in mem offset legal
+    sd      a4,56(sp)
+              #                    release a4 with temp_4_array_ptr_24
+              #                    store to temp_13_index_ptr_26 in mem offset legal
+    sd      s9,16(sp)
+              #                    release s9 with temp_13_index_ptr_26
+              #                    store to temp_10_logic_24 in mem offset legal
+    sb      s11,33(sp)
+              #                    release s11 with temp_10_logic_24
               #                    store to temp_3__161 in mem offset legal
     sb      s3,67(sp)
               #                    release s3 with temp_3__161
+              #                    store to temp_8_cmp_24 in mem offset legal
+    sb      s8,35(sp)
+              #                    release s8 with temp_8_cmp_24
+              #                    store to temp_5_array_ele_24 in mem offset legal
+    sw      s4,52(sp)
+              #                    release s4 with temp_5_array_ele_24
+              #                    store to temp_11_arithop_26 in mem offset legal
+    sw      s2,28(sp)
+              #                    release s2 with temp_11_arithop_26
+              #                    store to temp_7_array_ele_24 in mem offset legal
+    sw      s7,36(sp)
+              #                    release s7 with temp_7_array_ele_24
               #                    occupy a0 with _anonymous_of_str_16_0
               #                    load from str_16 in mem
     ld      a0,104(sp)
@@ -519,7 +519,7 @@ KMP:
               #                    occupy a3 with 1_0
     li      a3, 1
               #                    occupy a1 with j_33
-              #                    occupy a4 with _anonymous_of_src_31_0
+              #                    occupy a4 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a4,a3,a1
               #                    free a3
               #                    free a1
@@ -570,7 +570,7 @@ KMP:
               #                    occupy a4 with 1_0
     li      a4, 1
               #                    occupy a1 with j_33
-              #                    occupy a7 with _anonymous_of_src_31_0
+              #                    occupy a7 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a7,a4,a1
               #                    free a4
               #                    free a1
@@ -595,7 +595,7 @@ KMP:
               #                    found literal reg Some(a4) already exist with 1_0
               #                    occupy a4 with 1_0
               #                    occupy a0 with i_33
-              #                    occupy s4 with _anonymous_of_dst_31_0
+              #                    occupy s4 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s4,a4,a0
               #                    free a4
               #                    free a0
@@ -682,7 +682,7 @@ KMP:
               #                    occupy s8 with 1_0
     li      s8, 1
               #                    occupy a0 with i_33
-              #                    occupy s9 with _anonymous_of_dst_31_0
+              #                    occupy s9 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s9,s8,a0
               #                    free s8
               #                    free a0
@@ -779,7 +779,7 @@ KMP:
               #                    occupy a7 with 1_0
     li      a7, 1
               #                    occupy a0 with i_33
-              #                    occupy s4 with _anonymous_of_next_33_0
+              #                    occupy s4 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s4,a7,a0
               #                    free a7
               #                    free a0
@@ -861,12 +861,12 @@ KMP:
               #                    free s10
               #                    free a1
               #                          jump label: branch_false_52 
-              #                    store to temp_33_arithop_53 in mem offset legal
-    sw      s9,12(sp)
-              #                    release s9 with temp_33_arithop_53
               #                    store to temp_34_arithop_53 in mem offset legal
     sw      s10,8(sp)
               #                    release s10 with temp_34_arithop_53
+              #                    store to temp_33_arithop_53 in mem offset legal
+    sw      s9,12(sp)
+              #                    release s9 with temp_33_arithop_53
     j       .branch_false_52
               #                    regtab     a0:Freed { symidx: i_33, tracked: true } |     a1:Freed { symidx: j_33, tracked: true } |     a2:Freed { symidx: temp_16_array_ptr_37, tracked: true } |     a3:Freed { symidx: temp_19_array_ptr_40, tracked: true } |     a4:Freed { symidx: temp_30_array_ptr_49, tracked: true } |     a5:Freed { symidx: src_31, tracked: true } |     a6:Freed { symidx: temp_17_array_ele_37, tracked: true } |     s1:Freed { symidx: temp_18__684, tracked: true } |     s2:Freed { symidx: temp_20_array_ele_40, tracked: true } |     s3:Freed { symidx: temp_21_array_ptr_40, tracked: true } |     s4:Freed { symidx: temp_32_cmp_51, tracked: true } |     s5:Freed { symidx: dst_31, tracked: true } |     s6:Freed { symidx: temp_22_array_ele_40, tracked: true } |     s7:Freed { symidx: temp_23_cmp_40, tracked: true } |     s8:Freed { symidx: temp_31_array_ele_49, tracked: true } | 
               #                          label branch_false_52: 
@@ -875,53 +875,53 @@ KMP:
               #                          label L7_0: 
 .L7_0:
               #                          jump label: while.head_38 
-              #                    store to temp_20_array_ele_40 in mem offset legal
-    sw      s2,76(sp)
-              #                    release s2 with temp_20_array_ele_40
+              #                    store to temp_30_array_ptr_49 in mem offset legal
+    sd      a4,24(sp)
+              #                    release a4 with temp_30_array_ptr_49
+              #                    store to temp_32_cmp_51 in mem offset legal
+    sb      s4,19(sp)
+              #                    release s4 with temp_32_cmp_51
+              #                    store to temp_16_array_ptr_37 in mem offset legal
+    sd      a2,96(sp)
+              #                    release a2 with temp_16_array_ptr_37
+              #                    store to temp_23_cmp_40 in mem offset legal
+    sb      s7,59(sp)
+              #                    release s7 with temp_23_cmp_40
+              #                    store to temp_19_array_ptr_40 in mem offset legal
+    sd      a3,80(sp)
+              #                    release a3 with temp_19_array_ptr_40
+              #                    store to temp_22_array_ele_40 in mem offset legal
+    sw      s6,60(sp)
+              #                    release s6 with temp_22_array_ele_40
               #                    store to temp_31_array_ele_49 in mem offset legal
     sw      s8,20(sp)
               #                    release s8 with temp_31_array_ele_49
+              #                    store to temp_18__684 in mem offset legal
+    sb      s1,91(sp)
+              #                    release s1 with temp_18__684
+              #                    store to dst_31 in mem offset_illegal
+              #                    occupy a2 with 16504_0
+    li      a2, 16504
+    add     a2,sp,a2
+    sd      s5,0(a2)
+              #                    free a2
+              #                    release s5 with dst_31
+              #                    store to temp_20_array_ele_40 in mem offset legal
+    sw      s2,76(sp)
+              #                    release s2 with temp_20_array_ele_40
+              #                    store to temp_21_array_ptr_40 in mem offset legal
+    sd      s3,64(sp)
+              #                    release s3 with temp_21_array_ptr_40
               #                    store to src_31 in mem offset_illegal
-              #                    occupy a5 with 16496_0
-    li      a5, 16496
-    add     a5,sp,a5
-    sd      a5,0(a5)
-              #                    free a5
+              #                    occupy a3 with 16496_0
+    li      a3, 16496
+    add     a3,sp,a3
+    sd      a5,0(a3)
+              #                    free a3
               #                    release a5 with src_31
               #                    store to temp_17_array_ele_37 in mem offset legal
     sw      a6,92(sp)
               #                    release a6 with temp_17_array_ele_37
-              #                    store to temp_30_array_ptr_49 in mem offset legal
-    sd      a4,24(sp)
-              #                    release a4 with temp_30_array_ptr_49
-              #                    store to temp_22_array_ele_40 in mem offset legal
-    sw      s6,60(sp)
-              #                    release s6 with temp_22_array_ele_40
-              #                    store to temp_21_array_ptr_40 in mem offset legal
-    sd      s3,64(sp)
-              #                    release s3 with temp_21_array_ptr_40
-              #                    store to temp_23_cmp_40 in mem offset legal
-    sb      s7,59(sp)
-              #                    release s7 with temp_23_cmp_40
-              #                    store to dst_31 in mem offset_illegal
-              #                    occupy a4 with 16504_0
-    li      a4, 16504
-    add     a4,sp,a4
-    sd      s5,0(a4)
-              #                    free a4
-              #                    release s5 with dst_31
-              #                    store to temp_19_array_ptr_40 in mem offset legal
-    sd      a3,80(sp)
-              #                    release a3 with temp_19_array_ptr_40
-              #                    store to temp_16_array_ptr_37 in mem offset legal
-    sd      a2,96(sp)
-              #                    release a2 with temp_16_array_ptr_37
-              #                    store to temp_18__684 in mem offset legal
-    sb      s1,91(sp)
-              #                    release s1 with temp_18__684
-              #                    store to temp_32_cmp_51 in mem offset legal
-    sb      s4,19(sp)
-              #                    release s4 with temp_32_cmp_51
     j       .while.head_38
               #                    regtab     a0:Freed { symidx: i_33, tracked: true } |     a1:Freed { symidx: j_33, tracked: true } |     a2:Freed { symidx: temp_16_array_ptr_37, tracked: true } |     a5:Freed { symidx: src_31, tracked: true } |     a6:Freed { symidx: temp_17_array_ele_37, tracked: true } |     s1:Freed { symidx: temp_18__684, tracked: true } | 
               #                          label while.exit_38: 
@@ -1035,7 +1035,7 @@ read_str:
               #                    occupy a3 with 1_0
     li      a3, 1
               #                    occupy a1 with i_59
-              #                    occupy a5 with _anonymous_of_buf_57_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a3,a1
               #                    free a3
               #                    free a1
@@ -1095,7 +1095,7 @@ read_str:
 
 
     lw      a4,52(sp)
-              #                    occupy a5 with _anonymous_of_buf_57_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a3,a4
               #                    free a3
               #                    free a4
@@ -1137,38 +1137,38 @@ read_str:
               #                          label branch_true_66: 
 .branch_true_66:
               #                          jump label: while.exit_62 
-              #                    store to temp_39_array_ptr_65 in mem offset legal
-    sd      a2,24(sp)
-              #                    release a2 with temp_39_array_ptr_65
-              #                    store to temp_38_ret_of_getch_63 in mem offset legal
-    sw      a0,36(sp)
-              #                    release a0 with temp_38_ret_of_getch_63
               #                    store to temp_41_cmp_65 in mem offset legal
     sb      s2,19(sp)
               #                    release s2 with temp_41_cmp_65
-              #                    store to temp_40_array_ele_65 in mem offset legal
-    sw      a7,20(sp)
-              #                    release a7 with temp_40_array_ele_65
-              #                    store to buf_57 in mem offset legal
-    sd      a6,56(sp)
-              #                    release a6 with buf_57
-              #                    store to i_59 in mem offset legal
-    sw      a4,52(sp)
-              #                    release a4 with i_59
               #                    store to temp_37_index_ptr_63 in mem offset legal
     sd      a1,40(sp)
               #                    release a1 with temp_37_index_ptr_63
-              #                    occupy a0 with _anonymous_of_buf_57_0
-              #                    load from buf_57 in mem
-    ld      a0,56(sp)
-              #                    occupy a4 with _anonymous_of_temp_36__1228_0
-              #                    load from temp_36__1228 in mem
-    lb      a4,51(sp)
+              #                    store to buf_57 in mem offset legal
+    sd      a6,56(sp)
+              #                    release a6 with buf_57
+              #                    store to temp_39_array_ptr_65 in mem offset legal
+    sd      a2,24(sp)
+              #                    release a2 with temp_39_array_ptr_65
+              #                    store to temp_40_array_ele_65 in mem offset legal
+    sw      a7,20(sp)
+              #                    release a7 with temp_40_array_ele_65
+              #                    store to i_59 in mem offset legal
+    sw      a4,52(sp)
+              #                    release a4 with i_59
+              #                    store to temp_38_ret_of_getch_63 in mem offset legal
+    sw      a0,36(sp)
+              #                    release a0 with temp_38_ret_of_getch_63
               #                    occupy a1 with _anonymous_of_i_59_0
               #                    load from i_59 in mem
 
 
     lw      a1,52(sp)
+              #                    occupy a4 with _anonymous_of_temp_36__1228_0
+              #                    load from temp_36__1228 in mem
+    lb      a4,51(sp)
+              #                    occupy a0 with _anonymous_of_buf_57_0
+              #                    load from buf_57 in mem
+    ld      a0,56(sp)
     j       .while.exit_62
               #                    regtab     a0:Freed { symidx: buf_57, tracked: true } |     a1:Freed { symidx: i_59, tracked: true } |     a4:Freed { symidx: temp_36__1228, tracked: true } | 
               #                          label while.exit_62: 
@@ -1180,7 +1180,7 @@ read_str:
               #                    occupy a3 with 1_0
     li      a3, 1
               #                    occupy a1 with i_59
-              #                    occupy a5 with _anonymous_of_buf_57_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a3,a1
               #                    free a3
               #                    free a1
@@ -1243,38 +1243,38 @@ read_str:
               #                    free a5
               #                    free a4
               #                          jump label: while.head_62 
-              #                    store to temp_39_array_ptr_65 in mem offset legal
-    sd      a2,24(sp)
-              #                    release a2 with temp_39_array_ptr_65
-              #                    store to temp_38_ret_of_getch_63 in mem offset legal
-    sw      a0,36(sp)
-              #                    release a0 with temp_38_ret_of_getch_63
               #                    store to temp_41_cmp_65 in mem offset legal
     sb      s2,19(sp)
               #                    release s2 with temp_41_cmp_65
-              #                    store to temp_40_array_ele_65 in mem offset legal
-    sw      a7,20(sp)
-              #                    release a7 with temp_40_array_ele_65
-              #                    store to buf_57 in mem offset legal
-    sd      a6,56(sp)
-              #                    release a6 with buf_57
-              #                    store to i_59 in mem offset legal
-    sw      a4,52(sp)
-              #                    release a4 with i_59
-              #                    store to temp_42_arithop_63 in mem offset legal
-    sw      a5,12(sp)
-              #                    release a5 with temp_42_arithop_63
               #                    store to temp_37_index_ptr_63 in mem offset legal
     sd      a1,40(sp)
               #                    release a1 with temp_37_index_ptr_63
-              #                    occupy a0 with _anonymous_of_buf_57_0
-              #                    load from buf_57 in mem
-    ld      a0,56(sp)
+              #                    store to temp_42_arithop_63 in mem offset legal
+    sw      a5,12(sp)
+              #                    release a5 with temp_42_arithop_63
+              #                    store to buf_57 in mem offset legal
+    sd      a6,56(sp)
+              #                    release a6 with buf_57
+              #                    store to temp_39_array_ptr_65 in mem offset legal
+    sd      a2,24(sp)
+              #                    release a2 with temp_39_array_ptr_65
+              #                    store to temp_40_array_ele_65 in mem offset legal
+    sw      a7,20(sp)
+              #                    release a7 with temp_40_array_ele_65
+              #                    store to i_59 in mem offset legal
+    sw      a4,52(sp)
+              #                    release a4 with i_59
+              #                    store to temp_38_ret_of_getch_63 in mem offset legal
+    sw      a0,36(sp)
+              #                    release a0 with temp_38_ret_of_getch_63
               #                    occupy a1 with _anonymous_of_i_59_0
               #                    load from i_59 in mem
 
 
     lw      a1,52(sp)
+              #                    occupy a0 with _anonymous_of_buf_57_0
+              #                    load from buf_57 in mem
+    ld      a0,56(sp)
     j       .while.head_62
               #                    regtab 
               #                          Define main_0 [] -> main_ret_0 

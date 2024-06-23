@@ -244,7 +244,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 let idx = idx.as_ref().unwrap();
                                 let weight_reg = regtab.find_and_occupy_reg(weight, &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
                                 let idx_reg = regtab.find_and_occupy_reg(idx,&Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let temp_idx_mul_weight_reg = regtab.find_and_anonymous_occupy(&array_symidx,&Type::I32, symtab, asm_sect, &mut default_store, 
+                                let temp_idx_mul_weight_reg = regtab.find_and_anonymous_occupy(&SymIdx::from_str("temp_idx_mul_weight_reg"),&Type::I32, symtab, asm_sect, &mut default_store, 
                                     &mut |symidx,temp_reg,symtab,asm_sect,regtab|{
                                         asm_sect.asm(Arithmetic::new_mul(temp_reg, weight_reg.clone(), idx_reg.clone()).into());
                                         Ok(())
@@ -259,11 +259,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                             // 2 situations : 1. array is global  2. array is local to stack
                             match symtab.get(array_symidx)?.has_is_global() &&*symtab.get(array_symidx)?.get_is_global()?{
                                 true => {
-                                    let addr_reg = regtab.find_and_anonymous_occupy(&array_symidx,&Type::Ptr64 { ty: Box::new(Type::Void) }, symtab, asm_sect, &mut default_store, 
-                                        &mut |symidx,addr_reg,symtab,asm_sect,regtab|{
-                                        asm_sect.asm(PseudoInstr::new_la(addr_reg.clone(), Imm::new_global_label(array_symidx.clone())).into());
-                                        Ok(())
-                                    })?;
+                                    let addr_reg = regtab.find_and_occupy_reg(&array_symidx,&Type::Ptr64 { ty: Box::new(Type::Void) }, symtab, asm_sect, &mut default_store, &mut default_load)?;
                                     asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(), addr_reg.clone()).into());
                                     regtab.free_reg(addr_reg,asm_sect)?;
                                 },

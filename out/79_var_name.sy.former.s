@@ -43,15 +43,15 @@ main:
 	addiw	a1, s3, -1
 	addi	a0, sp, 0
 	.word	0x20a5c533	# sh2add	a0, a1, a0
-	lw	a3, 0(a0)
+	lw	a4, 0(a0)
 	addiw	a1, s3, -2
 	addi	a0, sp, 0
 	.word	0x20a5c533	# sh2add	a0, a1, a0
-	lw	a2, 0(a0)
+	lw	a3, 0(a0)
 	addi	a0, sp, 0
 	.word	0x20a9c5b3	# sh2add	a1, s3, a0
-	lw	a0, 0(a1)
-	addw	a0, a3, a0
+	lw	a2, 0(a1)
+	addw	a0, a4, a3
 	addw	a0, a0, a2
 	sw	a0, 0(a1)
 	lw	s2, 0(a1)

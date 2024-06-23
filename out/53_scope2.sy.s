@@ -255,18 +255,18 @@ main:
               #                    free s6
               #                    free a7
               #                          jump label: branch_false_30 
-              #                    store to l_33 in mem offset legal
-    sw      s2,24(sp)
-              #                    release s2 with l_33
+              #                    store to temp_7_arithop_35 in mem offset legal
+    sw      s3,20(sp)
+              #                    release s3 with temp_7_arithop_35
               #                    store to g_35 in mem offset legal
     sw      s4,16(sp)
               #                    release s4 with g_35
               #                    store to g_31 in mem offset legal
     sw      a0,28(sp)
               #                    release a0 with g_31
-              #                    store to temp_7_arithop_35 in mem offset legal
-    sw      s3,20(sp)
-              #                    release s3 with temp_7_arithop_35
+              #                    store to l_33 in mem offset legal
+    sw      s2,24(sp)
+              #                    release s2 with l_33
               #                    store to temp_9_arithop_35 in mem offset legal
     sw      s6,8(sp)
               #                    release s6 with temp_9_arithop_35
@@ -278,15 +278,15 @@ main:
               #                          label branch_false_30: 
 .branch_false_30:
               #                          jump label: while.head_26 
+              #                    store to temp_4_cmp_25 in mem offset legal
+    sb      a4,43(sp)
+              #                    release a4 with temp_4_cmp_25
               #                    store to temp_5_arithop_27 in mem offset legal
     sw      a6,36(sp)
               #                    release a6 with temp_5_arithop_27
               #                    store to temp_6_cmp_29 in mem offset legal
     sb      s1,35(sp)
               #                    release s1 with temp_6_cmp_29
-              #                    store to temp_4_cmp_25 in mem offset legal
-    sb      a4,43(sp)
-              #                    release a4 with temp_4_cmp_25
     j       .while.head_26
               #                    regtab     a1:Freed { symidx: temp_0_ptr2globl_20, tracked: true } |     a2:Freed { symidx: temp_2_ptr2globl_22, tracked: true } |     a3:Freed { symidx: temp_1_cmp_20, tracked: true } |     a4:Freed { symidx: temp_4_cmp_25, tracked: true } |     a5:Freed { symidx: temp_3_arithop_22, tracked: true } |     a7:Freed { symidx: k_22, tracked: true } | 
               #                          label while.exit_26: 
@@ -323,14 +323,14 @@ main:
 
     call    putint
               #                          jump label: branch_false_21 
-              #                    occupy a3 with _anonymous_of_temp_1_cmp_20_0
-              #                    load from temp_1_cmp_20 in mem
-    lb      a3,59(sp)
               #                    occupy a1 with _anonymous_of_temp_0_ptr2globl_20_0
               #                    load from temp_0_ptr2globl_20 in mem
 
 
     lw      a1,60(sp)
+              #                    occupy a3 with _anonymous_of_temp_1_cmp_20_0
+              #                    load from temp_1_cmp_20 in mem
+    lb      a3,59(sp)
     j       .branch_false_21
               #                    regtab     a1:Freed { symidx: temp_0_ptr2globl_20, tracked: true } |     a3:Freed { symidx: temp_1_cmp_20, tracked: true } | 
               #                          label branch_false_21: 

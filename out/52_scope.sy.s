@@ -251,12 +251,12 @@ main:
               #                    free a4
               #                    free a1
               #                          jump label: branch_false_35 
-              #                    store to result_28 in mem offset legal
-    sw      a1,28(sp)
-              #                    release a1 with result_28
               #                    store to temp_6_arithop_34 in mem offset legal
     sw      a4,8(sp)
               #                    release a4 with temp_6_arithop_34
+              #                    store to result_28 in mem offset legal
+    sw      a1,28(sp)
+              #                    release a1 with result_28
     j       .branch_false_35
               #                    regtab     a0:Freed { symidx: temp_4_ret_of_func_34, tracked: true } |     a2:Freed { symidx: temp_5_cmp_34, tracked: true } | 
               #                          label branch_false_35: 
@@ -285,15 +285,15 @@ main:
               #                    free a4
               #                    free a1
               #                          jump label: while.head_32 
-              #                    store to temp_4_ret_of_func_34 in mem offset legal
-    sw      a0,16(sp)
-              #                    release a0 with temp_4_ret_of_func_34
-              #                    store to temp_5_cmp_34 in mem offset legal
-    sb      a2,15(sp)
-              #                    release a2 with temp_5_cmp_34
               #                    store to temp_7_arithop_33 in mem offset legal
     sw      a4,4(sp)
               #                    release a4 with temp_7_arithop_33
+              #                    store to temp_5_cmp_34 in mem offset legal
+    sb      a2,15(sp)
+              #                    release a2 with temp_5_cmp_34
+              #                    store to temp_4_ret_of_func_34 in mem offset legal
+    sw      a0,16(sp)
+              #                    release a0 with temp_4_ret_of_func_34
               #                    occupy a0 with _anonymous_of_result_28_0
               #                    load from result_28 in mem
 

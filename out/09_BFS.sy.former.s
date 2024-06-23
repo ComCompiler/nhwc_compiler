@@ -234,8 +234,8 @@ quick_read:
 	call	getch
 	li	a1, 10
 	mulw	a1, s1, a1
-	addiw	a1, a1, -48
-	addw	s1, a1, s3
+	addw	a1, s3, a1
+	addiw	s1, a1, -48
 	mv	s3, a0
 	j	.LBB6_7.14
 .LBB6_10.25:

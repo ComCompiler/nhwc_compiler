@@ -164,18 +164,18 @@ doubleWhile:
               #                    free a6
               #                    free a1
               #                          jump label: while.head_23 
-              #                    store to temp_1_arithop_24 in mem offset legal
-    sw      a4,16(sp)
-              #                    release a4 with temp_1_arithop_24
               #                    store to temp_4_arithop_24 in mem offset legal
     sw      a6,4(sp)
               #                    release a6 with temp_4_arithop_24
-              #                    store to temp_0_cmp_22 in mem offset legal
-    sb      a3,23(sp)
-              #                    release a3 with temp_0_cmp_22
               #                    store to temp_2_cmp_26 in mem offset legal
     sb      a5,15(sp)
               #                    release a5 with temp_2_cmp_26
+              #                    store to temp_1_arithop_24 in mem offset legal
+    sw      a4,16(sp)
+              #                    release a4 with temp_1_arithop_24
+              #                    store to temp_0_cmp_22 in mem offset legal
+    sb      a3,23(sp)
+              #                    release a3 with temp_0_cmp_22
     j       .while.head_23
               #                    regtab     a0:Freed { symidx: i_17, tracked: true } |     a1:Freed { symidx: j_17, tracked: true } |     a3:Freed { symidx: temp_0_cmp_22, tracked: true } | 
               #                          label while.exit_23: 

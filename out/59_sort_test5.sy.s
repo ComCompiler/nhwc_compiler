@@ -50,7 +50,7 @@ swap:
               #                    occupy a4 with 1_0
     li      a4, 1
               #                    occupy a1 with i_17
-              #                    occupy a5 with _anonymous_of_array_17_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a4,a1
               #                    free a4
               #                    free a1
@@ -81,7 +81,7 @@ swap:
               #                    found literal reg Some(a4) already exist with 1_0
               #                    occupy a4 with 1_0
               #                    occupy a1 with i_17
-              #                    occupy s2 with _anonymous_of_array_17_0
+              #                    occupy s2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s2,a4,a1
               #                    free a4
               #                    free a1
@@ -99,7 +99,7 @@ swap:
               #                    found literal reg Some(a4) already exist with 1_0
               #                    occupy a4 with 1_0
               #                    occupy a2 with j_17
-              #                    occupy s4 with _anonymous_of_array_17_0
+              #                    occupy s4 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s4,a4,a2
               #                    free a4
               #                    free a2
@@ -132,7 +132,7 @@ swap:
               #                    found literal reg Some(a4) already exist with 1_0
               #                    occupy a4 with 1_0
               #                    occupy a2 with j_17
-              #                    occupy s7 with _anonymous_of_array_17_0
+              #                    occupy s7 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s7,a4,a2
               #                    free a4
               #                    free a2
@@ -289,7 +289,7 @@ heap_ajust:
               #                    found literal reg Some(a4) already exist with 1_0
               #                    occupy a4 with 1_0
               #                    occupy s3 with temp_10_arithop_35
-              #                    occupy s5 with _anonymous_of_arr_25_0
+              #                    occupy s5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s5,a4,s3
               #                    free a4
               #                    free s3
@@ -314,7 +314,7 @@ heap_ajust:
               #                    found literal reg Some(a4) already exist with 1_0
               #                    occupy a4 with 1_0
               #                    occupy s1 with son_27
-              #                    occupy s8 with _anonymous_of_arr_25_0
+              #                    occupy s8 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s8,a4,s1
               #                    free a4
               #                    free s1
@@ -406,7 +406,7 @@ heap_ajust:
               #                    store to arr_25 in mem offset legal
     sd      a0,128(sp)
               #                    release a0 with arr_25
-              #                    occupy a0 with _anonymous_of_arr_25_0
+              #                    occupy a0 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a0,s8,s1
               #                    free s8
               #                    free s1
@@ -442,7 +442,7 @@ heap_ajust:
               #                    store to end_25 in mem offset legal
     sw      a2,120(sp)
               #                    release a2 with end_25
-              #                    occupy a2 with _anonymous_of_arr_25_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a1,a3
               #                    free a1
               #                    free a3
@@ -477,14 +477,14 @@ heap_ajust:
               #                          br i1 temp_23_cmp_38, label branch_true_39, label branch_false_39 
               #                    occupy a0 with temp_23_cmp_38
               #                    free a0
-              #                    store to temp_22_array_ele_38 in mem offset legal
-    sw      a2,20(sp)
-              #                    release a2 with temp_22_array_ele_38
+              #                    store to temp_9_cmp_32 in mem offset legal
+    sb      s2,99(sp)
+              #                    release s2 with temp_9_cmp_32
               #                    occupy a0 with temp_23_cmp_38
     bnez    a0, .branch_true_39
               #                    free a0
     j       .branch_false_39
-              #                    regtab     a0:Freed { symidx: temp_23_cmp_38, tracked: true } |     a1:Freed { symidx: arr_25, tracked: true } |     a3:Freed { symidx: dad_27, tracked: true } |     a4:Freed { symidx: temp_17_logic_35, tracked: true } |     a5:Freed { symidx: temp_6_arithop_27, tracked: true } |     a6:Freed { symidx: temp_8_arithop_32, tracked: true } |     a7:Freed { symidx: temp_7_arithop_27, tracked: true } |     s10:Freed { symidx: temp_15_cmp_35, tracked: true } |     s11:Freed { symidx: temp_16_cmp_35, tracked: true } |     s1:Freed { symidx: son_27, tracked: true } |     s2:Freed { symidx: temp_9_cmp_32, tracked: true } |     s3:Freed { symidx: temp_10_arithop_35, tracked: true } |     s4:Freed { symidx: temp_11_array_ptr_35, tracked: true } |     s5:Freed { symidx: temp_19_array_ptr_38, tracked: true } |     s6:Freed { symidx: temp_12_array_ele_35, tracked: true } |     s7:Freed { symidx: temp_13_array_ptr_35, tracked: true } |     s8:Freed { symidx: temp_20_array_ele_38, tracked: true } |     s9:Freed { symidx: temp_14_array_ele_35, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_23_cmp_38, tracked: true } |     a1:Freed { symidx: arr_25, tracked: true } |     a2:Freed { symidx: temp_22_array_ele_38, tracked: true } |     a3:Freed { symidx: dad_27, tracked: true } |     a4:Freed { symidx: temp_17_logic_35, tracked: true } |     a5:Freed { symidx: temp_6_arithop_27, tracked: true } |     a6:Freed { symidx: temp_8_arithop_32, tracked: true } |     a7:Freed { symidx: temp_7_arithop_27, tracked: true } |     s10:Freed { symidx: temp_15_cmp_35, tracked: true } |     s11:Freed { symidx: temp_16_cmp_35, tracked: true } |     s1:Freed { symidx: son_27, tracked: true } |     s3:Freed { symidx: temp_10_arithop_35, tracked: true } |     s4:Freed { symidx: temp_11_array_ptr_35, tracked: true } |     s5:Freed { symidx: temp_19_array_ptr_38, tracked: true } |     s6:Freed { symidx: temp_12_array_ele_35, tracked: true } |     s7:Freed { symidx: temp_13_array_ptr_35, tracked: true } |     s8:Freed { symidx: temp_20_array_ele_38, tracked: true } |     s9:Freed { symidx: temp_14_array_ele_35, tracked: true } | 
               #                          label branch_true_39: 
 .branch_true_39:
               #                          ret 0_0 
@@ -500,7 +500,7 @@ heap_ajust:
     addi    sp,sp,152
               #                    free a0
     ret
-              #                    regtab     a0:Freed { symidx: temp_23_cmp_38, tracked: true } |     a1:Freed { symidx: arr_25, tracked: true } |     a3:Freed { symidx: dad_27, tracked: true } |     a4:Freed { symidx: temp_17_logic_35, tracked: true } |     a5:Freed { symidx: temp_6_arithop_27, tracked: true } |     a6:Freed { symidx: temp_8_arithop_32, tracked: true } |     a7:Freed { symidx: temp_7_arithop_27, tracked: true } |     s10:Freed { symidx: temp_15_cmp_35, tracked: true } |     s11:Freed { symidx: temp_16_cmp_35, tracked: true } |     s1:Freed { symidx: son_27, tracked: true } |     s2:Freed { symidx: temp_9_cmp_32, tracked: true } |     s3:Freed { symidx: temp_10_arithop_35, tracked: true } |     s4:Freed { symidx: temp_11_array_ptr_35, tracked: true } |     s5:Freed { symidx: temp_19_array_ptr_38, tracked: true } |     s6:Freed { symidx: temp_12_array_ele_35, tracked: true } |     s7:Freed { symidx: temp_13_array_ptr_35, tracked: true } |     s8:Freed { symidx: temp_20_array_ele_38, tracked: true } |     s9:Freed { symidx: temp_14_array_ele_35, tracked: true } | 
+              #                    regtab     a0:Freed { symidx: temp_23_cmp_38, tracked: true } |     a1:Freed { symidx: arr_25, tracked: true } |     a2:Freed { symidx: temp_22_array_ele_38, tracked: true } |     a3:Freed { symidx: dad_27, tracked: true } |     a4:Freed { symidx: temp_17_logic_35, tracked: true } |     a5:Freed { symidx: temp_6_arithop_27, tracked: true } |     a6:Freed { symidx: temp_8_arithop_32, tracked: true } |     a7:Freed { symidx: temp_7_arithop_27, tracked: true } |     s10:Freed { symidx: temp_15_cmp_35, tracked: true } |     s11:Freed { symidx: temp_16_cmp_35, tracked: true } |     s1:Freed { symidx: son_27, tracked: true } |     s3:Freed { symidx: temp_10_arithop_35, tracked: true } |     s4:Freed { symidx: temp_11_array_ptr_35, tracked: true } |     s5:Freed { symidx: temp_19_array_ptr_38, tracked: true } |     s6:Freed { symidx: temp_12_array_ele_35, tracked: true } |     s7:Freed { symidx: temp_13_array_ptr_35, tracked: true } |     s8:Freed { symidx: temp_20_array_ele_38, tracked: true } |     s9:Freed { symidx: temp_14_array_ele_35, tracked: true } | 
               #                          label branch_false_39: 
 .branch_false_39:
               #                          new_var temp_24_ret_of_swap_41:i32 
@@ -509,9 +509,6 @@ heap_ajust:
               #                    store to son_27 in mem offset legal
     sw      s1,112(sp)
               #                    release s1 with son_27
-              #                    store to temp_9_cmp_32 in mem offset legal
-    sb      s2,99(sp)
-              #                    release s2 with temp_9_cmp_32
               #                    store to temp_10_arithop_35 in mem offset legal
     sw      s3,92(sp)
               #                    release s3 with temp_10_arithop_35
@@ -545,6 +542,9 @@ heap_ajust:
               #                    store to arr_25 in mem offset legal
     sd      a1,128(sp)
               #                    release a1 with arr_25
+              #                    store to temp_22_array_ele_38 in mem offset legal
+    sw      a2,20(sp)
+              #                    release a2 with temp_22_array_ele_38
               #                    store to dad_27 in mem offset legal
     sw      a3,116(sp)
               #                    release a3 with dad_27
@@ -629,21 +629,34 @@ heap_ajust:
               #                          label L4_0: 
 .L4_0:
               #                          jump label: while.head_33 
-              #                    store to son_27 in mem offset legal
-    sw      a2,112(sp)
-              #                    release a2 with son_27
+              #                    store to temp_25_arithop_41 in mem offset legal
+    sw      a4,8(sp)
+              #                    release a4 with temp_25_arithop_41
               #                    store to temp_26_arithop_41 in mem offset legal
     sw      a6,4(sp)
               #                    release a6 with temp_26_arithop_41
               #                    store to temp_24_ret_of_swap_41 in mem offset legal
     sw      a0,12(sp)
               #                    release a0 with temp_24_ret_of_swap_41
+              #                    store to son_27 in mem offset legal
+    sw      a2,112(sp)
+              #                    release a2 with son_27
               #                    store to dad_27 in mem offset legal
     sw      a1,116(sp)
               #                    release a1 with dad_27
-              #                    store to temp_25_arithop_41 in mem offset legal
-    sw      a4,8(sp)
-              #                    release a4 with temp_25_arithop_41
+              #                    occupy s1 with _anonymous_of_son_27_0
+              #                    load from son_27 in mem
+
+
+    lw      s1,112(sp)
+              #                    occupy a0 with _anonymous_of_arr_25_0
+              #                    load from arr_25 in mem
+    ld      a0,128(sp)
+              #                    occupy a3 with _anonymous_of_dad_27_0
+              #                    load from dad_27 in mem
+
+
+    lw      a3,116(sp)
               #                    occupy a2 with _anonymous_of_end_25_0
               #                    load from end_25 in mem
 
@@ -659,19 +672,6 @@ heap_ajust:
 
 
     lw      a7,104(sp)
-              #                    occupy s1 with _anonymous_of_son_27_0
-              #                    load from son_27 in mem
-
-
-    lw      s1,112(sp)
-              #                    occupy a0 with _anonymous_of_arr_25_0
-              #                    load from arr_25 in mem
-    ld      a0,128(sp)
-              #                    occupy a3 with _anonymous_of_dad_27_0
-              #                    load from dad_27 in mem
-
-
-    lw      a3,116(sp)
               #                    occupy a1 with _anonymous_of_start_25_0
               #                    load from start_25 in mem
 
@@ -879,41 +879,41 @@ heap_sort:
               #                    free a4
               #                    free a2
               #                          jump label: while.head_53 
-              #                    store to tmp_48 in mem offset legal
-    sw      a1,52(sp)
-              #                    release a1 with tmp_48
-              #                    store to temp_31_ret_of_heap_ajust_54 in mem offset legal
-    sw      a0,32(sp)
-              #                    release a0 with temp_31_ret_of_heap_ajust_54
-              #                    store to i_48 in mem offset legal
-    sw      a2,56(sp)
-              #                    release a2 with i_48
               #                    store to temp_32_arithop_54 in mem offset legal
     sw      a4,28(sp)
               #                    release a4 with temp_32_arithop_54
-              #                    occupy a3 with _anonymous_of_temp_27_arithop_48_0
-              #                    load from temp_27_arithop_48 in mem
-
-
-    lw      a3,48(sp)
-              #                    occupy a1 with _anonymous_of_len_46_0
-              #                    load from len_46 in mem
-
-
-    lw      a1,60(sp)
-              #                    occupy a0 with _anonymous_of_arr_46_0
-              #                    load from arr_46 in mem
-    ld      a0,64(sp)
-              #                    occupy a5 with _anonymous_of_temp_28_arithop_48_0
-              #                    load from temp_28_arithop_48 in mem
-
-
-    lw      a5,44(sp)
+              #                    store to i_48 in mem offset legal
+    sw      a2,56(sp)
+              #                    release a2 with i_48
+              #                    store to temp_31_ret_of_heap_ajust_54 in mem offset legal
+    sw      a0,32(sp)
+              #                    release a0 with temp_31_ret_of_heap_ajust_54
+              #                    store to tmp_48 in mem offset legal
+    sw      a1,52(sp)
+              #                    release a1 with tmp_48
               #                    occupy a6 with _anonymous_of_i_48_0
               #                    load from i_48 in mem
 
 
     lw      a6,56(sp)
+              #                    occupy a3 with _anonymous_of_temp_27_arithop_48_0
+              #                    load from temp_27_arithop_48 in mem
+
+
+    lw      a3,48(sp)
+              #                    occupy a5 with _anonymous_of_temp_28_arithop_48_0
+              #                    load from temp_28_arithop_48 in mem
+
+
+    lw      a5,44(sp)
+              #                    occupy a0 with _anonymous_of_arr_46_0
+              #                    load from arr_46 in mem
+    ld      a0,64(sp)
+              #                    occupy a1 with _anonymous_of_len_46_0
+              #                    load from len_46 in mem
+
+
+    lw      a1,60(sp)
     j       .while.head_53
               #                    regtab     a0:Freed { symidx: arr_46, tracked: true } |     a1:Freed { symidx: len_46, tracked: true } |     a3:Freed { symidx: temp_27_arithop_48, tracked: true } |     a4:Freed { symidx: temp_29_cmp_52, tracked: true } |     a5:Freed { symidx: temp_28_arithop_48, tracked: true } |     a6:Freed { symidx: i_48, tracked: true } | 
               #                          label while.exit_53: 
@@ -1113,49 +1113,49 @@ heap_sort:
               #                    free a4
               #                    free a2
               #                          jump label: while.head_60 
-              #                    store to tmp_48 in mem offset legal
-    sw      a1,52(sp)
-              #                    release a1 with tmp_48
-              #                    store to temp_37_ret_of_heap_ajust_61 in mem offset legal
-    sw      a0,4(sp)
-              #                    release a0 with temp_37_ret_of_heap_ajust_61
-              #                    store to i_48 in mem offset legal
-    sw      a2,56(sp)
-              #                    release a2 with i_48
               #                    store to temp_38_arithop_61 in mem offset legal
     sw      a4,0(sp)
               #                    release a4 with temp_38_arithop_61
-              #                    occupy a7 with _anonymous_of_temp_33_arithop_48_0
-              #                    load from temp_33_arithop_48 in mem
-
-
-    lw      a7,24(sp)
-              #                    occupy a3 with _anonymous_of_temp_27_arithop_48_0
-              #                    load from temp_27_arithop_48 in mem
-
-
-    lw      a3,48(sp)
-              #                    occupy a1 with _anonymous_of_len_46_0
-              #                    load from len_46 in mem
-
-
-    lw      a1,60(sp)
-              #                    occupy a0 with _anonymous_of_arr_46_0
-              #                    load from arr_46 in mem
-    ld      a0,64(sp)
-              #                    occupy a4 with _anonymous_of_temp_29_cmp_52_0
-              #                    load from temp_29_cmp_52 in mem
-    lb      a4,43(sp)
-              #                    occupy a5 with _anonymous_of_temp_28_arithop_48_0
-              #                    load from temp_28_arithop_48 in mem
-
-
-    lw      a5,44(sp)
+              #                    store to i_48 in mem offset legal
+    sw      a2,56(sp)
+              #                    release a2 with i_48
+              #                    store to temp_37_ret_of_heap_ajust_61 in mem offset legal
+    sw      a0,4(sp)
+              #                    release a0 with temp_37_ret_of_heap_ajust_61
+              #                    store to tmp_48 in mem offset legal
+    sw      a1,52(sp)
+              #                    release a1 with tmp_48
               #                    occupy a6 with _anonymous_of_i_48_0
               #                    load from i_48 in mem
 
 
     lw      a6,56(sp)
+              #                    occupy a4 with _anonymous_of_temp_29_cmp_52_0
+              #                    load from temp_29_cmp_52 in mem
+    lb      a4,43(sp)
+              #                    occupy a3 with _anonymous_of_temp_27_arithop_48_0
+              #                    load from temp_27_arithop_48 in mem
+
+
+    lw      a3,48(sp)
+              #                    occupy a5 with _anonymous_of_temp_28_arithop_48_0
+              #                    load from temp_28_arithop_48 in mem
+
+
+    lw      a5,44(sp)
+              #                    occupy a0 with _anonymous_of_arr_46_0
+              #                    load from arr_46 in mem
+    ld      a0,64(sp)
+              #                    occupy a7 with _anonymous_of_temp_33_arithop_48_0
+              #                    load from temp_33_arithop_48 in mem
+
+
+    lw      a7,24(sp)
+              #                    occupy a1 with _anonymous_of_len_46_0
+              #                    load from len_46 in mem
+
+
+    lw      a1,60(sp)
     j       .while.head_60
               #                    regtab     a0:Freed { symidx: arr_46, tracked: true } |     a1:Freed { symidx: len_46, tracked: true } |     a3:Freed { symidx: temp_27_arithop_48, tracked: true } |     a4:Freed { symidx: temp_29_cmp_52, tracked: true } |     a5:Freed { symidx: temp_28_arithop_48, tracked: true } |     a6:Freed { symidx: i_48, tracked: true } |     a7:Freed { symidx: temp_33_arithop_48, tracked: true } |     s1:Freed { symidx: temp_34_cmp_59, tracked: true } | 
               #                          label while.exit_60: 
@@ -1228,7 +1228,7 @@ main:
     li      a3, 1
               #                    occupy a4 with 0_0
     li      a4, 0
-              #                    occupy a5 with _anonymous_of_a_70_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a3,a4
               #                    free a3
               #                    free a4
@@ -1255,7 +1255,7 @@ main:
               #                    occupy a3 with 1_0
               #                    occupy s1 with 1_0
     li      s1, 1
-              #                    occupy s2 with _anonymous_of_a_70_0
+              #                    occupy s2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s2,a3,s1
               #                    free a3
               #                    free s1
@@ -1278,13 +1278,13 @@ main:
               #                          temp_41_index_ptr_70 = getelementptr a_70:Array:i32:[Some(10_0)] [Some(2_0)] 
               #                    occupy s4 with temp_41_index_ptr_70
     li      s4, 0
-              #                    found literal reg Some(s1) already exist with 1_0
-              #                    occupy s1 with 1_0
+              #                    found literal reg Some(a3) already exist with 1_0
+              #                    occupy a3 with 1_0
               #                    occupy s5 with 2_0
     li      s5, 2
-              #                    occupy s6 with _anonymous_of_a_70_0
-    mul     s6,s1,s5
-              #                    free s1
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
+    mul     s6,a3,s5
+              #                    free a3
               #                    free s5
     add     s4,s4,s6
               #                    free s6
@@ -1305,13 +1305,13 @@ main:
               #                          temp_42_index_ptr_70 = getelementptr a_70:Array:i32:[Some(10_0)] [Some(3_0)] 
               #                    occupy s8 with temp_42_index_ptr_70
     li      s8, 0
-              #                    found literal reg Some(s1) already exist with 1_0
-              #                    occupy s1 with 1_0
+              #                    found literal reg Some(a3) already exist with 1_0
+              #                    occupy a3 with 1_0
               #                    found literal reg Some(s3) already exist with 3_0
               #                    occupy s3 with 3_0
-              #                    occupy s9 with _anonymous_of_a_70_0
-    mul     s9,s1,s3
-              #                    free s1
+              #                    occupy s9 with _anonymous_of_temp_idx_mul_weight_reg_0_0
+    mul     s9,a3,s3
+              #                    free a3
               #                    free s3
     add     s8,s8,s9
               #                    free s9
@@ -1332,13 +1332,13 @@ main:
               #                          temp_43_index_ptr_70 = getelementptr a_70:Array:i32:[Some(10_0)] [Some(4_0)] 
               #                    occupy s10 with temp_43_index_ptr_70
     li      s10, 0
-              #                    found literal reg Some(s1) already exist with 1_0
-              #                    occupy s1 with 1_0
+              #                    found literal reg Some(a3) already exist with 1_0
+              #                    occupy a3 with 1_0
               #                    found literal reg Some(a6) already exist with 4_0
               #                    occupy a6 with 4_0
-              #                    occupy s11 with _anonymous_of_a_70_0
-    mul     s11,s1,a6
-              #                    free s1
+              #                    occupy s11 with _anonymous_of_temp_idx_mul_weight_reg_0_0
+    mul     s11,a3,a6
+              #                    free a3
               #                    free a6
     add     s10,s10,s11
               #                    free s11
@@ -1359,26 +1359,26 @@ main:
               #                          temp_44_index_ptr_70 = getelementptr a_70:Array:i32:[Some(10_0)] [Some(5_0)] 
               #                    occupy a0 with temp_44_index_ptr_70
     li      a0, 0
-              #                    found literal reg Some(s1) already exist with 1_0
-              #                    occupy s1 with 1_0
+              #                    found literal reg Some(a3) already exist with 1_0
+              #                    occupy a3 with 1_0
               #                    occupy a1 with 5_0
     li      a1, 5
-              #                    occupy a3 with _anonymous_of_a_70_0
-    mul     a3,s1,a1
-              #                    free s1
-              #                    free a1
-    add     a0,a0,a3
+              #                    occupy a4 with _anonymous_of_temp_idx_mul_weight_reg_0_0
+    mul     a4,a3,a1
               #                    free a3
+              #                    free a1
+    add     a0,a0,a4
+              #                    free a4
     slli a0,a0,2
     add     a0,a0,sp
     addi    a0,a0,120
               #                    free a0
               #                          store 1_0:i32 temp_44_index_ptr_70:ptr->i32 
               #                    occupy a0 with temp_44_index_ptr_70
-              #                    found literal reg Some(s1) already exist with 1_0
-              #                    occupy s1 with 1_0
-    sw      s1,0(a0)
-              #                    free s1
+              #                    found literal reg Some(a3) already exist with 1_0
+              #                    occupy a3 with 1_0
+    sw      a3,0(a0)
+              #                    free a3
               #                    free a0
               #                          mu a_70:240 
               #                          a_70 = chi a_70:240 
@@ -1386,26 +1386,26 @@ main:
               #                          temp_45_index_ptr_70 = getelementptr a_70:Array:i32:[Some(10_0)] [Some(6_0)] 
               #                    occupy a1 with temp_45_index_ptr_70
     li      a1, 0
-              #                    found literal reg Some(s1) already exist with 1_0
-              #                    occupy s1 with 1_0
-              #                    occupy a3 with 6_0
-    li      a3, 6
-              #                    occupy a4 with _anonymous_of_a_70_0
-    mul     a4,s1,a3
-              #                    free s1
+              #                    found literal reg Some(a3) already exist with 1_0
+              #                    occupy a3 with 1_0
+              #                    occupy a4 with 6_0
+    li      a4, 6
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
+    mul     a5,a3,a4
               #                    free a3
-    add     a1,a1,a4
               #                    free a4
+    add     a1,a1,a5
+              #                    free a5
     slli a1,a1,2
     add     a1,a1,sp
     addi    a1,a1,120
               #                    free a1
               #                          store 6_0:i32 temp_45_index_ptr_70:ptr->i32 
               #                    occupy a1 with temp_45_index_ptr_70
-              #                    found literal reg Some(a3) already exist with 6_0
-              #                    occupy a3 with 6_0
-    sw      a3,0(a1)
-              #                    free a3
+              #                    found literal reg Some(a4) already exist with 6_0
+              #                    occupy a4 with 6_0
+    sw      a4,0(a1)
+              #                    free a4
               #                    free a1
               #                          mu a_70:246 
               #                          a_70 = chi a_70:246 
@@ -1417,7 +1417,7 @@ main:
               #                    occupy s1 with 1_0
               #                    occupy a4 with 7_0
     li      a4, 7
-              #                    occupy a5 with _anonymous_of_a_70_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,s1,a4
               #                    free s1
               #                    free a4
@@ -1444,7 +1444,7 @@ main:
               #                    occupy s1 with 1_0
               #                    occupy a5 with 8_0
     li      a5, 8
-              #                    occupy a6 with _anonymous_of_a_70_0
+              #                    occupy a6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a6,s1,a5
               #                    free s1
               #                    free a5
@@ -1471,7 +1471,7 @@ main:
               #                    occupy s1 with 1_0
               #                    found literal reg Some(s7) already exist with 9_0
               #                    occupy s7 with 9_0
-              #                    occupy a6 with _anonymous_of_a_70_0
+              #                    occupy a6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a6,s1,s7
               #                    free s1
               #                    free s7
@@ -1608,7 +1608,7 @@ main:
               #                    occupy a5 with 1_0
     li      a5, 1
               #                    occupy a1 with i_70
-              #                    occupy a6 with _anonymous_of_a_70_0
+              #                    occupy a6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a6,a5,a1
               #                    free a5
               #                    free a1
@@ -1706,22 +1706,22 @@ main:
               #                    free a2
               #                    free a0
               #                          jump label: while.head_87 
-              #                    store to temp_55_arithop_88 in mem offset legal
-    sw      a2,0(sp)
-              #                    release a2 with temp_55_arithop_88
               #                    store to i_70 in mem offset legal
     sw      a0,36(sp)
               #                    release a0 with i_70
-              #                    occupy a1 with _anonymous_of_i_70_0
-              #                    load from i_70 in mem
-
-
-    lw      a1,36(sp)
+              #                    store to temp_55_arithop_88 in mem offset legal
+    sw      a2,0(sp)
+              #                    release a2 with temp_55_arithop_88
               #                    occupy a0 with _anonymous_of_temp_50_ret_of_heap_sort_70_0
               #                    load from temp_50_ret_of_heap_sort_70 in mem
 
 
     lw      a0,28(sp)
+              #                    occupy a1 with _anonymous_of_i_70_0
+              #                    load from i_70 in mem
+
+
+    lw      a1,36(sp)
     j       .while.head_87
               #                    regtab     a0:Freed { symidx: temp_50_ret_of_heap_sort_70, tracked: true } |     a1:Freed { symidx: i_70, tracked: true } |     a3:Freed { symidx: temp_51_ptr2globl_86, tracked: true } |     a4:Freed { symidx: temp_52_cmp_86, tracked: true } | 
               #                          label while.exit_87: 

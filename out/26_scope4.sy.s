@@ -292,21 +292,23 @@ f1:
               #                    free a4
               #                    free a5
               #                          jump label: branch_false_31 
+              #                    store to a_32 in mem offset legal
+    sw      a1,28(sp)
+              #                    release a1 with a_32
               #                    store to temp_9_ret_of_getA_32 in mem offset legal
     sw      a0,32(sp)
               #                    release a0 with temp_9_ret_of_getA_32
               #                    store to temp_11_arithop_32 in mem offset legal
     sw      a4,20(sp)
               #                    release a4 with temp_11_arithop_32
-              #                    store to a_32 in mem offset legal
-    sw      a1,28(sp)
-              #                    release a1 with a_32
               #                    store to temp_10_ptr2globl_32 in mem offset legal
     sw      a3,24(sp)
               #                    release a3 with temp_10_ptr2globl_32
-              #                    occupy a6 with _anonymous_of_temp_8__274_0
-              #                    load from temp_8__274 in mem
-    lb      a6,39(sp)
+              #                    occupy a1 with _anonymous_of_a_23_0
+              #                    load from a_23 in mem
+
+
+    lw      a1,60(sp)
               #                    occupy a0 with _anonymous_of_temp_5_ret_of_getA_25_0
               #                    load from temp_5_ret_of_getA_25 in mem
 
@@ -317,11 +319,9 @@ f1:
 
 
     lw      a4,40(sp)
-              #                    occupy a1 with _anonymous_of_a_23_0
-              #                    load from a_23 in mem
-
-
-    lw      a1,60(sp)
+              #                    occupy a6 with _anonymous_of_temp_8__274_0
+              #                    load from temp_8__274 in mem
+    lb      a6,39(sp)
               #                    occupy a3 with _anonymous_of_temp_6_ptr2globl_25_0
               #                    load from temp_6_ptr2globl_25 in mem
 
@@ -1345,20 +1345,20 @@ main:
               #                    occupy a3 with _anonymous_of_temp_43__1886_0
               #                    load from temp_43__1886 in mem
     lb      a3,42(sp)
-              #                    occupy a2 with _anonymous_of_temp_42__1857_0
-              #                    load from temp_42__1857 in mem
-    lb      a2,43(sp)
-              #                    occupy a4 with _anonymous_of_temp_44_cmp_101_0
-              #                    load from temp_44_cmp_101 in mem
-    lb      a4,35(sp)
+              #                    occupy a6 with _anonymous_of_temp_45__1984_0
+              #                    load from temp_45__1984 in mem
+    lb      a6,34(sp)
               #                    occupy a0 with _anonymous_of_i_99_0
               #                    load from i_99 in mem
 
 
     lw      a0,36(sp)
-              #                    occupy a6 with _anonymous_of_temp_45__1984_0
-              #                    load from temp_45__1984 in mem
-    lb      a6,34(sp)
+              #                    occupy a4 with _anonymous_of_temp_44_cmp_101_0
+              #                    load from temp_44_cmp_101 in mem
+    lb      a4,35(sp)
+              #                    occupy a2 with _anonymous_of_temp_42__1857_0
+              #                    load from temp_42__1857 in mem
+    lb      a2,43(sp)
     j       .while.exit_105
               #                    regtab     a0:Freed { symidx: i_99, tracked: true } |     a2:Freed { symidx: temp_42__1857, tracked: true } |     a3:Freed { symidx: temp_43__1886, tracked: true } |     a4:Freed { symidx: temp_44_cmp_101, tracked: true } |     a6:Freed { symidx: temp_45__1984, tracked: true } | 
               #                          label while.exit_105: 
@@ -1481,15 +1481,15 @@ main:
               #                    occupy a3 with _anonymous_of_temp_43__1886_0
               #                    load from temp_43__1886 in mem
     lb      a3,42(sp)
-              #                    occupy a2 with _anonymous_of_temp_42__1857_0
-              #                    load from temp_42__1857 in mem
-    lb      a2,43(sp)
-              #                    occupy a4 with _anonymous_of_temp_44_cmp_101_0
-              #                    load from temp_44_cmp_101 in mem
-    lb      a4,35(sp)
               #                    occupy a6 with _anonymous_of_temp_45__1984_0
               #                    load from temp_45__1984 in mem
     lb      a6,34(sp)
+              #                    occupy a4 with _anonymous_of_temp_44_cmp_101_0
+              #                    load from temp_44_cmp_101 in mem
+    lb      a4,35(sp)
+              #                    occupy a2 with _anonymous_of_temp_42__1857_0
+              #                    load from temp_42__1857 in mem
+    lb      a2,43(sp)
     j       .while.exit_105
               #                    regtab     a0:Freed { symidx: i_99, tracked: true } |     a2:Freed { symidx: temp_42__1857, tracked: true } |     a3:Freed { symidx: temp_43__1886, tracked: true } |     a4:Freed { symidx: temp_44_cmp_101, tracked: true } |     a5:Freed { symidx: temp_48_cmp_116, tracked: true } |     a6:Freed { symidx: temp_45__1984, tracked: true } | 
               #                          label branch_false_117: 
@@ -1587,29 +1587,29 @@ main:
               #                    free a4
               #                    free a2
               #                          jump label: while.head_102 
+              #                    store to temp_51_ret_of_getA_115 in mem offset legal
+    sw      a0,8(sp)
+              #                    release a0 with temp_51_ret_of_getA_115
+              #                    store to temp_52_arithop_103 in mem offset legal
+    sw      a4,4(sp)
+              #                    release a4 with temp_52_arithop_103
               #                    store to a_57 in mem offset legal
     sw      a1,80(sp)
               #                    release a1 with a_57
               #                    store to i_99 in mem offset legal
     sw      a2,36(sp)
               #                    release a2 with i_99
-              #                    store to temp_52_arithop_103 in mem offset legal
-    sw      a4,4(sp)
-              #                    release a4 with temp_52_arithop_103
-              #                    store to temp_51_ret_of_getA_115 in mem offset legal
-    sw      a0,8(sp)
-              #                    release a0 with temp_51_ret_of_getA_115
               #                    occupy a3 with _anonymous_of_temp_43__1886_0
               #                    load from temp_43__1886 in mem
     lb      a3,42(sp)
-              #                    occupy a2 with _anonymous_of_temp_42__1857_0
-              #                    load from temp_42__1857 in mem
-    lb      a2,43(sp)
               #                    occupy a0 with _anonymous_of_i_99_0
               #                    load from i_99 in mem
 
 
     lw      a0,36(sp)
+              #                    occupy a2 with _anonymous_of_temp_42__1857_0
+              #                    load from temp_42__1857 in mem
+    lb      a2,43(sp)
     j       .while.head_102
               #                    regtab     a0:Freed { symidx: i_99, tracked: true } |     a2:Freed { symidx: temp_42__1857, tracked: true } |     a3:Freed { symidx: temp_43__1886, tracked: true } |     a4:Freed { symidx: temp_44_cmp_101, tracked: true } |     a6:Freed { symidx: temp_45__1984, tracked: true } |     a7:Freed { symidx: temp_46__2013, tracked: true } | 
               #                          label branch_false_108: 
@@ -1653,26 +1653,26 @@ main:
               #                    free a0
               #                    free a1
               #                          jump label: while.body_102 
-              #                    store to a_57 in mem offset legal
-    sw      a1,80(sp)
-              #                    release a1 with a_57
               #                    store to temp_47_ret_of_getA_106 in mem offset legal
     sw      a0,28(sp)
               #                    release a0 with temp_47_ret_of_getA_106
+              #                    store to a_57 in mem offset legal
+    sw      a1,80(sp)
+              #                    release a1 with a_57
               #                    occupy a3 with _anonymous_of_temp_43__1886_0
               #                    load from temp_43__1886 in mem
     lb      a3,42(sp)
-              #                    occupy a2 with _anonymous_of_temp_42__1857_0
-              #                    load from temp_42__1857 in mem
-    lb      a2,43(sp)
-              #                    occupy a4 with _anonymous_of_temp_44_cmp_101_0
-              #                    load from temp_44_cmp_101 in mem
-    lb      a4,35(sp)
               #                    occupy a0 with _anonymous_of_i_99_0
               #                    load from i_99 in mem
 
 
     lw      a0,36(sp)
+              #                    occupy a4 with _anonymous_of_temp_44_cmp_101_0
+              #                    load from temp_44_cmp_101 in mem
+    lb      a4,35(sp)
+              #                    occupy a2 with _anonymous_of_temp_42__1857_0
+              #                    load from temp_42__1857 in mem
+    lb      a2,43(sp)
     j       .while.body_102
               #                    regtab     a0:Freed { symidx: i_99, tracked: true } |     a2:Freed { symidx: temp_42__1857, tracked: true } |     a3:Freed { symidx: temp_43__1886, tracked: true } |     a4:Freed { symidx: temp_44_cmp_101, tracked: true } | 
               #                          label while.exit_102: 

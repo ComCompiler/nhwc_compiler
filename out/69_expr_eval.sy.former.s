@@ -392,11 +392,11 @@ next_token:
 	bne	a0, zero, .LBB8_7.16
 	j	.LBB8_8.22
 .LBB8_7.16:
-	lw	a2, 0(s3)
-	lw	a0, 0(s4)
-	addiw	a1, a0, -48
+	lw	a1, 0(s3)
 	li	a0, 10
-	mulw	a0, a2, a0
+	mulw	a0, a1, a0
+	addiw	a1, a0, -48
+	lw	a0, 0(s4)
 	addw	a0, a1, a0
 	sw	a0, 0(s3)
 	j	.LBB8_6.12

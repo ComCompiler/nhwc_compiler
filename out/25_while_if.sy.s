@@ -296,15 +296,15 @@ deepWhileBr:
               #                    free a4
               #                    free a5
               #                          jump label: branch_false_40 
-              #                    store to e_36 in mem offset legal
-    sw      a1,16(sp)
-              #                    release a1 with e_36
               #                    store to c_22 in mem offset legal
     sw      a5,44(sp)
               #                    release a5 with c_22
               #                    store to temp_8_arithop_41 in mem offset legal
     sw      a4,0(sp)
               #                    release a4 with temp_8_arithop_41
+              #                    store to e_36 in mem offset legal
+    sw      a1,16(sp)
+              #                    release a1 with e_36
     j       .branch_false_40
               #                    regtab     a0:Freed { symidx: temp_6_ret_of_get_one_39, tracked: true } |     a2:Freed { symidx: temp_7_cmp_39, tracked: true } | 
               #                          label branch_false_40: 
@@ -319,12 +319,12 @@ deepWhileBr:
               #                    store to temp_1_cmp_25 in mem offset legal
     sb      a5,39(sp)
               #                    release a5 with temp_1_cmp_25
-              #                    store to temp_2_cmp_30 in mem offset legal
-    sb      a7,31(sp)
-              #                    release a7 with temp_2_cmp_30
               #                    store to d_27 in mem offset legal
     sw      a4,32(sp)
               #                    release a4 with d_27
+              #                    store to temp_2_cmp_30 in mem offset legal
+    sb      a7,31(sp)
+              #                    release a7 with temp_2_cmp_30
     j       .while.head_26
               #                    regtab     a0:Freed { symidx: a_20, tracked: true } |     a1:Freed { symidx: b_20, tracked: true } |     a2:Freed { symidx: temp_0_arithop_22, tracked: true } |     a3:Freed { symidx: c_22, tracked: true } |     a5:Freed { symidx: temp_1_cmp_25, tracked: true } | 
               #                          label while.exit_26: 

@@ -131,7 +131,7 @@ counting_sort:
               #                    occupy s1 with 1_0
     li      s1, 1
               #                    occupy a3 with k_19
-              #                    occupy s2 with _anonymous_of_count_arr_19_0
+              #                    occupy s2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s2,s1,a3
               #                    free s1
               #                    free a3
@@ -206,7 +206,7 @@ counting_sort:
               #                    occupy s2 with 1_0
     li      s2, 1
               #                    occupy a4 with i_19
-              #                    occupy s3 with _anonymous_of_ini_arr_17_0
+              #                    occupy s3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s3,s2,a4
               #                    free s2
               #                    free a4
@@ -231,7 +231,7 @@ counting_sort:
               #                    found literal reg Some(s2) already exist with 1_0
               #                    occupy s2 with 1_0
               #                    occupy s4 with temp_5_array_ele_34
-              #                    occupy s6 with _anonymous_of_count_arr_19_0
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s6,s2,s4
               #                    free s2
               #                    free s4
@@ -248,7 +248,7 @@ counting_sort:
               #                    found literal reg Some(s2) already exist with 1_0
               #                    occupy s2 with 1_0
               #                    occupy a4 with i_19
-              #                    occupy s8 with _anonymous_of_ini_arr_17_0
+              #                    occupy s8 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s8,s2,a4
               #                    free s2
               #                    free a4
@@ -273,7 +273,7 @@ counting_sort:
               #                    found literal reg Some(s2) already exist with 1_0
               #                    occupy s2 with 1_0
               #                    occupy s9 with temp_8_array_ele_34
-              #                    occupy s11 with _anonymous_of_count_arr_19_0
+              #                    occupy s11 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s11,s2,s9
               #                    free s2
               #                    free s9
@@ -325,36 +325,36 @@ counting_sort:
               #                    free s8
               #                    free a4
               #                          jump label: while.exit_28 
+              #                    store to temp_10_array_ele_34 in mem offset legal
+    sw      s2,212(sp)
+              #                    release s2 with temp_10_array_ele_34
+              #                    store to temp_7_array_ptr_34 in mem offset legal
+    sd      s7,232(sp)
+              #                    release s7 with temp_7_array_ptr_34
               #                    store to temp_3_cmp_32 in mem offset legal
     sb      a6,267(sp)
               #                    release a6 with temp_3_cmp_32
               #                    store to temp_11_arithop_34 in mem offset legal
     sw      s6,208(sp)
               #                    release s6 with temp_11_arithop_34
-              #                    store to temp_8_array_ele_34 in mem offset legal
-    sw      s9,228(sp)
-              #                    release s9 with temp_8_array_ele_34
               #                    store to temp_4_array_ptr_34 in mem offset legal
     sd      s1,256(sp)
               #                    release s1 with temp_4_array_ptr_34
-              #                    store to temp_10_array_ele_34 in mem offset legal
-    sw      s2,212(sp)
-              #                    release s2 with temp_10_array_ele_34
-              #                    store to temp_5_array_ele_34 in mem offset legal
-    sw      s4,252(sp)
-              #                    release s4 with temp_5_array_ele_34
+              #                    store to temp_8_array_ele_34 in mem offset legal
+    sw      s9,228(sp)
+              #                    release s9 with temp_8_array_ele_34
               #                    store to temp_9_array_ptr_34 in mem offset legal
     sd      s10,216(sp)
               #                    release s10 with temp_9_array_ptr_34
-              #                    store to temp_12_arithop_34 in mem offset legal
-    sw      s8,204(sp)
-              #                    release s8 with temp_12_arithop_34
               #                    store to temp_6_index_ptr_34 in mem offset legal
     sd      s5,240(sp)
               #                    release s5 with temp_6_index_ptr_34
-              #                    store to temp_7_array_ptr_34 in mem offset legal
-    sd      s7,232(sp)
-              #                    release s7 with temp_7_array_ptr_34
+              #                    store to temp_12_arithop_34 in mem offset legal
+    sw      s8,204(sp)
+              #                    release s8 with temp_12_arithop_34
+              #                    store to temp_5_array_ele_34 in mem offset legal
+    sw      s4,252(sp)
+              #                    release s4 with temp_5_array_ele_34
     j       .while.exit_28
               #                    regtab     a0:Freed { symidx: ini_arr_17, tracked: true } |     a1:Freed { symidx: sorted_arr_17, tracked: true } |     a2:Freed { symidx: n_17, tracked: true } |     a3:Freed { symidx: k_19, tracked: true } |     a4:Freed { symidx: i_19, tracked: true } |     a5:Freed { symidx: j_19, tracked: true } |     a6:Freed { symidx: temp_3_cmp_32, tracked: true } |     a7:Freed { symidx: temp_0_cmp_27, tracked: true } | 
               #                          label while.exit_33: 
@@ -395,7 +395,7 @@ counting_sort:
               #                    occupy s3 with 1_0
     li      s3, 1
               #                    occupy a3 with k_19
-              #                    occupy s4 with _anonymous_of_count_arr_19_0
+              #                    occupy s4 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s4,s3,a3
               #                    free s3
               #                    free a3
@@ -411,7 +411,7 @@ counting_sort:
               #                    found literal reg Some(s3) already exist with 1_0
               #                    occupy s3 with 1_0
               #                    occupy s5 with temp_15_arithop_40
-              #                    regtab:    a0:Freed { symidx: ini_arr_17, tracked: true } |     a1:Freed { symidx: sorted_arr_17, tracked: true } |     a2:Freed { symidx: n_17, tracked: true } |     a3:Occupied { symidx: k_19, tracked: true, occupy_count: 1 } |     a4:Freed { symidx: i_19, tracked: true } |     a5:Freed { symidx: j_19, tracked: true } |     a6:Freed { symidx: temp_3_cmp_32, tracked: true } |     a7:Freed { symidx: temp_0_cmp_27, tracked: true } |     s1:Freed { symidx: temp_14_index_ptr_40, tracked: true } |     s2:Freed { symidx: temp_13_cmp_38, tracked: true } |     s3:Occupied { symidx: 1_0, tracked: false, occupy_count: 1 } |     s4:Freed { symidx: _anonymous_of_count_arr_19_0, tracked: false } |     s5:Occupied { symidx: temp_15_arithop_40, tracked: true, occupy_count: 1 } | 
+              #                    regtab:    a0:Freed { symidx: ini_arr_17, tracked: true } |     a1:Freed { symidx: sorted_arr_17, tracked: true } |     a2:Freed { symidx: n_17, tracked: true } |     a3:Occupied { symidx: k_19, tracked: true, occupy_count: 1 } |     a4:Freed { symidx: i_19, tracked: true } |     a5:Freed { symidx: j_19, tracked: true } |     a6:Freed { symidx: temp_3_cmp_32, tracked: true } |     a7:Freed { symidx: temp_0_cmp_27, tracked: true } |     s1:Freed { symidx: temp_14_index_ptr_40, tracked: true } |     s2:Freed { symidx: temp_13_cmp_38, tracked: true } |     s3:Occupied { symidx: 1_0, tracked: false, occupy_count: 1 } |     s4:Freed { symidx: _anonymous_of_temp_idx_mul_weight_reg_0_0, tracked: false } |     s5:Occupied { symidx: temp_15_arithop_40, tracked: true, occupy_count: 1 } | 
 
 
     sub     s5,a3,s3
@@ -425,7 +425,7 @@ counting_sort:
               #                    found literal reg Some(s3) already exist with 1_0
               #                    occupy s3 with 1_0
               #                    occupy s5 with temp_15_arithop_40
-              #                    occupy s7 with _anonymous_of_count_arr_19_0
+              #                    occupy s7 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s7,s3,s5
               #                    free s3
               #                    free s5
@@ -449,7 +449,7 @@ counting_sort:
               #                    found literal reg Some(s3) already exist with 1_0
               #                    occupy s3 with 1_0
               #                    occupy a3 with k_19
-              #                    occupy s10 with _anonymous_of_count_arr_19_0
+              #                    occupy s10 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s10,s3,a3
               #                    free s3
               #                    free a3
@@ -500,33 +500,33 @@ counting_sort:
               #                    free s7
               #                    free a3
               #                          jump label: while.head_39 
-              #                    store to temp_16_array_ptr_40 in mem offset legal
-    sd      s6,176(sp)
-              #                    release s6 with temp_16_array_ptr_40
-              #                    store to temp_18_array_ptr_40 in mem offset legal
-    sd      s9,160(sp)
-              #                    release s9 with temp_18_array_ptr_40
-              #                    store to temp_20_arithop_40 in mem offset legal
-    sw      s3,152(sp)
-              #                    release s3 with temp_20_arithop_40
-              #                    store to temp_19_array_ele_40 in mem offset legal
-    sw      s11,156(sp)
-              #                    release s11 with temp_19_array_ele_40
-              #                    store to temp_14_index_ptr_40 in mem offset legal
-    sd      s1,192(sp)
-              #                    release s1 with temp_14_index_ptr_40
               #                    store to temp_13_cmp_38 in mem offset legal
     sb      s2,203(sp)
               #                    release s2 with temp_13_cmp_38
-              #                    store to temp_17_array_ele_40 in mem offset legal
-    sw      s8,172(sp)
-              #                    release s8 with temp_17_array_ele_40
-              #                    store to temp_15_arithop_40 in mem offset legal
-    sw      s5,188(sp)
-              #                    release s5 with temp_15_arithop_40
               #                    store to temp_21_arithop_40 in mem offset legal
     sw      s7,148(sp)
               #                    release s7 with temp_21_arithop_40
+              #                    store to temp_16_array_ptr_40 in mem offset legal
+    sd      s6,176(sp)
+              #                    release s6 with temp_16_array_ptr_40
+              #                    store to temp_14_index_ptr_40 in mem offset legal
+    sd      s1,192(sp)
+              #                    release s1 with temp_14_index_ptr_40
+              #                    store to temp_18_array_ptr_40 in mem offset legal
+    sd      s9,160(sp)
+              #                    release s9 with temp_18_array_ptr_40
+              #                    store to temp_15_arithop_40 in mem offset legal
+    sw      s5,188(sp)
+              #                    release s5 with temp_15_arithop_40
+              #                    store to temp_19_array_ele_40 in mem offset legal
+    sw      s11,156(sp)
+              #                    release s11 with temp_19_array_ele_40
+              #                    store to temp_17_array_ele_40 in mem offset legal
+    sw      s8,172(sp)
+              #                    release s8 with temp_17_array_ele_40
+              #                    store to temp_20_arithop_40 in mem offset legal
+    sw      s3,152(sp)
+              #                    release s3 with temp_20_arithop_40
     j       .while.head_39
               #                    regtab     a0:Freed { symidx: ini_arr_17, tracked: true } |     a1:Freed { symidx: sorted_arr_17, tracked: true } |     a2:Freed { symidx: n_17, tracked: true } |     a3:Freed { symidx: k_19, tracked: true } |     a4:Freed { symidx: i_19, tracked: true } |     a5:Freed { symidx: j_19, tracked: true } |     a6:Freed { symidx: temp_3_cmp_32, tracked: true } |     a7:Freed { symidx: temp_0_cmp_27, tracked: true } |     s2:Freed { symidx: temp_13_cmp_38, tracked: true } | 
               #                          label while.exit_39: 
@@ -582,7 +582,7 @@ counting_sort:
               #                    found literal reg Some(s1) already exist with 1_0
               #                    occupy s1 with 1_0
               #                    occupy s4 with temp_23_arithop_46
-              #                    occupy s6 with _anonymous_of_ini_arr_17_0
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s6,s1,s4
               #                    free s1
               #                    free s4
@@ -607,7 +607,7 @@ counting_sort:
               #                    found literal reg Some(s1) already exist with 1_0
               #                    occupy s1 with 1_0
               #                    occupy s7 with temp_25_array_ele_46
-              #                    occupy s9 with _anonymous_of_count_arr_19_0
+              #                    occupy s9 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s9,s1,s7
               #                    free s1
               #                    free s7
@@ -623,7 +623,7 @@ counting_sort:
               #                    found literal reg Some(s1) already exist with 1_0
               #                    occupy s1 with 1_0
               #                    occupy s10 with temp_27_arithop_46
-              #                    regtab:    a0:Freed { symidx: ini_arr_17, tracked: true } |     a1:Freed { symidx: sorted_arr_17, tracked: true } |     a2:Freed { symidx: n_17, tracked: true } |     a3:Freed { symidx: k_19, tracked: true } |     a4:Freed { symidx: i_19, tracked: true } |     a5:Occupied { symidx: j_19, tracked: true, occupy_count: 1 } |     a6:Freed { symidx: temp_3_cmp_32, tracked: true } |     a7:Freed { symidx: temp_0_cmp_27, tracked: true } |     s10:Occupied { symidx: temp_27_arithop_46, tracked: true, occupy_count: 1 } |     s1:Occupied { symidx: 1_0, tracked: false, occupy_count: 1 } |     s2:Freed { symidx: temp_13_cmp_38, tracked: true } |     s3:Freed { symidx: temp_22_cmp_44, tracked: true } |     s4:Freed { symidx: temp_23_arithop_46, tracked: true } |     s5:Freed { symidx: temp_24_array_ptr_46, tracked: true } |     s6:Freed { symidx: _anonymous_of_ini_arr_17_0, tracked: false } |     s7:Freed { symidx: temp_25_array_ele_46, tracked: true } |     s8:Freed { symidx: temp_26_index_ptr_46, tracked: true } |     s9:Freed { symidx: _anonymous_of_count_arr_19_0, tracked: false } | 
+              #                    regtab:    a0:Freed { symidx: ini_arr_17, tracked: true } |     a1:Freed { symidx: sorted_arr_17, tracked: true } |     a2:Freed { symidx: n_17, tracked: true } |     a3:Freed { symidx: k_19, tracked: true } |     a4:Freed { symidx: i_19, tracked: true } |     a5:Occupied { symidx: j_19, tracked: true, occupy_count: 1 } |     a6:Freed { symidx: temp_3_cmp_32, tracked: true } |     a7:Freed { symidx: temp_0_cmp_27, tracked: true } |     s10:Occupied { symidx: temp_27_arithop_46, tracked: true, occupy_count: 1 } |     s1:Occupied { symidx: 1_0, tracked: false, occupy_count: 1 } |     s2:Freed { symidx: temp_13_cmp_38, tracked: true } |     s3:Freed { symidx: temp_22_cmp_44, tracked: true } |     s4:Freed { symidx: temp_23_arithop_46, tracked: true } |     s5:Freed { symidx: temp_24_array_ptr_46, tracked: true } |     s6:Freed { symidx: _anonymous_of_temp_idx_mul_weight_reg_0_0, tracked: false } |     s7:Freed { symidx: temp_25_array_ele_46, tracked: true } |     s8:Freed { symidx: temp_26_index_ptr_46, tracked: true } |     s9:Freed { symidx: _anonymous_of_temp_idx_mul_weight_reg_0_0, tracked: false } | 
 
 
     sub     s10,a5,s1
@@ -637,7 +637,7 @@ counting_sort:
               #                    found literal reg Some(s1) already exist with 1_0
               #                    occupy s1 with 1_0
               #                    occupy s10 with temp_27_arithop_46
-              #                    occupy s6 with _anonymous_of_ini_arr_17_0
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s6,s1,s10
               #                    free s1
               #                    free s10
@@ -665,7 +665,7 @@ counting_sort:
               #                    store to ini_arr_17 in mem offset legal
     sd      a0,352(sp)
               #                    release a0 with ini_arr_17
-              #                    occupy a0 with _anonymous_of_count_arr_19_0
+              #                    occupy a0 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a0,s9,s1
               #                    free s9
               #                    free s1
@@ -742,7 +742,7 @@ counting_sort:
               #                    store to n_17 in mem offset legal
     sw      a2,340(sp)
               #                    release a2 with n_17
-              #                    occupy a2 with _anonymous_of_ini_arr_17_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -778,7 +778,7 @@ counting_sort:
               #                    store to k_19 in mem offset legal
     sw      a3,288(sp)
               #                    release a3 with k_19
-              #                    occupy a3 with _anonymous_of_count_arr_19_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a1,a2
               #                    free a1
               #                    free a2
@@ -808,7 +808,7 @@ counting_sort:
               #                    store to temp_35_array_ele_46 in mem offset legal
     sw      a2,52(sp)
               #                    release a2 with temp_35_array_ele_46
-              #                    occupy a2 with _anonymous_of_sorted_arr_17_0
+              #                    occupy a2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a2,a0,a1
               #                    free a0
               #                    free a1
@@ -857,7 +857,7 @@ counting_sort:
               #                    store to temp_38_index_ptr_46 in mem offset legal
     sd      a3,24(sp)
               #                    release a3 with temp_38_index_ptr_46
-              #                    occupy a3 with _anonymous_of_ini_arr_17_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,a0,a1
               #                    free a0
               #                    free a1
@@ -916,45 +916,53 @@ counting_sort:
               #                    free a1
               #                    free a5
               #                          jump label: while.head_45 
-              #                    store to temp_30_array_ptr_46 in mem offset legal
-    sd      s6,80(sp)
-              #                    release s6 with temp_30_array_ptr_46
-              #                    store to temp_34_array_ptr_46 in mem offset legal
-    sd      s9,56(sp)
-              #                    release s9 with temp_34_array_ptr_46
-              #                    store to temp_22_cmp_44 in mem offset legal
-    sb      s3,147(sp)
-              #                    release s3 with temp_22_cmp_44
-              #                    store to temp_28_array_ptr_46 in mem offset legal
-    sd      s11,96(sp)
-              #                    release s11 with temp_28_array_ptr_46
-              #                    store to temp_41_array_ele_46 in mem offset legal
-    sw      a3,4(sp)
-              #                    release a3 with temp_41_array_ele_46
-              #                    store to temp_29_array_ele_46 in mem offset legal
-    sw      s1,92(sp)
-              #                    release s1 with temp_29_array_ele_46
-              #                    store to temp_42_arithop_46 in mem offset legal
-    sw      a1,0(sp)
-              #                    release a1 with temp_42_arithop_46
-              #                    store to temp_23_arithop_46 in mem offset legal
-    sw      s4,140(sp)
-              #                    release s4 with temp_23_arithop_46
-              #                    store to temp_40_array_ptr_46 in mem offset legal
-    sd      a2,8(sp)
-              #                    release a2 with temp_40_array_ptr_46
-              #                    store to temp_27_arithop_46 in mem offset legal
-    sw      s10,108(sp)
-              #                    release s10 with temp_27_arithop_46
-              #                    store to temp_26_index_ptr_46 in mem offset legal
-    sd      s8,112(sp)
-              #                    release s8 with temp_26_index_ptr_46
-              #                    store to temp_24_array_ptr_46 in mem offset legal
-    sd      s5,128(sp)
-              #                    release s5 with temp_24_array_ptr_46
               #                    store to temp_25_array_ele_46 in mem offset legal
     sw      s7,124(sp)
               #                    release s7 with temp_25_array_ele_46
+              #                    store to temp_30_array_ptr_46 in mem offset legal
+    sd      s6,80(sp)
+              #                    release s6 with temp_30_array_ptr_46
+              #                    store to temp_29_array_ele_46 in mem offset legal
+    sw      s1,92(sp)
+              #                    release s1 with temp_29_array_ele_46
+              #                    store to temp_34_array_ptr_46 in mem offset legal
+    sd      s9,56(sp)
+              #                    release s9 with temp_34_array_ptr_46
+              #                    store to temp_27_arithop_46 in mem offset legal
+    sw      s10,108(sp)
+              #                    release s10 with temp_27_arithop_46
+              #                    store to temp_24_array_ptr_46 in mem offset legal
+    sd      s5,128(sp)
+              #                    release s5 with temp_24_array_ptr_46
+              #                    store to temp_28_array_ptr_46 in mem offset legal
+    sd      s11,96(sp)
+              #                    release s11 with temp_28_array_ptr_46
+              #                    store to temp_26_index_ptr_46 in mem offset legal
+    sd      s8,112(sp)
+              #                    release s8 with temp_26_index_ptr_46
+              #                    store to temp_40_array_ptr_46 in mem offset legal
+    sd      a2,8(sp)
+              #                    release a2 with temp_40_array_ptr_46
+              #                    store to temp_22_cmp_44 in mem offset legal
+    sb      s3,147(sp)
+              #                    release s3 with temp_22_cmp_44
+              #                    store to temp_42_arithop_46 in mem offset legal
+    sw      a1,0(sp)
+              #                    release a1 with temp_42_arithop_46
+              #                    store to temp_41_array_ele_46 in mem offset legal
+    sw      a3,4(sp)
+              #                    release a3 with temp_41_array_ele_46
+              #                    store to temp_23_arithop_46 in mem offset legal
+    sw      s4,140(sp)
+              #                    release s4 with temp_23_arithop_46
+              #                    occupy a2 with _anonymous_of_n_17_0
+              #                    load from n_17 in mem
+
+
+    lw      a2,340(sp)
+              #                    occupy a1 with _anonymous_of_sorted_arr_17_0
+              #                    load from sorted_arr_17 in mem
+    ld      a1,344(sp)
               #                    occupy a0 with _anonymous_of_ini_arr_17_0
               #                    load from ini_arr_17 in mem
     ld      a0,352(sp)
@@ -963,14 +971,6 @@ counting_sort:
 
 
     lw      a3,288(sp)
-              #                    occupy a1 with _anonymous_of_sorted_arr_17_0
-              #                    load from sorted_arr_17 in mem
-    ld      a1,344(sp)
-              #                    occupy a2 with _anonymous_of_n_17_0
-              #                    load from n_17 in mem
-
-
-    lw      a2,340(sp)
     j       .while.head_45
               #                    regtab     a0:Freed { symidx: ini_arr_17, tracked: true } |     a1:Freed { symidx: sorted_arr_17, tracked: true } |     a2:Freed { symidx: n_17, tracked: true } |     a3:Freed { symidx: k_19, tracked: true } |     a4:Freed { symidx: i_19, tracked: true } |     a5:Freed { symidx: j_19, tracked: true } |     a6:Freed { symidx: temp_3_cmp_32, tracked: true } |     a7:Freed { symidx: temp_0_cmp_27, tracked: true } |     s2:Freed { symidx: temp_13_cmp_38, tracked: true } |     s3:Freed { symidx: temp_22_cmp_44, tracked: true } | 
               #                          label while.exit_45: 
@@ -1044,7 +1044,7 @@ main:
     li      a3, 1
               #                    occupy a4 with 0_0
     li      a4, 0
-              #                    occupy a5 with _anonymous_of_a_52_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,a3,a4
               #                    free a3
               #                    free a4
@@ -1071,7 +1071,7 @@ main:
               #                    occupy a3 with 1_0
               #                    occupy s1 with 1_0
     li      s1, 1
-              #                    occupy s2 with _anonymous_of_a_52_0
+              #                    occupy s2 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s2,a3,s1
               #                    free a3
               #                    free s1
@@ -1098,7 +1098,7 @@ main:
               #                    occupy s1 with 1_0
               #                    occupy s5 with 2_0
     li      s5, 2
-              #                    occupy s6 with _anonymous_of_a_52_0
+              #                    occupy s6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s6,s1,s5
               #                    free s1
               #                    free s5
@@ -1125,7 +1125,7 @@ main:
               #                    occupy s1 with 1_0
               #                    found literal reg Some(s3) already exist with 3_0
               #                    occupy s3 with 3_0
-              #                    occupy s9 with _anonymous_of_a_52_0
+              #                    occupy s9 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s9,s1,s3
               #                    free s1
               #                    free s3
@@ -1152,7 +1152,7 @@ main:
               #                    occupy s1 with 1_0
               #                    found literal reg Some(a6) already exist with 4_0
               #                    occupy a6 with 4_0
-              #                    occupy s11 with _anonymous_of_a_52_0
+              #                    occupy s11 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     s11,s1,a6
               #                    free s1
               #                    free a6
@@ -1179,7 +1179,7 @@ main:
               #                    occupy s1 with 1_0
               #                    occupy a1 with 5_0
     li      a1, 5
-              #                    occupy a3 with _anonymous_of_a_52_0
+              #                    occupy a3 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a3,s1,a1
               #                    free s1
               #                    free a1
@@ -1206,7 +1206,7 @@ main:
               #                    occupy s1 with 1_0
               #                    occupy a3 with 6_0
     li      a3, 6
-              #                    occupy a4 with _anonymous_of_a_52_0
+              #                    occupy a4 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a4,s1,a3
               #                    free s1
               #                    free a3
@@ -1233,7 +1233,7 @@ main:
               #                    occupy s1 with 1_0
               #                    occupy a4 with 7_0
     li      a4, 7
-              #                    occupy a5 with _anonymous_of_a_52_0
+              #                    occupy a5 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a5,s1,a4
               #                    free s1
               #                    free a4
@@ -1260,7 +1260,7 @@ main:
               #                    occupy s1 with 1_0
               #                    occupy a5 with 8_0
     li      a5, 8
-              #                    occupy a6 with _anonymous_of_a_52_0
+              #                    occupy a6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a6,s1,a5
               #                    free s1
               #                    free a5
@@ -1287,7 +1287,7 @@ main:
               #                    occupy s1 with 1_0
               #                    found literal reg Some(s7) already exist with 9_0
               #                    occupy s7 with 9_0
-              #                    occupy a6 with _anonymous_of_a_52_0
+              #                    occupy a6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a6,s1,s7
               #                    free s1
               #                    free s7
@@ -1428,7 +1428,7 @@ main:
               #                    occupy a5 with 1_0
     li      a5, 1
               #                    occupy a1 with i_52
-              #                    occupy a6 with _anonymous_of_b_52_0
+              #                    occupy a6 with _anonymous_of_temp_idx_mul_weight_reg_0_0
     mul     a6,a5,a1
               #                    free a5
               #                    free a1

@@ -79,8 +79,8 @@ main:
 	addi	a0, s1, 0
 	.word	0x20a74533	# sh2add	a0, a4, a0
 	lw	a1, 0(a0)
-	addw	a1, a1, a2
 	subw	a1, a1, a3
+	addw	a1, a1, a2
 	subw	a1, a1, a2
 	sw	a1, 0(a0)
 	addiw	a4, a4, 1
@@ -160,9 +160,9 @@ quick_read:
 .LBB2_9.20:
 	call	getch
 	li	a1, 10
-	mulw	a1, s1, a1
-	addw	a1, s3, a1
-	addiw	s1, a1, -48
+	mulw	a2, s1, a1
+	addiw	a1, s3, -48
+	addw	s1, a1, a2
 	mv	s3, a0
 	j	.LBB2_7.14
 .LBB2_10.25:

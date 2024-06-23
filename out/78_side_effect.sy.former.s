@@ -46,7 +46,7 @@ main:
 	li	s4, 5
 .LBB2_2.1:
 	bge	s4, zero, .LBB2_3.4
-	j	.LBB2_13.36
+	j	.LBB2_13.37
 .LBB2_3.4:
 	call	inc_a
 	bne	a0, zero, .LBB2_4.7
@@ -71,20 +71,21 @@ main:
 .LBB2_7.16:
 	call	inc_a
 	li	a1, 14
-	blt	a0, a1, .LBB2_10.28
+	blt	a0, a1, .LBB2_10.29
 .LBB2_8.19:
 	call	inc_a
 	bne	a0, zero, .LBB2_9.22
-	j	.LBB2_11.32
+	j	.LBB2_11.33
 .LBB2_9.22:
 	call	inc_a
 	mv	s3, a0
 	call	inc_a
-	subw	a0, s3, a0
+	subw	a0, zero, a0
+	addw	a0, a0, s3
 	addiw	a0, a0, 1
-	bne	a0, zero, .LBB2_10.28
-	j	.LBB2_11.32
-.LBB2_10.28:
+	bne	a0, zero, .LBB2_10.29
+	j	.LBB2_11.33
+.LBB2_10.29:
 	lw	a0, 0(s2)
 	call	putint
 	li	a0, 10
@@ -92,13 +93,13 @@ main:
 	lw	a0, 0(s1)
 	slliw	a0, a0, 1
 	sw	a0, 0(s1)
-	j	.LBB2_12.34
-.LBB2_11.32:
+	j	.LBB2_12.35
+.LBB2_11.33:
 	call	inc_a
-.LBB2_12.34:
+.LBB2_12.35:
 	addiw	s4, s4, -1
 	j	.LBB2_2.1
-.LBB2_13.36:
+.LBB2_13.37:
 	lw	a0, 0(s2)
 	call	putint
 	li	a0, 32

@@ -320,30 +320,30 @@ main:
               #                          label branch_true_42: 
 .branch_true_42:
               #                          jump label: while.exit_33 
-              #                    store to temp_9__39 in mem offset legal
-    sb      s8,59(sp)
-              #                    release s8 with temp_9__39
-              #                    store to temp_7_booltrans_39 in mem offset legal
-    sb      s6,61(sp)
-              #                    release s6 with temp_7_booltrans_39
-              #                    store to temp_6__370 in mem offset legal
-    sb      s4,62(sp)
-              #                    release s4 with temp_6__370
               #                    store to temp_8_logicnot_39 in mem offset legal
     sb      s7,60(sp)
               #                    release s7 with temp_8_logicnot_39
-              #                    store to temp_5_cmp_35 in mem offset legal
-    sb      s5,63(sp)
-              #                    release s5 with temp_5_cmp_35
-              #                    store to temp_12_cmp_41 in mem offset legal
-    sb      s1,51(sp)
-              #                    release s1 with temp_12_cmp_41
-              #                    store to temp_11_arithop_41 in mem offset legal
-    sw      s10,52(sp)
-              #                    release s10 with temp_11_arithop_41
               #                    store to temp_10_logic_39 in mem offset legal
     sb      s9,58(sp)
               #                    release s9 with temp_10_logic_39
+              #                    store to temp_9__39 in mem offset legal
+    sb      s8,59(sp)
+              #                    release s8 with temp_9__39
+              #                    store to temp_11_arithop_41 in mem offset legal
+    sw      s10,52(sp)
+              #                    release s10 with temp_11_arithop_41
+              #                    store to temp_7_booltrans_39 in mem offset legal
+    sb      s6,61(sp)
+              #                    release s6 with temp_7_booltrans_39
+              #                    store to temp_12_cmp_41 in mem offset legal
+    sb      s1,51(sp)
+              #                    release s1 with temp_12_cmp_41
+              #                    store to temp_6__370 in mem offset legal
+    sb      s4,62(sp)
+              #                    release s4 with temp_6__370
+              #                    store to temp_5_cmp_35 in mem offset legal
+    sb      s5,63(sp)
+              #                    release s5 with temp_5_cmp_35
               #                    store to temp_4_arithop_35 in mem offset legal
     sw      s3,64(sp)
               #                    release s3 with temp_4_arithop_35
@@ -422,21 +422,21 @@ main:
               #                    free s3
               #                    free a4
               #                          jump label: while.head_29 
-              #                    store to temp_18__752 in mem offset legal
-    sb      s4,23(sp)
-              #                    release s4 with temp_18__752
-              #                    store to m_30 in mem offset legal
-    sw      a6,72(sp)
-              #                    release a6 with m_30
-              #                    store to temp_20_arithop_30 in mem offset legal
-    sw      s3,16(sp)
-              #                    release s3 with temp_20_arithop_30
-              #                    store to temp_3_cmp_32 in mem offset legal
-    sb      s2,71(sp)
-              #                    release s2 with temp_3_cmp_32
               #                    store to temp_2_cmp_28 in mem offset legal
     sb      a7,79(sp)
               #                    release a7 with temp_2_cmp_28
+              #                    store to m_30 in mem offset legal
+    sw      a6,72(sp)
+              #                    release a6 with m_30
+              #                    store to temp_18__752 in mem offset legal
+    sb      s4,23(sp)
+              #                    release s4 with temp_18__752
+              #                    store to temp_3_cmp_32 in mem offset legal
+    sb      s2,71(sp)
+              #                    release s2 with temp_3_cmp_32
+              #                    store to temp_20_arithop_30 in mem offset legal
+    sw      s3,16(sp)
+              #                    release s3 with temp_20_arithop_30
     j       .while.head_29
               #                    regtab     a0:Freed { symidx: sum_17, tracked: true } |     a1:Freed { symidx: i_17, tracked: true } |     a2:Freed { symidx: j_22, tracked: true } |     a3:Freed { symidx: temp_0_cmp_20, tracked: true } |     a4:Freed { symidx: k_26, tracked: true } |     a5:Freed { symidx: temp_1_cmp_24, tracked: true } |     a6:Freed { symidx: m_30, tracked: true } |     a7:Freed { symidx: temp_2_cmp_28, tracked: true } |     s10:Freed { symidx: temp_11_arithop_41, tracked: true } |     s1:Freed { symidx: temp_12_cmp_41, tracked: true } |     s2:Freed { symidx: temp_3_cmp_32, tracked: true } |     s3:Freed { symidx: temp_4_arithop_35, tracked: true } |     s4:Freed { symidx: temp_6__370, tracked: true } |     s5:Freed { symidx: temp_5_cmp_35, tracked: true } |     s6:Freed { symidx: temp_7_booltrans_39, tracked: true } |     s7:Freed { symidx: temp_8_logicnot_39, tracked: true } |     s8:Freed { symidx: temp_9__39, tracked: true } |     s9:Freed { symidx: temp_10_logic_39, tracked: true } | 
               #                          label branch_false_42: 
@@ -539,27 +539,27 @@ main:
               #                    free s8
               #                    free a0
               #                          jump label: while.head_33 
+              #                    store to temp_16_arithop_34 in mem offset legal
+    sw      s7,28(sp)
+              #                    release s7 with temp_16_arithop_34
               #                    store to temp_17_arithop_34 in mem offset legal
     sw      s8,24(sp)
               #                    release s8 with temp_17_arithop_34
               #                    store to temp_13_cmp_52 in mem offset legal
     sb      s6,43(sp)
               #                    release s6 with temp_13_cmp_52
-              #                    store to temp_16_arithop_34 in mem offset legal
-    sw      s7,28(sp)
-              #                    release s7 with temp_16_arithop_34
-              #                    store to temp_5_cmp_35 in mem offset legal
-    sb      s5,63(sp)
-              #                    release s5 with temp_5_cmp_35
               #                    store to n_34 in mem offset legal
     sw      s1,44(sp)
               #                    release s1 with n_34
-              #                    store to temp_4_arithop_35 in mem offset legal
-    sw      s3,64(sp)
-              #                    release s3 with temp_4_arithop_35
               #                    store to temp_3_cmp_32 in mem offset legal
     sb      s2,71(sp)
               #                    release s2 with temp_3_cmp_32
+              #                    store to temp_5_cmp_35 in mem offset legal
+    sb      s5,63(sp)
+              #                    release s5 with temp_5_cmp_35
+              #                    store to temp_4_arithop_35 in mem offset legal
+    sw      s3,64(sp)
+              #                    release s3 with temp_4_arithop_35
     j       .while.head_33
               #                    regtab     a0:Freed { symidx: sum_17, tracked: true } |     a1:Freed { symidx: i_17, tracked: true } |     a2:Freed { symidx: j_22, tracked: true } |     a3:Freed { symidx: temp_0_cmp_20, tracked: true } |     a4:Freed { symidx: k_26, tracked: true } |     a5:Freed { symidx: temp_1_cmp_24, tracked: true } |     a7:Freed { symidx: temp_2_cmp_28, tracked: true } | 
               #                          label while.exit_29: 
@@ -605,18 +605,18 @@ main:
               #                    free a6
               #                    free a1
               #                          jump label: while.head_21 
-              #                    store to temp_1_cmp_24 in mem offset legal
-    sb      a5,87(sp)
-              #                    release a5 with temp_1_cmp_24
+              #                    store to j_22 in mem offset legal
+    sw      a2,88(sp)
+              #                    release a2 with j_22
               #                    store to temp_23_arithop_22 in mem offset legal
     sw      a6,4(sp)
               #                    release a6 with temp_23_arithop_22
               #                    store to temp_0_cmp_20 in mem offset legal
     sb      a3,95(sp)
               #                    release a3 with temp_0_cmp_20
-              #                    store to j_22 in mem offset legal
-    sw      a2,88(sp)
-              #                    release a2 with j_22
+              #                    store to temp_1_cmp_24 in mem offset legal
+    sb      a5,87(sp)
+              #                    release a5 with temp_1_cmp_24
     j       .while.head_21
               #                    regtab     a0:Freed { symidx: sum_17, tracked: true } |     a1:Freed { symidx: i_17, tracked: true } |     a3:Freed { symidx: temp_0_cmp_20, tracked: true } | 
               #                          label while.exit_21: 

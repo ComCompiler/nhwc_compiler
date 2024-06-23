@@ -564,22 +564,22 @@ EightWhile:
               #                    free a1
               #                    free s11
               #                          jump label: while.head_59 
-              #                    store to temp_23_arithop_60 in mem offset legal
-    sw      a1,88(sp)
-              #                    release a1 with temp_23_arithop_60
               #                    store to temp_22_ptr2globl_60 in mem offset legal
     sw      a0,92(sp)
               #                    release a0 with temp_22_ptr2globl_60
-              #                    occupy a1 with _anonymous_of_temp_19_arithop_56_0
-              #                    load from temp_19_arithop_56 in mem
-
-
-    lw      a1,104(sp)
+              #                    store to temp_23_arithop_60 in mem offset legal
+    sw      a1,88(sp)
+              #                    release a1 with temp_23_arithop_60
               #                    occupy a0 with _anonymous_of_temp_18_ptr2globl_56_0
               #                    load from temp_18_ptr2globl_56 in mem
 
 
     lw      a0,108(sp)
+              #                    occupy a1 with _anonymous_of_temp_19_arithop_56_0
+              #                    load from temp_19_arithop_56 in mem
+
+
+    lw      a1,104(sp)
     j       .while.head_59
               #                    regtab     a0:Freed { symidx: temp_20_ptr2globl_58, tracked: true } |     a1:Freed { symidx: temp_21_cmp_58, tracked: true } |     a2:Freed { symidx: c_21, tracked: true } |     a3:Freed { symidx: d_21, tracked: true } |     a4:Freed { symidx: temp_13_cmp_50, tracked: true } |     a5:Freed { symidx: temp_0_cmp_30, tracked: true } |     a6:Freed { symidx: temp_1_arithop_32, tracked: true } |     a7:Freed { symidx: temp_2_cmp_34, tracked: true } |     s10:Freed { symidx: temp_11_arithop_48, tracked: true } |     s1:Freed { symidx: temp_3_arithop_36, tracked: true } |     s2:Freed { symidx: temp_4_cmp_38, tracked: true } |     s3:Freed { symidx: temp_5_arithop_40, tracked: true } |     s4:Freed { symidx: temp_6_cmp_42, tracked: true } |     s5:Freed { symidx: temp_7_arithop_44, tracked: true } |     s6:Freed { symidx: temp_8_ptr2globl_46, tracked: true } |     s7:Freed { symidx: temp_10_ptr2globl_48, tracked: true } |     s8:Freed { symidx: temp_9_cmp_46, tracked: true } |     s9:Freed { symidx: temp_12_ptr2globl_50, tracked: true } | 
               #                          label while.exit_59: 
@@ -623,22 +623,22 @@ EightWhile:
               #                    free a1
               #                    free s11
               #                          jump label: while.head_55 
-              #                    store to temp_25_arithop_56 in mem offset legal
-    sw      a1,80(sp)
-              #                    release a1 with temp_25_arithop_56
               #                    store to temp_24_ptr2globl_56 in mem offset legal
     sw      a0,84(sp)
               #                    release a0 with temp_24_ptr2globl_56
-              #                    occupy a1 with _anonymous_of_temp_15_arithop_52_0
-              #                    load from temp_15_arithop_52 in mem
-
-
-    lw      a1,120(sp)
+              #                    store to temp_25_arithop_56 in mem offset legal
+    sw      a1,80(sp)
+              #                    release a1 with temp_25_arithop_56
               #                    occupy a0 with _anonymous_of_temp_14_ptr2globl_52_0
               #                    load from temp_14_ptr2globl_52 in mem
 
 
     lw      a0,124(sp)
+              #                    occupy a1 with _anonymous_of_temp_15_arithop_52_0
+              #                    load from temp_15_arithop_52 in mem
+
+
+    lw      a1,120(sp)
     j       .while.head_55
               #                    regtab     a0:Freed { symidx: temp_16_ptr2globl_54, tracked: true } |     a1:Freed { symidx: temp_17_cmp_54, tracked: true } |     a2:Freed { symidx: c_21, tracked: true } |     a3:Freed { symidx: d_21, tracked: true } |     a4:Freed { symidx: temp_13_cmp_50, tracked: true } |     a5:Freed { symidx: temp_0_cmp_30, tracked: true } |     a6:Freed { symidx: temp_1_arithop_32, tracked: true } |     a7:Freed { symidx: temp_2_cmp_34, tracked: true } |     s10:Freed { symidx: temp_11_arithop_48, tracked: true } |     s1:Freed { symidx: temp_3_arithop_36, tracked: true } |     s2:Freed { symidx: temp_4_cmp_38, tracked: true } |     s3:Freed { symidx: temp_5_arithop_40, tracked: true } |     s4:Freed { symidx: temp_6_cmp_42, tracked: true } |     s5:Freed { symidx: temp_7_arithop_44, tracked: true } |     s6:Freed { symidx: temp_8_ptr2globl_46, tracked: true } |     s7:Freed { symidx: temp_10_ptr2globl_48, tracked: true } |     s8:Freed { symidx: temp_9_cmp_46, tracked: true } |     s9:Freed { symidx: temp_12_ptr2globl_50, tracked: true } | 
               #                          label while.exit_55: 
@@ -682,28 +682,28 @@ EightWhile:
               #                    free a1
               #                    free s11
               #                          jump label: while.head_51 
-              #                    store to temp_12_ptr2globl_50 in mem offset legal
-    sw      s9,132(sp)
-              #                    release s9 with temp_12_ptr2globl_50
               #                    store to temp_13_cmp_50 in mem offset legal
     sb      a4,131(sp)
               #                    release a4 with temp_13_cmp_50
-              #                    store to temp_27_arithop_52 in mem offset legal
-    sw      a1,72(sp)
-              #                    release a1 with temp_27_arithop_52
               #                    store to temp_26_ptr2globl_52 in mem offset legal
     sw      a0,76(sp)
               #                    release a0 with temp_26_ptr2globl_52
-              #                    occupy a1 with _anonymous_of_b_21_0
-              #                    load from b_21 in mem
-
-
-    lw      a1,192(sp)
+              #                    store to temp_27_arithop_52 in mem offset legal
+    sw      a1,72(sp)
+              #                    release a1 with temp_27_arithop_52
+              #                    store to temp_12_ptr2globl_50 in mem offset legal
+    sw      s9,132(sp)
+              #                    release s9 with temp_12_ptr2globl_50
               #                    occupy a0 with _anonymous_of_a_21_0
               #                    load from a_21 in mem
 
 
     lw      a0,196(sp)
+              #                    occupy a1 with _anonymous_of_b_21_0
+              #                    load from b_21 in mem
+
+
+    lw      a1,192(sp)
     j       .while.head_51
               #                    regtab     a0:Freed { symidx: a_21, tracked: true } |     a1:Freed { symidx: b_21, tracked: true } |     a2:Freed { symidx: c_21, tracked: true } |     a3:Freed { symidx: d_21, tracked: true } |     a4:Freed { symidx: temp_13_cmp_50, tracked: true } |     a5:Freed { symidx: temp_0_cmp_30, tracked: true } |     a6:Freed { symidx: temp_1_arithop_32, tracked: true } |     a7:Freed { symidx: temp_2_cmp_34, tracked: true } |     s10:Freed { symidx: temp_11_arithop_48, tracked: true } |     s1:Freed { symidx: temp_3_arithop_36, tracked: true } |     s2:Freed { symidx: temp_4_cmp_38, tracked: true } |     s3:Freed { symidx: temp_5_arithop_40, tracked: true } |     s4:Freed { symidx: temp_6_cmp_42, tracked: true } |     s5:Freed { symidx: temp_7_arithop_44, tracked: true } |     s6:Freed { symidx: temp_8_ptr2globl_46, tracked: true } |     s7:Freed { symidx: temp_10_ptr2globl_48, tracked: true } |     s8:Freed { symidx: temp_9_cmp_46, tracked: true } |     s9:Freed { symidx: temp_12_ptr2globl_50, tracked: true } | 
               #                          label while.exit_51: 
@@ -744,40 +744,40 @@ EightWhile:
               #                    free a1
               #                    free s11
               #                          jump label: while.head_47 
-              #                    store to temp_11_arithop_48 in mem offset legal
-    sw      s10,136(sp)
-              #                    release s10 with temp_11_arithop_48
-              #                    store to temp_8_ptr2globl_46 in mem offset legal
-    sw      s6,148(sp)
-              #                    release s6 with temp_8_ptr2globl_46
               #                    store to temp_9_cmp_46 in mem offset legal
     sb      s8,147(sp)
               #                    release s8 with temp_9_cmp_46
-              #                    store to temp_12_ptr2globl_50 in mem offset legal
-    sw      s9,132(sp)
-              #                    release s9 with temp_12_ptr2globl_50
               #                    store to temp_13_cmp_50 in mem offset legal
     sb      a4,131(sp)
               #                    release a4 with temp_13_cmp_50
+              #                    store to temp_11_arithop_48 in mem offset legal
+    sw      s10,136(sp)
+              #                    release s10 with temp_11_arithop_48
               #                    store to temp_10_ptr2globl_48 in mem offset legal
     sw      s7,140(sp)
               #                    release s7 with temp_10_ptr2globl_48
-              #                    store to temp_29_arithop_48 in mem offset legal
-    sw      a1,64(sp)
-              #                    release a1 with temp_29_arithop_48
               #                    store to temp_28_ptr2globl_48 in mem offset legal
     sw      a0,68(sp)
               #                    release a0 with temp_28_ptr2globl_48
-              #                    occupy a1 with _anonymous_of_b_21_0
-              #                    load from b_21 in mem
-
-
-    lw      a1,192(sp)
+              #                    store to temp_8_ptr2globl_46 in mem offset legal
+    sw      s6,148(sp)
+              #                    release s6 with temp_8_ptr2globl_46
+              #                    store to temp_29_arithop_48 in mem offset legal
+    sw      a1,64(sp)
+              #                    release a1 with temp_29_arithop_48
+              #                    store to temp_12_ptr2globl_50 in mem offset legal
+    sw      s9,132(sp)
+              #                    release s9 with temp_12_ptr2globl_50
               #                    occupy a0 with _anonymous_of_a_21_0
               #                    load from a_21 in mem
 
 
     lw      a0,196(sp)
+              #                    occupy a1 with _anonymous_of_b_21_0
+              #                    load from b_21 in mem
+
+
+    lw      a1,192(sp)
     j       .while.head_47
               #                    regtab     a0:Freed { symidx: a_21, tracked: true } |     a1:Freed { symidx: b_21, tracked: true } |     a2:Freed { symidx: c_21, tracked: true } |     a3:Freed { symidx: d_21, tracked: true } |     a5:Freed { symidx: temp_0_cmp_30, tracked: true } |     a6:Freed { symidx: temp_1_arithop_32, tracked: true } |     a7:Freed { symidx: temp_2_cmp_34, tracked: true } |     s1:Freed { symidx: temp_3_arithop_36, tracked: true } |     s2:Freed { symidx: temp_4_cmp_38, tracked: true } |     s3:Freed { symidx: temp_5_arithop_40, tracked: true } |     s4:Freed { symidx: temp_6_cmp_42, tracked: true } |     s5:Freed { symidx: temp_7_arithop_44, tracked: true } |     s6:Freed { symidx: temp_8_ptr2globl_46, tracked: true } |     s8:Freed { symidx: temp_9_cmp_46, tracked: true } | 
               #                          label while.exit_47: 
@@ -812,24 +812,24 @@ EightWhile:
               #                    free s10
               #                    free s11
               #                          jump label: while.head_43 
-              #                    store to temp_7_arithop_44 in mem offset legal
-    sw      s5,152(sp)
-              #                    release s5 with temp_7_arithop_44
-              #                    store to temp_31_arithop_44 in mem offset legal
-    sw      s10,56(sp)
-              #                    release s10 with temp_31_arithop_44
-              #                    store to temp_8_ptr2globl_46 in mem offset legal
-    sw      s6,148(sp)
-              #                    release s6 with temp_8_ptr2globl_46
               #                    store to temp_9_cmp_46 in mem offset legal
     sb      s8,147(sp)
               #                    release s8 with temp_9_cmp_46
-              #                    store to temp_30_ptr2globl_44 in mem offset legal
-    sw      s7,60(sp)
-              #                    release s7 with temp_30_ptr2globl_44
+              #                    store to temp_31_arithop_44 in mem offset legal
+    sw      s10,56(sp)
+              #                    release s10 with temp_31_arithop_44
               #                    store to temp_6_cmp_42 in mem offset legal
     sb      s4,159(sp)
               #                    release s4 with temp_6_cmp_42
+              #                    store to temp_30_ptr2globl_44 in mem offset legal
+    sw      s7,60(sp)
+              #                    release s7 with temp_30_ptr2globl_44
+              #                    store to temp_7_arithop_44 in mem offset legal
+    sw      s5,152(sp)
+              #                    release s5 with temp_7_arithop_44
+              #                    store to temp_8_ptr2globl_46 in mem offset legal
+    sw      s6,148(sp)
+              #                    release s6 with temp_8_ptr2globl_46
     j       .while.head_43
               #                    regtab     a0:Freed { symidx: a_21, tracked: true } |     a1:Freed { symidx: b_21, tracked: true } |     a2:Freed { symidx: c_21, tracked: true } |     a3:Freed { symidx: d_21, tracked: true } |     a5:Freed { symidx: temp_0_cmp_30, tracked: true } |     a6:Freed { symidx: temp_1_arithop_32, tracked: true } |     a7:Freed { symidx: temp_2_cmp_34, tracked: true } |     s1:Freed { symidx: temp_3_arithop_36, tracked: true } |     s2:Freed { symidx: temp_4_cmp_38, tracked: true } |     s3:Freed { symidx: temp_5_arithop_40, tracked: true } |     s4:Freed { symidx: temp_6_cmp_42, tracked: true } | 
               #                          label while.exit_43: 
@@ -854,18 +854,18 @@ EightWhile:
               #                    free s5
               #                    free a3
               #                          jump label: while.head_39 
-              #                    store to temp_32_arithop_40 in mem offset legal
-    sw      s5,52(sp)
-              #                    release s5 with temp_32_arithop_40
-              #                    store to temp_5_arithop_40 in mem offset legal
-    sw      s3,160(sp)
-              #                    release s3 with temp_5_arithop_40
               #                    store to temp_4_cmp_38 in mem offset legal
     sb      s2,167(sp)
               #                    release s2 with temp_4_cmp_38
               #                    store to temp_6_cmp_42 in mem offset legal
     sb      s4,159(sp)
               #                    release s4 with temp_6_cmp_42
+              #                    store to temp_32_arithop_40 in mem offset legal
+    sw      s5,52(sp)
+              #                    release s5 with temp_32_arithop_40
+              #                    store to temp_5_arithop_40 in mem offset legal
+    sw      s3,160(sp)
+              #                    release s3 with temp_5_arithop_40
     j       .while.head_39
               #                    regtab     a0:Freed { symidx: a_21, tracked: true } |     a1:Freed { symidx: b_21, tracked: true } |     a2:Freed { symidx: c_21, tracked: true } |     a3:Freed { symidx: d_21, tracked: true } |     a5:Freed { symidx: temp_0_cmp_30, tracked: true } |     a6:Freed { symidx: temp_1_arithop_32, tracked: true } |     a7:Freed { symidx: temp_2_cmp_34, tracked: true } |     s1:Freed { symidx: temp_3_arithop_36, tracked: true } |     s2:Freed { symidx: temp_4_cmp_38, tracked: true } | 
               #                          label while.exit_39: 
@@ -887,18 +887,18 @@ EightWhile:
               #                    free s3
               #                    free a2
               #                          jump label: while.head_35 
-              #                    store to temp_33_arithop_36 in mem offset legal
-    sw      s3,48(sp)
-              #                    release s3 with temp_33_arithop_36
-              #                    store to temp_2_cmp_34 in mem offset legal
-    sb      a7,175(sp)
-              #                    release a7 with temp_2_cmp_34
               #                    store to temp_4_cmp_38 in mem offset legal
     sb      s2,167(sp)
               #                    release s2 with temp_4_cmp_38
+              #                    store to temp_2_cmp_34 in mem offset legal
+    sb      a7,175(sp)
+              #                    release a7 with temp_2_cmp_34
               #                    store to temp_3_arithop_36 in mem offset legal
     sw      s1,168(sp)
               #                    release s1 with temp_3_arithop_36
+              #                    store to temp_33_arithop_36 in mem offset legal
+    sw      s3,48(sp)
+              #                    release s3 with temp_33_arithop_36
     j       .while.head_35
               #                    regtab     a0:Freed { symidx: a_21, tracked: true } |     a1:Freed { symidx: b_21, tracked: true } |     a2:Freed { symidx: c_21, tracked: true } |     a3:Freed { symidx: d_21, tracked: true } |     a5:Freed { symidx: temp_0_cmp_30, tracked: true } |     a6:Freed { symidx: temp_1_arithop_32, tracked: true } |     a7:Freed { symidx: temp_2_cmp_34, tracked: true } | 
               #                          label while.exit_35: 
@@ -923,18 +923,18 @@ EightWhile:
               #                    free s1
               #                    free a1
               #                          jump label: while.head_31 
-              #                    store to temp_1_arithop_32 in mem offset legal
-    sw      a6,176(sp)
-              #                    release a6 with temp_1_arithop_32
+              #                    store to temp_0_cmp_30 in mem offset legal
+    sb      a5,183(sp)
+              #                    release a5 with temp_0_cmp_30
               #                    store to temp_2_cmp_34 in mem offset legal
     sb      a7,175(sp)
               #                    release a7 with temp_2_cmp_34
               #                    store to temp_34_arithop_32 in mem offset legal
     sw      s1,44(sp)
               #                    release s1 with temp_34_arithop_32
-              #                    store to temp_0_cmp_30 in mem offset legal
-    sb      a5,183(sp)
-              #                    release a5 with temp_0_cmp_30
+              #                    store to temp_1_arithop_32 in mem offset legal
+    sw      a6,176(sp)
+              #                    release a6 with temp_1_arithop_32
     j       .while.head_31
               #                    regtab     a0:Freed { symidx: a_21, tracked: true } |     a1:Freed { symidx: b_21, tracked: true } |     a2:Freed { symidx: c_21, tracked: true } |     a3:Freed { symidx: d_21, tracked: true } |     a5:Freed { symidx: temp_0_cmp_30, tracked: true } | 
               #                          label while.exit_31: 

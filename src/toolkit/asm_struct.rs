@@ -99,7 +99,7 @@ impl AsmSection{
                 }
                 if last_offset < val.get_mem_len()?{
                     debug_info_red!("mem_len:{} last_offset:{}",val.get_mem_len()?, last_offset);
-                    self.zero(val.get_mem_len()? - last_offset)
+                    self.zero(val.get_mem_len()? - last_offset*val.get_ele_size()?)
                 }
                 Ok(())
             },

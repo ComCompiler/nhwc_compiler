@@ -941,12 +941,12 @@ main:
 
     call    putch
               #                          jump label: branch_false_69 
-              #                    occupy a3 with _anonymous_of_temp_26_cmp_68_0
-              #                    load from temp_26_cmp_68 in mem
-    lb      a3,82(sp)
               #                    occupy a2 with _anonymous_of_temp_25_cmp_64_0
               #                    load from temp_25_cmp_64 in mem
     lb      a2,83(sp)
+              #                    occupy a3 with _anonymous_of_temp_26_cmp_68_0
+              #                    load from temp_26_cmp_68 in mem
+    lb      a3,82(sp)
     j       .branch_false_69
               #                    regtab     a2:Freed { symidx: temp_25_cmp_64, tracked: true } |     a3:Freed { symidx: temp_26_cmp_68, tracked: true } | 
               #                          label branch_false_69: 
@@ -1010,15 +1010,15 @@ main:
 
     call    putch
               #                          jump label: branch_false_72 
-              #                    occupy a3 with _anonymous_of_temp_26_cmp_68_0
-              #                    load from temp_26_cmp_68 in mem
-    lb      a3,82(sp)
               #                    occupy a2 with _anonymous_of_temp_25_cmp_64_0
               #                    load from temp_25_cmp_64 in mem
     lb      a2,83(sp)
               #                    occupy a6 with _anonymous_of_temp_28_cmp_71_0
               #                    load from temp_28_cmp_71 in mem
     lb      a6,75(sp)
+              #                    occupy a3 with _anonymous_of_temp_26_cmp_68_0
+              #                    load from temp_26_cmp_68 in mem
+    lb      a3,82(sp)
               #                    occupy a4 with _anonymous_of_temp_27__71_0
               #                    load from temp_27__71 in mem
 
@@ -1093,23 +1093,23 @@ main:
 
     call    putch
               #                          jump label: branch_false_76 
-              #                    occupy a3 with _anonymous_of_temp_26_cmp_68_0
-              #                    load from temp_26_cmp_68 in mem
-    lb      a3,82(sp)
               #                    occupy a7 with _anonymous_of_temp_29__75_0
               #                    load from temp_29__75 in mem
 
 
     lw      a7,68(sp)
-              #                    occupy s1 with _anonymous_of_temp_30_cmp_75_0
-              #                    load from temp_30_cmp_75 in mem
-    lb      s1,67(sp)
               #                    occupy a2 with _anonymous_of_temp_25_cmp_64_0
               #                    load from temp_25_cmp_64 in mem
     lb      a2,83(sp)
               #                    occupy a6 with _anonymous_of_temp_28_cmp_71_0
               #                    load from temp_28_cmp_71 in mem
     lb      a6,75(sp)
+              #                    occupy s1 with _anonymous_of_temp_30_cmp_75_0
+              #                    load from temp_30_cmp_75 in mem
+    lb      s1,67(sp)
+              #                    occupy a3 with _anonymous_of_temp_26_cmp_68_0
+              #                    load from temp_26_cmp_68 in mem
+    lb      a3,82(sp)
               #                    occupy a4 with _anonymous_of_temp_27__71_0
               #                    load from temp_27__71 in mem
 
@@ -1206,17 +1206,16 @@ main:
               #                    occupy a5 with _anonymous_of_temp_31_cmp_79_0
               #                    load from temp_31_cmp_79 in mem
     lb      a5,66(sp)
-              #                    occupy a3 with _anonymous_of_temp_26_cmp_68_0
-              #                    load from temp_26_cmp_68 in mem
-    lb      a3,82(sp)
+              #                    occupy s3 with _anonymous_of_temp_32__79_0
+              #                    load from temp_32__79 in mem
+
+
+    lw      s3,60(sp)
               #                    occupy a7 with _anonymous_of_temp_29__75_0
               #                    load from temp_29__75 in mem
 
 
     lw      a7,68(sp)
-              #                    occupy s1 with _anonymous_of_temp_30_cmp_75_0
-              #                    load from temp_30_cmp_75 in mem
-    lb      s1,67(sp)
               #                    occupy a2 with _anonymous_of_temp_25_cmp_64_0
               #                    load from temp_25_cmp_64 in mem
     lb      a2,83(sp)
@@ -1226,16 +1225,17 @@ main:
               #                    occupy a6 with _anonymous_of_temp_28_cmp_71_0
               #                    load from temp_28_cmp_71 in mem
     lb      a6,75(sp)
+              #                    occupy s1 with _anonymous_of_temp_30_cmp_75_0
+              #                    load from temp_30_cmp_75 in mem
+    lb      s1,67(sp)
+              #                    occupy a3 with _anonymous_of_temp_26_cmp_68_0
+              #                    load from temp_26_cmp_68 in mem
+    lb      a3,82(sp)
               #                    occupy a4 with _anonymous_of_temp_27__71_0
               #                    load from temp_27__71 in mem
 
 
     lw      a4,76(sp)
-              #                    occupy s3 with _anonymous_of_temp_32__79_0
-              #                    load from temp_32__79 in mem
-
-
-    lw      s3,60(sp)
     j       .branch_false_80
               #                    regtab     a2:Freed { symidx: temp_25_cmp_64, tracked: true } |     a3:Freed { symidx: temp_26_cmp_68, tracked: true } |     a4:Freed { symidx: temp_27__71, tracked: true } |     a5:Freed { symidx: temp_31_cmp_79, tracked: true } |     a6:Freed { symidx: temp_28_cmp_71, tracked: true } |     a7:Freed { symidx: temp_29__75, tracked: true } |     s1:Freed { symidx: temp_30_cmp_75, tracked: true } |     s3:Freed { symidx: temp_32__79, tracked: true } |     s4:Freed { symidx: temp_33_cmp_79, tracked: true } | 
               #                          label branch_false_80: 
@@ -1309,9 +1309,11 @@ main:
               #                    occupy a5 with _anonymous_of_temp_31_cmp_79_0
               #                    load from temp_31_cmp_79 in mem
     lb      a5,66(sp)
-              #                    occupy a3 with _anonymous_of_temp_26_cmp_68_0
-              #                    load from temp_26_cmp_68 in mem
-    lb      a3,82(sp)
+              #                    occupy s3 with _anonymous_of_temp_32__79_0
+              #                    load from temp_32__79 in mem
+
+
+    lw      s3,60(sp)
               #                    occupy a7 with _anonymous_of_temp_29__75_0
               #                    load from temp_29__75 in mem
 
@@ -1320,9 +1322,6 @@ main:
               #                    occupy s2 with _anonymous_of_temp_34_cmp_82_0
               #                    load from temp_34_cmp_82 in mem
     lb      s2,58(sp)
-              #                    occupy s1 with _anonymous_of_temp_30_cmp_75_0
-              #                    load from temp_30_cmp_75 in mem
-    lb      s1,67(sp)
               #                    occupy a2 with _anonymous_of_temp_25_cmp_64_0
               #                    load from temp_25_cmp_64 in mem
     lb      a2,83(sp)
@@ -1332,16 +1331,17 @@ main:
               #                    occupy a6 with _anonymous_of_temp_28_cmp_71_0
               #                    load from temp_28_cmp_71 in mem
     lb      a6,75(sp)
+              #                    occupy s1 with _anonymous_of_temp_30_cmp_75_0
+              #                    load from temp_30_cmp_75 in mem
+    lb      s1,67(sp)
+              #                    occupy a3 with _anonymous_of_temp_26_cmp_68_0
+              #                    load from temp_26_cmp_68 in mem
+    lb      a3,82(sp)
               #                    occupy a4 with _anonymous_of_temp_27__71_0
               #                    load from temp_27__71 in mem
 
 
     lw      a4,76(sp)
-              #                    occupy s3 with _anonymous_of_temp_32__79_0
-              #                    load from temp_32__79 in mem
-
-
-    lw      s3,60(sp)
     j       .branch_false_83
               #                    regtab     a2:Freed { symidx: temp_25_cmp_64, tracked: true } |     a3:Freed { symidx: temp_26_cmp_68, tracked: true } |     a4:Freed { symidx: temp_27__71, tracked: true } |     a5:Freed { symidx: temp_31_cmp_79, tracked: true } |     a6:Freed { symidx: temp_28_cmp_71, tracked: true } |     a7:Freed { symidx: temp_29__75, tracked: true } |     s1:Freed { symidx: temp_30_cmp_75, tracked: true } |     s2:Freed { symidx: temp_34_cmp_82, tracked: true } |     s3:Freed { symidx: temp_32__79, tracked: true } |     s4:Freed { symidx: temp_33_cmp_79, tracked: true } | 
               #                          label branch_false_83: 
@@ -1490,11 +1490,11 @@ main:
 
     call    putch
               #                          jump label: while.head_88 
-              #                    occupy a3 with _anonymous_of_i3_33_0
-              #                    load from i3_33 in mem
+              #                    occupy a1 with _anonymous_of_i1_33_0
+              #                    load from i1_33 in mem
 
 
-    lw      a3,40(sp)
+    lw      a1,48(sp)
               #                    occupy a0 with _anonymous_of_i0_33_0
               #                    load from i0_33 in mem
 
@@ -1505,11 +1505,11 @@ main:
 
 
     lw      a2,44(sp)
-              #                    occupy a1 with _anonymous_of_i1_33_0
-              #                    load from i1_33 in mem
+              #                    occupy a3 with _anonymous_of_i3_33_0
+              #                    load from i3_33 in mem
 
 
-    lw      a1,48(sp)
+    lw      a3,40(sp)
               #                    occupy a4 with _anonymous_of_i4_33_0
               #                    load from i4_33 in mem
 
@@ -1605,49 +1605,49 @@ main:
 
     call    putch
               #                          jump label: branch_false_91 
-              #                    occupy a3 with _anonymous_of_i3_33_0
-              #                    load from i3_33 in mem
-
-
-    lw      a3,40(sp)
-              #                    occupy a0 with _anonymous_of_i0_33_0
-              #                    load from i0_33 in mem
-
-
-    lw      a0,52(sp)
+              #                    occupy s3 with _anonymous_of_temp_39__90_0
+              #                    load from temp_39__90 in mem
+    lb      s3,31(sp)
               #                    occupy a7 with _anonymous_of_temp_36__87_0
               #                    load from temp_36__87 in mem
     lb      a7,34(sp)
-              #                    occupy s2 with _anonymous_of_temp_38__90_0
-              #                    load from temp_38__90 in mem
-    lb      s2,32(sp)
-              #                    occupy s1 with _anonymous_of_temp_37_logic_87_0
-              #                    load from temp_37_logic_87 in mem
-    lb      s1,33(sp)
-              #                    occupy a2 with _anonymous_of_i2_33_0
-              #                    load from i2_33 in mem
-
-
-    lw      a2,44(sp)
               #                    occupy a1 with _anonymous_of_i1_33_0
               #                    load from i1_33 in mem
 
 
     lw      a1,48(sp)
+              #                    occupy a0 with _anonymous_of_i0_33_0
+              #                    load from i0_33 in mem
+
+
+    lw      a0,52(sp)
+              #                    occupy s2 with _anonymous_of_temp_38__90_0
+              #                    load from temp_38__90 in mem
+    lb      s2,32(sp)
+              #                    occupy a2 with _anonymous_of_i2_33_0
+              #                    load from i2_33 in mem
+
+
+    lw      a2,44(sp)
               #                    occupy s4 with _anonymous_of_temp_40_logic_90_0
               #                    load from temp_40_logic_90 in mem
     lb      s4,30(sp)
               #                    occupy a6 with _anonymous_of_temp_35__87_0
               #                    load from temp_35__87 in mem
     lb      a6,35(sp)
+              #                    occupy s1 with _anonymous_of_temp_37_logic_87_0
+              #                    load from temp_37_logic_87 in mem
+    lb      s1,33(sp)
+              #                    occupy a3 with _anonymous_of_i3_33_0
+              #                    load from i3_33 in mem
+
+
+    lw      a3,40(sp)
               #                    occupy a4 with _anonymous_of_i4_33_0
               #                    load from i4_33 in mem
 
 
     lw      a4,36(sp)
-              #                    occupy s3 with _anonymous_of_temp_39__90_0
-              #                    load from temp_39__90 in mem
-    lb      s3,31(sp)
     j       .branch_false_91
               #                    regtab     a0:Freed { symidx: i0_33, tracked: true } |     a1:Freed { symidx: i1_33, tracked: true } |     a2:Freed { symidx: i2_33, tracked: true } |     a3:Freed { symidx: i3_33, tracked: true } |     a4:Freed { symidx: i4_33, tracked: true } |     a6:Freed { symidx: temp_35__87, tracked: true } |     a7:Freed { symidx: temp_36__87, tracked: true } |     s1:Freed { symidx: temp_37_logic_87, tracked: true } |     s2:Freed { symidx: temp_38__90, tracked: true } |     s3:Freed { symidx: temp_39__90, tracked: true } |     s4:Freed { symidx: temp_40_logic_90, tracked: true } | 
               #                          label branch_false_91: 
@@ -1751,55 +1751,55 @@ main:
               #                    occupy a5 with _anonymous_of_temp_41_cmp_93_0
               #                    load from temp_41_cmp_93 in mem
     lb      a5,29(sp)
-              #                    occupy s6 with _anonymous_of_temp_43_logic_93_0
-              #                    load from temp_43_logic_93 in mem
-    lb      s6,27(sp)
-              #                    occupy a3 with _anonymous_of_i3_33_0
-              #                    load from i3_33 in mem
-
-
-    lw      a3,40(sp)
-              #                    occupy a0 with _anonymous_of_i0_33_0
-              #                    load from i0_33 in mem
-
-
-    lw      a0,52(sp)
+              #                    occupy s3 with _anonymous_of_temp_39__90_0
+              #                    load from temp_39__90 in mem
+    lb      s3,31(sp)
               #                    occupy a7 with _anonymous_of_temp_36__87_0
               #                    load from temp_36__87 in mem
     lb      a7,34(sp)
-              #                    occupy s2 with _anonymous_of_temp_38__90_0
-              #                    load from temp_38__90 in mem
-    lb      s2,32(sp)
-              #                    occupy s1 with _anonymous_of_temp_37_logic_87_0
-              #                    load from temp_37_logic_87 in mem
-    lb      s1,33(sp)
               #                    occupy s5 with _anonymous_of_temp_42_cmp_93_0
               #                    load from temp_42_cmp_93 in mem
     lb      s5,28(sp)
-              #                    occupy a2 with _anonymous_of_i2_33_0
-              #                    load from i2_33 in mem
-
-
-    lw      a2,44(sp)
               #                    occupy a1 with _anonymous_of_i1_33_0
               #                    load from i1_33 in mem
 
 
     lw      a1,48(sp)
+              #                    occupy a0 with _anonymous_of_i0_33_0
+              #                    load from i0_33 in mem
+
+
+    lw      a0,52(sp)
+              #                    occupy s2 with _anonymous_of_temp_38__90_0
+              #                    load from temp_38__90 in mem
+    lb      s2,32(sp)
+              #                    occupy a2 with _anonymous_of_i2_33_0
+              #                    load from i2_33 in mem
+
+
+    lw      a2,44(sp)
               #                    occupy s4 with _anonymous_of_temp_40_logic_90_0
               #                    load from temp_40_logic_90 in mem
     lb      s4,30(sp)
               #                    occupy a6 with _anonymous_of_temp_35__87_0
               #                    load from temp_35__87 in mem
     lb      a6,35(sp)
+              #                    occupy s1 with _anonymous_of_temp_37_logic_87_0
+              #                    load from temp_37_logic_87 in mem
+    lb      s1,33(sp)
+              #                    occupy a3 with _anonymous_of_i3_33_0
+              #                    load from i3_33 in mem
+
+
+    lw      a3,40(sp)
+              #                    occupy s6 with _anonymous_of_temp_43_logic_93_0
+              #                    load from temp_43_logic_93 in mem
+    lb      s6,27(sp)
               #                    occupy a4 with _anonymous_of_i4_33_0
               #                    load from i4_33 in mem
 
 
     lw      a4,36(sp)
-              #                    occupy s3 with _anonymous_of_temp_39__90_0
-              #                    load from temp_39__90 in mem
-    lb      s3,31(sp)
     j       .branch_false_94
               #                    regtab     a0:Freed { symidx: i0_33, tracked: true } |     a1:Freed { symidx: i1_33, tracked: true } |     a2:Freed { symidx: i2_33, tracked: true } |     a3:Freed { symidx: i3_33, tracked: true } |     a4:Freed { symidx: i4_33, tracked: true } |     a5:Freed { symidx: temp_41_cmp_93, tracked: true } |     a6:Freed { symidx: temp_35__87, tracked: true } |     a7:Freed { symidx: temp_36__87, tracked: true } |     s1:Freed { symidx: temp_37_logic_87, tracked: true } |     s2:Freed { symidx: temp_38__90, tracked: true } |     s3:Freed { symidx: temp_39__90, tracked: true } |     s4:Freed { symidx: temp_40_logic_90, tracked: true } |     s5:Freed { symidx: temp_42_cmp_93, tracked: true } |     s6:Freed { symidx: temp_43_logic_93, tracked: true } | 
               #                          label branch_false_94: 
@@ -1911,64 +1911,64 @@ main:
               #                    occupy a5 with _anonymous_of_temp_41_cmp_93_0
               #                    load from temp_41_cmp_93 in mem
     lb      a5,29(sp)
-              #                    occupy s6 with _anonymous_of_temp_43_logic_93_0
-              #                    load from temp_43_logic_93 in mem
-    lb      s6,27(sp)
-              #                    occupy a3 with _anonymous_of_i3_33_0
-              #                    load from i3_33 in mem
-
-
-    lw      a3,40(sp)
-              #                    occupy a0 with _anonymous_of_i0_33_0
-              #                    load from i0_33 in mem
-
-
-    lw      a0,52(sp)
-              #                    occupy a7 with _anonymous_of_temp_36__87_0
-              #                    load from temp_36__87 in mem
-    lb      a7,34(sp)
+              #                    occupy s3 with _anonymous_of_temp_39__90_0
+              #                    load from temp_39__90 in mem
+    lb      s3,31(sp)
               #                    occupy s7 with _anonymous_of_temp_44_cmp_96_0
               #                    load from temp_44_cmp_96 in mem
     lb      s7,26(sp)
-              #                    occupy s2 with _anonymous_of_temp_38__90_0
-              #                    load from temp_38__90 in mem
-    lb      s2,32(sp)
-              #                    occupy s1 with _anonymous_of_temp_37_logic_87_0
-              #                    load from temp_37_logic_87 in mem
-    lb      s1,33(sp)
+              #                    occupy a7 with _anonymous_of_temp_36__87_0
+              #                    load from temp_36__87 in mem
+    lb      a7,34(sp)
               #                    occupy s5 with _anonymous_of_temp_42_cmp_93_0
               #                    load from temp_42_cmp_93 in mem
     lb      s5,28(sp)
-              #                    occupy s9 with _anonymous_of_temp_46_logic_96_0
-              #                    load from temp_46_logic_96 in mem
-    lb      s9,24(sp)
-              #                    occupy a2 with _anonymous_of_i2_33_0
-              #                    load from i2_33 in mem
-
-
-    lw      a2,44(sp)
               #                    occupy a1 with _anonymous_of_i1_33_0
               #                    load from i1_33 in mem
 
 
     lw      a1,48(sp)
+              #                    occupy s8 with _anonymous_of_temp_45_cmp_96_0
+              #                    load from temp_45_cmp_96 in mem
+    lb      s8,25(sp)
+              #                    occupy a0 with _anonymous_of_i0_33_0
+              #                    load from i0_33 in mem
+
+
+    lw      a0,52(sp)
+              #                    occupy s2 with _anonymous_of_temp_38__90_0
+              #                    load from temp_38__90 in mem
+    lb      s2,32(sp)
+              #                    occupy a2 with _anonymous_of_i2_33_0
+              #                    load from i2_33 in mem
+
+
+    lw      a2,44(sp)
               #                    occupy s4 with _anonymous_of_temp_40_logic_90_0
               #                    load from temp_40_logic_90 in mem
     lb      s4,30(sp)
               #                    occupy a6 with _anonymous_of_temp_35__87_0
               #                    load from temp_35__87 in mem
     lb      a6,35(sp)
+              #                    occupy s1 with _anonymous_of_temp_37_logic_87_0
+              #                    load from temp_37_logic_87 in mem
+    lb      s1,33(sp)
+              #                    occupy a3 with _anonymous_of_i3_33_0
+              #                    load from i3_33 in mem
+
+
+    lw      a3,40(sp)
+              #                    occupy s6 with _anonymous_of_temp_43_logic_93_0
+              #                    load from temp_43_logic_93 in mem
+    lb      s6,27(sp)
+              #                    occupy s9 with _anonymous_of_temp_46_logic_96_0
+              #                    load from temp_46_logic_96 in mem
+    lb      s9,24(sp)
               #                    occupy a4 with _anonymous_of_i4_33_0
               #                    load from i4_33 in mem
 
 
     lw      a4,36(sp)
-              #                    occupy s8 with _anonymous_of_temp_45_cmp_96_0
-              #                    load from temp_45_cmp_96 in mem
-    lb      s8,25(sp)
-              #                    occupy s3 with _anonymous_of_temp_39__90_0
-              #                    load from temp_39__90 in mem
-    lb      s3,31(sp)
     j       .branch_false_97
               #                    regtab     a0:Freed { symidx: i0_33, tracked: true } |     a1:Freed { symidx: i1_33, tracked: true } |     a2:Freed { symidx: i2_33, tracked: true } |     a3:Freed { symidx: i3_33, tracked: true } |     a4:Freed { symidx: i4_33, tracked: true } |     a5:Freed { symidx: temp_41_cmp_93, tracked: true } |     a6:Freed { symidx: temp_35__87, tracked: true } |     a7:Freed { symidx: temp_36__87, tracked: true } |     s1:Freed { symidx: temp_37_logic_87, tracked: true } |     s2:Freed { symidx: temp_38__90, tracked: true } |     s3:Freed { symidx: temp_39__90, tracked: true } |     s4:Freed { symidx: temp_40_logic_90, tracked: true } |     s5:Freed { symidx: temp_42_cmp_93, tracked: true } |     s6:Freed { symidx: temp_43_logic_93, tracked: true } |     s7:Freed { symidx: temp_44_cmp_96, tracked: true } |     s8:Freed { symidx: temp_45_cmp_96, tracked: true } |     s9:Freed { symidx: temp_46_logic_96, tracked: true } | 
               #                          label branch_false_97: 
@@ -2155,66 +2155,66 @@ main:
 
     call    putch
               #                          jump label: branch_false_101 
-              #                    occupy s6 with _anonymous_of_temp_43_logic_93_0
-              #                    load from temp_43_logic_93 in mem
-    lb      s6,27(sp)
-              #                    occupy s10 with _anonymous_of_temp_47_cmp_100_0
-              #                    load from temp_47_cmp_100 in mem
-    lb      s10,23(sp)
-              #                    occupy a3 with _anonymous_of_i3_33_0
-              #                    load from i3_33 in mem
-
-
-    lw      a3,40(sp)
-              #                    occupy a0 with _anonymous_of_temp_54_logic_100_0
-              #                    load from temp_54_logic_100 in mem
-    lb      a0,13(sp)
-              #                    occupy a7 with _anonymous_of_temp_36__87_0
-              #                    load from temp_36__87 in mem
-    lb      a7,34(sp)
-              #                    occupy s7 with _anonymous_of_temp_44_cmp_96_0
-              #                    load from temp_44_cmp_96 in mem
-    lb      s7,26(sp)
-              #                    occupy s2 with _anonymous_of_temp_38__90_0
-              #                    load from temp_38__90 in mem
-    lb      s2,32(sp)
-              #                    occupy s1 with _anonymous_of_temp_37_logic_87_0
-              #                    load from temp_37_logic_87 in mem
-    lb      s1,33(sp)
-              #                    occupy s5 with _anonymous_of_temp_42_cmp_93_0
-              #                    load from temp_42_cmp_93 in mem
-    lb      s5,28(sp)
-              #                    occupy s9 with _anonymous_of_temp_46_logic_96_0
-              #                    load from temp_46_logic_96 in mem
-    lb      s9,24(sp)
               #                    occupy s11 with _anonymous_of_temp_48_cmp_100_0
               #                    load from temp_48_cmp_100 in mem
     lb      s11,22(sp)
-              #                    occupy a2 with _anonymous_of_temp_52_cmp_100_0
-              #                    load from temp_52_cmp_100 in mem
-    lb      a2,15(sp)
+              #                    occupy s3 with _anonymous_of_temp_39__90_0
+              #                    load from temp_39__90 in mem
+    lb      s3,31(sp)
+              #                    occupy s10 with _anonymous_of_temp_47_cmp_100_0
+              #                    load from temp_47_cmp_100 in mem
+    lb      s10,23(sp)
+              #                    occupy s7 with _anonymous_of_temp_44_cmp_96_0
+              #                    load from temp_44_cmp_96 in mem
+    lb      s7,26(sp)
+              #                    occupy a7 with _anonymous_of_temp_36__87_0
+              #                    load from temp_36__87 in mem
+    lb      a7,34(sp)
+              #                    occupy s5 with _anonymous_of_temp_42_cmp_93_0
+              #                    load from temp_42_cmp_93 in mem
+    lb      s5,28(sp)
               #                    occupy a1 with _anonymous_of_temp_51__100_0
               #                    load from temp_51__100 in mem
 
 
     lw      a1,16(sp)
+              #                    occupy s8 with _anonymous_of_temp_45_cmp_96_0
+              #                    load from temp_45_cmp_96 in mem
+    lb      s8,25(sp)
+              #                    occupy a0 with _anonymous_of_temp_54_logic_100_0
+              #                    load from temp_54_logic_100 in mem
+    lb      a0,13(sp)
+              #                    occupy s2 with _anonymous_of_temp_38__90_0
+              #                    load from temp_38__90 in mem
+    lb      s2,32(sp)
+              #                    occupy a2 with _anonymous_of_temp_52_cmp_100_0
+              #                    load from temp_52_cmp_100 in mem
+    lb      a2,15(sp)
               #                    occupy s4 with _anonymous_of_temp_40_logic_90_0
               #                    load from temp_40_logic_90 in mem
     lb      s4,30(sp)
               #                    occupy a6 with _anonymous_of_temp_35__87_0
               #                    load from temp_35__87 in mem
     lb      a6,35(sp)
+              #                    occupy s1 with _anonymous_of_temp_37_logic_87_0
+              #                    load from temp_37_logic_87 in mem
+    lb      s1,33(sp)
+              #                    occupy a3 with _anonymous_of_i3_33_0
+              #                    load from i3_33 in mem
+
+
+    lw      a3,40(sp)
+              #                    occupy s6 with _anonymous_of_temp_43_logic_93_0
+              #                    load from temp_43_logic_93 in mem
+    lb      s6,27(sp)
+              #                    occupy s9 with _anonymous_of_temp_46_logic_96_0
+              #                    load from temp_46_logic_96 in mem
+    lb      s9,24(sp)
               #                    occupy a4 with _anonymous_of_i4_33_0
               #                    load from i4_33 in mem
 
 
     lw      a4,36(sp)
-              #                    occupy s8 with _anonymous_of_temp_45_cmp_96_0
-              #                    load from temp_45_cmp_96 in mem
-    lb      s8,25(sp)
-              #                    occupy s3 with _anonymous_of_temp_39__90_0
-              #                    load from temp_39__90 in mem
-    lb      s3,31(sp)
     j       .branch_false_101
               #                    regtab     a0:Freed { symidx: temp_54_logic_100, tracked: true } |     a1:Freed { symidx: temp_51__100, tracked: true } |     a2:Freed { symidx: temp_52_cmp_100, tracked: true } |     a3:Freed { symidx: i3_33, tracked: true } |     a4:Freed { symidx: i4_33, tracked: true } |     a6:Freed { symidx: temp_35__87, tracked: true } |     a7:Freed { symidx: temp_36__87, tracked: true } |     s10:Freed { symidx: temp_47_cmp_100, tracked: true } |     s11:Freed { symidx: temp_48_cmp_100, tracked: true } |     s1:Freed { symidx: temp_37_logic_87, tracked: true } |     s2:Freed { symidx: temp_38__90, tracked: true } |     s3:Freed { symidx: temp_39__90, tracked: true } |     s4:Freed { symidx: temp_40_logic_90, tracked: true } |     s5:Freed { symidx: temp_42_cmp_93, tracked: true } |     s6:Freed { symidx: temp_43_logic_93, tracked: true } |     s7:Freed { symidx: temp_44_cmp_96, tracked: true } |     s8:Freed { symidx: temp_45_cmp_96, tracked: true } |     s9:Freed { symidx: temp_46_logic_96, tracked: true } | 
               #                          label branch_false_101: 
@@ -2416,66 +2416,66 @@ main:
 
     call    putch
               #                          jump label: branch_false_105 
-              #                    occupy s6 with _anonymous_of_temp_43_logic_93_0
-              #                    load from temp_43_logic_93 in mem
-    lb      s6,27(sp)
-              #                    occupy s10 with _anonymous_of_temp_47_cmp_100_0
-              #                    load from temp_47_cmp_100 in mem
-    lb      s10,23(sp)
-              #                    occupy a3 with _anonymous_of_i3_33_0
-              #                    load from i3_33 in mem
-
-
-    lw      a3,40(sp)
-              #                    occupy a0 with _anonymous_of_temp_62_logic_104_0
-              #                    load from temp_62_logic_104 in mem
-    lb      a0,2(sp)
-              #                    occupy a7 with _anonymous_of_temp_36__87_0
-              #                    load from temp_36__87 in mem
-    lb      a7,34(sp)
-              #                    occupy s7 with _anonymous_of_temp_44_cmp_96_0
-              #                    load from temp_44_cmp_96 in mem
-    lb      s7,26(sp)
-              #                    occupy s2 with _anonymous_of_temp_38__90_0
-              #                    load from temp_38__90 in mem
-    lb      s2,32(sp)
-              #                    occupy s1 with _anonymous_of_temp_37_logic_87_0
-              #                    load from temp_37_logic_87 in mem
-    lb      s1,33(sp)
-              #                    occupy s5 with _anonymous_of_temp_42_cmp_93_0
-              #                    load from temp_42_cmp_93 in mem
-    lb      s5,28(sp)
-              #                    occupy s9 with _anonymous_of_temp_46_logic_96_0
-              #                    load from temp_46_logic_96 in mem
-    lb      s9,24(sp)
               #                    occupy s11 with _anonymous_of_temp_48_cmp_100_0
               #                    load from temp_48_cmp_100 in mem
     lb      s11,22(sp)
-              #                    occupy a2 with _anonymous_of_temp_61_cmp_104_0
-              #                    load from temp_61_cmp_104 in mem
-    lb      a2,3(sp)
+              #                    occupy s3 with _anonymous_of_temp_39__90_0
+              #                    load from temp_39__90 in mem
+    lb      s3,31(sp)
+              #                    occupy s10 with _anonymous_of_temp_47_cmp_100_0
+              #                    load from temp_47_cmp_100 in mem
+    lb      s10,23(sp)
+              #                    occupy s7 with _anonymous_of_temp_44_cmp_96_0
+              #                    load from temp_44_cmp_96 in mem
+    lb      s7,26(sp)
+              #                    occupy a7 with _anonymous_of_temp_36__87_0
+              #                    load from temp_36__87 in mem
+    lb      a7,34(sp)
+              #                    occupy s5 with _anonymous_of_temp_42_cmp_93_0
+              #                    load from temp_42_cmp_93 in mem
+    lb      s5,28(sp)
               #                    occupy a1 with _anonymous_of_temp_60__104_0
               #                    load from temp_60__104 in mem
 
 
     lw      a1,4(sp)
+              #                    occupy s8 with _anonymous_of_temp_45_cmp_96_0
+              #                    load from temp_45_cmp_96 in mem
+    lb      s8,25(sp)
+              #                    occupy a0 with _anonymous_of_temp_62_logic_104_0
+              #                    load from temp_62_logic_104 in mem
+    lb      a0,2(sp)
+              #                    occupy s2 with _anonymous_of_temp_38__90_0
+              #                    load from temp_38__90 in mem
+    lb      s2,32(sp)
+              #                    occupy a2 with _anonymous_of_temp_61_cmp_104_0
+              #                    load from temp_61_cmp_104 in mem
+    lb      a2,3(sp)
               #                    occupy s4 with _anonymous_of_temp_40_logic_90_0
               #                    load from temp_40_logic_90 in mem
     lb      s4,30(sp)
               #                    occupy a6 with _anonymous_of_temp_35__87_0
               #                    load from temp_35__87 in mem
     lb      a6,35(sp)
+              #                    occupy s1 with _anonymous_of_temp_37_logic_87_0
+              #                    load from temp_37_logic_87 in mem
+    lb      s1,33(sp)
+              #                    occupy a3 with _anonymous_of_i3_33_0
+              #                    load from i3_33 in mem
+
+
+    lw      a3,40(sp)
+              #                    occupy s6 with _anonymous_of_temp_43_logic_93_0
+              #                    load from temp_43_logic_93 in mem
+    lb      s6,27(sp)
+              #                    occupy s9 with _anonymous_of_temp_46_logic_96_0
+              #                    load from temp_46_logic_96 in mem
+    lb      s9,24(sp)
               #                    occupy a4 with _anonymous_of_i4_33_0
               #                    load from i4_33 in mem
 
 
     lw      a4,36(sp)
-              #                    occupy s8 with _anonymous_of_temp_45_cmp_96_0
-              #                    load from temp_45_cmp_96 in mem
-    lb      s8,25(sp)
-              #                    occupy s3 with _anonymous_of_temp_39__90_0
-              #                    load from temp_39__90 in mem
-    lb      s3,31(sp)
     j       .branch_false_105
               #                    regtab     a0:Freed { symidx: temp_62_logic_104, tracked: true } |     a1:Freed { symidx: temp_60__104, tracked: true } |     a2:Freed { symidx: temp_61_cmp_104, tracked: true } |     a3:Freed { symidx: i3_33, tracked: true } |     a4:Freed { symidx: i4_33, tracked: true } |     a6:Freed { symidx: temp_35__87, tracked: true } |     a7:Freed { symidx: temp_36__87, tracked: true } |     s10:Freed { symidx: temp_47_cmp_100, tracked: true } |     s11:Freed { symidx: temp_48_cmp_100, tracked: true } |     s1:Freed { symidx: temp_37_logic_87, tracked: true } |     s2:Freed { symidx: temp_38__90, tracked: true } |     s3:Freed { symidx: temp_39__90, tracked: true } |     s4:Freed { symidx: temp_40_logic_90, tracked: true } |     s5:Freed { symidx: temp_42_cmp_93, tracked: true } |     s6:Freed { symidx: temp_43_logic_93, tracked: true } |     s7:Freed { symidx: temp_44_cmp_96, tracked: true } |     s8:Freed { symidx: temp_45_cmp_96, tracked: true } |     s9:Freed { symidx: temp_46_logic_96, tracked: true } | 
               #                          label branch_false_105: 
