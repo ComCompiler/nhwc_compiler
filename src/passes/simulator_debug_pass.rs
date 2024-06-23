@@ -1,5 +1,5 @@
 use std::vec;
-use log::trace;
+use log::{error, trace};
 use crate::{ debug_info_red, debug_info_yellow, toolkit::{ context::NhwcCtx, nhwc_instr::{InstrSlab, NhwcInstr}, pass_manager::Pass, simulator::Simulator, symtab::{SymTab, SymTabGraph}}};
 use itertools::Itertools;
 use crate::toolkit::dot::Config;
@@ -136,7 +136,7 @@ pub fn debug_simu_run(simu:&mut Simulator, instr_slab:&InstrSlab<NhwcInstr>, src
                 vec![]
             );
             debug_info_yellow!("{:?}",simu);
-            debug_info_red!("{:?}",e);
+            error!("{:?}",e);
             break;
         }
     }

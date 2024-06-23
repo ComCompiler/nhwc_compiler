@@ -9,7 +9,7 @@ use regex::{self, Regex};
 
 use super::{ast_node::AstTree, scope_node::ST_ROOT};
 use super::symtab::SymIdx;
-use crate::{debug_info_blue, debug_info_red, node};
+use crate::{debug_info_blue, debug_info_green, debug_info_red, node};
 
 pub type Fields = HashMap<&'static str, Box<dyn Field>>;
 pub static TARGET_POINTER_MEM_LEN:usize = 8;
@@ -307,7 +307,7 @@ impl Value {
             (Value::I32(_v), Type::I1) => todo!(),
             (Value::I32(_v), Type::Void) => todo!(),
             (Value::I32(_v), Type::Label) => todo!(),
-            (Value::F32(_v), Type::I32) => todo!(),
+            (Value::F32(v), Type::I32) => Ok(Value::new_i32(v.context("unsure of f32 ")? as i32)),
             (Value::F32(v), Type::F32) => Ok(Value::new_f32(v.context("没毛病")? as f32)),
             (Value::F32(_v), Type::I1) => todo!(),
             (Value::F32(_v), Type::Void) => todo!(),
@@ -325,9 +325,9 @@ impl Value {
     // }
     pub fn from_string_with_specific_type(s:&String,ty:&Type)->Result<Value>{
         Ok(match &ty{
-            Type::I32 => Value::new_i32(s.parse().with_context(||format!("when parsing {}",s))?),
-            Type::F32 => Value::new_f32(s.parse().with_context(||format!("when parsing {}",s))?),
-            Type::I1 => Value::new_i1(s.parse().with_context(||format!("when parsing {}",s))?),
+            Type::I32 => Value::new_i32(s.parse().with_context(||format!("when parsing {} to i32",s)).or(i32::from_str_radix(&s.trim_start_matches("0x"), 16)).with_context(||format!("can't trans {}",s))?),
+            Type::F32 => Value::new_f32(s.parse().with_context(||format!("when parsing {} to f32",s)).or(Value::parse_hex_float(s))?),
+            Type::I1 => Value::new_i1(s.parse().with_context(||format!("when parsing {} to i1",s))?),
             Type::Void => Err(anyhow!("不能从string 转化为 Void 类型的value"))?,
             Type::Label => Err(anyhow!("不能从string 转化为 Label 类型的value"))?,
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("不能从string 转化为 Fn 类型的value"))?,
@@ -338,6 +338,44 @@ impl Value {
             Type::Unknown => Err(anyhow!("不能从string 转化为 Unknown 类型的value"))?,
         })
     }
+    fn parse_hex_float(s: &str) -> Result<f32> {
+        let mut parts: Vec<&str> = s.split('p').collect();
+        // debug_info_red!("split into {parts:?}");
+        if parts.len() !=2{
+            parts= s.split('P').collect();
+            // debug_info_red!("split into {parts:?}");
+        }
+        if parts.len() != 2 {
+            return Err(anyhow!("float part have multiple power"))
+        }
+
+        let float_parts: Vec<&str> = parts[0].trim_start_matches("0x").split('.').collect();
+        if float_parts.len() > 2 {
+            return Err(anyhow!("float part have multiple dot"))// 处理非法格式，如多个小数点
+        }
+
+        let int_part = if float_parts[0] != ""{ i32::from_str_radix(float_parts[0], 16)? as f32}else{0.};
+
+        let frac_part = if float_parts.len() == 2 {
+            let frac_part_str = float_parts[1];
+            let mut frac_part = 0f32;
+            for (i, ch) in frac_part_str.chars().enumerate() {
+                let digit = ch.to_digit(16).unwrap() as f32;
+                frac_part += digit * 16f32.powi(-(i as i32 + 1));
+            }
+            frac_part
+        } else {
+            0f32
+        };
+
+        let base = int_part + frac_part;
+        let exp: i32 = parts[1].parse()?;
+
+        Ok(base * 2f32.powi(exp))
+    }
+
+
+
     pub fn to_type(&self)->Type{
         match self{
             Value::I32(_) => Type::I32,
@@ -449,7 +487,7 @@ impl Type {
         }
         Ok(Type::Array { dims, ele_ty: Box::new(ele_ty) })
     }
-    pub fn suits(&self, another_type:&Type) -> bool{
+    pub fn direct_suits(&self, another_type:&Type) -> bool{
         match (self,another_type){
             (Type::Array { dims, ele_ty },Type::Array { dims:dims2, ele_ty:ele_ty2 }) => {
                 dims.len() == dims2.len() && ele_ty == ele_ty2
@@ -627,9 +665,9 @@ impl Type {
     pub fn new_from_const_str(const_str:&String) -> Self {
         if const_str.contains("true") || const_str.contains("false"){
             Type::I1
-        }else if const_str.contains(".") && (const_str.chars().next().map_or(false, |x|x.is_numeric()|| x=='-')) {
+        }else if const_str.contains(".") && (const_str.chars().next().map_or(false, |x|x.is_numeric()|| x=='-' || x=='.')) {
             Type::F32
-        } else if const_str.chars().next().map_or(false, |x|x.is_numeric() || x=='-') && const_str.contains("e"){
+        } else if const_str.chars().next().map_or(false, |x|x.is_numeric() || x=='-') && (const_str.contains("e")|| const_str.contains("E")){
             Type::F32
         }else if const_str.chars().next().map_or(false, |x|x.is_numeric() || x=='-'){
             Type::I32

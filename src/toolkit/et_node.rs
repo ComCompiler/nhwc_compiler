@@ -512,8 +512,8 @@ impl Debug for EtNodeType {
             EtNodeType::Literal { literal_symidx: const_sym_idx, ast_node: _, text: _, } => {
                 write!(f, "literal {}", const_sym_idx.symbol_name)
             }
-            EtNodeType::Symbol { sym_idx, ast_node: _, text, decldef_def_or_use: def_or_use } => {
-                write!(f, "{:?} symbol {} {}", def_or_use, text, sym_idx.symbol_name)
+            EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use: def_or_use } => {
+                write!(f, "{:?} symbol {} {} at {}", def_or_use, text, sym_idx.symbol_name,ast_node)
             }
             // EtNakedNode::ArraySym { sym_idx, ast_node, text, def_or_use } =>
             // write!(f,"{:?} {} {}",def_or_use,text,sym_idx.symbol_name),

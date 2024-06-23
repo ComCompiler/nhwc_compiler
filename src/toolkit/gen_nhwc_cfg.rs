@@ -5,6 +5,7 @@ use petgraph::{
 };
 use core::panic;
 use std::collections::HashMap;
+use std::mem::replace;
 use crate::instr;
 
 use super::cfg_node::CFG_ROOT;
@@ -645,6 +646,7 @@ fn process_temp_symbol(
             let func_symidx = node_mut!(at cfg_node in cfg_graph).get_func_cor_symidx()?;
             symtab.get_mut(&func_symidx)?.get_mut_declared_vars()?.push(temp_symidx.clone());
             node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(temp_def_instr, instr_slab)?;
+
             let alloc_instr = NhwcInstrType::new_alloc(temp_type.clone(), temp_symidx.clone()).into();
             let cfg_entry = get_cfg_entry_by_cfg_node(cfg_graph, symtab, cfg_node)?.ok_or(anyhow!("这个cfg node:{} 没有对应的entry节点",cfg_node))?;
             node_mut!(at cfg_entry in cfg_graph).push_nhwc_instr(alloc_instr, instr_slab)?;
@@ -663,16 +665,14 @@ fn force_trans_type(
     cfg_graph:&mut CfgGraph, symtab:&mut SymTab, type_to_trans_to:&Type, type_be_transed:&Type, symidx:&SymIdx, scope_node:u32, cfg_bb:u32, instr_slab:&mut InstrSlab<NhwcInstr>,
     symtab_graph:&mut Option<&mut SymTabGraph>,op_et_node:Option<u32>,et_tree:&mut EtTree,
 ) -> Result<SymIdx> {
-    // 如果是数组类型，就直接转化为 ty 
-    // let type_to_trans_to = if let Type::Array { dims, ele_ty: ty } = type_to_trans_to.clone(){
-    //     *ty
-    // }else{
-    //     type_to_trans_to.clone()
-    // };
-    if type_be_transed == type_to_trans_to{
-        //相同类型不需要转换
+    if type_be_transed.direct_suits(type_to_trans_to){
+        // suit
+        debug_info_blue!("{:?} suits from {:?} to {:?} ",symidx,type_be_transed,type_to_trans_to);
         return Ok(symidx.clone());
     }
+    // if type_be_transed == type_to_trans_to {
+    //     return Ok(symidx.clone());
+    // }
     match (type_be_transed, type_to_trans_to) {
         (Type::I32, Type::F32) => {
             //创建f32类型的临时变量
@@ -1062,16 +1062,16 @@ fn process_call(
     let mut para_symidxs = vec![];
     for &para_et_node in func_name_and_args[1..].iter() {
         let para_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, para_et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?.unwrap();
+        debug_info_red!("process_et to be {:?} in call ",para_symidx);
         let para_symidx = match &symtab.get(&para_symidx)?.get_type()?{
             Type::Array { dims, ele_ty } => {
-                // let ty = symtab.get(&para_symidx)?.get_type()?.clone();
-                // let temp_symidx = process_temp_symbol(cfg_graph, symtab, &ty.arr2ptr()?, scope_node, cfg_bb, instr_slab, symtab_graph, None, et_tree, "array_ele_ptr")?;
-                // let instr_struct = NhwcInstrType::new_get_element_ptr(temp_symidx.clone()
-                //     ,para_symidx,ty,vec![]
-                // ).into();
-                // let getelementptr_instr = node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(instr_struct, instr_slab)?;
-                // temp_symidx
-                para_symidx
+                let ty = symtab.get(&para_symidx)?.get_type()?.clone();
+                let temp_symidx = process_temp_symbol(cfg_graph, symtab, &ty.arr2ptr()?, scope_node, cfg_bb, instr_slab, symtab_graph, None, et_tree, "array_ele_ptr")?;
+                let instr_struct = NhwcInstrType::new_get_element_ptr(temp_symidx.clone()
+                    ,para_symidx,ty,vec![]
+                ).into();
+                let _getelementptr_instr = node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(instr_struct, instr_slab)?;
+                temp_symidx
             },
             _ => para_symidx,
         };
@@ -1081,9 +1081,10 @@ fn process_call(
         //检查形参和实参是否一致
         if para_symidxs.len() == arg_syms.len(){
             for arg_idx in 0..arg_syms.len(){
-                if !symtab.get(&para_symidxs[arg_idx])?.get_type()?.suits(symtab.get(&arg_syms[arg_idx])?.get_type()?){
-                    return Err(anyhow!("传入实参与函数形参不符 left:{:?}:{:?} right:{:?}:{:?}",&para_symidxs[arg_idx],symtab.get(&para_symidxs[arg_idx])?.get_type()?.clone(),arg_syms[arg_idx],symtab.get(&arg_syms[arg_idx])?.get_type()?.clone() ))
-                }
+                let type_to_trans_to = symtab.get(&arg_syms[arg_idx])?.get_type()?.clone();
+                let type_be_transed = symtab.get(&para_symidxs[arg_idx])?.get_type()?.clone();
+                let transed_symidx = force_trans_type(cfg_graph, symtab, &type_to_trans_to, &type_be_transed, &para_symidxs[arg_idx],scope_node, cfg_bb, instr_slab, symtab_graph, Some(et_node), et_tree)?;
+                *para_symidxs.get_mut(arg_idx).unwrap() = transed_symidx; 
             }
         }else{
             return Err(anyhow!("传入实参与函数形参数量不符"))
@@ -1211,12 +1212,12 @@ fn process_et(
                             match symbol_type {
                                 Type::F32 => {
                                     let fzero_symidx = process_literal(symtab, &"0.0".to_string(), symtab_graph)?;
-                                    let f2b_instr = NhwcInstrType::new_icmp(num2bool_tmp_symidx.clone(), IcmpPlan::Ne, symbol_symidx, fzero_symidx, Type::I1).into();
+                                    let f2b_instr = NhwcInstrType::new_fcmp(num2bool_tmp_symidx.clone(), FcmpPlan::One, symbol_symidx, fzero_symidx, Type::F32).into();
                                     node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(f2b_instr, instr_slab)?;
                                 }
                                 Type::I32 => {
                                     let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
-                                    let i2b_instr = NhwcInstrType::new_icmp(num2bool_tmp_symidx.clone(), IcmpPlan::Ne, symbol_symidx, izero_symidx, Type::I1).into();
+                                    let i2b_instr = NhwcInstrType::new_icmp(num2bool_tmp_symidx.clone(), IcmpPlan::Ne, symbol_symidx, izero_symidx, Type::I32).into();
                                     node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
                                 }
                                 Type::I1 => {
@@ -1756,7 +1757,7 @@ fn parse_extern_declfunc2nhwc(
             func_type
         };
         //将函数签名转为 global ir
-        let func_instr = NhwcInstrType::new_global(func_type,func_symidx.clone()).into();
+        let func_instr = NhwcInstrType::new_globl(func_type,func_symidx.clone()).into();
 
         node_mut!(at cfg_root in cfg_graph ).push_nhwc_instr(func_instr, instr_slab)?;
     } else {
@@ -1772,10 +1773,11 @@ fn parse_declvar2nhwc(
 ) -> Result<()> {
     //将declaration生成et
     let et_sep_node = process_any_stmt(et_tree, ast_tree, scope_tree, ast_decl_node, decl_parent_scope);
-    eval_et::compress_et(et_tree, et_sep_node, symtab, decl_parent_scope, scope_tree)?;
     //如果该节点有子树
     let detail_et_nodes = direct_child_nodes!(at et_sep_node in et_tree);
     for et_item_node in detail_et_nodes {
+        // we move the compress et to here because you may define a number dependently in one line (sep) 
+        eval_et::compress_et(et_tree, et_item_node, symtab, decl_parent_scope, scope_tree)?;
         let et_node_type = &node!(at et_item_node in et_tree).et_node_type.clone();
         match et_node_type {
             // 先考虑这个语句存在 = 的情况
@@ -1791,7 +1793,7 @@ fn parse_declvar2nhwc(
                     node_mut!(at cfg_entry in cfg_graph ).push_nhwc_instr(alloc_instr, instr_slab)?;
                 }else{
                     // 说明这个 cfg_node 就是root ，那么直接把 global 指令加入 root 就行了
-                    let global_instr = NhwcInstrType::new_global(var_type.clone(), var_symidx.clone()).into();
+                    let global_instr = NhwcInstrType::new_globl(var_type.clone(), var_symidx.clone()).into();
                     node_mut!(at cfg_node in cfg_graph ).insert_nhwc_instr(global_instr, 0,instr_slab)?;
                 }
 
@@ -1818,7 +1820,7 @@ fn parse_declvar2nhwc(
                     node_mut!(at cfg_entry in cfg_graph ).push_nhwc_instr(alloc_instr, instr_slab)?;
                 }else{
                     // global variable
-                    let global_instr = NhwcInstrType::new_global(var_type.clone(), var_symidx.clone()).into();
+                    let global_instr = NhwcInstrType::new_globl(var_type.clone(), var_symidx.clone()).into();
                     node_mut!(at cfg_node in cfg_graph ).insert_nhwc_instr(global_instr, 0,instr_slab)?;
                 }
 
@@ -1845,7 +1847,7 @@ fn parse_declvar2nhwc(
                     node_mut!(at cfg_entry in cfg_graph ).push_nhwc_instr(alloc_instr, instr_slab)?;
                 }else{
                     // 说明这个 cfg_node 就是root ，那么直接把 global 指令加入 root 就行了
-                    let global_instr = NhwcInstrType::new_global(var_type.clone(), symbol_symidx.clone()).into();
+                    let global_instr = NhwcInstrType::new_globl(var_type.clone(), symbol_symidx.clone()).into();
                     node_mut!(at cfg_node in cfg_graph ).insert_nhwc_instr(global_instr, 0,instr_slab)?;
                 }
             }
@@ -1992,7 +1994,23 @@ pub fn parse_cfg_into_nhwc_cfg(
                 CfgNodeType::BasicBlock { ast_nodes } => {
                     parse_bb2nhwc(ast_tree, cfg_graph, scope_tree, et_tree, symtab, ast2scope, ast_nodes.clone(), cfg_node,  instr_slab, symtab_graph)?;
                 },
-                _ =>{}
+                CfgNodeType::Exit { ast_node, } => {
+                    if node!(at cfg_node in cfg_graph).has_func_cor_symidx(){
+                        match  symtab.get(node!(at cfg_node in cfg_graph).get_func_cor_symidx()?)?.get_type()?{
+                            Type::Fn { arg_syms, ret_sym } => {
+                                match symtab.get(ret_sym)?.get_type()?{
+                                    Type::Void => {
+                                        node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_ret(None).into(), instr_slab)?;
+                                    },
+                                    _ => {}
+                                }
+                            },
+                            _ => panic!()
+                        }
+
+                    }
+                },
+                _ => {}
             }
         }
     }

@@ -43,7 +43,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::Phi { lhs: _, rhs: _ } => {},
                     NhwcInstrType::TranType { lhs: _, op: _ } => {},
                     NhwcInstrType::BreakPoint { symidx: _, breakpoint_args: _ } => continue,
-                    NhwcInstrType::Global { var_symidx: _, vartype: _ } => {},
+                    NhwcInstrType::Globl { var_symidx: _, vartype: _ } => {},
                     NhwcInstrType::Load { lhs: _, ptr_symidx: _ptr_symdix, ptr_ty: _ } => {},
                     NhwcInstrType::Store { val_symidx: _value, value_ty: _, ptr_symidx: _, ptr_ty: _ } => {},
                     NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx: _, idx_vec: _ } => {},
@@ -88,7 +88,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                             NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
                                 let _dug_edge = add_edge!({DefUseEdge::new_alloc_dep(var_symidx.clone())} from alloc_or_global_instr_cor_dug_node to dug_cor_node in def_use_graph);
                             },
-                            NhwcInstrType::Global { var_symidx, vartype: _ } => {
+                            NhwcInstrType::Globl { var_symidx, vartype: _ } => {
                                 let _dug_edge = add_edge!({DefUseEdge::new_global_dep(var_symidx.clone())} from alloc_or_global_instr_cor_dug_node  to dug_cor_node in def_use_graph);
                             },
                             _ => {
@@ -110,7 +110,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::Phi { lhs: _, rhs: _ } => {},
                     NhwcInstrType::TranType { lhs: _, op: _ } => {},
                     NhwcInstrType::BreakPoint { symidx: _, breakpoint_args: _ } => continue,
-                    NhwcInstrType::Global { var_symidx: _, vartype: _ } => continue,
+                    NhwcInstrType::Globl { var_symidx: _, vartype: _ } => continue,
                     NhwcInstrType::Load { lhs: _, ptr_symidx: _ptr_symdix, ptr_ty: _ } => {},
                     NhwcInstrType::Store { val_symidx: _value, value_ty: _, ptr_symidx: _, ptr_ty: _ } => {},
                     NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx: _, idx_vec: _ } => {},
@@ -207,7 +207,7 @@ pub fn update_src_symdix_alloc_global_instr_info(symtab:&mut SymTab, cfg_graph:&
                 NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
                     symtab.get_mut(&var_symidx.to_src_symidx())?.add_mem_instr(instr);
                 },
-                NhwcInstrType::Global { var_symidx, vartype: _ } => {
+                NhwcInstrType::Globl { var_symidx, vartype: _ } => {
                     symtab.get_mut(&var_symidx.to_src_symidx())?.add_mem_instr(instr);
                 },
                 _ => {}

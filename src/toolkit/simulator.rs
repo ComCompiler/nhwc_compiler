@@ -11,7 +11,7 @@ use super::cfg_node::InstrList;
 use super::field::Type::{self, F32, I32};
 
 use super::nhwc_instr::{BreakpointArg, NhwcInstr};
-use super::symtab::{SymIdx};
+use super::symtab::SymIdx;
 use super::{field::{Field, Value}, nhwc_instr::{ArithOp::*, InstrSlab, NhwcInstrType::*}, symbol::Symbol, symtab::{SymTab, SymTabEdge, SymTabGraph}};
 make_field_trait_for_struct!(Value,(usize,usize));
 // simu_func_pos_range 是一个左闭右开区间
@@ -599,7 +599,7 @@ impl Simulator{
                     );
                 }
             },
-            Global { var_symidx, vartype } => {
+            Globl { var_symidx, vartype } => {
                 // 全局变量
                 let simu_symtab = &mut self.simu_symtab;
                 let src_var_symidx = var_symidx.to_src_symidx();
@@ -653,6 +653,7 @@ impl Simulator{
                 }
             },
             Store { val_symidx: value_symidx, value_ty: _, ptr_symidx, ptr_ty: _ } => {
+                debug_info_red!("store {value_symidx:?} to ptr {ptr_symidx:?}");
                 match self.simu_symtab.get(ptr_symidx)?.get_simu_val()?.clone(){
                     Value::Ptr64 { pointed_ty: _ty, op_pointed_symidx, offset } => {
                         match op_pointed_symidx{
@@ -660,14 +661,17 @@ impl Simulator{
                                 // 这里要分两种情况，一种是数组，另一种是普通指针
                                 let val = self.simu_symtab.get(value_symidx)?.get_simu_val()?.clone();
                                 let var_be_assigned = self.simu_symtab.get_mut(&pointed_symidx)?.get_mut_simu_val()?;
+                                debug_info_red!("assigned val is {val:?}");
                                 match var_be_assigned{
                                     // 数组
                                     Value::Array { value_map, dims: _, ele_ty: _ele_type } => {
                                         // 在数组中我们无法追踪 def_instr 因此无法使用 simu_add_value
-                                        value_map.insert_ele_by_value_type_offset(&offset, val)?
+                                        value_map.insert_ele_by_value_type_offset(&offset, val)?;
+                                        debug_info_red!("value_map of {pointed_symidx:?} is {value_map:?}");
                                     },
                                     _ => {
                                         // 普通指针
+                                        debug_info_red!("add value {val:?} to {pointed_symidx:?}");
                                         self.simu_add_value(&pointed_symidx, val)?;
                                     }
                                 }

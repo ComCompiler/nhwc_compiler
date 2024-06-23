@@ -5,7 +5,7 @@ use anyhow::*;
 use derive_new::new;
 use strum_macros::EnumIs;
 
-use crate::{passes::ast2st_pass::Ast2StPass, toolkit::field::Type};
+use crate::{passes::ast2st_pass::Ast2StPass, toolkit::field::{Type, Value}};
 
 use super::symtab::SymIdx;
 
@@ -77,7 +77,10 @@ impl Debug for Imm{
                         write!(f,"{}", symidx)
                     },
                     Type::F32 => {
-                        let f_val:f32 = symidx.symbol_name.parse().unwrap();
+                        let f_val:f32 = match Value::from_string_with_specific_type(&symidx.symbol_name, &Type::F32).unwrap(){
+                            Value::F32(Some(f_val)) => f_val,
+                            _ => panic!()
+                        };
                         write!(f,"{}", f_val.to_bits())
                     },
                     Type::I1 => {
@@ -171,6 +174,7 @@ pub enum PseudoInstr {
     Sd {rd:Register ,symbol:Imm ,rt:Register},//将寄存器rt的双字存储到指定地址或符号位置
 
     Fmv_s {rd:Register ,rs:Register},//单精度符点移动
+    Fmv_w_x {rd:Register ,rs:Register},//单精度符点移动
     Fabs_s {rd:Register ,rs:Register},//单精度取绝对值
     Fneg_s {rd:Register ,rs:Register},//单精度取反
     Fmv_d {rd:Register ,rs:Register},//双精度移动
@@ -190,19 +194,18 @@ pub enum PseudoInstr {
     Fence {},
 }
 impl PseudoInstr{
-    pub fn new_reg_mv(rd:Register,rs:Register,vartype:&Type) -> PseudoInstr{
-        match &vartype.get_ele_ty(){
-            Type::I32 |
-            Type::I1 => {
+    pub fn new_reg_mv(rd:Register,rs:Register) -> PseudoInstr{
+        match (rd.is_gpr(),rs.is_gpr()){
+            (true,true) => {
                 Self::new_mv(rd, rs)
             },
-            Type::Ptr64 { ty } => {
-                Self::new_mv(rd, rs)
-            },
-            Type::F32 => {
+            (false,false)=> {
                 Self::new_fmv_s(rd, rs)
             },
-            _ => panic!("can't parse ty {:?}",vartype)
+            (false,true)=> {
+                Self::new_fmv_w_x(rd, rs)
+            },
+            _ => panic!("can't mv from reg {:?} to {:?}",rd,rs)
         }
     }
 }
@@ -264,6 +267,7 @@ impl Debug for PseudoInstr {
             PseudoInstr::Fmv_d { rd, rs } => write!(f, "{:7} {:?}, {:?}","fmv.d", rd, rs),
             PseudoInstr::Fabs_d { rd, rs } => write!(f, "{:7} {:?}, {:?}","fabs.d", rd, rs),
             PseudoInstr::Fneg_d { rd, rs } => write!(f, "{:7} {:?}, {:?}","fneg.d", rd, rs),
+            PseudoInstr::Fmv_w_x { rd, rs } => write!(f, "{:7} {:?}, {:?}","fmv.w.x", rd, rs),
 
             PseudoInstr::Bgt { rs1: rs, rs2: rd, offset } => write!(f, "{:7} {:?}, {:?}, {:?}","bgt", rs, rd, offset),
             PseudoInstr::Ble { rs1: rs, rs2: rd, offset } => write!(f, "{:7} {:?}, {:?}, {:?}","ble", rs, rd, offset),
@@ -758,8 +762,8 @@ impl Debug for Loads {
 
             Loads::Lwu { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","lwu", rd, imm, rs1),
             Loads::Ld { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","ld", rd, imm, rs1),
-            Loads::Fld { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","fld", rd,  rs1,imm),
-            Loads::Flw { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","flw", rd,  rs1, imm),
+            Loads::Fld { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","fld", rd,imm,  rs1),
+            Loads::Flw { rd, rs1, imm } => write!(f, "{:7} {:?},{:?}({:?})","flw", rd, imm,  rs1),
         }
     }
 }
@@ -859,8 +863,8 @@ pub enum Trans{
 impl Debug for Trans{
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self{
-            Trans::Fcvt_w_s { rd, rs1 } => write!(f, "{:5} {:?},{:?},rdn","fcvt.w.s", rd, rs1),
-            Trans::Fcvt_s_w { rd, rs1 } => write!(f, "{:5} {:?},{:?},rdn","fcvt.s.w", rd, rs1),
+            Trans::Fcvt_w_s { rd, rs1 } => write!(f, "{:5} {:?},{:?},rtz","fcvt.w.s", rd, rs1),
+            Trans::Fcvt_s_w { rd, rs1 } => write!(f, "{:5} {:?},{:?},rtz","fcvt.s.w", rd, rs1),
         }
     }
 }

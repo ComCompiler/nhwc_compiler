@@ -163,7 +163,7 @@ pub enum NhwcInstrType {
     //定义变量
     DefineVar { var_symidx:SymIdx, vartype:Type, op_value:Option<SymIdx> },
     Alloc { var_symidx:SymIdx, vartype:Type },
-    Global { var_symidx:SymIdx, vartype:Type },
+    Globl { var_symidx:SymIdx, vartype:Type },
     Load { lhs:SymIdx ,ptr_symidx:SymIdx ,ptr_ty:Type},
     Store { val_symidx:SymIdx, value_ty:Type, ptr_symidx:SymIdx , ptr_ty:Type},
     /// 注意getelementptr 的 ty 必须是一个 数组
@@ -226,7 +226,7 @@ impl NhwcInstr {
             NhwcInstrType::TranType { lhs, op: _ } => vec![lhs],
             NhwcInstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe } => vec![],
             NhwcInstrType::GetElementPtr { array_ty: _ty, array_symidx: _, idx_vec: _, lhs } => vec![lhs],
-            NhwcInstrType::Global { var_symidx: _, vartype: _, } => vec![],
+            NhwcInstrType::Globl { var_symidx: _, vartype: _, } => vec![],
             /// 这几个都认为是没有ssa 层面上的def 
             NhwcInstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
             NhwcInstrType::Load { ptr_symidx: _ptr_symdix, lhs, ptr_ty: _ } => vec![lhs],
@@ -286,7 +286,7 @@ impl NhwcInstr {
             ,
             NhwcInstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
             NhwcInstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
-            NhwcInstrType::Global { var_symidx: _, vartype: _ } => vec![],
+            NhwcInstrType::Globl { var_symidx: _, vartype: _ } => vec![],
             NhwcInstrType::Load { lhs: _, ptr_symidx: ptr_symdix, ptr_ty: _ } => vec![ptr_symdix],
             NhwcInstrType::Store { val_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
             NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx, idx_vec } => idx_vec.iter().filter(|idx|idx.is_some()).map(|idx|idx.as_ref().unwrap()).chain(vec![array_symidx].into_iter()).collect_vec(),
@@ -324,7 +324,7 @@ impl NhwcInstr {
             NhwcInstrType::TranType { lhs, op:_ } => vec![lhs],
             NhwcInstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
             NhwcInstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
-            NhwcInstrType::Global { var_symidx: _, vartype: _ } => vec![],
+            NhwcInstrType::Globl { var_symidx: _, vartype: _ } => vec![],
             NhwcInstrType::Load { lhs, ptr_symidx: _ptr_symdix, ptr_ty: _ } => vec![lhs],
             NhwcInstrType::Store { val_symidx: _value, ptr_symidx: _, ptr_ty: _, value_ty: _ } => vec![],
             NhwcInstrType::GetElementPtr { lhs, array_ty: _ty, array_symidx: _, idx_vec: _ } => vec![lhs],
@@ -382,7 +382,7 @@ impl NhwcInstr {
             ,
             NhwcInstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe  } => vec![],
             NhwcInstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
-            NhwcInstrType::Global { var_symidx: _, vartype: _ } => vec![],
+            NhwcInstrType::Globl { var_symidx: _, vartype: _ } => vec![],
             NhwcInstrType::Load { lhs: _, ptr_symidx: ptr_symdix, ptr_ty: _ } => vec![ptr_symdix],
             NhwcInstrType::Store { val_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
             NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_symidx, idx_vec } => idx_vec.iter_mut().filter(|idx|idx.is_some()).map(|idx|idx.as_mut().unwrap()).chain(vec![array_symidx].into_iter()).collect_vec(),
@@ -517,7 +517,7 @@ impl NhwcInstrType {
     pub fn new_def_var(vartype:Type, var_symidx:SymIdx, value:Option<SymIdx>) -> Self { Self::DefineVar { var_symidx, vartype, op_value: value } }
 
     pub fn new_alloc(vartype:Type, var_symidx:SymIdx) -> Self { Self::Alloc { var_symidx, vartype, }  }
-    pub fn new_global(vartype:Type, var_symidx:SymIdx) -> Self { Self::Global { var_symidx, vartype, }  }
+    pub fn new_globl(vartype:Type, var_symidx:SymIdx) -> Self { Self::Globl { var_symidx, vartype, }  }
 
     // Instruction -> Arith -> ArithOp
     pub fn new_add(lhs:SymIdx, a:SymIdx, b:SymIdx, vartype:Type) -> Self { Self::Arith { lhs, rhs:ArithOp::Add { a, b, vartype } } }
@@ -679,7 +679,7 @@ impl Debug for NhwcInstrType {
             NhwcInstrType::TranType { lhs, op } => write!(f, "{:?} = {:?}", lhs, op),
             NhwcInstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args  } => write!(f,"breakpoint {:?}({:?}) !",breakpoint_symidx,breakpoint_args),
             NhwcInstrType::Alloc { var_symidx, vartype, } => write!(f,"alloc {:?} {:?}",vartype,var_symidx),
-            NhwcInstrType::Global { var_symidx, vartype } => write!(f,"global {:?} {:?}",vartype,var_symidx),
+            NhwcInstrType::Globl { var_symidx, vartype } => write!(f,"global {:?} {:?}",vartype,var_symidx),
             NhwcInstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => write!(f,"{:?} = load {:?}:{:?}",lhs,ptr_symdix,ptr_ty),
             NhwcInstrType::Store { val_symidx: value, ptr_symidx, ptr_ty, value_ty } => write!(f,"store {:?}:{:?} {:?}:{:?}",value,value_ty,ptr_symidx,ptr_ty),
             NhwcInstrType::GetElementPtr { lhs, array_ty: ty, array_symidx, idx_vec } => write!(f,"{:?} = getelementptr {:?}:{:?} {:?}",lhs,array_symidx,ty,idx_vec,),

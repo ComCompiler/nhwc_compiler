@@ -473,13 +473,13 @@ impl RegTab{
             if matches!(regstat,RegState::Freed { symidx, tracked:false }){
                 *regstat =RegState::Released;
                 if reg.is_arg()|| reg.is_saved(){
-                    debug_info_red!("find released {:?} {:?}!!!",reg,regstat);
+                    // debug_info_red!("find released {:?} {:?}!!!",reg,regstat);
                     has_released_reg = true;
                 }
             }
             if matches!(regstat,RegState::Released {}){
                 if reg.is_arg()|| reg.is_saved(){
-                    debug_info_red!("find released {:?} {:?}!!!",reg,regstat);
+                    // debug_info_red!("find released {:?} {:?}!!!",reg,regstat);
                     has_released_reg = true;
                 }
             }
@@ -501,7 +501,7 @@ impl RegTab{
     /// the reverse operation of apply
     pub fn reset(&mut self,symtab:&mut SymTab) -> Result<()>{
         debug_info_red!("reset regtab!");
-        debug_info_red!("{:?}",self.reg_symidx_map);
+        // debug_info_red!("{:?}",self.reg_symidx_map);
         for (k,v) in self.reg_symidx_map.iter(){
             match v{
                 RegState::Occupied { symidx, tracked:true, occupy_count } => {
