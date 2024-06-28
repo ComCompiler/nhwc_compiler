@@ -445,7 +445,7 @@ impl Register{
             _ => panic!()
         }
     }
-    pub fn is_fpu(&self) -> bool{
+    pub fn is_fpr(&self) -> bool{
         match self{
             Register::FArg { reg_idx: _ } => true,
             Register::FSaved { reg_idx: _ } => true,
@@ -769,7 +769,7 @@ impl Debug for Loads {
 }
 impl Loads{
     pub fn new(size:usize,rd:Register,rs1:Register, offset:isize, is_float:bool) -> Result<Self>{
-        if rd.is_fpu() != is_float{
+        if rd.is_fpr() != is_float{
             panic!("can't load to {:?}",rd)
         }
         Ok(match (size,is_float){

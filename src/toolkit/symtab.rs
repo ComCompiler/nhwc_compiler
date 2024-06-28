@@ -6,10 +6,11 @@ use anyhow::{anyhow,Result};
 use delegate::delegate;
 use itertools::Itertools;
 use petgraph::stable_graph::StableDiGraph;
-use std::{collections::hash_map::{Iter, IterMut}, fmt::{Display, Formatter}, hash::Hash};
+use std::{cell::RefCell, collections::hash_map::{Iter, IterMut}, fmt::{Display, Formatter}, hash::Hash, rc::Rc};
 
 pub type SymTabGraph = StableDiGraph<SymTab, SymTabEdge, u32>;
 
+pub type RcSymIdx = Rc<RefCell<SymIdx>>;
 #[derive(Clone)]
 pub struct SymTab {
     // map:BTreeMap<SymIdx, Symbol>,

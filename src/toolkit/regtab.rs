@@ -1,18 +1,17 @@
-use std::any::Any;
 use std::fmt::Debug;
 use ahash::AHashMap;
 use anyhow::*;
 use derive_new::new;
 use itertools::Itertools;
 use strum_macros::EnumIs;
-use crate::{debug_info_blue, toolkit::symtab::*};
+use crate::debug_info_blue;
 use crate::toolkit::field::Field;
 
-use crate::{debug_info_green, debug_info_red, make_field_trait_for_struct, reg_field_for_struct};
+use crate::{debug_info_red, make_field_trait_for_struct, reg_field_for_struct};
 
 use super::rv64_instr::{REG_A_RANGE, REG_FA_RANGE, REG_FS_RANGE, REG_S_RANGE, REG_T_RANGE};
-use super::symtab;
-use super::{asm_struct::AsmSection, field::Type, nhwc_instr::NhwcInstr, rv64_instr::Register, symbol::Symbol, symtab::{SymIdx, SymTab}};
+
+use super::{asm_struct::AsmSection, field::Type, rv64_instr::Register, symbol::Symbol, symtab::{SymIdx, SymTab}};
 
 make_field_trait_for_struct!(RegTab);
 /// only manage s & fs registers 
@@ -522,7 +521,7 @@ impl RegTab{
     ,) -> Result<Register>{
         match sym_ty{
             Type::F32 => {
-                assert!(reg.is_fpu())
+                assert!(reg.is_fpr())
             },
             _ => {}
         }
@@ -539,7 +538,7 @@ impl RegTab{
     ,) -> Result<Register>{
         match sym_ty{
             Type::F32 => {
-                assert!(reg.is_fpu())
+                assert!(reg.is_fpr())
             },
             _ => {}
         }

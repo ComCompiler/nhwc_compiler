@@ -3,6 +3,7 @@ use antlr_rust::{common_token_stream::CommonTokenStream, InputStream};
 use petgraph::csr::NodeIndex;
 
 use crate::antlr_parser::rule_walkers::TerminalRuleListener;
+use crate::node_mut;
 use crate::{
     antlr_parser::{
         clexer::CLexer, cparser::{CParser, CTreeWalker}
@@ -10,6 +11,8 @@ use crate::{
 };
 
 use super::context::NhwcCtx;
+use super::eval_et::compress_et;
+// use super::gen_et::compress_ast;
 
 /// 把代码生成为AST树 code 为代码文本的字符串
 pub fn parse_as_ast_tree(context:&mut NhwcCtx) {
@@ -29,14 +32,15 @@ pub fn parse_as_ast_tree(context:&mut NhwcCtx) {
                 let node_id = g.add_node(ast_node).index();
                 // println!("enter rule {} id {}",ctx.get_text(),node_id);
                 if node_id != 0 {
-                    let father_id = match is_last_wrap_drop {
+                    let parent_node = match is_last_wrap_drop {
                         true => {
                             // println!("branch");
                             node_id - node_count_under_depth.last().expect("But stack is empty")
                         }
                         false => node_id - 1,
-                    };
-                    g.add_edge(NodeIndex::from(father_id as u32), NodeIndex::from(node_id as u32), ());
+                    } as u32;
+                    node_mut!(at parent_node in g).child_vec.push(node_id as u32);
+                    g.add_edge(NodeIndex::from(parent_node), NodeIndex::from(node_id as u32), ());
                     // {   println!("{:?}",ASTNode::new(ctx.get_rule_index(),ctx.get_text()));}
                     // save_dot_and_generate_png(&*g.borrow(),format!("{}",node_id));
                     // println!("father {:?}",father_id);
@@ -62,6 +66,8 @@ pub fn parse_as_ast_tree(context:&mut NhwcCtx) {
         let tree = result.expect("解析失败");
         CTreeWalker::walk(Box::new(listener), &*tree);
     }
+
+    // compress_ast(&mut context.ast_tree);
     // println!("{:?}",tree);
     // 更新 context 中的 ast_tree
 }

@@ -48,10 +48,8 @@ make_field_trait_for_struct!(
     MemLayout
 );
 
-reg_field_for_struct!(EtNode {
-        DIMS:Vec<Option<SymIdx>>,
-        TYPE:Type,
-    } with_fields info);
+// reg_field_for_struct!(EtNode {
+//     } with_fields info);
 // for variables symbol
 reg_field_for_struct!(Symbol {
         DEF_INSTRS_VEC:Vec<usize>,
@@ -433,7 +431,7 @@ fn parse_branch2nhwc(
                 let expr_parent_scope = direct_parent_node!(at expr_scope in scope_tree);
                 let ret_vec = parse_stmt_or_expr2nhwc(ast_tree, cfg_graph, symtab, scope_tree, et_tree, expr_parent_scope, expr_node, cfg_branch_node,  instr_slab, symtab_g)?;
                 if ret_vec.len()>1{
-                    return Err(anyhow!("条件表达式错误，返回类型不能转为bool"))
+                    return Err(anyhow!("{:?} number of ret value is not 1",ret_vec))
                 }
                 let r2bool_symidx;
                 if let Some(result_symidx) = &ret_vec[0]{
@@ -458,9 +456,6 @@ fn parse_branch2nhwc(
         }
         (_, _) => return Err(anyhow!("不正确的astnode")),
     }
-
-
-    
 
     Ok(())
 }
@@ -1607,7 +1602,7 @@ fn process_et(
                                 let func_call_instr_struct = NhwcInstrType::new_func_call(None, 
                                     SymIdx::new(0, "memset".to_string()), 
                                     vec![temp_ptr_symidx,SymIdx::new(0, "0".to_string()),array_len.into()], Type::Void).into();
-                                let func_call_instr = node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(func_call_instr_struct, instr_slab)?;
+                                let _func_call_instr = node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(func_call_instr_struct, instr_slab)?;
                                 for (&offset,value) in value_map.iter(){
                                     let value_symidx = value.to_symidx()?;
                                     process_literal(symtab, &value_symidx.symbol_name, symtab_graph)?;

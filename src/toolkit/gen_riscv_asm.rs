@@ -7,7 +7,7 @@ use crate::{antlr_parser::clexer::{Register, Void}, debug_info_blue, debug_info_
 use anyhow::*;
 use itertools::Itertools;
 
-use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CfgNode, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Type, gen_nhwc_cfg::{IS_LITERAL, TYPE}, nhwc_instr::{FuncOp, InstrSlab, NhwcInstr, NhwcInstrType}, regtab::{self, RegTab}, rv64_instr::{Compare, Imm, Loads, Logical, PseudoInstr, RV64Instr, Register, RiscvOffsetLimit, Shifts, Stores, Trans, REG_FS_RANGE, REG_S_RANGE}, simulator::Simulator, symtab::{self, SymIdx, SymTab}};
+use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CfgNode, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Type, gen_nhwc_cfg::{IS_LITERAL}, nhwc_instr::{FuncOp, InstrSlab, NhwcInstr, NhwcInstrType}, regtab::{self, RegTab}, rv64_instr::{Compare, Imm, Loads, Logical, PseudoInstr, RV64Instr, Register, RiscvOffsetLimit, Shifts, Stores, Trans, REG_FS_RANGE, REG_S_RANGE}, simulator::Simulator, symtab::{self, SymIdx, SymTab}};
 
 reg_field_for_struct!(CfgNode {
     REGTAB:RegTab,
@@ -99,7 +99,7 @@ fn no_load(symidx:SymIdx,reg:Register,symtab:&mut SymTab,asm_sect:& mut AsmSecti
     Ok(())
 }
 fn default_store(symidx:SymIdx,reg:Register,symtab:&mut SymTab,asm_sect:& mut AsmSection, regtab:& mut RegTab) -> Result<()> {
-    _store_sym(asm_sect, &symidx, reg, regtab,symtab)
+    _store_sym(asm_sect, &symidx, reg, regtab,symtab,0)
 }
 
 /// convert `cfg_entry_node` into riscv 
@@ -169,19 +169,19 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         let mem_layout = node!(at cfg_entry_node in cfg_graph).get_mem_layout()?;
                         asm_sect.annotate(format!("mem layout:{:?}",mem_layout));
                         // set_freed_reg for args
-                        let mut fpu_args = vec![];
+                        let mut fpr_args = vec![];
                         let mut gpr_args = vec![];
                         for (_idx,arg) in args.iter().enumerate(){
                             match symtab.get(arg)?.get_type()?{
                                 Type::F32 => {
-                                    fpu_args.push(arg)
+                                    fpr_args.push(arg)
                                 },
                                 _ => {
                                     gpr_args.push(arg)
                                 }
                             }
                         } 
-                        for (idx,arg) in fpu_args.iter().enumerate(){
+                        for (idx,arg) in fpr_args.iter().enumerate(){
                             // _store_sym(asm_sect, &arg,Register::new_fa(idx as u8), symtab)?;
                             if REG_FA_RANGE.contains(&(idx as u8)){
                                 let reg = Register::new_fa(idx as u8);
@@ -204,8 +204,8 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         // })?;
                         let ra_symidx= symtab.get(func_symidx)?.get_func_cor_ra_symidx()?.clone();
                         let s0_symidx = symtab.get(func_symidx)?.get_func_cor_s0_symidx()?.clone();
-                        _store_sym(asm_sect, &ra_symidx, Register::RA, regtab,symtab)?;
-                        _store_sym(asm_sect, &s0_symidx, Register::new_s0(), regtab,symtab)?;
+                        _store_sym(asm_sect, &ra_symidx, Register::RA, regtab,symtab,0)?;
+                        _store_sym(asm_sect, &s0_symidx, Register::new_s0(), regtab,symtab,0)?;
                         add_literal_to_reg(asm_sect, Register::new_s0(),  Register::SP,regtab, symtab,stack_size as isize)?;
                     },
                     NhwcInstrType::DefineVar { var_symidx, vartype: _, op_value } => {
@@ -494,9 +494,28 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         }
                     },
                     NhwcInstrType::Call { op_assigned_symidx, func_op } => {
-                        let mut fpu_args = vec![];
+                        let mut fpr_args = vec![];
                         let mut gpr_args = vec![];
                         asm_sect.annotate("saved register dumping to mem".to_string());
+                        if symtab.get(&func_op.func_symidx)?.has_stack_pass_args(){
+                            let stack_pass_args = symtab.get(&func_op.func_symidx)?.get_stack_pass_args()?.clone();
+                            // if we need to pass args by stack (may because arg reg is not enough)
+                            if stack_pass_args.len()!=0 {
+                                let &cfg_entry_of_called_func =  symtab.get(&func_op.func_symidx)?.get_cfg_entry_node()?;
+                                let stack_size = node!(at cfg_entry_of_called_func in cfg_graph).get_mem_layout()?.get_mem_len();
+                                // here we have to 
+                                for (idx,formal_arg) in stack_pass_args{
+                                    let actual_arg = &func_op.actual_arg_symidx_vec[idx];
+                                    let actual_arg_ty = symtab.get(actual_arg)?.get_type()?.clone();
+                                    // load actual argument 
+                                    let value_reg = regtab.find_and_occupy_reg(actual_arg, &actual_arg_ty, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                    // formal argument 
+                                    _store_sym(asm_sect, &formal_arg, value_reg.clone(), regtab, symtab, -(stack_size as isize))?;
+                                    regtab.free_reg(value_reg, asm_sect)?;
+                                }
+                            }
+                        }
+
                         for i in REG_S_RANGE.clone(){
                             regtab.try_release_reg(Register::new_s(i), symtab, asm_sect, &mut default_store)?;
                         }
@@ -514,19 +533,20 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         for (_idx,arg) in func_op.actual_arg_symidx_vec.iter().enumerate(){
                             match symtab.get(arg)?.get_type()?{
                                 Type::F32 => {
-                                    fpu_args.push(arg)
+                                    fpr_args.push(arg)
                                 },
                                 _ => {
                                     gpr_args.push(arg)
                                 }
                             }
                         }   
-                        if fpu_args.len() > 8{
+                        if fpr_args.len() > 8{
                             
                         }
+                        // for fpu arg 
                         {
                             // first make all args occupyied 
-                            for (idx,arg) in fpu_args.iter().enumerate(){
+                            for (idx,arg) in fpr_args.iter().enumerate(){
                                 if REG_FA_RANGE.contains(&(idx as u8)){
                                     let reg =Register::new_fa(idx as u8);
                                     regtab.anonymous_load_into(reg, arg, &Type::F32, symtab, asm_sect, &mut default_store, &mut default_load)?;
@@ -534,7 +554,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 }
                             } 
                             // than free the arg reg at the same time
-                            for (idx,arg) in fpu_args.iter().enumerate(){
+                            for (idx,arg) in fpr_args.iter().enumerate(){
                                 if REG_A_RANGE.contains(&(idx as u8)){
                                     let reg =Register::new_fa(idx as u8);
                                     regtab.forget(reg, symtab)?;
@@ -564,13 +584,13 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                     Type::I32 => {
                                         let reg = Register::new_a(0);
                                         regtab.try_release_reg(reg.clone(), symtab, asm_sect, &mut default_store)?;
-                                        _store_sym(asm_sect, assigned_symidx, Register::new_a(0), regtab,symtab)?;
+                                        _store_sym(asm_sect, assigned_symidx, Register::new_a(0), regtab,symtab,0)?;
                                         regtab.set_freed_reg(reg, assigned_symidx, symtab)?;
                                     },
                                     Type::F32 => {
                                         let reg =Register::new_fa(0);
                                         regtab.try_release_reg(reg.clone(), symtab, asm_sect, &mut default_store)?;
-                                        _store_sym(asm_sect, assigned_symidx, Register::new_fa(0), regtab,symtab)?;
+                                        _store_sym(asm_sect, assigned_symidx, Register::new_fa(0), regtab,symtab,0)?;
                                         regtab.set_freed_reg(reg, assigned_symidx, symtab)?;
                                     },
                                     _ => {
@@ -780,10 +800,10 @@ pub fn load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,regtab:&mut RegTa
 
 //     let &symidx_offset2sp = symtab.get(symidx)?.get_mem_offset2sp()?;
 //     let size = symtab.get(symidx)?.get_type()?.get_ele_size()?;
-//     if val_reg.is_fpu() ^ symtab.get(symidx)?.get_type()?.is_f_32(){
+//     if val_reg.is_fpr() ^ symtab.get(symidx)?.get_type()?.is_f_32(){
 //         return Err(anyhow!("can't store symidx {:?}:{:?} to register {:?}",symidx,symtab.get(symidx)?.get_type()?,val_reg))
 //     }
-//     asm_sect.asm(Stores::new( size,val_reg.clone(),Register::SP, symidx_offset2sp as isize, val_reg.is_fpu())?.into());
+//     asm_sect.asm(Stores::new( size,val_reg.clone(),Register::SP, symidx_offset2sp as isize, val_reg.is_fpr())?.into());
 
 //     regtab.free_reg(val_reg.clone(,asm_sect))?;
 //     Ok(val_reg)
@@ -834,7 +854,7 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                 match Type::new_from_const_str(&symidx.symbol_name) {
                     Type::F32 => {
                         // f32 
-                        assert!(reg.is_fpu());
+                        assert!(reg.is_fpr());
                         // first put the f32 into a gpr so here type is i32
                         let temp_reg = regtab.find_and_anonymous_occupy(symidx, &Type::I32, symtab, asm_sect, &mut default_store, &mut |symidx,temp_reg,symtab,asm_sect,regtab|{
                             asm_sect.asm(PseudoInstr::new_li(temp_reg.clone(), Imm::new_literal(symidx.clone())).into());
@@ -847,12 +867,12 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                     Type::I32 => {
                         // i32 ... since riscv li instr has ensured the bitwidth will be ext from 32 to 64 
                         // no need sext.w
-                        assert!(!reg.is_fpu());
+                        assert!(!reg.is_fpr());
                         asm_sect.asm(PseudoInstr::new_li(reg, Imm::new_literal(symidx.clone())).into());
                         Ok(())
                     }
                     _ => {
-                        assert!(!reg.is_fpu());
+                        assert!(!reg.is_fpr());
                         asm_sect.asm(PseudoInstr::new_li(reg, Imm::new_literal(symidx.clone())).into());
                         Ok(())
                     },
@@ -865,7 +885,7 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                 let ty = symtab.get(symidx)?.get_type()?;
                 match ty{
                     Type::F32 => {
-                        assert!(reg.is_fpu());
+                        assert!(reg.is_fpr());
                         // because load is used after occupy, so you can always find reg of symidx, it should be deleted 
                         if let Some(reg_in_regtab) = symtab.reg_of_symidx(symidx)?{
                             if reg_in_regtab != reg{
@@ -893,7 +913,7 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                     },
                     Type::I32 => {
                         // you should ext it by sext.w
-                        assert!(!reg.is_fpu());
+                        assert!(!reg.is_fpr());
                         if let Some(reg_in_regtab) = symtab.reg_of_symidx(symidx)?{
                             if reg_in_regtab != reg{
                                 debug_info_red!("reg already found in {:?}",reg_in_regtab);
@@ -917,7 +937,7 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                         Ok(())
                     }
                     _ => {
-                        assert!(!reg.is_fpu());
+                        assert!(!reg.is_fpr());
                         if let Some(reg_in_regtab) = symtab.reg_of_symidx(symidx)?{
                             if reg_in_regtab != reg{
                                 debug_info_red!("reg already found in {:?}",reg_in_regtab);
@@ -951,24 +971,24 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
 }
 /// reg value -> sym in memory  
 /// require symidx to be symbol in symtab
-pub fn _store_sym(asm_sect:&mut AsmSection, symidx:&SymIdx,value_reg:Register,regtab:&mut RegTab,symtab:&mut SymTab) -> Result<()>{
+pub fn _store_sym(asm_sect:&mut AsmSection, symidx:&SymIdx,value_reg:Register,regtab:&mut RegTab,symtab:&mut SymTab, additional_mem_offset:isize) -> Result<()>{
     // if symidx.is_global_ptr() || (symtab.has_symbol(symidx) && *symtab.get(symidx)?.get_is_global()?){
     //     return Ok(())
     // }
-    let &symidx_offset2sp = symtab.get(symidx)?.get_mem_offset2sp()?;
+    let symidx_offset2sp = *symtab.get(symidx)?.get_mem_offset2sp()? + additional_mem_offset;
     let size = symtab.get(symidx)?.get_type()?.get_size()?;
-    if value_reg.is_fpu() ^ symtab.get(symidx)?.get_type()?.is_f_32(){
+    if value_reg.is_fpr() ^ symtab.get(symidx)?.get_type()?.is_f_32(){
         return Err(anyhow!("can't store symidx {:?}:{:?} from register {:?}",symidx,symtab.get(symidx)?.get_type()?,value_reg))
     }
     if symidx_offset2sp.is_legal_offset(){
         asm_sect.annotate(format!("store to {:?} in mem offset legal",symidx));
-        asm_sect.asm(Stores::new( size,value_reg.clone(),Register::SP, symidx_offset2sp as isize, value_reg.is_fpu())?.into());
+        asm_sect.asm(Stores::new( size,value_reg.clone(),Register::SP, symidx_offset2sp as isize, value_reg.is_fpr())?.into());
     }else{
         asm_sect.annotate(format!("store to {:?} in mem offset_illegal",symidx));
-        // asm_sect.asm(Stores::new( size,value_reg.clone(),Register::SP, , value_reg.is_fpu())?.into());
+        // asm_sect.asm(Stores::new( size,value_reg.clone(),Register::SP, , value_reg.is_fpr())?.into());
         let temp_reg = regtab.find_and_occupy_reg(&SymIdx::from(symidx_offset2sp), &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
         asm_sect.asm(Arithmetic::new_add(temp_reg.clone(), Register::SP,temp_reg.clone()).into());
-        asm_sect.asm(Stores::new( size,value_reg.clone(),temp_reg.clone(), 0 as isize, value_reg.is_fpu())?.into());
+        asm_sect.asm(Stores::new( size,value_reg.clone(),temp_reg.clone(), 0 as isize, value_reg.is_fpr())?.into());
         regtab.free_reg(temp_reg,asm_sect)?;
     }
     Ok(())
@@ -977,10 +997,10 @@ pub fn _store_sym(asm_sect:&mut AsmSection, symidx:&SymIdx,value_reg:Register,re
 /// require value and pointer is ready in ptr_reg and val_reg
 pub fn _store_from_ptr(asm_sect:&mut AsmSection,ptr_symidx:&SymIdx, ptr_reg:Register, val_reg:Register ,symtab:&mut SymTab)-> Result<()>{
     let ele_size = symtab.get(ptr_symidx)?.get_type()?.to_deref_ptr_type()?.get_ele_size()?;
-    if val_reg.is_fpu() ^ symtab.get(ptr_symidx)?.get_type()?.to_deref_ptr_type()?.is_f_32(){
+    if val_reg.is_fpr() ^ symtab.get(ptr_symidx)?.get_type()?.to_deref_ptr_type()?.is_f_32(){
         return Err(anyhow!("can't store symidx {:?}:{:?}'s pointed symidx to register {:?}",ptr_symidx,symtab.get(ptr_symidx)?.get_type()?,val_reg))
     }
-    asm_sect.asm(Stores::new( ele_size,val_reg.clone(),ptr_reg, 0, val_reg.is_fpu())?.into());
+    asm_sect.asm(Stores::new( ele_size,val_reg.clone(),ptr_reg, 0, val_reg.is_fpr())?.into());
     Ok(())
 }
 

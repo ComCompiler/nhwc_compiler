@@ -50,8 +50,8 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
                         match op_symidx{
                             Some(const_symidx) => {
                                 let et_node_added_struct = EtNodeType::new_literal(0, const_symidx.clone()).into();
-                                let et_node_edge_removed = et_tree.find_edge(NodeIndex::new(et_node as usize), NodeIndex::new(et_child_node as usize)).unwrap();
-                                et_tree.remove_edge(et_node_edge_removed);
+                                let et_node_edge_to_remove = et_tree.find_edge(NodeIndex::new(et_node as usize), NodeIndex::new(et_child_node as usize)).unwrap();
+                                et_tree.remove_edge(et_node_edge_to_remove);
                                 let et_node_added = add_node_with_edge!({et_node_added_struct} with_edge {EtEdgeType::Direct.into()} from et_node in et_tree);
                                 add_edge!({EtEdgeType::Deleted.into()} from et_node_added to et_child_node in et_tree);
                                 // add_edge!(from et_no)
@@ -190,47 +190,60 @@ fn match_x_add_x(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree)->bool{
 
 }
 fn hash_equal(node1:u32,node2:u32,et_tree:&EtTree) -> bool{
-    node!(at node1 in et_tree).hash.is_some() &&node!(at node2 in et_tree).hash.is_some() &&
-            node!(at node1 in et_tree).hash == node!(at node2 in et_tree).hash
+    let rst = node!(at node1 in et_tree).hash.is_some() &&node!(at node2 in et_tree).hash.is_some() &&
+            node!(at node1 in et_tree).hash == node!(at node2 in et_tree).hash;
+    debug_info_blue!("hash equal between {} and {} is {}",node1,node2,rst);
+    rst
 }
 fn match_x_add_x_mul_const(et_node:u32,et_tree:&mut EtTree) -> Result<bool>{
     let et_symidx_vec = get_symidx_vec(et_node, et_tree);
     let et_nodes = direct_et_child_nodes!(at et_node in et_tree);
-    if node!(at et_node in et_tree).common_eliminated{return Ok(false)}
-    debug_info_blue!("match_x_add_x_mul_const {:?} at {}",et_symidx_vec,et_node);
+    if node!(at et_node in et_tree).common_eliminated{
+        debug_info_blue!("common eliminated so ignored at {et_node}");
+        return Ok(false)
+    }
+    debug_info_blue!("try match_x_add_x_mul_const {:?} at {}",et_symidx_vec,et_node);
     assert!(et_symidx_vec.len()==2);
     let (l,r) = (&et_symidx_vec[0],&et_symidx_vec[1]);
     let (l_node,r_node) = (et_nodes[0],et_nodes[1]);
     let (l_et_ty,r_et_ty) = (&node!(at l_node in et_tree).et_node_type, &node!(at r_node in et_tree).et_node_type);
     let (sym_node1,mul_op_node) = match (l,r){
         (l,r)if matches!(r_et_ty,EtNodeType::Operator { op:ExprOp::Mul, ast_node, text, op_symidx }) => {
-            (et_nodes[0],et_nodes[1])
+            (l_node,r_node)
         }
         (l,r)if matches!(l_et_ty,EtNodeType::Operator { op:ExprOp::Mul, ast_node, text, op_symidx }) => {
-            (et_nodes[1],et_nodes[0])
+            (r_node,l_node)
         }
-        _ => return Ok(false)
+        _ => {
+            debug_info_blue!("match failed because have no mul");
+            return Ok(false)}
     };
+    assert!(et_symidx_vec.len()==2);
     let mul_et_nodes = direct_et_child_nodes!(at mul_op_node in et_tree );
     let et_mul_symidx_vec = get_symidx_vec(mul_op_node, et_tree);
-    let (mul_l,mul_r) = if let (Some(l),Some(r)) = (&et_mul_symidx_vec[0],&et_mul_symidx_vec[1]){ (l,r) }else { return Ok(false) };
 
     let (mul_l_node,mul_r_node) = (mul_et_nodes[0],mul_et_nodes[1]);
     let (mul_l_et_ty,mul_r_et_ty) = (&node!(at mul_l_node in et_tree).et_node_type, &node!(at mul_r_node in et_tree).et_node_type);
-    let (sym_node2,literal_node,literal_symidx) = match (mul_l,mul_r){
-        (l,r) if (matches!(mul_l_et_ty,EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use })&&
-            matches!(mul_r_et_ty,EtNodeType::Literal { literal_symidx, ast_node, text })) => {
-            (mul_l_node,mul_r_node,mul_r)
-        }
-        (l,r) if (matches!(mul_l_et_ty,EtNodeType::Operator { op:ExprOp::ArrayIndex, ast_node, text, op_symidx })&&
-            matches!(mul_r_et_ty,EtNodeType::Literal { literal_symidx, ast_node, text })) => {
-            (mul_l_node,mul_r_node,mul_r)
-        }
-        (l,r) if (matches!(mul_l_et_ty,EtNodeType::Literal { literal_symidx, ast_node, text })&&
-            matches!(mul_r_et_ty,EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use })) => {
-            (mul_r_node,mul_l_node,mul_l)
-        }
-        _ => return Ok(false)
+    let (sym_node2,literal_node,literal_symidx) = match (mul_l_et_ty,mul_r_et_ty){
+        (EtNodeType::Operator { op, ast_node, text, op_symidx }, 
+            EtNodeType::Literal { literal_symidx, ast_node:_, text:_}) => {
+            (mul_l_node,mul_r_node,literal_symidx.clone())
+        },
+        (EtNodeType::Literal { literal_symidx, ast_node, text }, 
+            EtNodeType::Operator { op, ast_node:_, text:_, op_symidx }) => {
+            (mul_l_node,mul_r_node,literal_symidx.clone())
+        },
+        (EtNodeType::Literal { literal_symidx, ast_node, text },
+             EtNodeType::Symbol { sym_idx, ast_node:_, text:_, decldef_def_or_use }) => {
+            (mul_r_node,mul_l_node,literal_symidx.clone())
+        },
+        (EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use }, 
+            EtNodeType::Literal { literal_symidx, ast_node:_, text:_ }) => {
+            (mul_l_node,mul_r_node,literal_symidx.clone())
+        },
+        _ => {
+            debug_info_blue!("matched failed because find no literal l:{} r:{}",mul_l_node,mul_r_node);
+            return Ok(false)}
     };
     if hash_equal(sym_node1, sym_node2, et_tree){
         let et_parent_node = direct_et_parent_node!(at et_node in et_tree );
@@ -249,7 +262,7 @@ fn match_x_add_x_mul_const(et_node:u32,et_tree:&mut EtTree) -> Result<bool>{
         let et_node_edge_parent2cur = et_tree.find_edge(NodeIndex::new(et_parent_node as usize), NodeIndex::new(et_node as usize)).unwrap();
         et_tree.edge_weight_mut(et_node_edge_parent2cur).unwrap().et_edge_type = EtEdgeType::Deleted;
         add_edge!({EtEdgeType::Direct.into()} from et_parent_node to  mul_op_node in et_tree);
-        let literal_plus_1 = (Value::from_symidx(literal_symidx)? +Value::new_i32(1))?.to_symidx()?;
+        let literal_plus_1 = (Value::from_symidx(&literal_symidx)? +Value::new_i32(1))?.to_symidx()?;
         debug_info_red!("{:?} at et_node {}",literal_plus_1,literal_node);
         node_mut!(at literal_node in et_tree).replace_symidx(literal_plus_1)?;
         node_mut!(at et_node in et_tree).common_eliminated = true;
@@ -337,6 +350,7 @@ fn match_x_div_1(et_node:u32,et_tree:&mut EtTree) -> bool{
 /// replace all the const symbol with its cont value in symtab
 fn recursive_replace_const_symbol(et_tree:&mut EtTree,et_node:u32,symtab:&SymTab,mut scope_node:u32, scope_tree:&ScopeTree) -> Result<()>{
     let dfs_et_nodes = dfs(et_tree, et_node);
+    debug_info_red!("dfs_et_nodes successfully");
     for et_node in dfs_et_nodes{
         // debug_info_green!("visit {}",et_node);
         match &node_mut!(at et_node in et_tree).et_node_type{
@@ -371,14 +385,14 @@ fn recursive_replace_const_symbol(et_tree:&mut EtTree,et_node:u32,symtab:&SymTab
 /// 本函数用于把et_tree中的常量表达式计算出并替换掉
 /// 注意: 替换后,et_tree中的et_node的et_naked_node字段会被替换掉
 pub fn compress_et(et_tree:&mut EtTree, et_sep_node:u32, symtab:&SymTab, scope_node:u32, scope_tree:&ScopeTree) -> Result<()> {
-    debug_info_blue!("exec compress_et on {}",et_sep_node);
+    debug_info_red!("exec compress_et on {}",et_sep_node);
     recursive_replace_const_symbol(et_tree, et_sep_node, symtab, scope_node, scope_tree)?;
     eval_et(et_tree, et_sep_node);
     let dfs_nodes = dfs_with_predicate(&et_tree, et_sep_node, |e|!e.weight().et_edge_type.is_deleted());
-    // for et_node in direct_et_child_nodes!(at et_sep_node in et_tree ){
-    //     debug_info_blue!("hash expr eliminate on {}",et_node);
-    //     hash_expr_elimination(et_node, et_tree);
-    // }
+    for et_node in direct_et_child_nodes!(at et_sep_node in et_tree ){
+        debug_info_blue!("hash expr eliminate on {}",et_node);
+        hash_expr_elimination(et_node, et_tree);
+    }
     for et_node in dfs_nodes{
         reducation(et_node, et_tree);
     }
@@ -394,7 +408,7 @@ pub fn hash_expr_elimination(et_node:u32,et_tree:&mut EtTree){
 }
 pub fn _common_expr_elimination_by_hash(et_node:u32,et_tree:&mut EtTree, map:&mut HashMap<isize,u32>){
     // map hash into et_node
-    debug_info_blue!("et_ndoe:::::: {}",et_node);
+    // debug_info_blue!("et_ndoe:::::: {}",et_node);
     et_tree.update_hash(et_node);
     let parent_et_node = direct_et_parent_node!(at et_node in et_tree );
     let &hash = node!(at et_node in et_tree).hash.as_ref().unwrap();
@@ -408,7 +422,7 @@ pub fn _common_expr_elimination_by_hash(et_node:u32,et_tree:&mut EtTree, map:&mu
     }else {
         if can_eliminate_et_node(et_node, et_tree){
             map.insert(hash, et_node);
-            debug_info_blue!("after insert map {:?}",map);
+            // debug_info_blue!("after insert map {:?}",map);
         }
     }
     for child_node in direct_et_child_nodes!(at et_node in et_tree ){

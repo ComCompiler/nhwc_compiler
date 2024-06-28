@@ -13,9 +13,10 @@ pub struct AstNode {
     pub node_index:u32,
     pub text:String,
     pub is_terminal:bool,
+    pub child_vec:Vec<u32>,
 }
 impl AstNode {
-    pub fn new(rule_id:usize, text:String, is_terminal:bool) -> Self { Self { rule_id, node_index:0, text, is_terminal } }
+    pub fn new(rule_id:usize, text:String, is_terminal:bool) -> Self { Self { rule_id, node_index:0, text, is_terminal, child_vec: vec![] } }
 }
 
 impl Debug for AstNode {

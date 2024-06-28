@@ -1,20 +1,12 @@
-use crate::{add_symbol, debug_info_red, direct_child_nodes, node, node_mut, toolkit::{cfg_node::{CfgGraph, CFG_ROOT}, context::NhwcCtx, mem_layout::{self, MemLayout}, nhwc_instr::{InstrSlab, NhwcInstr}, pass_manager::Pass, scope_node::ST_ROOT, symbol::Symbol, symtab::{SymIdx, SymTab}}};
+use crate::{add_symbol, debug_info_red, direct_child_nodes, node, node_mut, reg_field_for_struct, toolkit::{cfg_node::{CfgGraph, CFG_ROOT}, context::NhwcCtx, mem_layout::{self, MemLayout}, nhwc_instr::{InstrSlab, NhwcInstr}, pass_manager::Pass, scope_node::ST_ROOT, symbol::Symbol, symtab::{SymIdx, SymTab}}};
 use anyhow::*;
+use itertools::Itertools;
 use crate::toolkit::field::Type;
 use lazy_static::lazy_static;
 use crate::instr;
-/// 定义额外的信息，这样我们就可以把 add_field 宏加入到符号表或者任何实现了 Fields trait 的地方
-/// 任何一个Pass 都有一个pass_run函数 来进行这个pass 相关的工作，比如说对于 SSAPass 我们要对 一个BasicBlock 中的ExprTree做出转换。
-/// 因为实际上 一个 ExprTree 最终会对应一个BasicBlock。
-/// 可能会有人问，那我们为什么还要生成 nhwc_ir ？ 因为 nhwc_ir 有如下优点
-/// 1. 便于debug，到时候这个pass 写完生成这个 cfg 对应的 llvm_ir 我就能更清楚的知道我们到底做了哪些更改
-/// 2. nhwc_ir 是线性的结构，而 汇编语言也是线性的结构 ，这样就可以 从 nhwc_ir 转换成 汇编代码了
-///
-///
-///
-/// 总上，pass 的主要操作对象是 每个basic block 的expr_tree以及 cfg node。这点我们大概不会变
-/// 这个结构体，用于存储与Pass 相关的数据
-///
+reg_field_for_struct!{Symbol {
+    STACK_PASS_ARGS:Vec<(usize,SymIdx)>,
+} with_fields fields}
 #[derive(Debug)]
 pub struct MemAllocPass {}
 impl MemAllocPass {
@@ -38,17 +30,17 @@ impl Pass for MemAllocPass {
             let (reg_args,overflowed_args) = {
                 let mut gpr_cnt = 0 ; let mut fpu_cnt = 0 ;
                 let mut reg_args = vec![]; let mut overflowed_args = vec![];
-                for symidx in &arg_symidx_vec{
+                for (idx,symidx) in arg_symidx_vec.iter().enumerate(){
                     if symtab.get(symidx)?.get_type()?.is_f_32(){
                         if fpu_cnt >= 8{
-                            overflowed_args.push(symidx);
+                            overflowed_args.push((idx,symidx.clone()));
                         }else{
                             reg_args.push(symidx)
                         }
                         fpu_cnt +=1;
                     }else {
                         if gpr_cnt >= 8{
-                            overflowed_args.push(symidx);
+                            overflowed_args.push((idx,symidx.clone()));
                         }else{
                             reg_args.push(symidx)
                         }
@@ -58,8 +50,10 @@ impl Pass for MemAllocPass {
                 (reg_args,overflowed_args)
             };
             
+            
             node_mut!(at cfg_entry in cfg_graph).add_mem_layout(MemLayout::new());
-            for arg in overflowed_args{
+            //  insert overflowed_args to mem_layout before ra and s0
+            for (idx,arg) in &overflowed_args{
                 alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &arg.to_src_symidx())?;
             }
             alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &ra_symidx)?;
@@ -69,10 +63,8 @@ impl Pass for MemAllocPass {
             }
             for &instr in node!(at cfg_entry in cfg_graph).instrs.clone().iter(){
                 match &instr!(at instr in instr_slab)?.instr_type{
-                    crate::toolkit::nhwc_instr::NhwcInstrType::DefineFunc { func_symidx: _, ret_symidx: _, args } => {
-                        for arg in args{
-                            
-                        }
+                    crate::toolkit::nhwc_instr::NhwcInstrType::DefineFunc { func_symidx, ret_symidx: _, args } => {
+                        symtab.get_mut(func_symidx)?.add_stack_pass_args(overflowed_args.clone())
                     }
                     crate::toolkit::nhwc_instr::NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
                         alloc_stack_mem_for_cfg_entry(cfg_graph, cfg_entry, symtab, &var_symidx.to_src_symidx())?;

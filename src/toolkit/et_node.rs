@@ -7,7 +7,8 @@ use std::hash::{DefaultHasher, Hash, Hasher};
 use std::{mem, u32};
 
 use super::ast_node::AstTree;
-use super::field::Fields;
+use super::etc::dfs_with_predicate;
+use super::field::{Fields, Type};
 use super::symtab::SymIdx;
 use crate::toolkit::dot::Config;
 use crate::toolkit::etc::generate_png_by_graph;
@@ -88,8 +89,9 @@ impl EtNode{
 }
 #[derive(Clone)]
 pub struct EtNode {
+    dims:Option<Vec<Option<SymIdx>>>,
+    ty:Option<Type>,
     pub et_node_type:EtNodeType,
-    pub info:Fields,
     pub hash:Option<isize>,
     pub calculated_symidx: Option<Option<SymIdx>>,
     pub et_ret_symidx_vec: Option<Vec<SymIdx>>,
@@ -99,6 +101,7 @@ pub trait EtHash{
     fn update_hash(&mut self,et_node:u32) ;
     fn deprecate_hash(&mut self,et_node:u32);
     fn lazy_delete(&mut self,et_node:u32);
+    fn _update_hash(&mut self,et_node:u32);
 }
 const ET_HASH_MODULUS:isize =  10000000;
 impl EtHash for EtTree{
@@ -108,15 +111,8 @@ impl EtHash for EtTree{
     fn lazy_delete(&mut self,et_node:u32) {
         node_mut!(at et_node in self).common_eliminated = true;
     }
-    /// you should deprecate hash if you want to update it at second time
-    fn update_hash(&mut self,et_node:u32) {
-        // if node!(at et_node in self).hash.is_some() || node!(at et_node in self).common_eliminated{
-        //     return 
-        // }
+    fn _update_hash(&mut self,et_node:u32){
         let child_nodes = direct_child_nodes!(at et_node in self with_predicate {|e| !e.weight().et_edge_type.is_deleted()});
-        for &child_node in &child_nodes{
-            self.update_hash(child_node);
-        }
         match &node!(at et_node in self).et_node_type{
             EtNodeType::Operator { op, ast_node, text, op_symidx } => {
                 match op{
@@ -323,6 +319,17 @@ impl EtHash for EtTree{
                 // do nothing because sep node don't need to hash 
             },
         }
+
+    }
+    /// you should deprecate hash if you want to update it at second time
+    fn update_hash(&mut self,et_node:u32) {
+        // if node!(at et_node in self).hash.is_some() || node!(at et_node in self).common_eliminated{
+        //     return 
+        // }
+        let dfs_nodes = dfs_with_predicate(self, et_node,{|e| !e.weight().et_edge_type.is_deleted()});
+        for &child_node in dfs_nodes.iter().rev(){
+            self._update_hash(child_node);
+        }
     }
 }
 
@@ -415,7 +422,7 @@ impl Debug for ExprOp {
 }
 impl From<EtNodeType> for EtNode{
     fn from(et_node_type: EtNodeType) -> Self {
-        Self { et_node_type, info: Fields::new(), hash: None, calculated_symidx: None, et_ret_symidx_vec: None ,common_eliminated:false}
+        Self { et_node_type, hash: None, calculated_symidx: None, et_ret_symidx_vec: None ,common_eliminated:false, dims: None, ty: None }
     }
 }
 
@@ -538,10 +545,18 @@ impl Debug for DeclOrDefOrUse {
 }
 
 impl Debug for EtNode {
-    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{:?} {:?} hash:{:?} {}", self.et_node_type, self.info, self.hash, if self.common_eliminated{"eliminated"}else{""}) }
+    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{:?} ty {:?} dims {:?} hash:{:?} {}", self.et_node_type, self.dims,self.ty, self.hash, if self.common_eliminated{"eliminated"}else{""}) }
 }
 
 impl EtNode {
+    pub fn get_type(&self) -> Result<&Type>{ if self.ty.is_none(){ return Err(anyhow!("have no ty field")) }else { Ok(self.ty.as_ref().unwrap()) }}
+    pub fn get_mut_type(&mut self) -> Result<&mut Type>{ if self.ty.is_none(){ return Err(anyhow!("have no ty field")) }else { Ok(self.ty.as_mut().unwrap()) }}
+    pub fn add_type(&mut self, ty:Type) {self.ty = Some(ty)}
+    pub fn get_dims(&self) -> Result<&Vec<Option<SymIdx>>>{ if self.dims.is_none(){ return Err(anyhow!("have no dims field")) }else { Ok(self.dims.as_ref().unwrap()) }}
+    pub fn get_mut_dims(&mut self) -> Result<&mut Vec<Option<SymIdx>>>{ if self.dims.is_none(){ return Err(anyhow!("have no dims field")) }else { Ok(self.dims.as_mut().unwrap()) }}
+    pub fn add_dims(&mut self,dims:Vec<Option<SymIdx>>) {self.dims = Some(dims)}
+    pub fn has_dims(&self) -> bool {self.dims.is_some()}
+    pub fn has_type(&self) -> bool {self.ty.is_some()}
     pub fn load_ast_node_text(&mut self, ast_tree:&AstTree) -> Result<()> { self.et_node_type.load_ast_node_text(ast_tree) }
     pub fn name_text(&self) -> String{
         match &self.et_node_type{

@@ -98,6 +98,12 @@ macro_rules! find_nodes {
             nodes
         }
     };
+    (term at $node:ident in $ast_tree:ident iter_reversed) => {
+        {
+            let iter = crate::toolkit::ast_node::find_neighbors_term_ast($ast_tree,$node,None);
+            iter
+        }
+    };
     (rule $($id:ident)then+ finally $fin_id:ident at $node:ident in $ast_tree:ident) => {
         {
             let new_node = $node;
@@ -268,6 +274,10 @@ macro_rules! incoming_edge_weight {
 
 #[macro_export]
 macro_rules! direct_child_nodes {
+    (at $node:ident in $graph:ident iter_reversed) => {{
+        let iter = $graph.neighbors(petgraph::matrix_graph::NodeIndex::from($node)).map(|x| x.index() as u32);
+        iter
+    }};
     (at $node:ident in $graph:ident) => {{
         let iter = $graph.neighbors(petgraph::matrix_graph::NodeIndex::from($node)).map(|x| x.index() as u32);
         let mut nodes:Vec<u32> = iter.collect();
