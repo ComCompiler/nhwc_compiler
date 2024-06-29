@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use super::{et_node::{DeclOrDefOrUse, EtEdge, EtHash, EtNode, EtNodeType, EtTree, ExprOp}, etc::{self, dfs}, field::Value, scope_node::ScopeTree, symtab::SymTab};
-use crate::{add_edge, add_node_with_edge, debug_info_blue, debug_info_green, debug_info_red, direct_child_node, direct_child_nodes, direct_parent_node, node, node_mut, toolkit::{dot::Config, et_node::EtEdgeType, etc::{dfs_with_predicate, generate_png_by_graph, generate_png_by_graph_multi_tasks}, scope_node::ST_ROOT, symtab::SymIdx}};
+use crate::{add_edge, add_node_with_edge, debug_info_blue, debug_info_green, debug_info_red, direct_child_node, direct_child_nodes, direct_parent_node, node, node_mut, toolkit::{dot::Config, et_node::EtEdgeType, etc::{dfs_with_predicate, generate_png_by_graph, generate_png_by_graph_multi_tasks}, gen_cfg::AST_ROOT, scope_node::ST_ROOT, symtab::SymIdx}};
 use anyhow::Result;
 use anyhow::anyhow;
 use itertools::Itertools;
@@ -36,7 +36,6 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
 
         EtNodeType::Operator { ast_node: _, text: _, op, op_symidx } => {
             let et_nodes = direct_et_child_nodes!(at et_node in et_tree); //里面的u32是节点编号
-            let et_parent_node = direct_et_parent_node!(at et_node in et_tree);
             // whether return None
             let mut ret_flag = false;
             let mut et_ret_symidx_vec = vec![];
@@ -49,11 +48,14 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
                         let op_symidx = eval_et(et_tree, et_child_node);
                         match op_symidx{
                             Some(const_symidx) => {
-                                let et_node_added_struct = EtNodeType::new_literal(0, const_symidx.clone()).into();
-                                let et_node_edge_to_remove = et_tree.find_edge(NodeIndex::new(et_node as usize), NodeIndex::new(et_child_node as usize)).unwrap();
-                                et_tree.remove_edge(et_node_edge_to_remove);
-                                let et_node_added = add_node_with_edge!({et_node_added_struct} with_edge {EtEdgeType::Direct.into()} from et_node in et_tree);
-                                add_edge!({EtEdgeType::Deleted.into()} from et_node_added to et_child_node in et_tree);
+                                let const_et_node_struct = EtNodeType::new_literal(AST_ROOT, const_symidx.clone()).into();
+                                node_mut!(at et_child_node in et_tree).et_node_type = const_et_node_struct;
+
+                                for grandson_node in direct_et_child_nodes!(at et_child_node in et_tree){
+                                    let edge = et_tree.find_edge(node_index(et_child_node as usize), node_index(grandson_node as usize)).unwrap();
+                                    *et_tree.edge_weight_mut(edge).unwrap() = EtEdgeType::Deleted.into();
+                                }
+
                                 // add_edge!(from et_no)
                                 et_ret_symidx_vec.push(const_symidx);
                             },
@@ -396,7 +398,7 @@ pub fn compress_et(et_tree:&mut EtTree, et_sep_node:u32, symtab:&SymTab, scope_n
     for et_node in dfs_nodes{
         reducation(et_node, et_tree);
     }
-    // eval_et(et_tree, et_node);
+    // // eval_et(et_tree, et_node);
     Ok(())
 }
 
@@ -545,7 +547,7 @@ impl ExprOp{
             ExprOp::BitwiseAnd => (Value::from_symidx( &vec[0])?&Value::from_symidx( &vec[1])?)?,
             // ExprOp::BitwiseXor => (Value::from_symidx( &vec[0])?^Value::from_symidx( &vec[1])?)?,
             ExprOp::BitwiseNot => (!Value::from_symidx( &vec[0])?)?, //一元运算符
-            ExprOp::Eq => (Value::from_symidx(&vec[0])?.logical_or(&Value::from_symidx( &vec[1])?))?,
+            // ExprOp::Eq => ((Value::from_symidx(&vec[0])?.less_than_or_equal((&Value::from_symidx( &vec[1])?)))?,
             ExprOp::NEq => (Value::from_symidx( &vec[0])?.logical_neq(&Value::from_symidx( &vec[1])?))?,
             ExprOp::Less => (Value::from_symidx( &vec[0])?.less_than(&Value::from_symidx( &vec[1])?))?,
             ExprOp::Greater => (Value::from_symidx( &vec[0])?.greater_than(&Value::from_symidx( &vec[1])?))?,

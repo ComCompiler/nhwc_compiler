@@ -81,7 +81,7 @@ pub fn add_literal_to_reg(asm_sect:&mut AsmSection,rd:Register,rs:Register, regt
         asm_sect.asm(Arithmetic::new_addi(rd, rs, Imm::from_offset(offset)).into());
     }else{
         // offset is large, so we use a intermediate reg 
-        let offset_reg = regtab.find_and_occupy_reg(&SymIdx::from(offset), &Type::I32, symtab, asm_sect, &mut &mut default_store,&mut default_load)?;
+        let offset_reg = regtab.find_and_occupy_reg(&SymIdx::from(offset), &Type::I32, symtab, asm_sect, &mut default_store,&mut default_load)?;
         asm_sect.asm(PseudoInstr::new_li(offset_reg.clone(), Imm::new_literal_isize(offset)).into());
         asm_sect.asm(Arithmetic::new_add(rd, offset_reg.clone(),rs).into());
         regtab.free_reg(offset_reg,asm_sect)?;
@@ -240,51 +240,48 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         // s4 * element size 
                         // put array offset to s5
                         // finally plus array offset 
-                        let ptr_reg = regtab.find_and_occupy_reg(lhs,&Type::I32, symtab, asm_sect, &mut default_store, 
-                            &mut |symidx,ptr_reg,symtab,asm_sect,regtab|{
-                            _load_sym_or_imm(asm_sect, &SymIdx::from_str("0"), ptr_reg.clone(), regtab, symtab)?;
-                            for (idx,weight) in idx_vec.iter().zip(array_ty.get_array_dim_weight_vec()?.iter()){
-                                let idx = idx.as_ref().unwrap();
-                                let weight_reg = regtab.find_and_occupy_reg(weight, &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let idx_reg = regtab.find_and_occupy_reg(idx,&Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let temp_idx_mul_weight_reg = regtab.find_and_anonymous_occupy(&SymIdx::from_str("temp_idx_mul_weight_reg"),&Type::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
-                                asm_sect.asm(Arithmetic::new_mul(temp_idx_mul_weight_reg.clone(), weight_reg.clone(), idx_reg.clone()).into());
-                                regtab.free_reg(weight_reg,asm_sect)?;
-                                regtab.free_reg(idx_reg,asm_sect)?;
-                                asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(),temp_idx_mul_weight_reg.clone() ).into());
-                                regtab.free_reg(temp_idx_mul_weight_reg,asm_sect)?;
-                            }
-                            let ele_size = array_ty.get_ele_size()?;
-                            asm_sect.asm(Shifts::new_slli_from_multiple(ptr_reg.clone(), ptr_reg.clone(), ele_size)?.into());
-                            // 2 situations : 1. array is global  2. array is local to stack
-                            match symtab.get(array_symidx)?.has_is_global() &&*symtab.get(array_symidx)?.get_is_global()?{
-                                true => {
-                                    let addr_reg = regtab.find_and_occupy_reg(&array_symidx,&Type::Ptr64 { ty: Box::new(Type::Void) }, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                    asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(), addr_reg.clone()).into());
-                                    regtab.free_reg(addr_reg,asm_sect)?;
-                                },
-                                false => {
-                                    // only one situations 
-                                    // you should find it in regtab or mem 
-                                    // judge whether ptr and pointed array is in same function 
-                                    match array_ty{
-                                        Type::Ptr64 { ty } => {
-                                            let addr_reg = regtab.find_and_occupy_reg(&array_symidx, &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                            asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(),addr_reg.clone()).into());
-                                            regtab.free_reg(addr_reg, asm_sect)?;
-                                        },
-                                        Type::Array { dims, ele_ty } => {
-                                            asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(),Register::SP).into());
-                                            let &offset2sp = symtab.get(array_symidx)?.get_mem_offset2sp()?;
-                                            add_literal_to_reg(asm_sect, ptr_reg.clone(), ptr_reg.clone(), regtab, symtab,offset2sp )?;
-                                        },
-                                        _ => panic!()
-                                    }
+                        let ptr_reg = regtab.find_and_occupy_reg(lhs,&Type::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                        _load_sym_or_imm(asm_sect, &SymIdx::from_str("0"), ptr_reg.clone(), regtab, symtab)?;
+                        for (idx,weight) in idx_vec.iter().zip(array_ty.get_array_dim_weight_vec()?.iter()){
+                            let idx = idx.as_ref().unwrap();
+                            let weight_reg = regtab.find_and_occupy_reg(weight, &Type::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                            let idx_reg = regtab.find_and_occupy_reg(idx,&Type::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                            let temp_idx_mul_weight_reg = regtab.find_and_anonymous_occupy(&SymIdx::from_str("temp_idx_mul_weight_reg"),&Type::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                            asm_sect.asm(Arithmetic::new_mul(temp_idx_mul_weight_reg.clone(), weight_reg.clone(), idx_reg.clone()).into());
+                            regtab.free_reg(weight_reg,asm_sect)?;
+                            regtab.free_reg(idx_reg,asm_sect)?;
+                            asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(),temp_idx_mul_weight_reg.clone() ).into());
+                            regtab.free_reg(temp_idx_mul_weight_reg,asm_sect)?;
+                        }
+                        let ele_size = array_ty.get_ele_size()?;
+                        asm_sect.asm(Shifts::new_slli_from_multiple(ptr_reg.clone(), ptr_reg.clone(), ele_size)?.into());
+                        // 2 situations : 1. array is global  2. array is local to stack
+                        match symtab.get(array_symidx)?.has_is_global() &&*symtab.get(array_symidx)?.get_is_global()?{
+                            true => {
+                                let addr_reg = regtab.find_and_occupy_reg(&array_symidx,&Type::Ptr64 { ty: Box::new(Type::Void) }, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(), addr_reg.clone()).into());
+                                regtab.free_reg(addr_reg,asm_sect)?;
+                            },
+                            false => {
+                                // only one situations 
+                                // you should find it in regtab or mem 
+                                // judge whether ptr and pointed array is in same function 
+                                match array_ty{
+                                    Type::Ptr64 { ty } => {
+                                        let addr_reg = regtab.find_and_occupy_reg(&array_symidx, &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                        asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(),addr_reg.clone()).into());
+                                        regtab.free_reg(addr_reg, asm_sect)?;
+                                    },
+                                    Type::Array { dims, ele_ty } => {
+                                        asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(),Register::SP).into());
+                                        let &offset2sp = symtab.get(array_symidx)?.get_mem_offset2sp()?;
+                                        add_literal_to_reg(asm_sect, ptr_reg.clone(), ptr_reg.clone(), regtab, symtab,offset2sp )?;
+                                    },
+                                    _ => panic!()
+                                }
 
-                                },
-                            }
-                            Ok(())
-                        })?;
+                            },
+                        }
                         regtab.free_reg(ptr_reg,asm_sect)?;
                     },
                     NhwcInstrType::Arith { lhs, rhs } => {
@@ -695,35 +692,24 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         match op{
                             super::nhwc_instr::Trans::Fptosi { float_symidx } => {
                                 let val_reg =regtab.find_and_occupy_reg(float_symidx, &Type::F32, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg = regtab.find_and_occupy_reg(lhs, &Type::I32, symtab, asm_sect, &mut default_store, 
-                                    &mut |symidx,rst_reg,symtab,asm_sect,regtab|{
-                                        asm_sect.asm(Trans::new_fcvt_w_s(rst_reg.clone(),val_reg.clone()).into());
-                                        Ok(())
-                                    }
-                                )?;
+                                let rst_reg = regtab.find_and_occupy_reg(lhs, &Type::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                asm_sect.asm(Trans::new_fcvt_w_s(rst_reg.clone(),val_reg.clone()).into());
                                 regtab.free_reg(val_reg,asm_sect)?;
                                 regtab.free_reg(rst_reg,asm_sect)?;
                             },
                             super::nhwc_instr::Trans::Sitofp { int_symidx } => {
                                 let val_reg =regtab.find_and_occupy_reg(int_symidx, &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg = regtab.find_and_occupy_reg(lhs, &Type::F32, symtab, asm_sect, &mut default_store, 
-                                    &mut |symidx,rst_reg,symtab,asm_sect,regtab|{
-                                        asm_sect.asm(Trans::new_fcvt_s_w(rst_reg.clone(),val_reg.clone()).into());
-                                        Ok(())
-                                    }
-                                )?;
+                                let rst_reg = regtab.find_and_occupy_reg(lhs, &Type::F32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                asm_sect.asm(Trans::new_fcvt_s_w(rst_reg.clone(),val_reg.clone()).into());
                                 regtab.free_reg(val_reg,asm_sect)?;
                                 regtab.free_reg(rst_reg,asm_sect)?;
                             },
                             super::nhwc_instr::Trans::Zext { bool_symidx } => {
                                 //b->i
                                 let val_reg =regtab.find_and_occupy_reg(bool_symidx, &Type::I1, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg = regtab.find_and_occupy_reg(lhs, &Type::I1, symtab, asm_sect, &mut default_store, 
-                                    &mut |symidx,rst_reg,symtab,asm_sect,regtab|{
-                                        asm_sect.asm(Logical::new_andi(rst_reg.clone(),val_reg.clone(),Imm::from_offset(1)).into());
-                                        Ok(())
-                                    }
-                                )?;
+                                let rst_reg = regtab.find_and_occupy_reg(lhs, &Type::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                // asm_sect.asm(Logical::new_andi(rst_reg.clone(),val_reg.clone(),Imm::from_offset(1)).into());
+                                asm_sect.asm(PseudoInstr::new_reg_mv(rst_reg.clone(), val_reg.clone()).into());
                                 regtab.free_reg(val_reg,asm_sect)?;
                                 regtab.free_reg(rst_reg,asm_sect)?;
 

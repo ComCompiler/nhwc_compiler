@@ -802,13 +802,13 @@ fn autotrans_logic_type(
             //i32转i1
             //由于除了i1都要转为i1，这里变量名中ltmp指左操作符转换后的临时symidx，rtmp指右操作符
             //处理左操作数，i32转i1
-            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
+            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "i32_to_bool")?;
             //转i1相当于和0进行不等比较，这里调用常数处理函数处理0
             let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
             let i2b_instr = NhwcInstrType::new_icmp(ltmp_type_symidx.clone(), IcmpPlan::Ne, l_symidx.clone(), izero_symidx, Type::I1).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
             //处理右操作数，f32转i1
-            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
+            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "f32_to_bool")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), symtab_graph)?;
             let f2b_instr = NhwcInstrType::new_fcmp(rtmp_type_symidx.clone(), FcmpPlan::One, r_symidx.clone(), fzero_symidx, Type::F32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(f2b_instr, instr_slab)?;
@@ -816,12 +816,12 @@ fn autotrans_logic_type(
         }
         (Type::F32, Type::I32) => {
             //左操作数f32转i1
-            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
+            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "f32_to_bool")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), symtab_graph)?;
             let f2b_instr = NhwcInstrType::new_fcmp(ltmp_type_symidx.clone(), FcmpPlan::One, l_symidx.clone(), fzero_symidx, Type::F32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(f2b_instr, instr_slab)?;
             //右操作数i32转i1
-            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
+            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "i32_to_bool")?;
             let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
             let i2b_instr = NhwcInstrType::new_icmp(rtmp_type_symidx.clone(), IcmpPlan::Ne, r_symidx.clone(), izero_symidx, Type::I32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
@@ -829,7 +829,7 @@ fn autotrans_logic_type(
         }
         (Type::I1, Type::I32) => {
             //处理右操作数i32转i1
-            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
+            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "i32_to_bool")?;
             let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
             let i2b_instr = NhwcInstrType::new_icmp(rtmp_type_symidx.clone(), IcmpPlan::Ne, r_symidx.clone(), izero_symidx, Type::I32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
@@ -837,7 +837,7 @@ fn autotrans_logic_type(
         }
         (Type::I32, Type::I1) => {
             //处理左操作数i32转i1
-            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
+            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "i32_to_bool")?;
             let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
             let i2b_instr = NhwcInstrType::new_icmp(ltmp_type_symidx.clone(), IcmpPlan::Ne, l_symidx.clone(), izero_symidx, Type::I32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
@@ -845,7 +845,7 @@ fn autotrans_logic_type(
         }
         (Type::I1, Type::F32) => {
             //处理右操作数f32转i1
-            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
+            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "f32_to_bool")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), symtab_graph)?;
             let i2b_instr = NhwcInstrType::new_fcmp(rtmp_type_symidx.clone(), FcmpPlan::One, r_symidx.clone(), fzero_symidx, Type::F32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
@@ -853,7 +853,7 @@ fn autotrans_logic_type(
         }
         (Type::F32, Type::I1) => {
             //左操作数f32转i1
-            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
+            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "f32_to_bool")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), symtab_graph)?;
             let i2b_instr = NhwcInstrType::new_fcmp(ltmp_type_symidx.clone(), FcmpPlan::One, l_symidx.clone(), fzero_symidx, Type::F32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
@@ -861,25 +861,25 @@ fn autotrans_logic_type(
         }
         (Type::F32, Type::F32) => {
             //左操作数f32转i1
-            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
+            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "f32_to_bool")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), symtab_graph)?;
             let lf2b_instr = NhwcInstrType::new_fcmp(ltmp_type_symidx.clone(), FcmpPlan::One, l_symidx.clone(), fzero_symidx.clone(), Type::F32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(lf2b_instr, instr_slab)?;
             //右操作数f32转i1
-            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
-            let rf2b_instr = NhwcInstrType::new_fcmp(ltmp_type_symidx.clone(), FcmpPlan::One, r_symidx.clone(), fzero_symidx.clone(), Type::F32).into();
+            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "f32_to_bool")?;
+            let rf2b_instr = NhwcInstrType::new_fcmp(rtmp_type_symidx.clone(), FcmpPlan::One, r_symidx.clone(), fzero_symidx.clone(), Type::F32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(rf2b_instr, instr_slab)?;
             return Ok((ltmp_type_symidx, rtmp_type_symidx));
         }
         (Type::I32, Type::I32) => {
             //左操作数i32转i1
-            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
+            let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "i32_to_bool")?;
             let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
             let li2b_instr = NhwcInstrType::new_icmp(ltmp_type_symidx.clone(), IcmpPlan::Ne, l_symidx.clone(), izero_symidx.clone(), Type::I32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(li2b_instr, instr_slab)?;
             //右操作数i32转i1
-            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "")?;
-            let ri2b_instr = NhwcInstrType::new_icmp(ltmp_type_symidx.clone(), IcmpPlan::Ne, r_symidx.clone(), izero_symidx.clone(), Type::I32).into();
+            let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, symtab_graph,op_et_node,et_tree, "i32_to_bool")?;
+            let ri2b_instr = NhwcInstrType::new_icmp(rtmp_type_symidx.clone(), IcmpPlan::Ne, r_symidx.clone(), izero_symidx.clone(), Type::I32).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(ri2b_instr, instr_slab)?;
             return Ok((ltmp_type_symidx, rtmp_type_symidx));
         }
@@ -2108,27 +2108,27 @@ pub fn get_while_or_for_node_of_cfg_node(cfg_node:u32, cfg_graph:&mut CfgGraph) 
     Err(anyhow!("can't find corresponding while block's while node of the cfg_node {}",cfg_node))
 }
 
-pub fn find_gather_of_branch_downward(cfg_branch_node:u32,cfg_graph:&CfgGraph)-> Result<u32>{
-    let cur_branch_layer_count = 0;
-    recursive_find_gather(cfg_branch_node, cfg_graph, cur_branch_layer_count)
-}
-fn recursive_find_gather(cfg_node:u32,cfg_graph:&CfgGraph, mut cur_branch_layer_count: u32) -> Result<u32>{
-    if node!(at cfg_node in cfg_graph).cfg_node_type.is_gather(){
-        cur_branch_layer_count -= 1;
-    }else if node!(at cfg_node in cfg_graph).cfg_node_type.is_branch(){
-        cur_branch_layer_count += 1;
-    }
-    // 如果 层数 =0 ，那么说明找到了
-    if cur_branch_layer_count == 0{
-        Ok(cfg_node)
-    }else{
-        let mut rst = Err(anyhow!("找不到此 if 对应的gather"));
-        for neighbor in direct_child_nodes!(at cfg_node in cfg_graph){
-            rst = rst.or(recursive_find_gather(neighbor, cfg_graph, cur_branch_layer_count));
-        }
-        rst
-    }
-}
+// pub fn find_gather_of_branch_downward(cfg_branch_node:u32,cfg_graph:&CfgGraph)-> Result<u32>{
+//     let cur_branch_layer_count = 0;
+//     recursive_find_gather(cfg_branch_node, cfg_graph, cur_branch_layer_count)
+// }
+// fn recursive_find_gather(cfg_node:u32,cfg_graph:&CfgGraph, mut cur_branch_layer_count: u32) -> Result<u32>{
+//     if node!(at cfg_node in cfg_graph).cfg_node_type.is_gather(){
+//         cur_branch_layer_count -= 1;
+//     }else if node!(at cfg_node in cfg_graph).cfg_node_type.is_branch(){
+//         cur_branch_layer_count += 1;
+//     }
+//     // 如果 层数 =0 ，那么说明找到了
+//     if cur_branch_layer_count == 0{
+//         Ok(cfg_node)
+//     }else{
+//         let mut rst = Err(anyhow!("找不到此 if 对应的gather"));
+//         for neighbor in direct_child_nodes!(at cfg_node in cfg_graph){
+//             rst = rst.or(recursive_find_gather(neighbor, cfg_graph, cur_branch_layer_count));
+//         }
+//         rst
+//     }
+// }
 pub fn find_branch_of_gather_upward(cfg_branch_node:u32,cfg_graph:&CfgGraph)-> Result<u32>{
     let cur_branch_layer_count = 0;
     _recursive_find_branch(cfg_branch_node, cfg_graph, cur_branch_layer_count)
