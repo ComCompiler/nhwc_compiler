@@ -16,7 +16,7 @@ if [ $# -eq 0 ]; then
             # sed -i 's/main/_start/g' $filename
             # 执行编译命令，输出到同一目录
             riscv64-linux-gnu-as "$filename" -o "./out/${base_name}.o" 
-            riscv64-linux-gnu-gcc --static "./out/${base_name}.o" -lsysy -L./compiler2022/公开样例与运行时库 -o "./out/${base_name}.elf" -lc
+            riscv64-linux-gnu-gcc --static "./out/${base_name}.o" -lsysy -L./ -o "./out/${base_name}.elf" -lc
             # riscv64-linux-gnu-objcopy -O "./out/${base_name}.elf" "./out/${base_name}.hex"
             # xxd -p -c 4 "./out/${base_name}.bin" "./out/${base_name}.hex"
             echo ans_start:
@@ -35,7 +35,7 @@ else
              # sed -i 's/main/_start/g' $filename
              # 执行编译命令，输出到同一目录
              riscv64-linux-gnu-as "$filename" -o "./out/${base_name}.o" # > ./out/${base_name}.out
-             riscv64-linux-gnu-gcc --static "./out/${base_name}.o" -lsysy -L./compiler2022/公开样例与运行时库 -o "./out/${base_name}.elf" -lc
+             riscv64-linux-gnu-gcc --static "./out/${base_name}.o" -lsysy -L./ -o "./out/${base_name}.elf" -lc
              # riscv64-linux-gnu-objcopy -O "./out/${base_name}.elf" "./out/${base_name}.hex"
              # xxd -p -c 4 "./out/${base_name}.bin" "./out/${base_name}.hex"
              echo ans_start:

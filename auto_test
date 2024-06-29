@@ -1,0 +1,106 @@
+#!/bin/bash
+
+# 使用说明:
+# bash auto_test : 把 sy_path 中所有文件运行一遍
+# bash auto_test ./for_auto_test/00sy/***.sy : 只运行一边这个 sy 文件
+# 本脚本自动将 .in 文件输入（如果有的话）然后输出到 .ours_out 文件夹下，并自动和 .official_out 文件夹中的 .out 进行比对
+# 有 .in，把 .in 文件输入
+# 没 .in，直接运行 .sy 文件
+
+export in_path=./for_auto_test/00in
+export official_path=./for_auto_test/00official_out
+export sy_path=./for_auto_test/00sy
+
+export s_path=./for_auto_test/1s
+export o_path=./for_auto_test/2o
+export elf_path=./for_auto_test/3elf
+export ours_out_path=./for_auto_test/4ours_out
+
+# 定义颜色
+export RED='\033[0;31m'
+export GREEN='\033[0;32m'
+export NC='\033[0m' # 没有颜色
+
+timeout_duration=4s
+
+# 删除指定目录中的所有内容
+rm -rf $elf_path/*
+rm -rf $o_path/*
+rm -rf $ours_out_path/*
+rm -rf $s_path/*
+
+cargo build --release
+
+# 初始化数组
+files_to_compare=()
+
+# 检查是否提供了单个 .sy 文件作为参数
+if [ "$#" -eq 1 ]; then
+    sy_files=("$1")
+else
+    sy_files=($sy_path/*.sy)
+fi
+
+# 遍历指定路径下的所有文件
+for filename in "${sy_files[@]}"; do
+    # 检查是否为文件
+    echo $filename
+    if [ -f "$filename" ] && [[ "$filename" == *.sy ]]; then
+        echo "is_file"
+        # 获取文件的基本名称，没有路径
+        export base_name=$(basename "$filename" .sy)
+        # 执行编译命令，输出到同一目录
+        ./target/release/compiler "$filename" -o "$s_path/${base_name}.s" 2> /dev/null
+        
+        # 使用 gcc 工具链把 .s 文件链接
+        riscv64-linux-gnu-as "$s_path/${base_name}.s" -o "$o_path/${base_name}.o"
+        riscv64-linux-gnu-gcc --static "$o_path/${base_name}.o" -lsysy -L./ -o "$elf_path/${base_name}.elf" -lc
+
+        # 检查 ELF 文件是否生成
+        if [ ! -s "$elf_path/${base_name}.elf" ]; then
+            echo "Failed to generate ELF file: $elf_path/${base_name}.elf"
+            exit 1
+        fi
+
+        # 如果有对应的 .in 文件，运行 .elf 文件，并将结果输出到 ours_out
+
+        timeout $timeout_duration bash -c '
+        if [ -f "$in_path/${base_name}.in" ]; then
+            qemu-riscv64-static "$elf_path/${base_name}.elf" < "$in_path/${base_name}.in" > "$ours_out_path/${base_name}.out" 2>&1 
+            echo "$?" >> "$ours_out_path/${base_name}.out"
+        else
+            qemu-riscv64-static "$elf_path/${base_name}.elf" > "$ours_out_path/${base_name}.out" 2>&1 
+            echo "$?" >> "$ours_out_path/${base_name}.out"
+        fi
+        # 删除.out文件的第一行 (时间记录)
+        sed -i '1d' "$ours_out_path/${base_name}.out"
+        # 添加需要比对的文件路径到数组中
+
+        if diff -wB "$ours_out_path/${base_name}.out" "$official_path/${base_name}.out" > /dev/null; then
+            echo -e "${GREEN}${base_name} 过了${NC}"
+        else
+            diff -wB "$ours_out_path/${base_name}.out" "$official_path/${base_name}.out" -y | head -n 10
+            echo -e "${RED}${base_name} 结果不一样!${NC}"
+        fi
+        '
+        timeout_status=$?
+        if [ $timeout_status -eq 124 ]; then
+            echo "Timeout occurred: Code block did not complete within $timeout_duration seconds"
+        else
+            echo
+        fi
+
+        files_to_compare+=("$ours_out_path/${base_name}.out $official_path/${base_name}.out")
+    fi
+done
+
+# 执行所有文件的比对
+for files in "${files_to_compare[@]}"; do
+    # 拆分文件路径
+    IFS=' ' read -r ours_file official_file <<< "$files"
+    if diff -wB "$ours_file" "$official_file" > /dev/null; then
+        echo -e "${GREEN}$(basename "$ours_file") 过了${NC}"
+    else
+        echo -e "${RED}$(basename "$ours_file") 结果不一样!${NC}"
+    fi
+done

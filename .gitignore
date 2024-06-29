@@ -7,4 +7,4 @@
 *.java
 */.*/*
 *.pdf
-out/*
+out/
