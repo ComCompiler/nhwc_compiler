@@ -1,31 +1,766 @@
-# input: "./compiler2022/公开样例与运行时库/functional/01_var_defn2.sy"
-      global i32 b_0 
-      global i32 a_0 
-      store 3_0:i32 *a_0:ptr->i32 
-      store 5_0:i32 *b_0:ptr->i32 
+# input: "./compiler2022/公开样例与运行时库/functional/98_matrix_mul.sy"
+      global i32 N_0 
+      global i32 L_0 
+      global i32 M_0 
       global Fn[]->getint_ret_0 getint_0 
       global Fn[]->getch_ret_0 getch_0 
-      global Fn[zz_array_5]->getarray_ret_0 getarray_0 
+      global Fn[zz_array_6]->getarray_ret_0 getarray_0 
       global Fn[]->getfloat_ret_0 getfloat_0 
-      global Fn[zz_array_7]->getfarray_ret_0 getfarray_0 
-      global Fn[zz_int_8]->putint_ret_0 putint_0 
-      global Fn[zz_ch_9]->putch_ret_0 putch_0 
-      global Fn[x_10, zz_array_10]->putarray_ret_0 putarray_0 
-      global Fn[zz_float_11]->putfloat_ret_0 putfloat_0 
-      global Fn[zz_len_12, zz_farray_12]->putfarray_ret_0 putfarray_0 
+      global Fn[zz_array_8]->getfarray_ret_0 getfarray_0 
+      global Fn[zz_int_9]->putint_ret_0 putint_0 
+      global Fn[zz_ch_10]->putch_ret_0 putch_0 
+      global Fn[x_11, zz_array_11]->putarray_ret_0 putarray_0 
+      global Fn[zz_float_12]->putfloat_ret_0 putfloat_0 
+      global Fn[zz_len_13, zz_farray_13]->putfarray_ret_0 putfarray_0 
       global Fn[]->putf_ret_0 putf_0 
       global Fn[]->starttime_ret_0 starttime_0 
       global Fn[]->stoptime_ret_0 stoptime_0 
-      global Fn[zz_ptr_16, zz_len_16, zz_val_16]->memset_ret_0 memset_0 
-      global Fn[zz_dest_17, zz_ptr_17, zz_len_17]->memcpy_ret_0 memcpy_0 
+      global Fn[zz_ptr_17, zz_val_17, zz_len_17]->memset_ret_0 memset_0 
+      global Fn[zz_dest_18, zz_ptr_18, zz_len_18]->memcpy_ret_0 memcpy_0 
       Define main_0 [] -> main_ret_0 
-              alloc i32 a_19 
-              alloc i32 temp_0_19 
-              alloc i32 temp_1_19 
+              alloc Array:f32:[Some(3_0)] a0_35 
+              alloc Array:f32:[Some(3_0)] a1_35 
+              alloc Array:f32:[Some(3_0)] a2_35 
+              alloc Array:f32:[Some(3_0)] b0_35 
+              alloc Array:f32:[Some(3_0)] b1_35 
+              alloc Array:f32:[Some(3_0)] b2_35 
+              alloc Array:f32:[Some(6_0)] c0_35 
+              alloc Array:f32:[Some(3_0)] c1_35 
+              alloc Array:f32:[Some(3_0)] c2_35 
+              alloc i32 i_35 
+              alloc i32 temp_162_ptr2globl_42 
+              alloc i1 temp_163_cmp_42 
+              alloc ptr->f32 temp_164_index_ptr_44 
+              alloc f32 temp_165__44 
+              alloc ptr->f32 temp_166_index_ptr_44 
+              alloc f32 temp_167__44 
+              alloc ptr->f32 temp_168_index_ptr_44 
+              alloc f32 temp_169__44 
+              alloc ptr->f32 temp_170_index_ptr_44 
+              alloc f32 temp_171__44 
+              alloc ptr->f32 temp_172_index_ptr_44 
+              alloc f32 temp_173__44 
+              alloc ptr->f32 temp_174_index_ptr_44 
+              alloc f32 temp_175__44 
+              alloc i32 temp_176_arithop_44 
+              alloc ptr->f32 temp_177_array_ele_ptr_35 
+              alloc ptr->f32 temp_178_array_ele_ptr_35 
+              alloc ptr->f32 temp_179_array_ele_ptr_35 
+              alloc ptr->f32 temp_180_array_ele_ptr_35 
+              alloc ptr->f32 temp_181_array_ele_ptr_35 
+              alloc ptr->f32 temp_182_array_ele_ptr_35 
+              alloc ptr->f32 temp_183_array_ele_ptr_35 
+              alloc ptr->f32 temp_184_array_ele_ptr_35 
+              alloc ptr->f32 temp_185_array_ele_ptr_35 
+              alloc i32 temp_186_ret_of_mul_35 
+              alloc i32 x_35 
+              alloc i32 temp_187_ptr2globl_54 
+              alloc i1 temp_188_cmp_54 
+              alloc ptr->f32 temp_189_array_ptr_56 
+              alloc f32 temp_190_array_ele_56 
+              alloc i32 temp_191__56 
+              alloc i32 temp_192_arithop_56 
+              alloc i32 temp_193_ptr2globl_63 
+              alloc i1 temp_194_cmp_63 
+              alloc ptr->f32 temp_195_array_ptr_65 
+              alloc f32 temp_196_array_ele_65 
+              alloc i32 temp_197__65 
+              alloc i32 temp_198_arithop_65 
+              alloc i32 temp_199_ptr2globl_72 
+              alloc i1 temp_200_cmp_72 
+              alloc ptr->f32 temp_201_array_ptr_74 
+              alloc f32 temp_202_array_ele_74 
+              alloc i32 temp_203__74 
+              alloc i32 temp_204_arithop_74 
           label L0_0: 
-              a_19 = i32 5_0 
-              new_var temp_0_19:i32 
-              temp_0_19 = load *b_0:ptr->i32 
-              new_var temp_1_19:i32 
-              temp_1_19 = Add i32 a_19, temp_0_19 
-              ret temp_1_19 
+              store 3_0:i32 *N_0:ptr->i32 
+              store 3_0:i32 *M_0:ptr->i32 
+              store 3_0:i32 *L_0:ptr->i32 
+              new_var a0_35:Array:f32:[Some(3_0)] 
+              new_var a1_35:Array:f32:[Some(3_0)] 
+              new_var a2_35:Array:f32:[Some(3_0)] 
+              new_var b0_35:Array:f32:[Some(3_0)] 
+              new_var b1_35:Array:f32:[Some(3_0)] 
+              new_var b2_35:Array:f32:[Some(3_0)] 
+              new_var c0_35:Array:f32:[Some(6_0)] 
+              new_var c1_35:Array:f32:[Some(3_0)] 
+              new_var c2_35:Array:f32:[Some(3_0)] 
+              new_var i_35:i32 
+              i_35 = i32 0_0 
+              jump label: while.head_43 
+          label while.head_43: 
+              new_var temp_162_ptr2globl_42:i32 
+              temp_162_ptr2globl_42 = load *M_0:ptr->i32 
+              new_var temp_163_cmp_42:i1 
+              temp_163_cmp_42 = icmp i32 Slt i_35, temp_162_ptr2globl_42 
+              br i1 temp_163_cmp_42, label while.body_43, label while.exit_43 
+          label while.body_43: 
+              new_var temp_164_index_ptr_44:ptr->f32 
+              temp_164_index_ptr_44 = getelementptr a0_35:Array:f32:[Some(3_0)] [Some(i_35)] 
+              new_var temp_165__44:f32 
+              temp_165__44 = sitofp i32 i_35 to f32 
+              store temp_165__44:f32 temp_164_index_ptr_44:ptr->f32 
+              mu a0_35:588 
+              a0_35 = chi a0_35:588 
+              new_var temp_166_index_ptr_44:ptr->f32 
+              temp_166_index_ptr_44 = getelementptr a1_35:Array:f32:[Some(3_0)] [Some(i_35)] 
+              new_var temp_167__44:f32 
+              temp_167__44 = sitofp i32 i_35 to f32 
+              store temp_167__44:f32 temp_166_index_ptr_44:ptr->f32 
+              mu a1_35:597 
+              a1_35 = chi a1_35:597 
+              new_var temp_168_index_ptr_44:ptr->f32 
+              temp_168_index_ptr_44 = getelementptr a2_35:Array:f32:[Some(3_0)] [Some(i_35)] 
+              new_var temp_169__44:f32 
+              temp_169__44 = sitofp i32 i_35 to f32 
+              store temp_169__44:f32 temp_168_index_ptr_44:ptr->f32 
+              mu a2_35:606 
+              a2_35 = chi a2_35:606 
+              new_var temp_170_index_ptr_44:ptr->f32 
+              temp_170_index_ptr_44 = getelementptr b0_35:Array:f32:[Some(3_0)] [Some(i_35)] 
+              new_var temp_171__44:f32 
+              temp_171__44 = sitofp i32 i_35 to f32 
+              store temp_171__44:f32 temp_170_index_ptr_44:ptr->f32 
+              mu b0_35:615 
+              b0_35 = chi b0_35:615 
+              new_var temp_172_index_ptr_44:ptr->f32 
+              temp_172_index_ptr_44 = getelementptr b1_35:Array:f32:[Some(3_0)] [Some(i_35)] 
+              new_var temp_173__44:f32 
+              temp_173__44 = sitofp i32 i_35 to f32 
+              store temp_173__44:f32 temp_172_index_ptr_44:ptr->f32 
+              mu b1_35:624 
+              b1_35 = chi b1_35:624 
+              new_var temp_174_index_ptr_44:ptr->f32 
+              temp_174_index_ptr_44 = getelementptr b2_35:Array:f32:[Some(3_0)] [Some(i_35)] 
+              new_var temp_175__44:f32 
+              temp_175__44 = sitofp i32 i_35 to f32 
+              store temp_175__44:f32 temp_174_index_ptr_44:ptr->f32 
+              mu b2_35:633 
+              b2_35 = chi b2_35:633 
+              new_var temp_176_arithop_44:i32 
+              temp_176_arithop_44 = Add i32 i_35, 1_0 
+              i_35 = i32 temp_176_arithop_44 
+              jump label: while.head_43 
+          label while.exit_43: 
+              new_var temp_177_array_ele_ptr_35:ptr->f32 
+              temp_177_array_ele_ptr_35 = getelementptr a0_35:Array:f32:[Some(3_0)] [] 
+              new_var temp_178_array_ele_ptr_35:ptr->f32 
+              temp_178_array_ele_ptr_35 = getelementptr a1_35:Array:f32:[Some(3_0)] [] 
+              new_var temp_179_array_ele_ptr_35:ptr->f32 
+              temp_179_array_ele_ptr_35 = getelementptr a2_35:Array:f32:[Some(3_0)] [] 
+              new_var temp_180_array_ele_ptr_35:ptr->f32 
+              temp_180_array_ele_ptr_35 = getelementptr b0_35:Array:f32:[Some(3_0)] [] 
+              new_var temp_181_array_ele_ptr_35:ptr->f32 
+              temp_181_array_ele_ptr_35 = getelementptr b1_35:Array:f32:[Some(3_0)] [] 
+              new_var temp_182_array_ele_ptr_35:ptr->f32 
+              temp_182_array_ele_ptr_35 = getelementptr b2_35:Array:f32:[Some(3_0)] [] 
+              new_var temp_183_array_ele_ptr_35:ptr->f32 
+              temp_183_array_ele_ptr_35 = getelementptr c0_35:Array:f32:[Some(6_0)] [] 
+              new_var temp_184_array_ele_ptr_35:ptr->f32 
+              temp_184_array_ele_ptr_35 = getelementptr c1_35:Array:f32:[Some(3_0)] [] 
+              new_var temp_185_array_ele_ptr_35:ptr->f32 
+              temp_185_array_ele_ptr_35 = getelementptr c2_35:Array:f32:[Some(3_0)] [] 
+              new_var temp_186_ret_of_mul_35:i32 
+              temp_186_ret_of_mul_35 =  Call i32 mul_0(temp_177_array_ele_ptr_35, temp_178_array_ele_ptr_35, temp_179_array_ele_ptr_35, temp_180_array_ele_ptr_35, temp_181_array_ele_ptr_35, temp_182_array_ele_ptr_35, temp_183_array_ele_ptr_35, temp_184_array_ele_ptr_35, temp_185_array_ele_ptr_35) 
+              i_35 = i32 temp_186_ret_of_mul_35 
+              new_var x_35:i32 
+              jump label: while.head_55 
+          label while.head_55: 
+              new_var temp_187_ptr2globl_54:i32 
+              temp_187_ptr2globl_54 = load *N_0:ptr->i32 
+              new_var temp_188_cmp_54:i1 
+              temp_188_cmp_54 = icmp i32 Slt i_35, temp_187_ptr2globl_54 
+              br i1 temp_188_cmp_54, label while.body_55, label while.exit_55 
+          label while.body_55: 
+              new_var temp_189_array_ptr_56:ptr->f32 
+              temp_189_array_ptr_56 = getelementptr c0_35:Array:f32:[Some(6_0)] [Some(i_35)] 
+              new_var temp_190_array_ele_56:f32 
+              temp_190_array_ele_56 = load temp_189_array_ptr_56:ptr->f32 
+              new_var temp_191__56:i32 
+              temp_191__56 = fptosi f32 temp_190_array_ele_56 to i32 
+              x_35 = i32 temp_191__56 
+               Call void putint_0(x_35) 
+              new_var temp_192_arithop_56:i32 
+              temp_192_arithop_56 = Add i32 i_35, 1_0 
+              i_35 = i32 temp_192_arithop_56 
+              jump label: while.head_55 
+          label while.exit_55: 
+              x_35 = i32 10_0 
+              i_35 = i32 0_0 
+               Call void putch_0(x_35) 
+              jump label: while.head_64 
+          label while.head_64: 
+              new_var temp_193_ptr2globl_63:i32 
+              temp_193_ptr2globl_63 = load *N_0:ptr->i32 
+              new_var temp_194_cmp_63:i1 
+              temp_194_cmp_63 = icmp i32 Slt i_35, temp_193_ptr2globl_63 
+              br i1 temp_194_cmp_63, label while.body_64, label while.exit_64 
+          label while.body_64: 
+              new_var temp_195_array_ptr_65:ptr->f32 
+              temp_195_array_ptr_65 = getelementptr c1_35:Array:f32:[Some(3_0)] [Some(i_35)] 
+              new_var temp_196_array_ele_65:f32 
+              temp_196_array_ele_65 = load temp_195_array_ptr_65:ptr->f32 
+              new_var temp_197__65:i32 
+              temp_197__65 = fptosi f32 temp_196_array_ele_65 to i32 
+              x_35 = i32 temp_197__65 
+               Call void putint_0(x_35) 
+              new_var temp_198_arithop_65:i32 
+              temp_198_arithop_65 = Add i32 i_35, 1_0 
+              i_35 = i32 temp_198_arithop_65 
+              jump label: while.head_64 
+          label while.exit_64: 
+              x_35 = i32 10_0 
+              i_35 = i32 0_0 
+               Call void putch_0(x_35) 
+              jump label: while.head_73 
+          label while.head_73: 
+              new_var temp_199_ptr2globl_72:i32 
+              temp_199_ptr2globl_72 = load *N_0:ptr->i32 
+              new_var temp_200_cmp_72:i1 
+              temp_200_cmp_72 = icmp i32 Slt i_35, temp_199_ptr2globl_72 
+              br i1 temp_200_cmp_72, label while.body_73, label while.exit_73 
+          label while.body_73: 
+              new_var temp_201_array_ptr_74:ptr->f32 
+              temp_201_array_ptr_74 = getelementptr c2_35:Array:f32:[Some(3_0)] [Some(i_35)] 
+              new_var temp_202_array_ele_74:f32 
+              temp_202_array_ele_74 = load temp_201_array_ptr_74:ptr->f32 
+              new_var temp_203__74:i32 
+              temp_203__74 = fptosi f32 temp_202_array_ele_74 to i32 
+              x_35 = i32 temp_203__74 
+               Call void putint_0(x_35) 
+              new_var temp_204_arithop_74:i32 
+              temp_204_arithop_74 = Add i32 i_35, 1_0 
+              i_35 = i32 temp_204_arithop_74 
+              jump label: while.head_73 
+          label while.exit_73: 
+              x_35 = i32 10_0 
+               Call void putch_0(x_35) 
+              ret 0_0 
+      Define mul_0 [a0_19, a1_19, a2_19, b0_19, b1_19, b2_19, c0_19, c1_19, c2_19] -> mul_ret_0 
+              new_var a0_19:ptr->f32 
+              new_var a1_19:ptr->f32 
+              new_var a2_19:ptr->f32 
+              new_var b0_19:ptr->f32 
+              new_var b1_19:ptr->f32 
+              new_var b2_19:ptr->f32 
+              new_var c0_19:ptr->f32 
+              new_var c1_19:ptr->f32 
+              new_var c2_19:ptr->f32 
+              alloc i32 i_21 
+              alloc ptr->f32 temp_0_index_ptr_21 
+              alloc ptr->f32 temp_1_array_ptr_21 
+              alloc f32 temp_2_array_ele_21 
+              alloc ptr->f32 temp_3_array_ptr_21 
+              alloc f32 temp_4_array_ele_21 
+              alloc f32 temp_5_arithop_21 
+              alloc ptr->f32 temp_6_array_ptr_21 
+              alloc f32 temp_7_array_ele_21 
+              alloc ptr->f32 temp_8_array_ptr_21 
+              alloc f32 temp_9_array_ele_21 
+              alloc f32 temp_10_arithop_21 
+              alloc ptr->f32 temp_11_array_ptr_21 
+              alloc f32 temp_12_array_ele_21 
+              alloc ptr->f32 temp_13_array_ptr_21 
+              alloc f32 temp_14_array_ele_21 
+              alloc f32 temp_15_arithop_21 
+              alloc f32 temp_16_arithop_21 
+              alloc f32 temp_17_arithop_21 
+              alloc ptr->f32 temp_18_index_ptr_21 
+              alloc ptr->f32 temp_19_array_ptr_21 
+              alloc f32 temp_20_array_ele_21 
+              alloc ptr->f32 temp_21_array_ptr_21 
+              alloc f32 temp_22_array_ele_21 
+              alloc f32 temp_23_arithop_21 
+              alloc ptr->f32 temp_24_array_ptr_21 
+              alloc f32 temp_25_array_ele_21 
+              alloc ptr->f32 temp_26_array_ptr_21 
+              alloc f32 temp_27_array_ele_21 
+              alloc f32 temp_28_arithop_21 
+              alloc ptr->f32 temp_29_array_ptr_21 
+              alloc f32 temp_30_array_ele_21 
+              alloc ptr->f32 temp_31_array_ptr_21 
+              alloc f32 temp_32_array_ele_21 
+              alloc f32 temp_33_arithop_21 
+              alloc f32 temp_34_arithop_21 
+              alloc f32 temp_35_arithop_21 
+              alloc ptr->f32 temp_36_index_ptr_21 
+              alloc ptr->f32 temp_37_array_ptr_21 
+              alloc f32 temp_38_array_ele_21 
+              alloc ptr->f32 temp_39_array_ptr_21 
+              alloc f32 temp_40_array_ele_21 
+              alloc f32 temp_41_arithop_21 
+              alloc ptr->f32 temp_42_array_ptr_21 
+              alloc f32 temp_43_array_ele_21 
+              alloc ptr->f32 temp_44_array_ptr_21 
+              alloc f32 temp_45_array_ele_21 
+              alloc f32 temp_46_arithop_21 
+              alloc ptr->f32 temp_47_array_ptr_21 
+              alloc f32 temp_48_array_ele_21 
+              alloc ptr->f32 temp_49_array_ptr_21 
+              alloc f32 temp_50_array_ele_21 
+              alloc f32 temp_51_arithop_21 
+              alloc f32 temp_52_arithop_21 
+              alloc f32 temp_53_arithop_21 
+              alloc ptr->f32 temp_54_index_ptr_21 
+              alloc ptr->f32 temp_55_array_ptr_21 
+              alloc f32 temp_56_array_ele_21 
+              alloc ptr->f32 temp_57_array_ptr_21 
+              alloc f32 temp_58_array_ele_21 
+              alloc f32 temp_59_arithop_21 
+              alloc ptr->f32 temp_60_array_ptr_21 
+              alloc f32 temp_61_array_ele_21 
+              alloc ptr->f32 temp_62_array_ptr_21 
+              alloc f32 temp_63_array_ele_21 
+              alloc f32 temp_64_arithop_21 
+              alloc ptr->f32 temp_65_array_ptr_21 
+              alloc f32 temp_66_array_ele_21 
+              alloc ptr->f32 temp_67_array_ptr_21 
+              alloc f32 temp_68_array_ele_21 
+              alloc f32 temp_69_arithop_21 
+              alloc f32 temp_70_arithop_21 
+              alloc f32 temp_71_arithop_21 
+              alloc ptr->f32 temp_72_index_ptr_21 
+              alloc ptr->f32 temp_73_array_ptr_21 
+              alloc f32 temp_74_array_ele_21 
+              alloc ptr->f32 temp_75_array_ptr_21 
+              alloc f32 temp_76_array_ele_21 
+              alloc f32 temp_77_arithop_21 
+              alloc ptr->f32 temp_78_array_ptr_21 
+              alloc f32 temp_79_array_ele_21 
+              alloc ptr->f32 temp_80_array_ptr_21 
+              alloc f32 temp_81_array_ele_21 
+              alloc f32 temp_82_arithop_21 
+              alloc ptr->f32 temp_83_array_ptr_21 
+              alloc f32 temp_84_array_ele_21 
+              alloc ptr->f32 temp_85_array_ptr_21 
+              alloc f32 temp_86_array_ele_21 
+              alloc f32 temp_87_arithop_21 
+              alloc f32 temp_88_arithop_21 
+              alloc f32 temp_89_arithop_21 
+              alloc ptr->f32 temp_90_index_ptr_21 
+              alloc ptr->f32 temp_91_array_ptr_21 
+              alloc f32 temp_92_array_ele_21 
+              alloc ptr->f32 temp_93_array_ptr_21 
+              alloc f32 temp_94_array_ele_21 
+              alloc f32 temp_95_arithop_21 
+              alloc ptr->f32 temp_96_array_ptr_21 
+              alloc f32 temp_97_array_ele_21 
+              alloc ptr->f32 temp_98_array_ptr_21 
+              alloc f32 temp_99_array_ele_21 
+              alloc f32 temp_100_arithop_21 
+              alloc ptr->f32 temp_101_array_ptr_21 
+              alloc f32 temp_102_array_ele_21 
+              alloc ptr->f32 temp_103_array_ptr_21 
+              alloc f32 temp_104_array_ele_21 
+              alloc f32 temp_105_arithop_21 
+              alloc f32 temp_106_arithop_21 
+              alloc f32 temp_107_arithop_21 
+              alloc ptr->f32 temp_108_index_ptr_21 
+              alloc ptr->f32 temp_109_array_ptr_21 
+              alloc f32 temp_110_array_ele_21 
+              alloc ptr->f32 temp_111_array_ptr_21 
+              alloc f32 temp_112_array_ele_21 
+              alloc f32 temp_113_arithop_21 
+              alloc ptr->f32 temp_114_array_ptr_21 
+              alloc f32 temp_115_array_ele_21 
+              alloc ptr->f32 temp_116_array_ptr_21 
+              alloc f32 temp_117_array_ele_21 
+              alloc f32 temp_118_arithop_21 
+              alloc ptr->f32 temp_119_array_ptr_21 
+              alloc f32 temp_120_array_ele_21 
+              alloc ptr->f32 temp_121_array_ptr_21 
+              alloc f32 temp_122_array_ele_21 
+              alloc f32 temp_123_arithop_21 
+              alloc f32 temp_124_arithop_21 
+              alloc f32 temp_125_arithop_21 
+              alloc ptr->f32 temp_126_index_ptr_21 
+              alloc ptr->f32 temp_127_array_ptr_21 
+              alloc f32 temp_128_array_ele_21 
+              alloc ptr->f32 temp_129_array_ptr_21 
+              alloc f32 temp_130_array_ele_21 
+              alloc f32 temp_131_arithop_21 
+              alloc ptr->f32 temp_132_array_ptr_21 
+              alloc f32 temp_133_array_ele_21 
+              alloc ptr->f32 temp_134_array_ptr_21 
+              alloc f32 temp_135_array_ele_21 
+              alloc f32 temp_136_arithop_21 
+              alloc ptr->f32 temp_137_array_ptr_21 
+              alloc f32 temp_138_array_ele_21 
+              alloc ptr->f32 temp_139_array_ptr_21 
+              alloc f32 temp_140_array_ele_21 
+              alloc f32 temp_141_arithop_21 
+              alloc f32 temp_142_arithop_21 
+              alloc f32 temp_143_arithop_21 
+              alloc ptr->f32 temp_144_index_ptr_21 
+              alloc ptr->f32 temp_145_array_ptr_21 
+              alloc f32 temp_146_array_ele_21 
+              alloc ptr->f32 temp_147_array_ptr_21 
+              alloc f32 temp_148_array_ele_21 
+              alloc f32 temp_149_arithop_21 
+              alloc ptr->f32 temp_150_array_ptr_21 
+              alloc f32 temp_151_array_ele_21 
+              alloc ptr->f32 temp_152_array_ptr_21 
+              alloc f32 temp_153_array_ele_21 
+              alloc f32 temp_154_arithop_21 
+              alloc ptr->f32 temp_155_array_ptr_21 
+              alloc f32 temp_156_array_ele_21 
+              alloc ptr->f32 temp_157_array_ptr_21 
+              alloc f32 temp_158_array_ele_21 
+              alloc f32 temp_159_arithop_21 
+              alloc f32 temp_160_arithop_21 
+              alloc f32 temp_161_arithop_21 
+          label L1_0: 
+              new_var i_21:i32 
+              i_21 = i32 0_0 
+              new_var temp_0_index_ptr_21:ptr->f32 
+              temp_0_index_ptr_21 = getelementptr c0_19:ptr->f32 [Some(0_0)] 
+              new_var temp_1_array_ptr_21:ptr->f32 
+              temp_1_array_ptr_21 = getelementptr b2_19:ptr->f32 [Some(0_0)] 
+              new_var temp_2_array_ele_21:f32 
+              temp_2_array_ele_21 = load temp_1_array_ptr_21:ptr->f32 
+              new_var temp_3_array_ptr_21:ptr->f32 
+              temp_3_array_ptr_21 = getelementptr a0_19:ptr->f32 [Some(2_0)] 
+              new_var temp_4_array_ele_21:f32 
+              temp_4_array_ele_21 = load temp_3_array_ptr_21:ptr->f32 
+              new_var temp_5_arithop_21:f32 
+              temp_5_arithop_21 = Mul f32 temp_4_array_ele_21, temp_2_array_ele_21 
+              new_var temp_6_array_ptr_21:ptr->f32 
+              temp_6_array_ptr_21 = getelementptr b1_19:ptr->f32 [Some(0_0)] 
+              new_var temp_7_array_ele_21:f32 
+              temp_7_array_ele_21 = load temp_6_array_ptr_21:ptr->f32 
+              new_var temp_8_array_ptr_21:ptr->f32 
+              temp_8_array_ptr_21 = getelementptr a0_19:ptr->f32 [Some(1_0)] 
+              new_var temp_9_array_ele_21:f32 
+              temp_9_array_ele_21 = load temp_8_array_ptr_21:ptr->f32 
+              new_var temp_10_arithop_21:f32 
+              temp_10_arithop_21 = Mul f32 temp_9_array_ele_21, temp_7_array_ele_21 
+              new_var temp_11_array_ptr_21:ptr->f32 
+              temp_11_array_ptr_21 = getelementptr b0_19:ptr->f32 [Some(0_0)] 
+              new_var temp_12_array_ele_21:f32 
+              temp_12_array_ele_21 = load temp_11_array_ptr_21:ptr->f32 
+              new_var temp_13_array_ptr_21:ptr->f32 
+              temp_13_array_ptr_21 = getelementptr a0_19:ptr->f32 [Some(0_0)] 
+              new_var temp_14_array_ele_21:f32 
+              temp_14_array_ele_21 = load temp_13_array_ptr_21:ptr->f32 
+              new_var temp_15_arithop_21:f32 
+              temp_15_arithop_21 = Mul f32 temp_14_array_ele_21, temp_12_array_ele_21 
+              new_var temp_16_arithop_21:f32 
+              temp_16_arithop_21 = Add f32 temp_15_arithop_21, temp_10_arithop_21 
+              new_var temp_17_arithop_21:f32 
+              temp_17_arithop_21 = Add f32 temp_16_arithop_21, temp_5_arithop_21 
+              store temp_17_arithop_21:f32 temp_0_index_ptr_21:ptr->f32 
+              mu c0_19:86 
+              c0_19 = chi c0_19:86 
+              new_var temp_18_index_ptr_21:ptr->f32 
+              temp_18_index_ptr_21 = getelementptr c0_19:ptr->f32 [Some(1_0)] 
+              new_var temp_19_array_ptr_21:ptr->f32 
+              temp_19_array_ptr_21 = getelementptr b2_19:ptr->f32 [Some(1_0)] 
+              new_var temp_20_array_ele_21:f32 
+              temp_20_array_ele_21 = load temp_19_array_ptr_21:ptr->f32 
+              new_var temp_21_array_ptr_21:ptr->f32 
+              temp_21_array_ptr_21 = getelementptr a0_19:ptr->f32 [Some(2_0)] 
+              new_var temp_22_array_ele_21:f32 
+              temp_22_array_ele_21 = load temp_21_array_ptr_21:ptr->f32 
+              new_var temp_23_arithop_21:f32 
+              temp_23_arithop_21 = Mul f32 temp_22_array_ele_21, temp_20_array_ele_21 
+              new_var temp_24_array_ptr_21:ptr->f32 
+              temp_24_array_ptr_21 = getelementptr b1_19:ptr->f32 [Some(1_0)] 
+              new_var temp_25_array_ele_21:f32 
+              temp_25_array_ele_21 = load temp_24_array_ptr_21:ptr->f32 
+              new_var temp_26_array_ptr_21:ptr->f32 
+              temp_26_array_ptr_21 = getelementptr a0_19:ptr->f32 [Some(1_0)] 
+              new_var temp_27_array_ele_21:f32 
+              temp_27_array_ele_21 = load temp_26_array_ptr_21:ptr->f32 
+              new_var temp_28_arithop_21:f32 
+              temp_28_arithop_21 = Mul f32 temp_27_array_ele_21, temp_25_array_ele_21 
+              new_var temp_29_array_ptr_21:ptr->f32 
+              temp_29_array_ptr_21 = getelementptr b0_19:ptr->f32 [Some(1_0)] 
+              new_var temp_30_array_ele_21:f32 
+              temp_30_array_ele_21 = load temp_29_array_ptr_21:ptr->f32 
+              new_var temp_31_array_ptr_21:ptr->f32 
+              temp_31_array_ptr_21 = getelementptr a0_19:ptr->f32 [Some(0_0)] 
+              new_var temp_32_array_ele_21:f32 
+              temp_32_array_ele_21 = load temp_31_array_ptr_21:ptr->f32 
+              new_var temp_33_arithop_21:f32 
+              temp_33_arithop_21 = Mul f32 temp_32_array_ele_21, temp_30_array_ele_21 
+              new_var temp_34_arithop_21:f32 
+              temp_34_arithop_21 = Add f32 temp_33_arithop_21, temp_28_arithop_21 
+              new_var temp_35_arithop_21:f32 
+              temp_35_arithop_21 = Add f32 temp_34_arithop_21, temp_23_arithop_21 
+              store temp_35_arithop_21:f32 temp_18_index_ptr_21:ptr->f32 
+              mu c0_19:143 
+              c0_19 = chi c0_19:143 
+              new_var temp_36_index_ptr_21:ptr->f32 
+              temp_36_index_ptr_21 = getelementptr c0_19:ptr->f32 [Some(2_0)] 
+              new_var temp_37_array_ptr_21:ptr->f32 
+              temp_37_array_ptr_21 = getelementptr b2_19:ptr->f32 [Some(2_0)] 
+              new_var temp_38_array_ele_21:f32 
+              temp_38_array_ele_21 = load temp_37_array_ptr_21:ptr->f32 
+              new_var temp_39_array_ptr_21:ptr->f32 
+              temp_39_array_ptr_21 = getelementptr a0_19:ptr->f32 [Some(2_0)] 
+              new_var temp_40_array_ele_21:f32 
+              temp_40_array_ele_21 = load temp_39_array_ptr_21:ptr->f32 
+              new_var temp_41_arithop_21:f32 
+              temp_41_arithop_21 = Mul f32 temp_40_array_ele_21, temp_38_array_ele_21 
+              new_var temp_42_array_ptr_21:ptr->f32 
+              temp_42_array_ptr_21 = getelementptr b1_19:ptr->f32 [Some(2_0)] 
+              new_var temp_43_array_ele_21:f32 
+              temp_43_array_ele_21 = load temp_42_array_ptr_21:ptr->f32 
+              new_var temp_44_array_ptr_21:ptr->f32 
+              temp_44_array_ptr_21 = getelementptr a0_19:ptr->f32 [Some(1_0)] 
+              new_var temp_45_array_ele_21:f32 
+              temp_45_array_ele_21 = load temp_44_array_ptr_21:ptr->f32 
+              new_var temp_46_arithop_21:f32 
+              temp_46_arithop_21 = Mul f32 temp_45_array_ele_21, temp_43_array_ele_21 
+              new_var temp_47_array_ptr_21:ptr->f32 
+              temp_47_array_ptr_21 = getelementptr b0_19:ptr->f32 [Some(2_0)] 
+              new_var temp_48_array_ele_21:f32 
+              temp_48_array_ele_21 = load temp_47_array_ptr_21:ptr->f32 
+              new_var temp_49_array_ptr_21:ptr->f32 
+              temp_49_array_ptr_21 = getelementptr a0_19:ptr->f32 [Some(0_0)] 
+              new_var temp_50_array_ele_21:f32 
+              temp_50_array_ele_21 = load temp_49_array_ptr_21:ptr->f32 
+              new_var temp_51_arithop_21:f32 
+              temp_51_arithop_21 = Mul f32 temp_50_array_ele_21, temp_48_array_ele_21 
+              new_var temp_52_arithop_21:f32 
+              temp_52_arithop_21 = Add f32 temp_51_arithop_21, temp_46_arithop_21 
+              new_var temp_53_arithop_21:f32 
+              temp_53_arithop_21 = Add f32 temp_52_arithop_21, temp_41_arithop_21 
+              store temp_53_arithop_21:f32 temp_36_index_ptr_21:ptr->f32 
+              mu c0_19:200 
+              c0_19 = chi c0_19:200 
+              new_var temp_54_index_ptr_21:ptr->f32 
+              temp_54_index_ptr_21 = getelementptr c1_19:ptr->f32 [Some(0_0)] 
+              new_var temp_55_array_ptr_21:ptr->f32 
+              temp_55_array_ptr_21 = getelementptr b2_19:ptr->f32 [Some(0_0)] 
+              new_var temp_56_array_ele_21:f32 
+              temp_56_array_ele_21 = load temp_55_array_ptr_21:ptr->f32 
+              new_var temp_57_array_ptr_21:ptr->f32 
+              temp_57_array_ptr_21 = getelementptr a1_19:ptr->f32 [Some(2_0)] 
+              new_var temp_58_array_ele_21:f32 
+              temp_58_array_ele_21 = load temp_57_array_ptr_21:ptr->f32 
+              new_var temp_59_arithop_21:f32 
+              temp_59_arithop_21 = Mul f32 temp_58_array_ele_21, temp_56_array_ele_21 
+              new_var temp_60_array_ptr_21:ptr->f32 
+              temp_60_array_ptr_21 = getelementptr b1_19:ptr->f32 [Some(0_0)] 
+              new_var temp_61_array_ele_21:f32 
+              temp_61_array_ele_21 = load temp_60_array_ptr_21:ptr->f32 
+              new_var temp_62_array_ptr_21:ptr->f32 
+              temp_62_array_ptr_21 = getelementptr a1_19:ptr->f32 [Some(1_0)] 
+              new_var temp_63_array_ele_21:f32 
+              temp_63_array_ele_21 = load temp_62_array_ptr_21:ptr->f32 
+              new_var temp_64_arithop_21:f32 
+              temp_64_arithop_21 = Mul f32 temp_63_array_ele_21, temp_61_array_ele_21 
+              new_var temp_65_array_ptr_21:ptr->f32 
+              temp_65_array_ptr_21 = getelementptr b0_19:ptr->f32 [Some(0_0)] 
+              new_var temp_66_array_ele_21:f32 
+              temp_66_array_ele_21 = load temp_65_array_ptr_21:ptr->f32 
+              new_var temp_67_array_ptr_21:ptr->f32 
+              temp_67_array_ptr_21 = getelementptr a1_19:ptr->f32 [Some(0_0)] 
+              new_var temp_68_array_ele_21:f32 
+              temp_68_array_ele_21 = load temp_67_array_ptr_21:ptr->f32 
+              new_var temp_69_arithop_21:f32 
+              temp_69_arithop_21 = Mul f32 temp_68_array_ele_21, temp_66_array_ele_21 
+              new_var temp_70_arithop_21:f32 
+              temp_70_arithop_21 = Add f32 temp_69_arithop_21, temp_64_arithop_21 
+              new_var temp_71_arithop_21:f32 
+              temp_71_arithop_21 = Add f32 temp_70_arithop_21, temp_59_arithop_21 
+              store temp_71_arithop_21:f32 temp_54_index_ptr_21:ptr->f32 
+              mu c1_19:257 
+              c1_19 = chi c1_19:257 
+              new_var temp_72_index_ptr_21:ptr->f32 
+              temp_72_index_ptr_21 = getelementptr c1_19:ptr->f32 [Some(1_0)] 
+              new_var temp_73_array_ptr_21:ptr->f32 
+              temp_73_array_ptr_21 = getelementptr b2_19:ptr->f32 [Some(1_0)] 
+              new_var temp_74_array_ele_21:f32 
+              temp_74_array_ele_21 = load temp_73_array_ptr_21:ptr->f32 
+              new_var temp_75_array_ptr_21:ptr->f32 
+              temp_75_array_ptr_21 = getelementptr a1_19:ptr->f32 [Some(2_0)] 
+              new_var temp_76_array_ele_21:f32 
+              temp_76_array_ele_21 = load temp_75_array_ptr_21:ptr->f32 
+              new_var temp_77_arithop_21:f32 
+              temp_77_arithop_21 = Mul f32 temp_76_array_ele_21, temp_74_array_ele_21 
+              new_var temp_78_array_ptr_21:ptr->f32 
+              temp_78_array_ptr_21 = getelementptr b1_19:ptr->f32 [Some(1_0)] 
+              new_var temp_79_array_ele_21:f32 
+              temp_79_array_ele_21 = load temp_78_array_ptr_21:ptr->f32 
+              new_var temp_80_array_ptr_21:ptr->f32 
+              temp_80_array_ptr_21 = getelementptr a1_19:ptr->f32 [Some(1_0)] 
+              new_var temp_81_array_ele_21:f32 
+              temp_81_array_ele_21 = load temp_80_array_ptr_21:ptr->f32 
+              new_var temp_82_arithop_21:f32 
+              temp_82_arithop_21 = Mul f32 temp_81_array_ele_21, temp_79_array_ele_21 
+              new_var temp_83_array_ptr_21:ptr->f32 
+              temp_83_array_ptr_21 = getelementptr b0_19:ptr->f32 [Some(1_0)] 
+              new_var temp_84_array_ele_21:f32 
+              temp_84_array_ele_21 = load temp_83_array_ptr_21:ptr->f32 
+              new_var temp_85_array_ptr_21:ptr->f32 
+              temp_85_array_ptr_21 = getelementptr a1_19:ptr->f32 [Some(0_0)] 
+              new_var temp_86_array_ele_21:f32 
+              temp_86_array_ele_21 = load temp_85_array_ptr_21:ptr->f32 
+              new_var temp_87_arithop_21:f32 
+              temp_87_arithop_21 = Mul f32 temp_86_array_ele_21, temp_84_array_ele_21 
+              new_var temp_88_arithop_21:f32 
+              temp_88_arithop_21 = Add f32 temp_87_arithop_21, temp_82_arithop_21 
+              new_var temp_89_arithop_21:f32 
+              temp_89_arithop_21 = Add f32 temp_88_arithop_21, temp_77_arithop_21 
+              store temp_89_arithop_21:f32 temp_72_index_ptr_21:ptr->f32 
+              mu c1_19:314 
+              c1_19 = chi c1_19:314 
+              new_var temp_90_index_ptr_21:ptr->f32 
+              temp_90_index_ptr_21 = getelementptr c1_19:ptr->f32 [Some(2_0)] 
+              new_var temp_91_array_ptr_21:ptr->f32 
+              temp_91_array_ptr_21 = getelementptr b2_19:ptr->f32 [Some(2_0)] 
+              new_var temp_92_array_ele_21:f32 
+              temp_92_array_ele_21 = load temp_91_array_ptr_21:ptr->f32 
+              new_var temp_93_array_ptr_21:ptr->f32 
+              temp_93_array_ptr_21 = getelementptr a1_19:ptr->f32 [Some(2_0)] 
+              new_var temp_94_array_ele_21:f32 
+              temp_94_array_ele_21 = load temp_93_array_ptr_21:ptr->f32 
+              new_var temp_95_arithop_21:f32 
+              temp_95_arithop_21 = Mul f32 temp_94_array_ele_21, temp_92_array_ele_21 
+              new_var temp_96_array_ptr_21:ptr->f32 
+              temp_96_array_ptr_21 = getelementptr b1_19:ptr->f32 [Some(2_0)] 
+              new_var temp_97_array_ele_21:f32 
+              temp_97_array_ele_21 = load temp_96_array_ptr_21:ptr->f32 
+              new_var temp_98_array_ptr_21:ptr->f32 
+              temp_98_array_ptr_21 = getelementptr a1_19:ptr->f32 [Some(1_0)] 
+              new_var temp_99_array_ele_21:f32 
+              temp_99_array_ele_21 = load temp_98_array_ptr_21:ptr->f32 
+              new_var temp_100_arithop_21:f32 
+              temp_100_arithop_21 = Mul f32 temp_99_array_ele_21, temp_97_array_ele_21 
+              new_var temp_101_array_ptr_21:ptr->f32 
+              temp_101_array_ptr_21 = getelementptr b0_19:ptr->f32 [Some(2_0)] 
+              new_var temp_102_array_ele_21:f32 
+              temp_102_array_ele_21 = load temp_101_array_ptr_21:ptr->f32 
+              new_var temp_103_array_ptr_21:ptr->f32 
+              temp_103_array_ptr_21 = getelementptr a1_19:ptr->f32 [Some(0_0)] 
+              new_var temp_104_array_ele_21:f32 
+              temp_104_array_ele_21 = load temp_103_array_ptr_21:ptr->f32 
+              new_var temp_105_arithop_21:f32 
+              temp_105_arithop_21 = Mul f32 temp_104_array_ele_21, temp_102_array_ele_21 
+              new_var temp_106_arithop_21:f32 
+              temp_106_arithop_21 = Add f32 temp_105_arithop_21, temp_100_arithop_21 
+              new_var temp_107_arithop_21:f32 
+              temp_107_arithop_21 = Add f32 temp_106_arithop_21, temp_95_arithop_21 
+              store temp_107_arithop_21:f32 temp_90_index_ptr_21:ptr->f32 
+              mu c1_19:371 
+              c1_19 = chi c1_19:371 
+              new_var temp_108_index_ptr_21:ptr->f32 
+              temp_108_index_ptr_21 = getelementptr c2_19:ptr->f32 [Some(0_0)] 
+              new_var temp_109_array_ptr_21:ptr->f32 
+              temp_109_array_ptr_21 = getelementptr b2_19:ptr->f32 [Some(0_0)] 
+              new_var temp_110_array_ele_21:f32 
+              temp_110_array_ele_21 = load temp_109_array_ptr_21:ptr->f32 
+              new_var temp_111_array_ptr_21:ptr->f32 
+              temp_111_array_ptr_21 = getelementptr a2_19:ptr->f32 [Some(2_0)] 
+              new_var temp_112_array_ele_21:f32 
+              temp_112_array_ele_21 = load temp_111_array_ptr_21:ptr->f32 
+              new_var temp_113_arithop_21:f32 
+              temp_113_arithop_21 = Mul f32 temp_112_array_ele_21, temp_110_array_ele_21 
+              new_var temp_114_array_ptr_21:ptr->f32 
+              temp_114_array_ptr_21 = getelementptr b1_19:ptr->f32 [Some(0_0)] 
+              new_var temp_115_array_ele_21:f32 
+              temp_115_array_ele_21 = load temp_114_array_ptr_21:ptr->f32 
+              new_var temp_116_array_ptr_21:ptr->f32 
+              temp_116_array_ptr_21 = getelementptr a2_19:ptr->f32 [Some(1_0)] 
+              new_var temp_117_array_ele_21:f32 
+              temp_117_array_ele_21 = load temp_116_array_ptr_21:ptr->f32 
+              new_var temp_118_arithop_21:f32 
+              temp_118_arithop_21 = Mul f32 temp_117_array_ele_21, temp_115_array_ele_21 
+              new_var temp_119_array_ptr_21:ptr->f32 
+              temp_119_array_ptr_21 = getelementptr b0_19:ptr->f32 [Some(0_0)] 
+              new_var temp_120_array_ele_21:f32 
+              temp_120_array_ele_21 = load temp_119_array_ptr_21:ptr->f32 
+              new_var temp_121_array_ptr_21:ptr->f32 
+              temp_121_array_ptr_21 = getelementptr a2_19:ptr->f32 [Some(0_0)] 
+              new_var temp_122_array_ele_21:f32 
+              temp_122_array_ele_21 = load temp_121_array_ptr_21:ptr->f32 
+              new_var temp_123_arithop_21:f32 
+              temp_123_arithop_21 = Mul f32 temp_122_array_ele_21, temp_120_array_ele_21 
+              new_var temp_124_arithop_21:f32 
+              temp_124_arithop_21 = Add f32 temp_123_arithop_21, temp_118_arithop_21 
+              new_var temp_125_arithop_21:f32 
+              temp_125_arithop_21 = Add f32 temp_124_arithop_21, temp_113_arithop_21 
+              store temp_125_arithop_21:f32 temp_108_index_ptr_21:ptr->f32 
+              mu c2_19:428 
+              c2_19 = chi c2_19:428 
+              new_var temp_126_index_ptr_21:ptr->f32 
+              temp_126_index_ptr_21 = getelementptr c2_19:ptr->f32 [Some(1_0)] 
+              new_var temp_127_array_ptr_21:ptr->f32 
+              temp_127_array_ptr_21 = getelementptr b2_19:ptr->f32 [Some(1_0)] 
+              new_var temp_128_array_ele_21:f32 
+              temp_128_array_ele_21 = load temp_127_array_ptr_21:ptr->f32 
+              new_var temp_129_array_ptr_21:ptr->f32 
+              temp_129_array_ptr_21 = getelementptr a2_19:ptr->f32 [Some(2_0)] 
+              new_var temp_130_array_ele_21:f32 
+              temp_130_array_ele_21 = load temp_129_array_ptr_21:ptr->f32 
+              new_var temp_131_arithop_21:f32 
+              temp_131_arithop_21 = Mul f32 temp_130_array_ele_21, temp_128_array_ele_21 
+              new_var temp_132_array_ptr_21:ptr->f32 
+              temp_132_array_ptr_21 = getelementptr b1_19:ptr->f32 [Some(1_0)] 
+              new_var temp_133_array_ele_21:f32 
+              temp_133_array_ele_21 = load temp_132_array_ptr_21:ptr->f32 
+              new_var temp_134_array_ptr_21:ptr->f32 
+              temp_134_array_ptr_21 = getelementptr a2_19:ptr->f32 [Some(1_0)] 
+              new_var temp_135_array_ele_21:f32 
+              temp_135_array_ele_21 = load temp_134_array_ptr_21:ptr->f32 
+              new_var temp_136_arithop_21:f32 
+              temp_136_arithop_21 = Mul f32 temp_135_array_ele_21, temp_133_array_ele_21 
+              new_var temp_137_array_ptr_21:ptr->f32 
+              temp_137_array_ptr_21 = getelementptr b0_19:ptr->f32 [Some(1_0)] 
+              new_var temp_138_array_ele_21:f32 
+              temp_138_array_ele_21 = load temp_137_array_ptr_21:ptr->f32 
+              new_var temp_139_array_ptr_21:ptr->f32 
+              temp_139_array_ptr_21 = getelementptr a2_19:ptr->f32 [Some(0_0)] 
+              new_var temp_140_array_ele_21:f32 
+              temp_140_array_ele_21 = load temp_139_array_ptr_21:ptr->f32 
+              new_var temp_141_arithop_21:f32 
+              temp_141_arithop_21 = Mul f32 temp_140_array_ele_21, temp_138_array_ele_21 
+              new_var temp_142_arithop_21:f32 
+              temp_142_arithop_21 = Add f32 temp_141_arithop_21, temp_136_arithop_21 
+              new_var temp_143_arithop_21:f32 
+              temp_143_arithop_21 = Add f32 temp_142_arithop_21, temp_131_arithop_21 
+              store temp_143_arithop_21:f32 temp_126_index_ptr_21:ptr->f32 
+              mu c2_19:485 
+              c2_19 = chi c2_19:485 
+              new_var temp_144_index_ptr_21:ptr->f32 
+              temp_144_index_ptr_21 = getelementptr c2_19:ptr->f32 [Some(2_0)] 
+              new_var temp_145_array_ptr_21:ptr->f32 
+              temp_145_array_ptr_21 = getelementptr b2_19:ptr->f32 [Some(2_0)] 
+              new_var temp_146_array_ele_21:f32 
+              temp_146_array_ele_21 = load temp_145_array_ptr_21:ptr->f32 
+              new_var temp_147_array_ptr_21:ptr->f32 
+              temp_147_array_ptr_21 = getelementptr a2_19:ptr->f32 [Some(2_0)] 
+              new_var temp_148_array_ele_21:f32 
+              temp_148_array_ele_21 = load temp_147_array_ptr_21:ptr->f32 
+              new_var temp_149_arithop_21:f32 
+              temp_149_arithop_21 = Mul f32 temp_148_array_ele_21, temp_146_array_ele_21 
+              new_var temp_150_array_ptr_21:ptr->f32 
+              temp_150_array_ptr_21 = getelementptr b1_19:ptr->f32 [Some(2_0)] 
+              new_var temp_151_array_ele_21:f32 
+              temp_151_array_ele_21 = load temp_150_array_ptr_21:ptr->f32 
+              new_var temp_152_array_ptr_21:ptr->f32 
+              temp_152_array_ptr_21 = getelementptr a2_19:ptr->f32 [Some(1_0)] 
+              new_var temp_153_array_ele_21:f32 
+              temp_153_array_ele_21 = load temp_152_array_ptr_21:ptr->f32 
+              new_var temp_154_arithop_21:f32 
+              temp_154_arithop_21 = Mul f32 temp_153_array_ele_21, temp_151_array_ele_21 
+              new_var temp_155_array_ptr_21:ptr->f32 
+              temp_155_array_ptr_21 = getelementptr b0_19:ptr->f32 [Some(2_0)] 
+              new_var temp_156_array_ele_21:f32 
+              temp_156_array_ele_21 = load temp_155_array_ptr_21:ptr->f32 
+              new_var temp_157_array_ptr_21:ptr->f32 
+              temp_157_array_ptr_21 = getelementptr a2_19:ptr->f32 [Some(0_0)] 
+              new_var temp_158_array_ele_21:f32 
+              temp_158_array_ele_21 = load temp_157_array_ptr_21:ptr->f32 
+              new_var temp_159_arithop_21:f32 
+              temp_159_arithop_21 = Mul f32 temp_158_array_ele_21, temp_156_array_ele_21 
+              new_var temp_160_arithop_21:f32 
+              temp_160_arithop_21 = Add f32 temp_159_arithop_21, temp_154_arithop_21 
+              new_var temp_161_arithop_21:f32 
+              temp_161_arithop_21 = Add f32 temp_160_arithop_21, temp_149_arithop_21 
+              store temp_161_arithop_21:f32 temp_144_index_ptr_21:ptr->f32 
+              mu c2_19:542 
+              c2_19 = chi c2_19:542 
+              ret 0_0 

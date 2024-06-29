@@ -1,6 +1,7 @@
-path1="./compiler2022/公开样例与运行时库/hidden_functional"
-cargo build 
-# cargo build --release 
+export RUST_LOG=error
+path1="./compiler2022/公开样例与运行时库/$1"
+# cargo build 
+cargo build --release 
 
 # 遍历指定路径下的所有文件
 for filename in "$path1"/*; do
@@ -10,21 +11,21 @@ for filename in "$path1"/*; do
         # 获取文件的基本名称，没有路径
         base_name=$(basename "$filename")
         # 执行编译命令，输出到同一目录
-        ./target/debug/compiler "$filename" -o "./out/${base_name}.s" -a > ./out/${base_name}.out
+        ./target/release/compiler "$filename" -o "./out/${base_name}.s" -a > ./out/${base_name}.out
+        ../202310013201098-3687/target/debug/compiler "$filename" -o "./out/${base_name}.former.s"  > ./out/${base_name}.out
     fi
 done
-path="./compiler2022/公开样例与运行时库/functional"
-cargo build 
-# cargo build --release 
+# path1="./demos/$1"
+# # cargo build --release 
 
-# 遍历指定路径下的所有文件
-for filename in "$path"/*; do
-    # 检查是否为文件
-    echo $filename
-    if [ -f "$filename" ] && [[ "$filename" == *.sy ]]; then
-        # 获取文件的基本名称，没有路径
-        base_name=$(basename "$filename")
-        # 执行编译命令，输出到同一目录
-        ./target/debug/compiler "$filename" -o "./out/${base_name}.s" -a > ./out/${base_name}.out
-    fi
-done
+# # 遍历指定路径下的所有文件
+# for filename in "$path1"/*; do
+#     # 检查是否为文件
+#     echo $filename
+#     if [ -f "$filename" ] && [[ "$filename" == *.sy ]]; then
+#         # 获取文件的基本名称，没有路径
+#         base_name=$(basename "$filename")
+#         # 执行编译命令，输出到同一目录
+#         ./target/debug/compiler "$filename" -o "./out/${base_name}.s" -a > ./out/${base_name}.out
+#     fi
+# done
