@@ -1,31 +1,120 @@
-# input: "./compiler2022/公开样例与运行时库/functional/01_var_defn2.sy"
-      global i32 b_0 
-      global i32 a_0 
-      store 3_0:i32 *a_0:ptr->i32 
-      store 5_0:i32 *b_0:ptr->i32 
+# input: "./compiler2022/公开样例与运行时库/hidden_functional/03_branch.sy"
       global Fn[]->getint_ret_0 getint_0 
       global Fn[]->getch_ret_0 getch_0 
-      global Fn[zz_array_5]->getarray_ret_0 getarray_0 
+      global Fn[zz_array_3]->getarray_ret_0 getarray_0 
       global Fn[]->getfloat_ret_0 getfloat_0 
-      global Fn[zz_array_7]->getfarray_ret_0 getfarray_0 
-      global Fn[zz_int_8]->putint_ret_0 putint_0 
-      global Fn[zz_ch_9]->putch_ret_0 putch_0 
-      global Fn[x_10, zz_array_10]->putarray_ret_0 putarray_0 
-      global Fn[zz_float_11]->putfloat_ret_0 putfloat_0 
-      global Fn[zz_len_12, zz_farray_12]->putfarray_ret_0 putfarray_0 
+      global Fn[zz_array_5]->getfarray_ret_0 getfarray_0 
+      global Fn[zz_int_6]->putint_ret_0 putint_0 
+      global Fn[zz_ch_7]->putch_ret_0 putch_0 
+      global Fn[x_8, zz_array_8]->putarray_ret_0 putarray_0 
+      global Fn[zz_float_9]->putfloat_ret_0 putfloat_0 
+      global Fn[zz_len_10, zz_farray_10]->putfarray_ret_0 putfarray_0 
       global Fn[]->putf_ret_0 putf_0 
       global Fn[]->starttime_ret_0 starttime_0 
       global Fn[]->stoptime_ret_0 stoptime_0 
-      global Fn[zz_ptr_16, zz_len_16, zz_val_16]->memset_ret_0 memset_0 
-      global Fn[zz_dest_17, zz_ptr_17, zz_len_17]->memcpy_ret_0 memcpy_0 
+      global Fn[zz_ptr_14, zz_val_14, zz_len_14]->memset_ret_0 memset_0 
+      global Fn[zz_dest_15, zz_ptr_15, zz_len_15]->memcpy_ret_0 memcpy_0 
       Define main_0 [] -> main_ret_0 
-              alloc i32 a_19 
-              alloc i32 temp_0_19 
-              alloc i32 temp_1_19 
+              alloc i32 a_17 
+              alloc i32 b_17 
+              alloc i32 c_17 
+              alloc i32 d_17 
+              alloc i32 e_17 
+              alloc i32 f_17 
+              alloc i1 temp_0_logic_24 
+              alloc i1 temp_1__27 
+              alloc i1 temp_2__27 
+              alloc i1 temp_3_logic_27 
+              alloc i1 temp_4_logic_30 
+              alloc i1 temp_5__34 
+              alloc i1 temp_6__34 
+              alloc i1 temp_7_logic_34 
+              alloc i1 temp_8_cmp_38 
+              alloc i1 temp_9_logic_41 
+              alloc i1 temp_10_cmp_45 
+              alloc i1 temp_11_cmp_48 
+              alloc i1 temp_12_booltrans_51 
+              alloc i1 temp_13_logicnot_51 
           label L0_0: 
-              a_19 = i32 5_0 
-              new_var temp_0_19:i32 
-              temp_0_19 = load *b_0:ptr->i32 
-              new_var temp_1_19:i32 
-              temp_1_19 = Add i32 a_19, temp_0_19 
-              ret temp_1_19 
+              a_17 = i32 1_0 
+              b_17 = i32 2_0 
+              c_17 = i32 3_0 
+              d_17 = i32 4_0 
+              e_17 = i32 5_0 
+              f_17 = i32 6_0 
+              jump label: L1_0 
+          label L1_0: 
+              new_var temp_0_logic_24:i1 
+              temp_0_logic_24 = And i1 true_0, true_0 
+              br i1 temp_0_logic_24, label branch_true_25, label branch_false_25 
+          label branch_true_25: 
+              new_var temp_1__27:i1 
+              temp_1__27 = icmp i32 Ne 5_0, 0_0 
+              new_var temp_2__27:i1 
+              temp_1__27 = icmp i32 Ne -2_0, 0_0 
+              new_var temp_3_logic_27:i1 
+              temp_3_logic_27 = Or i1 temp_1__27, temp_2__27 
+              br i1 temp_3_logic_27, label branch_true_28, label branch_false_28 
+          label branch_true_28: 
+              new_var temp_4_logic_30:i1 
+              temp_4_logic_30 = And i1 true_0, true_0 
+              br i1 temp_4_logic_30, label branch_true_31, label branch_false_31 
+          label branch_true_31: 
+              ret 3_0 
+          label branch_false_31: 
+              new_var temp_5__34:i1 
+              temp_5__34 = icmp i32 Ne 5_0, 0_0 
+              new_var temp_6__34:i1 
+              temp_5__34 = icmp i32 Ne 0_0, 0_0 
+              new_var temp_7_logic_34:i1 
+              temp_7_logic_34 = And i1 temp_5__34, temp_6__34 
+              br i1 temp_7_logic_34, label branch_true_35, label branch_false_35 
+          label branch_true_35: 
+              ret 4_0 
+          label branch_false_35: 
+              new_var temp_8_cmp_38:i1 
+              temp_8_cmp_38 = icmp i32 Sge 2_0, 3_0 
+              br i1 temp_8_cmp_38, label branch_true_39, label branch_false_39 
+          label branch_true_39: 
+              new_var temp_9_logic_41:i1 
+              temp_9_logic_41 = Or i1 false_0, false_0 
+              br i1 temp_9_logic_41, label branch_true_42, label branch_false_42 
+          label branch_true_42: 
+              ret 6_0 
+          label branch_false_42: 
+              new_var temp_10_cmp_45:i1 
+              temp_10_cmp_45 = icmp i32 Ne 3_0, 6_0 
+              br i1 temp_10_cmp_45, label branch_true_46, label branch_false_46 
+          label branch_true_46: 
+              new_var temp_11_cmp_48:i1 
+              temp_11_cmp_48 = icmp i32 Sgt 10_0, 22_0 
+              br i1 temp_11_cmp_48, label branch_true_49, label branch_false_49 
+          label branch_true_49: 
+              new_var temp_12_booltrans_51:i1 
+              temp_12_booltrans_51 = icmp i32 Ne 6_0, 0_0 
+              new_var temp_13_logicnot_51:i1 
+              temp_13_logicnot_51 = xor i1 temp_12_booltrans_51, true 
+              br i1 temp_13_logicnot_51, label branch_true_52, label branch_false_52 
+          label branch_true_52: 
+              ret 9_0 
+          label branch_false_52: 
+              ret 10_0 
+          label L2_0: 
+          label branch_false_49: 
+              ret 8_0 
+          label L3_0: 
+          label branch_false_46: 
+              ret 7_0 
+          label L4_0: 
+          label L5_0: 
+          label branch_false_39: 
+              ret 5_0 
+          label L6_0: 
+          label L7_0: 
+          label L8_0: 
+          label branch_false_28: 
+              ret 2_0 
+          label L9_0: 
+          label branch_false_25: 
+              ret 1_0 
+          label L10_0: 
