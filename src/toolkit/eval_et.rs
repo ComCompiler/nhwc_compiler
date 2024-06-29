@@ -5,7 +5,7 @@ use crate::{add_edge, add_node_with_edge, debug_info_blue, debug_info_green, deb
 use anyhow::Result;
 use anyhow::anyhow;
 use itertools::Itertools;
-use petgraph::graph::{NodeIndex};
+use petgraph::{graph::{node_index, NodeIndex}, visit::{EdgeRef, NodeRef}, Direction::Outgoing};
 use syn::ExprAssignOp;
 ///
 /// pattern 
@@ -388,11 +388,11 @@ pub fn compress_et(et_tree:&mut EtTree, et_sep_node:u32, symtab:&SymTab, scope_n
     debug_info_red!("exec compress_et on {}",et_sep_node);
     recursive_replace_const_symbol(et_tree, et_sep_node, symtab, scope_node, scope_tree)?;
     eval_et(et_tree, et_sep_node);
-    let dfs_nodes = dfs_with_predicate(&et_tree, et_sep_node, |e|!e.weight().et_edge_type.is_deleted());
     for et_node in direct_et_child_nodes!(at et_sep_node in et_tree ){
         debug_info_blue!("hash expr eliminate on {}",et_node);
         hash_expr_elimination(et_node, et_tree);
     }
+    let dfs_nodes = dfs_with_predicate(&et_tree, et_sep_node, |e|!e.weight().et_edge_type.is_deleted());
     for et_node in dfs_nodes{
         reducation(et_node, et_tree);
     }
@@ -414,10 +414,25 @@ pub fn _common_expr_elimination_by_hash(et_node:u32,et_tree:&mut EtTree, map:&mu
     let &hash = node!(at et_node in et_tree).hash.as_ref().unwrap();
     if let Some(&found_et_node) = map.get(&hash){
         if can_eliminate_et_node(et_node, et_tree){
-            // edge between parent and child
-            let et_edge = et_tree.find_edge(NodeIndex::new(parent_et_node as usize), NodeIndex::new(et_node as usize)).unwrap();
-            *et_tree.edge_weight_mut(et_edge).unwrap() = EtEdgeType::Deleted.into();
-            add_edge!({EtEdgeType::Direct.into()} from parent_et_node to found_et_node in et_tree);
+            // clone all edges that it has 
+            let mut edge_weight_tuple_vec = vec![];
+            for edge_ref in et_tree.edges_directed(node_index(parent_et_node as usize), Outgoing).collect_vec().iter().rev(){
+                let mut weight = edge_ref.weight().clone();
+                let s = edge_ref.source().index() as u32;
+                let t = edge_ref.target().index() as u32;
+                if t == et_node{
+                    weight = EtEdgeType::Deleted.into();
+                    edge_weight_tuple_vec.push((EtEdgeType::Direct.into(),s,found_et_node));
+                }
+                edge_weight_tuple_vec.push((weight,s,t));
+            }
+            let edges = et_tree.edges_directed(node_index(parent_et_node as usize), Outgoing).map(|edge| edge.id()).collect_vec();
+            for edge in edges{
+                et_tree.remove_edge(edge);
+            }
+            for (weight,s,t) in edge_weight_tuple_vec{
+                add_edge!({weight} from s to t in et_tree);
+            }
         }
     }else {
         if can_eliminate_et_node(et_node, et_tree){
