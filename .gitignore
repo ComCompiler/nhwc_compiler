@@ -7,4 +7,9 @@
 *.java
 */.*/*
 *.pdf
-out/
+out/*
+for_auto_test/1s/*
+for_auto_test/2o/*
+for_auto_test/3elf/*
+for_auto_test/4ours_out/*
+

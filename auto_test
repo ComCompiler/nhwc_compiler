@@ -34,6 +34,10 @@ cargo build --release
 # 初始化数组
 files_to_compare=()
 
+# 初始化计数器
+correct_count=0
+incorrect_count=0
+
 # 检查是否提供了单个 .sy 文件作为参数
 if [ "$#" -eq 1 ]; then
     sy_files=("$1")
@@ -51,6 +55,13 @@ for filename in "${sy_files[@]}"; do
         export base_name=$(basename "$filename" .sy)
         # 执行编译命令，输出到同一目录
         ./target/release/compiler "$filename" -o "$s_path/${base_name}.s" 2> /dev/null
+        compile_status=$?
+
+        if [ $compile_status -ne 0 ]; then
+            echo "Failed to compile $filename" >> "$o_path/${base_name}_compiler_error.log"
+            ./target/release/compiler "$filename" -o "$s_path/${base_name}.s" 2>> "$o_path/${base_name}_compiler_error.log"
+            continue
+        fi
         
         # 使用 gcc 工具链把 .s 文件链接
         riscv64-linux-gnu-as "$s_path/${base_name}.s" -o "$o_path/${base_name}.o"
@@ -100,7 +111,14 @@ for files in "${files_to_compare[@]}"; do
     IFS=' ' read -r ours_file official_file <<< "$files"
     if diff -wB "$ours_file" "$official_file" > /dev/null; then
         echo -e "${GREEN}$(basename "$ours_file") 过了${NC}"
+        let correct_count++
     else
         echo -e "${RED}$(basename "$ours_file") 结果不一样!${NC}"
+        diff -wB "$ours_out_path/$(basename "$ours_file")" "$official_path/$(basename "$ours_file")" -y | head -n 10
+        let incorrect_count++
     fi
 done
+
+# 输出统计结果
+echo -e "${GREEN}通过的文件数: $correct_count${NC}"
+echo -e "${RED}未通过的文件数: $incorrect_count${NC}"
