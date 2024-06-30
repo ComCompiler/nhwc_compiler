@@ -17,6 +17,8 @@ make_field_trait_for_struct!(RegTab);
 /// only manage s & fs registers 
 #[derive(Clone)]
 pub struct RegTab {
+    gpr_released_reg_count : usize,
+    fpr_released_reg_count : usize,
     reg_symidx_map :AHashMap<Register, RegState>,
 } 
 reg_field_for_struct!(Symbol {
@@ -89,7 +91,9 @@ impl RegTab{
         for idx in REG_FS_RANGE.clone(){
             map.insert(Register::new_fs(idx), RegState::new_released());
         }
-        Self { reg_symidx_map: map }
+        Self { reg_symidx_map: map, gpr_released_reg_count: REG_A_RANGE.len() +  REG_S_RANGE.len() ,
+            fpr_released_reg_count: REG_FA_RANGE.len() + REG_FS_RANGE.len(),
+        }
     }
     // pub fn check_reg_releasable(&mut self,reg:&Register) -> Result<bool> {
     //     if let Some(regstate) = self.reg_symidx_map.get(&reg){
@@ -116,6 +120,11 @@ impl RegTab{
             Some(regstat) => {
                 match regstat{
                     RegState::Released => {
+                        if reg.is_gpr(){
+                            self.gpr_released_reg_count -= 1;
+                        }else{
+                            self.fpr_released_reg_count -= 1;
+                        }
                         if tracked{
                             symtab.get_mut(&symidx)?.add_cur_reg(Some(reg));
                         }
@@ -275,14 +284,29 @@ impl RegTab{
                     // take func will leave a None in place 
                     let reg = symtab.get_mut(symidx)?.get_mut_cur_reg()?.take().with_context(||format!("symbol {:?} must has cur_reg field Some(reg)",symidx))?;
                     let symidx = symidx.clone();
-                    *regstat = RegState::new_released();
+
+                    self.occupy_reg(reg.clone(), &symidx, symtab, asm_sect, true)?;
                     store_f(symidx.clone(),reg.clone(), symtab ,asm_sect, self)?;
+                    // self.free_reg(reg.clone(), asm_sect)?;
+
+                    let regstat = self.reg_symidx_map.get_mut(&reg).unwrap();
+                    *regstat = RegState::new_released();
                     // this will recursively try release reg until released 
-                    self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
+                    // self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
                     asm_sect.annotate(format!("release {:?} with {:?}",reg,symidx));
+                    if reg.is_gpr(){
+                        self.gpr_released_reg_count += 1;
+                    }else {
+                        self.fpr_released_reg_count += 1;
+                    }
                     Ok(())
                 }else{
                     *regstat = RegState::new_released();
+                    if reg.is_gpr(){
+                        self.gpr_released_reg_count += 1;
+                    }else {
+                        self.fpr_released_reg_count += 1;
+                    }
                     Ok(())
                 }
             },
@@ -303,12 +327,19 @@ impl RegTab{
         }
         Ok(())
     }
-
-    pub fn free_reg(&mut self, reg:Register,asm_sect:&mut AsmSection) -> Result<()>{
+    /// if released reg is less than 2, we should release this reg 
+    pub fn unoccupied_reg(&mut self, reg:Register,symtab:&mut SymTab, asm_sect:&mut AsmSection, store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>) -> Result<()>{
         asm_sect.annotate(format!("free {:?}",reg));
         let regstat = self.reg_symidx_map.get_mut(&reg).unwrap();
         debug_info_blue!("free reg {:?} ",reg);
-        regstat.free_once()
+        regstat.free_once()?;
+        if regstat.is_freed(){
+            debug_info_red!("release reg {:?} because not enough",reg);
+            if reg.is_gpr()&& self.gpr_released_reg_count<5 || reg.is_fpr() && self.fpr_released_reg_count < 5{
+                self.release_reg(reg, symtab, asm_sect, store_f)?;
+            }
+        }
+        Ok(())
     }
     pub fn find_avail_reg_for_ty_and_try_release(&mut self, sym_ty:&Type, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self)-> Result<()>) -> Result<Register>{
         let reg = self.find_avail_reg_for_ty(sym_ty)?;
@@ -316,6 +347,7 @@ impl RegTab{
         Ok(reg)
     }
     /// ret a Released register or Freed register of sym_ty
+    /// should keep one released reg always  
     pub fn find_avail_reg_for_ty(&mut self, sym_ty:&Type) -> Result<Register> {
         // find tail in priority 
         // only use s register when meet i32 or ptr or i1
@@ -367,6 +399,13 @@ impl RegTab{
                 }
             }else {
                 symtab.get_mut(symidx)?.add_cur_reg(Some(reg.clone()))
+            }
+        }
+        if self.is_released(&reg){
+            if reg.is_gpr(){
+                self.gpr_released_reg_count -= 1;
+            }else{
+                self.fpr_released_reg_count -= 1;
             }
         }
         *self.reg_symidx_map.get_mut(&reg).unwrap() = RegState::new_freed(symidx.clone(), should_track);
@@ -558,9 +597,19 @@ impl RegTab{
                     // take func will leave a None in place 
                     let reg = symtab.get_mut(symidx)?.get_mut_cur_reg()?.take().unwrap();
                     *regstat = RegState::new_released();
+                    if reg.is_gpr(){
+                        self.gpr_released_reg_count += 1;
+                    }else {
+                        self.fpr_released_reg_count += 1;
+                    }
                     Ok(())
                 }else{
                     *regstat = RegState::new_released();
+                    if reg.is_gpr(){
+                        self.gpr_released_reg_count += 1;
+                    }else {
+                        self.fpr_released_reg_count += 1;
+                    }
                     Ok(())
                 }
             },
@@ -569,9 +618,19 @@ impl RegTab{
                     // take func will leave a None in place 
                     let reg = symtab.get_mut(symidx)?.get_mut_cur_reg()?.take().unwrap();
                     *regstat = RegState::new_released();
+                    if reg.is_gpr(){
+                        self.gpr_released_reg_count += 1;
+                    }else {
+                        self.fpr_released_reg_count += 1;
+                    }
                     Ok(())
                 }else{
                     *regstat = RegState::new_released();
+                    if reg.is_gpr(){
+                        self.gpr_released_reg_count += 1;
+                    }else {
+                        self.fpr_released_reg_count += 1;
+                    }
                     Ok(())
                 }
             }
@@ -607,6 +666,6 @@ impl Debug for RegTab{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s:String = self.reg_symidx_map.iter().filter(|(r,s)|!s.is_released()).
             map(|(r,s)|format!("    {:?}:{:?} | ",r,s)).sorted().collect();
-        write!(f,"{}",s)
+        write!(f,"{} released_gpr_count:{},released_fpr_count:{}",s,self.gpr_released_reg_count,self.fpr_released_reg_count)
     }
 }

@@ -21,6 +21,7 @@ if [ $# -eq 0 ]; then
             # xxd -p -c 4 "./out/${base_name}.bin" "./out/${base_name}.hex"
             echo ans_start:
             qemu-riscv64-static "./out/${base_name}.elf"
+            echo $?
             echo ans_end:
         fi
     done
@@ -40,6 +41,7 @@ else
              # xxd -p -c 4 "./out/${base_name}.bin" "./out/${base_name}.hex"
              echo ans_start:
              qemu-riscv64-static "./out/${base_name}.elf"
+             echo $?
              echo ans_end:
          fi
      done

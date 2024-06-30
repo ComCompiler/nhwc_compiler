@@ -88,7 +88,7 @@ impl MemLayout{
     }
     /// 返回这个 新插入data 的起始位置
     pub fn insert_data(&mut self, align:usize,data_len:usize, symidx:&SymIdx)-> usize{
-        debug_info_red!("insert data_len {} for symidx {:?}",data_len,symidx);
+        // debug_info_ed!("insert data_len {} for symidx {:?}",data_len,symidx);
             // debug_info_blue!("align:{} data_len:{}",align,data_len);
         let rst = self.find_available(align,data_len);
         match rst {

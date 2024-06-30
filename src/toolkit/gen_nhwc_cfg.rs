@@ -5,13 +5,13 @@ use petgraph::{
 };
 use core::panic;
 use std::collections::HashMap;
-use std::mem::replace;
 use crate::instr;
 
 use super::cfg_node::CFG_ROOT;
-use super::et_node::{EtNode, ExprOp};
+use super::et_node::ExprOp;
 use super::eval_et::{self};
 use super::field::{ArrayEleMap, Value};
+use super::gen_cfg::AST_ROOT;
 use super::gen_et;
 use super::mem_layout::MemLayout;
 use super::nhwc_instr::CmpPlan;
@@ -575,8 +575,8 @@ fn process_symbol(
             if *symtab.get(&symidx)?.get_is_global()? {
                 match symtab.get(&symidx)?.get_type()?{
                     Type::Array { dims, ele_ty } => {
-                        let temp_type = symtab.get(&symidx)?.get_type()?.clone();
-                        let ptr_type = symtab.get(&symidx.to_globl_ptr()?)?.get_type()?.clone();
+                        // let temp_type = symtab.get(&symidx)?.get_type()?.clone();
+                        // let ptr_type = symtab.get(&symidx.to_globl_ptr()?)?.get_type()?.clone();
                         // let temp_symidx = process_temp_symbol(cfg_graph, symtab, &temp_type, scope_parent_node, cfg_node, instr_slab, &mut None, op_et_node, et_tree, "ptr2globl")?;
                         // node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_assign(temp_symidx.clone(), symidx.to_globl_ptr()?, ptr_type.clone()).into(), instr_slab)?;
                         Ok(symidx.to_globl_ptr()?)
@@ -1493,7 +1493,6 @@ fn process_et(
                     },
                     super::et_node::ExprOp::ArrayWrapper => {
                         // 遇到arraywrapper后，就不会由 process_et 递归处理了
-                        let et_node_vec = vec![et_node];
                         let mut array_ele_map = ArrayEleMap::new();
                         // 这里假定了et_node 父亲一定是 assign 并且左子节点一定有等号
                         let et_assign_node = direct_parent_node!(at et_node in et_tree);
@@ -1529,7 +1528,8 @@ fn process_et(
                                     reversed_remained_dims.reverse();
 
                                     // add values to value_map according to initializer
-                                    array_initialize(et_node_vec, et_tree, &mut array_ele_map, &ele_ty, &mut reversed_remained_dims, &mut 0, ast_tree, cfg_graph, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
+                                    array_initialize( et_tree, &mut array_ele_map, &ele_ty, &mut reversed_remained_dims, &mut 0, ast_tree, cfg_graph, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
+                                    debug_info_red!("{:?}",array_ele_map);
                                     let initializer_symidx = process_literal(symtab, &format!("{{{:?}}} ", array_ele_map), symtab_graph)?;
                                     symtab.get_mut(&initializer_symidx)?.add_value(Value::new_array(array_ele_map, dims.clone().into_iter().map(|x| x.unwrap()).collect_vec(), *ele_ty.clone()));
                                     symtab.get_mut(&initializer_symidx)?.add_type(array_ty);
@@ -1607,6 +1607,7 @@ fn process_et(
                                     let value_symidx = value.to_symidx()?;
                                     process_literal(symtab, &value_symidx.symbol_name, symtab_graph)?;
                                     let array_idx_vec = deduce_linear_offset_by_weights(offset, r_type.get_array_dim_weight_vec()?.into_iter().map(|s| s.symbol_name.parse().unwrap()).collect_vec());
+                                    debug_info_red!("deduce linear_offset_by_weights from {} into {:?}",offset,array_idx_vec);
                                     for &array_idx in array_idx_vec.iter(){
                                         process_literal(symtab, &array_idx.to_string(), symtab_graph)?;
                                     }
@@ -1701,6 +1702,7 @@ fn parse_extern_declfunc2nhwc(
 
                 let (et_sym_node,ast_sym_name_node) ={
                     let sep_node = gen_et::process_any_stmt(et_tree, ast_tree, scope_tree, ast_parameter_decl_node, func_scope);
+                    eval_et::compress_et(et_tree, sep_node, symtab, ST_ROOT, scope_tree)?;
                     let mut cur_et_node = sep_node;
                     let ast_sym_name_node;
                     loop{
@@ -1881,6 +1883,7 @@ fn parse_func2nhwc(
                 // let ast_arg_type = find!(rule RULE_declarationSpecifiers at ast_func_arg in ast_tree).unwrap();
                 // let func_arg_str = &node!(at ast_para_node in ast_tree).text;
                 let et_arg_sep = process_any_stmt(et_tree, ast_tree, scope_tree, ast_func_arg, func_scope);
+                eval_et::compress_et(et_tree, et_arg_sep, symtab, ST_ROOT, scope_tree)?;
                 let arg_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, direct_child_node!(at et_arg_sep in et_tree), func_scope, cfg_entry, instr_slab, op_symtab_graph)?.unwrap();
                 arg_syms.push(arg_symidx);
             }
@@ -2168,71 +2171,51 @@ pub fn get_cfg_entry_by_cfg_node(cfg_graph:&CfgGraph,symtab:&SymTab,cfg_node:u32
 
 /// array init
 /// require input `reversed_remained_dims` dimensions to be reversed 
-pub fn array_initialize(et_node_vec:Vec<u32>, et_tree:&mut EtTree, array_ele_map:&mut ArrayEleMap, ele_type:&Type,reversed_remained_dims:&mut Vec<usize>, array_offset:&mut usize,
+pub fn array_initialize( et_tree:&mut EtTree, array_ele_map:&mut ArrayEleMap, ele_type:&Type,reversed_remained_dims:&mut Vec<usize>, array_offset:&mut usize,
     ast_tree:&AstTree, cfg_graph:&mut CfgGraph,  scope_tree:&ScopeTree, symtab:&mut SymTab, et_node:u32, scope_node:u32, cfg_bb:u32, instr_slab:&mut InstrSlab<NhwcInstr>,
     symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<()>
-
 {
-    debug_info_blue!("array_init {:?} ",reversed_remained_dims);
+    let ele_count_to_read:usize = if reversed_remained_dims.len()!=0 { reversed_remained_dims.iter().product()}else {panic!()};
+        // array_ele_map.add_ele_from_usize(*array_offset, Value::from_string_with_specific_type(&"0".to_string(), ele_type)?)?;
+        // debug_info_blue!("add array ele with offset {},{:?}",*array_offset, Value::from_string_with_specific_type(&"0".to_string(), ele_type)?);
+    let last_array_offset = *array_offset;
+    *array_offset+= (ele_count_to_read - *array_offset % ele_count_to_read)%ele_count_to_read;
+    debug_info_blue!("array_init {:?} at et_node {}",reversed_remained_dims,et_node);
+    let et_node_vec = direct_child_nodes!(at et_node in et_tree);
     let mut i = 0;
     while i < et_node_vec.len(){
+        debug_info_blue!("ele_count_to_read =  {},{:?}",ele_count_to_read , reversed_remained_dims);
         let et_node = et_node_vec[i];
-        match &node!(at et_node in et_tree).et_node_type {
-            EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _, op_symidx } => {
-                let ele_and_sub_array_vec = direct_child_nodes!(at et_node in et_tree);
-                // let last_dim = reversed_remained_dims.pop().unwrap();
-                array_initialize(ele_and_sub_array_vec, et_tree, array_ele_map, ele_type,reversed_remained_dims, array_offset,ast_tree, cfg_graph, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
-                // reversed_remained_dims.push(last_dim);
-                i+=1;
-            }
-            _ => {
-                // 如果遇到Constant 那么应该继续读几个？
-                // 这里 pop 掉
+        match &node!(at et_node in et_tree).et_node_type{
+            EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _, op_symidx }=>{
                 let cur_dim = reversed_remained_dims.pop().unwrap();
-                let ele_count_to_read:usize = if reversed_remained_dims.len()!=0 { reversed_remained_dims[0..reversed_remained_dims.len()-1].iter().product()}else {1};
-                debug_info_blue!("ele_count_to_read =  {},{:?}",ele_count_to_read , reversed_remained_dims);
-
-                let last_i = i;
-                while i < last_i+ele_count_to_read{
-                    if i >= et_node_vec.len(){
-                        break;
-                    }
-                    let et_node = et_node_vec[i];
-                    match &node!(at et_node in et_tree).et_node_type{
-                        EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _, op_symidx }=>{
-                            return Err(anyhow!("expect a constant but meet a array wrapper {}",et_node))
-                        },
-                        EtNodeType::Literal { literal_symidx: const_sym_idx, ast_node: _, text: _ } => {
-                            array_ele_map.insert_ele(*array_offset, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?)?;
-                            // debug_info_blue!("add array ele with offset {},{:?}",i, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?);
-                            *array_offset +=1;
-                        },
-                        _ => {
-                            let l_type = ele_type;
-                            let r_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?.with_context(|| format!("no value of this expr et node{}",et_node))?;
-                            // only 2 types should be considered, f32 & i32
-                            let r_type = symtab.get(&r_symidx)?.get_type()?.clone();
-                            let new_value_symidx = force_trans_type(cfg_graph, symtab, l_type, &r_type, &r_symidx, scope_node, cfg_bb, instr_slab, symtab_graph,Some(et_node),et_tree)?;
-                            array_ele_map.insert_ele(*array_offset, Value::new_ref(new_value_symidx, r_type))?;
-                            *array_offset +=1;
-                        },
-                        _ => {
-                            return Err(anyhow!("expect a constant or arraywrapper but meet nor of them at {}",et_node))
-                        }
-                    };
-                    i+=1;
-                }
-                // 不足的补 0 
-                while i< last_i + ele_count_to_read{
-                    // array_ele_map.add_ele_from_usize(*array_offset, Value::from_string_with_specific_type(&"0".to_string(), ele_type)?)?;
-                    // debug_info_blue!("add array ele with offset {},{:?}",*array_offset, Value::from_string_with_specific_type(&"0".to_string(), ele_type)?);
-                    *array_offset+=1;
-                    i+=1;
-                }
+                array_initialize( et_tree, array_ele_map, ele_type,reversed_remained_dims, array_offset,ast_tree, cfg_graph, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?;
                 reversed_remained_dims.push(cur_dim);
+            },
+            EtNodeType::Literal { literal_symidx: const_sym_idx, ast_node: _, text: _ } => {
+                array_ele_map.insert_ele(*array_offset, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?)?;
+                // debug_info_blue!("add array ele with offset {},{:?}",i, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?);
+                *array_offset +=1;
+            },
+            _ => {
+                let l_type = ele_type;
+                let r_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, symtab_graph)?.with_context(|| format!("no value of this expr et node{}",et_node))?;
+                // only 2 types should be considered, f32 & i32
+                let r_type = symtab.get(&r_symidx)?.get_type()?.clone();
+                let new_value_symidx = force_trans_type(cfg_graph, symtab, l_type, &r_type, &r_symidx, scope_node, cfg_bb, instr_slab, symtab_graph,Some(et_node),et_tree)?;
+                array_ele_map.insert_ele(*array_offset, Value::new_ref(new_value_symidx, r_type))?;
+                *array_offset +=1;
+            },
+            _ => {
+                return Err(anyhow!("expect a constant or arraywrapper but meet nor of them at {}",et_node))
             }
-        }
+        };
+        i+=1;
+    }
+    // if has ele in this dimension and is not full
+    if last_array_offset+ele_count_to_read!=*array_offset{
+        *array_offset+= ele_count_to_read - *array_offset % ele_count_to_read;
     }
     Ok(())
 }
