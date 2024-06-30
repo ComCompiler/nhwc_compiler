@@ -239,8 +239,7 @@ fn parse_bb2nhwc(
                                 anyhow::Result::Ok(while_or_for_node ) => while_or_for_node ,
                                 Err(e) => {debug_info_blue!("{}",e);continue;},
                             };
-                            let body_exit_node = get_exit_node_of_while_or_for_node(while_or_for_node, cfg_graph)?;
-                            let jump_label = node!(at body_exit_node in cfg_graph).op_label_instr.unwrap();
+                            let jump_label = node!(at while_or_for_node in cfg_graph).op_label_instr.unwrap();
                             let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
                             let jump_label = match jump_nhwctype{
                                 NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
@@ -1437,7 +1436,13 @@ fn process_et(
                             },
                             EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, decldef_def_or_use:DeclOrDefOrUse::Use } => {
                                 // 在最接近 symbol 的一层 array_index 插入 getelementptr 语句
-                                let array_ty = symtab.get(&array_symidx)?.get_type()?.clone();
+                                let array_ty = {let ty = symtab.get(&array_symidx)?.get_type()?.clone();
+                                    if ty.is_ptr_64(){
+                                        ty.ptr2arr()?
+                                    }else {
+                                        ty
+                                    }
+                                };
                                 // debug_info_blue!("array {:?} type is {:?}", array_symidx,array_ty);
                                 // 可删此段
                                 let l_child_type = node!(at et_l_child in et_tree).get_type()?.clone();

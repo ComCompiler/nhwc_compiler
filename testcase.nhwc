@@ -1,4 +1,4 @@
-# input: "./compiler2022/公开样例与运行时库/hidden_functional/03_branch.sy"
+# input: "./compiler2022/公开样例与运行时库/functional/04_arr_defn3.sy"
       global Fn[]->getint_ret_0 getint_0 
       global Fn[]->getch_ret_0 getch_0 
       global Fn[zz_array_3]->getarray_ret_0 getarray_0 
@@ -15,106 +15,75 @@
       global Fn[zz_ptr_14, zz_val_14, zz_len_14]->memset_ret_0 memset_0 
       global Fn[zz_dest_15, zz_ptr_15, zz_len_15]->memcpy_ret_0 memcpy_0 
       Define main_0 [] -> main_ret_0 
-              alloc i32 a_17 
-              alloc i32 b_17 
-              alloc i32 c_17 
-              alloc i32 d_17 
-              alloc i32 e_17 
-              alloc i32 f_17 
-              alloc i1 temp_0_logic_24 
-              alloc i1 temp_1__27 
-              alloc i1 temp_2__27 
-              alloc i1 temp_3_logic_27 
-              alloc i1 temp_4_logic_30 
-              alloc i1 temp_5__34 
-              alloc i1 temp_6__34 
-              alloc i1 temp_7_logic_34 
-              alloc i1 temp_8_cmp_38 
-              alloc i1 temp_9_logic_41 
-              alloc i1 temp_10_cmp_45 
-              alloc i1 temp_11_cmp_48 
-              alloc i1 temp_12_booltrans_51 
-              alloc i1 temp_13_logicnot_51 
+              alloc ptr->i32 temp_0_array_init_ptr_17 
+              alloc ptr->i32 temp_1_array_init_ptr_17 
+              alloc ptr->i32 temp_2_array_init_ptr_17 
+              alloc ptr->i32 temp_3_array_init_ptr_17 
+              alloc ptr->i32 temp_4_array_init_ptr_17 
+              alloc ptr->i32 temp_5_array_init_ptr_17 
+              alloc ptr->i32 temp_6_array_init_ptr_17 
+              alloc Array:i32:[Some(4_0), Some(2_0)] d_17 
+              alloc Array:i32:[Some(2_0)] temp_7_array_ptr_17 
+              alloc ptr->i32 temp_8_array_ele_ptr_17 
+              alloc Array:i32:[Some(2_0)] temp_9_array_ptr_17 
+              alloc ptr->i32 temp_10_array_ele_ptr_17 
+              alloc Array:i32:[Some(2_0)] temp_11_array_ptr_17 
+              alloc ptr->i32 temp_12_array_ele_ptr_17 
+              alloc Array:i32:[Some(2_0)] temp_13_array_ptr_17 
+              alloc ptr->i32 temp_14_array_ele_ptr_17 
           label L0_0: 
-              a_17 = i32 1_0 
-              b_17 = i32 2_0 
-              c_17 = i32 3_0 
-              d_17 = i32 4_0 
-              e_17 = i32 5_0 
-              f_17 = i32 6_0 
-              jump label: L1_0 
-          label L1_0: 
-              new_var temp_0_logic_24:i1 
-              temp_0_logic_24 = And i1 true_0, true_0 
-              br i1 temp_0_logic_24, label branch_true_25, label branch_false_25 
-          label branch_true_25: 
-              new_var temp_1__27:i1 
-              temp_1__27 = icmp i32 Ne 5_0, 0_0 
-              new_var temp_2__27:i1 
-              temp_1__27 = icmp i32 Ne -2_0, 0_0 
-              new_var temp_3_logic_27:i1 
-              temp_3_logic_27 = Or i1 temp_1__27, temp_2__27 
-              br i1 temp_3_logic_27, label branch_true_28, label branch_false_28 
-          label branch_true_28: 
-              new_var temp_4_logic_30:i1 
-              temp_4_logic_30 = And i1 true_0, true_0 
-              br i1 temp_4_logic_30, label branch_true_31, label branch_false_31 
-          label branch_true_31: 
-              ret 3_0 
-          label branch_false_31: 
-              new_var temp_5__34:i1 
-              temp_5__34 = icmp i32 Ne 5_0, 0_0 
-              new_var temp_6__34:i1 
-              temp_5__34 = icmp i32 Ne 0_0, 0_0 
-              new_var temp_7_logic_34:i1 
-              temp_7_logic_34 = And i1 temp_5__34, temp_6__34 
-              br i1 temp_7_logic_34, label branch_true_35, label branch_false_35 
-          label branch_true_35: 
-              ret 4_0 
-          label branch_false_35: 
-              new_var temp_8_cmp_38:i1 
-              temp_8_cmp_38 = icmp i32 Sge 2_0, 3_0 
-              br i1 temp_8_cmp_38, label branch_true_39, label branch_false_39 
-          label branch_true_39: 
-              new_var temp_9_logic_41:i1 
-              temp_9_logic_41 = Or i1 false_0, false_0 
-              br i1 temp_9_logic_41, label branch_true_42, label branch_false_42 
-          label branch_true_42: 
-              ret 6_0 
-          label branch_false_42: 
-              new_var temp_10_cmp_45:i1 
-              temp_10_cmp_45 = icmp i32 Ne 3_0, 6_0 
-              br i1 temp_10_cmp_45, label branch_true_46, label branch_false_46 
-          label branch_true_46: 
-              new_var temp_11_cmp_48:i1 
-              temp_11_cmp_48 = icmp i32 Sgt 10_0, 22_0 
-              br i1 temp_11_cmp_48, label branch_true_49, label branch_false_49 
-          label branch_true_49: 
-              new_var temp_12_booltrans_51:i1 
-              temp_12_booltrans_51 = icmp i32 Ne 6_0, 0_0 
-              new_var temp_13_logicnot_51:i1 
-              temp_13_logicnot_51 = xor i1 temp_12_booltrans_51, true 
-              br i1 temp_13_logicnot_51, label branch_true_52, label branch_false_52 
-          label branch_true_52: 
-              ret 9_0 
-          label branch_false_52: 
-              ret 10_0 
-          label L2_0: 
-          label branch_false_49: 
-              ret 8_0 
-          label L3_0: 
-          label branch_false_46: 
-              ret 7_0 
-          label L4_0: 
-          label L5_0: 
-          label branch_false_39: 
-              ret 5_0 
-          label L6_0: 
-          label L7_0: 
-          label L8_0: 
-          label branch_false_28: 
-              ret 2_0 
-          label L9_0: 
-          label branch_false_25: 
-              ret 1_0 
-          label L10_0: 
+              new_var d_17:Array:i32:[Some(4_0), Some(2_0)] 
+              new_var temp_0_array_init_ptr_17:ptr->i32 
+              temp_0_array_init_ptr_17 = getelementptr d_17:Array:i32:[Some(4_0), Some(2_0)] [] 
+               Call void memset_0(temp_0_array_init_ptr_17, 0_0, 32_0) 
+              new_var temp_1_array_init_ptr_17:ptr->i32 
+              temp_1_array_init_ptr_17 = getelementptr d_17:Array:i32:[Some(4_0), Some(2_0)] [Some(3_0), Some(0_0)] 
+              store 7_0:i32 temp_1_array_init_ptr_17:ptr->Array:i32:[Some(2_0)] 
+              mu d_17:24 
+              d_17 = chi d_17:24 
+              new_var temp_2_array_init_ptr_17:ptr->i32 
+              temp_2_array_init_ptr_17 = getelementptr d_17:Array:i32:[Some(4_0), Some(2_0)] [Some(0_0), Some(0_0)] 
+              store 1_0:i32 temp_2_array_init_ptr_17:ptr->Array:i32:[Some(2_0)] 
+              mu d_17:30 
+              d_17 = chi d_17:30 
+              new_var temp_3_array_init_ptr_17:ptr->i32 
+              temp_3_array_init_ptr_17 = getelementptr d_17:Array:i32:[Some(4_0), Some(2_0)] [Some(0_0), Some(1_0)] 
+              store 2_0:i32 temp_3_array_init_ptr_17:ptr->Array:i32:[Some(2_0)] 
+              mu d_17:36 
+              d_17 = chi d_17:36 
+              new_var temp_4_array_init_ptr_17:ptr->i32 
+              temp_4_array_init_ptr_17 = getelementptr d_17:Array:i32:[Some(4_0), Some(2_0)] [Some(1_0), Some(0_0)] 
+              store 3_0:i32 temp_4_array_init_ptr_17:ptr->Array:i32:[Some(2_0)] 
+              mu d_17:42 
+              d_17 = chi d_17:42 
+              new_var temp_5_array_init_ptr_17:ptr->i32 
+              temp_5_array_init_ptr_17 = getelementptr d_17:Array:i32:[Some(4_0), Some(2_0)] [Some(2_0), Some(0_0)] 
+              store 5_0:i32 temp_5_array_init_ptr_17:ptr->Array:i32:[Some(2_0)] 
+              mu d_17:48 
+              d_17 = chi d_17:48 
+              new_var temp_6_array_init_ptr_17:ptr->i32 
+              temp_6_array_init_ptr_17 = getelementptr d_17:Array:i32:[Some(4_0), Some(2_0)] [Some(3_0), Some(1_0)] 
+              store 8_0:i32 temp_6_array_init_ptr_17:ptr->Array:i32:[Some(2_0)] 
+              mu d_17:54 
+              d_17 = chi d_17:54 
+              new_var temp_7_array_ptr_17:Array:i32:[Some(2_0)] 
+              temp_7_array_ptr_17 = getelementptr d_17:Array:i32:[Some(4_0), Some(2_0)] [Some(0_0)] 
+              new_var temp_8_array_ele_ptr_17:ptr->i32 
+              temp_8_array_ele_ptr_17 = getelementptr temp_7_array_ptr_17:Array:i32:[Some(2_0)] [] 
+               Call void putarray_0(2_0, temp_8_array_ele_ptr_17) 
+              new_var temp_9_array_ptr_17:Array:i32:[Some(2_0)] 
+              temp_9_array_ptr_17 = getelementptr d_17:Array:i32:[Some(4_0), Some(2_0)] [Some(1_0)] 
+              new_var temp_10_array_ele_ptr_17:ptr->i32 
+              temp_10_array_ele_ptr_17 = getelementptr temp_9_array_ptr_17:Array:i32:[Some(2_0)] [] 
+               Call void putarray_0(2_0, temp_10_array_ele_ptr_17) 
+              new_var temp_11_array_ptr_17:Array:i32:[Some(2_0)] 
+              temp_11_array_ptr_17 = getelementptr d_17:Array:i32:[Some(4_0), Some(2_0)] [Some(2_0)] 
+              new_var temp_12_array_ele_ptr_17:ptr->i32 
+              temp_12_array_ele_ptr_17 = getelementptr temp_11_array_ptr_17:Array:i32:[Some(2_0)] [] 
+               Call void putarray_0(2_0, temp_12_array_ele_ptr_17) 
+              new_var temp_13_array_ptr_17:Array:i32:[Some(2_0)] 
+              temp_13_array_ptr_17 = getelementptr d_17:Array:i32:[Some(4_0), Some(2_0)] [Some(3_0)] 
+              new_var temp_14_array_ele_ptr_17:ptr->i32 
+              temp_14_array_ele_ptr_17 = getelementptr temp_13_array_ptr_17:Array:i32:[Some(2_0)] [] 
+               Call void putarray_0(2_0, temp_14_array_ele_ptr_17) 
+              ret 0_0 

@@ -682,7 +682,7 @@ impl Simulator{
                     _ => {return Err(anyhow!("{:?} 不是pointer,无法使用load指令",ptr_symidx))}
                 }
             },
-            GetElementPtr { lhs, array_ty, array_symidx, idx_vec } => {
+            GetElementPtr { lhs, array_ty, array_or_ptr_symidx: array_symidx, idx_vec } => {
                 match array_ty{
                     Type::Array { dims, ele_ty } => {
                         // if dims.len() != idx_vec.len(){

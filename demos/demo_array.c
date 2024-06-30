@@ -5,20 +5,28 @@ int b(int s){
 }
 int a(int m);
 int main(){
-    // int a[5]={1,2,3,4,5};
-    // a[3] = 2;
+    float a[10][5]={{1,2,3,4,5}};
     // float b[10] = {1.0};
-    // int i = 1;
-    // while(i<10) {
-    //     b[i]=b[i-1]*2;
-    //     i=i+1;
-    // }
+    int k = 0;
+    while(k<5){
+        int i = 1;
+        while(i<10) {
+            // b[i]=b[i-1]*2;
+            a[i][k] = a[i-1][k]*2;
+            i=i+1;
+        }
+        k =k +1;
+    }
     // breakpoint bp1(b)
     
     // int b , c = 3;
     // int d[2][3] = {{1,2,3},{4,5,6}};
     // b=d[1][2];
-    putarray(5, c);
+    k = 0;
+    while(k<5){
+        putfarray(5, a[k]);
+        k = k+1;
+    }
     return 0;
 }
 

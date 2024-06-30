@@ -1,24 +1,9 @@
-// int square(int num) {
-//     return -num*num;
-// }
-// int m(){
-//     // square(3);
-// }
-// int hello(){
-//     // square(3);
-// }
-int k(){
-    int x = 4;
-    int y =0 ;
-    if (x > 5){
-        if (x<6) y=5;
-        
-        // m();
-    } else if (x<3){
-        // square(x);
-        if (x<6) y=5;
-    } else {
-        // hello(x);
-        y=9;
-    }
+int func(int m[][5]){
+    putarray(5,m[1]);
+    return 0;
+}
+int main(){
+    int c[2][5] = {1,2,3,4,5,{9,10}};
+    func(c);
+    return 0;
 }

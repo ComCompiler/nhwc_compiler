@@ -231,7 +231,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     NhwcInstrType::Store { val_symidx: value_symidx, value_ty: _, ptr_symidx, ptr_ty: _ } => {
                         store_from_ptr(asm_sect, ptr_symidx, value_symidx,regtab, symtab)?;
                     },
-                    NhwcInstrType::GetElementPtr { lhs, array_symidx, array_ty, idx_vec } => {
+                    NhwcInstrType::GetElementPtr { lhs, array_or_ptr_symidx, array_ty, idx_vec } => {
                         // clear s3
                         // use reg s3 as rst register
                         // load idx to s2 
@@ -256,9 +256,9 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         let ele_size = array_ty.get_ele_size()?;
                         asm_sect.asm(Shifts::new_slli_from_multiple(ptr_reg.clone(), ptr_reg.clone(), ele_size)?.into());
                         // 2 situations : 1. array is global  2. array is local to stack
-                        match symtab.get(array_symidx)?.has_is_global() &&*symtab.get(array_symidx)?.get_is_global()?{
+                        match symtab.get(array_or_ptr_symidx)?.has_is_global() &&*symtab.get(array_or_ptr_symidx)?.get_is_global()?{
                             true => {
-                                let addr_reg = regtab.find_and_occupy_reg(&array_symidx,&Type::Ptr64 { ty: Box::new(Type::Void) }, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let addr_reg = regtab.find_and_occupy_reg(&array_or_ptr_symidx,&Type::Ptr64 { ty: Box::new(Type::Void) }, symtab, asm_sect, &mut default_store, &mut default_load)?;
                                 asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(), addr_reg.clone()).into());
                                 regtab.unoccupied_reg(addr_reg,symtab,asm_sect,&mut default_store)?;
                             },
@@ -266,15 +266,15 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 // only one situations 
                                 // you should find it in regtab or mem 
                                 // judge whether ptr and pointed array is in same function 
-                                match array_ty{
+                                match symtab.get(array_or_ptr_symidx)?.get_type()?{
                                     Type::Ptr64 { ty } => {
-                                        let addr_reg = regtab.find_and_occupy_reg(&array_symidx, &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                        let addr_reg = regtab.find_and_occupy_reg(&array_or_ptr_symidx, &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
                                         asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(),addr_reg.clone()).into());
                                         regtab.unoccupied_reg(addr_reg,symtab, asm_sect,&mut default_store)?;
                                     },
                                     Type::Array { dims, ele_ty } => {
                                         asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(),Register::SP).into());
-                                        let &offset2sp = symtab.get(array_symidx)?.get_mem_offset2sp()?;
+                                        let &offset2sp = symtab.get(array_or_ptr_symidx)?.get_mem_offset2sp()?;
                                         add_literal_to_reg(asm_sect, ptr_reg.clone(), ptr_reg.clone(), regtab, symtab,offset2sp )?;
                                     },
                                     _ => panic!()

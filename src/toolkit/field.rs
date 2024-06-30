@@ -607,12 +607,22 @@ impl Type {
         match self{
             Type::Ptr64 { ty } => {
                 Ok(Type::Array { dims: 
-                    match self{
+                    match ty.as_ref(){
                         Type::Array { dims, ele_ty } => {
                             let mut dims = dims.clone();
                             dims.insert(0, None);
                             dims
                         },
+                        Type::Ptr64{ ty } => {
+                            let arr = self.ptr2arr()?;
+                            match arr{
+                                Type::Array { mut dims, ele_ty } => {
+                                    dims.insert(0, None);
+                                    dims
+                                },
+                                _ => {panic!()}
+                            }
+                        }
                         _=>{
                             vec![None]
                         }

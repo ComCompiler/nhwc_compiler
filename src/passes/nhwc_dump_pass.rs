@@ -61,7 +61,7 @@ impl Pass for NhwcDumpPass {
             }
         }
         for &cfg_node in dfs_node_vec.iter(){
-            if node!(at cfg_node in cfg_graph).cfg_node_type.is_basic_block() {
+            if node!(at cfg_node in cfg_graph).cfg_node_type.is_basic_block() ||  node!(at cfg_node in cfg_graph).cfg_node_type.is_gather(){
                 if let Some(cfg_node_to_jump) =direct_child_node!(at cfg_node in cfg_graph ret_option){
                     if let Some(label_instr_to_jump) =node!(at cfg_node_to_jump in cfg_graph).op_label_instr{
                         match &instr!(at label_instr_to_jump in instr_slab)?.instr_type{
