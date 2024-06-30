@@ -50,7 +50,7 @@ for filename in "${sy_files[@]}"; do
         # 获取文件的基本名称，没有路径
         export base_name=$(basename "$filename" .sy)
         # 执行编译命令，输出到同一目录
-        ./target/release/compiler "$filename" -o "$s_path/${base_name}.s" 2> /dev/null
+        ./target/release/compiler "$filename" -o "$s_path/${base_name}.s" -a 2> /dev/null
         
         # 使用 gcc 工具链把 .s 文件链接
         riscv64-linux-gnu-as "$s_path/${base_name}.s" -o "$o_path/${base_name}.o"
