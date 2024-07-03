@@ -1569,7 +1569,10 @@ fn process_et(
 
                         if let EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use:DeclOrDefOrUse::DeclDef { type_ast_node, is_const }} = &node!(at left_child_et_node in et_tree).et_node_type {
                             if *is_const {
-                                symtab.get_mut(sym_idx)?.add_const_symidx(r_symidx.clone());
+                                // here we should transform value of const symidx r_symidx into the target type
+                                let val = Value::from_symidx(&r_symidx)?;
+                                let r_symidx = val.force_to_ty(&l_type)?.to_symidx()?;
+                                symtab.get_mut(sym_idx)?.add_const_symidx(r_symidx);
                             }
                         };
 

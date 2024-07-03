@@ -398,7 +398,7 @@ pub fn compress_et(et_tree:&mut EtTree, et_sep_node:u32, symtab:&SymTab, scope_n
     for et_node in dfs_nodes{
         reducation(et_node, et_tree);
     }
-    // // eval_et(et_tree, et_node);
+    // eval_et(et_tree, et_node);
     Ok(())
 }
 

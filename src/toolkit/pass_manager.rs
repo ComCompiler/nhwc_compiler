@@ -19,7 +19,7 @@ impl PassManager {
     pub fn add_pass(&mut self, pass:Box<dyn Pass>) { self.passes.push(pass); }
     /// 调用这个函数运行 PassManager 中的所有函数
     pub fn execute_passes(&mut self) -> bool{
-        let mut err_flag = false;
+        let mut errs = vec![];
         for pass in &mut self.passes {
             // match pass.run(&mut self.ctx).with_context(|| format!("Error occurred when running Pass {}",pass.get_pass_name())){
             match anyhow::Context::with_context(pass.run(&mut self.ctx), || format!("Error occurred when running Pass {}", pass.get_pass_name())) {
@@ -28,13 +28,19 @@ impl PassManager {
                     //println!("{}", format!("Pass {} run successfully", pass.get_pass_name()).green());
                 }
                 Err(e) => {
-                    err_flag =true;
-                    error!("{}", format!("{:?}", e).red())
+                    error!("{}", format!("{:?}", e).red());
+                    errs.push(e);
                     // println!("{}", format!("{:?}", e).red());
                 }
             }
+        };
+        if errs.len()>0{
+            println!("All errors:");
         }
-        err_flag
+        for e in &errs{
+            error!("{}", format!("{:?}", e).red());
+        }
+        errs.len() > 0
     }
     pub fn await_all_io_tasks(&mut self){
         for handle in self.ctx.io_task_list.drain(..){

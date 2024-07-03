@@ -157,6 +157,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
             for instr in node!(at cfg_node in cfg_graph).iter_all_instrs().cloned().collect_vec() {
                 let instr_struct = instr!(at instr in nhwc_instr_slab)?;
                 debug_info_red!("{:?}",instr_struct);
+                // debug_info_red!("cur_reg of {:?} is {:?}",SymIdx::new(16, "ah".to_string()),symtab.get(&SymIdx::new(16, "ah".to_string()))?.get_cur_reg());
                 asm_sect.annotate(format!("{:?}",instr_struct));
                 match &instr_struct.instr_type{
                     NhwcInstrType::Label { label_symidx } => {
@@ -181,14 +182,14 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 }
                             }
                         } 
-                        for (idx,arg) in fpr_args.iter().enumerate(){
+                        for (idx,arg) in fpr_args.iter().take(8).enumerate(){
                             // _store_sym(asm_sect, &arg,Register::new_fa(idx as u8), symtab)?;
                             if REG_FA_RANGE.contains(&(idx as u8)){
                                 let reg = Register::new_fa(idx as u8);
                                 regtab.set_freed_reg(reg,&arg,symtab)?;
                             }
                         }   
-                        for (idx,arg) in gpr_args.iter().enumerate(){
+                        for (idx,arg) in gpr_args.iter().take(8).enumerate(){
                             // _store_sym(asm_sect, &arg,Register::new_a(idx as u8), symtab)?;
                             if REG_A_RANGE.contains(&(idx as u8)){
                                 let reg = Register::new_a(idx as u8);
@@ -207,6 +208,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         _store_sym(asm_sect, &ra_symidx, Register::RA, regtab,symtab,0)?;
                         _store_sym(asm_sect, &s0_symidx, Register::new_s0(), regtab,symtab,0)?;
                         add_literal_to_reg(asm_sect, Register::new_s0(),  Register::SP,regtab, symtab,stack_size as isize)?;
+                        debug_info_red!("after func define instr {:?}", regtab);
                     },
                     NhwcInstrType::DefineVar { var_symidx, vartype: _, op_value } => {
                         match op_value{
@@ -220,6 +222,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     },
                     NhwcInstrType::Alloc { var_symidx: _, vartype: _ } => {
                         // do nothing
+                        // debug_info_red!("when meet alloc instr {:?}", regtab);
                     },
                     NhwcInstrType::Globl { var_symidx: _, vartype: _ } => {
                         // do nothing
@@ -543,35 +546,35 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         // for fpu arg 
                         {
                             // first make all args occupyied 
-                            for (idx,arg) in fpr_args.iter().enumerate(){
+                            for (idx,arg) in fpr_args.iter().take(8).enumerate(){
                                 if REG_FA_RANGE.contains(&(idx as u8)){
                                     let reg =Register::new_fa(idx as u8);
                                     regtab.anonymous_load_into(reg, arg, &Type::F32, symtab, asm_sect, &mut default_store, &mut default_load)?;
                                     // regtab.forget(reg, symtab)?;
                                 }
                             } 
-                            // than free the arg reg at the same time
-                            for (idx,arg) in fpr_args.iter().enumerate(){
-                                if REG_A_RANGE.contains(&(idx as u8)){
-                                    let reg =Register::new_fa(idx as u8);
-                                    regtab.forget(reg, symtab)?;
-                                }
-                            }
-                        }  
                         // for gpr args
-                        {
-                            for (idx,arg) in gpr_args.iter().enumerate(){
+                            for (idx,arg) in gpr_args.iter().take(8).enumerate(){
                                 if REG_A_RANGE.contains(&(idx as u8)){
                                     let reg =Register::new_a(idx as u8);
                                     regtab.anonymous_load_into(reg, arg, &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
                                 }
                             }   
-                            for (idx,arg) in gpr_args.iter().enumerate(){
+                        }  
+                        {
+                            for (idx,arg) in gpr_args.iter().take(8).enumerate(){
                                 if REG_A_RANGE.contains(&(idx as u8)){
                                     let reg =Register::new_a(idx as u8);
                                     regtab.forget(reg, symtab)?;
                                 }
                             }   
+                            // than free the arg reg at the same time
+                            for (idx,arg) in fpr_args.iter().take(8).enumerate(){
+                                if REG_A_RANGE.contains(&(idx as u8)){
+                                    let reg =Register::new_fa(idx as u8);
+                                    regtab.forget(reg, symtab)?;
+                                }
+                            }
                         }
                         asm_sect.annotate("arg load ended\n".to_string());
                         asm_sect.asm(PseudoInstr::new_call(Imm::new_global_label(func_op.func_symidx.clone())).into());
