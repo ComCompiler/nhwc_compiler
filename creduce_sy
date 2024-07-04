@@ -39,21 +39,20 @@ correct_count=0
 incorrect_count=0
 
 # 检查是否提供了单个 .sy 文件作为参数
-echo $1
+echo $1 | tee /home/mineral/log 
 file_name="${1}"
 if [ "$#" -eq 1 ]; then
     file_name=$1
 else
     echo "you should choose one file"
-    file_name=39_fp_params.c
-    exit 1
+    file_name=32_many_params3.c
 fi
 
-echo $file_name
+echo $file_name | tee /home/mineral/log 
 if [ -f "$file_name"  ]; then
-    echo "is_file"
+    echo "is_file" | tee /home/mineral/log 
     # 获取文件的基本名称，没有路径
-    export base_name=$(basename "$file_name" .sy)
+    export base_name=$(basename "$file_name" .c)
     # 执行编译命令，输出到同一目录
     /home/mineral/Compiler2024-nhwc/target/release/compiler "$file_name" -o "$s_path/${base_name}.s" -a 2> /dev/null
     compile_status=$?
@@ -66,9 +65,14 @@ if [ -f "$file_name"  ]; then
     riscv64-linux-gnu-as "$s_path/${base_name}.s" -o "$o_path/${base_name}.o"
     riscv64-linux-gnu-gcc --static "$o_path/${base_name}.o" -lsysy -L/home/mineral/Compiler2024-nhwc/ -o "$elf_path/${base_name}.elf" -lc
 
+    gcc $file_name -o ${file_name}.elf 
+    if [ $? -ne 0 ]; then
+        exit 4
+    fi
+
     # 检查 ELF 文件是否生成
     if [ ! -s "$elf_path/${base_name}.elf" ]; then
-        echo -e "$RED Failed to generate ELF file: $elf_path/${base_name}.elf $NC"
+        echo -e "$RED Failed to generate ELF file: $elf_path/${base_name}.elf $NC" | tee /home/mineral/log 
         exit 1
     fi
 
@@ -77,24 +81,27 @@ if [ -f "$file_name"  ]; then
     if [ -f "$in_path/${FIXED_INPUT_FILE}.in" ]; then
         timeout 4s qemu-riscv64-static "$elf_path/${base_name}.elf" < "$in_path/${FIXED_INPUT_FILE}.in" > "$ours_out_path/${FIXED_INPUT_FILE}.out" 2>&1 
         export ret_val=$?
-        echo -e "\n$ret_val" >> "$ours_out_path/${base_name}.out"
+        echo -e "\n$ret_val" >> "$ours_out_path/${base_name}.out" | tee /home/mineral/log 
     else
-        echo -e "can't find in file $$in_path/${FIXED_INPUT_FILE}.in"
+        timeout 4s qemu-riscv64-static "$elf_path/${base_name}.elf" > "$ours_out_path/${FIXED_INPUT_FILE}.out" 2>&1 
+        export ret_val=$?
+        echo -e "\n$ret_val" >> "$ours_out_path/${base_name}.out" | tee /home/mineral/log 
+        echo -e "can't find in file $in_path/${FIXED_INPUT_FILE}.in so input nothing" | tee /home/mineral/log
     fi
     # 删除.out文件的第一行 (时间记录)
     sed -i '1d' "$ours_out_path/${base_name}.out"
     # 添加需要比对的文件路径到数组中
 
     if diff -wB "$ours_out_path/${base_name}.out" "$official_path/${base_name}.out" > /dev/null; then
-        echo -e "${GREEN}${base_name} 过了${NC}"
+        echo -e "${GREEN}${base_name} 过了${NC}" | tee /home/mineral/log 
     else
         diff -wB "$ours_out_path/${base_name}.out" "$official_path/${base_name}.out" -y | head -n 10
-        echo -e "${RED}${base_name} 结果不一样!${NC}"
+        echo -e "${RED}${base_name} 结果不一样!${NC}" | tee /home/mineral/log 
     fi
 
     # files_to_compare+=("$ours_out_path/${base_name}.out $official_path/${base_name}.out")
 else 
-    echo "${file_name} is not a file"
+    echo "${file_name} is not a file" | tee /home/mineral/log 
 fi
 
 # # 执行所有文件的比对
@@ -113,7 +120,7 @@ fi
 
 # 输出统计结果
 
-echo $ret_val
+echo $ret_val | tee /home/mineral/log 
 
 # if timeout then return -1 
 if [ "$ret_val" == "124" ]; then 

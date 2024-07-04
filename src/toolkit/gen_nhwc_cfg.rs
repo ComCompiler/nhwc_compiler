@@ -194,6 +194,11 @@ fn parse_bb2nhwc(
                                     x if x ==1 =>{
                                         let ret_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ret_sep_child_nodes[0], jump_parent_scope, cfg_bb,  instr_slab, symtab_g)?.unwrap();
                                         let ret_instr = NhwcInstrType::new_ret(Some(ret_symidx)).into();
+                                        // then delete all edges of the node 
+                                        let edges = cfg_graph.edges_directed(node_index(cfg_bb as usize), petgraph::Direction::Outgoing);
+                                        for edge in edges.into_iter().map(|edge| edge.id()).collect_vec() {
+                                            cfg_graph.remove_edge(edge);
+                                        }
                                         node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
                                     }
                                     _=>{
@@ -2007,6 +2012,10 @@ pub fn parse_cfg_into_nhwc_cfg(
                                 match symtab.get(ret_sym)?.get_type()?{
                                     Type::Void => {
                                         node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_ret(None).into(), instr_slab)?;
+                                    },
+                                    Type::I32 => {
+                                        let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
+                                        node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_ret(Some(izero_symidx)).into(), instr_slab)?;
                                     },
                                     _ => {}
                                 }
