@@ -133,7 +133,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
             CfgEdgeType::Direct {  } => 2,
             CfgEdgeType::IfTrue {  } => 1,
             CfgEdgeType::BodyTail {  } => -1,
-            CfgEdgeType::GatherTrue {  } => -1,
+            CfgEdgeType::GatherTrue {  } => 1,
             CfgEdgeType::GatherFalse {  } => 5,
         });
         let mut _regtab = RegTab::new();
@@ -890,10 +890,7 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                         }else{
                             asm_sect.annotate(format!("load from {:?} in mem]n",symidx));
                             // you should first put the f32 into a gpr so here type is i32
-                            let temp_reg = regtab.find_and_occupy_reg(&symidx_offset2sp.into(), &Type::I32, symtab, asm_sect, &mut default_store, &mut |symidx,temp_reg,symtab,asm_sect,regtab|{
-                                asm_sect.asm(PseudoInstr::new_li(temp_reg.clone(), Imm::new_literal_isize(symidx_offset2sp)).into());
-                                Ok(())
-                            })?;
+                            let temp_reg = regtab.find_and_anonymous_occupy(&symidx_offset2sp.into(), &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
                             asm_sect.asm(Arithmetic::new_add(temp_reg.clone(), Register::SP,temp_reg.clone()).into());
                             asm_sect.asm(Loads::new(size, reg.clone(), temp_reg.clone(), 0, true)?.into());
                             regtab.unoccupied_reg(temp_reg,symtab,asm_sect,&mut default_store)?;
@@ -915,10 +912,8 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                             asm_sect.asm(Loads::new(size,reg.clone(), Register::SP, symidx_offset2sp, false)?.into());
                         }else{
                             asm_sect.annotate(format!("load from {:?} in mem\n",symidx));
-                            let temp_reg = regtab.find_and_occupy_reg(&symidx_offset2sp.into(), &Type::I32, symtab, asm_sect, &mut default_store, &mut |symidx,temp_reg,symtab,asm_sect,regtab|{
-                                asm_sect.asm(PseudoInstr::new_li(temp_reg.clone(), Imm::new_literal_isize(symidx_offset2sp)).into());
-                                Ok(())
-                            })?;
+                            let temp_reg = regtab.find_and_anonymous_occupy(&symidx_offset2sp.into(), &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                            asm_sect.asm(PseudoInstr::new_li(temp_reg.clone(), Imm::new_literal_isize(symidx_offset2sp)).into());
                             asm_sect.asm(Arithmetic::new_add(temp_reg.clone(), Register::SP,temp_reg.clone()).into());
                             asm_sect.asm(Loads::new(size, reg.clone(), temp_reg.clone(), 0, false)?.into());
                             regtab.unoccupied_reg(temp_reg,symtab,asm_sect,&mut default_store)?;
@@ -939,10 +934,7 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                             asm_sect.asm(Loads::new(size,reg.clone(), Register::SP, symidx_offset2sp, false)?.into());
                         }else{
                             asm_sect.annotate(format!("load from {:?} in mem",symidx));
-                            let temp_reg = regtab.find_and_occupy_reg(&symidx_offset2sp.into(), &Type::I32, symtab, asm_sect, &mut default_store, &mut |symidx,temp_reg,symtab,asm_sect,regtab|{
-                                asm_sect.asm(PseudoInstr::new_li(temp_reg.clone(), Imm::new_literal_isize(symidx_offset2sp)).into());
-                                Ok(())
-                            })?;
+                            let temp_reg = regtab.find_and_anonymous_occupy(&symidx_offset2sp.into(), &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
                             asm_sect.asm(Arithmetic::new_add(temp_reg.clone(), Register::SP,temp_reg.clone()).into());
                             asm_sect.asm(Loads::new(size, reg.clone(), temp_reg.clone(), 0, false)?.into());
                             regtab.unoccupied_reg(temp_reg,symtab,asm_sect,&mut default_store)?;
@@ -975,7 +967,8 @@ pub fn _store_sym(asm_sect:&mut AsmSection, symidx:&SymIdx,value_reg:Register,re
     }else{
         asm_sect.annotate(format!("store to {:?} in mem offset_illegal",symidx));
         // asm_sect.asm(Stores::new( size,value_reg.clone(),Register::SP, , value_reg.is_fpr())?.into());
-        let temp_reg = regtab.find_and_occupy_reg(&SymIdx::from(symidx_offset2sp), &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
+        let temp_reg = regtab.find_and_anonymous_occupy(&SymIdx::from(symidx_offset2sp), &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
+        asm_sect.asm(PseudoInstr::new_li(temp_reg.clone(), Imm::new_literal_isize(symidx_offset2sp)).into());
         asm_sect.asm(Arithmetic::new_add(temp_reg.clone(), Register::SP,temp_reg.clone()).into());
         asm_sect.asm(Stores::new( size,value_reg.clone(),temp_reg.clone(), 0 as isize, value_reg.is_fpr())?.into());
         regtab.unoccupied_reg(temp_reg,symtab,asm_sect,&mut default_store)?;

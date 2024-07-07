@@ -2022,10 +2022,19 @@ pub fn parse_cfg_into_nhwc_cfg(
                             },
                             _ => panic!()
                         }
-
                     }
                 },
-                _ => {}
+                CfgNodeType::Gather {  } => {
+                    // add label to gather 
+                    if node!(at cfg_node in cfg_graph).op_label_instr.is_none() {
+                        let gather_label = process_label_symbol(cfg_node, cfg_node, "gather".to_string(), symtab)?;
+                        let label_instr_struct = NhwcInstrType::new_label(gather_label).into();
+                        node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(label_instr_struct, instr_slab)?;
+                    }
+                },
+                _ =>{
+
+                }
             }
         }
     }
