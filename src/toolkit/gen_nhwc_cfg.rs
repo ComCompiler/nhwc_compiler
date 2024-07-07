@@ -9,6 +9,7 @@ use crate::instr;
 
 use super::cfg_node::CFG_ROOT;
 use super::et_node::ExprOp;
+use super::etc::dfs_with_priority;
 use super::eval_et::{self};
 use super::field::{ArrayEleMap, Value};
 use super::gen_cfg::AST_ROOT;
@@ -1970,7 +1971,15 @@ pub fn parse_cfg_into_nhwc_cfg(
     }
     //再遍历一遍entry，对于每个函数做dfs,处理函数体
     for &cfg_entry in cfg_funcs.iter() {
-        let dfs_vec = etc::dfs(cfg_graph, cfg_entry);
+        let dfs_vec = dfs_with_priority(cfg_graph,cfg_entry,|e| match &e.weight().cfg_edge_type{
+            CfgEdgeType::BodyHead {  } => 1,
+            CfgEdgeType::IfFalse {  } => 2,
+            CfgEdgeType::Direct {  } => 2,
+            CfgEdgeType::IfTrue {  } => 1,
+            CfgEdgeType::BodyTail {  } => 2,
+            CfgEdgeType::GatherTrue {  } => 1,
+            CfgEdgeType::GatherFalse {  } => 5,
+        });
         // dfs_vec.sort_by(|node| )
         // dfs_vec.reverse();
         for &cfg_node in dfs_vec.iter() {
@@ -2130,7 +2139,7 @@ pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph)
 
 // return the corresponding while block's while node of the cfg_node 
 pub fn get_while_or_for_node_of_cfg_node(cfg_node:u32, cfg_graph:&mut CfgGraph) -> Result<u32>{
-    let dfs_nodes = etc::reverse_dfs_with_predicate(cfg_graph, cfg_node,|e| {let parent_node = e.target().index() as u32; !node!(at parent_node in cfg_graph).cfg_node_type.is_root()});
+    let dfs_nodes = etc::dfs_with_predicate(cfg_graph, cfg_node,|e| {let parent_node = e.target().index() as u32; !node!(at parent_node in cfg_graph).cfg_node_type.is_root()});
     for cfg_node in dfs_nodes{
         // debug_info_red!("cur cfg_node:{}",cfg_node);
         if node!(at cfg_node in cfg_graph).cfg_node_type.is_for_loop() || 
