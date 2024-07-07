@@ -43,8 +43,8 @@ impl Pass for NhwcDumpPass {
             CfgEdgeType::IfFalse {  } => 2,
             CfgEdgeType::Direct {  } => 2,
             CfgEdgeType::IfTrue {  } => 1,
-            CfgEdgeType::BodyTail {  } => -1,
-            CfgEdgeType::GatherTrue {  } => -1,
+            CfgEdgeType::BodyTail {  } => 1,
+            CfgEdgeType::GatherTrue {  } => 1,
             CfgEdgeType::GatherFalse {  } => 5,
         });
 
@@ -66,8 +66,8 @@ impl Pass for NhwcDumpPass {
                     if let Some(label_instr_to_jump) =node!(at cfg_node_to_jump in cfg_graph).op_label_instr{
                         match &instr!(at label_instr_to_jump in instr_slab)?.instr_type{
                             NhwcInstrType::Label { label_symidx } => {
-                                let jump_instr_struct = NhwcInstrType::new_jump(label_symidx.clone()).into();
-                                if let None = node!(at cfg_node in cfg_graph).op_jump_instr{
+                                if node!(at cfg_node in cfg_graph).op_jump_instr.is_none(){
+                                    let jump_instr_struct = NhwcInstrType::new_jump(label_symidx.clone()).into();
                                     node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(jump_instr_struct, instr_slab)?;
                                 }
                             },
