@@ -221,17 +221,17 @@ fn parse_bb2nhwc(
                                 Err(e) => {debug_info_blue!("{}",e);continue;},
                             };
                             let body_exit_node = get_exit_node_of_while_or_for_node(while_or_for_node, cfg_graph)?;
-                            let jump_label = node!(at body_exit_node in cfg_graph).op_label_instr.unwrap();
-                            let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
-                            let jump_label = match jump_nhwctype{
-                                NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
-                                _ =>{
-                                    return Err(anyhow!("this instr should be a label {:?}", jump_nhwctype))
-                                }
-                            };
+                            // let jump_label = node!(at body_exit_node in cfg_graph).op_label_instr.unwrap();
+                            // let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
+                            // let jump_label = match jump_nhwctype{
+                            //     NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
+                            //     _ =>{
+                            //         return Err(anyhow!("this instr should be a label {:?}", jump_nhwctype))
+                            //     }
+                            // };
 
-                            let jump_instr = NhwcInstrType::new_jump(jump_label).into();
-                            node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(jump_instr, instr_slab)?;
+                            // let jump_instr = NhwcInstrType::new_jump(jump_label).into();
+                            // node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(jump_instr, instr_slab)?;
 
                             // we should remove the edge 
                             let cfg_child_node = direct_child_node!(at cfg_bb in cfg_graph);
@@ -245,17 +245,17 @@ fn parse_bb2nhwc(
                                 anyhow::Result::Ok(while_or_for_node ) => while_or_for_node ,
                                 Err(e) => {debug_info_blue!("{}",e);continue;},
                             };
-                            let jump_label = node!(at while_or_for_node in cfg_graph).op_label_instr.unwrap();
-                            let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
-                            let jump_label = match jump_nhwctype{
-                                NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
-                                _ =>{
-                                    return Err(anyhow!("this instr should be a label {:?}", jump_nhwctype))
-                                }
-                            };
+                            // let jump_label = node!(at while_or_for_node in cfg_graph).op_label_instr.unwrap();
+                            // let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
+                            // let jump_label = match jump_nhwctype{
+                            //     NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
+                            //     _ =>{
+                            //         return Err(anyhow!("this instr should be a label {:?}", jump_nhwctype))
+                            //     }
+                            // };
 
-                            let jump_instr = NhwcInstrType::new_jump(jump_label).into();
-                            node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(jump_instr, instr_slab)?;
+                            // let jump_instr = NhwcInstrType::new_jump(jump_label).into();
+                            // node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(jump_instr, instr_slab)?;
 
                             // we should remove the edge 
                             let cfg_child_node = direct_child_node!(at cfg_bb in cfg_graph);
@@ -2221,11 +2221,11 @@ pub fn array_initialize( et_tree:&mut EtTree, array_ele_map:&mut ArrayEleMap, el
     let last_array_offset = *array_offset;
     *array_offset+= (ele_count_to_read - *array_offset % ele_count_to_read)%ele_count_to_read;
     debug_info_blue!("array_init {:?} at et_node {}",reversed_remained_dims,et_node);
-    let et_node_vec = direct_child_nodes!(at et_node in et_tree);
+    let et_node_vec = direct_child_nodes!(at et_node in et_tree with_predicate {|e| e.weight().et_edge_type.is_direct()});
     let mut i = 0;
     while i < et_node_vec.len(){
-        debug_info_blue!("ele_count_to_read =  {},{:?}",ele_count_to_read , reversed_remained_dims);
         let et_node = et_node_vec[i];
+        debug_info_blue!("ele_count_to_read =  {},{:?}  cur_et_node:{et_node}",ele_count_to_read , reversed_remained_dims);
         match &node!(at et_node in et_tree).et_node_type{
             EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _, op_symidx }=>{
                 let cur_dim = reversed_remained_dims.pop().unwrap();
