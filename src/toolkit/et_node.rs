@@ -151,13 +151,13 @@ impl EtHash for EtTree{
                         assert!(child_nodes.len() == 2);
                         let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
                         let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1|h2 + 10000) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash = Some((h1^h2 + 120300) % ET_HASH_MODULUS);
                     },
                     ExprOp::LogicalAnd => {
                         assert!(child_nodes.len() == 2);
                         let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
                         let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1&h2+10000) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash = Some((h1^h2+13000) % ET_HASH_MODULUS);
                     },
                     ExprOp::LogicalNot => {
                         assert!(child_nodes.len() == 1);

@@ -6,6 +6,7 @@ use petgraph::{
 use core::panic;
 use std::collections::HashMap;
 use crate::instr;
+use crate::toolkit::etc::remove_isolate_nodes_from_dfs;
 
 use super::cfg_node::CFG_ROOT;
 use super::et_node::ExprOp;
@@ -99,7 +100,6 @@ fn parse_stmt_or_expr2nhwc(
     instr_slab:&mut InstrSlab<NhwcInstr>, symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<Vec<Option<SymIdx>>> {
     //将declaration生成et
-    // let sep_node = process_any_stmt(et_tree, ast_tree, scope_tree, ast_stmt_node, stmt_parent_scope);
     let sep_node = gen_et::process_any_stmt(et_tree, ast_tree, scope_tree, ast_stmt_node, stmt_parent_scope);
     // debug_info_red!("parent {}",stmt_parent_scope);
     eval_et::compress_et(et_tree, sep_node, &symtab,stmt_parent_scope ,scope_tree)?;
@@ -1039,7 +1039,7 @@ fn process_call(
     symtab_graph:&mut Option<&mut SymTabGraph>
 ) -> Result<(Option<SymIdx>,usize)> {
     //取函数名和实参
-    let func_name_and_args = direct_child_nodes!(at et_node in et_tree);
+    let func_name_and_args = direct_child_nodes!(at et_node in et_tree with_predicate {|e| !e.weight().et_edge_type.is_deleted()});
     let func_name_et_node = func_name_and_args[0];
     let et_type = &node!(at func_name_et_node in et_tree).et_node_type;
     let func_name_str ;
@@ -1102,13 +1102,22 @@ fn process_call(
         Ok((Some(tmp_symidx),node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(call_instr, instr_slab)?))
     }
 }
-
+static mut a:i32 = 5;
 
 fn process_et(
     ast_tree:&AstTree, cfg_graph:&mut CfgGraph, et_tree:&mut EtTree, scope_tree:&ScopeTree, symtab:&mut SymTab, et_node:u32, scope_node:u32, cfg_bb:u32, instr_slab:&mut InstrSlab<NhwcInstr>,
     symtab_graph:&mut Option<&mut SymTabGraph>,
 ) -> Result<Option<SymIdx>> {
-    debug_info_red!("et_node {} ",et_node );
+    debug_info_red!("process_et et_node {} ",et_node );
+    // if et_node == 429 {
+    //     unsafe {
+    //         a -= 1;
+    //         if a< 0{
+    //             remove_isolate_nodes_from_dfs(et_tree, direct_parent_node!(at et_node in et_tree));
+    //             return Err(anyhow!(" process_et meet 429"));
+    //         }
+    //     }
+    // }
     // generate_png_by_graph(et_tree, "debug_et".to_string(), &[Config::NodeIndexLabel]);
     if node!(at et_node in et_tree).calculated_symidx.is_none(){
         let et_node_ty = &node!(at et_node in et_tree).et_node_type.clone();
@@ -1815,7 +1824,7 @@ fn parse_declvar2nhwc(
             // 考虑这个语句的 et_sep_item_node 不是 = 的情况
             EtNodeType::Operator { op: ExprOp::ArrayIndex , ast_node: _, text: _, op_symidx } => {
                 // debug_info_red!("no =  as start ");
-                let _op_values = direct_child_nodes!(at et_item_node in et_tree);
+                // let _op_values = direct_child_nodes!(at et_item_node in et_tree with_predicate {|e|!e.weight().et_edge_type.is_deleted()});
                 let var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_item_node, decl_parent_scope, cfg_node,  instr_slab, symtab_g)?.unwrap();
                 let var_type = symtab.get(&var_symidx)?.get_type()?.clone();
                 //大纲：
@@ -2221,7 +2230,7 @@ pub fn array_initialize( et_tree:&mut EtTree, array_ele_map:&mut ArrayEleMap, el
     let last_array_offset = *array_offset;
     *array_offset+= (ele_count_to_read - *array_offset % ele_count_to_read)%ele_count_to_read;
     debug_info_blue!("array_init {:?} at et_node {}",reversed_remained_dims,et_node);
-    let et_node_vec = direct_child_nodes!(at et_node in et_tree with_predicate {|e| e.weight().et_edge_type.is_direct()});
+    let et_node_vec = direct_child_nodes!(at et_node in et_tree with_predicate {|e| !e.weight().et_edge_type.is_deleted()});
     let mut i = 0;
     while i < et_node_vec.len(){
         let et_node = et_node_vec[i];
