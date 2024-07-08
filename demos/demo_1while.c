@@ -2,8 +2,9 @@ int main(){
     int i=0;
     int a = 0;
     while(i<5){
-        a+=i;
-        i+=1;
+        // a+=i;
+        // i+=1;
+        a = a+1;
     }
     breakpoint m;
     return a;
