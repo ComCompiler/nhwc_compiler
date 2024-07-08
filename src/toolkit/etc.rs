@@ -143,6 +143,9 @@ where
         }
     }
 }
+/// dfs the graph.
+/// if the closure ret val < 0 then don't access the edge 
+/// access with low closure ret value in priority
 pub fn dfs_with_priority<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, mut predicate:impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->isize)-> Vec<u32>
 where
     Ty: EdgeType,

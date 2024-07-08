@@ -142,7 +142,6 @@ impl RegTab{
                         }
                         *regstat = RegState::new_occupied(symidx.clone(), tracked,1);   
                     }
-                    _ => return Err(anyhow!("you can't occupy {:?}",regstat)),
                 }
                 Ok(())
             },
@@ -334,8 +333,8 @@ impl RegTab{
         debug_info_blue!("free reg {:?} ",reg);
         regstat.free_once()?;
         if regstat.is_freed(){
-            debug_info_red!("release reg {:?} because not enough",reg);
             if reg.is_gpr()&& self.gpr_released_reg_count<5 || reg.is_fpr() && self.fpr_released_reg_count < 5{
+                debug_info_red!("release reg {:?} because not enough",reg);
                 self.release_reg(reg, symtab, asm_sect, store_f)?;
             }
         }
@@ -385,9 +384,9 @@ impl RegTab{
             return Err(anyhow!("reg type not supported {:?}",sym_ty));
         }
     }
-    // after put the args into arg register, you should call this to inform regexp this info
-    pub fn set_freed_reg(&mut self,reg:Register,symidx:&SymIdx,symtab:&mut SymTab) -> Result<()>{
-        // debug_info_green!("set_freed_reg:{:?} symidx {:?}",reg, symidx);
+    /// after put the args into arg register, you should call this to inform regtab this info
+    pub fn set_freed_reg(&mut self, reg:Register, symidx:&SymIdx, symtab:&mut SymTab) -> Result<()>{
+        debug_info_red!("set_freed_reg:{:?} symidx {:?}",reg, symidx);
         let should_track = RegTab::symidx_should_track(symidx, symtab)?;
         if should_track{
             if symtab.get(symidx)?.has_cur_reg(){
@@ -506,6 +505,7 @@ impl RegTab{
     }
     pub fn forget_all_temp(&mut self, asm_sect:&mut AsmSection,symtab:&mut SymTab, 
         store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>)-> Result<()>{
+        debug_info_blue!("before forget_all_temp {:?}",self);
         let mut has_released_reg = false;
         for (reg,regstat) in self.reg_symidx_map.iter_mut(){
             if matches!(regstat,RegState::Freed { symidx, tracked:false }){

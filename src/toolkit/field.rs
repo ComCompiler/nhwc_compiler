@@ -182,6 +182,35 @@ impl Value {
             }
         })
     }
+    pub fn force_to_ty(&self,target_ty:&Type)-> Result<Value>{
+        Ok(match target_ty{
+            Type::I32 => {
+                match &self{
+                    Value::I32(_) => self.clone(),
+                    Value::F32(op_f) => match op_f {
+                        Some(f) => {
+                            Value::I32(Some(*f as i32))
+                        },
+                        None => {Value::I32(None)},
+                    },
+                    _ => todo!()
+                }
+            },
+            Type::F32 => {
+                match &self{
+                    Value::F32(_) => self.clone(),
+                    Value::I32(op_i) => match op_i {
+                        Some(i) => {
+                            Value::F32(Some(*i as f32))
+                        },
+                        None => {Value::F32(None)},
+                    },
+                    _ => todo!()
+                }
+            },
+            _ => todo!()
+        })
+    }
     pub fn logical_and(&self,val:&Value) -> Result<Value>{
         Ok(match (self,val){
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1((*v1!=0)&&(*v2!=0)),

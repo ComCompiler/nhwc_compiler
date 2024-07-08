@@ -398,7 +398,7 @@ pub fn compress_et(et_tree:&mut EtTree, et_sep_node:u32, symtab:&SymTab, scope_n
     for et_node in dfs_nodes{
         reducation(et_node, et_tree);
     }
-    // // eval_et(et_tree, et_node);
+    // eval_et(et_tree, et_node);
     Ok(())
 }
 
@@ -424,6 +424,7 @@ pub fn _common_expr_elimination_by_hash(et_node:u32,et_tree:&mut EtTree, map:&mu
                 let t = edge_ref.target().index() as u32;
                 if t == et_node{
                     weight = EtEdgeType::Deleted.into();
+                    debug_info_blue!("trans edge from {} to {} to deleted edge",s,t);
                     edge_weight_tuple_vec.push((EtEdgeType::Direct.into(),s,found_et_node));
                 }
                 edge_weight_tuple_vec.push((weight,s,t));

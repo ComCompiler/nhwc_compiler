@@ -12,6 +12,7 @@ use crate::{add_node, instr};
 
 use super::cfg_node::CFG_ROOT;
 use super::et_node::ExprOp;
+use super::etc::dfs_with_priority;
 use super::eval_et::{self};
 use super::field::{ArrayEleMap, Value};
 use super::gen_cfg::AST_ROOT;
@@ -197,6 +198,11 @@ fn parse_bb2nhwc(
                                     x if x ==1 =>{
                                         let ret_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, ret_sep_child_nodes[0], jump_parent_scope, cfg_bb,  instr_slab, ast2scope,symtab_g)?.unwrap();
                                         let ret_instr = NhwcInstrType::new_ret(Some(ret_symidx)).into();
+                                        // then delete all edges of the node 
+                                        let edges = cfg_graph.edges_directed(node_index(cfg_bb as usize), petgraph::Direction::Outgoing);
+                                        for edge in edges.into_iter().map(|edge| edge.id()).collect_vec() {
+                                            cfg_graph.remove_edge(edge);
+                                        }
                                         node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
                                     }
                                     _=>{
@@ -218,17 +224,17 @@ fn parse_bb2nhwc(
                                 Err(e) => {debug_info_blue!("{}",e);continue;},
                             };
                             let body_exit_node = get_exit_node_of_while_or_for_node(while_or_for_node, cfg_graph)?;
-                            let jump_label = node!(at body_exit_node in cfg_graph).op_label_instr.unwrap();
-                            let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
-                            let jump_label = match jump_nhwctype{
-                                NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
-                                _ =>{
-                                    return Err(anyhow!("this instr should be a label {:?}", jump_nhwctype))
-                                }
-                            };
+                            // let jump_label = node!(at body_exit_node in cfg_graph).op_label_instr.unwrap();
+                            // let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
+                            // let jump_label = match jump_nhwctype{
+                            //     NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
+                            //     _ =>{
+                            //         return Err(anyhow!("this instr should be a label {:?}", jump_nhwctype))
+                            //     }
+                            // };
 
-                            let jump_instr = NhwcInstrType::new_jump(jump_label).into();
-                            node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(jump_instr, instr_slab)?;
+                            // let jump_instr = NhwcInstrType::new_jump(jump_label).into();
+                            // node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(jump_instr, instr_slab)?;
 
                             // we should remove the edge 
                             let cfg_child_node = direct_child_node!(at cfg_bb in cfg_graph);
@@ -242,17 +248,17 @@ fn parse_bb2nhwc(
                                 anyhow::Result::Ok(while_or_for_node ) => while_or_for_node ,
                                 Err(e) => {debug_info_blue!("{}",e);continue;},
                             };
-                            let jump_label = node!(at while_or_for_node in cfg_graph).op_label_instr.unwrap();
-                            let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
-                            let jump_label = match jump_nhwctype{
-                                NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
-                                _ =>{
-                                    return Err(anyhow!("this instr should be a label {:?}", jump_nhwctype))
-                                }
-                            };
+                            // let jump_label = node!(at while_or_for_node in cfg_graph).op_label_instr.unwrap();
+                            // let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
+                            // let jump_label = match jump_nhwctype{
+                            //     NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
+                            //     _ =>{
+                            //         return Err(anyhow!("this instr should be a label {:?}", jump_nhwctype))
+                            //     }
+                            // };
 
-                            let jump_instr = NhwcInstrType::new_jump(jump_label).into();
-                            node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(jump_instr, instr_slab)?;
+                            // let jump_instr = NhwcInstrType::new_jump(jump_label).into();
+                            // node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(jump_instr, instr_slab)?;
 
                             // we should remove the edge 
                             let cfg_child_node = direct_child_node!(at cfg_bb in cfg_graph);
@@ -1576,7 +1582,10 @@ fn process_et(
 
                         if let EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use:DeclOrDefOrUse::DeclDef { type_ast_node, is_const }} = &node!(at left_child_et_node in et_tree).et_node_type {
                             if *is_const {
-                                symtab.get_mut(sym_idx)?.add_const_symidx(r_symidx.clone());
+                                // here we should transform value of const symidx r_symidx into the target type
+                                let val = Value::from_symidx(&r_symidx)?;
+                                let r_symidx = val.force_to_ty(&l_type)?.to_symidx()?;
+                                symtab.get_mut(sym_idx)?.add_const_symidx(r_symidx);
                             }
                         };
 
@@ -1969,7 +1978,15 @@ pub fn parse_cfg_into_nhwc_cfg(
     }
     //再遍历一遍entry，对于每个函数做dfs,处理函数体
     for &cfg_entry in cfg_funcs.iter() {
-        let dfs_vec = etc::dfs(cfg_graph, cfg_entry);
+        let dfs_vec = dfs_with_priority(cfg_graph,cfg_entry,|e| match &e.weight().cfg_edge_type{
+            CfgEdgeType::BodyHead {  } => 1,
+            CfgEdgeType::IfFalse {  } => 2,
+            CfgEdgeType::Direct {  } => 2,
+            CfgEdgeType::IfTrue {  } => 1,
+            CfgEdgeType::BodyTail {  } => 2,
+            CfgEdgeType::GatherTrue {  } => 1,
+            CfgEdgeType::GatherFalse {  } => 5,
+        });
         // dfs_vec.sort_by(|node| )
         // dfs_vec.reverse();
         for &cfg_node in dfs_vec.iter() {
@@ -2012,12 +2029,29 @@ pub fn parse_cfg_into_nhwc_cfg(
                                     Type::Void => {
                                         node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_ret(None).into(), instr_slab)?;
                                     },
+                                    Type::I32 => {
+                                        let izero_symidx = process_literal(symtab, &"0".to_string(), symtab_graph)?;
+                                        node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_ret(Some(izero_symidx)).into(), instr_slab)?;
+                                    },
                                     _ => {}
                                 }
                             },
                             _ => panic!()
                         }
-
+                    }
+                    // add label to gather 
+                    if node!(at cfg_node in cfg_graph).op_label_instr.is_none() {
+                        let gather_label = process_label_symbol(cfg_node, cfg_node, "exit".to_string(), symtab)?;
+                        let label_instr_struct = NhwcInstrType::new_label(gather_label).into();
+                        node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(label_instr_struct, instr_slab)?;
+                    }
+                },
+                CfgNodeType::Gather {  } => {
+                    // add label to gather 
+                    if node!(at cfg_node in cfg_graph).op_label_instr.is_none() {
+                        let gather_label = process_label_symbol(cfg_node, cfg_node, "gather".to_string(), symtab)?;
+                        let label_instr_struct = NhwcInstrType::new_label(gather_label).into();
+                        node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(label_instr_struct, instr_slab)?;
                     }
                 },
                 _ => {}
@@ -2164,7 +2198,7 @@ pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph)
 
 // return the corresponding while block's while node of the cfg_node 
 pub fn get_while_or_for_node_of_cfg_node(cfg_node:u32, cfg_graph:&mut CfgGraph) -> Result<u32>{
-    let dfs_nodes = etc::reverse_dfs_with_predicate(cfg_graph, cfg_node,|e| {let parent_node = e.target().index() as u32; !node!(at parent_node in cfg_graph).cfg_node_type.is_root()});
+    let dfs_nodes = etc::dfs_with_predicate(cfg_graph, cfg_node,|e| {let parent_node = e.target().index() as u32; !node!(at parent_node in cfg_graph).cfg_node_type.is_root()});
     for cfg_node in dfs_nodes{
         // debug_info_red!("cur cfg_node:{}",cfg_node);
         if node!(at cfg_node in cfg_graph).cfg_node_type.is_for_loop() || 
@@ -2246,11 +2280,11 @@ pub fn array_initialize( et_tree:&mut EtTree, array_ele_map:&mut ArrayEleMap, el
     let last_array_offset = *array_offset;
     *array_offset+= (ele_count_to_read - *array_offset % ele_count_to_read)%ele_count_to_read;
     debug_info_blue!("array_init {:?} at et_node {}",reversed_remained_dims,et_node);
-    let et_node_vec = direct_child_nodes!(at et_node in et_tree);
+    let et_node_vec = direct_child_nodes!(at et_node in et_tree with_predicate {|e| e.weight().et_edge_type.is_direct()});
     let mut i = 0;
     while i < et_node_vec.len(){
-        debug_info_blue!("ele_count_to_read =  {},{:?}",ele_count_to_read , reversed_remained_dims);
         let et_node = et_node_vec[i];
+        debug_info_blue!("ele_count_to_read =  {},{:?}  cur_et_node:{et_node}",ele_count_to_read , reversed_remained_dims);
         match &node!(at et_node in et_tree).et_node_type{
             EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _, op_symidx }=>{
                 let cur_dim = reversed_remained_dims.pop().unwrap();
