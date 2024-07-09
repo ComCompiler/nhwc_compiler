@@ -24,7 +24,7 @@
     .globl main
     .type main,@function
 main:
-              #                    mem layout:|ra_main:8 at 48|s0_main:8 at 40|a:4 at 36|temp_0_:4 at 32|temp_1_arithop:4 at 28|b:4 at 24|c:4 at 20|temp_2_f32_to_bool:1 at 19|temp_3_i32_to_bool:1 at 18|temp_4_i32_to_bool:1 at 17|none:1 at 16|temp_5_:4 at 12|temp_6_arithop:4 at 8|temp_7_:4 at 4|none:4 at 0
+              #                    mem layout:|ra_main:8 at 48|s0_main:8 at 40|a:4 at 36|temp_0_:4 at 32|temp_1_arithop:4 at 28|b:4 at 24|c:4 at 20|temp_2_i32_to_bool:1 at 19|temp_3_f32_to_bool:1 at 18|none:2 at 16|temp_4_:4 at 12|temp_5_arithop:4 at 8|temp_6_:4 at 4|none:4 at 0
     addi    sp,sp,-56
               #                    store to ra_main_0 in mem offset legal
     sd      ra,48(sp)
@@ -36,12 +36,11 @@ main:
               #                          alloc f32 temp_1_arithop_17 
               #                          alloc f32 b_17 
               #                          alloc i32 c_17 
-              #                          alloc i1 temp_2_f32_to_bool_21 
-              #                          alloc i1 temp_3_i32_to_bool_21 
-              #                          alloc i1 temp_4_i32_to_bool_21 
-              #                          alloc f32 temp_5__23 
-              #                          alloc f32 temp_6_arithop_23 
-              #                          alloc i32 temp_7__23 
+              #                          alloc i1 temp_2_i32_to_bool_21 
+              #                          alloc i1 temp_3_f32_to_bool_21 
+              #                          alloc f32 temp_4__23 
+              #                          alloc f32 temp_5_arithop_23 
+              #                          alloc i32 temp_6__23 
               #                    regtab  released_gpr_count:19,released_fpr_count:24
               #                          label L0_0: 
 .L0_0:
@@ -84,153 +83,110 @@ main:
               #                    regtab     a0:Freed { symidx: a_17, tracked: true } |     a2:Freed { symidx: c_17, tracked: true } |     fa0:Freed { symidx: temp_0__17, tracked: true } |     fa2:Freed { symidx: temp_1_arithop_17, tracked: true } |     fa3:Freed { symidx: b_17, tracked: true } |  released_gpr_count:16,released_fpr_count:20
               #                          label L1_0: 
 .L1_0:
-              #                          new_var temp_4_i32_to_bool_21:i1 
-              #                          temp_4_i32_to_bool_21 = icmp i32 Ne a_17, 0_0 
+              #                          new_var temp_2_i32_to_bool_21:i1 
+              #                          temp_2_i32_to_bool_21 = icmp i1 Ne a_17, 0_0 
               #                    occupy a0 with a_17
               #                    occupy a1 with 0_0
     li      a1, 0
-              #                    occupy a3 with temp_4_i32_to_bool_21
+              #                    occupy a3 with temp_2_i32_to_bool_21
     xor     a3,a0,a1
     snez    a3, a3
               #                    free a0
               #                    free a1
               #                    free a3
-              #                          br i1 temp_4_i32_to_bool_21, label branch_true_22, label branch_false_22 
-              #                    occupy a3 with temp_4_i32_to_bool_21
+              #                          br i1 temp_2_i32_to_bool_21, label branch_true_22, label branch_false_22 
+              #                    occupy a3 with temp_2_i32_to_bool_21
               #                    free a3
-              #                    occupy a3 with temp_4_i32_to_bool_21
+              #                    occupy a3 with temp_2_i32_to_bool_21
     bnez    a3, .branch_true_22
               #                    free a3
     j       .branch_false_22
-              #                    regtab     a0:Freed { symidx: a_17, tracked: true } |     a2:Freed { symidx: c_17, tracked: true } |     a3:Freed { symidx: temp_4_i32_to_bool_21, tracked: true } |     fa0:Freed { symidx: temp_0__17, tracked: true } |     fa2:Freed { symidx: temp_1_arithop_17, tracked: true } |     fa3:Freed { symidx: b_17, tracked: true } |  released_gpr_count:14,released_fpr_count:20
+              #                    regtab     a0:Freed { symidx: a_17, tracked: true } |     a2:Freed { symidx: c_17, tracked: true } |     a3:Freed { symidx: temp_2_i32_to_bool_21, tracked: true } |     fa0:Freed { symidx: temp_0__17, tracked: true } |     fa2:Freed { symidx: temp_1_arithop_17, tracked: true } |     fa3:Freed { symidx: b_17, tracked: true } |  released_gpr_count:14,released_fpr_count:20
               #                          label branch_short_circuit_p_true_70: 
 .branch_short_circuit_p_true_70:
-              #                          new_var temp_2_f32_to_bool_21:i1 
-              #                          temp_2_f32_to_bool_21 = fcmp f32 One b_17, 0.0_0 
+              #                          new_var temp_3_f32_to_bool_21:i1 
+              #                          temp_3_f32_to_bool_21 = fcmp f32 One b_17, 0.0_0 
               #                    occupy fa3 with b_17
               #                    occupy fa1 with 0.0_0
               #                    occupy a1 with _anonymous_of_0.0_0_0
     li      a1, 0
     fmv.w.x fa1, a1
               #                    free a1
-              #                    occupy a4 with temp_2_f32_to_bool_21
+              #                    occupy a4 with temp_3_f32_to_bool_21
     feq.s   a4,fa3,fa1
     seqz    a4, a4
               #                    free fa3
               #                    free fa1
               #                    free a4
-              #                          br i1 temp_3_i32_to_bool_21, label branch_short_circuit_p_true_70, label branch_false_22 
-              #                    occupy a5 with temp_3_i32_to_bool_21
-              #                    load from temp_3_i32_to_bool_21 in mem
-    lb      a5,18(sp)
-              #                    free a5
-              #                    occupy a5 with temp_3_i32_to_bool_21
-              #                    store to temp_3_i32_to_bool_21 in mem offset legal
-    sb      a5,18(sp)
-              #                    release a5 with temp_3_i32_to_bool_21
-              #                    occupy a4 with temp_2_f32_to_bool_21
-              #                    store to temp_2_f32_to_bool_21 in mem offset legal
-    sb      a4,19(sp)
-              #                    release a4 with temp_2_f32_to_bool_21
-              #                    occupy a1 with temp_3_i32_to_bool_21
-              #                    load from temp_3_i32_to_bool_21 in mem
-    lb      a1,18(sp)
-    bnez    a1, .branch_short_circuit_p_true_70
-              #                    free a1
-              #                    occupy a1 with temp_3_i32_to_bool_21
-              #                    store to temp_3_i32_to_bool_21 in mem offset legal
-    sb      a1,18(sp)
-              #                    release a1 with temp_3_i32_to_bool_21
-    j       .branch_false_22
-              #                    regtab     a0:Freed { symidx: a_17, tracked: true } |     a2:Freed { symidx: c_17, tracked: true } |     a3:Freed { symidx: temp_4_i32_to_bool_21, tracked: true } |     fa0:Freed { symidx: temp_0__17, tracked: true } |     fa2:Freed { symidx: temp_1_arithop_17, tracked: true } |     fa3:Freed { symidx: b_17, tracked: true } |  released_gpr_count:14,released_fpr_count:20
-              #                          label branch_short_circuit_p_true_72: 
-.branch_short_circuit_p_true_72:
-              #                          new_var temp_3_i32_to_bool_21:i1 
-              #                          temp_3_i32_to_bool_21 = icmp i32 Ne c_17, 0_0 
-              #                    occupy a2 with c_17
-              #                    occupy a1 with 0_0
-    li      a1, 0
-              #                    occupy a4 with temp_3_i32_to_bool_21
-    xor     a4,a2,a1
-    snez    a4, a4
-              #                    free a2
-              #                    free a1
+              #                          br i1 temp_3_f32_to_bool_21, label branch_true_22, label branch_false_22 
+              #                    occupy a4 with temp_3_f32_to_bool_21
               #                    free a4
-              #                          br i1 temp_2_f32_to_bool_21, label branch_short_circuit_p_true_72, label branch_false_22 
-              #                    occupy a5 with temp_2_f32_to_bool_21
-              #                    load from temp_2_f32_to_bool_21 in mem
-    lb      a5,19(sp)
-              #                    free a5
-              #                    occupy a5 with temp_2_f32_to_bool_21
-              #                    store to temp_2_f32_to_bool_21 in mem offset legal
-    sb      a5,19(sp)
-              #                    release a5 with temp_2_f32_to_bool_21
-              #                    occupy a4 with temp_3_i32_to_bool_21
-              #                    store to temp_3_i32_to_bool_21 in mem offset legal
+              #                    occupy a4 with temp_3_f32_to_bool_21
+              #                    store to temp_3_f32_to_bool_21 in mem offset legal
     sb      a4,18(sp)
-              #                    release a4 with temp_3_i32_to_bool_21
-              #                    occupy a1 with temp_2_f32_to_bool_21
-              #                    load from temp_2_f32_to_bool_21 in mem
-    lb      a1,19(sp)
-    bnez    a1, .branch_short_circuit_p_true_72
+              #                    release a4 with temp_3_f32_to_bool_21
+              #                    occupy a1 with temp_3_f32_to_bool_21
+              #                    load from temp_3_f32_to_bool_21 in mem
+    lb      a1,18(sp)
+    bnez    a1, .branch_true_22
               #                    free a1
-              #                    occupy a1 with temp_2_f32_to_bool_21
-              #                    store to temp_2_f32_to_bool_21 in mem offset legal
-    sb      a1,19(sp)
-              #                    release a1 with temp_2_f32_to_bool_21
+              #                    occupy a1 with temp_3_f32_to_bool_21
+              #                    store to temp_3_f32_to_bool_21 in mem offset legal
+    sb      a1,18(sp)
+              #                    release a1 with temp_3_f32_to_bool_21
     j       .branch_false_22
-              #                    regtab     a0:Freed { symidx: a_17, tracked: true } |     a2:Freed { symidx: c_17, tracked: true } |     a3:Freed { symidx: temp_4_i32_to_bool_21, tracked: true } |     fa0:Freed { symidx: temp_0__17, tracked: true } |     fa2:Freed { symidx: temp_1_arithop_17, tracked: true } |     fa3:Freed { symidx: b_17, tracked: true } |  released_gpr_count:14,released_fpr_count:20
+              #                    regtab     a0:Freed { symidx: a_17, tracked: true } |     a2:Freed { symidx: c_17, tracked: true } |     a3:Freed { symidx: temp_2_i32_to_bool_21, tracked: true } |     fa0:Freed { symidx: temp_0__17, tracked: true } |     fa2:Freed { symidx: temp_1_arithop_17, tracked: true } |     fa3:Freed { symidx: b_17, tracked: true } |  released_gpr_count:14,released_fpr_count:20
               #                          label branch_true_22: 
 .branch_true_22:
-              #                          new_var temp_5__23:f32 
-              #                          temp_5__23 = sitofp i32 c_17 to f32 
+              #                          new_var temp_4__23:f32 
+              #                          temp_4__23 = sitofp i32 c_17 to f32 
               #                    occupy a2 with c_17
-              #                    occupy fa1 with temp_5__23
+              #                    occupy fa1 with temp_4__23
     fcvt.s.w fa1,a2,rtz
               #                    free a2
               #                    free fa1
-              #                          new_var temp_6_arithop_23:f32 
-              #                          temp_6_arithop_23 = Add f32 b_17, temp_5__23 
+              #                          new_var temp_5_arithop_23:f32 
+              #                          temp_5_arithop_23 = Add f32 b_17, temp_4__23 
               #                    occupy fa3 with b_17
-              #                    occupy fa1 with temp_5__23
-              #                    occupy fa4 with temp_6_arithop_23
+              #                    occupy fa1 with temp_4__23
+              #                    occupy fa4 with temp_5_arithop_23
     fadd.s  fa4,fa3,fa1
               #                    free fa3
               #                    free fa1
               #                    free fa4
-              #                          new_var temp_7__23:i32 
-              #                          temp_7__23 = fptosi f32 temp_6_arithop_23 to i32 
-              #                    occupy fa4 with temp_6_arithop_23
-              #                    occupy a1 with temp_7__23
+              #                          new_var temp_6__23:i32 
+              #                          temp_6__23 = fptosi f32 temp_5_arithop_23 to i32 
+              #                    occupy fa4 with temp_5_arithop_23
+              #                    occupy a1 with temp_6__23
     fcvt.w.s a1,fa4,rtz
               #                    free fa4
               #                    free a1
-              #                          a_17 = i32 temp_7__23 
-              #                    occupy a1 with temp_7__23
+              #                          a_17 = i32 temp_6__23 
+              #                    occupy a1 with temp_6__23
               #                    occupy a0 with a_17
     mv      a0, a1
               #                    free a1
               #                    free a0
               #                          jump label: branch_false_22 
-              #                    occupy a1 with temp_7__23
-              #                    store to temp_7__23 in mem offset legal
+              #                    occupy a1 with temp_6__23
+              #                    store to temp_6__23 in mem offset legal
     sw      a1,4(sp)
-              #                    release a1 with temp_7__23
-              #                    occupy fa1 with temp_5__23
-              #                    store to temp_5__23 in mem offset legal
+              #                    release a1 with temp_6__23
+              #                    occupy fa1 with temp_4__23
+              #                    store to temp_4__23 in mem offset legal
     fsw     fa1,12(sp)
-              #                    release fa1 with temp_5__23
-              #                    occupy fa4 with temp_6_arithop_23
-              #                    store to temp_6_arithop_23 in mem offset legal
+              #                    release fa1 with temp_4__23
+              #                    occupy fa4 with temp_5_arithop_23
+              #                    store to temp_5_arithop_23 in mem offset legal
     fsw     fa4,8(sp)
-              #                    release fa4 with temp_6_arithop_23
+              #                    release fa4 with temp_5_arithop_23
     j       .branch_false_22
-              #                    regtab     a0:Freed { symidx: a_17, tracked: true } |     a2:Freed { symidx: c_17, tracked: true } |     a3:Freed { symidx: temp_4_i32_to_bool_21, tracked: true } |     fa0:Freed { symidx: temp_0__17, tracked: true } |     fa2:Freed { symidx: temp_1_arithop_17, tracked: true } |     fa3:Freed { symidx: b_17, tracked: true } |  released_gpr_count:14,released_fpr_count:20
+              #                    regtab     a0:Freed { symidx: a_17, tracked: true } |     a2:Freed { symidx: c_17, tracked: true } |     a3:Freed { symidx: temp_2_i32_to_bool_21, tracked: true } |     fa0:Freed { symidx: temp_0__17, tracked: true } |     fa2:Freed { symidx: temp_1_arithop_17, tracked: true } |     fa3:Freed { symidx: b_17, tracked: true } |  released_gpr_count:14,released_fpr_count:20
               #                          label branch_false_22: 
 .branch_false_22:
               #                          jump label: L2_0 
     j       .L2_0
-              #                    regtab     a0:Freed { symidx: a_17, tracked: true } |     a2:Freed { symidx: c_17, tracked: true } |     a3:Freed { symidx: temp_4_i32_to_bool_21, tracked: true } |     fa0:Freed { symidx: temp_0__17, tracked: true } |     fa2:Freed { symidx: temp_1_arithop_17, tracked: true } |     fa3:Freed { symidx: b_17, tracked: true } |  released_gpr_count:14,released_fpr_count:20
+              #                    regtab     a0:Freed { symidx: a_17, tracked: true } |     a2:Freed { symidx: c_17, tracked: true } |     a3:Freed { symidx: temp_2_i32_to_bool_21, tracked: true } |     fa0:Freed { symidx: temp_0__17, tracked: true } |     fa2:Freed { symidx: temp_1_arithop_17, tracked: true } |     fa3:Freed { symidx: b_17, tracked: true } |  released_gpr_count:14,released_fpr_count:20
               #                          label L2_0: 
 .L2_0:
               #                          ret a_17 
@@ -250,4 +206,3 @@ main:
     addi    sp,sp,56
               #                    free a0
     ret
-              #                    regtab     a2:Freed { symidx: c_17, tracked: true } |     a3:Freed { symidx: temp_4_i32_to_bool_21, tracked: true } |     fa0:Freed { symidx: temp_0__17, tracked: true } |     fa2:Freed { symidx: temp_1_arithop_17, tracked: true } |     fa3:Freed { symidx: b_17, tracked: true } |  released_gpr_count:14,released_fpr_count:20

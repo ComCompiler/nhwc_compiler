@@ -6,8 +6,8 @@ int main(){
     // bool e = a||b||c;
     // int f = 2.45;
     // int g = b++;
-    23 = int a;
-    // a += 5.6;
+    int b = 1;
+    int c = a&&b;    // a += 5.6;
     // b *= 2;
     // b++;
 }

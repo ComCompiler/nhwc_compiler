@@ -88,7 +88,7 @@ pub struct CfgNode {
     pub info:Fields,
     // instructions of this basic block (第二步才生成这个 instrs)
 }
-#[derive(Clone)]
+#[derive(Clone,Default)]
 pub struct InstrList{
     pub instr_vec:Vec<usize>,
     pub outdated:bool

@@ -1,12 +1,15 @@
 use anyhow::{anyhow, Context, Ok, Result};
 use itertools::Itertools;
-use petgraph::graph::{EdgeIndex, NodeIndex};
-use petgraph::visit::IntoEdges;
+use petgraph::data::Build;
+use petgraph::graph::{edge_index, EdgeIndex, NodeIndex};
+use petgraph::visit::{IntoEdges, NodeRef};
+use petgraph::Direction::Incoming;
 use petgraph::{
     graph::node_index, visit::EdgeRef
 };
 use core::panic;
 use std::collections::HashMap;
+use std::mem;
 use crate::{add_node, instr};
 
 use super::cfg_node::CFG_ROOT;
@@ -1191,19 +1194,19 @@ fn process_et(
                     //逻辑运算符
                     super::et_node::ExprOp::LogicalOr | super::et_node::ExprOp::LogicalAnd => {
                         if let Some(_) = direct_child_node!(at et_node in et_tree ret_option) {
-                            let new_br_node = process_short_logic(cfg_node,cfg_graph,op)?;
+                            let (br_node,new_br_node) = process_short_logic(cfg_node,cfg_graph,op)?;
                             let (tmp_var_symidx, l_symidx, r_symidx) = process_logicop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_node,new_br_node, instr_slab,ast2scope, symtab_graph)?;
 
-                            //  = NhwcInstrType::new_logic_and(tmp_var_symidx.clone(), l_symidx, r_symidx, Type::I1).into();
-                            let p_cfg_true_node = direct_child_node!(at cfg_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_true()});
-                            let p_cfg_false_node = direct_child_node!(at cfg_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_false()});
-                            let p_label_true_symidx = find_or_new_label_to_cfg_node(p_cfg_true_node,scope_node+et_node, "branch_short_circuit_p_true".to_string(), symtab,cfg_graph,instr_slab)?;
-                            let p_label_false_symidx = find_or_new_label_to_cfg_node(p_cfg_false_node,scope_node+et_node, "branch_short_circuit_p_false".to_string(), symtab,cfg_graph,instr_slab)?;
-
-                            let c_cfg_true_node = direct_child_node!(at cfg_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_true()});
-                            let c_cfg_false_node = direct_child_node!(at cfg_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_false()});
+                            let c_cfg_true_node = direct_child_node!(at new_br_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_true()});
+                            let c_cfg_false_node = direct_child_node!(at new_br_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_false()});
                             let c_label_true_symidx = find_or_new_label_to_cfg_node(c_cfg_true_node,scope_node+et_node, "branch_short_circuit_c_true".to_string(), symtab,cfg_graph,instr_slab)?;
                             let c_label_false_symidx = find_or_new_label_to_cfg_node(c_cfg_false_node,scope_node+et_node, "branch_short_circuit_c_false".to_string(), symtab,cfg_graph,instr_slab)?;
+
+                            //  = NhwcInstrType::new_logic_and(tmp_var_symidx.clone(), l_symidx, r_symidx, Type::I2).into();
+                            let p_cfg_true_node = direct_child_node!(at br_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_true()});
+                            let p_cfg_false_node = direct_child_node!(at br_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_false()});
+                            let p_label_true_symidx = find_or_new_label_to_cfg_node(p_cfg_true_node,scope_node+et_node, "branch_short_circuit_p_true".to_string(), symtab,cfg_graph,instr_slab)?;
+                            let p_label_false_symidx = find_or_new_label_to_cfg_node(p_cfg_false_node,scope_node+et_node, "branch_short_circuit_p_false".to_string(), symtab,cfg_graph,instr_slab)?;
 
                             let logic_a_br_instr = NhwcInstrType::new_br(l_symidx,p_label_true_symidx,p_label_false_symidx).into();
                             node_mut!(at cfg_node in cfg_graph ).push_nhwc_instr(logic_a_br_instr, instr_slab)?;
@@ -2068,14 +2071,31 @@ pub fn parse_cfg_into_nhwc_cfg(
     // debug_info_yellow!("success end");
     Ok(())
 }
-// /// 这个函数会把入边转移到 新建的 较前的  basic block，并返回这个 cfg_node:u32
-// /// 然后把出边转移到较后的 cfg_node  
-// /// 并且可以通过添加一个Option<idx> 来选择分割instrs 到这个新增的 basic block  
-// /// 将下标为[0,idx)的 instr 转移到新的 basic block
-// /// 需要注意的是存在phi_instrs 和 instrs 两种 instr ，执行这个函数必须确保 phi_instrs 为空，并且instrs 有足够的语句
-// pub fn split_cfg_node(cfg_node:u32,cfg_graph:&mut CfgGraph) -> Result<u32>{
 
-// }
+
+// this function will insert a new basic block before specified cfg_node and inherit all edges of 
+// specified cfg_node, and take all normal instrs(except for label instr & jump instr)
+/// return the index u32 of cfg_new_bb
+pub fn split_bb_node(cfg_node:u32,cfg_graph:&mut CfgGraph,is_move_instrs:bool) -> Result<(u32,u32)>{
+    if !node!(at cfg_node in cfg_graph).cfg_node_type.is_basic_block(){
+        return Err(anyhow!("bb分割操作不能用于bb外的节点{}",cfg_node))
+    }
+    // add new bb cfg node 
+    let mut bb_struct = CfgNode::new_bb(vec![]);
+    bb_struct.add_func_cor_symidx(node!(at cfg_node in cfg_graph).get_func_cor_symidx()?.clone()); 
+    bb_struct.op_label_instr = node_mut!(at cfg_node in cfg_graph).op_label_instr.take();
+    bb_struct.instrs = mem::take(&mut node_mut!(at cfg_node in cfg_graph).instrs);
+    let cfg_new_bb = add_node!({bb_struct} to cfg_graph);
+   
+    // inherit all edges of specified cfg_node 
+    for (e,s,t) in cfg_graph.edges_directed(node_index(cfg_node as usize), Incoming).map(|e|{ let (s,t) = (e.source(),e.target()); (e.id(),s,t)}).collect_vec(){
+        let weight = cfg_graph.remove_edge(e).unwrap();
+        add_edge!({weight} from s to cfg_new_bb in cfg_graph);
+    }
+    // then add a direct edge from new cfg_bb to specified cfg_node
+    let new_edge = add_edge!({CfgEdge::new_direct()} from cfg_new_bb to cfg_node in cfg_graph);
+    Ok((cfg_new_bb,new_edge))
+}
 
 /// 在两个cfg node 之间插入一个bb ，并保留 边的属性，函数会自动判断究竟把带属性的边放到哪里(因为插入一个bb会多生成一条Direct边，需要判断把这条边放在什么位置)
 /// 以下条件满足之一可以insert new bb 
@@ -2122,8 +2142,8 @@ pub fn insert_bb_between(cfg_node1:u32, cfg_node2:u32, cfg_graph:&mut CfgGraph) 
 
 ///用于处理if条件表达式中逻辑运算符的短路运算符的cfg扩展，里面会根据传入的是&&还是||进行两种扩展
 /// &&是在原br和true边的bb中见添加的，新br的true指向内部bb，false指向原br指向的gather
-/// ||是在原br之外添加的，新br的true指向内部bb，false指向原br
-pub fn process_short_logic(cfg_node:u32,cfg_graph:&mut CfgGraph,logic_op:&ExprOp)->Result<u32>{
+/// 两种扩展都是向下扩展，然后返回原br节点和新扩展的br节点
+pub fn process_short_logic(cfg_node:u32,cfg_graph:&mut CfgGraph,logic_op:&ExprOp)->Result<(u32,u32)>{
     match (&node!(at cfg_node in cfg_graph).cfg_node_type,cfg_node){
         (CfgNodeType::Branch { ast_expr_node},br_node) => {
             let ast_expr_node = *ast_expr_node;
@@ -2135,9 +2155,11 @@ pub fn process_short_logic(cfg_node:u32,cfg_graph:&mut CfgGraph,logic_op:&ExprOp
                 if edge_type.cfg_edge_type.is_if_false(){
                     let (true_edge_idx,true_edge_type) = &edge_weights[1];
                     (true_edge_idx,true_edge_type,edge_idx,edge_type)
-                }else{
+                }else if edge_type.cfg_edge_type.is_if_true(){
                     let (false_edge_idx,false_edge_type) = &edge_weights[0];
                     (edge_idx,edge_type,false_edge_idx,false_edge_type)
+                }else{
+                    return Err(anyhow!("不是br"))
                 }
             };
             let (_,br_inside_bb) = cfg_graph.edge_endpoints(*true_edge_idx).unwrap();
@@ -2163,10 +2185,30 @@ pub fn process_short_logic(cfg_node:u32,cfg_graph:&mut CfgGraph,logic_op:&ExprOp
             //添加新br到gather的false边
             let outside_node = br_outside_bb.index() as u32;
             add_edge!({false_edge.clone()} from new_br to outside_node in cfg_graph);
-            Ok(new_br)
+            Ok((br_node,new_br))
         },
         (CfgNodeType::WhileLoop { ast_expr_node },while_node) => todo!(),
-        (CfgNodeType::BasicBlock { ast_nodes },bbjknode) => todo!(),
+        (CfgNodeType::BasicBlock { ast_nodes },bb_node) => {
+            let (new_bb,new_direct_edge) = split_bb_node(cfg_node, cfg_graph,true)?;
+            cfg_graph.remove_edge(edge_index(new_direct_edge as usize)).unwrap();
+            let mut new_br_struct = CfgNode::new_branch(0);
+            new_br_struct.add_func_cor_symidx(node!(at new_bb in cfg_graph).get_func_cor_symidx()?.clone());
+            let new_br = add_node_with_edge!({new_br_struct } with_edge {CfgEdge::new_direct()} from new_bb in cfg_graph);
+            let mut new_true_struct = CfgNode::new_bb(vec![]);
+            new_true_struct.add_func_cor_symidx(node!(at new_bb in cfg_graph).get_func_cor_symidx()?.clone());
+            let new_true_bb = add_node_with_edge!({new_true_struct} with_edge {CfgEdge::new_if_true()} from new_br in cfg_graph);
+            let mut new_false_struct = CfgNode::new_bb(vec![]);
+            new_false_struct.add_func_cor_symidx(node!(at new_bb in cfg_graph).get_func_cor_symidx()?.clone());
+            let new_false_bb = add_node_with_edge!({new_false_struct} with_edge {CfgEdge::new_if_false()} from new_br in cfg_graph);
+            let mut new_gather_struct = CfgNode::new_gather();
+            new_gather_struct.add_func_cor_symidx(node!(at new_bb in cfg_graph).get_func_cor_symidx()?.clone());
+            let new_gather = add_node_with_edge!({{new_gather_struct}} with_edge {CfgEdge::new_gather_true()} from new_true_bb in cfg_graph);
+            add_edge!({CfgEdge::new_gather_false()} from new_false_bb to new_gather in cfg_graph);
+            add_edge!({CfgEdge::new_direct()} from new_gather to bb_node in cfg_graph);
+
+            let (new_br,c_new_br) = process_short_logic(new_br, cfg_graph, logic_op)?;
+            Ok((new_br,c_new_br))
+        },
         _ => {
             return Err(anyhow!("逻辑语句不应该出现在{}中",cfg_node))
         }
