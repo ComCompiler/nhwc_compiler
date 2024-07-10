@@ -166,12 +166,20 @@ macro_rules! direct_parent_node {
             panic!("this node have multiple or zero parent_node, direct_parent_node failed")
         }
     }};
+    (at $node:ident in $graph:ident ret_option) => {{
+        let nodes = $crate::direct_parent_nodes!(at $node in $graph );
+        if nodes.len() ==1 {
+            Some(nodes[0])
+        }else{
+            None
+        }
+    }};
     (at $node:ident in $graph:ident with_predicate $f:block ) => {{
         let nodes = $crate::direct_parent_nodes!(at $node in $graph with_predicate $f);
         if nodes.len() ==1 {
             nodes[0]
         }else{
-            panic!("this node have multiple or zero parent_node, direct_parent_node failed {}",$node)
+            panic!("this node have multiple or zero parent_node, direct_parent_node failed for {} with ans {:?}",$node,nodes)
         }
     }};
     (at $node:ident in $graph:ident with_predicate $f:block ret_option) => {{

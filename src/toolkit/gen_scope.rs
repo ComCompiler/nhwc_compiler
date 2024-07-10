@@ -5,7 +5,7 @@ use crate::toolkit::ast_node::AstTree;
 use crate::antlr_parser::cparser::{
     RULE_blockItem, RULE_blockItemList, RULE_breakpointStatement, RULE_constantExpression, RULE_declaration, RULE_declarator, RULE_directDeclarator, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forCondition, RULE_forIterationStatement, RULE_forMidExpression, RULE_ifSelection, RULE_iterationStatement, RULE_jumpStatement, RULE_labeledStatement, RULE_parameterTypeList, RULE_selectionStatement, RULE_statement, RULE_switchSelection, RULE_whileIterationStatement
 };
-use crate::{add_node, add_node_with_edge, debug_info_red, debug_info_yellow, direct_child_node, direct_child_nodes, rule_id, RULE_compoundStatement, RULE_functionDefinition};
+use crate::{add_node, add_node_with_edge, debug_info_red, debug_info_yellow, direct_child_node, direct_child_nodes, direct_parent_node, rule_id, RULE_compoundStatement, RULE_functionDefinition};
 use crate::{find, find_nodes, node};
 
 use super::cfg_node::{CfgGraph};
@@ -134,7 +134,7 @@ pub fn process_iteration(scope_tree:&mut ScopeTree, ast_tree:&AstTree, scope_par
 
 ///处理while循环
 pub fn process_while(scope_tree:&mut ScopeTree, ast_tree:&AstTree, scope_parent:u32, current_while_node:u32, ast2scope:&mut HashMap<u32, u32>) {
-    let scope_while_node = add_node_with_edge!({ScopeNode{ast_node:current_while_node,text:String::new(),scope_type:ScopeType::While}} from scope_parent in scope_tree);
+    let scope_while_node = add_node_with_edge!({ScopeNode{ast_node:current_while_node,text:String::new(),scope_type:ScopeType::While { op_cfg_while_node: None }}} from scope_parent in scope_tree);
     ast2scope.insert(current_while_node, scope_while_node);
 
     let while_expression = find!(rule RULE_expression at current_while_node in ast_tree).unwrap();
@@ -145,7 +145,7 @@ pub fn process_while(scope_tree:&mut ScopeTree, ast_tree:&AstTree, scope_parent:
     let compound_node = direct_child_node!(at while_statment in ast_tree);
     if let Some(stmt) = find!(rule RULE_statement at current_while_node in ast_tree){
         // `for()i=i+3;`
-        process_statement(scope_tree, ast_tree, scope_parent, stmt, ast2scope);
+        process_statement(scope_tree, ast_tree, scope_while_node, stmt, ast2scope);
     }else{
         let while_compound_node = find!(rule RULE_compoundStatement at current_while_node in ast_tree).unwrap();
         process_compound(scope_tree, ast_tree, scope_while_node, while_compound_node, ast2scope)
@@ -240,4 +240,14 @@ pub fn parse_ast_to_scope(ast_tree:&AstTree,_cfg_graph:&CfgGraph,scope_tree:&mut
         let ast_compound_node = find!(rule RULE_compoundStatement at func_ast in ast_tree).unwrap();
         process_compound(scope_tree, ast_tree, scope_compound_parent, ast_compound_node, ast2scope);
     }
+}
+
+
+
+pub fn get_while_scope_of_scope_node(scope_node:u32, scope_tree:&ScopeTree) -> u32{
+    let mut scope_node = scope_node;
+    while !node!(at scope_node in scope_tree).scope_type.is_while() {
+        scope_node = direct_parent_node!(at scope_node in scope_tree);
+    }
+    scope_node
 }

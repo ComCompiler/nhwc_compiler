@@ -20,6 +20,7 @@ use super::eval_et::{self};
 use super::field::{ArrayEleMap, Value};
 use super::gen_cfg::AST_ROOT;
 use super::gen_et;
+use super::gen_scope::get_while_scope_of_scope_node;
 use super::mem_layout::MemLayout;
 use super::nhwc_instr::{CmpPlan, JumpOp};
 use super::{cfg_edge::CfgEdge, nhwc_instr::NhwcInstr};
@@ -215,29 +216,21 @@ fn parse_bb2nhwc(
                                 let ret_instr = NhwcInstrType::new_ret(None).into();
                                 node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
                             }
-                            //// we should remove the edge 
-                            // let cfg_child_node = direct_child_node!(at cfg_bb in cfg_graph);
-                            // let cfg_edge_to_removed = cfg_graph.find_edge(node_index(cfg_bb as usize), node_index(cfg_child_node as usize)).unwrap();
-                            // cfg_graph.remove_edge(cfg_edge_to_removed);
                         },
                         (RULE_breakStatement,break_ast) => {
-                            let while_or_for_node = match get_while_or_for_node_of_cfg_node(cfg_bb, cfg_graph){
+                            let while_or_for_node = match get_while_or_for_node_of_cfg_node(cfg_bb, cfg_graph, scope_tree, ast2scope){
                                 anyhow::Result::Ok(while_or_for_node ) => while_or_for_node ,
-                                Err(e) => {debug_info_blue!("{}",e);continue;},
+                                Err(e) => {
+                                    if direct_parent_node!(at cfg_bb in cfg_graph ret_option).is_some(){
+                                        return Err(e);
+                                    }else{
+                                        continue;
+                                    }
+                                },
                             };
+                            // 说明这个bb 已经被孤立了
+                            debug_info_green!("while_or_for_node_of_cfg_node {cfg_bb} is {while_or_for_node}");
                             let body_exit_node = get_exit_node_of_while_or_for_node(while_or_for_node, cfg_graph)?;
-                            // let jump_label = node!(at body_exit_node in cfg_graph).op_label_instr.unwrap();
-                            // let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
-                            // let jump_label = match jump_nhwctype{
-                            //     NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
-                            //     _ =>{
-                            //         return Err(anyhow!("this instr should be a label {:?}", jump_nhwctype))
-                            //     }
-                            // };
-
-                            // let jump_instr = NhwcInstrType::new_jump(jump_label).into();
-                            // node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(jump_instr, instr_slab)?;
-
                             // we should remove the edge 
                             let cfg_child_node = direct_child_node!(at cfg_bb in cfg_graph);
                             let cfg_edge_to_removed = cfg_graph.find_edge(node_index(cfg_bb as usize), node_index(cfg_child_node as usize)).unwrap();
@@ -246,22 +239,16 @@ fn parse_bb2nhwc(
                             add_edge!({CfgEdge::new_direct()} from cfg_bb to body_exit_node in cfg_graph);
                         },
                         (RULE_continueStatement,ctn_ast) => {
-                            let while_or_for_node = match get_while_or_for_node_of_cfg_node(cfg_bb, cfg_graph){
+                            let while_or_for_node = match get_while_or_for_node_of_cfg_node(cfg_bb, cfg_graph, scope_tree, ast2scope){
                                 anyhow::Result::Ok(while_or_for_node ) => while_or_for_node ,
-                                Err(e) => {debug_info_blue!("{}",e);continue;},
+                                Err(e) => {
+                                    if direct_parent_node!(at cfg_bb in cfg_graph ret_option).is_some(){
+                                        return Err(e);
+                                    }else{
+                                        continue;
+                                    }
+                                },
                             };
-                            // let jump_label = node!(at while_or_for_node in cfg_graph).op_label_instr.unwrap();
-                            // let jump_nhwctype = &instr_slab.get_instr(jump_label)?.instr_type;
-                            // let jump_label = match jump_nhwctype{
-                            //     NhwcInstrType::Label { label_symidx } => {label_symidx.clone()},
-                            //     _ =>{
-                            //         return Err(anyhow!("this instr should be a label {:?}", jump_nhwctype))
-                            //     }
-                            // };
-
-                            // let jump_instr = NhwcInstrType::new_jump(jump_label).into();
-                            // node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(jump_instr, instr_slab)?;
-
                             // we should remove the edge 
                             let cfg_child_node = direct_child_node!(at cfg_bb in cfg_graph);
                             let cfg_edge_to_removed = cfg_graph.find_edge(node_index(cfg_bb as usize), node_index(cfg_child_node as usize)).unwrap();
@@ -301,6 +288,7 @@ fn parse_whileloop2nhwc(
                     // 添加 br 语句
                     let cfg_body_head_node = direct_child_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_head() });
                     let cfg_exit_node = get_exit_node_of_while_or_for_node(cfg_whileloop, cfg_graph)?;
+                    debug_info_blue!("exit_node of cfg_while_node:{cfg_whileloop} is cfg_exit_node:{cfg_exit_node}");
                     let cfg_body_tail_node = direct_parent_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_tail() });
                     let while_head_symidx = find_or_new_label_to_cfg_node(cfg_whileloop,*ast2scope.get(&ast_expr_node).unwrap(), "while.head".to_string(), symtab,cfg_graph,instr_slab)?;
                     let while_body_symidx = find_or_new_label_to_cfg_node(cfg_body_head_node,*ast2scope.get(&ast_expr_node).unwrap(), "while.body".to_string(), symtab,cfg_graph, instr_slab)?;
@@ -1123,7 +1111,7 @@ fn process_call(
         Ok((Some(tmp_symidx),node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(call_instr, instr_slab)?))
     }
 }
-static mut a:i32 = 5;
+// static mut a:i32 = 5;
 
 fn process_et(
     ast_tree:&AstTree, cfg_graph:&mut CfgGraph, et_tree:&mut EtTree, scope_tree:&ScopeTree, symtab:&mut SymTab, et_node:u32, scope_node:u32, cfg_node:u32, instr_slab:&mut InstrSlab<NhwcInstr>,ast2scope:&HashMap<u32, u32>,
@@ -2010,8 +1998,26 @@ pub fn parse_cfg_into_nhwc_cfg(
             CfgEdgeType::IfTrue {  } => 1,
             CfgEdgeType::BodyTail {  } => 2,
         });
-        // dfs_vec.sort_by(|node| )
-        // dfs_vec.reverse();
+        // 遍历一遍这个函数体，确保 将 whileloop cfg_node 存到  scope_node 中 
+        for &cfg_node in dfs_vec.iter(){
+            if node!(at cfg_node in cfg_graph).cfg_node_type.is_while_loop(){
+                // if it is while loop then add current cfg_while_loop 
+                match &node!(at cfg_node in cfg_graph).cfg_node_type{
+                    CfgNodeType::WhileLoop { ast_expr_node } => {
+                        let &scope_expr_node = ast2scope.get(ast_expr_node).unwrap();
+                        let while_scope_node = get_while_scope_of_scope_node(scope_expr_node, scope_tree);
+                        match &mut node_mut!(at while_scope_node in scope_tree).scope_type{
+                            super::scope_node::ScopeType::While { op_cfg_while_node } => {
+                                *op_cfg_while_node = Some(cfg_node);
+                            },
+                            _ => {panic!()}
+                        }
+                    },
+                    _ => {panic!()}
+                };
+            }
+        }
+
         for &cfg_node in dfs_vec.iter() {
             // debug_info_yellow!("dfs current is {:?}", cfg_node);
             let cfgnode = node!(at cfg_node in cfg_graph);
@@ -2327,16 +2333,47 @@ pub fn get_head_tail_of_while_or_for_node(cfg_node:u32, cfg_graph:&mut CfgGraph)
 }
 
 // return the corresponding while block's while node of the cfg_node 
-pub fn get_while_or_for_node_of_cfg_node(cfg_node:u32, cfg_graph:&mut CfgGraph) -> Result<u32>{
-    let dfs_nodes = etc::dfs_with_predicate(cfg_graph, cfg_node,|e| {let parent_node = e.target().index() as u32; !node!(at parent_node in cfg_graph).cfg_node_type.is_root()});
-    for cfg_node in dfs_nodes{
-        // debug_info_red!("cur cfg_node:{}",cfg_node);
-        if node!(at cfg_node in cfg_graph).cfg_node_type.is_for_loop() || 
-        node!(at cfg_node in cfg_graph).cfg_node_type.is_while_loop(){
-            return Ok(cfg_node)
-        }
-    }
-    Err(anyhow!("can't find corresponding while block's while node of the cfg_node {}",cfg_node))
+// assert that more than one ast_node is in the node
+pub fn get_while_or_for_node_of_cfg_node(cfg_node:u32, cfg_graph:&mut CfgGraph, scope_tree:&ScopeTree, ast2scope:&HashMap<u32, u32>) -> Result<u32>{
+    debug_info_green!("try find while node of cfg_node {}",cfg_node);
+    // get any ast_node of the cfg _node 
+    let ast_node = match &node!(at cfg_node in cfg_graph).cfg_node_type{
+        CfgNodeType::WhileLoop { ast_expr_node } => {ast_expr_node},
+        CfgNodeType::BasicBlock { ast_nodes } => {
+            ast_nodes.get(0).unwrap()
+        },
+        _ => { panic!() }
+    };
+    let &scope_node = ast2scope.get(ast_node).unwrap();
+    let while_scope_node = get_while_scope_of_scope_node(scope_node , scope_tree);
+    let while_cfg_node = match &node!(at while_scope_node in scope_tree).scope_type {
+        crate::toolkit::scope_node::ScopeType::While { op_cfg_while_node } => {
+            op_cfg_while_node.unwrap()
+        },
+        _ => panic!()
+    };
+    Ok(while_cfg_node)
+    // let dfs_nodes = etc::reverse_dfs_with_predicate(cfg_graph, cfg_node,
+    //     |e| {
+    //         debug_info_green!("{}",e.source().index());
+    //         let parent_node = e.source().index() as u32; 
+    //         if node!(at parent_node in cfg_graph).cfg_node_type.is_while_loop() && e.weight().cfg_edge_type.is_body_head(){
+    //             false
+    //         }else {
+    //             true
+    //         }
+    //     }
+    // );
+    // let last_cfg_node = *dfs_nodes.last().unwrap();
+    // let op_while_node = direct_parent_node!(at last_cfg_node in cfg_graph with_predicate  {|e|e.weight().cfg_edge_type.is_body_head()} ret_option);
+    // if node!(at last_cfg_node in cfg_graph).cfg_node_type.is_while_loop() || op_while_node.is_none() {
+    //     Err(anyhow!("can't find corresponding while block's while node of the cfg_node {}",cfg_node))
+    // }else {
+    //     let while_node = op_while_node.unwrap();
+    //     debug_info_green!("find {while_node}");
+    //     Ok(while_node)
+    // }
+    
 }
 
 // pub fn find_gather_of_branch_downward(cfg_branch_node:u32,cfg_graph:&CfgGraph)-> Result<u32>{
