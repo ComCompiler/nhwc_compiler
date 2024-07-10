@@ -24,6 +24,7 @@ impl Pass for Cfg2NcfgPass {
         //4.1可视化
         if self.is_gen_ncfg_png {
             for cfg_node in ctx.cfg_graph.node_weights_mut() {
+                cfg_node.clear_text();
                 cfg_node.load_instrs_text(&ctx.nhwc_instr_slab)?;
             }
             generate_png_by_graph_multi_tasks(&ctx.cfg_graph.clone(), "nhwc_cfg_graph".to_string(), 

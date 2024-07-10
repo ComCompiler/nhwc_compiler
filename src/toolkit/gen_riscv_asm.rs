@@ -133,8 +133,6 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
             CfgEdgeType::Direct {  } => 2,
             CfgEdgeType::IfTrue {  } => 1,
             CfgEdgeType::BodyTail {  } => -1,
-            CfgEdgeType::GatherTrue {  } => 1,
-            CfgEdgeType::GatherFalse {  } => 5,
         });
         let mut _regtab = RegTab::new();
         let regtab =&mut _regtab;
@@ -662,7 +660,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 let op_t2_regtab = if node!(at t2_cfg_node in cfg_graph).has_regtab(){ Some(node!(at t2_cfg_node in cfg_graph).get_regtab()?) }else { None };
                                 match op_t2_regtab{
                                     Some(target_regtab) => {
-                                        regtab.suit(target_regtab, asm_sect, symtab, &mut default_store, &mut default_load)?;
+                                        regtab.suit(target_regtab, asm_sect, symtab, &mut default_store, &mut default_load).context(format!("current cfg_node:{cfg_node}"))?;
                                     },
                                     None => {
                                         regtab.forget_all_temp(asm_sect, symtab, &mut default_store)?;

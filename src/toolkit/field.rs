@@ -975,7 +975,9 @@ impl Not for Value{
         // let pub_ty=self.adapt(&self)?;
         // let l_val=self.to_specific_type(&pub_ty)?;
         match &self {
-            Value::I32(Some(v1)) => Ok(Value::new_i32(!v1)),
+            Value::I32(Some(v1)) => Ok(Value::new_i32({
+                if *v1 == 0 { 1 }else{ 0 } }
+            )),
             Value::F32(Some(_v1)) => Err(anyhow!("F32 can't logical not")),
             Value::I1(Some(v1)) => Ok(Value::new_i1(!v1)),
             Value::Void => Err(anyhow!("Void can't logical not")),

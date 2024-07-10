@@ -13,7 +13,7 @@ use super::cfg_node::{CfgGraph, CfgNode, CfgNodeType};
 
 
 use super::symtab::SymTab;
-/// 这个文件中没有在命名中提到是哪一中图中的节点，那么统一是 scope_node
+// 这个文件中没有在命名中提到是哪一中图中的节点，那么统一是 scope_node
 
 reg_field_for_struct!(CfgNode{
     // CFG_COR_GATHER:u32,
@@ -139,7 +139,7 @@ pub fn process_if(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab
         match p0 {
             Some((st_head_node, st_tail_node)) => {
                 add_edge!({CfgEdge::new_if_true()} from cfg_branch_node to st_head_node in cfg_graph);
-                add_edge!({CfgEdge::new_gather_true()} from st_tail_node to cfg_gather_node in cfg_graph);
+                add_edge!({CfgEdge::new_direct()} from st_tail_node to cfg_gather_node in cfg_graph);
             }
             None => {
                 add_edge!({CfgEdge::new_if_true()} from cfg_branch_node to cfg_gather_node in cfg_graph);
@@ -160,7 +160,7 @@ pub fn process_if(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab
         match p0 {
             Some((st_head_node, st_tail_node)) => {
                 add_edge!({CfgEdge::new_if_true()} from cfg_branch_node to st_head_node in cfg_graph);
-                add_edge!({CfgEdge::new_gather_true()} from st_tail_node to cfg_gather_node in cfg_graph);
+                add_edge!({CfgEdge::new_direct()} from st_tail_node to cfg_gather_node in cfg_graph);
             }
             None => {
                 // 加入一个空的bb
@@ -172,7 +172,7 @@ pub fn process_if(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab
         match p1 {
             Some((st_head_node, st_tail_node)) => {
                 add_edge!({CfgEdge::new_if_false()} from cfg_branch_node to st_head_node in cfg_graph);
-                add_edge!({CfgEdge::new_gather_false()} from st_tail_node to cfg_gather_node in cfg_graph);
+                add_edge!({CfgEdge::new_direct()} from st_tail_node to cfg_gather_node in cfg_graph);
             }
             None => {
                 let cfg_new_bb = add_node!({CfgNode::new_bb(vec![])} to cfg_graph);

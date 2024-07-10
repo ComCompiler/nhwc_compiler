@@ -3,14 +3,15 @@ use itertools::Itertools;
 use petgraph::data::Build;
 use petgraph::graph::{edge_index, EdgeIndex, NodeIndex};
 use petgraph::visit::{IntoEdges, NodeRef};
-use petgraph::Direction::Incoming;
+use petgraph::Direction::{Incoming, Outgoing};
 use petgraph::{
     graph::node_index, visit::EdgeRef
 };
+use syn::ext::IdentExt;
 use core::panic;
 use std::collections::HashMap;
 use std::mem;
-use crate::{add_node, instr};
+use crate::{add_node, instr, instr_mut};
 
 use super::cfg_node::CFG_ROOT;
 use super::et_node::ExprOp;
@@ -20,7 +21,7 @@ use super::field::{ArrayEleMap, Value};
 use super::gen_cfg::AST_ROOT;
 use super::gen_et;
 use super::mem_layout::MemLayout;
-use super::nhwc_instr::CmpPlan;
+use super::nhwc_instr::{CmpPlan, JumpOp};
 use super::{cfg_edge::CfgEdge, nhwc_instr::NhwcInstr};
 use super::{
     ast_node::AstTree, cfg_node::CfgGraph, et_node::{DeclOrDefOrUse, EtNodeType, EtTree}, gen_et::process_any_stmt, nhwc_instr::NhwcInstrType, scope_node::ScopeTree, symtab::{SymIdx, SymTab, SymTabGraph}
@@ -286,13 +287,6 @@ fn parse_whileloop2nhwc(
     match (rule_id!(at ast_expr_node in ast_tree), ast_expr_node) {
         (RULE_expression, expr_ast) => {
 
-            let cfg_body_head_node = direct_child_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_head() });
-            let cfg_exit_node = get_exit_node_of_while_or_for_node(cfg_whileloop, cfg_graph)?;
-            let cfg_body_tail_node = direct_parent_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_tail() });
-
-            let while_head_symidx = find_or_new_label_to_cfg_node(cfg_whileloop,*ast2scope.get(&ast_expr_node).unwrap(), "while.head".to_string(), symtab,cfg_graph,instr_slab)?;
-            let while_body_symidx = find_or_new_label_to_cfg_node(cfg_body_head_node,*ast2scope.get(&ast_expr_node).unwrap(), "while.body".to_string(), symtab,cfg_graph, instr_slab)?;
-            let while_exit_symidx = find_or_new_label_to_cfg_node(cfg_exit_node,*ast2scope.get(&ast_expr_node).unwrap(), "while.exit".to_string(), symtab,cfg_graph,instr_slab)?;
 
             if let Some(&expr_scope) = ast2scope.get(&expr_ast) {
                 let expr_parent_scope = direct_parent_node!(at expr_scope in scope_tree);
@@ -305,12 +299,18 @@ fn parse_whileloop2nhwc(
                     let result_type = symtab.get(&symidx)?.get_type()?.clone();
                     r2bool_symidx = force_trans_type(cfg_graph, symtab, &Type::I1,  &result_type,&symidx, ast_expr_node, cfg_whileloop,  instr_slab, symtab_graph,None,et_tree)?;
                     // 添加 br 语句
+                    let cfg_body_head_node = direct_child_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_head() });
+                    let cfg_exit_node = get_exit_node_of_while_or_for_node(cfg_whileloop, cfg_graph)?;
+                    let cfg_body_tail_node = direct_parent_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_tail() });
+                    let while_head_symidx = find_or_new_label_to_cfg_node(cfg_whileloop,*ast2scope.get(&ast_expr_node).unwrap(), "while.head".to_string(), symtab,cfg_graph,instr_slab)?;
+                    let while_body_symidx = find_or_new_label_to_cfg_node(cfg_body_head_node,*ast2scope.get(&ast_expr_node).unwrap(), "while.body".to_string(), symtab,cfg_graph, instr_slab)?;
+                    let while_exit_symidx = find_or_new_label_to_cfg_node(cfg_exit_node,*ast2scope.get(&ast_expr_node).unwrap(), "while.exit".to_string(), symtab,cfg_graph,instr_slab)?;
+
                     let br_whileloop_instr_struct = NhwcInstrType::new_br(r2bool_symidx.clone(),while_body_symidx,while_exit_symidx).into();
                     node_mut!(at cfg_whileloop in cfg_graph).push_nhwc_instr(br_whileloop_instr_struct, instr_slab)?;
 
-
-                    let jump_body_tail_instr_struct = NhwcInstrType::new_jump(while_head_symidx.clone()).into();
-                    node_mut!(at cfg_body_tail_node in cfg_graph).push_nhwc_instr(jump_body_tail_instr_struct, instr_slab)?;
+                    // let jump_body_tail_instr_struct = NhwcInstrType::new_jump(while_head_symidx.clone()).into();
+                    // node_mut!(at cfg_body_tail_node in cfg_graph).push_nhwc_instr(jump_body_tail_instr_struct, instr_slab)?;
 
                     node_mut!(at cfg_whileloop in cfg_graph).add_jump_det(r2bool_symidx);
                 }else{
@@ -332,6 +332,22 @@ pub fn process_label_symbol(cfg_node:u32,scope_node:u32,label_name:String,symtab
         with_field DEF_INSTRS_VEC:{Vec::<usize>::new()}
     to symtab);
     Ok(label_symidx)
+}
+pub fn find_label_of_cfg_node(cfg_node:u32,cfg_graph:&mut CfgGraph, instr_slab:&mut InstrSlab<NhwcInstr>)->Result<SymIdx>{
+    match &node!(at cfg_node in cfg_graph).op_label_instr{
+        Some(instr) => {
+            let instr = *instr;
+            match &instr!(at instr in instr_slab)?.instr_type{
+                NhwcInstrType::Label { label_symidx } => {
+                    Ok(label_symidx.clone())
+                },
+                _ => panic!()
+            }
+        }
+        _ => {
+            return Err(anyhow!("can't find label of cfg_node:{cfg_node}"))
+        }
+    }
 }
 pub fn find_or_new_label_to_cfg_node(cfg_node:u32,scope_node:u32,label_name:String,symtab:&mut SymTab,cfg_graph:&mut CfgGraph, instr_slab:&mut InstrSlab<NhwcInstr>) -> Result<SymIdx>{
     match &node!(at cfg_node in cfg_graph).op_label_instr{
@@ -428,11 +444,6 @@ fn parse_branch2nhwc(
     ast_tree:&AstTree, cfg_graph:&mut CfgGraph, scope_tree:&ScopeTree, et_tree:&mut EtTree, symtab:&mut SymTab, ast2scope:&HashMap<u32, u32>, ast_expr_node:u32, cfg_branch_node:u32, 
     instr_slab:&mut InstrSlab<NhwcInstr>, symtab_g:&mut Option<&mut SymTabGraph>,
 ) -> Result<()> {
-    let cfg_true_node = direct_child_node!(at cfg_branch_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_true()});
-    let cfg_false_node = direct_child_node!(at cfg_branch_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_false()});
-
-    let label_true_symidx = find_or_new_label_to_cfg_node(cfg_true_node,*ast2scope.get(&ast_expr_node).unwrap(), "branch_true".to_string(), symtab,cfg_graph,instr_slab)?;
-    let label_false_symidx = find_or_new_label_to_cfg_node(cfg_false_node,*ast2scope.get(&ast_expr_node).unwrap(), "branch_false".to_string(), symtab,cfg_graph,instr_slab)?;
 
     match (rule_id!(at ast_expr_node in ast_tree), ast_expr_node) {
         (RULE_expression, expr_node) => {
@@ -450,12 +461,16 @@ fn parse_branch2nhwc(
                     return Err(anyhow!("条件表达式错误，返回类型不能转为bool"))
                 }
 
+                let cfg_true_node = direct_child_node!(at cfg_branch_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_true()});
+                let cfg_false_node = direct_child_node!(at cfg_branch_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_false()});
                 if cfg_true_node != cfg_false_node{
+                    let label_true_symidx = find_or_new_label_to_cfg_node(cfg_true_node,*ast2scope.get(&ast_expr_node).unwrap(), "branch_true".to_string(), symtab,cfg_graph,instr_slab)?;
+                    let label_false_symidx = find_or_new_label_to_cfg_node(cfg_false_node,*ast2scope.get(&ast_expr_node).unwrap(), "branch_false".to_string(), symtab,cfg_graph,instr_slab)?;
                     let br_branch_instr_struct = NhwcInstrType::new_br(r2bool_symidx.clone(),label_true_symidx,label_false_symidx).into();
                     node_mut!(at cfg_branch_node in cfg_graph).push_nhwc_instr(br_branch_instr_struct, instr_slab)?;
                 }else {
-                    let jump_instr_struct = NhwcInstrType::new_jump(label_false_symidx).into();
-                    node_mut!(at cfg_branch_node in cfg_graph).push_nhwc_instr(jump_instr_struct, instr_slab)?;
+                    // let jump_instr_struct = NhwcInstrType::new_jump(label_false_symidx).into();
+                    // node_mut!(at cfg_branch_node in cfg_graph).push_nhwc_instr(jump_instr_struct, instr_slab)?;
                 }
 
                 node_mut!(at cfg_branch_node in cfg_graph).add_jump_det(r2bool_symidx);
@@ -1194,17 +1209,17 @@ fn process_et(
                     //逻辑运算符
                     super::et_node::ExprOp::LogicalOr | super::et_node::ExprOp::LogicalAnd => {
                         if let Some(_) = direct_child_node!(at et_node in et_tree ret_option) {
-                            let (br_node,new_br_node) = process_short_logic(cfg_node,cfg_graph,op)?;
+                            let (br_node,new_br_node) = process_short_logic(cfg_node,cfg_graph,op,instr_slab)?;
                             let (tmp_var_symidx, l_symidx, r_symidx) = process_logicop(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_node, scope_node, cfg_node,new_br_node, instr_slab,ast2scope, symtab_graph)?;
 
-                            let c_cfg_true_node = direct_child_node!(at new_br_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_true()});
-                            let c_cfg_false_node = direct_child_node!(at new_br_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_false()});
+                            let c_cfg_true_node = direct_child_node!(at new_br_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_true()|| e.weight().cfg_edge_type.is_body_head()});
+                            let c_cfg_false_node = direct_child_node!(at new_br_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_false()|| e.weight().cfg_edge_type.is_direct() });
                             let c_label_true_symidx = find_or_new_label_to_cfg_node(c_cfg_true_node,scope_node+et_node, "branch_short_circuit_c_true".to_string(), symtab,cfg_graph,instr_slab)?;
                             let c_label_false_symidx = find_or_new_label_to_cfg_node(c_cfg_false_node,scope_node+et_node, "branch_short_circuit_c_false".to_string(), symtab,cfg_graph,instr_slab)?;
 
                             //  = NhwcInstrType::new_logic_and(tmp_var_symidx.clone(), l_symidx, r_symidx, Type::I2).into();
-                            let p_cfg_true_node = direct_child_node!(at br_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_true()});
-                            let p_cfg_false_node = direct_child_node!(at br_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_false()});
+                            let p_cfg_true_node = direct_child_node!(at br_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_true() || e.weight().cfg_edge_type.is_body_head()});
+                            let p_cfg_false_node = direct_child_node!(at br_node in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_if_false()  || e.weight().cfg_edge_type.is_direct() });
                             let p_label_true_symidx = find_or_new_label_to_cfg_node(p_cfg_true_node,scope_node+et_node, "branch_short_circuit_p_true".to_string(), symtab,cfg_graph,instr_slab)?;
                             let p_label_false_symidx = find_or_new_label_to_cfg_node(p_cfg_false_node,scope_node+et_node, "branch_short_circuit_p_false".to_string(), symtab,cfg_graph,instr_slab)?;
 
@@ -1994,8 +2009,6 @@ pub fn parse_cfg_into_nhwc_cfg(
             CfgEdgeType::Direct {  } => 2,
             CfgEdgeType::IfTrue {  } => 1,
             CfgEdgeType::BodyTail {  } => 2,
-            CfgEdgeType::GatherTrue {  } => 1,
-            CfgEdgeType::GatherFalse {  } => 5,
         });
         // dfs_vec.sort_by(|node| )
         // dfs_vec.reverse();
@@ -2143,7 +2156,7 @@ pub fn insert_bb_between(cfg_node1:u32, cfg_node2:u32, cfg_graph:&mut CfgGraph) 
 ///用于处理if条件表达式中逻辑运算符的短路运算符的cfg扩展，里面会根据传入的是&&还是||进行两种扩展
 /// &&是在原br和true边的bb中见添加的，新br的true指向内部bb，false指向原br指向的gather
 /// 两种扩展都是向下扩展，然后返回原br节点和新扩展的br节点
-pub fn process_short_logic(cfg_node:u32,cfg_graph:&mut CfgGraph,logic_op:&ExprOp)->Result<(u32,u32)>{
+pub fn process_short_logic(cfg_node:u32,cfg_graph:&mut CfgGraph,logic_op:&ExprOp, instr_slab:&mut InstrSlab<NhwcInstr>)->Result<(u32,u32)>{
     match (&node!(at cfg_node in cfg_graph).cfg_node_type,cfg_node){
         (CfgNodeType::Branch { ast_expr_node},br_node) => {
             let ast_expr_node = *ast_expr_node;
@@ -2187,32 +2200,100 @@ pub fn process_short_logic(cfg_node:u32,cfg_graph:&mut CfgGraph,logic_op:&ExprOp
             add_edge!({false_edge.clone()} from new_br to outside_node in cfg_graph);
             Ok((br_node,new_br))
         },
-        (CfgNodeType::WhileLoop { ast_expr_node },while_node) => todo!(),
-        (CfgNodeType::BasicBlock { ast_nodes },bb_node) => {
-            let (new_bb,new_direct_edge) = split_bb_node(cfg_node, cfg_graph,true)?;
-            cfg_graph.remove_edge(edge_index(new_direct_edge as usize)).unwrap();
-            let mut new_br_struct = CfgNode::new_branch(0);
-            new_br_struct.add_func_cor_symidx(node!(at new_bb in cfg_graph).get_func_cor_symidx()?.clone());
-            let new_br = add_node_with_edge!({new_br_struct } with_edge {CfgEdge::new_direct()} from new_bb in cfg_graph);
-            let mut new_true_struct = CfgNode::new_bb(vec![]);
-            new_true_struct.add_func_cor_symidx(node!(at new_bb in cfg_graph).get_func_cor_symidx()?.clone());
-            let new_true_bb = add_node_with_edge!({new_true_struct} with_edge {CfgEdge::new_if_true()} from new_br in cfg_graph);
-            let mut new_false_struct = CfgNode::new_bb(vec![]);
-            new_false_struct.add_func_cor_symidx(node!(at new_bb in cfg_graph).get_func_cor_symidx()?.clone());
-            let new_false_bb = add_node_with_edge!({new_false_struct} with_edge {CfgEdge::new_if_false()} from new_br in cfg_graph);
-            let mut new_gather_struct = CfgNode::new_gather();
-            new_gather_struct.add_func_cor_symidx(node!(at new_bb in cfg_graph).get_func_cor_symidx()?.clone());
-            let new_gather = add_node_with_edge!({{new_gather_struct}} with_edge {CfgEdge::new_gather_true()} from new_true_bb in cfg_graph);
-            add_edge!({CfgEdge::new_gather_false()} from new_false_bb to new_gather in cfg_graph);
-            add_edge!({CfgEdge::new_direct()} from new_gather to bb_node in cfg_graph);
+        (CfgNodeType::WhileLoop { ast_expr_node },while_node) => {
+            let ast_expr_node = *ast_expr_node;
+            let br_outedges = cfg_graph.edges_directed(node_index(while_node as usize),petgraph::Direction::Outgoing);
+            let edge_weights: Vec<(EdgeIndex, CfgEdge)> = br_outedges.map(|edge| (edge.id(), edge.weight().clone())).collect();
+            let mut new_br_struct = CfgNode::new_branch(ast_expr_node);
+            let (true_edge_idx,true_edge,false_edge_idx,false_edge) = {
+                let (edge_idx,edge_type) = &edge_weights[0];
+                if edge_type.cfg_edge_type.is_direct(){
+                    let (true_edge_idx,true_edge_type) = &edge_weights[1];
+                    (true_edge_idx,true_edge_type,edge_idx,edge_type)
+                }else if edge_type.cfg_edge_type.is_body_head(){
+                    let (false_edge_idx,false_edge_type) = &edge_weights[0];
+                    (edge_idx,edge_type,false_edge_idx,false_edge_type)
+                }else{
+                    return Err(anyhow!("不是br"))
+                }
+            };
+            let (_,br_inside_bb) = cfg_graph.edge_endpoints(*true_edge_idx).unwrap();
+            let (_,br_outside_bb) = cfg_graph.edge_endpoints(*false_edge_idx).unwrap();
+            new_br_struct.add_func_cor_symidx(node!(at while_node in cfg_graph).get_func_cor_symidx()?.clone());
+            let new_br:u32;
+            match logic_op{
+                ExprOp::LogicalOr => {
+                    cfg_graph.remove_edge(*false_edge_idx).unwrap();
+                    new_br = add_node_with_edge!({new_br_struct} with_edge {false_edge.clone()} from while_node in cfg_graph);
+                },
+                ExprOp::LogicalAnd => {
+                    cfg_graph.remove_edge(*true_edge_idx).unwrap();
+                    new_br = add_node_with_edge!({new_br_struct} with_edge {true_edge.clone()} from while_node in cfg_graph);
+                },
+                _=>{
+                    return Err(anyhow!("操作符{:?}不是逻辑运算符",*logic_op))
+                }
+            }
+            //添加新br到内部bb的true边 
+            let inside_bb = br_inside_bb.index() as u32;
+            add_edge!({CfgEdge::new_if_true()} from new_br to inside_bb in cfg_graph);
+            //添加新br到gather的false边
+            let outside_node = br_outside_bb.index() as u32;
+            add_edge!({CfgEdge::new_if_false()} from new_br to outside_node in cfg_graph);
+            Ok((while_node,new_br))
 
-            let (new_br,c_new_br) = process_short_logic(new_br, cfg_graph, logic_op)?;
-            Ok((new_br,c_new_br))
+        },
+        (CfgNodeType::BasicBlock { ast_nodes },bb_node) => {
+            todo!()
+            // let (new_bb,new_direct_edge) = split_bb_node(cfg_node, cfg_graph,true)?;
+            // cfg_graph.remove_edge(edge_index(new_direct_edge as usize)).unwrap();
+            // let mut new_br_struct = CfgNode::new_branch(0);
+            // new_br_struct.add_func_cor_symidx(node!(at new_bb in cfg_graph).get_func_cor_symidx()?.clone());
+            // let new_br = add_node_with_edge!({new_br_struct } with_edge {CfgEdge::new_direct()} from new_bb in cfg_graph);
+            // let mut new_true_struct = CfgNode::new_bb(vec![]);
+            // new_true_struct.add_func_cor_symidx(node!(at new_bb in cfg_graph).get_func_cor_symidx()?.clone());
+            // let new_true_bb = add_node_with_edge!({new_true_struct} with_edge {CfgEdge::new_if_true()} from new_br in cfg_graph);
+            // let mut new_false_struct = CfgNode::new_bb(vec![]);
+            // new_false_struct.add_func_cor_symidx(node!(at new_bb in cfg_graph).get_func_cor_symidx()?.clone());
+            // let new_false_bb = add_node_with_edge!({new_false_struct} with_edge {CfgEdge::new_if_false()} from new_br in cfg_graph);
+            // let mut new_gather_struct = CfgNode::new_gather();
+            // new_gather_struct.add_func_cor_symidx(node!(at new_bb in cfg_graph).get_func_cor_symidx()?.clone());
+            // let new_gather = add_node_with_edge!({{new_gather_struct}} with_edge {CfgEdge::new_direct()} from new_true_bb in cfg_graph);
+            // add_edge!({CfgEdge::new_direct()} from new_false_bb to new_gather in cfg_graph);
+            // add_edge!({CfgEdge::new_direct()} from new_gather to bb_node in cfg_graph);
+
+            // let (new_br,c_new_br) = process_short_logic(new_br, cfg_graph, logic_op, instr_slab)?;
+            // Ok((new_br,c_new_br))
         },
         _ => {
             return Err(anyhow!("逻辑语句不应该出现在{}中",cfg_node))
         }
     }
+}
+pub fn refresh_br_instr_of_branch(cfg_branch_node:u32,cfg_graph:&mut CfgGraph, instr_slab:&mut InstrSlab<NhwcInstr>) -> Result<()>{
+    // first assert that the cfg_branch has 2 edges 
+    let mut edges = cfg_graph.edges_directed(node_index(cfg_branch_node as usize), Outgoing).into_iter().map(|e|(e.weight().clone(),e.target().index() as u32)).collect_vec();
+    if edges.len() != 2 {
+        return Err(anyhow!("can't refresh br instr of cfg_branch_node:{cfg_branch_node}"))
+    }
+    edges.sort_by_key(|(e,idx)|{
+        match e.cfg_edge_type{
+            CfgEdgeType::IfFalse {  } => { 2 },
+            CfgEdgeType::IfTrue {  } => { 1 },
+            _ => panic!("unacceptable edge of branch_node")
+        }
+    });
+    let jump_instr = node_mut!(at cfg_branch_node in cfg_graph).op_jump_instr.unwrap();
+    let true_label = find_label_of_cfg_node(edges[0].1,  cfg_graph, instr_slab)?.clone();
+    let false_label = find_label_of_cfg_node(edges[1].1,  cfg_graph, instr_slab)?.clone();
+    match &mut instr_mut!(at jump_instr in instr_slab)?.instr_type{
+        NhwcInstrType::Jump { jump_op:JumpOp::Br { cond, t1, t2 } } => {
+            *t1 = true_label;
+            *t2 = false_label;
+        },
+        _ => {panic!("jump instr should be a br ")}
+    };
+    Ok(())
 }
 
 pub fn get_exit_node_of_while_or_for_node(cfg_while_or_for_node:u32, cfg_graph:&mut CfgGraph) -> Result<u32>{

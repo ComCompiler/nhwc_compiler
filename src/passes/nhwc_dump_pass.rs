@@ -44,8 +44,6 @@ impl Pass for NhwcDumpPass {
             CfgEdgeType::Direct {  } => 2,
             CfgEdgeType::IfTrue {  } => 1,
             CfgEdgeType::BodyTail {  } => 1,
-            CfgEdgeType::GatherTrue {  } => 1,
-            CfgEdgeType::GatherFalse {  } => 5,
         });
 
         let mut anonymous_label_count = 0;
