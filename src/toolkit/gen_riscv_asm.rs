@@ -586,13 +586,11 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                     Type::I32 => {
                                         let reg = Register::new_a(0);
                                         regtab.try_release_reg(reg.clone(), symtab, asm_sect, &mut default_store)?;
-                                        _store_sym(asm_sect, assigned_symidx, Register::new_a(0), regtab,symtab,0)?;
                                         regtab.set_freed_reg(reg, assigned_symidx, symtab)?;
                                     },
                                     Type::F32 => {
                                         let reg =Register::new_fa(0);
                                         regtab.try_release_reg(reg.clone(), symtab, asm_sect, &mut default_store)?;
-                                        _store_sym(asm_sect, assigned_symidx, Register::new_fa(0), regtab,symtab,0)?;
                                         regtab.set_freed_reg(reg, assigned_symidx, symtab)?;
                                     },
                                     _ => {

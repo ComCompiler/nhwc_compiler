@@ -973,13 +973,13 @@ fn process_arithop(
 ) -> Result<(SymIdx, SymIdx, SymIdx, Type, Type)> {
     let next_nodes = direct_child_nodes!(at root_et_node in et_tree with_predicate {|e|!e.weight().et_edge_type.is_deleted()});
     check_child_nodes(&next_nodes, 2)?;
+    //取左操作数symidx和type
+    let l_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_nodes[0], scope_node, cfg_bb, instr_slab, ast2scope,symtab_graph)?.unwrap();
+    let l_type = symtab.get(&l_symidx)?.get_type()?.clone();
     //取右操作数symidx和type
     let r_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_nodes[1], scope_node, cfg_bb, instr_slab, ast2scope,symtab_graph)?.unwrap();
     let r_type = symtab.get(&r_symidx)?.get_type()?.clone();
 
-    //取左操作数symidx和type
-    let l_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, next_nodes[0], scope_node, cfg_bb, instr_slab, ast2scope,symtab_graph)?.unwrap();
-    let l_type = symtab.get(&l_symidx)?.get_type()?.clone();
 
     //将左右操作数进行类型自动转换
     let (l_symidx, r_symidx) = autotrans_arith_type(cfg_graph, symtab, &l_type, &l_symidx, &r_type, &r_symidx, scope_node, cfg_bb, instr_slab, symtab_graph,Some(et_node),et_tree)?;
@@ -1161,6 +1161,7 @@ fn process_et(
                         if let Some(_) = direct_child_node!(at et_node in et_tree ret_option) {
                             let (tmp_var_symidx, l_symidx, r_symidx, var_type, _) =
                                 process_arithop(ast_tree, cfg_graph, et_tree,et_node, scope_tree, symtab, et_node, scope_node, cfg_node, instr_slab, ast2scope,symtab_graph)?;
+                            // println!("lsymidx is {:?} while r_symidx is {:?}",l_symidx,r_symidx);
                             let sub_instr = NhwcInstrType::new_sub(tmp_var_symidx.clone(), l_symidx, r_symidx, var_type).into();
                             node_mut!(at cfg_node in cfg_graph ).push_nhwc_instr(sub_instr, instr_slab)?;
 
