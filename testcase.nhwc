@@ -20,11 +20,12 @@
               alloc f32 temp_1_arithop_17 
               alloc f32 b_17 
               alloc i32 c_17 
-              alloc i1 temp_2_i32_to_bool_21 
-              alloc i1 temp_3_f32_to_bool_21 
-              alloc f32 temp_4__23 
-              alloc f32 temp_5_arithop_23 
-              alloc i32 temp_6__23 
+              alloc i1 temp_2_f32_to_bool_21 
+              alloc i1 temp_3_i32_to_bool_21 
+              alloc i1 temp_4_i32_to_bool_21 
+              alloc f32 temp_5__23 
+              alloc f32 temp_6_arithop_23 
+              alloc i32 temp_7__23 
           label L0_0: 
               a_17 = i32 3_0 
               new_var temp_0__17:f32 
@@ -35,23 +36,27 @@
               c_17 = i32 1_0 
               jump label: L1_0 
           label L1_0: 
-              new_var temp_2_i32_to_bool_21:i1 
-              temp_2_i32_to_bool_21 = icmp i1 Ne a_17, 0_0 
-              br i1 temp_2_i32_to_bool_21, label branch_true_22, label branch_false_22 
-          label branch_short_circuit_p_true_70: 
-              new_var temp_3_f32_to_bool_21:i1 
-              temp_3_f32_to_bool_21 = fcmp f32 One b_17, 0.0_0 
-              br i1 temp_3_f32_to_bool_21, label branch_true_22, label branch_false_22 
-          label branch_true_22: 
-              new_var temp_4__23:f32 
-              temp_4__23 = sitofp i32 c_17 to f32 
-              new_var temp_5_arithop_23:f32 
-              temp_5_arithop_23 = Add f32 b_17, temp_4__23 
-              new_var temp_6__23:i32 
-              temp_6__23 = fptosi f32 temp_5_arithop_23 to i32 
-              a_17 = i32 temp_6__23 
-              jump label: branch_false_22 
-          label branch_false_22: 
+              new_var temp_4_i32_to_bool_21:i1 
+              temp_4_i32_to_bool_21 = icmp i32 Ne a_17, 0_0 
+              br i1 temp_4_i32_to_bool_21, label branch_short_circuit_c_true_72, label branch_short_circuit_p_false_70 
+          label branch_short_circuit_c_true_72: 
+              new_var temp_5__23:f32 
+              temp_5__23 = sitofp i32 c_17 to f32 
+              new_var temp_6_arithop_23:f32 
+              temp_6_arithop_23 = Add f32 b_17, temp_5__23 
+              new_var temp_7__23:i32 
+              temp_7__23 = fptosi f32 temp_6_arithop_23 to i32 
+              a_17 = i32 temp_7__23 
+              jump label: branch_short_circuit_c_false_72 
+          label branch_short_circuit_c_false_72: 
               jump label: L2_0 
           label L2_0: 
               ret a_17 
+          label branch_short_circuit_p_false_70: 
+              new_var temp_2_f32_to_bool_21:i1 
+              temp_2_f32_to_bool_21 = fcmp f32 One b_17, 0.0_0 
+              br i1 temp_3_i32_to_bool_21, label branch_short_circuit_p_true_72, label branch_short_circuit_c_false_72 
+          label branch_short_circuit_p_true_72: 
+              new_var temp_3_i32_to_bool_21:i1 
+              temp_3_i32_to_bool_21 = icmp i32 Ne c_17, 0_0 
+              br i1 temp_2_f32_to_bool_21, label branch_short_circuit_c_true_72, label branch_short_circuit_c_false_72 

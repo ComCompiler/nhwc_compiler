@@ -31,3 +31,4 @@ pub mod gen_riscv_asm;
 pub mod asm_struct;
 pub mod gen_func_call;
 pub mod regtab;
+pub mod gen_instr_et;
