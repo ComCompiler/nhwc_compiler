@@ -96,6 +96,7 @@ pub struct EtNode {
     pub calculated_symidx: Option<Option<SymIdx>>,
     pub et_ret_symidx_vec: Option<Vec<SymIdx>>,
     pub common_eliminated:bool,
+    pub equivalent_symidx_vec:Vec<SymIdx>,
 }
 pub trait EtHash{
     fn update_hash(&mut self,et_node:u32) ;
@@ -422,7 +423,7 @@ impl Debug for ExprOp {
 }
 impl From<EtNodeType> for EtNode{
     fn from(et_node_type: EtNodeType) -> Self {
-        Self { et_node_type, hash: None, calculated_symidx: None, et_ret_symidx_vec: None ,common_eliminated:false, dims: None, ty: None }
+        Self { et_node_type, hash: None, calculated_symidx: None, et_ret_symidx_vec: None ,common_eliminated:false, dims: None, ty: None,equivalent_symidx_vec:vec![] }
     }
 }
 
