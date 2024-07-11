@@ -2176,7 +2176,7 @@ pub fn process_short_logic(cfg_node:u32,cfg_graph:&mut CfgGraph,logic_op:&ExprOp
                     let (true_edge_idx,true_edge_type) = &edge_weights[1];
                     (true_edge_idx,true_edge_type,edge_idx,edge_type)
                 }else if edge_type.cfg_edge_type.is_if_true(){
-                    let (false_edge_idx,false_edge_type) = &edge_weights[0];
+                    let (false_edge_idx,false_edge_type) = &edge_weights[1];
                     (edge_idx,edge_type,false_edge_idx,false_edge_type)
                 }else{
                     return Err(anyhow!("不是br"))
