@@ -277,6 +277,7 @@ impl RegTab{
     /// 3. you can only release a freed reg
     pub fn release_reg(&mut self, reg:Register, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>) -> Result<()>{
         debug_info_blue!("release {:?}",reg);
+
         let regstat = self.reg_symidx_map.get_mut(&reg).unwrap();
         match regstat{
             RegState::Freed { symidx, tracked} => {
@@ -408,8 +409,11 @@ impl RegTab{
             }else{
                 self.fpr_released_reg_count -= 1;
             }
+        }else {
+            return Err(anyhow!("you can't set a unreleased reg to free"));
         }
         *self.reg_symidx_map.get_mut(&reg).unwrap() = RegState::new_freed(symidx.clone(), should_track);
+
         Ok(())
     }
     /// recover the symtab's *cur_reg* field by the regtab 
