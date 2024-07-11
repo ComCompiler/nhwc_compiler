@@ -2,6 +2,7 @@ use std::fmt::Debug;
 use std::mem;
 
 use petgraph::stable_graph::StableDiGraph;
+use strum_macros::EnumIs;
 
 use crate::node;
 
@@ -44,7 +45,7 @@ impl Debug for ScopeNode {
             "{} \n {:?} {}",
             match self.scope_type {
                 ScopeType::For => "For",
-                ScopeType::While => "While",
+                ScopeType::While{ op_cfg_while_node } => "While",
                 ScopeType::Func => "Func",
                 ScopeType::Normal => "Normal",
                 ScopeType::Terminal => "Terminal",
@@ -58,10 +59,12 @@ impl Debug for ScopeNode {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone,EnumIs)]
 pub enum ScopeType {
     For,
-    While,
+    While{
+        op_cfg_while_node:Option<u32>
+    },
     Func,
     Normal,
     Terminal,
