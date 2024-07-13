@@ -7,7 +7,8 @@ use super::{cfg_node::InstrList, et_node::{EtEdgeType, EtNode, EtNodeType, EtTre
 pub fn process_arith_et(instr_et:&mut EtTree,child_et_map:&mut HashMap<SymIdx,u32>,scope_tree:&ScopeTree,arith_et_struct:&mut EtNode,arith_ast:u32, a:&SymIdx, b:&SymIdx,lhs:&SymIdx){
     let arith_et = add_node!({arith_et_struct.clone()} to instr_et);
     arith_et_struct.equivalent_symidx_vec.push(lhs.clone());
-    child_et_map.insert(lhs.clone(), arith_ast);
+    child_et_map.insert(lhs.clone(), arith_et);
+    println!("添加变量{:?},{}",lhs.clone(),arith_et);
     //查找操作数，有的话连边，没有添加节点连边
     if let Some(&a_node) = child_et_map.get(a){
         add_edge!({EtEdgeType::Direct.into()} from arith_et to a_node in instr_et);
@@ -15,6 +16,7 @@ pub fn process_arith_et(instr_et:&mut EtTree,child_et_map:&mut HashMap<SymIdx,u3
         let a_ast = get_ast_from_symidx!(find a with scope_tree);
         let a_et = add_node_with_edge!({EtNodeType::new_symbol(a_ast,a.clone(),super::et_node::DeclOrDefOrUse::Use).into()} with_edge {EtEdgeType::Direct.into()} from arith_et in instr_et);
         child_et_map.insert(a.clone(), a_et);
+        println!("添加左{:?},{}",a.clone(),a_et);
     }
     if let Some(&b_node) = child_et_map.get(b){
         add_edge!({EtEdgeType::Direct.into()} from arith_et to b_node in instr_et);
@@ -22,6 +24,7 @@ pub fn process_arith_et(instr_et:&mut EtTree,child_et_map:&mut HashMap<SymIdx,u3
         let b_ast = get_ast_from_symidx!(find a with scope_tree);
         let b_et = add_node_with_edge!({EtNodeType::new_symbol(b_ast,a.clone(),super::et_node::DeclOrDefOrUse::Use).into()} with_edge {EtEdgeType::Direct.into()} from arith_et in instr_et);
         child_et_map.insert(b.clone(), b_et);
+        println!("添加右{:?},{}",b.clone(),b_et);
     }
 }
 

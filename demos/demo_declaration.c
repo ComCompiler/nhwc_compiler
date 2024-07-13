@@ -4,4 +4,5 @@ int main(){
     int c = a+b;
     int d = a+3;
     int e = a+c;
+    int f = a+c;
 }

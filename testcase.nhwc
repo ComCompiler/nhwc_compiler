@@ -23,6 +23,8 @@
               alloc i32 d_17 
               alloc i32 temp_2_arithop_17 
               alloc i32 e_17 
+              alloc i32 temp_3_arithop_17 
+              alloc i32 f_17 
           label L0_0: 
               a_17 = i32 3_0 
               b_17 = i32 3_0 
@@ -35,6 +37,9 @@
               new_var temp_2_arithop_17:i32 
               temp_2_arithop_17 = Add i32 a_17, c_17 
               e_17 = i32 temp_2_arithop_17 
+              new_var temp_3_arithop_17:i32 
+              temp_3_arithop_17 = Add i32 a_17, c_17 
+              f_17 = i32 temp_3_arithop_17 
               jump label: exit_2 
           label exit_2: 
               ret 0_0 
