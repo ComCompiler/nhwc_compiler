@@ -40,7 +40,7 @@ impl<T: Clone> InstrSlab<T>{
 }
 
 
-#[derive(Clone,Eq)]
+#[derive(Clone,Eq,PartialEq)]
 pub enum ArithOp {
     Add {
         a:SymIdx,
