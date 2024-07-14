@@ -145,7 +145,7 @@ impl PartialOrd for ArrayEleMap{
     }
 }
 
-#[derive(Clone,EnumIs,PartialOrd,PartialEq,Eq,Hash)]
+#[derive(Clone,EnumIs,PartialOrd,PartialEq,Eq)]
 pub enum Type {
     I32,
     F32,

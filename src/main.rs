@@ -95,7 +95,7 @@ fn main() {
         then symtab_debug_pass
         then nhwc2riscv_pass
         then cfg_debug_pass2
-        then nhwc2et_pass
+        // then nhwc2et_pass
         to pass_manager
         
     );

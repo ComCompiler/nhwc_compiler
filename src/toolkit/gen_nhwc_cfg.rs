@@ -1085,7 +1085,7 @@ fn process_call(
     let et_type = &node!(at func_name_et_node in et_tree).et_node_type;
     let func_name_str ;
     match et_type {
-        EtNodeType::Symbol { sym_idx:_, ast_node, text:_, decldef_def_or_use } => {
+        EtNodeType::Symbol { rc_symidx:_, ast_node, text:_, decldef_def_or_use } => {
             let ast_node = *ast_node;
             func_name_str = node!(at ast_node in ast_tree).text.clone();
         }
@@ -1167,7 +1167,7 @@ fn process_et(
     if node!(at et_node in et_tree).cached_rc_symidx.is_none(){
         let et_node_ty = &node!(at et_node in et_tree).et_node_type.clone();
         let op_symidx = match &et_node_ty {
-            EtNodeType::Operator { op, ast_node, text: _, op_symidx } => {
+            EtNodeType::Operator { op, ast_node, text: _, op_rc_symidx: op_symidx } => {
                 match op {
                     super::et_node::ExprOp::Mul => {
                         if let Some(_) = direct_child_node!(at et_node in et_tree ret_option) {
@@ -1461,7 +1461,7 @@ fn process_et(
 
                         debug_info_red!("arr ptr {:?}",rc_array_symidx);
                         match &node!(at et_l_child in et_tree).et_node_type {
-                            EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, decldef_def_or_use:DeclOrDefOrUse::Def } => {
+                            EtNodeType::Symbol { rc_symidx: _, ast_node: _, text: _, decldef_def_or_use:DeclOrDefOrUse::Def } => {
                                 // 在最接近 symbol 的一层 array_index 插入 getelementptr 语句
                                 let mut l_child_type = node!(at et_l_child in et_tree).get_type()?.clone();
                                 debug_info_blue!("left child type {:?}",l_child_type);
@@ -1504,7 +1504,7 @@ fn process_et(
                                 }
                                 Some(rc_temp_ptr_symidx)
                             },
-                            EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, decldef_def_or_use:DeclOrDefOrUse::Use } => {
+                            EtNodeType::Symbol { rc_symidx: _, ast_node: _, text: _, decldef_def_or_use:DeclOrDefOrUse::Use } => {
                                 // 在最接近 symbol 的一层 array_index 插入 getelementptr 语句
                                 let array_ty = {let ty = symtab.get(&array_symidx)?.get_type()?.clone();
                                     if ty.is_ptr_64(){
@@ -1550,7 +1550,7 @@ fn process_et(
                                 }
                                 
                             },
-                            EtNodeType::Symbol { sym_idx: _, ast_node: _, text: _, decldef_def_or_use:DeclOrDefOrUse::DeclDef { type_ast_node: _, is_const } } => {
+                            EtNodeType::Symbol { rc_symidx: _, ast_node: _, text: _, decldef_def_or_use:DeclOrDefOrUse::DeclDef { type_ast_node: _, is_const } } => {
                                 // 可删此段
                                 let l_child_type = node!(at et_l_child in et_tree).get_type()?.clone();
                                 // debug_info_blue!("left child type {:?}",l_child_type);
@@ -1640,12 +1640,12 @@ fn process_et(
                         // let value_type = find!(field TYPE:Type at value_symidx in symtab debug symtab_graph symtab_g).unwrap().clone();
                         let r_type = symtab.get(&r_symidx)?.get_type()?.clone();
 
-                        if let EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use:DeclOrDefOrUse::DeclDef { type_ast_node, is_const }} = &node!(at left_child_et_node in et_tree).et_node_type {
+                        if let EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use:DeclOrDefOrUse::DeclDef { type_ast_node, is_const }} = &node!(at left_child_et_node in et_tree).et_node_type {
                             if *is_const {
                                 // here we should transform value of const symidx r_symidx into the target type
                                 let val = Value::from_symidx(&r_symidx)?;
                                 let r_symidx = val.force_to_ty(&l_type)?.to_symidx()?;
-                                symtab.get_mut(sym_idx)?.add_const_cor_literal_symidx(r_symidx);
+                                symtab.get_mut(&rc_symidx.as_ref_borrow())?.add_const_cor_literal_symidx(r_symidx);
                             }
                         };
 
@@ -1737,13 +1737,13 @@ fn process_et(
                     }
                 }
             }
-            EtNodeType::Literal { literal_symidx: const_sym_idx, ast_node, text: _} => {
+            EtNodeType::Literal { rc_literal_symidx, ast_node, text: _} => {
                 let ast_node = *ast_node;
-                let constant_literal = &const_sym_idx.symbol_name;
+                let literal = &rc_literal_symidx.as_ref_borrow().symbol_name;
                 // debug_info_blue!("add constant {}",constant_literal);
-                Some(process_literal(symtab, constant_literal, symtab_graph)?)
+                Some(process_literal(symtab, literal, symtab_graph)?)
             }
-            EtNodeType::Symbol { sym_idx: _, ast_node, text: _, decldef_def_or_use }=> {
+            EtNodeType::Symbol { rc_symidx: _, ast_node, text: _, decldef_def_or_use }=> {
                 let symbol_name_text = &node!(at et_node in et_tree).name_text();
                 let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab, decldef_def_or_use, symtab_graph,scope_node,symbol_name_text,  cfg_node,cfg_graph,Some(et_node),et_tree)?;
                 Some(symbol_symidx)
@@ -1797,7 +1797,7 @@ fn parse_extern_declfunc2nhwc(
                     let ast_sym_name_node;
                     loop{
                         let child_et_node =  direct_child_node!(at cur_et_node in et_tree);
-                        if let EtNodeType::Operator {  ast_node: _, text: _, op, op_symidx } = &node!(at child_et_node in et_tree).et_node_type{
+                        if let EtNodeType::Operator {  ast_node: _, text: _, op, op_rc_symidx: op_symidx } = &node!(at child_et_node in et_tree).et_node_type{
                             if let ExprOp::ArrayIndex = op{
                                 if node!(at cur_et_node in et_tree).has_dims(){
                                     let mut cur_dims = node_mut!(at cur_et_node in et_tree).get_dims()?.clone();
@@ -1811,7 +1811,7 @@ fn parse_extern_declfunc2nhwc(
                                 let cur_dims = node_mut!(at cur_et_node in et_tree).get_dims()?.clone();
                                 node_mut!(at child_et_node in et_tree).add_dims(cur_dims);
                             }
-                        }else if let EtNodeType::Symbol { sym_idx: _, ast_node, text: _, decldef_def_or_use: _ } = &node!(at child_et_node in et_tree).et_node_type{
+                        }else if let EtNodeType::Symbol { rc_symidx: _, ast_node, text: _, decldef_def_or_use: _ } = &node!(at child_et_node in et_tree).et_node_type{
                             // implies this is symbol et_node
                             ast_sym_name_node = *ast_node;
                             if node!(at cur_et_node in et_tree).has_dims(){
@@ -1868,7 +1868,7 @@ fn parse_declvar2nhwc(
         let et_node_type = &node!(at et_item_node in et_tree).et_node_type.clone();
         match et_node_type {
             // 先考虑这个语句存在 = 的情况
-            EtNodeType::Operator { op: ExprOp::Assign, ast_node: _, text: _, op_symidx } => {
+            EtNodeType::Operator { op: ExprOp::Assign, ast_node: _, text: _, op_rc_symidx: op_symidx } => {
                 let rc_var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_item_node, decl_parent_scope, cfg_node,  instr_slab, ast2scope,symtab_g)?.unwrap();
                 let var_symidx = rc_var_symidx.as_ref_borrow();
                 let var_type = symtab.get(&var_symidx)?.get_type()?.clone();
@@ -1890,7 +1890,7 @@ fn parse_declvar2nhwc(
                 // node_mut!(at cfg_node in cfg_graph ).push_nhwc_instr(defvar_instr, instr_slab)??;
             }
             // 考虑这个语句的 et_sep_item_node 不是 = 的情况
-            EtNodeType::Operator { op: ExprOp::ArrayIndex , ast_node: _, text: _, op_symidx } => {
+            EtNodeType::Operator { op: ExprOp::ArrayIndex , ast_node: _, text: _, op_rc_symidx: op_symidx } => {
                 // debug_info_red!("no =  as start ");
                 let _op_values = direct_child_nodes!(at et_item_node in et_tree);
                 let rc_var_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, et_item_node, decl_parent_scope, cfg_node,  instr_slab, ast2scope,symtab_g)?.unwrap();
@@ -1918,12 +1918,12 @@ fn parse_declvar2nhwc(
                 // node_mut!(at cfg_node in cfg_graph ).push_nhwc_instr(defvar_instr, instr_slab)?;
             }
             // 首个 operator 不是 = assign 的情况
-            EtNodeType::Literal { literal_symidx: _, ast_node: _, text: _ } => todo!(),
-            EtNodeType::Symbol { sym_idx, ast_node, text:_, decldef_def_or_use } => {
+            EtNodeType::Literal { rc_literal_symidx: _, ast_node: _, text: _ } => todo!(),
+            EtNodeType::Symbol { rc_symidx, ast_node, text:_, decldef_def_or_use } => {
                 //获得变量类型，做成symidx
                 let type_ast_node = find!(rule RULE_declarationSpecifiers at ast_decl_node in ast_tree).unwrap();
                 let var_type = Type::new(type_ast_node, ast_tree);
-                let var_str = &sym_idx.symbol_name;
+                let var_str = &rc_symidx.as_ref_borrow().symbol_name;
                 let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab, &decldef_def_or_use, symtab_g, decl_parent_scope,var_str ,cfg_node,cfg_graph,Some(et_item_node),et_tree)?;
                 let def_instr = NhwcInstrType::new_def_var(var_type.clone(), symbol_symidx.clone(), None).into();
                 let alloc_instr = NhwcInstrType::new_alloc(var_type.clone(), symbol_symidx.clone()).into();
@@ -2528,13 +2528,13 @@ pub fn array_initialize( et_tree:&mut EtTree, array_ele_map:&mut ArrayEleMap, el
         let et_node = et_node_vec[i];
         debug_info_blue!("ele_count_to_read =  {},{:?}  cur_et_node:{et_node}",ele_count_to_read , reversed_remained_dims);
         match &node!(at et_node in et_tree).et_node_type{
-            EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _, op_symidx }=>{
+            EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node: _, text: _, op_rc_symidx: op_symidx }=>{
                 let cur_dim = reversed_remained_dims.pop().unwrap();
                 array_initialize( et_tree, array_ele_map, ele_type,reversed_remained_dims, array_offset,ast_tree, cfg_graph, scope_tree, symtab, et_node, scope_node, cfg_bb, instr_slab, ast2scope,symtab_graph)?;
                 reversed_remained_dims.push(cur_dim);
             },
-            EtNodeType::Literal { literal_symidx: const_sym_idx, ast_node: _, text: _ } => {
-                array_ele_map.insert_ele(*array_offset, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?)?;
+            EtNodeType::Literal { rc_literal_symidx, ast_node: _, text: _ } => {
+                array_ele_map.insert_ele(*array_offset, Value::from_string_with_specific_type(&rc_literal_symidx.as_ref_borrow().symbol_name, ele_type)?)?;
                 // debug_info_blue!("add array ele with offset {},{:?}",i, Value::from_string_with_specific_type(&const_sym_idx.symbol_name, ele_type)?);
                 *array_offset +=1;
             },

@@ -773,7 +773,7 @@ fn process_arg_expr_list(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Sco
 fn process_primary_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, primary_expr_node:u32, scope_node:u32, parent_et_node:u32,def_or_use:DeclOrDefOrUse) {
     if let Some(const_node) = find!(term Constant at primary_expr_node in ast_tree) {
         // println!("constant {}",const_node);
-        process_constant(et_tree, ast_tree, scope_tree, const_node, scope_node, parent_et_node);
+        process_literal(et_tree, ast_tree, scope_tree, const_node, scope_node, parent_et_node);
     } else if let Some(ident_node) = find!(term Identifier at primary_expr_node in ast_tree) {
         // println!("ident {}",ident_node);
         process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, parent_et_node, def_or_use);
@@ -781,7 +781,7 @@ fn process_primary_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Scop
         // println!("expr found under {}",primary_expr_node );
         process_expr(et_tree, ast_tree, scope_tree, expr_node, scope_node, parent_et_node);
     } else if let Some(string_node) = find!(term StringLiteral at primary_expr_node in ast_tree) {
-        process_constant(et_tree, ast_tree, scope_tree, string_node, scope_node, parent_et_node);
+        process_literal(et_tree, ast_tree, scope_tree, string_node, scope_node, parent_et_node);
     }
 }
 
@@ -808,17 +808,17 @@ fn process_ident(et_tree:&mut EtTree, ast_tree:&AstTree, _scope_tree:&ScopeTree,
     let sym_name = node!(at ident_node in ast_tree).text.clone();
     // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 
-    let sym_idx = SymIdx::new(scope_node, sym_name);
+    let symidx = SymIdx::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
-    add_node_with_edge!({EtNodeType::new_symbol(ident_node, sym_idx, def_or_use).into()} with_edge {EtEdgeType::Direct.into()} from parent_et_node in et_tree);
+    add_node_with_edge!({EtNodeType::new_symbol(ident_node, symidx.as_rc(), def_or_use).into()} with_edge {EtEdgeType::Direct.into()} from parent_et_node in et_tree);
 }
-fn process_constant(et_tree:&mut EtTree, ast_tree:&AstTree, _scope_tree:&ScopeTree, const_node:u32, scope_node:u32, parent_et_node:u32) {
-    let sym_name = node!(at const_node in ast_tree).text.clone();
+fn process_literal(et_tree:&mut EtTree, ast_tree:&AstTree, _scope_tree:&ScopeTree, literal_node:u32, scope_node:u32, parent_et_node:u32) {
+    let sym_name = node!(at literal_node in ast_tree).text.clone();
     // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 
-    let const_symidx = SymIdx::new(scope_node, sym_name);
+    let literal_symidx = SymIdx::new(scope_node, sym_name);
     // let symbol = symtab.add(symbol_struct);
-    add_node_with_edge!({EtNodeType::new_literal(const_node, const_symidx).into()} with_edge {EtEdgeType::Direct.into()} from parent_et_node in et_tree);
+    add_node_with_edge!({EtNodeType::new_literal(literal_node, literal_symidx.as_rc()).into()} with_edge {EtEdgeType::Direct.into()} from parent_et_node in et_tree);
 }
 
 // fn symbol_def_use_order_check(et_tree:&mut EtTree)->u32{

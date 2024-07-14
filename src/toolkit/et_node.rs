@@ -8,7 +8,7 @@ use std::{mem, u32};
 use super::ast_node::AstTree;
 use super::etc::dfs_with_predicate;
 use super::field::{Fields, Type};
-use super::symtab::{ RcSymIdx, SymIdx};
+use super::symtab::{ RcSymIdx, SymIdx, WithBorrow};
 use crate::toolkit::dot::Config;
 use crate::toolkit::etc::generate_png_by_graph;
 use crate::{debug_info_red, direct_child_nodes, node, node_mut};
@@ -55,11 +55,11 @@ impl From<EtEdgeType> for EtEdge{
 pub enum EtNodeType {
     // et 树的terminal 要么是一个 literal ，要么是一个 SymbolIndex
     // 而 et 树的 non-terminal node 要么是 root 要么是一个 op
-    Operator { op:ExprOp, ast_node:u32, text:String ,op_symidx:Option<SymIdx> },
+    Operator { op:ExprOp, ast_node:u32, text:String ,op_rc_symidx:Option<RcSymIdx> },
     // 在这里 literal 也是一个 Symbol ，到时候在 SymbolField 里面加上 literal 标记 就可以了
-    Literal { literal_symidx:SymIdx, ast_node:u32, text:String },
+    Literal { rc_literal_symidx:RcSymIdx, ast_node:u32, text:String },
     // Def_Or_Use 是一个枚举类型，要么是 Def 要么是 Use
-    Symbol { sym_idx:SymIdx, ast_node:u32, text:String, decldef_def_or_use:DeclOrDefOrUse },
+    Symbol { rc_symidx:RcSymIdx, ast_node:u32, text:String, decldef_def_or_use:DeclOrDefOrUse },
     // array symbol 一个 array 是 array symbol
     // ArraySym{sym_idx:SymbolIndex,ast_node:u32,text:String,def_or_use:Def_Or_Use},
     // // 考虑到 可能出现  a=3,b=2; 这样的语句，因此需要规定一个Separator
@@ -68,15 +68,15 @@ pub enum EtNodeType {
 }
 impl EtNode{
     /// replace the symidx in the et_node_type *mention* will ret err when node type is not constant or symbol operator
-    pub fn replace_symidx(&mut self,symidx:SymIdx) -> Result<()>{
+    pub fn replace_symidx(&mut self,symidx:RcSymIdx) -> Result<()>{
         match &mut self.et_node_type{
-            EtNodeType::Operator { op, ast_node, text, op_symidx } => {
+            EtNodeType::Operator { op, ast_node, text, op_rc_symidx: op_symidx } => {
                 *op_symidx = Some(symidx);
             },
-            EtNodeType::Literal { literal_symidx, ast_node, text } => {
+            EtNodeType::Literal { rc_literal_symidx: literal_symidx, ast_node, text } => {
                 *literal_symidx = symidx;
             },
-            EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => {
+            EtNodeType::Symbol { rc_symidx: sym_idx, ast_node, text, decldef_def_or_use } => {
                 *sym_idx  = symidx;
             },
             _ => {
@@ -93,9 +93,9 @@ pub struct EtNode {
     pub et_node_type:EtNodeType,
     pub hash:Option<isize>,
     pub cached_rc_symidx: Option<Option<RcSymIdx>>,
-    pub et_ret_symidx_vec: Option<Vec<SymIdx>>,
+    pub et_ret_symidx_vec: Option<Vec<RcSymIdx>>,
     pub common_eliminated:bool,
-    pub equivalent_symidx_vec:Vec<SymIdx>,
+    pub equivalent_symidx_vec:Vec<RcSymIdx>,
 }
 pub trait EtHash{
     fn update_hash(&mut self,et_node:u32) ;
@@ -114,7 +114,7 @@ impl EtHash for EtTree{
     fn _update_hash(&mut self,et_node:u32){
         let child_nodes = direct_child_nodes!(at et_node in self with_predicate {|e| !e.weight().et_edge_type.is_deleted()});
         match &node!(at et_node in self).et_node_type{
-            EtNodeType::Operator { op, ast_node, text, op_symidx } => {
+            EtNodeType::Operator { op, ast_node, text, op_rc_symidx: op_symidx } => {
                 match op{
                     ExprOp::Mul => {
                         assert!(child_nodes.len() == 2);
@@ -302,15 +302,18 @@ impl EtHash for EtTree{
                     }
                 }
             },
-            EtNodeType::Literal { literal_symidx: const_sym_idx, ast_node, text } => {
+            EtNodeType::Literal { rc_literal_symidx, ast_node, text } => {
                 let mut hasher = DefaultHasher::new();
-                const_sym_idx.hash(&mut hasher);
+                {
+                    let literal_symidx = rc_literal_symidx.as_ref_borrow();
+                    literal_symidx.hash(&mut hasher);
+                }
                 let hash_val = hasher.finish() as isize;
                 node_mut!(at et_node in self).hash = Some(hash_val % ET_HASH_MODULUS);
             },
-            EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => {
+            EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } => {
                 let mut hasher = DefaultHasher::new();
-                sym_idx.hash(&mut hasher);
+                rc_symidx.as_ref_borrow().hash(&mut hasher);
                 decldef_def_or_use.hash(&mut hasher);
                 let hash_val = hasher.finish() as isize;
                 node_mut!(at et_node in self).hash = Some(hash_val % ET_HASH_MODULUS);
@@ -427,72 +430,72 @@ impl From<EtNodeType> for EtNode{
 }
 
 impl EtNodeType {
-    pub fn new_op_array_idx(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::ArrayIndex, ast_node, text:String::new(), op_symidx: None } }
-    pub fn new_op_array_wrapper(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node, text:String::new(), op_symidx: None } }
-    pub fn new_op_add(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Add, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_sub(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Sub, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_div(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Div, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_mul(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Mul, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Assign, ast_node, text:String::new() ,op_symidx:None} }
+    pub fn new_op_array_idx(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::ArrayIndex, ast_node, text:String::new(), op_rc_symidx: None } }
+    pub fn new_op_array_wrapper(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node, text:String::new(), op_rc_symidx: None } }
+    pub fn new_op_add(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Add, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_sub(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Sub, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_div(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Div, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_mul(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Mul, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Assign, ast_node, text:String::new() ,op_rc_symidx:None} }
     pub fn new_sep(ast_node:u32) -> Self { EtNodeType::Separator { ast_node, text:String::new() } }
-    pub fn new_op_logical_or(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::LogicalOr, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_logical_and(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::LogicalAnd, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_logical_not(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::LogicalNot, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_bitwise_or(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::BitwiseOr, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_bitwise_xor(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::BitwiseXor, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_bitwise_and(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::BitwiseAnd, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_bitwise_not(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::BitwiseNot, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_mul_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::MulAssign, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_minus_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::MinusAssign, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_div_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::DivAssign, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_plus_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::PlusAssign, ast_node, text:String::new() ,op_symidx:None} }
+    pub fn new_op_logical_or(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::LogicalOr, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_logical_and(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::LogicalAnd, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_logical_not(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::LogicalNot, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_bitwise_or(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::BitwiseOr, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_bitwise_xor(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::BitwiseXor, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_bitwise_and(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::BitwiseAnd, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_bitwise_not(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::BitwiseNot, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_mul_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::MulAssign, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_minus_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::MinusAssign, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_div_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::DivAssign, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_plus_assign(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::PlusAssign, ast_node, text:String::new() ,op_rc_symidx:None} }
     //你必须确保这个symbol 是一个 constant
-    pub fn new_literal(ast_node:u32, const_symidx:SymIdx) -> Self { EtNodeType::Literal { literal_symidx:const_symidx, ast_node, text:String::new() } }
-    pub fn new_symbol(ast_node:u32, sym_idx:SymIdx, def_or_use:DeclOrDefOrUse) -> Self { EtNodeType::Symbol { sym_idx, ast_node, text:String::new(), decldef_def_or_use:def_or_use } }
+    pub fn new_literal(ast_node:u32, rc_literal_symidx:RcSymIdx) -> Self { EtNodeType::Literal { rc_literal_symidx, ast_node, text:String::new() } }
+    pub fn new_symbol(ast_node:u32, rc_symidx:RcSymIdx, def_or_use:DeclOrDefOrUse) -> Self { EtNodeType::Symbol { rc_symidx, ast_node, text:String::new(), decldef_def_or_use:def_or_use } }
     // pub fn new_array_symbol(ast_node:u32,sym_idx:SymbolIndex ,def_or_use:Def_Or_Use)->Self{
     //     EtNakedNode::ArraySym  {sym_idx,ast_node,text:String::new(), def_or_use:def_or_use  }
     // }
-    pub fn new_op_equal(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Eq, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_not_equal(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::NEq, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_less_than(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Less, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_greater_than(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Greater, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_less_than_or_equal(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::LEq, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_greater_than_or_equal(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::GEq, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_left_shift(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::LShift, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_right_shift(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::RShift, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_mod(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Mod, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_cast(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Cast, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_call(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Call, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_negative(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Negative, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_positive(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Positive, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_addr_of(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::AddrOf, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_deref(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Deref, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_dot_member(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::DotMember, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_arrow_member(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::ArrowMember, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_left_plusplus(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::LPlusPlus, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_right_plusplus(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::RPlusPlus, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_left_minusminus(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::LMinusMinus, ast_node, text:String::new() ,op_symidx:None} }
-    pub fn new_op_right_minusminus(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::RMinusMinus, ast_node, text:String::new() ,op_symidx:None} }
+    pub fn new_op_equal(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Eq, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_not_equal(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::NEq, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_less_than(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Less, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_greater_than(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Greater, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_less_than_or_equal(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::LEq, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_greater_than_or_equal(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::GEq, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_left_shift(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::LShift, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_right_shift(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::RShift, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_mod(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Mod, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_cast(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Cast, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_call(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Call, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_negative(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Negative, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_positive(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Positive, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_addr_of(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::AddrOf, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_deref(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Deref, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_dot_member(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::DotMember, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_arrow_member(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::ArrowMember, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_left_plusplus(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::LPlusPlus, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_right_plusplus(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::RPlusPlus, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_left_minusminus(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::LMinusMinus, ast_node, text:String::new() ,op_rc_symidx:None} }
+    pub fn new_op_right_minusminus(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::RMinusMinus, ast_node, text:String::new() ,op_rc_symidx:None} }
     fn load_et_node_text(&mut self) {
         let _et_node = match self {
-            EtNodeType::Operator { op: _, ast_node, text: _, op_symidx } => ast_node,
-            EtNodeType::Literal { literal_symidx: _, ast_node, text: _, } => ast_node,
-            EtNodeType::Symbol { sym_idx: _, ast_node, text: _, decldef_def_or_use: _ } => ast_node,
+            EtNodeType::Operator { op: _, ast_node, text: _, op_rc_symidx: op_symidx } => ast_node,
+            EtNodeType::Literal { rc_literal_symidx: _, ast_node, text: _, } => ast_node,
+            EtNodeType::Symbol { rc_symidx: _, ast_node, text: _, decldef_def_or_use: _ } => ast_node,
             // EtNakedNode::ArraySym { sym_idx, ast_node, text ,def_or_use} => ast_node,
             EtNodeType::Separator { ast_node, text: _ } => ast_node,
         };
         let new_str = match self {
-            EtNodeType::Operator { op: _, ast_node: _, text, op_symidx } => text.clone(),
-            EtNodeType::Literal { literal_symidx: _, ast_node: _, text, } => text.clone(),
-            EtNodeType::Symbol { sym_idx: _, ast_node: _, text, decldef_def_or_use: _ } => text.clone(),
+            EtNodeType::Operator { op: _, ast_node: _, text, op_rc_symidx: op_symidx } => text.clone(),
+            EtNodeType::Literal { rc_literal_symidx: _, ast_node: _, text, } => text.clone(),
+            EtNodeType::Symbol { rc_symidx: _, ast_node: _, text, decldef_def_or_use: _ } => text.clone(),
             // EtNakedNode::ArraySym { sym_idx, ast_node, text,def_or_use } => text.clone(),
             EtNodeType::Separator { ast_node: _, text } => text.clone(),
         };
         let _ = mem::replace(
             match self {
-                EtNodeType::Operator { op: _, ast_node: _, text, op_symidx } => text,
-                EtNodeType::Literal { literal_symidx: _, ast_node: _, text, } => text,
-                EtNodeType::Symbol { sym_idx: _, ast_node: _, text, decldef_def_or_use: _ } => text,
+                EtNodeType::Operator { op: _, ast_node: _, text, op_rc_symidx: op_symidx } => text,
+                EtNodeType::Literal { rc_literal_symidx: _, ast_node: _, text, } => text,
+                EtNodeType::Symbol { rc_symidx: _, ast_node: _, text, decldef_def_or_use: _ } => text,
                 // EtNakedNode::ArraySym { sym_idx, ast_node, text,def_or_use } => text,
                 EtNodeType::Separator { ast_node: _, text } => text,
             },
@@ -503,7 +506,7 @@ impl EtNodeType {
         if let EtNodeType::Separator { ast_node, text } = self {
             let ast_node = *ast_node;
             let _ = mem::replace(text, node!(at ast_node in ast_tree).text.clone());
-        } else if let EtNodeType::Symbol { sym_idx: _, ast_node: _, text, decldef_def_or_use: def_or_use } = self {
+        } else if let EtNodeType::Symbol { rc_symidx: _, ast_node: _, text, decldef_def_or_use: def_or_use } = self {
             if let DeclOrDefOrUse::DeclDef { type_ast_node, is_const } = def_or_use {
                 let type_ast_node = *type_ast_node;
                 let _ = mem::replace(text, node!(at type_ast_node in ast_tree).text.clone());
@@ -515,12 +518,12 @@ impl EtNodeType {
 impl Debug for EtNodeType {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            EtNodeType::Operator { op, ast_node: _, text: _, op_symidx } => write!(f, "{:?}", op),
-            EtNodeType::Literal { literal_symidx: const_sym_idx, ast_node: _, text: _, } => {
-                write!(f, "literal {}", const_sym_idx.symbol_name)
+            EtNodeType::Operator { op, ast_node: _, text: _, op_rc_symidx: op_symidx } => write!(f, "{:?}", op),
+            EtNodeType::Literal { rc_literal_symidx, ast_node: _, text: _, } => {
+                write!(f, "literal {}", rc_literal_symidx.as_ref_borrow().symbol_name)
             }
-            EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use: def_or_use } => {
-                write!(f, "{:?} symbol {} {} at {}", def_or_use, text, sym_idx.symbol_name,ast_node)
+            EtNodeType::Symbol { rc_symidx: sym_idx, ast_node, text, decldef_def_or_use: def_or_use } => {
+                write!(f, "{:?} symbol {} {} at {}", def_or_use, text, sym_idx.as_ref_borrow().symbol_name,ast_node)
             }
             // EtNakedNode::ArraySym { sym_idx, ast_node, text, def_or_use } =>
             // write!(f,"{:?} {} {}",def_or_use,text,sym_idx.symbol_name),
@@ -560,12 +563,12 @@ impl EtNode {
     pub fn load_ast_node_text(&mut self, ast_tree:&AstTree) -> Result<()> { self.et_node_type.load_ast_node_text(ast_tree) }
     pub fn name_text(&self) -> String{
         match &self.et_node_type{
-            EtNodeType::Operator { op, ast_node, text, op_symidx } => todo!(),
-            EtNodeType::Literal { literal_symidx: const_sym_idx, ast_node, text } => {
-                const_sym_idx.symbol_name.clone()
+            EtNodeType::Operator { op, ast_node, text, op_rc_symidx: op_symidx } => todo!(),
+            EtNodeType::Literal { rc_literal_symidx: const_sym_idx, ast_node, text } => {
+                const_sym_idx.as_ref_borrow().symbol_name.clone()
             },
-            EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => {
-                sym_idx.symbol_name.clone()
+            EtNodeType::Symbol { rc_symidx: sym_idx, ast_node, text, decldef_def_or_use } => {
+                sym_idx.as_ref_borrow().symbol_name.clone()
             },
             EtNodeType::Separator { ast_node, text } => todo!(),
         }

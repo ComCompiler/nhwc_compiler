@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use super::{et_node::{DeclOrDefOrUse, EtEdge, EtHash, EtNode, EtNodeType, EtTree, ExprOp}, etc::{self, dfs}, field::Value, scope_node::ScopeTree, symtab::SymTab};
-use crate::{add_edge, add_node_with_edge, debug_info_blue, debug_info_green, debug_info_red, direct_child_node, direct_child_nodes, direct_parent_node, node, node_mut, toolkit::{dot::Config, et_node::EtEdgeType, etc::{dfs_with_predicate, generate_png_by_graph, generate_png_by_graph_multi_tasks}, gen_cfg::AST_ROOT, scope_node::ST_ROOT, symtab::{RcSymIdx, SymIdx}}};
+use crate::{add_edge, add_node_with_edge, debug_info_blue, debug_info_green, debug_info_red, direct_child_node, direct_child_nodes, direct_parent_node, node, node_mut, toolkit::{dot::Config, et_node::EtEdgeType, etc::{dfs_with_predicate, generate_png_by_graph, generate_png_by_graph_multi_tasks}, gen_cfg::AST_ROOT, scope_node::ST_ROOT, symtab::{RcSymIdx, SymIdx, WithBorrow}}};
 use anyhow::Result;
 use anyhow::anyhow;
 use itertools::Itertools;
@@ -24,7 +24,7 @@ macro_rules! direct_et_child_nodes {
         direct_child_nodes!(at $et_node in $et_tree with_predicate {|e|!e.weight().et_edge_type.is_deleted()} ) 
     };
 }
-fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
+fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<RcSymIdx> {
     // let mut value = SymIdx::new(0, 0.to_string());
     // println!("输入的operator_et_node: {:?}", node!(at any_et_node in et_tree).clone().et_naked_node);
     // 每个节点分两种情况,constant 或者 operator
@@ -32,9 +32,9 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
     et_tree.update_hash(et_node);
     let value_symidx = match node!(at et_node in et_tree).clone().et_node_type {
         // let value = match node!(at Operator_node in et_tree){
-        EtNodeType::Literal { literal_symidx: const_sym_idx, ast_node: _, text: _ } => Some(const_sym_idx),
+        EtNodeType::Literal { rc_literal_symidx: const_sym_idx, ast_node: _, text: _ } => Some(const_sym_idx),
 
-        EtNodeType::Operator { ast_node: _, text: _, op, op_symidx } => {
+        EtNodeType::Operator { ast_node: _, text: _, op, op_rc_symidx: op_symidx } => {
             let et_nodes = direct_et_child_nodes!(at et_node in et_tree); //里面的u32是节点编号
             // whether return None
             let mut ret_flag = false;
@@ -44,11 +44,11 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
                     continue;
                 }
                 match &node!(at et_child_node in et_tree).et_node_type {
-                    EtNodeType::Operator { op, ast_node, text, op_symidx } => {
+                    EtNodeType::Operator { op, ast_node, text, op_rc_symidx: op_symidx } => {
                         let op_symidx = eval_et(et_tree, et_child_node);
                         match op_symidx{
-                            Some(const_symidx) => {
-                                let const_et_node_struct = EtNodeType::new_literal(AST_ROOT, const_symidx.clone()).into();
+                            Some(literal_symidx) => {
+                                let const_et_node_struct = EtNodeType::new_literal(AST_ROOT, literal_symidx.clone()).into();
                                 node_mut!(at et_child_node in et_tree).et_node_type = const_et_node_struct;
 
                                 for grandson_node in direct_et_child_nodes!(at et_child_node in et_tree){
@@ -57,20 +57,20 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
                                 }
 
                                 // add_edge!(from et_no)
-                                et_ret_symidx_vec.push(const_symidx.clone());
+                                et_ret_symidx_vec.push(literal_symidx);
                             },
                             None => {
-                                et_ret_symidx_vec.push(SymIdx::from_str("unidentified"));
+                                et_ret_symidx_vec.push(SymIdx::from_str("unidentified").as_rc());
                                 ret_flag = true;
                             },
                         }
                     }
-                    EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => {
-                        et_ret_symidx_vec.push(SymIdx::from_str("unidentified"));
+                    EtNodeType::Symbol { rc_symidx: sym_idx, ast_node, text, decldef_def_or_use } => {
+                        et_ret_symidx_vec.push(SymIdx::from_str("unidentified").as_rc());
                         ret_flag = true;
                     }
-                    EtNodeType::Literal { literal_symidx: const_sym_idx, ast_node, text } => {
-                        et_ret_symidx_vec.push(const_sym_idx.clone());
+                    EtNodeType::Literal { rc_literal_symidx, ast_node, text } => {
+                        et_ret_symidx_vec.push(rc_literal_symidx.clone());
 
                     },
                     _ => {}
@@ -82,7 +82,7 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
             }else {
                 match op.eval(&et_ret_symidx_vec){
                     Ok(val) => {
-                        Some(val.to_symidx().unwrap())
+                        Some(val.to_symidx().unwrap().as_rc())
                     },
                     Err(e) => {
                         debug_info_red!("{}",e);
@@ -94,9 +94,9 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
         EtNodeType::Separator { ast_node: _, text: _ } => {
             let mut nodes = direct_et_child_nodes!(at et_node in et_tree );
             nodes.sort_by_key(|&x| match &node!(at x in et_tree ).et_node_type{
-                EtNodeType::Operator { op, ast_node, text, op_symidx } => { 0 },
-                EtNodeType::Literal { literal_symidx, ast_node, text } => { 9 },
-                EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => { 9 },
+                EtNodeType::Operator { op, ast_node, text, op_rc_symidx: op_symidx } => { 0 },
+                EtNodeType::Literal { rc_literal_symidx: literal_symidx, ast_node, text } => { 9 },
+                EtNodeType::Symbol { rc_symidx: sym_idx, ast_node, text, decldef_def_or_use } => { 9 },
                 EtNodeType::Separator { ast_node, text } => 9,
             });
             for et_node in nodes{
@@ -104,7 +104,7 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
             }
             None
         }
-        EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => {
+        EtNodeType::Symbol { rc_symidx: sym_idx, ast_node, text, decldef_def_or_use } => {
             None
         },
         // _ => Err(anyhow!("错误的 EtNode 类型 ! 不是 Constant , Operator, Separator 中的一个")),
@@ -115,7 +115,7 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
 }
 fn match_x_mul_1(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree)->bool{
     let et_symidx_vec = get_symidx_vec(et_node, et_tree);
-    let (l,r) = if let (Some(l),Some(r)) = (&et_symidx_vec[0],&et_symidx_vec[1]){ (l,r) }else { return false };
+    let (l,r) = if let (Some(l),Some(r)) = (&et_symidx_vec[0],&et_symidx_vec[1]){ (l.as_ref_borrow(),r.as_ref_borrow()) }else { return false };
     // ensure r is 1
     let (sym_node,unit_node) = match (l,r){
         (l,r)if r.symbol_name=="1" => {
@@ -137,21 +137,23 @@ fn match_x_mul_0(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree) -> bool{
     let et_ret_symidx_vec = node!(at et_node in et_tree).et_ret_symidx_vec.as_ref().unwrap();
     let mut check= false;
     for symidx in et_ret_symidx_vec{
-        if symidx.symbol_name == "0"{
+        if symidx.as_ref_borrow().symbol_name == "0"{
             check = true;
         }
     }
     if check{
-        let (l,r) = (&et_ret_symidx_vec[0],&et_ret_symidx_vec[1]);
-        // ensure r is 0
-        let (sym_node,zero_node) = match (l,r){
-            (l,r)if r.symbol_name=="0" => {
-                (et_nodes[0],et_nodes[1])
+        let (sym_node,zero_node) = {
+            let (l,r) = (&et_ret_symidx_vec[0].as_ref_borrow(),&et_ret_symidx_vec[1].as_ref_borrow());
+            // ensure r is 0
+            match (l,r){
+                (l,r)if r.symbol_name=="0" => {
+                    (et_nodes[0],et_nodes[1])
+                }
+                (l,r)if l.symbol_name=="0" => {
+                    (et_nodes[1],et_nodes[0])
+                }
+                _ => return false
             }
-            (l,r)if l.symbol_name=="0" => {
-                (et_nodes[1],et_nodes[0])
-            }
-            _ => return false
         };
         let et_parent_node = direct_et_parent_node!(at et_node in et_tree );
         // delete parent to cur et_node
@@ -175,7 +177,7 @@ fn match_x_add_x(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree)->bool{
     };
 
     if hash_equal(l_node, r_node, et_tree){
-        let added_node_struct = EtNodeType::new_literal(0, SymIdx::from_str("2")).into();
+        let added_node_struct = EtNodeType::new_literal(0, SymIdx::from_str("2").as_rc()).into();
         add_node_with_edge!({added_node_struct} with_edge {EtEdgeType::Direct.into()} from et_node in et_tree);
         let et_parent_node = direct_et_parent_node!(at et_node in et_tree );
         // delete parent to cur et_node
@@ -210,10 +212,10 @@ fn match_x_add_x_mul_const(et_node:u32,et_tree:&mut EtTree) -> Result<bool>{
     let (l_node,r_node) = (et_nodes[0],et_nodes[1]);
     let (l_et_ty,r_et_ty) = (&node!(at l_node in et_tree).et_node_type, &node!(at r_node in et_tree).et_node_type);
     let (sym_node1,mul_op_node) = match (l,r){
-        (l,r)if matches!(r_et_ty,EtNodeType::Operator { op:ExprOp::Mul, ast_node, text, op_symidx }) => {
+        (l,r)if matches!(r_et_ty,EtNodeType::Operator { op:ExprOp::Mul, ast_node, text, op_rc_symidx }) => {
             (l_node,r_node)
         }
-        (l,r)if matches!(l_et_ty,EtNodeType::Operator { op:ExprOp::Mul, ast_node, text, op_symidx }) => {
+        (l,r)if matches!(l_et_ty,EtNodeType::Operator { op:ExprOp::Mul, ast_node, text, op_rc_symidx }) => {
             (r_node,l_node)
         }
         _ => {
@@ -226,21 +228,21 @@ fn match_x_add_x_mul_const(et_node:u32,et_tree:&mut EtTree) -> Result<bool>{
 
     let (mul_l_node,mul_r_node) = (mul_et_nodes[0],mul_et_nodes[1]);
     let (mul_l_et_ty,mul_r_et_ty) = (&node!(at mul_l_node in et_tree).et_node_type, &node!(at mul_r_node in et_tree).et_node_type);
-    let (sym_node2,literal_node,literal_symidx) = match (mul_l_et_ty,mul_r_et_ty){
-        (EtNodeType::Operator { op, ast_node, text, op_symidx }, 
-            EtNodeType::Literal { literal_symidx, ast_node:_, text:_}) => {
+    let (sym_node2,literal_node,rc_literal_symidx) = match (mul_l_et_ty,mul_r_et_ty){
+        (EtNodeType::Operator { op, ast_node, text, op_rc_symidx: op_symidx }, 
+            EtNodeType::Literal { rc_literal_symidx: literal_symidx, ast_node:_, text:_}) => {
             (mul_l_node,mul_r_node,literal_symidx.clone())
         },
-        (EtNodeType::Literal { literal_symidx, ast_node, text }, 
-            EtNodeType::Operator { op, ast_node:_, text:_, op_symidx }) => {
+        (EtNodeType::Literal { rc_literal_symidx: literal_symidx, ast_node, text }, 
+            EtNodeType::Operator { op, ast_node:_, text:_, op_rc_symidx: op_symidx }) => {
             (mul_l_node,mul_r_node,literal_symidx.clone())
         },
-        (EtNodeType::Literal { literal_symidx, ast_node, text },
-             EtNodeType::Symbol { sym_idx, ast_node:_, text:_, decldef_def_or_use }) => {
+        (EtNodeType::Literal { rc_literal_symidx: literal_symidx, ast_node, text },
+             EtNodeType::Symbol { rc_symidx: sym_idx, ast_node:_, text:_, decldef_def_or_use }) => {
             (mul_r_node,mul_l_node,literal_symidx.clone())
         },
-        (EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use }, 
-            EtNodeType::Literal { literal_symidx, ast_node:_, text:_ }) => {
+        (EtNodeType::Symbol { rc_symidx: sym_idx, ast_node, text, decldef_def_or_use }, 
+            EtNodeType::Literal { rc_literal_symidx: literal_symidx, ast_node:_, text:_ }) => {
             (mul_l_node,mul_r_node,literal_symidx.clone())
         },
         _ => {
@@ -264,23 +266,23 @@ fn match_x_add_x_mul_const(et_node:u32,et_tree:&mut EtTree) -> Result<bool>{
         let et_node_edge_parent2cur = et_tree.find_edge(NodeIndex::new(et_parent_node as usize), NodeIndex::new(et_node as usize)).unwrap();
         et_tree.edge_weight_mut(et_node_edge_parent2cur).unwrap().et_edge_type = EtEdgeType::Deleted;
         add_edge!({EtEdgeType::Direct.into()} from et_parent_node to  mul_op_node in et_tree);
-        let literal_plus_1 = (Value::from_symidx(&literal_symidx)? +Value::new_i32(1))?.to_symidx()?;
-        debug_info_red!("{:?} at et_node {}",literal_plus_1,literal_node);
-        node_mut!(at literal_node in et_tree).replace_symidx(literal_plus_1)?;
+        let rc_literal_plus_1 = (Value::from_symidx(&rc_literal_symidx.as_ref_borrow())? +Value::new_i32(1))?.to_symidx()?.as_rc();
+        debug_info_red!("{:?} at et_node {}",rc_literal_plus_1,literal_node);
+        node_mut!(at literal_node in et_tree).replace_symidx(rc_literal_plus_1)?;
         node_mut!(at et_node in et_tree).common_eliminated = true;
         Ok(true)
     }else{
         Ok(false)
     }
 }
-fn get_symidx_vec(et_node:u32,et_tree:&EtTree) -> Vec<Option<SymIdx>>{
+fn get_symidx_vec(et_node:u32,et_tree:&EtTree) -> Vec<Option<RcSymIdx>>{
     let et_nodes = direct_et_child_nodes!(at et_node in et_tree);
     let mut symdix_vec = vec![];
     for et_node in et_nodes{
         match &node!(at et_node in et_tree).et_node_type{
-            EtNodeType::Literal { literal_symidx, ast_node, text } => symdix_vec.push(Some(literal_symidx.clone())),
-            EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } =>{
-                symdix_vec.push(Some(sym_idx.clone()))
+            EtNodeType::Literal { rc_literal_symidx, ast_node, text } => symdix_vec.push(Some(rc_literal_symidx.clone())),
+            EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } =>{
+                symdix_vec.push(Some(rc_symidx.clone()))
             },
             _ => {
                 symdix_vec.push(None)
@@ -291,7 +293,7 @@ fn get_symidx_vec(et_node:u32,et_tree:&EtTree) -> Vec<Option<SymIdx>>{
 }
 fn match_x_add_0(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree) -> bool{
     let et_symidx_vec = get_symidx_vec(et_node, et_tree);
-    let (l,r) = if let (Some(l),Some(r)) = (&et_symidx_vec[0],&et_symidx_vec[1]){ (l,r) }else { return false };
+    let (l,r) = if let (Some(l),Some(r)) = (&et_symidx_vec[0],&et_symidx_vec[1]){ (l.as_ref_borrow(),r.as_ref_borrow()) }else { return false };
     // ensure r is 0
     let (sym_node,zero_node) = match (l,r){
         (l,r)if r.symbol_name=="0" => {
@@ -313,7 +315,7 @@ fn match_x_add_0(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree) -> bool{
 }
 fn match_x_sub_0(et_nodes:&Vec<u32>,et_node:u32,et_tree:&mut EtTree)->bool{
     let et_symidx_vec = get_symidx_vec(et_node, et_tree);
-    let (l,r) = if let (Some(l),Some(r)) = (&et_symidx_vec[0],&et_symidx_vec[1]){ (l,r) }else { return false };
+    let (l,r) = if let (Some(l),Some(r)) = (&et_symidx_vec[0],&et_symidx_vec[1]){ (l.as_ref_borrow(),r.as_ref_borrow()) }else { return false };
 
     // ensure r is 0
     let (sym_node,zero_node) = match (l,r){
@@ -334,7 +336,7 @@ fn match_x_div_1(et_node:u32,et_tree:&mut EtTree) -> bool{
     let et_symidx_vec = get_symidx_vec(et_node, et_tree);
     if node!(at et_node in et_tree).common_eliminated{return false}
     debug_info_blue!("match_x_div_1 at {} with_et_nodes {:?}",et_node,et_nodes);
-    let (l,r) = if let (Some(l),Some(r)) = (&et_symidx_vec[0],&et_symidx_vec[1]){ (l,r) }else { return false };
+    let (l,r) = if let (Some(l),Some(r)) = (&et_symidx_vec[0],&et_symidx_vec[1]){ (l.as_ref_borrow(),r.as_ref_borrow()) }else { return false };
     // ensure r is 1
     let (sym_node,unit_node) = match (l,r){
         (l,r)if r.symbol_name=="1" => {
@@ -349,32 +351,32 @@ fn match_x_div_1(et_node:u32,et_tree:&mut EtTree) -> bool{
     et_tree.edge_weight_mut(et_node_edge_parent2cur).unwrap().et_edge_type = EtEdgeType::Deleted;
     true
 }
-/// replace all the const symbol with its cont value in symtab
+/// replace all the const symbol with its literal value in symtab
 fn recursive_replace_const_symbol(et_tree:&mut EtTree,et_node:u32,symtab:&SymTab,mut scope_node:u32, scope_tree:&ScopeTree) -> Result<()>{
     let dfs_et_nodes = dfs(et_tree, et_node);
     debug_info_red!("dfs_et_nodes successfully");
     for et_node in dfs_et_nodes{
         // debug_info_green!("visit {}",et_node);
         match &node_mut!(at et_node in et_tree).et_node_type{
-            EtNodeType::Symbol { sym_idx: init_sym_idx, ast_node, text, decldef_def_or_use } => {
+            EtNodeType::Symbol { rc_symidx: rc_init_symidx, ast_node, text, decldef_def_or_use } => {
                 // debug_info_blue!("cur scope {}",scope_node);
                 if let DeclOrDefOrUse::Use {} = decldef_def_or_use{
                     let initial_scope = scope_node.clone();
 
-                    let mut symidx =  init_sym_idx.clone();
+                    let mut symidx =  rc_init_symidx.as_ref_borrow().clone();
                     while let Err(_) = symtab.get(&symidx) {
                         let scope_node = symidx.scope_node;
                         if scope_node != ST_ROOT{
                             symidx.scope_node = direct_parent_node!(at scope_node in scope_tree );
                         }else{
-                            return Err(anyhow!("scope为{}符号表中未找到{:?}", initial_scope, init_sym_idx.symbol_name.clone()));
+                            return Err(anyhow!("scope为{}符号表中未找到{:?}", initial_scope, symidx.symbol_name.clone()));
                         }
                     }
                     // debug_info_green!("replace symidx {}",sym_idx);
                     // if the symidx have its corresponding const symidx
                     if !symtab.get(&symidx)?.get_type()?.is_array() && symtab.get(&symidx)?.has_const_cor_literal_symidx() {
-                        let const_symidx = symtab.get(&symidx)?.get_const_cor_literal_symidx()?.clone();
-                        node_mut!(at et_node in et_tree).et_node_type = EtNodeType::new_literal(*ast_node, const_symidx)
+                        let literal_symidx = symtab.get(&symidx)?.get_const_cor_literal_symidx()?.clone();
+                        node_mut!(at et_node in et_tree).et_node_type = EtNodeType::new_literal(*ast_node, literal_symidx.as_rc())
                     }
                 }
             },
@@ -452,11 +454,11 @@ pub fn can_eliminate_et_node(et_node:u32, et_tree:&EtTree) -> bool{
     match (&node!(at et_node in et_tree).et_node_type,&node!(at parent_node in et_tree).et_node_type){
         // (EtNodeType::Operator { op: op1, ast_node: ast_node1, text:_, op_symidx:_ } ,
         (_ ,
-        EtNodeType::Operator { op: op_parent, ast_node: ast_node2, text:_, op_symidx:_ } ) if op_parent.is_array_index() => {
+        EtNodeType::Operator { op: op_parent, ast_node: ast_node2, text:_, op_rc_symidx:_ } ) if op_parent.is_array_index() => {
             debug_info_blue!("et_ndoe_can_eliminate false {}",et_node);
             false
         }
-        (_,EtNodeType::Operator { op, ast_node, text, op_symidx } ) if op.is_call() => {
+        (_,EtNodeType::Operator { op, ast_node, text, op_rc_symidx: op_symidx } ) if op.is_call() => {
             debug_info_blue!("et_ndoe_can_eliminate false {}",et_node);
             false
         }
@@ -473,7 +475,7 @@ pub fn reducation(et_node:u32,et_tree:&mut EtTree){
     let et_nodes = direct_et_child_nodes!(at et_node in et_tree); //里面的u32是节点编号
     // generate_png_by_graph(et_tree,"et_tree".to_string(),&[Config::NodeIndexLabel,Config::Record]);
     match &node!(at et_node in et_tree).et_node_type{
-        EtNodeType::Operator { op, ast_node, text, op_symidx } => {
+        EtNodeType::Operator { op, ast_node, text, op_rc_symidx: op_symidx } => {
             debug_info_blue!("access {}",et_node);
             match op{
                 ExprOp::Mul => {
@@ -529,36 +531,36 @@ pub fn reducation(et_node:u32,et_tree:&mut EtTree){
                 _ => { }
             }
         },
-        EtNodeType::Literal { literal_symidx, ast_node, text } => {},
-        EtNodeType::Symbol { sym_idx, ast_node, text, decldef_def_or_use } => {},
+        EtNodeType::Literal { rc_literal_symidx: literal_symidx, ast_node, text } => {},
+        EtNodeType::Symbol { rc_symidx: sym_idx, ast_node, text, decldef_def_or_use } => {},
         EtNodeType::Separator { ast_node, text } => {},
     }
 }
 impl ExprOp{
-    pub fn eval(&self, vec:&Vec<SymIdx>) -> Result<Value>{
+    pub fn eval(&self, vec:&Vec<RcSymIdx>) -> Result<Value>{
         Ok(match self{
-            ExprOp::Mul => (Value::from_symidx( &vec[0])?*Value::from_symidx( &vec[1])?)?,
-            ExprOp::Add => (Value::from_symidx( &vec[0])?+Value::from_symidx( &vec[1])?)?,
-            ExprOp::Sub => (Value::from_symidx( &vec[0])?-Value::from_symidx( &vec[1])?)?,
-            ExprOp::Div => (Value::from_symidx( &vec[0])?/Value::from_symidx( &vec[1])?)?,
-            ExprOp::LogicalOr => (Value::from_symidx( &vec[0])?.logical_or(&Value::from_symidx( &vec[1])?))?,
-            ExprOp::LogicalAnd => (Value::from_symidx( &vec[0])?.logical_and(&Value::from_symidx( &vec[1])?))?,
-            ExprOp::LogicalNot => (!Value::from_symidx( &vec[0])?)?, 
-            ExprOp::BitwiseOr => (Value::from_symidx( &vec[0])?|Value::from_symidx( &vec[1])?)?,
-            ExprOp::BitwiseAnd => (Value::from_symidx( &vec[0])?&Value::from_symidx( &vec[1])?)?,
-            // ExprOp::BitwiseXor => (Value::from_symidx( &vec[0])?^Value::from_symidx( &vec[1])?)?,
-            ExprOp::BitwiseNot => (!Value::from_symidx( &vec[0])?)?, //一元运算符
-            // ExprOp::Eq => ((Value::from_symidx(&vec[0])?.less_than_or_equal((&Value::from_symidx( &vec[1])?)))?,
-            ExprOp::NEq => (Value::from_symidx( &vec[0])?.logical_neq(&Value::from_symidx( &vec[1])?))?,
-            ExprOp::Less => (Value::from_symidx( &vec[0])?.less_than(&Value::from_symidx( &vec[1])?))?,
-            ExprOp::Greater => (Value::from_symidx( &vec[0])?.greater_than(&Value::from_symidx( &vec[1])?))?,
-            ExprOp::LEq => (Value::from_symidx( &vec[0])?.less_than_or_equal(&Value::from_symidx( &vec[1])?))?,
-            ExprOp::GEq => (Value::from_symidx( &vec[0])?.greater_than_or_equal(&Value::from_symidx( &vec[1])?))?,
-            // ExprOp::LShift => (Value::from_symidx( &vec[0])?<<Value::from_symidx( &vec[1])?)?,
-            // ExprOp::RShift => (Value::from_symidx( &vec[0])?>>Value::from_symidx( &vec[1])?)?,
-            ExprOp::Mod => (Value::from_symidx( &vec[0])?%Value::from_symidx( &vec[1])?)?,
-            ExprOp::Negative => (-Value::from_symidx( &vec[0])?)?,
-            ExprOp::Positive => Value::from_symidx( &vec[0])?,
+            ExprOp::Mul => (Value::from_symidx( &vec[0].as_ref_borrow())?*Value::from_symidx( &vec[1].as_ref_borrow())?)?,
+            ExprOp::Add => (Value::from_symidx( &vec[0].as_ref_borrow())?+Value::from_symidx( &vec[1].as_ref_borrow())?)?,
+            ExprOp::Sub => (Value::from_symidx( &vec[0].as_ref_borrow())?-Value::from_symidx( &vec[1].as_ref_borrow())?)?,
+            ExprOp::Div => (Value::from_symidx( &vec[0].as_ref_borrow())?/Value::from_symidx( &vec[1].as_ref_borrow())?)?,
+            ExprOp::LogicalOr => (Value::from_symidx( &vec[0].as_ref_borrow())?.logical_or(&Value::from_symidx( &vec[1].as_ref_borrow())?))?,
+            ExprOp::LogicalAnd => (Value::from_symidx( &vec[0].as_ref_borrow())?.logical_and(&Value::from_symidx( &vec[1].as_ref_borrow())?))?,
+            ExprOp::LogicalNot => (!Value::from_symidx( &vec[0].as_ref_borrow())?)?, 
+            ExprOp::BitwiseOr => (Value::from_symidx( &vec[0].as_ref_borrow())?|Value::from_symidx( &vec[1].as_ref_borrow())?)?,
+            ExprOp::BitwiseAnd => (Value::from_symidx( &vec[0].as_ref_borrow())?&Value::from_symidx( &vec[1].as_ref_borrow())?)?,
+            // ExprOp::BitwiseXor => (Value::from_symidx( &vec[0].as_ref_borrow())?^Value::from_symidx( &vec[1].as_ref_borrow())?)?,
+            ExprOp::BitwiseNot => (!Value::from_symidx( &vec[0].as_ref_borrow())?)?, //一元运算符
+            // ExprOp::Eq => ((Value::from_symidx(&vec[0].as_ref_borrow())?.less_than_or_equal((&Value::from_symidx( &vec[1].as_ref_borrow())?)))?,
+            ExprOp::NEq => (Value::from_symidx( &vec[0].as_ref_borrow())?.logical_neq(&Value::from_symidx( &vec[1].as_ref_borrow())?))?,
+            ExprOp::Less => (Value::from_symidx( &vec[0].as_ref_borrow())?.less_than(&Value::from_symidx( &vec[1].as_ref_borrow())?))?,
+            ExprOp::Greater => (Value::from_symidx( &vec[0].as_ref_borrow())?.greater_than(&Value::from_symidx( &vec[1].as_ref_borrow())?))?,
+            ExprOp::LEq => (Value::from_symidx( &vec[0].as_ref_borrow())?.less_than_or_equal(&Value::from_symidx( &vec[1].as_ref_borrow())?))?,
+            ExprOp::GEq => (Value::from_symidx( &vec[0].as_ref_borrow())?.greater_than_or_equal(&Value::from_symidx( &vec[1].as_ref_borrow())?))?,
+            // ExprOp::LShift => (Value::from_symidx( &vec[0].as_ref_borrow())?<<Value::from_symidx( &vec[1].as_ref_borrow())?)?,
+            // ExprOp::RShift => (Value::from_symidx( &vec[0].as_ref_borrow())?>>Value::from_symidx( &vec[1].as_ref_borrow())?)?,
+            ExprOp::Mod => (Value::from_symidx( &vec[0].as_ref_borrow())?%Value::from_symidx( &vec[1].as_ref_borrow())?)?,
+            ExprOp::Negative => (-Value::from_symidx( &vec[0].as_ref_borrow())?)?,
+            ExprOp::Positive => Value::from_symidx( &vec[0].as_ref_borrow())?,
             _ => {Err(anyhow!(format!("unsupported operator {:?} for {:?}",self,vec)))?},
         })
     }
