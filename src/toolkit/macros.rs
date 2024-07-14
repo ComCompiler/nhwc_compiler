@@ -516,6 +516,15 @@ macro_rules! add_field {
 }
 
 #[macro_export]
+macro_rules! get_ast_from_symidx {
+    (find $symidx:ident with $scope_tree:ident) => {{
+        let sym_scope = $symidx.scope_node;
+        let sym_ast = node!(at sym_scope in $scope_tree).ast_node;
+        sym_ast
+    }}
+}
+
+#[macro_export]
 macro_rules! node {
     (at $node:ident in $graph:ident) => {{
         $graph.node_weight(petgraph::matrix_graph::NodeIndex::from($node)).expect("找不到 index 对应的 node ")

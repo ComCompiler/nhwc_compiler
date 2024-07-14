@@ -40,7 +40,7 @@ impl<T: Clone> InstrSlab<T>{
 }
 
 
-#[derive(Clone)]
+#[derive(Clone,Eq,PartialEq)]
 pub enum ArithOp {
     Add {
         a:RcSymIdx,
@@ -431,7 +431,7 @@ impl CmpPlan{
         }
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug,Hash,Eq,PartialEq)]
 pub enum IcmpPlan {
     Eq,
     Ne, // 等与不等
@@ -444,7 +444,7 @@ pub enum IcmpPlan {
     Slt,
     Sle, //有符号比较
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug,Hash,Eq,PartialEq)]
 pub enum FcmpPlan {
     Oeq,
     One, // 等与不等

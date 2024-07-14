@@ -26,6 +26,7 @@ pub struct NhwcCtx {
     pub scope_tree:ScopeTree,
     pub dj_graph:DjGraph,
     pub et_tree:EtTree,
+    pub instr_et:EtTree,
     pub ast2scope:HashMap<u32, u32>,
     pub symtab_graph:SymTabGraph,
     pub nhwc_instr_slab:InstrSlab<NhwcInstr>,
@@ -61,6 +62,7 @@ impl NhwcCtx {
             def_use_graph: DefUseGraph::new(),
             io_task_list: vec![],
             collected_nhwc_ir: InstrList::new(),
+            instr_et: EtTree::new(),
         })
     }
 }

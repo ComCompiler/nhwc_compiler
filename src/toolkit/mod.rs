@@ -30,3 +30,4 @@ pub mod mem_layout;
 pub mod gen_riscv_asm;
 pub mod asm_struct;
 pub mod regtab;
+pub mod gen_instr_et;
