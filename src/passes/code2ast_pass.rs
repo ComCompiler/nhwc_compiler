@@ -38,7 +38,7 @@ impl Pass for Code2AstPass {
             void memset(void *zz_ptr, int zz_val, int zz_len);
             void memcpy(void *zz_dest, void *zz_ptr, int zz_len);";
         if !ctx.args.no_header{
-            ctx.code += defs;
+            ctx.code.insert_str(0,defs);
         }
 
         parse_as_ast_tree(ctx);

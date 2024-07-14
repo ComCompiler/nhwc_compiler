@@ -5,7 +5,7 @@ use strum_macros::EnumIs;
 
 use crate::{debug_info_blue, debug_info_red};
 
-use super::{field::Value, rv64_instr::{Imm, RV64Instr}, symtab::SymIdx};
+use super::{field::Value, rv64_instr::{Imm, RV64Instr}, symtab::{RcSymIdx, SymIdx}};
 
 /// a asm file contains several sections
 pub struct AsmStructure{
@@ -105,10 +105,10 @@ impl AsmSection{
             },
             _ => {
                 match val.get_ele_size()?{
-                    8 => { self.double(Imm::new_literal(val.to_symidx().unwrap_or(SymIdx::new_verbose(0, "0".to_string(), None)))) }
-                    4 => { self.word(Imm::new_literal(val.to_symidx().unwrap_or(SymIdx::new_verbose(0, "0".to_string(), None)))) }
-                    2 => { self.half(Imm::new_literal(val.to_symidx().unwrap_or(SymIdx::new_verbose(0, "0".to_string(), None)))) }
-                    1 => { self.byte(Imm::new_literal(val.to_symidx().unwrap_or(SymIdx::new_verbose(0, "0".to_string(), None)))) }
+                    8 => { self.double(Imm::new_literal(val.to_symidx().unwrap_or(SymIdx::new_verbose(0, "0".to_string(), None)).as_rc())) }
+                    4 => { self.word(Imm::new_literal(val.to_symidx().unwrap_or(SymIdx::new_verbose(0, "0".to_string(), None)).as_rc())) }
+                    2 => { self.half(Imm::new_literal(val.to_symidx().unwrap_or(SymIdx::new_verbose(0, "0".to_string(), None)).as_rc())) }
+                    1 => { self.byte(Imm::new_literal(val.to_symidx().unwrap_or(SymIdx::new_verbose(0, "0".to_string(), None)).as_rc())) }
                     _ => { return Err(anyhow!("unexpected ele size")) }
                 }
                 Ok(())

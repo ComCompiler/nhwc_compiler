@@ -7,11 +7,13 @@ use strum_macros::EnumIs;
 use crate::debug_info_blue;
 use crate::toolkit::field::Field;
 
+use crate::toolkit::symtab::WithBorrow;
 use crate::{debug_info_red, make_field_trait_for_struct, reg_field_for_struct};
 
 use super::rv64_instr::{REG_A_RANGE, REG_FA_RANGE, REG_FS_RANGE, REG_S_RANGE, REG_T_RANGE};
 
-use super::{asm_struct::AsmSection, field::Type, rv64_instr::Register, symbol::Symbol, symtab::{SymIdx, SymTab}};
+use super::symtab::SymIdx;
+use super::{asm_struct::AsmSection, field::Type, rv64_instr::Register, symbol::Symbol, symtab::{RcSymIdx, SymTab}};
 
 make_field_trait_for_struct!(RegTab);
 /// only manage s & fs registers 

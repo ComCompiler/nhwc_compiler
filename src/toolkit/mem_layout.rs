@@ -5,15 +5,15 @@ use std::fmt::Debug;
 use anyhow::*;
 use crate::{reg_field_for_struct};
 
-use super::{cfg_node::{CfgNode}, symbol::Symbol, symtab::{SymIdx, SymTab}};
+use super::{cfg_node::{CfgNode}, symbol::Symbol, symtab::{RcSymIdx, SymTab}};
 use itertools::{self, Itertools};
 
 //  mem offset is the offset to s0 (so you should divide stack_size by mem_offset to get offset to sp)
 reg_field_for_struct!(Symbol {
         MEM_OFFSET2S0:isize,
         MEM_OFFSET2SP:isize,
-        FUNC_COR_RA_SYMIDX:SymIdx,
-        FUNC_COR_S0_SYMIDX:SymIdx,
+        FUNC_COR_RA_SYMIDX:RcSymIdx,
+        FUNC_COR_S0_SYMIDX:RcSymIdx,
     } with_fields fields);
 reg_field_for_struct!(CfgNode {
     MEM_LAYOUT:MemLayout,
@@ -38,11 +38,11 @@ pub struct MemLayout{
 }
 #[derive(Clone,Debug)]
 pub struct MemSegment{
-    pub op_symidx:Option<SymIdx>,
+    pub op_symidx:Option<RcSymIdx>,
     pub len:usize,
 }
 impl MemSegment{
-    pub fn split(self,first_seg_len:usize,op_symidx1:Option<SymIdx>,op_symidx2:Option<SymIdx>) -> Result<(MemSegment,MemSegment)>{
+    pub fn split(self,first_seg_len:usize,op_symidx1:Option<RcSymIdx>,op_symidx2:Option<RcSymIdx>) -> Result<(MemSegment,MemSegment)>{
         if first_seg_len > self.len{
             return Err(anyhow!("can't split {} mem into {} mem",self.len,first_seg_len))
         }
@@ -54,7 +54,7 @@ impl MemSegment{
             len: self.len - first_seg_len,
         }))
     }
-    pub fn split_into_may_3_parts(self,first_seg_len:usize,op_symidx1:Option<SymIdx>,second_seg_len:usize,op_symidx2:Option<SymIdx>,op_symidx3:Option<SymIdx>) 
+    pub fn split_into_may_3_parts(self,first_seg_len:usize,op_symidx1:Option<RcSymIdx>,second_seg_len:usize,op_symidx2:Option<RcSymIdx>,op_symidx3:Option<RcSymIdx>) 
     -> Result<(MemSegment,MemSegment,Option<MemSegment>)>{
         let (a,b) = self.split(first_seg_len, op_symidx1, None)?;
         let (b,c) = b.split(second_seg_len,op_symidx2,op_symidx3)?;
@@ -87,7 +87,7 @@ impl MemLayout{
         None
     }
     /// 返回这个 新插入data 的起始位置
-    pub fn insert_data(&mut self, align:usize,data_len:usize, symidx:&SymIdx)-> usize{
+    pub fn insert_data(&mut self, align:usize,data_len:usize, symidx:&RcSymIdx)-> usize{
         // debug_info_ed!("insert data_len {} for symidx {:?}",data_len,symidx);
             // debug_info_blue!("align:{} data_len:{}",align,data_len);
         let rst = self.find_available(align,data_len);
@@ -147,7 +147,7 @@ impl Debug for MemLayout{
         };
         for (idx,mem_seg) in self.mem.iter().enumerate(){
             s += format!("|{}:{} at {}",{match &mem_seg.op_symidx{
-                Some(symidx) => symidx.to_string(),
+                Some(symidx) => symidx.as_ref_borrow().to_string(),
                 None => "none".to_string(),
             }},mem_seg.len,offset2sp_vec[self.mem.len()-idx-1]).as_str();
         }

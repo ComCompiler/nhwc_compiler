@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use super::{et_node::{DeclOrDefOrUse, EtEdge, EtHash, EtNode, EtNodeType, EtTree, ExprOp}, etc::{self, dfs}, field::Value, scope_node::ScopeTree, symtab::SymTab};
-use crate::{add_edge, add_node_with_edge, debug_info_blue, debug_info_green, debug_info_red, direct_child_node, direct_child_nodes, direct_parent_node, node, node_mut, toolkit::{dot::Config, et_node::EtEdgeType, etc::{dfs_with_predicate, generate_png_by_graph, generate_png_by_graph_multi_tasks}, gen_cfg::AST_ROOT, scope_node::ST_ROOT, symtab::SymIdx}};
+use crate::{add_edge, add_node_with_edge, debug_info_blue, debug_info_green, debug_info_red, direct_child_node, direct_child_nodes, direct_parent_node, node, node_mut, toolkit::{dot::Config, et_node::EtEdgeType, etc::{dfs_with_predicate, generate_png_by_graph, generate_png_by_graph_multi_tasks}, gen_cfg::AST_ROOT, scope_node::ST_ROOT, symtab::{RcSymIdx, SymIdx}}};
 use anyhow::Result;
 use anyhow::anyhow;
 use itertools::Itertools;
@@ -57,7 +57,7 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) -> Option<SymIdx> {
                                 }
 
                                 // add_edge!(from et_no)
-                                et_ret_symidx_vec.push(const_symidx);
+                                et_ret_symidx_vec.push(const_symidx.clone());
                             },
                             None => {
                                 et_ret_symidx_vec.push(SymIdx::from_str("unidentified"));
@@ -372,8 +372,8 @@ fn recursive_replace_const_symbol(et_tree:&mut EtTree,et_node:u32,symtab:&SymTab
                     }
                     // debug_info_green!("replace symidx {}",sym_idx);
                     // if the symidx have its corresponding const symidx
-                    if !symtab.get(&symidx)?.get_type()?.is_array() && symtab.get(&symidx)?.has_const_symidx() {
-                        let const_symidx = symtab.get(&symidx)?.get_const_symidx()?.clone();
+                    if !symtab.get(&symidx)?.get_type()?.is_array() && symtab.get(&symidx)?.has_const_cor_literal_symidx() {
+                        let const_symidx = symtab.get(&symidx)?.get_const_cor_literal_symidx()?.clone();
                         node_mut!(at et_node in et_tree).et_node_type = EtNodeType::new_literal(*ast_node, const_symidx)
                     }
                 }

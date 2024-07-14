@@ -117,14 +117,14 @@ pub fn debug_simu_run(simu:&mut Simulator, instr_slab:&InstrSlab<NhwcInstr>, src
                 if is_detailed_info{
                     vec![]
                 }else{
-                    field_vec.into_iter().map(|tuple|tuple.1).collect_vec()
+                    field_vec.iter().map(|tuple|&tuple.1).collect_vec()
                 });
             simu.clear_text();
             simu.load_instr_text(Some(6),instr_slab,)?;
             simu.load_stack_text()?;
             trace!("{:?}",simu);
             // println!("{:?}",simu);
-            if bp_symidx.symbol_name == "exit"{
+            if bp_symidx.borrow().symbol_name == "exit"{
                 break;
             }
         }else if let Err(e) = rst {

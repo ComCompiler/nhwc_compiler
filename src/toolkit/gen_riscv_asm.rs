@@ -3,11 +3,11 @@
 
 use std::{default, f64::consts::E, ops::Deref, str::FromStr};
 
-use crate::{antlr_parser::clexer::{Register, Void}, debug_info_blue, debug_info_red, direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, reg_field_for_struct, toolkit::rv64_instr::{Arithmetic, REG_A_RANGE, REG_FA_RANGE}};
+use crate::{antlr_parser::clexer::{Register, Void}, debug_info_blue, debug_info_red, direct_child_nodes, instr, node, node_mut, passes::simulator_debug_pass::debug_simu_run, reg_field_for_struct, toolkit::{rv64_instr::{Arithmetic, REG_A_RANGE, REG_FA_RANGE}, symtab::WithBorrow}};
 use anyhow::*;
 use itertools::Itertools;
 
-use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CfgNode, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Type, gen_nhwc_cfg::{IS_LITERAL}, nhwc_instr::{FuncOp, InstrSlab, NhwcInstr, NhwcInstrType}, regtab::{self, RegTab}, rv64_instr::{Compare, Imm, Loads, Logical, PseudoInstr, RV64Instr, Register, RiscvOffsetLimit, Shifts, Stores, Trans, REG_FS_RANGE, REG_S_RANGE}, simulator::Simulator, symtab::{self, SymIdx, SymTab}};
+use super::{asm_struct::{AsmSection, AsmStructure}, cfg_edge::CfgEdgeType, cfg_node::{CfgGraph, CfgNode, CFG_ROOT}, dot::Config, etc::{dfs_with_priority, generate_png_by_graph}, field::Type, gen_nhwc_cfg::IS_LITERAL, nhwc_instr::{FuncOp, InstrSlab, NhwcInstr, NhwcInstrType}, regtab::{self, RegTab}, rv64_instr::{Compare, Imm, Loads, Logical, PseudoInstr, RV64Instr, Register, RiscvOffsetLimit, Shifts, Stores, Trans, REG_FS_RANGE, REG_S_RANGE}, simulator::Simulator, symtab::{self, RcSymIdx, SymIdx, SymTab}};
 
 reg_field_for_struct!(CfgNode {
     REGTAB:RegTab,
@@ -54,7 +54,7 @@ fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhwc
                         asm_sect.annotate(format!("{:?}",&instr!(at instr in nhwc_instr_slab)?));
                         asm_sect.obj_type(Imm::new_global_label(var_symidx.clone()));
                         asm_sect.label(Imm::new_global_label(var_symidx.clone()));
-                        asm_sect.apply_value(simulator.simu_symtab.get(&var_symidx.to_src_symidx())?.get_simu_val()?)?;
+                        asm_sect.apply_value(simulator.simu_symtab.get(&var_symidx.borrow().to_src_symidx())?.get_simu_val()?)?;
                     }
                 }
             },
@@ -169,13 +169,14 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         asm_sect.global(Imm::new_global_label(func_symidx.clone()));
                         asm_sect.func_type(Imm::new_global_label(func_symidx.clone()));
                         asm_sect.label(Imm::new_global_label(func_symidx.clone()));
+                        let func_symidx = func_symidx.as_ref_borrow();
                         let mem_layout = node!(at cfg_entry_node in cfg_graph).get_mem_layout()?;
                         asm_sect.annotate(format!("mem layout:{:?}",mem_layout));
                         // set_freed_reg for args
                         let mut fpr_args = vec![];
                         let mut gpr_args = vec![];
                         for (_idx,arg) in args.iter().enumerate(){
-                            match symtab.get(arg)?.get_type()?{
+                            match symtab.get(&arg.as_ref_borrow())?.get_type()?{
                                 Type::F32 => {
                                     fpr_args.push(arg)
                                 },
@@ -188,14 +189,14 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                             // _store_sym(asm_sect, &arg,Register::new_fa(idx as u8), symtab)?;
                             if REG_FA_RANGE.contains(&(idx as u8)){
                                 let reg = Register::new_fa(idx as u8);
-                                regtab.set_freed_reg(reg,&arg,symtab)?;
+                                regtab.set_freed_reg(reg,&arg.as_ref_borrow(),symtab)?;
                             }
                         }   
                         for (idx,arg) in gpr_args.iter().take(8).enumerate(){
                             // _store_sym(asm_sect, &arg,Register::new_a(idx as u8), symtab)?;
                             if REG_A_RANGE.contains(&(idx as u8)){
                                 let reg = Register::new_a(idx as u8);
-                                regtab.set_freed_reg(reg,&arg,symtab)?;
+                                regtab.set_freed_reg(reg,&arg.as_ref_borrow(),symtab)?;
                             }
                         }   
                         // apply for stack mem
@@ -205,9 +206,11 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         // &mut default_store,|symidx,temp_reg,symtab,asm_sect,regtab|{
                         add_literal_to_reg(asm_sect, Register::SP, Register::SP, regtab,symtab,-(stack_size as isize))?;
                         // })?;
-                        let ra_symidx= symtab.get(func_symidx)?.get_func_cor_ra_symidx()?.clone();
-                        let s0_symidx = symtab.get(func_symidx)?.get_func_cor_s0_symidx()?.clone();
+                        let rc_ra_symidx= symtab.get(&func_symidx)?.get_func_cor_ra_symidx()?.clone();
+                        let ra_symidx = rc_ra_symidx.as_ref_borrow();
                         _store_sym(asm_sect, &ra_symidx, Register::RA, regtab,symtab,0)?;
+                        let rc_s0_symidx = symtab.get(&func_symidx)?.get_func_cor_s0_symidx()?.clone();
+                        let s0_symidx = rc_s0_symidx.as_ref_borrow();
                         _store_sym(asm_sect, &s0_symidx, Register::new_s0(), regtab,symtab,0)?;
                         add_literal_to_reg(asm_sect, Register::new_s0(),  Register::SP,regtab, symtab,stack_size as isize)?;
                         debug_info_red!("after func define instr {:?}", regtab);
@@ -215,7 +218,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     NhwcInstrType::DefineVar { var_symidx, vartype: _, op_value } => {
                         match op_value{
                             Some(value_symidx) => {
-                                load_sym_or_imm(asm_sect,  value_symidx, regtab, symtab)?;
+                                load_sym_or_imm(asm_sect,  &value_symidx.as_ref_borrow(), regtab, symtab)?;
                             },
                             None => {
                                 // do nothing
@@ -231,12 +234,14 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     },
                     NhwcInstrType::Load { lhs, ptr_symidx, ptr_ty: _ } => {
                         debug_info_red!("{:?} {:?}",instr_struct, ptr_symidx);
-                        load_from_ptr(asm_sect, ptr_symidx, lhs,  regtab, symtab)?;
+                        load_from_ptr(asm_sect, &ptr_symidx.as_ref_borrow(), &lhs.as_ref_borrow(),  regtab, symtab)?;
                     },
                     NhwcInstrType::Store { val_symidx: value_symidx, value_ty: _, ptr_symidx, ptr_ty: _ } => {
-                        store_from_ptr(asm_sect, ptr_symidx, value_symidx,regtab, symtab)?;
+                        store_from_ptr(asm_sect, &ptr_symidx.as_ref_borrow(), &value_symidx.as_ref_borrow(),regtab, symtab)?;
                     },
                     NhwcInstrType::GetElementPtr { lhs, array_or_ptr_symidx, array_ty, idx_vec } => {
+                        let lhs = lhs.as_ref_borrow();
+                        let array_or_ptr_symidx = array_or_ptr_symidx.as_ref_borrow();
                         // clear s3
                         // use reg s3 as rst register
                         // load idx to s2 
@@ -245,12 +250,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         // s4 * element size 
                         // put array offset to s5
                         // finally plus array offset 
-                        let ptr_reg = regtab.find_and_occupy_reg(lhs,&Type::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                        let ptr_reg = regtab.find_and_occupy_reg(&lhs,&Type::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
                         _load_sym_or_imm(asm_sect, &SymIdx::from_str("0"), ptr_reg.clone(), regtab, symtab)?;
                         for (idx,weight) in idx_vec.iter().zip(array_ty.get_array_dim_weight_vec()?.iter()){
-                            let idx = idx.as_ref().unwrap();
+                            let idx = idx.as_ref().unwrap().as_ref_borrow();
                             let weight_reg = regtab.find_and_occupy_reg(weight, &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                            let idx_reg = regtab.find_and_occupy_reg(idx,&Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                            let idx_reg = regtab.find_and_occupy_reg(&idx,&Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
                             let temp_idx_mul_weight_reg = regtab.find_and_anonymous_occupy(&SymIdx::from_str("temp_idx_mul_weight_reg"),&Type::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
                             asm_sect.asm(Arithmetic::new_mul(temp_idx_mul_weight_reg.clone(), weight_reg.clone(), idx_reg.clone()).into());
                             regtab.unoccupied_reg(weight_reg,symtab,asm_sect,&mut default_store)?;
@@ -261,7 +266,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         let ele_size = array_ty.get_ele_size()?;
                         asm_sect.asm(Shifts::new_slli_from_multiple(ptr_reg.clone(), ptr_reg.clone(), ele_size)?.into());
                         // 2 situations : 1. array is global  2. array is local to stack
-                        match symtab.get(array_or_ptr_symidx)?.has_is_global() &&*symtab.get(array_or_ptr_symidx)?.get_is_global()?{
+                        match symtab.get(&array_or_ptr_symidx)?.has_is_global() &&*symtab.get(&array_or_ptr_symidx)?.get_is_global()?{
                             true => {
                                 let addr_reg = regtab.find_and_occupy_reg(&array_or_ptr_symidx,&Type::Ptr64 { ty: Box::new(Type::Void) }, symtab, asm_sect, &mut default_store, &mut default_load)?;
                                 asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(), addr_reg.clone()).into());
@@ -271,7 +276,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 // only one situations 
                                 // you should find it in regtab or mem 
                                 // judge whether ptr and pointed array is in same function 
-                                match symtab.get(array_or_ptr_symidx)?.get_type()?{
+                                match symtab.get(&array_or_ptr_symidx)?.get_type()?{
                                     Type::Ptr64 { ty } => {
                                         let addr_reg = regtab.find_and_occupy_reg(&array_or_ptr_symidx, &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
                                         asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(),addr_reg.clone()).into());
@@ -279,7 +284,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                     },
                                     Type::Array { dims, ele_ty } => {
                                         asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(),Register::SP).into());
-                                        let &offset2sp = symtab.get(array_or_ptr_symidx)?.get_mem_offset2sp()?;
+                                        let &offset2sp = symtab.get(&array_or_ptr_symidx)?.get_mem_offset2sp()?;
                                         add_literal_to_reg(asm_sect, ptr_reg.clone(), ptr_reg.clone(), regtab, symtab,offset2sp )?;
                                     },
                                     _ => panic!()
@@ -290,11 +295,15 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         regtab.unoccupied_reg(ptr_reg,symtab,asm_sect,&mut default_store)?;
                     },
                     NhwcInstrType::Arith { lhs, rhs } => {
+                        let lhs = lhs.as_ref_borrow();
                         match rhs{
                             super::nhwc_instr::ArithOp::Add { a, b, vartype } => {
-                                let val_reg1= regtab.find_and_occupy_reg(a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(b, vartype, symtab, asm_sect,&mut default_store,&mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let a = a.as_ref_borrow();
+                                let b = b.as_ref_borrow();
+
+                                let val_reg1= regtab.find_and_occupy_reg(&a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, vartype, symtab, asm_sect,&mut default_store,&mut default_load)?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
                                 match vartype{
                                     Type::I32 => {
                                         asm_sect.asm(Arithmetic::new_add(rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).into());
@@ -309,9 +318,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                             },
                             super::nhwc_instr::ArithOp::Mul { a, b, vartype } => {
-                                let val_reg1= regtab.find_and_occupy_reg(a, vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(b, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let a = a.as_ref_borrow();
+                                let b = b.as_ref_borrow();
+
+                                let val_reg1= regtab.find_and_occupy_reg(&a, vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
                                 match vartype{
                                     Type::I32 => {
                                         asm_sect.asm(Arithmetic::new_mul(rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).into());
@@ -326,9 +338,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                             },
                             super::nhwc_instr::ArithOp::Div { a, b, vartype} => {
-                                let val_reg1= regtab.find_and_occupy_reg(a, vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(b, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let a = a.as_ref_borrow();
+                                let b = b.as_ref_borrow();
+
+                                let val_reg1= regtab.find_and_occupy_reg(&a, vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
                                 match vartype{
                                     Type::I32 => {
                                         asm_sect.asm(Arithmetic::new_div(rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).into());
@@ -343,9 +358,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                             },
                             super::nhwc_instr::ArithOp::Sub { a, b, vartype} => {
-                                let val_reg1= regtab.find_and_occupy_reg(a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(b, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let a = a.as_ref_borrow();
+                                let b = b.as_ref_borrow();
+
+                                let val_reg1= regtab.find_and_occupy_reg(&a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
                                 match vartype{
                                     Type::I32 => {
                                         asm_sect.annotate(format!("regtab:{:?}\n",regtab));
@@ -364,9 +382,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                             },
                             super::nhwc_instr::ArithOp::Mod { a, b, vartype} => {
-                                let val_reg1= regtab.find_and_occupy_reg(a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(b, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let a = a.as_ref_borrow();
+                                let b = b.as_ref_borrow();
+
+                                let val_reg1= regtab.find_and_occupy_reg(&a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
                                 match vartype{
                                     Type::I32 => {
                                         asm_sect.asm(Arithmetic::new_rem(rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).clone().clone().into());
@@ -381,9 +402,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                             },
                             super::nhwc_instr::ArithOp::Icmp { plan, a, b, vartype } => {
-                                let val_reg1= regtab.find_and_occupy_reg(a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(b, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(lhs, &Type::I1, symtab, asm_sect, &mut default_store,&mut no_load)?; 
+                                let a = a.as_ref_borrow();
+                                let b = b.as_ref_borrow();
+
+                                let val_reg1= regtab.find_and_occupy_reg(&a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &Type::I1, symtab, asm_sect, &mut default_store,&mut no_load)?; 
                                 match plan{
                                     super::nhwc_instr::IcmpPlan::Eq => {
                                         // BinOp!(sect asm_sect func_name {Compare::new} args{a,b,1,2,3} with_symtab src_symtab);
@@ -426,9 +450,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                             },
                             super::nhwc_instr::ArithOp::Fcmp { plan, a, b, vartype } => {
-                                let val_reg1= regtab.find_and_occupy_reg(a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(b, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(lhs, &Type::I1, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let a = a.as_ref_borrow();
+                                let b = b.as_ref_borrow();
+
+                                let val_reg1= regtab.find_and_occupy_reg(&a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &Type::I1, symtab, asm_sect, &mut default_store, &mut no_load)?;
                                 match plan{
                                     super::nhwc_instr::FcmpPlan::Oeq => {
                                         asm_sect.asm({Compare::new_feq_s} (rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).into());
@@ -455,26 +482,34 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                             },
                             super::nhwc_instr::ArithOp::LogicAnd { a, b, vartype} => {
-                                let val_reg1= regtab.find_and_occupy_reg(a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(b, vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(lhs, vartype,symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let a = a.as_ref_borrow();
+                                let b = b.as_ref_borrow();
+
+                                let val_reg1= regtab.find_and_occupy_reg(&a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, vartype,symtab, asm_sect, &mut default_store, &mut no_load)?;
                                 asm_sect.asm(Logical::new_and(rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).into());
                                 regtab.unoccupied_reg(val_reg1,symtab,asm_sect,&mut default_store)?;
                                 regtab.unoccupied_reg(val_reg2,symtab,asm_sect,&mut default_store)?;
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                             },
                             super::nhwc_instr::ArithOp::LogicOr { a, b, vartype} => {
-                                let val_reg1= regtab.find_and_occupy_reg(a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(b, vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let a = a.as_ref_borrow();
+                                let b = b.as_ref_borrow();
+
+                                let val_reg1= regtab.find_and_occupy_reg(&a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
                                 asm_sect.asm(Logical::new_or(rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).into());
                                 regtab.unoccupied_reg(val_reg1,symtab,asm_sect,&mut default_store)?;
                                 regtab.unoccupied_reg(val_reg2,symtab,asm_sect,&mut default_store)?;
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                             },
                             super::nhwc_instr::ArithOp::LogicNot { a, vartype} => {
-                                let val_reg1= regtab.find_and_occupy_reg(a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let a = a.as_ref_borrow();
+
+                                let val_reg1= regtab.find_and_occupy_reg(&a, vartype, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
                                 asm_sect.asm(PseudoInstr::new_seqz(rst_reg.clone(), val_reg1.clone()).into());
                                 regtab.unoccupied_reg(val_reg1,symtab,asm_sect,&mut default_store)?;
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
@@ -483,13 +518,16 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         // store reg to lhs
                     },
                     NhwcInstrType::SimpleAssign { lhs, rhs, vartype } => {
+                        let lhs = lhs.as_ref_borrow();
+                        let rhs = rhs.as_ref_borrow();
+
                         if rhs.is_literal(){
-                            let rst_reg= regtab.find_and_occupy_reg(lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                            let rst_reg= regtab.find_and_occupy_reg(&lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
                             _load_sym_or_imm(asm_sect, &rhs, rst_reg.clone(), regtab, symtab)?;
                             regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                         }else{
-                            let val_reg1= regtab.find_and_occupy_reg(rhs, vartype, symtab, asm_sect, &mut default_store, &mut &mut default_load)?;
-                            let rst_reg= regtab.find_and_occupy_reg(lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                            let val_reg1= regtab.find_and_occupy_reg(&rhs, vartype, symtab, asm_sect, &mut default_store, &mut &mut default_load)?;
+                            let rst_reg= regtab.find_and_occupy_reg(&lhs, vartype, symtab, asm_sect, &mut default_store, &mut no_load)?;
                             asm_sect.asm(PseudoInstr::new_reg_mv(rst_reg.clone(), val_reg1.clone()).into());
                             regtab.unoccupied_reg(val_reg1,symtab,asm_sect,&mut default_store)?;
                             regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
@@ -498,16 +536,19 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     NhwcInstrType::Call { op_assigned_symidx, func_op } => {
                         let mut fpr_args = vec![];
                         let mut gpr_args = vec![];
+                        let func_symidx = &func_op.func_symidx.as_ref_borrow();
                         asm_sect.annotate("saved register dumping to mem".to_string());
-                        if symtab.get(&func_op.func_symidx)?.has_stack_pass_args(){
-                            let stack_pass_args = symtab.get(&func_op.func_symidx)?.get_stack_pass_args()?.clone();
+                        if symtab.get(func_symidx)?.has_stack_pass_args(){
+                            let stack_pass_args = symtab.get(func_symidx)?.get_stack_pass_args()?.clone();
                             // if we need to pass args by stack (may because arg reg is not enough)
                             if stack_pass_args.len()!=0 {
-                                let &cfg_entry_of_called_func =  symtab.get(&func_op.func_symidx)?.get_cfg_entry_node()?;
+                                let &cfg_entry_of_called_func =  symtab.get(func_symidx)?.get_cfg_entry_node()?;
                                 let stack_size = node!(at cfg_entry_of_called_func in cfg_graph).get_mem_layout()?.get_mem_len();
                                 // here we have to 
                                 for (idx,formal_arg) in stack_pass_args{
-                                    let actual_arg = &func_op.actual_arg_symidx_vec[idx];
+                                    let actual_arg = &func_op.actual_arg_symidx_vec[idx].as_ref_borrow();
+                                    let formal_arg = formal_arg.as_ref_borrow();
+
                                     let actual_arg_ty = symtab.get(actual_arg)?.get_type()?.clone();
                                     // load actual argument 
                                     let value_reg = regtab.find_and_occupy_reg(actual_arg, &actual_arg_ty, symtab, asm_sect, &mut default_store, &mut default_load)?;
@@ -533,7 +574,8 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         asm_sect.annotate("caller-saved register dumped to mem".to_string());
                         asm_sect.annotate("arg load start".to_string());
                         for (_idx,arg) in func_op.actual_arg_symidx_vec.iter().enumerate(){
-                            match symtab.get(arg)?.get_type()?{
+                            let arg = arg.as_ref_borrow();
+                            match symtab.get(&arg)?.get_type()?{
                                 Type::F32 => {
                                     fpr_args.push(arg)
                                 },
@@ -582,16 +624,17 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         asm_sect.asm(PseudoInstr::new_call(Imm::new_global_label(func_op.func_symidx.clone())).into());
                         match op_assigned_symidx{
                             Some(assigned_symidx) => {
-                                match symtab.get(assigned_symidx)?.get_type()?{
+                                let assigned_symidx = assigned_symidx.as_ref_borrow();
+                                match symtab.get(&assigned_symidx)?.get_type()?{
                                     Type::I32 => {
                                         let reg = Register::new_a(0);
                                         regtab.try_release_reg(reg.clone(), symtab, asm_sect, &mut default_store)?;
-                                        regtab.set_freed_reg(reg, assigned_symidx, symtab)?;
+                                        regtab.set_freed_reg(reg, &assigned_symidx, symtab)?;
                                     },
                                     Type::F32 => {
                                         let reg =Register::new_fa(0);
                                         regtab.try_release_reg(reg.clone(), symtab, asm_sect, &mut default_store)?;
-                                        regtab.set_freed_reg(reg, assigned_symidx, symtab)?;
+                                        regtab.set_freed_reg(reg, &assigned_symidx, symtab)?;
                                     },
                                     _ => {
                                         return Err(anyhow!("ret type is not supported: {:?}",instr_struct))
@@ -608,16 +651,18 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     NhwcInstrType::Jump { jump_op } => {
                         match jump_op{
                             super::nhwc_instr::JumpOp::Ret { op_ret_sym } => {
-                                let func_symidx = node!(at cfg_entry_node in cfg_graph).get_func_cor_symidx()?.clone();
-                                _load_sym_or_imm(asm_sect, &symtab.get(&func_symidx)?.get_func_cor_ra_symidx()?.clone(), Register::RA,regtab, symtab)?;
-                                _load_sym_or_imm(asm_sect, &symtab.get(&func_symidx)?.get_func_cor_s0_symidx()?.clone(), Register::new_s0(),regtab, symtab)?;
+                                let rc_func_symidx = node!(at cfg_entry_node in cfg_graph).get_func_cor_symidx()?;
+                                let func_symidx = rc_func_symidx.as_ref_borrow();
+                                _load_sym_or_imm(asm_sect, &symtab.get(&func_symidx)?.get_func_cor_ra_symidx()?.clone().as_ref_borrow(), Register::RA,regtab, symtab)?;
+                                _load_sym_or_imm(asm_sect, &symtab.get(&func_symidx)?.get_func_cor_s0_symidx()?.clone().as_ref_borrow(), Register::new_s0(),regtab, symtab)?;
 
                                 let op_ret_reg = match op_ret_sym{
                                     Some(ret_sym) => {
-                                        if symtab.get(ret_sym)?.get_type()?.is_f_32(){
-                                            Some(regtab.load_into(Register::new_fa(0), ret_sym, &Type::F32, symtab, asm_sect, &mut default_store,  &mut default_load)?)
+                                        let ret_sym = ret_sym.as_ref_borrow();
+                                        if symtab.get(&ret_sym)?.get_type()?.is_f_32(){
+                                            Some(regtab.load_into(Register::new_fa(0), &ret_sym, &Type::F32, symtab, asm_sect, &mut default_store,  &mut default_load)?)
                                         }else{
-                                            Some(regtab.load_into(Register::new_a(0), ret_sym, &Type::I32, symtab, asm_sect, &mut default_store,  &mut default_load)?)
+                                            Some(regtab.load_into(Register::new_a(0), &ret_sym, &Type::I32, symtab, asm_sect, &mut default_store,  &mut default_load)?)
                                         }
                                     },
                                     None => {
@@ -632,13 +677,17 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 };
                                 asm_sect.asm(PseudoInstr::new_ret().into());
                             },
-                            super::nhwc_instr::JumpOp::Br { cond, t1, t2 } => {
-                                let (&t1_cfg_node,&t2_cfg_node) = (symtab.get(t1)?.get_label_cfg_node()?,symtab.get(t2)?.get_label_cfg_node()?);
+                            super::nhwc_instr::JumpOp::Br { cond, t1: rc_t1, t2: rc_t2 } => {
+                                let cond = cond.as_ref_borrow();
+                                let t1 = rc_t1.as_ref_borrow();
+                                let t2 = rc_t2.as_ref_borrow();
+
+                                let (&t1_cfg_node,&t2_cfg_node) = (symtab.get(&t1)?.get_label_cfg_node()?,symtab.get(&t2)?.get_label_cfg_node()?);
                                 let op_t1_regtab = if node!(at t1_cfg_node in cfg_graph).has_regtab(){ Some(node!(at t1_cfg_node in cfg_graph).get_regtab()?) }else { None };
                                 
                                 // *mention* here we occupy reg then free it by design, because we want to the cloned regtab has this field
                                 // this is not redundant !!
-                                let val_reg = regtab.find_and_occupy_reg(cond, &Type::I1, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let val_reg = regtab.find_and_occupy_reg(&cond, &Type::I1, symtab, asm_sect, &mut default_store, &mut default_load)?;
                                 regtab.unoccupied_reg(val_reg,symtab,asm_sect,&mut default_store)?;
                                 match op_t1_regtab{
                                     Some(target_regtab) => {
@@ -651,8 +700,8 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                         // asm_sect.annotation(format!("{:?}",regtab));
                                     },
                                 }
-                                let val_reg = regtab.find_and_occupy_reg(cond, &Type::I1, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                asm_sect.asm(PseudoInstr::new_bnez(val_reg.clone(),Imm::new_local_label(t1.clone())).into());
+                                let val_reg = regtab.find_and_occupy_reg(&cond, &Type::I1, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                asm_sect.asm(PseudoInstr::new_bnez(val_reg.clone(),Imm::new_local_label(rc_t1.clone())).into());
                                 regtab.unoccupied_reg(val_reg,symtab,asm_sect,&mut default_store)?;
                                 
                                 let op_t2_regtab = if node!(at t2_cfg_node in cfg_graph).has_regtab(){ Some(node!(at t2_cfg_node in cfg_graph).get_regtab()?) }else { None };
@@ -666,11 +715,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                         // asm_sect.annotation(format!("{:?}",regtab));
                                     },
                                 }
-                                asm_sect.asm(PseudoInstr::new_j(Imm::new_local_label(t2.clone())).into());
+                                asm_sect.asm(PseudoInstr::new_j(Imm::new_local_label(rc_t2.clone())).into());
                             },
                             super::nhwc_instr::JumpOp::Switch { cond: _, default: _, compared: _ } => todo!(),
-                            super::nhwc_instr::JumpOp::DirectJump { label_symidx } => {
-                                let &label_cfg_node = symtab.get(label_symidx)?.get_label_cfg_node()?;
+                            super::nhwc_instr::JumpOp::DirectJump { label_symidx: rc_label_symidx } => {
+                                let label_symidx = rc_label_symidx.as_ref_borrow();
+                                let &label_cfg_node = symtab.get(&label_symidx)?.get_label_cfg_node()?;
                                 let op_regtab = if node!(at label_cfg_node in cfg_graph).has_regtab(){ Some(node!(at label_cfg_node in cfg_graph).get_regtab()?) }else { None };
                                 match op_regtab{
                                     Some(target_regtab) => {
@@ -684,7 +734,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                         // asm_sect.annotation(format!("{:?}",regtab));
                                     },
                                 }
-                                asm_sect.asm(PseudoInstr::new_j(Imm::new_local_label(label_symidx.clone())).into())
+                                asm_sect.asm(PseudoInstr::new_j(Imm::new_local_label(rc_label_symidx.clone())).into())
                             },
                         }
                     },
@@ -692,25 +742,29 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         panic!("phi appeared in gen asm pass");
                     },
                     NhwcInstrType::TranType { lhs, op } => {
+                        let lhs = lhs.as_ref_borrow();
                         match op{
                             super::nhwc_instr::Trans::Fptosi { float_symidx } => {
-                                let val_reg =regtab.find_and_occupy_reg(float_symidx, &Type::F32, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg = regtab.find_and_occupy_reg(lhs, &Type::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let float_symidx = float_symidx.as_ref_borrow();
+                                let val_reg =regtab.find_and_occupy_reg(&float_symidx, &Type::F32, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let rst_reg = regtab.find_and_occupy_reg(&lhs, &Type::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
                                 asm_sect.asm(Trans::new_fcvt_w_s(rst_reg.clone(),val_reg.clone()).into());
                                 regtab.unoccupied_reg(val_reg,symtab,asm_sect,&mut default_store)?;
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                             },
                             super::nhwc_instr::Trans::Sitofp { int_symidx } => {
-                                let val_reg =regtab.find_and_occupy_reg(int_symidx, &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg = regtab.find_and_occupy_reg(lhs, &Type::F32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let int_symidx = int_symidx.as_ref_borrow();
+                                let val_reg =regtab.find_and_occupy_reg(&int_symidx, &Type::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let rst_reg = regtab.find_and_occupy_reg(&lhs, &Type::F32, symtab, asm_sect, &mut default_store, &mut no_load)?;
                                 asm_sect.asm(Trans::new_fcvt_s_w(rst_reg.clone(),val_reg.clone()).into());
                                 regtab.unoccupied_reg(val_reg,symtab,asm_sect,&mut default_store)?;
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                             },
                             super::nhwc_instr::Trans::Zext { bool_symidx } => {
+                                let bool_symidx = bool_symidx.as_ref_borrow();
                                 //b->i
-                                let val_reg =regtab.find_and_occupy_reg(bool_symidx, &Type::I1, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg = regtab.find_and_occupy_reg(lhs, &Type::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let val_reg =regtab.find_and_occupy_reg(&bool_symidx, &Type::I1, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let rst_reg = regtab.find_and_occupy_reg(&lhs, &Type::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
                                 // asm_sect.asm(Logical::new_andi(rst_reg.clone(),val_reg.clone(),Imm::from_offset(1)).into());
                                 asm_sect.asm(PseudoInstr::new_reg_mv(rst_reg.clone(), val_reg.clone()).into());
                                 regtab.unoccupied_reg(val_reg,symtab,asm_sect,&mut default_store)?;
@@ -846,7 +900,7 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                         assert!(reg.is_fpr());
                         // first put the f32 into a gpr so here type is i32
                         let temp_reg = regtab.find_and_anonymous_occupy(symidx, &Type::I32, symtab, asm_sect, &mut default_store, &mut |symidx,temp_reg,symtab,asm_sect,regtab|{
-                            asm_sect.asm(PseudoInstr::new_li(temp_reg.clone(), Imm::new_literal(symidx.clone())).into());
+                            asm_sect.asm(PseudoInstr::new_li(temp_reg.clone(), Imm::new_literal(symidx.clone().as_rc())).into());
                             Ok(())
                         })?;
                         asm_sect.asm(PseudoInstr::new_reg_mv(reg, temp_reg.clone()).into());
@@ -857,12 +911,12 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
                         // i32 ... since riscv li instr has ensured the bitwidth will be ext from 32 to 64 
                         // no need sext.w
                         assert!(!reg.is_fpr());
-                        asm_sect.asm(PseudoInstr::new_li(reg, Imm::new_literal(symidx.clone())).into());
+                        asm_sect.asm(PseudoInstr::new_li(reg, Imm::new_literal(symidx.clone().as_rc())).into());
                         Ok(())
                     }
                     _ => {
                         assert!(!reg.is_fpr());
-                        asm_sect.asm(PseudoInstr::new_li(reg, Imm::new_literal(symidx.clone())).into());
+                        asm_sect.asm(PseudoInstr::new_li(reg, Imm::new_literal(symidx.clone().as_rc())).into());
                         Ok(())
                     },
                 }
@@ -946,7 +1000,7 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
         }
     }else{
         asm_sect.annotate(format!("   load label {} as ptr to reg",symidx.to_deglobal_ptr()?));
-        asm_sect.asm(PseudoInstr::new_la(reg.clone(), Imm::new_global_label(symidx.to_deglobal_ptr()?)).into());
+        asm_sect.asm(PseudoInstr::new_la(reg.clone(), Imm::new_global_label(symidx.to_deglobal_ptr()?.as_rc())).into());
         Ok(())
     }
 }

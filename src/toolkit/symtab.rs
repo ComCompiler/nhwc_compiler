@@ -6,11 +6,28 @@ use anyhow::{anyhow,Result};
 use delegate::delegate;
 use itertools::Itertools;
 use petgraph::stable_graph::StableDiGraph;
-use std::{cell::RefCell, collections::hash_map::{Iter, IterMut}, fmt::{Display, Formatter}, hash::Hash, rc::Rc};
+use std::{cell::{Ref, RefCell, RefMut}, collections::hash_map::{Iter, IterMut}, fmt::{Display, Formatter}, hash::Hash, rc::Rc};
 
 pub type SymTabGraph = StableDiGraph<SymTab, SymTabEdge, u32>;
 
 pub type RcSymIdx = Rc<RefCell<SymIdx>>;
+
+pub trait WithBorrow {
+    // fn with_borrow<'a>(&'a self) -> (RcSymIdx,Ref<'a,SymIdx>);
+    // fn with_borrow_mut<'a>(&'a self) -> (&'a RcSymIdx,RefMut<'a,SymIdx>);
+    fn as_ref_borrow<'a>(&'a self) -> Ref<'a,SymIdx>;
+    fn as_ref_borrow_mut<'a>(&'a self) -> RefMut<'a,SymIdx>;
+}
+impl WithBorrow for RcSymIdx{
+    fn as_ref_borrow<'a >(&'a self) -> Ref<'a,SymIdx> {
+        self.as_ref().borrow()
+    }
+    
+    fn as_ref_borrow_mut<'a >(&'a self) -> RefMut<'a,SymIdx> {
+        self.as_ref().borrow_mut()
+    }
+}
+
 #[derive(Clone)]
 pub struct SymTab {
     // map:BTreeMap<SymIdx, Symbol>,
@@ -45,6 +62,9 @@ impl From<isize> for SymIdx{
     }
 }
 impl SymIdx {
+    pub fn as_rc(self)-> Rc<RefCell<Self>>{
+        Rc::new(RefCell::new(self))
+    }
     pub fn new(scope_node:u32, symbol_name:String) -> Self { SymIdx { scope_node, symbol_name, index_ssa:None } }
     pub fn new_verbose(scope_node:u32, symbol_name:String, index_ssa:Option<u32>) -> Self { SymIdx { scope_node, symbol_name, index_ssa } }
     pub fn from_str(s:&str) -> Self{
@@ -131,20 +151,20 @@ impl SymTab {
     pub fn new() -> SymTab { SymTab { map:AHashMap::new(), text: String::new() } }
     
     // 添加或更新符号，如果是更新，那么返回旧的符号
-    pub fn add_symbol(&mut self, sym:Symbol) -> Result<SymIdx> {
-        let symidx = sym.symidx.clone();
-        let symidx_cloned = sym.symidx.clone();
-        match self.map.insert(symidx, sym) {
-            None => Ok(symidx_cloned),
-            Some(_) => Err(anyhow!("symtab插入失败,你这个表中已经存在同名称同scope的符号{:?}了,你必须先remove 掉它", symidx_cloned)), // do nothing , 插入成功，里面没有同scope的同名符号
-        }
+    pub fn add_symbol(&mut self, sym:Symbol) -> Result<RcSymIdx> {
+        let rc_symidx = sym.rc_symidx.clone();
+        if self.map.insert(rc_symidx.borrow().clone(), sym).is_none() { Ok(rc_symidx) }
+            else { Err(anyhow!("symtab插入失败,你这个表中已经存在同名称同scope的符号{:?}了,你必须先remove 掉它", rc_symidx))} // do nothing , 插入成功，里面没有同scope的同名符号
     }
 
     // 查找符号
-    pub fn get_symbol_verbose(&self, symbol_name:String, scope_node:u32) -> Result<&Symbol> {let symidx = SymIdx { scope_node, symbol_name, index_ssa:None}; self.map.get(&symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx)) }
+    pub fn get_symbol_verbose(&self,  scope_node:u32,symbol_name:String) -> Result<&Symbol> {let symidx = SymIdx { scope_node, symbol_name, index_ssa:None}; self.map.get(&symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx)) }
     pub fn get(&self, symidx:&SymIdx) -> Result<&Symbol> { self.map.get(symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx)) }
     pub fn get_mut_symbol_verbose(&mut self, symbol_name:String, scope_node:u32) -> Result<&mut Symbol> { let symidx = SymIdx { scope_node, symbol_name, index_ssa:None }; self.map.get_mut(&symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx )) }
     pub fn get_mut(&mut self, symidx:&SymIdx) -> Result<&mut Symbol> { self.map.get_mut(symidx).ok_or(anyhow!("找不到{:?}对应的symbol",symidx)) }
+    pub fn get_symidx_cor_rc(&self,symidx:&SymIdx) -> Result<RcSymIdx>{
+        Ok(self.get(symidx)?.rc_symidx.clone())
+    }
 
     delegate!{
         to self.map {
@@ -165,10 +185,10 @@ impl SymTab {
         self.get_mut_symbol_verbose(COMPILATION_UNIT.to_string(),0).unwrap()
     }
     pub fn get_global_info(&self) -> &Symbol{
-        self.get_symbol_verbose(COMPILATION_UNIT.to_string(),0).unwrap()
+        self.get_symbol_verbose(0,COMPILATION_UNIT.to_string()).unwrap()
     }
 
-    pub fn debug_symtab_graph(&mut self,desc:String, symtab_graph:&mut SymTabGraph,symidx_vec:Vec<SymIdx>){
+    pub fn debug_symtab_graph(&mut self,desc:String, symtab_graph:&mut SymTabGraph,symidx_vec:Vec<&SymIdx>){
         let mut idx = symtab_graph.node_count() as u32;
         if idx==0{
             add_node!({let mut s = self.clone(); s.load_symtab_text(symidx_vec);s } to symtab_graph);
@@ -179,7 +199,7 @@ impl SymTab {
 
     }
 
-    pub fn load_symtab_text(&mut self,symidx_vec:Vec<SymIdx>)->Result<()>{
+    pub fn load_symtab_text(&mut self,symidx_vec:Vec<&SymIdx>)->Result<()>{
         if symidx_vec.len()!=0{
             self.text+= "#sym_name@fields$";
             for symidx in &symidx_vec{

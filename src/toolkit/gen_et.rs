@@ -10,13 +10,13 @@ use crate::antlr_parser::cparser::{
     Assign, Const, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_conditionalExpression, RULE_declaration, RULE_declarationSpecifier, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forDeclaration, RULE_forMidExpression, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_initializerList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_typeQualifier, RULE_typeSpecifier, RULE_unaryExpression, RULE_unaryOperator
 };
 
-use crate::toolkit::symtab::SymIdx;
 use crate::{add_edge, add_node, add_node_with_edge, debug_info_blue, debug_info_red, debug_info_yellow, direct_child_node, direct_child_nodes, find, find_nodes, node, rule_id, term_id};
 
 use super::et_node::{DeclOrDefOrUse, EtEdgeType, EtNodeType, EtTree};
 use super::etc::dfs;
 use super::eval_et::{compress_et};
 use super::gen_cfg::AST_ROOT;
+use super::symtab::SymIdx;
 use super::{ast_node::AstTree, scope_node::ScopeTree};
 
 // pub fn compress_ast(ast_tree:&mut AstTree){

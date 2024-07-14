@@ -1,6 +1,6 @@
 use petgraph::stable_graph::StableDiGraph;
 
-use super::{nhwc_instr::{InstrSlab, NhwcInstr}, symtab::SymIdx};
+use super::{nhwc_instr::{InstrSlab, NhwcInstr}, symtab::RcSymIdx};
 use std::fmt::Debug;
 
 pub type DefUseGraph = StableDiGraph<DefUseNode, DefUseEdge, u32>;
@@ -23,22 +23,22 @@ pub enum DepType{
 #[derive(Clone)]
 pub struct DefUseEdge{
     pub dep_type:DepType,
-    pub symidx:SymIdx,
+    pub symidx:RcSymIdx,
 }
 impl DefUseEdge{
-    pub fn new(symidx:SymIdx)->Self{
+    pub fn new(symidx:RcSymIdx)->Self{
         Self { dep_type: DepType::Dep {  }, symidx }
     }
-    pub fn new_alloc_dep(symidx:SymIdx)->Self{
+    pub fn new_alloc_dep(symidx:RcSymIdx)->Self{
         Self { dep_type: DepType::AllocDep {  }, symidx }
     }
-    pub fn new_phi_dep(symidx:SymIdx)->Self{
+    pub fn new_phi_dep(symidx:RcSymIdx)->Self{
         Self { dep_type: DepType::PhiDep {  }, symidx }
     }
-    pub fn new_final_dep(symidx:SymIdx)->Self{
+    pub fn new_final_dep(symidx:RcSymIdx)->Self{
         Self { dep_type: DepType::FinalDep {  } , symidx }
     }
-    pub fn new_global_dep(symidx:SymIdx)->Self{
+    pub fn new_global_dep(symidx:RcSymIdx)->Self{
         Self { dep_type: DepType::GlobalDep {  } , symidx }
     }
 }

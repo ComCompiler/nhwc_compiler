@@ -3,7 +3,7 @@ use std::{collections::HashMap, thread::JoinHandle};
 use anyhow::Result;
 
 
-use crate::toolkit::symtab::SymIdx;
+use crate::toolkit::symtab::{SymIdx};
 use crate::{add_symbol, Args};
 
 use super::cfg_node::InstrList;

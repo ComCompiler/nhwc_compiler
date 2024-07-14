@@ -7,7 +7,7 @@ use strum_macros::EnumIs;
 
 use crate::{passes::ast2st_pass::Ast2StPass, toolkit::field::{Type, Value}};
 
-use super::symtab::SymIdx;
+use super::symtab::{RcSymIdx, SymIdx};
 
 
 // #[derive(Clone)]
@@ -34,34 +34,35 @@ impl RiscvOffsetLimit for isize{
 pub enum Imm{
     /// global label is for global symbol
     GlobalLabel{
-        symidx:SymIdx,
+        symidx:RcSymIdx,
     },
     /// local label is for function jump label 
     LocalLabel{
-        symidx:SymIdx,
+        symidx:RcSymIdx,
     },
     Literal{
-        symidx:SymIdx,
+        symidx:RcSymIdx,
     }
 }
 impl Imm{
-    pub fn new_local_label(label:SymIdx) -> Self{
+    pub fn new_local_label(label:RcSymIdx) -> Self{
         Self::LocalLabel { symidx:label } 
     }
-    pub fn new_global_label(label:SymIdx) -> Self{
+    pub fn new_global_label(label:RcSymIdx) -> Self{
         Self::GlobalLabel  { symidx:label } 
     }
-    pub fn new_literal(symidx:SymIdx) -> Self{
+    pub fn new_literal(symidx:RcSymIdx) -> Self{
         Self::Literal { symidx }
     }
     pub fn new_literal_isize(li:isize) -> Self{
-        Self::Literal { symidx : li.into()}
+        let li_symidx:SymIdx = li.into();
+        Self::Literal { symidx : li_symidx.as_rc()}
     }
     pub fn from_offset(offset:isize)-> Self{
         if !offset.is_legal_offset(){
             panic!("you can't use an offset from ")
         }
-        Self::Literal { symidx:SymIdx::from(offset) }
+        Self::Literal { symidx:SymIdx::from(offset).as_rc() }
     }
 }
 
@@ -69,34 +70,34 @@ impl Debug for Imm{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::GlobalLabel {symidx} =>{
-                write!(f,"{}",symidx.symbol_name)
+                write!(f,"{}",&symidx.borrow().symbol_name)
             },
             Self::Literal { symidx } => {
-                match &Type::new_from_const_str(&symidx.symbol_name) {
+                match &Type::new_from_const_str(&symidx.borrow().symbol_name) {
                     Type::I32 => {
-                        write!(f,"{}", symidx)
+                        write!(f,"{}", symidx.borrow())
                     },
                     Type::F32 => {
-                        let f_val:f32 = match Value::from_string_with_specific_type(&symidx.symbol_name, &Type::F32).unwrap(){
+                        let f_val:f32 = match Value::from_string_with_specific_type(&symidx.borrow().symbol_name, &Type::F32).unwrap(){
                             Value::F32(Some(f_val)) => f_val,
                             _ => panic!()
                         };
                         write!(f,"{}", f_val.to_bits())
                     },
                     Type::I1 => {
-                        if symidx.symbol_name == "true"{
+                        if symidx.borrow().symbol_name == "true"{
                             write!(f,"{}", 1)
                         }else {
                             write!(f,"{}", 0)
                         }
                     }
                     _ => {
-                        write!(f,"{}", symidx)
+                        write!(f,"{}", symidx.borrow())
                     }
                 }
             }
             Self::LocalLabel { symidx } => {
-                write!(f,".{:?}",symidx)
+                write!(f,".{:?}",symidx.borrow())
             },
         }
     }

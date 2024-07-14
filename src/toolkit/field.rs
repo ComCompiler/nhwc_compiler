@@ -1,4 +1,4 @@
-use std::{any::Any, collections::{hash_map::Iter, HashMap}, fmt::Debug, ops::{Add, BitAnd, BitOr, Div, Mul, Neg, Not, Rem, Sub}, };
+use std::{any::Any, cell::RefCell, collections::{hash_map::Iter, HashMap}, fmt::Debug, ops::{Add, BitAnd, BitOr, Div, Mul, Neg, Not, Rem, Sub}, rc::Rc };
 
 use ahash::AHashMap;
 use itertools::Itertools;
@@ -7,8 +7,8 @@ use anyhow::*;
 use regex::{self, Regex};
 
 
-use super::{ast_node::AstTree, scope_node::ST_ROOT};
-use super::symtab::SymIdx;
+use super::{ast_node::AstTree, scope_node::ST_ROOT, symtab::SymIdx};
+use super::symtab::RcSymIdx;
 use crate::{debug_info_blue, debug_info_green, debug_info_red, node};
 
 pub type Fields = HashMap<&'static str, Box<dyn Field>>;
@@ -64,13 +64,13 @@ pub enum Value {
     I32(Option<i32>),
     F32(Option<f32>),
     I1(Option<bool>),
-    Ref{symidx:SymIdx, ty:Type},
+    Ref{rc_symidx:RcSymIdx, ty:Type},
     Void,
-    Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
-    Ptr64{pointed_ty:Box<Type>,op_pointed_symidx:Option<SymIdx>,offset:Box<Value>},
+    Fn { arg_syms:Vec<RcSymIdx>, rc_ret_sym:RcSymIdx },
+    Ptr64{pointed_ty:Box<Type>,op_pointed_symidx:Option<RcSymIdx>,offset:Box<Value>},
     Array {
         value_map:ArrayEleMap,
-        dims:Vec<SymIdx>,
+        dims:Vec<RcSymIdx>,
         ele_ty:Type,
     },
     Unknown,
@@ -157,10 +157,10 @@ pub enum Type {
         ty:Box<Type>,
     },
     Array{
-        dims:Vec<Option<SymIdx>>,
+        dims:Vec<Option<RcSymIdx>>,
         ele_ty:Box<Type>,
     },
-    Fn { arg_syms:Vec<SymIdx>, ret_sym:SymIdx },
+    Fn { arg_syms:Vec<RcSymIdx>, ret_sym:RcSymIdx },
     Unknown,
 }
 impl Clone for Box<dyn Field> {
@@ -168,8 +168,8 @@ impl Clone for Box<dyn Field> {
 }
 
 impl Value {
-    pub fn new_ref(symidx:SymIdx, ty:Type) -> Self{
-        Self::Ref { symidx, ty }
+    pub fn new_ref(rc_symidx:RcSymIdx, ty:Type) -> Self{
+        Self::Ref { rc_symidx, ty }
     }
     pub fn logical_or(&self,val:&Value) -> Result<Value>{
         Ok(match (self,val){
@@ -297,7 +297,7 @@ impl Value {
             Type::Label => todo!(),
             Type::Array { dims, ele_ty } => Value::Array { value_map: ArrayEleMap::new(), dims:unwrap_vec(dims), ele_ty: *ele_ty.clone()},
             Type::Fn { arg_syms, ret_sym } => {
-                Value::Fn { arg_syms: arg_syms.clone(), ret_sym: ret_sym.clone() }
+                Value::Fn { arg_syms: arg_syms.clone(), rc_ret_sym: ret_sym.clone() }
             },
             Type::Ptr64 { ty: _ } => {
                  Value::Ptr64 { op_pointed_symidx: None, offset: Box::new(Value::new_unsure_from_specific_type(&Type::I32)), pointed_ty: Box::new(specified_ty.clone()) }
@@ -310,11 +310,11 @@ impl Value {
             },
         }
     }
-    pub fn new_ptr64_from_array_with_offset(array_symidx:SymIdx,pointed_ty:Type,offset:Value) -> Self{
-        Value::Ptr64 { pointed_ty:Box::new(pointed_ty), op_pointed_symidx: Some(array_symidx), offset:Box::new(offset) }
+    pub fn new_ptr64_from_array_with_offset(rc_array_symidx:RcSymIdx,pointed_ty:Type,offset:Value) -> Self{
+        Value::Ptr64 { pointed_ty:Box::new(pointed_ty), op_pointed_symidx: Some(rc_array_symidx), offset:Box::new(offset) }
     }
-    pub fn new_ptr64_to_variable(pointed_symidx:SymIdx,pointed_ty:Type) -> Self{
-        Value::Ptr64 { pointed_ty:Box::new(pointed_ty), op_pointed_symidx: Some(pointed_symidx), offset:Box::new(Value::I32(None)) }
+    pub fn new_ptr64_to_variable(rc_pointed_symidx:RcSymIdx,pointed_ty:Type) -> Self{
+        Value::Ptr64 { pointed_ty:Box::new(pointed_ty), op_pointed_symidx: Some(rc_pointed_symidx), offset:Box::new(Value::I32(None)) }
     }
     pub fn is_unsure(&self)->Result<bool>{
         match self{
@@ -326,7 +326,7 @@ impl Value {
     }
     pub fn new_i1(value:bool) -> Self { Value::I1(Some(value)) }
     pub fn new_void() -> Self { Value::Void }
-    pub fn new_array(value_map:ArrayEleMap, dims:Vec<SymIdx>, ele_ty: Type) -> Self{
+    pub fn new_array(value_map:ArrayEleMap, dims:Vec<RcSymIdx>, ele_ty: Type) -> Self{
         Value::Array { value_map, dims, ele_ty }
     }
     pub fn to_specific_type(&self,ty:&Type) -> Result<Value>{
@@ -345,7 +345,7 @@ impl Value {
             (Value::I1(v), Type::F32) => Ok(Value::new_f32(v.context("F32 to I1 but not a f32")?.into())),
             (Value::I1(v), Type::I1) => Ok(Value::new_i1(v.context("没毛病")?.into())),
             (Value::Void, t) => Err(anyhow!("void 类型不能转化为 {:?} 类型",t)),
-            (Value::Fn { arg_syms: _, ret_sym: _ }, _t) => todo!(),
+            (Value::Fn { arg_syms: _, rc_ret_sym: _ }, _t) => todo!(),
             _ => Err(anyhow!("不能将 {:?} 转化为 {:?}",self,ty )),
         }
     }
@@ -411,10 +411,10 @@ impl Value {
             Value::F32(_) => Type::F32,
             Value::I1(_) => Type::I1,
             Value::Void => Type::Void,
-            Value::Fn { arg_syms, ret_sym } => Type::Fn { arg_syms: arg_syms.clone(), ret_sym: ret_sym.clone() },
+            Value::Fn { arg_syms, rc_ret_sym: ret_sym } => Type::Fn { arg_syms: arg_syms.clone(), ret_sym: ret_sym.clone() },
             Value::Array { value_map: _, dims , ele_ty: ele_type } => Type::Array { dims: dims.clone().into_iter().map(|x| Some(x)).collect_vec(), ele_ty:Box::new(ele_type.clone())  },
             Value::Ptr64 { pointed_ty: ty, op_pointed_symidx: _, offset: _  } => Type::Ptr64 { ty: Box::new(*ty.clone()) },
-            Value::Ref{ symidx, ty } => Type::Ref,
+            Value::Ref{ rc_symidx: symidx, ty } => Type::Ref,
             Value::Unknown => Type::Unknown,
             // Value::Unsure {  } => Type::Unsure {  },
         }
@@ -447,8 +447,8 @@ impl Value {
                 }
 
             },
-            Value::Ref { symidx, ty } => {
-                Ok(symidx.clone())
+            Value::Ref { rc_symidx, ty } => {
+                Ok(rc_symidx.borrow().clone())
             },
             Value::I1(op_i1) => {
                 if let Some(i1_value) = op_i1{
@@ -502,14 +502,14 @@ impl Type {
     }
     /// 这个函数接受一个元素类型和各个维度的大小来构建一个数组类型
     /// 但是禁止创建数组的数组
-    pub fn new_array_dims_known(ele_ty:Type,dims:Vec<SymIdx>)->Result<Self>{
+    pub fn new_array_dims_known(ele_ty:Type,dims:Vec<RcSymIdx>)->Result<Self>{
         match &ele_ty{
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
             _=>{}
         }
         Ok(Type::Array { dims:dims.into_iter().map(|x| Some(x)).collect_vec(), ele_ty: Box::new(ele_ty) })
     }
-    pub fn new_array_dims_may_unknown(ele_ty:Type,dims:Vec<Option<SymIdx>>)->Result<Self>{
+    pub fn new_array_dims_may_unknown(ele_ty:Type,dims:Vec<Option<RcSymIdx>>)->Result<Self>{
         match &ele_ty{
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
             _=>{}
@@ -591,7 +591,7 @@ impl Type {
 
     }
 
-    pub fn push_dim(&mut self,dim_symidx:SymIdx)->Result<()>{
+    pub fn push_dim(&mut self,dim_symidx:RcSymIdx)->Result<()>{
         match self{
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
             Type::Void => Err(anyhow!("无法新建void类型的数组"))?,
@@ -687,7 +687,7 @@ impl Type {
                 let mut v1 = Value::new_i32(1);
                 let mut weighted_dims = vec![v1.to_symidx()?];
                 for dim_symidx in dims.get(1..dims.len()).unwrap().iter().rev(){
-                    let v2 = Value::from_string_with_specific_type(&dim_symidx.as_ref().unwrap().symbol_name, &Type::I32)?;
+                    let v2 = Value::from_string_with_specific_type(&dim_symidx.as_ref().unwrap().borrow().symbol_name, &Type::I32)?;
                     debug_info_blue!(" v2 is  {:?}",v2);
                     v1 = (v1*v2)?;
                     weighted_dims.push(v1.to_symidx()?)
@@ -726,19 +726,20 @@ impl Type {
                 Ok(Type::F32)
             },
             _ => {
-                let re = Regex::new(r"^array:(\w+)((?:\[\d+\])+)").unwrap();
-                // 匹配输入字符串
-                    // 提取维度
-                if let Some(captures) = re.captures(ty_str) {
-                    let ele_ty = Box::new(Type::new_from_string(&captures[1])?);
-                    let dims = captures[2]
-                        .split(|c| c == '[' || c == ']')
-                        .map(|s| SymIdx::new(ST_ROOT,s.to_string())).into_iter()
-                        .collect_vec();
-                    Ok(Type::Array { dims:dims.into_iter().map(|x| Some(x)).collect_vec(), ele_ty  })
-                } else {
-                    Err(anyhow!("无法识别为 type: {:?}",ty_str))
-                }
+                todo!()
+                // let re = Regex::new(r"^array:(\w+)((?:\[\d+\])+)").unwrap();
+                // // 匹配输入字符串
+                //     // 提取维度
+                // if let Some(captures) = re.captures(ty_str) {
+                //     let ele_ty = Box::new(Type::new_from_string(&captures[1])?);
+                //     let dims = captures[2]
+                //         .split(|c| c == '[' || c == ']')
+                //         .map(|s| Rc::new(RefCell::new(SymIdx::new(ST_ROOT,s.to_string())))).into_iter()
+                //         .collect_vec();
+                //     Ok(Type::Array { dims:dims.into_iter().map(|x| Some(x)).collect_vec(), ele_ty  })
+                // } else {
+                //     Err(anyhow!("无法识别为 type: {:?}",ty_str))
+                // }
             }
         }
     }
@@ -747,7 +748,7 @@ impl Type {
         match self{
             Type::Array { dims, ele_ty: _ } => {
                 let array_size:usize = dims.iter()
-                    .map(|d|{let ans:usize = d.as_ref().unwrap().symbol_name.parse().unwrap();ans}).product() ;
+                    .map(|d|{let ans:usize = d.as_ref().unwrap().borrow().symbol_name.parse().unwrap();ans}).product() ;
                 Ok(array_size)
             },
             _ => {

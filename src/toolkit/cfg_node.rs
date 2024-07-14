@@ -9,7 +9,7 @@ use delegate::delegate;
 use petgraph::stable_graph::StableDiGraph;
 
 use super::rv64_instr::{RV64Instr};
-use super::symtab::{SymIdx, SymTab, SymTabEdge, SymTabGraph};
+use super::symtab::{RcSymIdx, SymTab, SymTabEdge, SymTabGraph};
 use crate::toolkit::cfg_edge::CfgEdge;
 use crate::toolkit::field::Field;
 use crate::{instr, toolkit::ast_node::AstTree};
@@ -28,7 +28,7 @@ pub type CfgGraph = StableDiGraph<CfgNode, CfgEdge, u32>;
 reg_field_for_struct!(
     CfgNode
     { 
-        JUMP_DET:SymIdx, 
+        JUMP_DET:RcSymIdx, 
     }
     with_fields info);
 

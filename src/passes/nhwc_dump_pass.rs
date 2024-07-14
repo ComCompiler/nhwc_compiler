@@ -6,7 +6,7 @@ use crate::toolkit::cfg_node::CFG_ROOT;
 use crate::toolkit::gen_nhwc_cfg;
 use crate::toolkit::nhwc_instr::NhwcInstrType;
 use crate::toolkit::scope_node::ST_ROOT;
-use crate::toolkit::symtab::SymIdx;
+use crate::toolkit::symtab::RcSymIdx;
 use crate::{direct_child_node, instr, node_mut};
 
 use crate::{node, toolkit::{cfg_edge::CfgEdgeType, context::NhwcCtx, etc::dfs_with_priority, pass_manager::Pass}};

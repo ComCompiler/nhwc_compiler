@@ -1,5 +1,4 @@
 use anyhow::{anyhow, Context, Result};
-use petgraph::EdgeType;
 use rand::{thread_rng, Rng};
 use strum_macros::EnumIs;
 use std::fmt::Debug;
@@ -9,7 +8,7 @@ use std::{mem, u32};
 use super::ast_node::AstTree;
 use super::etc::dfs_with_predicate;
 use super::field::{Fields, Type};
-use super::symtab::SymIdx;
+use super::symtab::{ RcSymIdx, SymIdx};
 use crate::toolkit::dot::Config;
 use crate::toolkit::etc::generate_png_by_graph;
 use crate::{debug_info_red, direct_child_nodes, node, node_mut};
@@ -89,11 +88,11 @@ impl EtNode{
 }
 #[derive(Clone)]
 pub struct EtNode {
-    dims:Option<Vec<Option<SymIdx>>>,
+    dims:Option<Vec<Option<RcSymIdx>>>,
     ty:Option<Type>,
     pub et_node_type:EtNodeType,
     pub hash:Option<isize>,
-    pub calculated_symidx: Option<Option<SymIdx>>,
+    pub cached_rc_symidx: Option<Option<RcSymIdx>>,
     pub et_ret_symidx_vec: Option<Vec<SymIdx>>,
     pub common_eliminated:bool,
 }
@@ -326,7 +325,7 @@ impl EtHash for EtTree{
         // if node!(at et_node in self).hash.is_some() || node!(at et_node in self).common_eliminated{
         //     return 
         // }
-        let dfs_nodes = dfs_with_predicate(self, et_node,{|e| !e.weight().et_edge_type.is_deleted()});
+        let dfs_nodes = dfs_with_predicate(self, et_node,|e| !e.weight().et_edge_type.is_deleted());
         for &child_node in dfs_nodes.iter().rev(){
             self._update_hash(child_node);
         }
@@ -422,7 +421,7 @@ impl Debug for ExprOp {
 }
 impl From<EtNodeType> for EtNode{
     fn from(et_node_type: EtNodeType) -> Self {
-        Self { et_node_type, hash: None, calculated_symidx: None, et_ret_symidx_vec: None ,common_eliminated:false, dims: None, ty: None }
+        Self { et_node_type, hash: None, cached_rc_symidx: None, et_ret_symidx_vec: None ,common_eliminated:false, dims: None, ty: None }
     }
 }
 
@@ -552,9 +551,9 @@ impl EtNode {
     pub fn get_type(&self) -> Result<&Type>{ if self.ty.is_none(){ return Err(anyhow!("have no ty field")) }else { Ok(self.ty.as_ref().unwrap()) }}
     pub fn get_mut_type(&mut self) -> Result<&mut Type>{ if self.ty.is_none(){ return Err(anyhow!("have no ty field")) }else { Ok(self.ty.as_mut().unwrap()) }}
     pub fn add_type(&mut self, ty:Type) {self.ty = Some(ty)}
-    pub fn get_dims(&self) -> Result<&Vec<Option<SymIdx>>>{ if self.dims.is_none(){ return Err(anyhow!("have no dims field")) }else { Ok(self.dims.as_ref().unwrap()) }}
-    pub fn get_mut_dims(&mut self) -> Result<&mut Vec<Option<SymIdx>>>{ if self.dims.is_none(){ return Err(anyhow!("have no dims field")) }else { Ok(self.dims.as_mut().unwrap()) }}
-    pub fn add_dims(&mut self,dims:Vec<Option<SymIdx>>) {self.dims = Some(dims)}
+    pub fn get_dims(&self) -> Result<&Vec<Option<RcSymIdx>>>{ if self.dims.is_none(){ return Err(anyhow!("have no dims field")) }else { Ok(self.dims.as_ref().unwrap()) }}
+    pub fn get_mut_dims(&mut self) -> Result<&mut Vec<Option<RcSymIdx>>>{ if self.dims.is_none(){ return Err(anyhow!("have no dims field")) }else { Ok(self.dims.as_mut().unwrap()) }}
+    pub fn add_dims(&mut self,dims:Vec<Option<RcSymIdx>>) {self.dims = Some(dims)}
     pub fn has_dims(&self) -> bool {self.dims.is_some()}
     pub fn has_type(&self) -> bool {self.ty.is_some()}
     pub fn load_ast_node_text(&mut self, ast_tree:&AstTree) -> Result<()> { self.et_node_type.load_ast_node_text(ast_tree) }
