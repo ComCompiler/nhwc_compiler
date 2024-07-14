@@ -5,6 +5,8 @@ use std::{cell::RefCell, fmt::{Debug, Formatter}, rc::Rc, vec};
 use anyhow::{anyhow,Result};
 use delegate::delegate;
 
+use crate::toolkit::symtab::WithBorrow;
+
 use super::{
     field::{Fields, Type}, symtab::{RcSymIdx, SymIdx}
 };
@@ -494,11 +496,11 @@ pub enum Trans {
 impl Debug for Trans {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Sitofp { int_symidx } => write!(f, "sitofp i32 {:?} to f32", int_symidx),
-            Self::Fptosi { float_symidx } => write!(f, "fptosi f32 {:?} to i32", float_symidx),
-            Self::Zext { bool_symidx } => write!(f, "zext i1 {:?} to i32", bool_symidx),
+            Self::Sitofp { int_symidx } => write!(f, "sitofp i32 {:?} to f32", int_symidx.as_ref_borrow()),
+            Self::Fptosi { float_symidx } => write!(f, "fptosi f32 {:?} to i32", float_symidx.as_ref_borrow()),
+            Self::Zext { bool_symidx } => write!(f, "zext i1 {:?} to i32", bool_symidx.as_ref_borrow()),
             Self::Bitcast { lptr_type, rptr_symidx, rptr_type } => {
-                write!(f, "bitcast {:?} {:?} to {:?}", rptr_type, rptr_symidx, lptr_type)
+                write!(f, "bitcast {:?} {:?} to {:?}", rptr_type, rptr_symidx.as_ref_borrow(), lptr_type)
             }
         }
     }
@@ -592,7 +594,7 @@ pub struct BreakpointArg{
 impl Debug for BreakpointArg{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match &self.op_field_name{
-            Some(field_name) => write!(f,"{:?}.{}",self.symidx,field_name),
+            Some(field_name) => write!(f,"{:?}.{}",self.symidx.as_ref_borrow(),field_name),
             None => write!(f,"{:?}",self.symidx),
         }
     }
@@ -600,44 +602,44 @@ impl Debug for BreakpointArg{
 impl Debug for ArithOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Add { a, b, vartype } => write!(f, "Add {:?} {:?}, {:?}", vartype, a, b),
-            Self::Mul { a, b, vartype } => write!(f, "Mul {:?} {:?}, {:?}", vartype, a, b),
-            Self::Div { a, b, vartype } => write!(f, "Div {:?} {:?}, {:?}", vartype, a, b),
-            Self::Sub { a, b, vartype } => write!(f, "Sub {:?} {:?}, {:?}", vartype, a, b),
-            Self::Mod { a, b, vartype } => write! {f,"Mod {:?} {:?}, {:?}",vartype,a,b},
+            Self::Add { a, b, vartype } => write!(f, "Add {:?} {:?}, {:?}", vartype, a.as_ref_borrow(), b.as_ref_borrow()),
+            Self::Mul { a, b, vartype } => write!(f, "Mul {:?} {:?}, {:?}", vartype, a.as_ref_borrow(), b.as_ref_borrow()),
+            Self::Div { a, b, vartype } => write!(f, "Div {:?} {:?}, {:?}", vartype, a.as_ref_borrow(), b.as_ref_borrow()),
+            Self::Sub { a, b, vartype } => write!(f, "Sub {:?} {:?}, {:?}", vartype, a.as_ref_borrow(), b.as_ref_borrow()),
+            Self::Mod { a, b, vartype } => write! {f,"Mod {:?} {:?}, {:?}",vartype,a.as_ref_borrow(),b.as_ref_borrow()},
             Self::Icmp { plan, a, b, vartype } => {
-                write!(f, "icmp {:?} {:?} {:?}, {:?}", vartype, plan, a, b)
+                write!(f, "icmp {:?} {:?} {:?}, {:?}", vartype, plan, a.as_ref_borrow(), b.as_ref_borrow())
             }
             Self::Fcmp { plan, a, b, vartype } => {
-                write!(f, "fcmp {:?} {:?} {:?}, {:?}", vartype, plan, a, b)
+                write!(f, "fcmp {:?} {:?} {:?}, {:?}", vartype, plan, a.as_ref_borrow(), b.as_ref_borrow())
             }
-            Self::LogicAnd { a, b, vartype } => write!(f, "And {:?} {:?}, {:?}", vartype, a, b),
-            Self::LogicOr { a, b, vartype } => write!(f, "Or {:?} {:?}, {:?}", vartype, a, b),
-            Self::LogicNot { a, vartype } => write!(f, "xor {:?} {:?}, true", vartype, a),
+            Self::LogicAnd { a, b, vartype } => write!(f, "And {:?} {:?}, {:?}", vartype, a.as_ref_borrow(), b.as_ref_borrow()),
+            Self::LogicOr { a, b, vartype } => write!(f, "Or {:?} {:?}, {:?}", vartype, a.as_ref_borrow(), b.as_ref_borrow()),
+            Self::LogicNot { a, vartype } => write!(f, "xor {:?} {:?}, true", vartype, a.as_ref_borrow()),
         }
     }
 }
 impl Debug for FuncOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let new_str_vec = self.actual_arg_symidx_vec.iter().map(|x| format!("{:?}",x)).collect_vec();
+        let new_str_vec = self.actual_arg_symidx_vec.iter().map(|x| format!("{:?}",x.as_ref_borrow())).collect_vec();
         let arg = new_str_vec.join(", ");
 
-        write!(f, " Call {:?} {:?}({})", self.ret_type,self.func_symidx, arg)
+        write!(f, " Call {:?} {:?}({})", self.ret_type,self.func_symidx.as_ref_borrow(), arg)
     }
 }
 impl Debug for JumpOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Ret { op_ret_sym:Some(ret_sym) } => write!(f, "ret {:?}", ret_sym),
+            Self::Ret { op_ret_sym:Some(ret_sym) } => write!(f, "ret {:?}", ret_sym.as_ref_borrow()),
             Self::Ret { op_ret_sym:None } => write!(f, "ret" ),
 
             Self::Br { cond, t1, t2 } => {
-                write!(f, "br i1 {:?}, label {:?}, label {:?}", cond, t1, t2)
+                write!(f, "br i1 {:?}, label {:?}, label {:?}", cond.as_ref_borrow(), t1.as_ref_borrow(), t2.as_ref_borrow())
             }
 
             Self::Switch { cond: _, default: _, compared: _ } => write!(f, "还没见过"),
 
-            Self::DirectJump { label_symidx } => write!(f, "jump label: {:?}",label_symidx),
+            Self::DirectJump { label_symidx } => write!(f, "jump label: {:?}",label_symidx.as_ref_borrow()),
         }
     }
 }
@@ -657,32 +659,33 @@ impl Debug for NhwcInstrType {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             NhwcInstrType::Label { label_symidx } => {
-                write!(f, "label {:?}:", label_symidx)
+                write!(f, "label {:?}:", label_symidx.as_ref_borrow())
             }
             NhwcInstrType::DefineFunc { func_symidx, ret_symidx, args } => {
-                write!(f, "Define {:?} {:?} -> {:?}", func_symidx, args, ret_symidx)
+                let args:String = args.iter().map(|x| format!("{:?},",x.as_ref_borrow())).collect();
+                write!(f, "Define {:?} {:?} -> {:?}", func_symidx.as_ref_borrow(), args, ret_symidx.as_ref_borrow())
             }
-            NhwcInstrType::DefineVar { var_symidx: varname, vartype, op_value: value } => {
-                match value{
-                    Some(value) => write!(f, "new_var {:?}:{:?} = {:?}",  varname, vartype, value),
+            NhwcInstrType::DefineVar { var_symidx: varname, vartype, op_value } => {
+                match op_value{
+                    Some(value) => write!(f, "new_var {:?}:{:?} = {:?}",  varname.as_ref_borrow(), vartype, value.as_ref_borrow()),
                     None => write!(f, "new_var {:?}:{:?}",  varname, vartype),
                 }
             }
-            NhwcInstrType::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs, rhs),
-            NhwcInstrType::SimpleAssign { lhs, rhs, vartype } => write!(f, "{:?} = {:?} {:?}", lhs,vartype, rhs),
+            NhwcInstrType::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs.as_ref_borrow(), rhs),
+            NhwcInstrType::SimpleAssign { lhs, rhs, vartype } => write!(f, "{:?} = {:?} {:?}", lhs.as_ref_borrow(),vartype, rhs.as_ref_borrow()),
             NhwcInstrType::Call { op_assigned_symidx: assigned, func_op } => match assigned {
-                Some(symidx) => write!(f, "{:?} = {:?}",symidx, func_op),
+                Some(symidx) => write!(f, "{:?} = {:?}",symidx.as_ref_borrow(), func_op),
                 None => write!(f, "{:?}", func_op),
             },
             NhwcInstrType::Jump { jump_op: op } => write!(f, "{:?}", op),
-            NhwcInstrType::Phi { lhs, rhs } => write!(f, "{:?} = {:?}",lhs,rhs),
-            NhwcInstrType::TranType { lhs, op } => write!(f, "{:?} = {:?}", lhs, op),
-            NhwcInstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args  } => write!(f,"breakpoint {:?}({:?}) !",breakpoint_symidx,breakpoint_args),
-            NhwcInstrType::Alloc { var_symidx, vartype, } => write!(f,"alloc {:?} {:?}",vartype,var_symidx),
-            NhwcInstrType::Globl { var_symidx, vartype } => write!(f,"global {:?} {:?}",vartype,var_symidx),
-            NhwcInstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => write!(f,"{:?} = load {:?}:{:?}",lhs,ptr_symdix,ptr_ty),
-            NhwcInstrType::Store { val_symidx: value, ptr_symidx, ptr_ty, value_ty } => write!(f,"store {:?}:{:?} {:?}:{:?}",value,value_ty,ptr_symidx,ptr_ty),
-            NhwcInstrType::GetElementPtr { lhs, array_ty: ty, array_or_ptr_symidx: array_symidx, idx_vec } => write!(f,"{:?} = getelementptr {:?}:{:?} {:?}",lhs,array_symidx,ty,idx_vec,),
+            NhwcInstrType::Phi { lhs, rhs } => write!(f, "{:?} = {:?}",lhs.as_ref_borrow(),rhs),
+            NhwcInstrType::TranType { lhs, op } => write!(f, "{:?} = {:?}", lhs.as_ref_borrow(), op),
+            NhwcInstrType::BreakPoint { symidx: breakpoint_symidx, breakpoint_args  } => write!(f,"breakpoint {:?}({:?}) !",breakpoint_symidx.as_ref_borrow(),breakpoint_args),
+            NhwcInstrType::Alloc { var_symidx, vartype, } => write!(f,"alloc {:?} {:?}",vartype,var_symidx.as_ref_borrow()),
+            NhwcInstrType::Globl { var_symidx, vartype } => write!(f,"global {:?} {:?}",vartype,var_symidx.as_ref_borrow()),
+            NhwcInstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => write!(f,"{:?} = load {:?}:{:?}",lhs.as_ref_borrow(),ptr_symdix.as_ref_borrow(),ptr_ty),
+            NhwcInstrType::Store { val_symidx: value, ptr_symidx, ptr_ty, value_ty } => write!(f,"store {:?}:{:?} {:?}:{:?}",value.as_ref_borrow(),value_ty,ptr_symidx.as_ref_borrow(),ptr_ty),
+            NhwcInstrType::GetElementPtr { lhs, array_ty: ty, array_or_ptr_symidx: array_symidx, idx_vec } => write!(f,"{:?} = getelementptr {:?}:{:?} {:?}",lhs.as_ref_borrow(),array_symidx,ty,idx_vec,),
             NhwcInstrType::Nope {  } => {write!(f,"(nop)")},
             NhwcInstrType::Mu { may_use_symidx, may_use_instr } => write!(f,"mu {:?}:{}",may_use_symidx, may_use_instr),
             NhwcInstrType::Chi { lhs, rhs, may_def_instr } => write!(f,"{:?} = chi {:?}:{}",lhs,rhs,may_def_instr),
