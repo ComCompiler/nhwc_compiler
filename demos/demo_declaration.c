@@ -1,8 +1,3 @@
 int main(){
-    int a = 1+2;
-    int b = 1+2;
-    int c = a+b;
-    int d = a+3;
-    int e = a+c;
-    int f = a+c;
+    int a[2][3] = {1,2,3,4,5,6};
 }

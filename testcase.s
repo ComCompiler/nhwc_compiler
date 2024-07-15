@@ -19,116 +19,102 @@
 .section ___func
     .text
     .align 4
-              #                    regtab  released_gpr_count:19,released_fpr_count:24
-              #                          Define main_0 [] -> main_ret_0 
     .globl main
     .type main,@function
 main:
-              #                    mem layout:|ra_main:8 at 48|s0_main:8 at 40|a:4 at 36|b:4 at 32|temp_0_arithop:4 at 28|c:4 at 24|temp_1_arithop:4 at 20|d:4 at 16|temp_2_arithop:4 at 12|e:4 at 8|temp_3_arithop:4 at 4|f:4 at 0
-    addi    sp,sp,-56
-              #                    store to ra_main_0 in mem offset legal
-    sd      ra,48(sp)
-              #                    store to s0_main_0 in mem offset legal
-    sd      s0,40(sp)
-    addi    s0,sp,56
-              #                          alloc i32 a_17 
-              #                          alloc i32 b_17 
-              #                          alloc i32 temp_0_arithop_17 
-              #                          alloc i32 c_17 
-              #                          alloc i32 temp_1_arithop_17 
-              #                          alloc i32 d_17 
-              #                          alloc i32 temp_2_arithop_17 
-              #                          alloc i32 e_17 
-              #                          alloc i32 temp_3_arithop_17 
-              #                          alloc i32 f_17 
-              #                    regtab  released_gpr_count:19,released_fpr_count:24
-              #                          label L0_0: 
+    addi    sp,sp,-96
+    sd      ra,88(sp)
+    sd      s0,80(sp)
+    addi    s0,sp,96
 .L0_0:
-              #                          a_17 = i32 3_0 
-              #                    occupy a0 with a_17
-    li      a0, 3
-              #                    free a0
-              #                          b_17 = i32 3_0 
-              #                    occupy a1 with b_17
-    li      a1, 3
-              #                    free a1
-              #                          new_var temp_0_arithop_17:i32 
-              #                          temp_0_arithop_17 = Add i32 a_17, b_17 
-              #                    occupy a0 with a_17
-              #                    occupy a1 with b_17
-              #                    occupy a2 with temp_0_arithop_17
-    add     a2,a0,a1
-              #                    free a0
-              #                    free a1
-              #                    free a2
-              #                          c_17 = i32 temp_0_arithop_17 
-              #                    occupy a2 with temp_0_arithop_17
-              #                    occupy a3 with c_17
-    mv      a3, a2
-              #                    free a2
-              #                    free a3
-              #                          new_var temp_1_arithop_17:i32 
-              #                          temp_1_arithop_17 = Add i32 a_17, 3_0 
-              #                    occupy a0 with a_17
-              #                    occupy a4 with 3_0
-    li      a4, 3
-              #                    occupy a5 with temp_1_arithop_17
-    add     a5,a0,a4
-              #                    free a0
-              #                    free a4
-              #                    free a5
-              #                          d_17 = i32 temp_1_arithop_17 
-              #                    occupy a5 with temp_1_arithop_17
-              #                    occupy a6 with d_17
-    mv      a6, a5
-              #                    free a5
-              #                    free a6
-              #                          new_var temp_2_arithop_17:i32 
-              #                          temp_2_arithop_17 = Add i32 a_17, c_17 
-              #                    occupy a0 with a_17
-              #                    occupy a3 with c_17
-              #                    occupy a7 with temp_2_arithop_17
-    add     a7,a0,a3
-              #                    free a0
-              #                    free a3
-              #                    free a7
-              #                          e_17 = i32 temp_2_arithop_17 
-              #                    occupy a7 with temp_2_arithop_17
-              #                    occupy s1 with e_17
-    mv      s1, a7
-              #                    free a7
-              #                    free s1
-              #                          new_var temp_3_arithop_17:i32 
-              #                          temp_3_arithop_17 = Add i32 a_17, c_17 
-              #                    occupy a0 with a_17
-              #                    occupy a3 with c_17
-              #                    occupy s2 with temp_3_arithop_17
-    add     s2,a0,a3
-              #                    free a0
-              #                    free a3
-              #                    free s2
-              #                          f_17 = i32 temp_3_arithop_17 
-              #                    occupy s2 with temp_3_arithop_17
-              #                    occupy s3 with f_17
-    mv      s3, s2
-              #                    free s2
-              #                    free s3
-              #                          jump label: exit_2 
-    j       .exit_2
-              #                    regtab     a0:Freed { symidx: a_17, tracked: true } |     a1:Freed { symidx: b_17, tracked: true } |     a2:Freed { symidx: temp_0_arithop_17, tracked: true } |     a3:Freed { symidx: c_17, tracked: true } |     a5:Freed { symidx: temp_1_arithop_17, tracked: true } |     a6:Freed { symidx: d_17, tracked: true } |     a7:Freed { symidx: temp_2_arithop_17, tracked: true } |     s1:Freed { symidx: e_17, tracked: true } |     s2:Freed { symidx: temp_3_arithop_17, tracked: true } |     s3:Freed { symidx: f_17, tracked: true } |  released_gpr_count:8,released_fpr_count:24
-              #                          label exit_2: 
-.exit_2:
-              #                          ret 0_0 
-              #                    load from ra_main_0 in mem
-    ld      ra,48(sp)
-              #                    load from s0_main_0 in mem
-    ld      s0,40(sp)
-              #                    occupy a0 with a_17
-              #                    store to a_17 in mem offset legal
-    sw      a0,36(sp)
-              #                    release a0 with a_17
-              #                    occupy a0 with 0_0
     li      a0, 0
-    addi    sp,sp,56
-              #                    free a0
+    slli a0,a0,2
+    add     a0,a0,sp
+    addi    a0,a0,0
+    sd      a0,72(sp)
+    ld      a0,72(sp)
+    li      a1, 0
+    li      a2, 24
+    call    memset
+    li      a0, 0
+    li      a1, 3
+    li      a2, 0
+    mul     a3,a1,a2
+    add     a0,a0,a3
+    li      a4, 1
+    mul     a5,a4,a2
+    add     a0,a0,a5
+    slli a0,a0,2
+    add     a0,a0,sp
+    addi    a0,a0,0
+    sw      a4,0(a0)
+    li      a6, 0
+    mul     a7,a1,a4
+    add     a6,a6,a7
+    mul     s1,a4,a2
+    add     a6,a6,s1
+    slli a6,a6,2
+    add     a6,a6,sp
+    addi    a6,a6,0
+    li      s2, 4
+    sw      s2,0(a6)
+    li      s3, 0
+    mul     s4,a1,a4
+    add     s3,s3,s4
+    li      s5, 1
+    mul     s6,a4,s5
+    add     s3,s3,s6
+    slli s3,s3,2
+    add     s3,s3,sp
+    addi    s3,s3,0
+    li      s7, 5
+    sw      s7,0(s3)
+    li      s7, 0
+    mul     s8,a1,a4
+    add     s7,s7,s8
+    li      a1, 2
+    mul     a4,s5,a1
+    add     s7,s7,a4
+    slli s7,s7,2
+    add     s7,s7,sp
+    addi    s7,s7,0
+    li      a1, 6
+    sw      a1,0(s7)
+    li      a1, 0
+    li      s5, 3
+    mul     s9,s5,a2
+    add     a1,a1,s9
+    li      a2, 1
+    li      s5, 1
+    mul     s9,a2,s5
+    add     a1,a1,s9
+    slli a1,a1,2
+    add     a1,a1,sp
+    addi    a1,a1,0
+    li      a2, 2
+    sw      a2,0(a1)
+    li      a2, 0
+    li      s5, 3
+    li      s9, 0
+    mul     s10,s5,s9
+    add     a2,a2,s10
+    li      s5, 1
+    li      s9, 2
+    mul     s10,s5,s9
+    add     a2,a2,s10
+    slli a2,a2,2
+    add     a2,a2,sp
+    addi    a2,a2,0
+    sd      a2,24(sp)
+    ld      a2,24(sp)
+    li      s5, 3
+    sw      s5,0(a2)
+    sd      a2,24(sp)
+    j       .exit_2
+.exit_2:
+    ld      ra,88(sp)
+    ld      s0,80(sp)
+    sd      a0,64(sp)
+    li      a0, 0
+    addi    sp,sp,96
     ret

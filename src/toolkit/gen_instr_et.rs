@@ -1,6 +1,6 @@
 use ahash::HashMap;
 
-use crate::{add_edge, add_node, add_node_with_edge, debug_info_red, get_ast_from_symidx, node, toolkit::symtab::WithBorrow};
+use crate::{add_edge, add_node, add_node_with_edge, debug_info_red, get_ast_from_symidx, node, toolkit::{field::Type, symtab::WithBorrow}};
 use anyhow::Result;
 use super::{cfg_node::InstrList, et_node::{EtEdgeType, EtNode, EtNodeType, EtTree}, nhwc_instr::{ArithOp, InstrSlab, NhwcInstr}, scope_node::ScopeTree, symtab::{self, RcSymIdx, SymIdx, SymTab}};
 
@@ -65,7 +65,15 @@ pub fn parse_instr_list_to_et(instrs:&InstrList,instr_et:&mut EtTree,stmtab:&Sym
             super::nhwc_instr::NhwcInstrType::Globl { var_symidx, vartype } => todo!(),
             super::nhwc_instr::NhwcInstrType::Load { lhs, ptr_symidx, ptr_ty } => todo!(),
             super::nhwc_instr::NhwcInstrType::Store { val_symidx, value_ty, ptr_symidx, ptr_ty } => todo!(),
-            super::nhwc_instr::NhwcInstrType::GetElementPtr { lhs, array_or_ptr_symidx, array_ty, idx_vec } => todo!(),
+            super::nhwc_instr::NhwcInstrType::GetElementPtr { lhs, array_or_ptr_symidx, array_ty, idx_vec } => {
+                println!("{:?}\n,{:?}\n,{:?}\n,{:?}\n",lhs,array_or_ptr_symidx,array_ty,idx_vec);
+                let array_dims = array_ty.get_array_dim()?;
+                for dim in array_dims{
+                    let dim_literal = dim.unwrap();
+                }
+                println!("{:?}",array_dim);
+                todo!();
+            },
             super::nhwc_instr::NhwcInstrType::Arith { lhs: rc_lhs, rhs } => {
                 let lhs = rc_lhs.as_ref_borrow();
                 let arith_ast = get_ast_from_symidx!(find lhs with scope_tree);
