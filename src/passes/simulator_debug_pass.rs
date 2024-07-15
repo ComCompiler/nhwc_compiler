@@ -1,6 +1,6 @@
 use std::vec;
 use log::{error, trace};
-use crate::{ debug_info_red, debug_info_yellow, toolkit::{ context::NhwcCtx, nhwc_instr::{InstrSlab, NhwcInstr}, pass_manager::Pass, simulator::Simulator, symtab::{SymTab, SymTabGraph}}};
+use crate::{ debug_info_red, debug_info_yellow, toolkit::{ context::NhwcCtx, nhwc_instr::{InstrSlab, NhwcInstr}, pass_manager::Pass, simulator::Simulator, symtab::{SymTab, SymTabGraph, WithBorrow}}};
 use itertools::Itertools;
 use crate::toolkit::dot::Config;
 use crate::toolkit::etc::generate_png_by_graph_multi_tasks;
@@ -124,7 +124,7 @@ pub fn debug_simu_run(simu:&mut Simulator, instr_slab:&InstrSlab<NhwcInstr>, src
             simu.load_stack_text()?;
             trace!("{:?}",simu);
             // println!("{:?}",simu);
-            if bp_symidx.borrow().symbol_name == "exit"{
+            if bp_symidx.as_ref_borrow().symbol_name == "exit"{
                 break;
             }
         }else if let Err(e) = rst {

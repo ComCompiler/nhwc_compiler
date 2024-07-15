@@ -85,7 +85,7 @@ impl Pass for MemAllocPass {
                 match &instr!(at instr in instr_slab)?.instr_type{
                     crate::toolkit::nhwc_instr::NhwcInstrType::DefineFunc { func_symidx: _, ret_symidx: _, args } => {
                         for arg in args{
-                            calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &symtab.get(&arg.borrow().to_src_symidx())?.rc_symidx.clone())?;
+                            calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &symtab.get(&arg.as_ref_borrow().to_src_symidx())?.rc_symidx.clone())?;
                         }
                     },
                     crate::toolkit::nhwc_instr::NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
@@ -151,7 +151,7 @@ pub fn get_src_arg_symidx_vec_of_func_define_instr(func_def_instr:usize,symtab:&
 pub fn add_ra_s0_of_func_to_symtab(cfg_entry:u32,cfg_graph:&CfgGraph,instr_slab:&InstrSlab<NhwcInstr>, symtab:&mut SymTab) -> Result<(RcSymIdx,RcSymIdx)>{
     let rc_s0_symidx = add_symbol!({
         let mut s0_for_cfg_entry = S0.clone();
-        s0_for_cfg_entry.symbol_name = format!("{}_{}",s0_for_cfg_entry.symbol_name,node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?.borrow().symbol_name);
+        s0_for_cfg_entry.symbol_name = format!("{}_{}",s0_for_cfg_entry.symbol_name,node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?.as_ref_borrow().symbol_name);
         Symbol::new_from_symidx(&s0_for_cfg_entry)
     }
         with_field TYPE:{Type::Ptr64 { ty: Box::new(Type::Void) }}
@@ -161,7 +161,7 @@ pub fn add_ra_s0_of_func_to_symtab(cfg_entry:u32,cfg_graph:&CfgGraph,instr_slab:
     );
     let rc_ra_symidx = add_symbol!({
         let mut ra_for_cfg_entry = RA.clone();
-        ra_for_cfg_entry.symbol_name = format!("{}_{}",ra_for_cfg_entry.symbol_name,node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?.borrow().symbol_name);
+        ra_for_cfg_entry.symbol_name = format!("{}_{}",ra_for_cfg_entry.symbol_name,node!(at cfg_entry in cfg_graph).get_func_cor_symidx()?.as_ref_borrow().symbol_name);
         Symbol::new_from_symidx(&ra_for_cfg_entry)
     }
         with_field TYPE:{Type::Ptr64 { ty: Box::new(Type::Void) }}

@@ -95,7 +95,7 @@ pub fn get_dj_graph_subtree_nodes(dj_node:u32,dj_graph:&mut DjGraph)->Vec<u32>{
             DjEdge::Join{} =>{
                 -1
             }
-            DjEdge::Dom {  } => -1,
+            DjEdge::Dom {  } => 1,
         }
     })
 }

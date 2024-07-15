@@ -10,7 +10,21 @@ use std::{cell::{Ref, RefCell, RefMut}, collections::hash_map::{Iter, IterMut}, 
 
 pub type SymTabGraph = StableDiGraph<SymTab, SymTabEdge, u32>;
 
-pub type RcSymIdx = Rc<RefCell<SymIdx>>;
+#[derive(Clone,PartialEq,Eq, PartialOrd, Ord)]
+pub struct RcSymIdx { 
+    rc_symidx:Rc<RefCell<SymIdx>>
+}
+impl RcSymIdx{
+    pub fn new(symidx:SymIdx) -> Self{
+        Self { rc_symidx: Rc::new(RefCell::new(symidx)) }
+    }
+}
+
+impl Debug for RcSymIdx{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f,"{:?}",self.as_ref_borrow())
+    }
+}
 
 pub trait WithBorrow {
     // fn with_borrow<'a>(&'a self) -> (RcSymIdx,Ref<'a,SymIdx>);
@@ -20,11 +34,11 @@ pub trait WithBorrow {
 }
 impl WithBorrow for RcSymIdx{
     fn as_ref_borrow<'a >(&'a self) -> Ref<'a,SymIdx> {
-        self.as_ref().borrow()
+        self.rc_symidx.as_ref().borrow()
     }
     
     fn as_ref_borrow_mut<'a >(&'a self) -> RefMut<'a,SymIdx> {
-        self.as_ref().borrow_mut()
+        self.rc_symidx.as_ref().borrow_mut()
     }
 }
 
@@ -62,8 +76,8 @@ impl From<isize> for SymIdx{
     }
 }
 impl SymIdx {
-    pub fn as_rc(self)-> Rc<RefCell<Self>>{
-        Rc::new(RefCell::new(self))
+    pub fn as_rc(self)-> RcSymIdx{
+        RcSymIdx::new(self)
     }
     pub fn new(scope_node:u32, symbol_name:String) -> Self { SymIdx { scope_node, symbol_name, index_ssa:None } }
     pub fn new_verbose(scope_node:u32, symbol_name:String, index_ssa:Option<u32>) -> Self { SymIdx { scope_node, symbol_name, index_ssa } }
@@ -153,7 +167,7 @@ impl SymTab {
     // 添加或更新符号，如果是更新，那么返回旧的符号
     pub fn add_symbol(&mut self, sym:Symbol) -> Result<RcSymIdx> {
         let rc_symidx = sym.rc_symidx.clone();
-        if self.map.insert(rc_symidx.borrow().clone(), sym).is_none() { Ok(rc_symidx) }
+        if self.map.insert(rc_symidx.as_ref_borrow().clone(), sym).is_none() { Ok(rc_symidx) }
             else { Err(anyhow!("symtab插入失败,你这个表中已经存在同名称同scope的符号{:?}了,你必须先remove 掉它", rc_symidx))} // do nothing , 插入成功，里面没有同scope的同名符号
     }
 

@@ -54,7 +54,7 @@ fn parse_root2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhwc
                         asm_sect.annotate(format!("{:?}",&instr!(at instr in nhwc_instr_slab)?));
                         asm_sect.obj_type(Imm::new_global_label(var_symidx.clone()));
                         asm_sect.label(Imm::new_global_label(var_symidx.clone()));
-                        asm_sect.apply_value(simulator.simu_symtab.get(&var_symidx.borrow().to_src_symidx())?.get_simu_val()?)?;
+                        asm_sect.apply_value(simulator.simu_symtab.get(&var_symidx.as_ref_borrow().to_src_symidx())?.get_simu_val()?)?;
                     }
                 }
             },

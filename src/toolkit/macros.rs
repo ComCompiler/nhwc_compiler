@@ -421,7 +421,7 @@ macro_rules! add_symbol {
             let symidx = $symtab.add_symbol($sym)?;
             $(
             $(if $if_block )? {
-                let sym =  $symtab.get_mut(&symidx.as_ref().borrow()).unwrap();
+                let sym =  $symtab.get_mut(&symidx.as_ref_borrow()).unwrap();
                 paste::paste!{
                     sym.[<add_ $field_name:lower>]($field_value);
                 };
@@ -435,7 +435,7 @@ macro_rules! add_symbol {
                         $crate::add_node!({$symtab.clone()} to symg);
                     }else {//如果已经有节点了,在最后一个节点上加点加边
                         idx-=1;
-                        $crate::add_node_with_edge!({$symtab.clone()} with_edge {SymTabEdge::new(format!("add_sym {}",symidx.as_ref().borrow().symbol_name))} from idx in symg);
+                        $crate::add_node_with_edge!({$symtab.clone()} with_edge {SymTabEdge::new(format!("add_sym {}",symidx.as_ref_borrow().symbol_name))} from idx in symg);
                     }
                 }
                 None => {},
@@ -489,7 +489,7 @@ macro_rules! add_field {
             None => {},
         })?
         paste::paste!{
-            $symtab.get_mut(&$symidx.as_ref().borrow())?.[<add_ $field_name:lower>]($field);
+            $symtab.get_mut(&$symidx.as_ref_borrow())?.[<add_ $field_name:lower>]($field);
         };
     };
     ($(with_field $field_name:ident:{$field:expr})+ to $symidx:ident in $symtab:ident $(debug $symtab_graph:ident)?) => {

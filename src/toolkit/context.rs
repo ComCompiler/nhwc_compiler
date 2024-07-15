@@ -6,6 +6,7 @@ use anyhow::Result;
 use crate::toolkit::symtab::{SymIdx};
 use crate::{add_symbol, Args};
 
+use crate::toolkit::symtab::WithBorrow;
 use super::cfg_node::InstrList;
 use super::asm_struct::AsmStructure;
 use super::nhwc_instr::NhwcInstr;

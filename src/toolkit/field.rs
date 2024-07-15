@@ -7,7 +7,7 @@ use anyhow::*;
 use regex::{self, Regex};
 
 
-use super::{ast_node::AstTree, scope_node::ST_ROOT, symtab::SymIdx};
+use super::{ast_node::AstTree, scope_node::ST_ROOT, symtab::{SymIdx, WithBorrow}};
 use super::symtab::RcSymIdx;
 use crate::{debug_info_blue, debug_info_green, debug_info_red, node};
 
@@ -448,7 +448,7 @@ impl Value {
 
             },
             Value::Ref { rc_symidx, ty } => {
-                Ok(rc_symidx.borrow().clone())
+                Ok(rc_symidx.as_ref_borrow().clone())
             },
             Value::I1(op_i1) => {
                 if let Some(i1_value) = op_i1{
@@ -687,7 +687,7 @@ impl Type {
                 let mut v1 = Value::new_i32(1);
                 let mut weighted_dims = vec![v1.to_symidx()?];
                 for dim_symidx in dims.get(1..dims.len()).unwrap().iter().rev(){
-                    let v2 = Value::from_string_with_specific_type(&dim_symidx.as_ref().unwrap().borrow().symbol_name, &Type::I32)?;
+                    let v2 = Value::from_string_with_specific_type(&dim_symidx.as_ref().unwrap().as_ref_borrow().symbol_name, &Type::I32)?;
                     debug_info_blue!(" v2 is  {:?}",v2);
                     v1 = (v1*v2)?;
                     weighted_dims.push(v1.to_symidx()?)
@@ -748,7 +748,7 @@ impl Type {
         match self{
             Type::Array { dims, ele_ty: _ } => {
                 let array_size:usize = dims.iter()
-                    .map(|d|{let ans:usize = d.as_ref().unwrap().borrow().symbol_name.parse().unwrap();ans}).product() ;
+                    .map(|d|{let ans:usize = d.as_ref().unwrap().as_ref_borrow().symbol_name.parse().unwrap();ans}).product() ;
                 Ok(array_size)
             },
             _ => {

@@ -5,7 +5,7 @@ use anyhow::*;
 use derive_new::new;
 use strum_macros::EnumIs;
 
-use crate::{passes::ast2st_pass::Ast2StPass, toolkit::field::{Type, Value}};
+use crate::{passes::ast2st_pass::Ast2StPass, toolkit::{field::{Type, Value}, symtab::WithBorrow}};
 
 use super::symtab::{RcSymIdx, SymIdx};
 
@@ -70,34 +70,34 @@ impl Debug for Imm{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::GlobalLabel {symidx} =>{
-                write!(f,"{}",&symidx.borrow().symbol_name)
+                write!(f,"{}",&symidx.as_ref_borrow().symbol_name)
             },
             Self::Literal { symidx } => {
-                match &Type::new_from_const_str(&symidx.borrow().symbol_name) {
+                match &Type::new_from_const_str(&symidx.as_ref_borrow().symbol_name) {
                     Type::I32 => {
-                        write!(f,"{}", symidx.borrow())
+                        write!(f,"{}", symidx.as_ref_borrow())
                     },
                     Type::F32 => {
-                        let f_val:f32 = match Value::from_string_with_specific_type(&symidx.borrow().symbol_name, &Type::F32).unwrap(){
+                        let f_val:f32 = match Value::from_string_with_specific_type(&symidx.as_ref_borrow().symbol_name, &Type::F32).unwrap(){
                             Value::F32(Some(f_val)) => f_val,
                             _ => panic!()
                         };
                         write!(f,"{}", f_val.to_bits())
                     },
                     Type::I1 => {
-                        if symidx.borrow().symbol_name == "true"{
+                        if symidx.as_ref_borrow().symbol_name == "true"{
                             write!(f,"{}", 1)
                         }else {
                             write!(f,"{}", 0)
                         }
                     }
                     _ => {
-                        write!(f,"{}", symidx.borrow())
+                        write!(f,"{}", symidx.as_ref_borrow())
                     }
                 }
             }
             Self::LocalLabel { symidx } => {
-                write!(f,".{:?}",symidx.borrow())
+                write!(f,".{:?}",symidx.as_ref_borrow())
             },
         }
     }

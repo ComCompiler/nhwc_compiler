@@ -109,7 +109,7 @@ impl Simulator{
         self.cur_instr_pos = main_pos;
 
         // add exit breakpoint and let simulator run it when main returned 
-        self.instr_list.push(instr_slab.insert_instr(BreakPoint { symidx: Rc::new(RefCell::new(SymIdx::new(0, "exit".to_string()))), breakpoint_args: vec![] }.into()));
+        self.instr_list.push(instr_slab.insert_instr(BreakPoint { symidx: SymIdx::new(0, "exit".to_string()).as_rc(), breakpoint_args: vec![] }.into()));
         self.func_call_ctx_stack.push(FuncCallCtx::new(main_func_symidx.as_rc(), ret_symidx, vec![], vec![], self.instr_list.len()-2, None));
 
         Ok(())
@@ -189,7 +189,7 @@ impl Simulator{
                     let mut field_vec = vec![];
                     for (itered_symidx, itered_symbol ) in self.simu_symtab.iter(){
                         for breakpoint_arg in breakpoint_args{
-                            if itered_symidx.symbol_name == breakpoint_arg.symidx.borrow().symbol_name {
+                            if itered_symidx.symbol_name == breakpoint_arg.symidx.as_ref_borrow().symbol_name {
                                 if let Some(field_name) = &breakpoint_arg.op_field_name{
                                     match field_name.as_str(){
                                         "simu_val"=>{
@@ -336,7 +336,7 @@ impl Simulator{
             if !simu_symtab.has_symbol(&use_symidx) && *src_symtab.get(&use_symidx)?.get_is_literal()?{
                 // 将字面量加入
                 add_symbol!({Symbol::new_from_symidx(&use_symidx)}
-                    with_field SIMU_VAL:{Value::from_string_with_specific_type(&src_symtab.get(&use_symidx)?.rc_symidx.borrow().symbol_name, 
+                    with_field SIMU_VAL:{Value::from_string_with_specific_type(&src_symtab.get(&use_symidx)?.rc_symidx.as_ref_borrow().symbol_name, 
                         src_symtab.get(&use_symidx)?.get_type()?)?}
                 to simu_symtab);
             }

@@ -127,7 +127,7 @@ impl PhiOp{
             if phi_pair.symidx == phi_pair_to_insert.symidx {
                 // return Err(anyhow!("对已存在的phi node 执行 push_phi_pair 失败,已经存在phi_pair包含symidx:{:?}",phi_pair.symidx))
             }
-            if phi_pair.symidx.borrow().to_src_symidx() == phi_pair_to_insert.symidx.borrow().to_src_symidx() && phi_pair.def_instr == phi_pair_to_insert.def_instr {
+            if phi_pair.symidx.as_ref_borrow().to_src_symidx() == phi_pair_to_insert.symidx.as_ref_borrow().to_src_symidx() && phi_pair.def_instr == phi_pair_to_insert.def_instr {
                 // return Err(anyhow!("对已存在的phi node 执行 push_phi_pair 失败,已经存在phi_pair包含symidx:{:?} with bb:{}",phi_pair.symidx,phi_pair_to_insert.bb))
             }
         }
@@ -206,7 +206,7 @@ impl NhwcInstr {
             NhwcInstrType::Label { label_symidx:_ } => vec![],
             NhwcInstrType::DefineFunc { func_symidx, ret_symidx:_, args } => {
                 {
-                    let mut symidx_vec= vec![func_symidx];
+                    let mut symidx_vec= vec![];
                     args.iter().map(|arg| symidx_vec.push(arg)).count();
                     symidx_vec
                 }
@@ -303,7 +303,7 @@ impl NhwcInstr {
             NhwcInstrType::Label { label_symidx:_ } => vec![],
             NhwcInstrType::DefineFunc { func_symidx, ret_symidx:_, args } => {
                 {
-                    let mut symidx_vec= vec![func_symidx];
+                    let mut symidx_vec= vec![];
                     args.iter_mut().map(|arg| symidx_vec.push(arg)).count();
                     symidx_vec
 
@@ -561,7 +561,7 @@ impl NhwcInstrType {
     }
 
     pub fn new_breakpoint(symidx:RcSymIdx,breakpoint_args:Vec<BreakpointArg>) -> Self { Self::BreakPoint {symidx ,breakpoint_args } }
-    pub fn new_exit_breakpoint(breakpoint_args:Vec<BreakpointArg>) -> Self { Self::BreakPoint {symidx:Rc::new(RefCell::new(SymIdx::new(0, "exit".to_string()))) , breakpoint_args } }
+    pub fn new_exit_breakpoint(breakpoint_args:Vec<BreakpointArg>) -> Self { Self::BreakPoint {symidx:SymIdx::new(0, "exit".to_string()).as_rc() , breakpoint_args } }
 
     //自动类型转换
     pub fn new_int2float(int_symidx:RcSymIdx, float_symidx:RcSymIdx) -> Self { Self::TranType { lhs:float_symidx, op:Trans::Sitofp { int_symidx } } }
@@ -665,10 +665,10 @@ impl Debug for NhwcInstrType {
                 let args:String = args.iter().map(|x| format!("{:?},",x.as_ref_borrow())).collect();
                 write!(f, "Define {:?} {:?} -> {:?}", func_symidx.as_ref_borrow(), args, ret_symidx.as_ref_borrow())
             }
-            NhwcInstrType::DefineVar { var_symidx: varname, vartype, op_value } => {
+            NhwcInstrType::DefineVar { var_symidx, vartype, op_value } => {
                 match op_value{
-                    Some(value) => write!(f, "new_var {:?}:{:?} = {:?}",  varname.as_ref_borrow(), vartype, value.as_ref_borrow()),
-                    None => write!(f, "new_var {:?}:{:?}",  varname, vartype),
+                    Some(value) => write!(f, "new_var {:?}:{:?} = {:?}",  var_symidx.as_ref_borrow(), vartype, value.as_ref_borrow()),
+                    None => write!(f, "new_var {:?}:{:?}",  var_symidx.as_ref_borrow(), vartype),
                 }
             }
             NhwcInstrType::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs.as_ref_borrow(), rhs),

@@ -211,10 +211,10 @@ pub fn update_src_symdix_alloc_global_instr_info(symtab:&mut SymTab, cfg_graph:&
         for &instr in node!(at cfg_entry in cfg_graph).instrs.iter(){
             match &instr!(at instr in instr_slab)?.instr_type {
                 NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
-                    symtab.get_mut(&var_symidx.borrow().to_src_symidx())?.add_mem_instr(instr);
+                    symtab.get_mut(&var_symidx.as_ref_borrow().to_src_symidx())?.add_mem_instr(instr);
                 },
                 NhwcInstrType::Globl { var_symidx, vartype: _ } => {
-                    symtab.get_mut(&var_symidx.borrow().to_src_symidx())?.add_mem_instr(instr);
+                    symtab.get_mut(&var_symidx.as_ref_borrow().to_src_symidx())?.add_mem_instr(instr);
                 },
                 _ => {}
             }
