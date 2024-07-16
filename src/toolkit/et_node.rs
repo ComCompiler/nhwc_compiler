@@ -377,6 +377,8 @@ pub enum ExprOp {
     MinusAssign,
     ArrayIndex,
     ArrayWrapper,
+    Store,
+    Load,
 }
 impl Debug for ExprOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -420,6 +422,8 @@ impl Debug for ExprOp {
             Self::DivAssign => write!(f, "/="),
             Self::ArrayIndex => write!(f, "[]"),
             Self::ArrayWrapper => write!(f, "{{}}"),
+            Self::Store => write!(f,"Store"),
+            Self::Load => write!(f,"Load"),
         }
     }
 }
@@ -430,6 +434,8 @@ impl From<EtNodeType> for EtNode{
 }
 
 impl EtNodeType {
+    pub fn new_store(ast_node:u32) -> Self{ EtNodeType::Operator { op: ExprOp::Store, ast_node, text:String::new(), op_rc_symidx: None }}
+    pub fn new_load(ast_node:u32) -> Self{EtNodeType::Operator { op: ExprOp::Load, ast_node, text: String::new(), op_rc_symidx: None }}
     pub fn new_op_array_idx(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::ArrayIndex, ast_node, text:String::new(), op_rc_symidx: None } }
     pub fn new_op_array_wrapper(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node, text:String::new(), op_rc_symidx: None } }
     pub fn new_op_add(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Add, ast_node, text:String::new() ,op_rc_symidx:None} }

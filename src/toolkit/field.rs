@@ -700,6 +700,20 @@ impl Type {
         }
 
     }
+    pub fn get_array_dim(&self)->Result<&Vec<Option<RcSymIdx>>>{
+        match &self{
+            Type::I32 => Err(anyhow!("can't get dim from i32")),
+            Type::F32 => Err(anyhow!("can't get dim from f32")),
+            Type::I1 => Err(anyhow!("can't get dim from i1")),
+            Type::Void => Err(anyhow!("can't get dim from void")),
+            Type::Label => Err(anyhow!("can't get dim from label")),
+            Type::Ref => Err(anyhow!("can't get dim from ref")),
+            Type::Ptr64 { ty } => Err(anyhow!("can't get dim from ptr64")),
+            Type::Array { dims, ele_ty } => Ok(dims),
+            Type::Fn { arg_syms, ret_sym } => Err(anyhow!("can't get dim from fn")),
+            Type::Unknown => Err(anyhow!("can't get dim from unknown")),
+        }
+    }
 
     pub fn new_from_const_str(const_str:&String) -> Self {
         if const_str.contains("true") || const_str.contains("false"){

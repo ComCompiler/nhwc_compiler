@@ -92,12 +92,12 @@ fn main() {
         // then simulator_debug_pass
         then ast2et_debug_pass
         then symtab_debug_pass
-        // then nhwc2et_pass
+        then nhwc2et_pass
         then ssa_deconstruction_pass
         then nhwc_dump_pass
         then mem_alloc_pass
         then cfg_debug_pass2
-        // then nhwc2riscv_pass
+        then nhwc2riscv_pass
         to pass_manager
         
     );
