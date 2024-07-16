@@ -1,4 +1,5 @@
-use std::collections::HashMap;
+
+use ahash::HashMap;
 
 use crate::toolkit::ast_node::AstTree;
 

@@ -59,13 +59,14 @@ pub fn generate_png_by_graph_multi_tasks<N:Debug, E:Debug, Ty:EdgeType>(g:&Stabl
             f.write_all(dot_string.as_bytes()).expect("写入失败");
             info!("dot write finished {:?}", env::current_dir());
             // println!("dot write finished {:?}", env::current_dir());
-            let output = Command::new("dot").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().with_context(||"执行失败")?;
+            // let output = Command::new("dot").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().with_context(||"执行失败")?;
+            // info!("Successfully Transform to png {}.png {:?}", name.green(),output);
+            info!("Successfully Transform to png {}.png ", name.green());
             // let output = Command::new("twopi").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().with_context(||"执行失败")?;
             // let output = Command::new("neato").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().with_context(||"执行失败")?;
             // let output = Command::new("fdp").args(["-Tpng", dot_name.as_str(), "-o", png_name.as_str()]).output().with_context(||"执行失败")?;
 
             // println!("Successfully Transform to png {}.png {:?}", name.green(),output);
-            info!("Successfully Transform to png {}.png {:?}", name.green(),output);
             Ok(())
         })
     );

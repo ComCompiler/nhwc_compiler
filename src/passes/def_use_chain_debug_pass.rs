@@ -26,6 +26,9 @@ impl Pass for DefUseChainDebugPass {
         
         if self.is_gen_png {
             // let symt = self.op_cfg_graph.unwrap();
+            for def_use_node in def_use_graph.node_weights_mut(){
+                def_use_node.load_instr_text(instr_slab);
+            }
             generate_png_by_graph_multi_tasks(&ctx.def_use_graph.clone(), "def_use_graph".to_string(), &[Config::Record, Config::Title("def_use_graph".to_string()),Config::RankDirLR],&mut ctx.io_task_list)?;
         }
 

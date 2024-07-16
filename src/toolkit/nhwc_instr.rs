@@ -8,7 +8,7 @@ use delegate::delegate;
 use crate::toolkit::symtab::WithBorrow;
 
 use super::{
-    field::{Fields, Type}, symtab::{RcSymIdx, SymIdx}
+    field::{Fields, Type}, symtab::{self, RcSymIdx, SymIdx}
 };
 
 
@@ -197,11 +197,11 @@ impl NhwcInstr {
         self.text += format!("{}",instr).as_str()
     }
     pub fn get_def_and_use_symidx_vec(&self)->Vec<&RcSymIdx>{
-        let all_symidx_vec = self.get_def_symidx_vec();
-        self.get_use_symidx_vec().append(&mut self.get_use_symidx_vec());
+        let all_symidx_vec = self.get_ssa_direct_def_symidx_vec();
+        self.get_ssa_direct_use_symidx_vec().append(&mut self.get_ssa_direct_use_symidx_vec());
         all_symidx_vec
     }
-    pub fn get_def_symidx_vec(&self)->Vec<&RcSymIdx>{
+    pub fn get_ssa_direct_def_symidx_vec(&self)->Vec<&RcSymIdx>{
         let vec = match &self.instr_type{
             NhwcInstrType::Label { label_symidx:_ } => vec![],
             NhwcInstrType::DefineFunc { func_symidx, ret_symidx:_, args } => {
@@ -239,7 +239,7 @@ impl NhwcInstr {
         };
         vec
     }
-    pub fn get_use_symidx_vec(&self)->Vec<&RcSymIdx>{
+    pub fn get_ssa_direct_use_symidx_vec(&self)->Vec<&RcSymIdx>{
         let vec = match &self.instr_type{
             NhwcInstrType::Label { label_symidx:_ } => vec![],
             NhwcInstrType::DefineFunc { func_symidx:_, ret_symidx:_, args: _ } => {
@@ -291,14 +291,17 @@ impl NhwcInstr {
             NhwcInstrType::Globl { var_symidx: _, vartype: _ } => vec![],
             NhwcInstrType::Load { lhs: _, ptr_symidx: ptr_symdix, ptr_ty: _ } => vec![ptr_symdix],
             NhwcInstrType::Store { val_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
-            NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_or_ptr_symidx: array_symidx, idx_vec } => idx_vec.iter().filter(|idx|idx.is_some()).map(|idx|idx.as_ref().unwrap()).chain(vec![array_symidx].into_iter()).collect_vec(),
+            NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_or_ptr_symidx: array_symidx, idx_vec } => {
+                // // we will don't seem array_symidx as a kind of `use` in ssa because it will not affect the ptr as the version of a changes
+                idx_vec.iter().filter(|idx|idx.is_some()).map(|idx|idx.as_ref().unwrap()).chain(vec![array_symidx].into_iter()).collect_vec()
+            },
             NhwcInstrType::Nope {  } => vec![],
             NhwcInstrType::Mu { may_use_symidx, may_use_instr: _ } => vec![may_use_symidx],
             NhwcInstrType::Chi { lhs: _, rhs , may_def_instr: _} => vec![rhs],
         };
         vec
     }
-        pub fn get_mut_def_symidx_vec(&mut self)->Vec<&mut RcSymIdx>{
+        pub fn get_mut_ssa_direct_def_symidx_vec(&mut self)->Vec<&mut RcSymIdx>{
         match &mut self.instr_type{
             NhwcInstrType::Label { label_symidx:_ } => vec![],
             NhwcInstrType::DefineFunc { func_symidx, ret_symidx:_, args } => {
@@ -335,7 +338,7 @@ impl NhwcInstr {
             NhwcInstrType::Chi { lhs, rhs: _ ,may_def_instr:_usize} => vec![lhs],
         }
     }
-    pub fn get_mut_use_symidx_vec(&mut self)->Vec<&mut RcSymIdx>{
+    pub fn get_mut_direct_use_symidx_vec(&mut self)->Vec<&mut RcSymIdx>{
         match &mut self.instr_type{
             NhwcInstrType::Label { label_symidx:_ } => vec![],
             NhwcInstrType::DefineFunc { func_symidx:_, ret_symidx:_, args: _ } => {

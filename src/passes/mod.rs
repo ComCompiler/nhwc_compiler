@@ -17,3 +17,4 @@ pub mod nhwc_dump_pass;
 pub mod mem_alloc_pass;
 pub mod func_call_pass;
 pub mod nhwc2et_pass;
+pub mod ssa_deconstruction_pass;

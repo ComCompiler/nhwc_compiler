@@ -1,5 +1,6 @@
-use std::{collections::HashMap, thread::JoinHandle};
+use std::{ thread::JoinHandle};
 
+use ahash::{HashMap, HashMapExt};
 use anyhow::Result;
 
 
@@ -47,8 +48,9 @@ impl NhwcCtx {
             symtab:{
                 let mut symtab = SymTab::new(); 
                 add_symbol!({SymIdx::new(0, COMPILATION_UNIT.to_string()).into_symbol()} 
-                    with_field ALL_CFG_FUNC_NAME_ENTRY_TUPLES:{vec![]}
+                    with_field ALL_CFG_FUNC_SYMIDX_ENTRY_TUPLES:{vec![]}
                     with_field TEMP_COUNTER:{0}
+                    with_field GLOBAL_VARS:{vec![]}
                 to symtab);
                 symtab},
             code:String::new(),

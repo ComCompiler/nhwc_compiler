@@ -14,6 +14,11 @@ pub type SymTabGraph = StableDiGraph<SymTab, SymTabEdge, u32>;
 pub struct RcSymIdx { 
     rc_symidx:Rc<RefCell<SymIdx>>
 }
+impl Hash for RcSymIdx{
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.rc_symidx.as_ptr().hash(state);
+    }
+}
 impl RcSymIdx{
     pub fn new(symidx:SymIdx) -> Self{
         Self { rc_symidx: Rc::new(RefCell::new(symidx)) }
@@ -128,6 +133,9 @@ impl SymIdx {
         cloned.index_ssa = None;
         cloned
     }
+    pub fn is_src_symidx(&self) -> bool{
+        self.index_ssa.is_none()
+    }
     pub fn as_src_symidx(mut self)-> SymIdx{
         self.index_ssa = None;
         self
@@ -238,7 +246,7 @@ impl Default for SymTab {
 impl Debug for SymIdx {
     fn fmt(&self, f:&mut Formatter<'_>) -> std::fmt::Result {
         match self.index_ssa {
-            Some(index_ssa) => write!(f, "{}*{}*{}", self.symbol_name, self.scope_node, index_ssa),
+            Some(index_ssa) => write!(f, "{}_{}_{}", self.symbol_name, self.scope_node, index_ssa),
             // Some(index_ssa) => write!(f, "{}*{}*{}", self.symbol_name,  ,index_ssa),
             // None => write!(f, "{} _s{}", self.symbol_name, self.scope_node),
             None => write!(f, "{}_{}", self.symbol_name, self.scope_node),

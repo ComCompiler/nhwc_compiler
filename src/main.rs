@@ -10,7 +10,7 @@ use std::{path::PathBuf, time::Instant};
 use antlr_parser::cparser::{RULE_compoundStatement, RULE_functionDefinition};
 use clap::Parser;
 
-use passes::{ast2cfg_pass::Ast2CfgPass, ast2et_debug_pass::Ast2EtDebugPass, ast2st_pass::Ast2StPass, cfg2ncfg_pass::Cfg2NcfgPass, code2ast_pass::Code2AstPass, nhwc2et_pass::{self, Nhwc2EtPass}, nhwc2riscv_pass::Nhwc2RiscvPass, nhwc_dump_pass::NhwcDumpPass, symtab_debug_pass::SymtabDebugPass};
+use passes::{ast2cfg_pass::Ast2CfgPass, ast2et_debug_pass::Ast2EtDebugPass, ast2st_pass::Ast2StPass, cfg2ncfg_pass::Cfg2NcfgPass, code2ast_pass::Code2AstPass, nhwc2et_pass::{self, Nhwc2EtPass}, nhwc2riscv_pass::Nhwc2RiscvPass, nhwc_dump_pass::NhwcDumpPass, ssa_deconstruction_pass::{self, SsaDeconstructionPass}, symtab_debug_pass::SymtabDebugPass};
 
 use crate::{passes::{cfg_debug_pass::CfgDebugPass, def_use_chain_debug_pass::DefUseChainDebugPass, mem_alloc_pass::MemAllocPass, ncfg2djg_pass::Ncfg2DjgPass, simulator_debug_pass::SimulatorDebugPass, ssa_pass::SsaPass}, toolkit::{pass_manager::PassManager}};
 #[derive(Parser, Clone, Default, Debug)]
@@ -69,6 +69,7 @@ fn main() {
     let ast2st_pass = Ast2StPass::new(debug);
     let ncfg2djg_pass = Ncfg2DjgPass::new(debug);
     let ssa_pass = SsaPass::new(debug, debug);
+    let ssa_deconstruction_pass = SsaDeconstructionPass::new(debug, debug);
     let cfg_debug_pass1 = CfgDebugPass::new(debug);
     let cfg_debug_pass2 = CfgDebugPass::new(debug);
     let def_use_chain_debug_pass: DefUseChainDebugPass = DefUseChainDebugPass::new(debug);
@@ -86,16 +87,17 @@ fn main() {
         then cfg2ncfg_pass
         then ncfg2djg_pass
         then ssa_pass
-        then mem_alloc_pass
+        then def_use_chain_debug_pass
         // then cfg_debug_pass2
-        // then def_use_chain_debug_pass
-        then nhwc_dump_pass
         // then simulator_debug_pass
         then ast2et_debug_pass
         then symtab_debug_pass
-        then nhwc2riscv_pass
-        then cfg_debug_pass2
         // then nhwc2et_pass
+        then ssa_deconstruction_pass
+        then nhwc_dump_pass
+        then mem_alloc_pass
+        then cfg_debug_pass2
+        // then nhwc2riscv_pass
         to pass_manager
         
     );

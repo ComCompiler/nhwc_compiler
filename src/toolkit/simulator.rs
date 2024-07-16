@@ -330,7 +330,7 @@ impl Simulator{
         let instr_struct = instr_slab.get_instr(self.instr_list[self.cur_instr_pos])?;
         // println!("exec_single_instr : {:?}",instr_struct);
         // 对于 use 到常量时的处理
-        for use_symidx in instr_struct.get_use_symidx_vec(){
+        for use_symidx in instr_struct.get_ssa_direct_use_symidx_vec(){
             let simu_symtab = &mut self.simu_symtab;
             let use_symidx = use_symidx.as_ref_borrow();
             if !simu_symtab.has_symbol(&use_symidx) && *src_symtab.get(&use_symidx)?.get_is_literal()?{
@@ -343,7 +343,7 @@ impl Simulator{
             
         }
         
-        for def_symidx in instr_struct.get_def_symidx_vec(){
+        for def_symidx in instr_struct.get_ssa_direct_def_symidx_vec(){
             let def_symidx = def_symidx.as_ref_borrow();
             let src_var_symidx= def_symidx.to_src_symidx();
             let simu_symtab = &mut self.simu_symtab;
