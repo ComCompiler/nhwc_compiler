@@ -22,42 +22,48 @@
               alloc ptr->i32 temp_4_array_init_ptr_17 
               alloc ptr->i32 temp_5_array_init_ptr_17 
               alloc ptr->i32 temp_6_array_init_ptr_17 
-              alloc Array:i32:[Some(2_0), Some(3_0)] a_17 
+              alloc ptr->i32 temp_7_array_init_ptr_17 
+              alloc Array:i32:[Some(3_0), Some(4_0)] a_17 
           label L0_0: 
-              new_var a_17:Array:i32:[Some(2_0), Some(3_0)] 
+              new_var a_17:Array:i32:[Some(3_0), Some(4_0)] 
               new_var temp_0_array_init_ptr_17:ptr->i32 
-              temp_0_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(2_0), Some(3_0)] [] 
-               Call void memset_0(temp_0_array_init_ptr_17, 0_0, 24_0) 
+              temp_0_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [] 
+               Call void memset_0(temp_0_array_init_ptr_17, 0_0, 48_0) 
               new_var temp_1_array_init_ptr_17:ptr->i32 
-              temp_1_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(2_0), Some(3_0)] [Some(0_0), Some(0_0)] 
-              store 1_0:i32 temp_1_array_init_ptr_17:ptr->Array:i32:[Some(3_0)] 
+              temp_1_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [Some(1_0), Some(1_0)] 
+              store 6_0:i32 temp_1_array_init_ptr_17:ptr->Array:i32:[Some(4_0)] 
               mu a_17:24 
               a_17 = chi a_17:24 
               new_var temp_2_array_init_ptr_17:ptr->i32 
-              temp_2_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(2_0), Some(3_0)] [Some(1_0), Some(0_0)] 
-              store 4_0:i32 temp_2_array_init_ptr_17:ptr->Array:i32:[Some(3_0)] 
+              temp_2_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [Some(0_0), Some(3_0)] 
+              store 4_0:i32 temp_2_array_init_ptr_17:ptr->Array:i32:[Some(4_0)] 
               mu a_17:30 
               a_17 = chi a_17:30 
               new_var temp_3_array_init_ptr_17:ptr->i32 
-              temp_3_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(2_0), Some(3_0)] [Some(1_0), Some(1_0)] 
-              store 5_0:i32 temp_3_array_init_ptr_17:ptr->Array:i32:[Some(3_0)] 
+              temp_3_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [Some(1_0), Some(0_0)] 
+              store 5_0:i32 temp_3_array_init_ptr_17:ptr->Array:i32:[Some(4_0)] 
               mu a_17:36 
               a_17 = chi a_17:36 
               new_var temp_4_array_init_ptr_17:ptr->i32 
-              temp_4_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(2_0), Some(3_0)] [Some(1_0), Some(2_0)] 
-              store 6_0:i32 temp_4_array_init_ptr_17:ptr->Array:i32:[Some(3_0)] 
+              temp_4_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [Some(0_0), Some(0_0)] 
+              store 1_0:i32 temp_4_array_init_ptr_17:ptr->Array:i32:[Some(4_0)] 
               mu a_17:42 
               a_17 = chi a_17:42 
               new_var temp_5_array_init_ptr_17:ptr->i32 
-              temp_5_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(2_0), Some(3_0)] [Some(0_0), Some(1_0)] 
-              store 2_0:i32 temp_5_array_init_ptr_17:ptr->Array:i32:[Some(3_0)] 
+              temp_5_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [Some(1_0), Some(2_0)] 
+              store 7_0:i32 temp_5_array_init_ptr_17:ptr->Array:i32:[Some(4_0)] 
               mu a_17:48 
               a_17 = chi a_17:48 
               new_var temp_6_array_init_ptr_17:ptr->i32 
-              temp_6_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(2_0), Some(3_0)] [Some(0_0), Some(2_0)] 
-              store 3_0:i32 temp_6_array_init_ptr_17:ptr->Array:i32:[Some(3_0)] 
+              temp_6_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [Some(0_0), Some(2_0)] 
+              store 3_0:i32 temp_6_array_init_ptr_17:ptr->Array:i32:[Some(4_0)] 
               mu a_17:54 
               a_17 = chi a_17:54 
+              new_var temp_7_array_init_ptr_17:ptr->i32 
+              temp_7_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [Some(0_0), Some(1_0)] 
+              store 2_0:i32 temp_7_array_init_ptr_17:ptr->Array:i32:[Some(4_0)] 
+              mu a_17:60 
+              a_17 = chi a_17:60 
               jump label: exit_2 
           label exit_2: 
               ret 0_0 

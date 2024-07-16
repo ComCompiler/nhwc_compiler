@@ -1,6 +1,8 @@
+use std::thread::scope;
+
 use ahash::HashMap;
 
-use crate::{add_edge, add_node, add_node_with_edge, debug_info_red, get_ast_from_symidx, node, toolkit::{field::Type, symtab::WithBorrow}};
+use crate::{add_edge, add_node, add_node_with_edge, debug_info_red, get_ast_from_symidx, node, node_mut, toolkit::{field::Type, gen_nhwc_cfg::IS_LITERAL, symtab::WithBorrow}};
 use anyhow::Result;
 use super::{cfg_node::InstrList, et_node::{EtEdgeType, EtNode, EtNodeType, EtTree}, nhwc_instr::{ArithOp, InstrSlab, NhwcInstr}, scope_node::ScopeTree, symtab::{self, RcSymIdx, SymIdx, SymTab}};
 
@@ -63,16 +65,72 @@ pub fn parse_instr_list_to_et(instrs:&InstrList,instr_et:&mut EtTree,stmtab:&Sym
             },
             super::nhwc_instr::NhwcInstrType::Alloc { var_symidx, vartype } => todo!(),
             super::nhwc_instr::NhwcInstrType::Globl { var_symidx, vartype } => todo!(),
-            super::nhwc_instr::NhwcInstrType::Load { lhs, ptr_symidx, ptr_ty } => todo!(),
-            super::nhwc_instr::NhwcInstrType::Store { val_symidx, value_ty, ptr_symidx, ptr_ty } => todo!(),
-            super::nhwc_instr::NhwcInstrType::GetElementPtr { lhs, array_or_ptr_symidx, array_ty, idx_vec } => {
-                println!("{:?}\n,{:?}\n,{:?}\n,{:?}\n",lhs,array_or_ptr_symidx,array_ty,idx_vec);
-                let array_dims = array_ty.get_array_dim()?;
-                for dim in array_dims{
-                    let dim_literal = dim.unwrap();
+            super::nhwc_instr::NhwcInstrType::Load { lhs, ptr_symidx, ptr_ty } => {
+                let rc_ptr_symidx = ptr_symidx.as_ref_borrow();
+                if let Some(&ptr_etnode) = child_et_map.get(&rc_ptr_symidx){
+                    let load_ast = get_ast_from_symidx!(find rc_ptr_symidx with scope_tree);
+                    let mut load_et_struct:EtNode = EtNodeType::new_load(load_ast).into();
+                    load_et_struct.equivalent_symidx_vec.push(lhs.clone());
+                    let load_et_node = add_node!({load_et_struct} to instr_et);
+                    add_edge!({EtEdgeType::Direct.into()} from load_et_node to ptr_etnode in instr_et);
+                    let rc_val_symidx = lhs.as_ref_borrow();
+                    child_et_map.insert(rc_val_symidx.clone(), load_et_node);
+                }else{
+                    //waring
+                    //问题详情看Store
                 }
-                println!("{:?}",array_dim);
-                todo!();
+            },
+            super::nhwc_instr::NhwcInstrType::Store { val_symidx, value_ty, ptr_symidx, ptr_ty } => {
+                println!("{:?},{:?},{:?},{:?}",val_symidx,value_ty,ptr_symidx,ptr_ty);
+                let rc_ptr_symidx = ptr_symidx.as_ref_borrow();
+                if let Some(&ptr_etnode) = child_et_map.get(&rc_ptr_symidx){
+                    let store_ast = get_ast_from_symidx!(find rc_ptr_symidx with scope_tree);
+                    let mut store_et_struct:EtNode = EtNodeType::new_store(store_ast).into();
+                    store_et_struct.equivalent_symidx_vec.push(val_symidx.clone());
+                    let store_et_node = add_node!({store_et_struct} to instr_et);
+                    add_edge!({EtEdgeType::Direct.into()} from store_et_node to ptr_etnode in instr_et);
+                    let rc_val_symidx = val_symidx.as_ref_borrow();
+                    child_et_map.insert(rc_val_symidx.clone(), store_et_node);
+                }else{
+                    //waring
+                    //原本这里是想要找到之前没出现过的ptr_symidx，但这里正常来说因该都能找到，没有找到说明该语句上一步的getelement语句的ptr不对，正常来说应该是能跑通说明是已经存在过的。Load同理
+                }
+            },
+            super::nhwc_instr::NhwcInstrType::GetElementPtr { lhs, array_or_ptr_symidx, array_ty, idx_vec } => {
+                //获取索引
+                let array_dims = array_ty.get_array_dim()?;
+                let rc_arr_symidx = array_or_ptr_symidx.as_ref_borrow();
+                let arr_ast = get_ast_from_symidx!(find rc_arr_symidx with scope_tree);
+                //构建数组名称节点
+                let arr_name_et_struct:EtNode = if idx_vec.is_empty(){
+                    EtNodeType::new_symbol(arr_ast, array_or_ptr_symidx.clone(), crate::toolkit::et_node::DeclOrDefOrUse::Def).into()
+                }else{
+                    EtNodeType::new_symbol(arr_ast, array_or_ptr_symidx.clone(), crate::toolkit::et_node::DeclOrDefOrUse::Use).into()
+                };
+                let mut child_arr_etnode = add_node!({arr_name_et_struct} to instr_et);
+                child_et_map.insert(rc_arr_symidx.clone(), child_arr_etnode);
+                //遍历dims
+                for dim in array_dims{
+                    let dim_literal = <Option<RcSymIdx> as Clone>::clone(&dim).unwrap();
+                    let rc_dim_literal = dim_literal.as_ref_borrow();
+                    let dim_ast = get_ast_from_symidx!(find rc_dim_literal with scope_tree);
+                    //创建数组的[]节点
+                    let arr_dim_branch_struct:EtNode = EtNodeType::new_op_array_idx(dim_ast).into();
+                    let arr_dim_etnode = add_node!({arr_dim_branch_struct} to instr_et);
+                    add_edge!({EtEdgeType::Direct.into()} from arr_dim_etnode to child_arr_etnode in instr_et);
+                    //创建具体dim内容节点
+                    if let Some(&dim_literal_etnode) = child_et_map.get(&rc_dim_literal){
+                        add_edge!({EtEdgeType::Direct.into()} from arr_dim_etnode to dim_literal_etnode in instr_et);
+                    }else{
+                        let dim_literal_etnode = add_node_with_edge!({EtNodeType::new_literal(dim_ast, dim_literal.clone()).into()} with_edge {EtEdgeType::Direct.into()} from arr_dim_etnode in instr_et);
+                        child_et_map.insert(rc_dim_literal.clone(), dim_literal_etnode);
+                    }
+                    //更换下一次递归的连接对象
+                    child_arr_etnode = arr_dim_etnode;
+                }
+                //warning:这里想要对自下而上递归建立的dim的子树的跟加入lhs的symidx，但不太会用
+                // let a = node_mut!(at child_arr_etnode in instr);
+                // todo!();
             },
             super::nhwc_instr::NhwcInstrType::Arith { lhs: rc_lhs, rhs } => {
                 let lhs = rc_lhs.as_ref_borrow();
@@ -217,7 +275,8 @@ pub fn parse_instr_list_to_et(instrs:&InstrList,instr_et:&mut EtTree,stmtab:&Sym
                 }
             },
             super::nhwc_instr::NhwcInstrType::Call { op_assigned_symidx, func_op } => {
-                todo!();
+                //warning:还没写，忘了
+                // todo!();
             },
             super::nhwc_instr::NhwcInstrType::Jump { jump_op } => todo!(),
             // super::nhwc_instr::NhwcInstrType::Phi { lhs, rhs } => todo!(),

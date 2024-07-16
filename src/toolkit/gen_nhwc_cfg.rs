@@ -1735,6 +1735,7 @@ fn process_et(
                             }
                         }
                     }
+                    _ => {todo!()},
                 }
             }
             EtNodeType::Literal { rc_literal_symidx, ast_node, text: _} => {
