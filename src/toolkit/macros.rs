@@ -716,3 +716,16 @@ macro_rules! code_pos {
         
     };
 }
+// 这是一个计时宏
+#[macro_export]
+macro_rules! timeit {
+    ($ret:block , $word:expr) => {{
+        use log::info;
+        let start_time = Instant::now();
+        let ret = $ret;
+        let duration = Instant::now() - start_time;
+        info!("{} 耗时: {:?}", $word, duration);
+        println!("{} 耗时: {:?}", $word, duration);
+        ret
+    }};
+}

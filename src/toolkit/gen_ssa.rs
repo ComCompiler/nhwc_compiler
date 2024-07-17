@@ -178,12 +178,11 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                         let def_symidx = def_symidx;
                         // replace the definition of src_symidx by def_symidx
                         // symtab.get_mut_symbol(&src_symidx).
-                        // 以下构建链
+                        // 以下构建链 construct the chain 
                         let op_src_reaching_def = symtab.get(&def_symidx)?.get_ssa_reaching_def()?.clone();
                         match &op_src_reaching_def{
                             Some(src_reaching_def) => {
                                 *symtab.get_mut(&rc_new_symidx.as_ref_borrow())?.get_mut_ssa_reaching_def()? = Some(src_reaching_def.clone()); 
-                                *symtab.get_mut(&src_reaching_def.as_ref_borrow())?.get_mut_ssa_reaching_def()? = Some(src_reaching_def.clone()); 
                             },
                             None => {
                                 // do nothing 
@@ -225,12 +224,17 @@ pub fn update_reaching_def(instr:usize,src_symidx:&SymIdx,symtab:&mut SymTab,cfg
     // src_symidx 的 reaching_def 一开始被设置为None,
     let mut r = symtab.get(&src_symidx)?.get_ssa_reaching_def()?.as_ref();
     debug_info_yellow!("current_ssa_reaching_def {:?}",r);
+    let mut count = 0;
     while r != None && {
         let &instr2 = symtab.get(&r.as_ref().unwrap().as_ref_borrow())?.get_ssa_def_instr()?;
         if instr_is_dominated_by(instr,instr2, cfg_graph, dj_graph, instr_slab)?{
             debug_info_yellow!("{:?} is_dominated_by {:?}",instr!(at instr in instr_slab)?, instr!(at instr2 in instr_slab)?);
             false
         }else {
+            count  = count +1 ;
+            if count> 20 {
+                return Err(anyhow!("count >20"));
+            }
             debug_info_yellow!("{:?} is_not_dominated_by {:?}",instr!(at instr in instr_slab)?, instr!(at instr2 in instr_slab)?);
             true
         }
@@ -467,6 +471,7 @@ fn update_cfg_instr_idx_in_cfg_node_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,
     let outdated = &mut node_mut!(at cfg_node in cfg_graph).instrs.outdated ;
     // 只有当instrList 是outdated 状态才进行操作
     if !*outdated {
+        debug_info_yellow!("cfg_node:{} is not outdated",cfg_node);
         return Ok(());
     }
     *outdated = false;

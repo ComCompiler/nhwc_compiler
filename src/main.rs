@@ -40,18 +40,6 @@ pub struct Args {
     pub annotation:bool,
 }
 
-// 这是一个计时宏
-macro_rules! timeit {
-    ($a:block , $word:expr) => {{
-        use log::info;
-        let start_time = Instant::now();
-        let a = $a;
-        let duration = Instant::now() - start_time;
-        info!("{} 耗时: {:?}", $word, duration);
-        println!("{} 耗时: {:?}", $word, duration);
-        a
-    }};
-}
 
 fn main() {
     // 读取命令选项，诸如 -c 表示代码文件地址
@@ -88,7 +76,6 @@ fn main() {
         then ncfg2djg_pass
         then ssa_pass
         then def_use_chain_debug_pass
-        // then cfg_debug_pass2
         // then simulator_debug_pass
         then ast2et_debug_pass
         then symtab_debug_pass

@@ -2,6 +2,7 @@ use std::panic;
 use anyhow::*;
 use petgraph::stable_graph::NodeIndex;
 use petgraph::graph::Edge;
+use std::time::Instant;
 
 use crate::antlr_parser::clexer::{
     And, Arrow, Constant, Div, DivAssign, Dot, Equal, Greater, GreaterEqual, Identifier, LeftShift, Less, LessEqual, Minus, MinusAssign, MinusMinus, Mod, MulAssign, Not, NotEqual, Plus, PlusAssign, PlusPlus, RightShift, Star, StringLiteral, Tilde
@@ -10,7 +11,7 @@ use crate::antlr_parser::cparser::{
     Assign, Const, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_conditionalExpression, RULE_declaration, RULE_declarationSpecifier, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forDeclaration, RULE_forMidExpression, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_initializerList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_typeQualifier, RULE_typeSpecifier, RULE_unaryExpression, RULE_unaryOperator
 };
 
-use crate::{add_edge, add_node, add_node_with_edge, debug_info_blue, debug_info_red, debug_info_yellow, direct_child_node, direct_child_nodes, find, find_nodes, node, rule_id, term_id};
+use crate::{add_edge, add_node, add_node_with_edge, debug_info_blue, debug_info_red, debug_info_yellow, direct_child_node, direct_child_nodes, find, find_nodes, node, rule_id, term_id, timeit};
 
 use super::et_node::{DeclOrDefOrUse, EtEdgeType, EtNodeType, EtTree};
 use super::etc::dfs;
@@ -54,6 +55,7 @@ use super::{ast_node::AstTree, scope_node::ScopeTree};
 // 这个函数 返回 separator node
 // 只能处理三类  expr_stmt & declaration & expr
 pub fn process_any_stmt(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, any_stmt_node:u32, scope_node:u32) -> u32 {
+    // timeit!({
     debug_info_red!("process any_stmt: {}",any_stmt_node);
     let sep_node = match node!(at any_stmt_node in ast_tree).rule_id {
         RULE_expressionStatement => {
@@ -112,7 +114,7 @@ pub fn process_any_stmt(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Scop
     // let calcuate_expr_node = eval_et(et_tree, sep_node);
     // et_tree.remove_node(find_nodes!());
     // let _ = eval_et(et_tree, sep_node);
-    sep_node
+    sep_node// } ,"parse_any_stmt finished")
 }
 fn is_any_expr_inner_node(ast_tree:&AstTree,ast_node:u32) -> bool{
     if node!(at ast_node in ast_tree).is_terminal{

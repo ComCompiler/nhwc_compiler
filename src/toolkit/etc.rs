@@ -1,10 +1,11 @@
 use std::{
     env, fmt::Debug, fs::File, io::{Read, Write}, process::Command, thread::{spawn, JoinHandle}
 };
+use std::time::Instant;
 
 use colored::Colorize;
 use log::info;
-use crate::{direct_parent_nodes, instr};
+use crate::{direct_parent_nodes, instr, timeit};
 
 use crate::{
     direct_child_nodes, toolkit::dot::{Config, Dot}
@@ -80,7 +81,6 @@ pub fn read_file_content(path:String) -> String {
     File::open(path).expect("文件读取异常").read_to_string(&mut buf).expect("读取失败");
     buf
 }
-
 pub fn dfs<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32) -> Vec<u32>
 where
     Ty: EdgeType,

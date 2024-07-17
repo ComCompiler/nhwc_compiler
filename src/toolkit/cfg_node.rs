@@ -108,6 +108,7 @@ impl InstrList{
     }
     pub fn insert(&mut self,idx:usize,instr:usize){
         self.instr_vec.insert(idx, instr);
+        self.outdated = true;
     }
     /// 删除在 vec 中下标为 idx 的 instr 索引
     pub fn remove(&mut self,idx:usize){

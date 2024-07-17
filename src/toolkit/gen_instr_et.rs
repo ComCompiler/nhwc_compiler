@@ -2,7 +2,7 @@ use std::thread::scope;
 
 use ahash::HashMap;
 
-use crate::{add_edge, add_node, add_node_with_edge, debug_info_red, get_ast_from_symidx, node, node_mut, toolkit::{field::Type, gen_nhwc_cfg::IS_LITERAL, symtab::WithBorrow}};
+use crate::{add_edge, add_node, add_node_with_edge, debug_info_blue, debug_info_red, get_ast_from_symidx, node, node_mut, toolkit::{field::Type, gen_nhwc_cfg::IS_LITERAL, symtab::WithBorrow}};
 use anyhow::Result;
 use super::{cfg_node::InstrList, et_node::{EtEdgeType, EtNode, EtNodeType, EtTree}, nhwc_instr::{ArithOp, InstrSlab, NhwcInstr}, scope_node::ScopeTree, symtab::{self, RcSymIdx, SymIdx, SymTab}};
 
@@ -10,7 +10,7 @@ pub fn process_arith_et(instr_et:&mut EtTree,symidx_et_node_map:&mut HashMap<Sym
     let arith_et = add_node!({arith_et_struct.clone()} to instr_et);
     arith_et_struct.equivalent_symidx_vec.push(rc_lhs.clone());
     symidx_et_node_map.insert(rc_lhs.as_ref_borrow().clone(), arith_et);
-    println!("添加变量{:?},{}",rc_lhs.clone(),arith_et);
+    debug_info_blue!("添加变量{:?},{}",rc_lhs.clone(),arith_et);
     let a = rc_a.as_ref_borrow();
     let b = rc_b.as_ref_borrow();
     let lhs = rc_lhs.as_ref_borrow();
@@ -21,7 +21,7 @@ pub fn process_arith_et(instr_et:&mut EtTree,symidx_et_node_map:&mut HashMap<Sym
         let a_ast = get_ast_from_symidx!(find a with scope_tree);
         let a_et = add_node_with_edge!({EtNodeType::new_symbol(a_ast,rc_a.clone(),super::et_node::DeclOrDefOrUse::Use).into()} with_edge {EtEdgeType::Direct.into()} from arith_et in instr_et);
         symidx_et_node_map.insert(a.clone(), a_et);
-        println!("添加左{:?},{}",rc_a.clone(),a_et);
+        debug_info_blue!("添加左{:?},{}",rc_a.clone(),a_et);
     }
     if let Some(&b_node) = symidx_et_node_map.get(&b){
         add_edge!({EtEdgeType::Direct.into()} from arith_et to b_node in instr_et);
@@ -29,7 +29,7 @@ pub fn process_arith_et(instr_et:&mut EtTree,symidx_et_node_map:&mut HashMap<Sym
         let b_ast = get_ast_from_symidx!(find a with scope_tree);
         let b_et = add_node_with_edge!({EtNodeType::new_symbol(b_ast,rc_a.clone(),super::et_node::DeclOrDefOrUse::Use).into()} with_edge {EtEdgeType::Direct.into()} from arith_et in instr_et);
         symidx_et_node_map.insert(b.clone(), b_et);
-        println!("添加右{:?},{}",b.clone(),b_et);
+        debug_info_blue!("添加右{:?},{}",b.clone(),b_et);
     }
 }
 
@@ -81,7 +81,7 @@ pub fn parse_instr_list_to_et(instrs:&InstrList,instr_et:&mut EtTree,stmtab:&Sym
                 }
             },
             super::nhwc_instr::NhwcInstrType::Store { val_symidx, value_ty, ptr_symidx, ptr_ty } => {
-                println!("{:?},{:?},{:?},{:?}",val_symidx,value_ty,ptr_symidx,ptr_ty);
+                debug_info_blue!("{:?},{:?},{:?},{:?}",val_symidx,value_ty,ptr_symidx,ptr_ty);
                 let rc_ptr_symidx = ptr_symidx.as_ref_borrow();
                 if let Some(&ptr_etnode) = child_et_map.get(&rc_ptr_symidx){
                     let store_ast = get_ast_from_symidx!(find rc_ptr_symidx with scope_tree);
@@ -98,7 +98,7 @@ pub fn parse_instr_list_to_et(instrs:&InstrList,instr_et:&mut EtTree,stmtab:&Sym
             },
             super::nhwc_instr::NhwcInstrType::GetElementPtr { lhs, array_or_ptr_symidx, array_ty, idx_vec } => {
                 //获取索引
-                let array_dims = array_ty.get_array_dim()?;
+                let array_dims = idx_vec;
                 let rc_arr_symidx = array_or_ptr_symidx.as_ref_borrow();
                 let arr_ast = get_ast_from_symidx!(find rc_arr_symidx with scope_tree);
                 //构建数组名称节点
@@ -260,7 +260,7 @@ pub fn parse_instr_list_to_et(instrs:&InstrList,instr_et:&mut EtTree,stmtab:&Sym
                 let rhs_ast = get_ast_from_symidx!(find rhs with scope_tree);
                 if let Some(&rhs_et_node) = child_et_map.get(&rhs){
 
-                    println!("anan{:?},{}",rhs,rhs_et_node);
+                    debug_info_blue!("anan{:?},{}",rhs,rhs_et_node);
                     let assign_et_struct = node!(at rhs_et_node in instr_et);
                     assign_et_struct.clone().equivalent_symidx_vec.push(rc_lhs.clone());
                     child_et_map.insert(lhs.clone(), rhs_et_node);

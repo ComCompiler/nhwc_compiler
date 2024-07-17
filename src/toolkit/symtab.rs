@@ -16,7 +16,8 @@ pub struct RcSymIdx {
 }
 impl Hash for RcSymIdx{
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.rc_symidx.as_ptr().hash(state);
+        self.as_ref_borrow().symbol_name.hash(state);
+        self.as_ref_borrow().scope_node.hash(state);
     }
 }
 impl RcSymIdx{

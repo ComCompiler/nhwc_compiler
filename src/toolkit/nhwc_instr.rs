@@ -196,7 +196,7 @@ impl NhwcInstr {
     pub fn load_idx_text(&mut self,instr:usize){
         self.text += format!("{}",instr).as_str()
     }
-    pub fn get_def_and_use_symidx_vec(&self)->Vec<&RcSymIdx>{
+    pub fn get_ssa_def_and_use_symidx_vec(&self)->Vec<&RcSymIdx>{
         let all_symidx_vec = self.get_ssa_direct_def_symidx_vec();
         self.get_ssa_direct_use_symidx_vec().append(&mut self.get_ssa_direct_use_symidx_vec());
         all_symidx_vec
