@@ -116,7 +116,7 @@ where
     _reverse_dfs_with_predicate(graph, start_node, &mut visited, &mut dfs_vec, &mut predicate);
     dfs_vec
 }
-fn _reverse_dfs_with_predicate<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, dfs_vec:&mut Vec<u32>, predicate:&mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->bool)
+pub fn _reverse_dfs_with_predicate<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, dfs_vec:&mut Vec<u32>, predicate:&mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->bool)
 where
     Ty: EdgeType,
 {
@@ -130,7 +130,7 @@ where
         }
     }
 }
-fn _dfs_with_predicate<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, dfs_vec:&mut Vec<u32>, predicate:&mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->bool)
+pub fn _dfs_with_predicate<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, dfs_vec:&mut Vec<u32>, predicate:&mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->bool)
 where
     Ty: EdgeType,
 {
@@ -158,7 +158,7 @@ where
     _dfs_with_priority(graph, start_node, &mut visited, &mut dfs_vec, &mut predicate);
     dfs_vec
 }
-fn _dfs_with_priority<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, dfs_vec:&mut Vec<u32>, priority:&mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->isize)
+pub fn _dfs_with_priority<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, dfs_vec:&mut Vec<u32>, priority:&mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->isize)
 where
     Ty: EdgeType,
 {

@@ -11,6 +11,7 @@ use crate::toolkit::symtab::WithBorrow;
 use super::cfg_node::InstrList;
 use super::asm_struct::AsmStructure;
 use super::nhwc_instr::NhwcInstr;
+use super::call_node::CallGraph;
 use super::rv64_instr::RV64Instr;
 use super::{
     ast_node::AstTree, cfg_node::CfgGraph, dug_node::DefUseGraph, dj_node::DjNode, et_node::EtTree, nhwc_instr::InstrSlab, scope_node::ScopeTree, symtab::{SymTab, SymTabGraph}
@@ -37,6 +38,7 @@ pub struct NhwcCtx {
     pub def_use_graph:DefUseGraph,
     pub collected_nhwc_ir: InstrList,
     pub io_task_list: Vec<JoinHandle<Result<()>>>,
+    pub call_graph: CallGraph,
 }
 pub(crate) static COMPILATION_UNIT:&str = "!compilation_unit";
 impl NhwcCtx {
@@ -50,6 +52,7 @@ impl NhwcCtx {
                 add_symbol!({SymIdx::new(0, COMPILATION_UNIT.to_string()).into_symbol()} 
                     with_field ALL_CFG_FUNC_SYMIDX_ENTRY_TUPLES:{vec![]}
                     with_field TEMP_COUNTER:{0}
+                    with_field EXTERNAL_FUNC_SYMIDX_VEC:{vec![]}
                     with_field GLOBAL_VARS:{vec![]}
                 to symtab);
                 symtab},
@@ -66,6 +69,7 @@ impl NhwcCtx {
             io_task_list: vec![],
             collected_nhwc_ir: InstrList::new(),
             instr_et: EtTree::new(),
+            call_graph: CallGraph::new(),
         })
     }
 }

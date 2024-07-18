@@ -568,7 +568,7 @@ impl Simulator{
                 self.simu_add_value(&lhs,rhs_val)?;
             },
             Call { op_assigned_symidx, func_op } => {
-                self.push_func_call(op_assigned_symidx.as_ref(),&func_op.func_symidx, &func_op.actual_arg_symidx_vec,  src_symtab)?;
+                self.push_func_call(op_assigned_symidx.as_ref(),&func_op.rc_func_symidx, &func_op.actual_arg_symidx_vec,  src_symtab)?;
             },
             Jump {  jump_op } => {
                 match jump_op {

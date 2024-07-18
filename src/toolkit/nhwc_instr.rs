@@ -99,7 +99,7 @@ pub enum ArithOp {
 }
 #[derive(Clone)]
 pub struct FuncOp {
-    pub func_symidx:RcSymIdx,
+    pub rc_func_symidx:RcSymIdx,
     pub actual_arg_symidx_vec:Vec<RcSymIdx>, //存储所有的实参
     pub ret_type:Type
 }
@@ -545,7 +545,7 @@ impl NhwcInstrType {
     // Instruction -> Call -> FuncOp
     pub fn new_func_call(assigned:Option<RcSymIdx>, func:RcSymIdx, args:Vec<RcSymIdx>,ret_type:Type) -> Self {
         //也许可以直接传入一个Func结构体
-        Self::Call { op_assigned_symidx: assigned, func_op:FuncOp { func_symidx: func, actual_arg_symidx_vec: args,ret_type } }
+        Self::Call { op_assigned_symidx: assigned, func_op:FuncOp { rc_func_symidx: func, actual_arg_symidx_vec: args,ret_type } }
     }
     // Instruction -> Jump ->JumpOp
     pub fn new_ret(op_ret_sym:Option<RcSymIdx>) -> Self { Self::Jump { jump_op:JumpOp::Ret { op_ret_sym } } }
@@ -627,7 +627,7 @@ impl Debug for FuncOp {
         let new_str_vec = self.actual_arg_symidx_vec.iter().map(|x| format!("{:?}",x.as_ref_borrow())).collect_vec();
         let arg = new_str_vec.join(", ");
 
-        write!(f, " Call {:?} {:?}({})", self.ret_type,self.func_symidx.as_ref_borrow(), arg)
+        write!(f, " Call {:?} {:?}({})", self.ret_type,self.rc_func_symidx.as_ref_borrow(), arg)
     }
 }
 impl Debug for JumpOp {

@@ -15,6 +15,7 @@ pub mod def_use_chain_debug_pass;
 pub mod cfg_loop_unrolling_pass;
 pub mod nhwc_dump_pass;
 pub mod mem_alloc_pass;
-pub mod func_call_pass;
+pub mod call_graph_pass;
 pub mod nhwc2et_pass;
 pub mod ssa_deconstruction_pass;
+pub mod dead_code_elimination_pass;

@@ -10,6 +10,7 @@ pub struct DefUseNode{
     pub is_det:bool,
     pub instr:usize,
     pub text:String,
+    pub checked:bool,
 }
 #[derive(Clone)]
 pub enum DepType{
@@ -51,6 +52,7 @@ impl DefUseNode{
             instr,
             text: String::new(),
             is_det: false,
+            checked: false,
         }
     }
 }

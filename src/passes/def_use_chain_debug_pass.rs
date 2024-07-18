@@ -8,14 +8,6 @@ impl DefUseChainDebugPass {
     pub fn new(is_gen_png:bool) -> Self { DefUseChainDebugPass { is_gen_png } }
 }
 
-reg_field_for_struct!(NhwcInstr
-    {
-        COR_DEF_USE_NODE:u32,
-    }
-    with_fields info
-    with_prefix DUG
-);
-
 impl Pass for DefUseChainDebugPass {
     // 运行这个pass
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> { 

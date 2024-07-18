@@ -67,24 +67,28 @@ reg_field_for_struct!(Symbol {
         CONST_COR_LITERAL_SYMIDX:SymIdx,
         IS_TEMP:bool,
         IS_GLOBAL:bool,
+        IS_FUNC_PARA:bool,
         IS_LITERAL:bool,
         IS_EXTERNAL:bool,
         POINTED_SYMIDX:RcSymIdx,
         LABEL_CFG_NODE:u32,
         TEMP_COUNTER:u32,
-        GLOBAL_MU_CALL_SET:HashSet<RcSymIdx>,
-        GLOBAL_CHI_CALL_SET:HashSet<RcSymIdx>,
+        GLOBAL_MU_SET:HashSet<RcSymIdx>,
+        GLOBAL_CHI_SET:HashSet<RcSymIdx>,
+        LOCAL_MU_SET:HashSet<RcSymIdx>,
+        LOCAL_CHI_SET:HashSet<RcSymIdx>,
     } with_fields fields);
+/// global_mu_call_set stores all mu to global variable in 
 // for compilation unit symbol
 reg_field_for_struct!(Symbol {
         ALL_CFG_FUNC_SYMIDX_ENTRY_TUPLES:Vec<(RcSymIdx,u32)>,
         GLOBAL_VARS:Vec<RcSymIdx>,
+        EXTERNAL_FUNC_SYMIDX_VEC:Vec<RcSymIdx>,
     } with_fields fields);
 // for func symbol
 // declared_vars field is not for mem_alloc, it's about simulator and ssa 
 reg_field_for_struct!(Symbol {
         DECLARED_VARS:Vec<RcSymIdx>,
-        FUNC_CALL_VEC:Vec<RcSymIdx>,
         CFG_ENTRY_NODE:u32,
     } with_fields fields);
 reg_field_for_struct!(CfgNode {
@@ -515,9 +519,10 @@ fn process_func_symbol(
         with_field IS_TEMP:{false}
         with_field IS_LITERAL:{false}
         with_field IS_EXTERNAL:{is_external}
-        with_field FUNC_CALL_VEC: {vec![]}
-        with_field GLOBAL_MU_CALL_SET:{HashSet::new()} 
-        with_field GLOBAL_CHI_CALL_SET:{HashSet::new()} 
+        with_field GLOBAL_MU_SET:{HashSet::new()} 
+        with_field GLOBAL_CHI_SET:{HashSet::new()} 
+        with_field LOCAL_MU_SET:{HashSet::new()} 
+        with_field LOCAL_CHI_SET:{HashSet::new()} 
     to symtab );
     Ok(func_symidx)
 }
@@ -562,6 +567,7 @@ fn process_symbol(
                 with_field IS_GLOBAL:{is_global}
                 with_field IS_TEMP:{false} 
                 with_field IS_LITERAL:{false}
+                with_field IS_FUNC_PARA:{node!(at scope_parent_node in scope_tree).scope_type.is_func()}
             to symtab );
             // if it is global then add global ptr to this global variable and add global variables 
             if is_global{
@@ -616,9 +622,10 @@ fn process_symbol(
                     _ => {
                         let temp_type = symtab.get(&symidx)?.get_type()?.clone();
                         let ptr_type = symtab.get(&symidx.to_globl_ptr()?)?.get_type()?.clone();
-                        let temp_symidx = process_temp_symbol(cfg_graph, symtab, &temp_type, scope_parent_node, cfg_node, instr_slab,  op_et_node, et_tree, "ptr2globl")?;
-                        node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_load(temp_symidx.clone(), 
+                        let temp_symidx = process_temp_symbol(cfg_graph, symtab, &temp_type, scope_parent_node, cfg_node, instr_slab,  op_et_node, et_tree, "value_from_ptr")?;
+                        let load_instr = node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_load(temp_symidx.clone(), 
                             symtab.get(&symidx.to_globl_ptr()?)?.rc_symidx.clone(), ptr_type.clone()).into(), instr_slab)?;
+                        let _mu_instr = node_mut!(at cfg_node in cfg_graph ).push_nhwc_instr(NhwcInstrType::new_mu(rc_symidx.clone(),load_instr).into(),instr_slab)?;
                         Ok(temp_symidx)
                     }
                 }
@@ -642,10 +649,7 @@ fn process_symbol(
             if *symtab.get(&symidx)?.get_is_global()? {
                 match symtab.get(&symidx)?.get_type()?{
                     Type::Array { dims, ele_ty } => {
-                        // let temp_type = symtab.get(&symidx)?.get_type()?.clone();
-                        // let ptr_type = symtab.get(&symidx.to_globl_ptr()?)?.get_type()?.clone();
-                        // let temp_symidx = process_temp_symbol(cfg_graph, symtab, &temp_type, scope_parent_node, cfg_node, instr_slab, &mut None, op_et_node, et_tree, "ptr2globl")?;
-                        // node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(NhwcInstrType::new_assign(temp_symidx.clone(), symidx.to_globl_ptr()?, ptr_type.clone()).into(), instr_slab)?;
+                        // return the global_ptr if is global variable 
                         Ok(symtab.get(&symidx.to_globl_ptr()?)?.rc_symidx.clone())
                     },
                     _ => {
@@ -1109,9 +1113,6 @@ fn process_call(
     // 给func call节点的field中添加cor symidx信息
     let rc_caller_func_symidx = node_mut!(at cfg_bb in cfg_graph).get_func_cor_symidx()?.clone();
     let caller_func_symidx = rc_caller_func_symidx.as_ref_borrow();
-    // 
-    symtab.get_mut(&caller_func_symidx)?.get_mut_func_call_vec()?.push(rc_callee_func_symidx.clone());
-
     // 实参
     let mut rc_para_symidx_vec = vec![];
     for &para_et_node in func_name_and_args[1..].iter() {
@@ -1860,6 +1861,7 @@ fn parse_extern_declfunc2nhwc(
             }
             let func_type = Type::Fn { arg_syms: arg_syms.clone(), ret_sym:rc_func_ret_symidx.clone()};
             symtab.get_mut(&func_symidx)?.add_type(func_type.clone());
+            symtab.get_mut_global_info().get_mut_external_func_symidx_vec()?.push(rc_func_symidx.clone());
             // label:function
             func_type
         }
@@ -1867,6 +1869,7 @@ fn parse_extern_declfunc2nhwc(
         else {
             let func_type = Type::Fn { arg_syms: vec![], ret_sym:rc_func_ret_symidx.clone()};
             symtab.get_mut(&func_symidx)?.add_type(func_type.clone());
+            symtab.get_mut_global_info().get_mut_external_func_symidx_vec()?.push(rc_func_symidx.clone());
             func_type
         };
         //将函数签名转为 global ir
@@ -2585,13 +2588,17 @@ pub fn insert_additional_mu_chi_for_call_instr(cfg_graph:&mut CfgGraph, instr_sl
                     NhwcInstrType::Mu { may_use_symidx: rc_may_use_symidx, may_use_instr } => {
                         let may_use_symidx = &rc_may_use_symidx.as_ref_borrow();
                         if *symtab.get(&may_use_symidx)?.get_is_global()?{
-                            symtab.get_mut(&rc_func_symidx.as_ref_borrow())?.get_mut_global_mu_call_set()?.insert(rc_may_use_symidx.clone());
+                            symtab.get_mut(&rc_func_symidx.as_ref_borrow())?.get_mut_global_mu_set()?.insert(rc_may_use_symidx.clone());
+                        }else {
+                            symtab.get_mut(&rc_func_symidx.as_ref_borrow())?.get_mut_local_mu_set()?.insert(rc_may_use_symidx.clone());
                         }
                     },
                     NhwcInstrType::Chi { lhs: rc_may_def_symidx, rhs, may_def_instr } => {
                         let may_def_symidx = &rc_may_def_symidx.as_ref_borrow();
                         if *symtab.get(&may_def_symidx)?.get_is_global()?{
-                            symtab.get_mut(&rc_func_symidx.as_ref_borrow())?.get_mut_global_chi_call_set()?.insert(rc_may_def_symidx.clone());
+                            symtab.get_mut(&rc_func_symidx.as_ref_borrow())?.get_mut_global_chi_set()?.insert(rc_may_def_symidx.clone());
+                        }else {
+                            symtab.get_mut(&rc_func_symidx.as_ref_borrow())?.get_mut_local_chi_set()?.insert(rc_may_def_symidx.clone());
                         }
                     },
                     _ => {
@@ -2607,22 +2614,13 @@ pub fn insert_additional_mu_chi_for_call_instr(cfg_graph:&mut CfgGraph, instr_sl
         for cfg_node in dfs_vec{
             let mut new_instrs = InstrList::new();
             let mut flag = false;
-            for (idx,&instr) in node!(at cfg_node in cfg_graph).instrs.iter().enumerate(){
-                let op_func_op = match &instr!(at instr in instr_slab)?.instr_type{
+            for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
+                match &mut instr_mut!(at instr in instr_slab)?.instr_type{
                     NhwcInstrType::Call { op_assigned_symidx, func_op } => {
                         new_instrs.push(instr);
-                        Some(func_op)
-                    },
-                    _ => {
-                        new_instrs.push(instr);
-                        None
-                    }
-                };
-                match op_func_op{
-                    Some(func_op) => {
                         flag = true;
-                        let mut chi_set = symtab.get(&func_op.func_symidx.as_ref_borrow())?.get_global_chi_call_set()?.clone();
-                        let mut mu_set = symtab.get(&func_op.func_symidx.as_ref_borrow())?.get_global_mu_call_set()?.clone();
+                        let mut chi_set = symtab.get(&func_op.rc_func_symidx.as_ref_borrow())?.get_global_chi_set()?.clone();
+                        let mut mu_set = symtab.get(&func_op.rc_func_symidx.as_ref_borrow())?.get_global_mu_set()?.clone();
                         for para_symidx in &func_op.actual_arg_symidx_vec{
                             let para_symidx = para_symidx.as_ref_borrow();
                             if symtab.get(&para_symidx)?.has_pointed_symidx(){
@@ -2631,16 +2629,41 @@ pub fn insert_additional_mu_chi_for_call_instr(cfg_graph:&mut CfgGraph, instr_sl
                                 mu_set.insert(pointed_symidx.clone());
                             }
                         }
-                        for rc_chi_symidx in chi_set{
-                            new_instrs.push(instr_slab.insert_instr(NhwcInstrType::new_chi(rc_chi_symidx.clone(),rc_chi_symidx.clone(), instr).into()));
-                        }
                         for rc_mu_symidx in mu_set{
                             new_instrs.push(instr_slab.insert_instr(NhwcInstrType::new_mu(rc_mu_symidx, instr).into()));
                         }
+                        for rc_chi_symidx in chi_set{
+                            new_instrs.push(instr_slab.insert_instr(NhwcInstrType::new_chi(rc_chi_symidx.clone(),rc_chi_symidx.clone(), instr).into()));
+                        }
                     },
-                    None =>  {
+                    NhwcInstrType::Jump { jump_op:JumpOp::Ret { op_ret_sym} } => {
+                        flag = true;
+                        let chi_iter = symtab.get(&rc_func_symidx.as_ref_borrow())?.get_global_chi_set()?.iter().chain(
+                        symtab.get(&rc_func_symidx.as_ref_borrow())?.get_local_chi_set()?.iter()
+                        .filter(|x| *symtab.get(&x.as_ref_borrow()).unwrap().get_is_func_para().unwrap()).into_iter());
+                        for rc_chi_symidx in chi_iter {
+                            new_instrs.push(instr_slab.insert_instr(NhwcInstrType::new_mu(rc_chi_symidx.clone(), instr).into()));
+                        }
                     }
-                }
+                    NhwcInstrType::Jump { jump_op } => {
+
+                    }
+                    NhwcInstrType::Label { label_symidx } => {
+
+                    }
+                    NhwcInstrType::DefineFunc { func_symidx, ret_symidx, args } => {
+                        new_instrs.push(instr);
+                        flag = true;
+                        let chi_iter = symtab.get(&rc_func_symidx.as_ref_borrow())?.get_global_chi_set()?.iter();
+
+                        for rc_chi_symidx in chi_iter {
+                            new_instrs.push(instr_slab.insert_instr(NhwcInstrType::new_chi(rc_chi_symidx.clone(),rc_chi_symidx.clone(), instr).into()));
+                        }
+                    }
+                    _ => {
+                        new_instrs.push(instr);
+                    }
+                };
             }
             if flag{
                 let _ = mem::replace(&mut node_mut!(at cfg_node in cfg_graph).instrs, new_instrs);

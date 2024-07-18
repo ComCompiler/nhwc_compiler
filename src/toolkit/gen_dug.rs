@@ -43,8 +43,8 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::Call { op_assigned_symidx: _, func_op: _ } => {},
                     NhwcInstrType::Jump { jump_op } => 
                         match jump_op{
-                            JumpOp::Ret { op_ret_sym: _ } => {},
-                            JumpOp::Br { cond: _, t1: _, t2: _ } => continue,
+                            JumpOp::Ret { op_ret_sym: _} => {},
+                            JumpOp::Br { cond: _, t1: _, t2: _ } => {},
                             JumpOp::Switch { cond: _, default: _, compared: _ } => continue,
                             JumpOp::DirectJump { label_symidx: _ } => continue,
                         },
@@ -119,8 +119,8 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::Call { op_assigned_symidx: _, func_op: _ } => {},
                     NhwcInstrType::Jump { jump_op } => 
                         match jump_op{
-                            JumpOp::Ret { op_ret_sym: _ } => {},
-                            JumpOp::Br { cond: _, t1: _, t2: _ } => continue,
+                            JumpOp::Ret { op_ret_sym: _} => {},
+                            JumpOp::Br { cond: _, t1: _, t2: _ } => {},
                             JumpOp::Switch { cond: _, default: _, compared: _ } => continue,
                             JumpOp::DirectJump { label_symidx: _ } => continue,
                         },
@@ -142,6 +142,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     let &def_instr = if symbol.has_ssa_def_instr(){
                         symbol.get_ssa_def_instr()?
                     }else{
+                        // println!("{:?} didn't has ssa_def_instr",rc_use_symidx);
                         continue;
                     };
                     let def_cfg_node = instr_slab.get_instr(def_instr)?.get_cfg_instr_idx()?.cfg_node;
@@ -176,10 +177,18 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                             let _dug_edge = add_edge!({DefUseEdge::new(rc_use_symidx.clone())} from def_dug_node to dug_cor_node in def_use_graph);
                         },
                         NhwcInstrType::Chi { lhs, rhs, may_def_instr } => {
+                            // here we consider it as 2 situation 
+                            // 1. when it is an array we should add edge from last def to here because you can't change all things in array in one time
+                            // 2. when it is a non-array variable we will not add this edge
+                            // if symtab.get(&lhs.as_ref_borrow().to_src_symidx())?.get_type()?.is_array() 
+                            // ||symtab.get(&lhs.as_ref_borrow().to_src_symidx())?.get_type()?.is_ptr_64(){
                             let may_def_instr = *may_def_instr;
                             let &dug_cor_node = instr!(at may_def_instr in instr_slab)?.get_dug_cor_def_use_node()?;
                             let &def_dug_node = instr!(at def_instr in instr_slab)?.get_dug_cor_def_use_node()?;
                             let _dug_edge = add_edge!({DefUseEdge::new(rc_use_symidx.clone())} from def_dug_node to dug_cor_node in def_use_graph);
+                            // }else {
+                            //     // do nothing
+                            // }
                         }
                         _ => {
                             let &dug_cor_node = cur_instr_struct.get_dug_cor_def_use_node()?;

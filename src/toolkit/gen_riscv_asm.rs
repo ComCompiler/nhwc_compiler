@@ -536,7 +536,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     NhwcInstrType::Call { op_assigned_symidx, func_op } => {
                         let mut fpr_args = vec![];
                         let mut gpr_args = vec![];
-                        let func_symidx = &func_op.func_symidx.as_ref_borrow();
+                        let func_symidx = &func_op.rc_func_symidx.as_ref_borrow();
                         asm_sect.annotate("saved register dumping to mem".to_string());
                         if symtab.get(func_symidx)?.has_stack_pass_args(){
                             let stack_pass_args = symtab.get(func_symidx)?.get_stack_pass_args()?.clone();
@@ -621,7 +621,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                             }
                         }
                         asm_sect.annotate("arg load ended\n".to_string());
-                        asm_sect.asm(PseudoInstr::new_call(Imm::new_global_label(func_op.func_symidx.clone())).into());
+                        asm_sect.asm(PseudoInstr::new_call(Imm::new_global_label(func_op.rc_func_symidx.clone())).into());
                         match op_assigned_symidx{
                             Some(assigned_symidx) => {
                                 let assigned_symidx = assigned_symidx.as_ref_borrow();

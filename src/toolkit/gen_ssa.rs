@@ -24,7 +24,9 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
 
     for (rc_func_symidx,_cfg_entry) in symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.iter(){
         let func_symidx = rc_func_symidx.as_ref_borrow();
-        for rc_variable in symtab.get(&func_symidx)?.get_declared_vars()?{
+        for rc_variable in symtab.get(&func_symidx)?.get_declared_vars()?.iter().chain(
+            symtab.get_global_info().get_global_vars()?.iter()
+        ){
             // if *symtab.get_symbol(variable)?.get_is_temp()?{
             //     // 我们不处理 临时变量的 ssa
             //     continue;
@@ -426,6 +428,9 @@ pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut
                                 todo!()
                             }
                         }
+                    }
+                    NhwcInstrType::Nope {  } => {
+                        // do nothing
                     }
                     _ => {
                         panic!("find non-phi instr in phi_instrs of cfg_node:{}",cfg_node);

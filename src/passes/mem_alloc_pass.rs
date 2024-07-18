@@ -73,7 +73,9 @@ impl Pass for MemAllocPass {
                     },
                     crate::toolkit::nhwc_instr::NhwcInstrType::DefineVar { var_symidx, vartype, op_value } => {
                     },
-                    _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 和 new_var 之外的 instr {:?}",instr!(at instr in instr_slab)));},
+                    crate::toolkit::nhwc_instr::NhwcInstrType::Chi { lhs, rhs, may_def_instr } => {
+                    },
+                    _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 和 new_var 和 chi 之外的 instr {:?}",instr!(at instr in instr_slab)));},
                 }
             }
             // align the mem by RISCV_STACK_MEM_ALIGN
@@ -94,7 +96,9 @@ impl Pass for MemAllocPass {
                     },
                     crate::toolkit::nhwc_instr::NhwcInstrType::DefineVar { var_symidx, vartype, op_value } => {
                     },
-                    _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 以及 definevar之外的 instr"));},
+                    crate::toolkit::nhwc_instr::NhwcInstrType::Chi { lhs, rhs, may_def_instr } => {
+                    },
+                    _ => {return Err(anyhow!("cfg_entry 中不应该出现 除了 defineFunc 和 alloc 和 new_var 和 chi 之外的 instr {:?}",instr!(at instr in instr_slab)));},
                 }
             }
             debug_info_red!("alloc ended");
