@@ -61,7 +61,7 @@ impl Pass for DeadCodeEliminationPass {
                 NhwcInstrType::Alloc { var_symidx, vartype } => {},
                 NhwcInstrType::Globl { var_symidx, vartype } => {},
                 _ => {
-                    println!("set instr {} to nope {:?}",unvisited_instr, instr!(at unvisited_instr in instr_slab)?);
+                    debug_info_blue!("set instr {} to nope {:?}",unvisited_instr, instr!(at unvisited_instr in instr_slab)?);
                     *instr_mut!(at unvisited_instr in instr_slab )? = NhwcInstrType::Nope {  }.into();
                 }
             }
