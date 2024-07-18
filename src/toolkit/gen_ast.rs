@@ -4,6 +4,8 @@ use petgraph::csr::NodeIndex;
 
 use crate::antlr_parser::rule_walkers::TerminalRuleListener;
 use crate::node_mut;
+use crate::toolkit::ast_node;
+use crate::toolkit::gen_et::compress_ast;
 use crate::{
     antlr_parser::{
         clexer::CLexer, cparser::{CParser, CTreeWalker}
@@ -11,7 +13,6 @@ use crate::{
 };
 
 use super::context::NhwcCtx;
-use super::eval_et::compress_et;
 // use super::gen_et::compress_ast;
 
 /// 把代码生成为AST树 code 为代码文本的字符串
@@ -22,11 +23,18 @@ pub fn parse_as_ast_tree(context:&mut NhwcCtx) {
     // 由于 antlr 已经生成了一个 AST 树 但我们需要的是 petgraph 类型，因此我们需要重新遍历一次这个树，生成 petgraph的
     {
         let mut count = 0;
+        let debug =  Box::new(context.args.debug);
+        let debug = Box::leak(debug);
+        
         let listener = TerminalRuleListener {
             st:(Vec::<usize>::new(), false, ast_tree, &mut count),
             enter_rule_f:Box::new(|ctx, s, is_terminal, type_idx| {
                 let (node_count_under_depth, is_last_wrap_drop, g, count) = s;
-                let mut ast_node = AstNode::new(type_idx, ctx.get_text(), is_terminal);
+                let mut ast_node = if is_terminal || *debug{
+                    AstNode::new(type_idx, Some(ctx.get_text()), is_terminal)
+                }else {
+                    AstNode::new(type_idx, None, is_terminal)
+                };
                 ast_node.node_index = **count;
                 **count += 1;
                 let node_id = g.add_node(ast_node).index();
@@ -67,7 +75,7 @@ pub fn parse_as_ast_tree(context:&mut NhwcCtx) {
         CTreeWalker::walk(Box::new(listener), &*tree);
     }
 
-    // compress_ast(&mut context.ast_tree);
-    // println!("{:?}",tree);
+    compress_ast(&mut context.ast_tree);
+    println!("{:?}","finished compress ast");
     // 更新 context 中的 ast_tree
 }

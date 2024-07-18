@@ -1,4 +1,4 @@
-use super::{context::COMPILATION_UNIT, field::Type, symbol::Symbol};
+use super::{context::COMPILATION_UNIT, field::{Type, Value}, symbol::Symbol};
 use crate::{add_node, add_node_with_edge };
 use core::fmt::Debug;
 use ahash::{AHashMap};
@@ -160,7 +160,13 @@ impl SymIdx {
             self.to_ssa_symidx(self.index_ssa.unwrap()+1)
         }
     }
-
+    pub fn try_log_two_as_i32(&self) -> Result<isize>{
+        if self.is_literal(){
+            Value::from_symidx(&self)?.log_if_is_pow_of_two()
+        }else {
+            Err(anyhow!("can't turn {:?} into log of two",self))
+        }
+    }
 }
 // macro_rules! make_get_field_func {
 //     ($($functionname:ident $field_name:ident:$field_type:ident),*) => {

@@ -518,23 +518,15 @@ impl Debug for Shifts {
 impl Shifts{
     /// mul 16 => shifts 4
     pub fn new_slli_from_multiple(reg1:Register,reg2:Register,mul:usize) -> Result<Self>{
-        Ok(match mul{
-            8 => {
-                Shifts::new_slli(reg1, reg2, Imm::from_offset(3))
-            },
-            4 => {
-                Shifts::new_slli(reg1, reg2, Imm::from_offset(2))
-            },
-            2 => {
-                Shifts::new_slli(reg1, reg2, Imm::from_offset(1))
-            },
-            1 => {
-                Shifts::new_slli(reg1, reg2, Imm::from_offset(0))
-            },
-            _ => {
-                return Err(anyhow!("unexpected shift size"))
+        if mul.is_power_of_two(){
+            let mut i = 0;
+            while mul > 2_usize.pow(i){
+                i=i+1;
             }
-        })
+            Ok(Shifts::new_slli(reg1, reg2, Imm::from_offset(i as isize)))
+        }else {
+            return Err(anyhow!("unexpected shift size"))
+        }
     }
 }
 #[derive(Clone,new)]
@@ -564,6 +556,8 @@ pub enum Arithmetic {
     FMULS { rd:Register, rs1:Register, rs2:Register },
     FDIVS { rd:Register, rs1:Register, rs2:Register },
     FSQRTS { rd:Register, rs1:Register },
+}
+impl Arithmetic {
 }
 impl Debug for Arithmetic {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {

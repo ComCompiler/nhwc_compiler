@@ -156,7 +156,7 @@ impl CfgNode {
     pub fn load_ast_node_text(&mut self, ast_tree:&AstTree)  -> Result<()>{
         match self.cfg_node_type.clone() {
             CfgNodeType::Entry { ast_node, calls_in_func: _ } => {
-                let node_text = node!(at ast_node in ast_tree).text.as_str();
+                let node_text = node!(at ast_node in ast_tree).op_text.as_ref().unwrap().as_str();
                 self.text += node_text;
                 self.text += "\n";
             }
@@ -169,23 +169,29 @@ impl CfgNode {
                 // op_true_head_tail_nodes: _true_head_tail_nodes,
                 // op_false_head_tail_nodes: _false_head_tail_nodess,
             } => {
-                self.text += node!(at ast_node in ast_tree).text.as_str();
-                self.text += "\n";
+                if node!(at ast_node in ast_tree).op_text.is_some(){
+                    self.text += node!(at ast_node in ast_tree).op_text.as_ref().unwrap().as_str();
+                    self.text += "\n";
+                }
             }
             CfgNodeType::Gather {} => {}
             CfgNodeType::BasicBlock { ast_nodes } => {
                 for ast_node in ast_nodes {
-                    let node_text = node!(at ast_node in ast_tree).text.clone();
-                    self.text += node_text.as_str();
-                    self.text += "\n";
+                    let node_text = node!(at ast_node in ast_tree).op_text.clone();
+                    if node_text.is_some(){
+                        self.text += node_text.as_ref().unwrap().as_str();
+                        self.text += "\n";
+                    }
                 }
                 self.text += "\n";
             }
             CfgNodeType::Root {static_ast_nodes} => {
                 for static_node in static_ast_nodes {
-                    let node_text = node!(at static_node in ast_tree).text.clone();
-                    self.text += node_text.as_str();
-                    self.text += "\n";
+                    let node_text = node!(at static_node in ast_tree).op_text.clone();
+                    if node_text.is_some(){
+                        self.text += node_text.as_ref().unwrap().as_str();
+                        self.text += "\n";
+                    }
                 }
             }
             CfgNodeType::ForLoop {
@@ -195,9 +201,9 @@ impl CfgNode {
                 // exit_node: _,
                 // op_body_head_tail_nodes: _body_node,
             } => {
-                self.text += node!(at ast_before_node in ast_tree).text.as_str();
-                self.text += node!(at ast_mid_node in ast_tree).text.as_str();
-                self.text += node!(at ast_after_node in ast_tree).text.as_str();
+                self.text += node!(at ast_before_node in ast_tree).op_text.as_ref().unwrap().as_str();
+                self.text += node!(at ast_mid_node in ast_tree).op_text.as_ref().unwrap().as_str();
+                self.text += node!(at ast_after_node in ast_tree).op_text.as_ref().unwrap().as_str();
                 self.text += "\n";
             }
             CfgNodeType::WhileLoop {
@@ -205,11 +211,11 @@ impl CfgNode {
                 // exit_node: _,
                 // body_node: _,
             } => {
-                self.text += node!(at ast_expr_node in ast_tree).text.as_str();
+                self.text += node!(at ast_expr_node in ast_tree).op_text.as_ref().unwrap().as_str();
                 self.text += "\n";
             }
             CfgNodeType::Switch { ast_expr_node } => {
-                self.text += node!(at ast_expr_node in ast_tree).text.as_str();
+                self.text += node!(at ast_expr_node in ast_tree).op_text.as_ref().unwrap().as_str();
                 self.text += "\n";
             }
         }

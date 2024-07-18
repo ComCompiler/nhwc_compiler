@@ -11,20 +11,20 @@ pub type AstTree = StableDiGraph<AstNode, (), u32>;
 pub struct AstNode {
     pub rule_id:usize, // grammar id
     pub node_index:u32,
-    pub text:String,
+    pub op_text:Option<String>,
     pub is_terminal:bool,
     pub child_vec:Vec<u32>,
 }
 impl AstNode {
-    pub fn new(rule_id:usize, text:String, is_terminal:bool) -> Self { Self { rule_id, node_index:0, text, is_terminal, child_vec: vec![] } }
+    pub fn new(rule_id:usize, op_text:Option<String>, is_terminal:bool) -> Self { Self { rule_id, node_index:0, op_text: op_text, is_terminal, child_vec: vec![] } }
 }
 
 impl Debug for AstNode {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if !self.is_terminal {
-            write!(f, "{} {} {}", crate::antlr_parser::cparser::ruleNames[self.rule_id], self.text, self.node_index)
+            write!(f, "{} {}", crate::antlr_parser::cparser::ruleNames[self.rule_id], self.node_index)
         } else {
-            write!(f, "{} {} {}", crate::antlr_parser::clexer::_SYMBOLIC_NAMES[self.rule_id].unwrap(), self.text, self.node_index)
+            write!(f, "{} {} {}", crate::antlr_parser::clexer::_SYMBOLIC_NAMES[self.rule_id].unwrap(), self.op_text.clone().unwrap(), self.node_index)
         }
     }
 }

@@ -11,7 +11,7 @@ use crate::antlr_parser::cparser::{
     Assign, Const, RULE_additiveExpression, RULE_andExpression, RULE_argumentExpressionList, RULE_assignmentExpression, RULE_assignmentOperator, RULE_castExpression, RULE_conditionalExpression, RULE_declaration, RULE_declarationSpecifier, RULE_declarationSpecifiers, RULE_declarator, RULE_directDeclarator, RULE_equalityExpression, RULE_exclusiveOrExpression, RULE_expression, RULE_expressionStatement, RULE_forAfterExpression, RULE_forBeforeExpression, RULE_forDeclaration, RULE_forMidExpression, RULE_inclusiveOrExpression, RULE_initDeclarator, RULE_initDeclaratorList, RULE_initializer, RULE_initializerList, RULE_logicalAndExpression, RULE_logicalOrExpression, RULE_multiplicativeExpression, RULE_parameterDeclaration, RULE_parameterList, RULE_parameterTypeList, RULE_postfixExpression, RULE_primaryExpression, RULE_relationalExpression, RULE_shiftExpression, RULE_typeName, RULE_typeQualifier, RULE_typeSpecifier, RULE_unaryExpression, RULE_unaryOperator
 };
 
-use crate::{add_edge, add_node, add_node_with_edge, debug_info_blue, debug_info_red, debug_info_yellow, direct_child_node, direct_child_nodes, find, find_nodes, node, rule_id, term_id, timeit};
+use crate::{add_edge, add_node, add_node_with_edge, debug_info_blue, debug_info_red, debug_info_yellow, direct_child_nodes, find, find_nodes, node, rule_id, term_id, timeit};
 
 use super::et_node::{DeclOrDefOrUse, EtEdgeType, EtNodeType, EtTree};
 use super::etc::dfs;
@@ -20,37 +20,37 @@ use super::gen_cfg::AST_ROOT;
 use super::symtab::SymIdx;
 use super::{ast_node::AstTree, scope_node::ScopeTree};
 
-// pub fn compress_ast(ast_tree:&mut AstTree){
-//     let dfs_nodes = dfs(ast_tree, AST_ROOT);
-//     let mut op_compress_start_node = None;
-//     for ast_node in dfs_nodes{
-//         // start condition 
-//         if ast_node % 300 == 0{
-//             debug_info_blue!("ast_node {ast_node}");
-//         }
-//         if node!(at ast_node in ast_tree).child_vec.len()==1 && is_any_expr_inner_node(ast_tree, ast_node) && is_any_expr_inner_node(ast_tree,node!(at ast_node in ast_tree).child_vec[0]){
-//             match op_compress_start_node {
-//                 Some(compress_start_node) => {
-//                     // do nothing
-//                 },
-//                 None => {
-//                     op_compress_start_node = Some(ast_node);
-//                     // remove the edge from here to child
-//                     // let child = node!(at ast_node in ast_tree).child_vec[0];
-//                     // let ast_edge_to_remove = ast_tree.find_edge(NodeIndex::new(ast_node as usize), NodeIndex::new(child as usize)).unwrap();
-//                     // ast_tree.remove_edge(ast_edge_to_remove);
-//                 },
-//             }
-//         }else {
-//             if let Some(compress_start_node) = op_compress_start_node{
-//                 // the simple chain end here, so we just add a edge from start to here 
-//                 add_edge!(from compress_start_node to ast_node in ast_tree);
-//                 op_compress_start_node = None;
+pub fn compress_ast(ast_tree:&mut AstTree){
+    let dfs_nodes = dfs(ast_tree, AST_ROOT);
+    let mut op_compress_start_node = None;
+    for ast_node in dfs_nodes{
+        // start condition 
+        if ast_node % 300 == 0{
+            debug_info_blue!("ast_node {ast_node}");
+        }
+        if node!(at ast_node in ast_tree).child_vec.len()==1 && is_any_expr_inner_node(ast_tree, ast_node) && is_any_expr_inner_node(ast_tree,node!(at ast_node in ast_tree).child_vec[0]){
+            match op_compress_start_node {
+                Some(compress_start_node) => {
+                    // do nothing
+                },
+                None => {
+                    op_compress_start_node = Some(ast_node);
+                    // remove the edge from here to child
+                    // let child = node!(at ast_node in ast_tree).child_vec[0];
+                    // let ast_edge_to_remove = ast_tree.find_edge(NodeIndex::new(ast_node as usize), NodeIndex::new(child as usize)).unwrap();
+                    // ast_tree.remove_edge(ast_edge_to_remove);
+                },
+            }
+        }else {
+            if let Some(compress_start_node) = op_compress_start_node{
+                // the simple chain end here, so we just add a edge from start to here 
+                add_edge!(from compress_start_node to ast_node in ast_tree);
+                op_compress_start_node = None;
 
-//             }
-//         }
-//     }
-// }
+            }
+        }
+    }
+}
 
 // 这个函数 返回 separator node
 // 只能处理三类  expr_stmt & declaration & expr
@@ -242,6 +242,10 @@ fn process_direct_decl(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Scope
         // 这说明这是一个至少有一个参数的 函数 声明
     } else if let Some(ident_node) = find!(term Identifier at direct_decl_node in ast_tree) {
         // 这说明这只是一个简单的 ident
+        let type_ast_node  = node!(at type_ast_node in ast_tree).child_vec[0];
+        if !node!(at type_ast_node in ast_tree).is_terminal{
+            panic!()
+        }
         process_ident(et_tree, ast_tree, scope_tree, ident_node, scope_node, parent_et_node, DeclOrDefOrUse::DeclDef { type_ast_node, is_const});
     } else if let Some(assign_expr_node) = find!(rule RULE_assignmentExpression at direct_decl_node in ast_tree) {
         // 说明这是一个数组，其中索引有表达式 assign_expr_node
@@ -345,8 +349,8 @@ fn process_cond_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTr
     process_any_expr_inner_node(et_tree, ast_tree, scope_tree, logical_or_node, scope_node, parent_et_node);
 }
 fn process_logical_or_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, logical_or_expr_node:u32, scope_node:u32, parent_et_node:u32) {
-    let mut logical_and_expr_nodes = direct_child_nodes!(at logical_or_expr_node in ast_tree iter_reversed);
-    let first = logical_and_expr_nodes.next().unwrap();
+    let mut logical_and_expr_nodes = node!(at logical_or_expr_node in ast_tree).child_vec.iter().rev();
+    let &first = logical_and_expr_nodes.next().unwrap();
     if logical_and_expr_nodes.next() == None{
         process_any_expr_inner_node(et_tree, ast_tree, scope_tree, first, scope_node, parent_et_node);
         return;
@@ -370,8 +374,8 @@ fn process_logical_or_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&S
     }
 }
 fn process_logical_and_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, logical_and_expr:u32, scope_node:u32, parent_et_node:u32) {
-    let mut inclusive_or_nodes = direct_child_nodes!(at logical_and_expr in ast_tree iter_reversed);
-    let first = inclusive_or_nodes.next().unwrap();
+    let mut inclusive_or_nodes = node!(at logical_and_expr in ast_tree ).child_vec.iter().rev();
+    let &first = inclusive_or_nodes.next().unwrap();
     if inclusive_or_nodes.next() == None{
         process_any_expr_inner_node(et_tree, ast_tree, scope_tree, first, scope_node, parent_et_node);
         return;
@@ -394,13 +398,13 @@ fn process_logical_and_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&
     }
 }
 fn process_inclusive_or_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, inclusive_or_expr:u32, scope_node:u32, parent_et_node:u32) {
-    let mut exclusive_or_nodes = direct_child_nodes!(at inclusive_or_expr in ast_tree iter_reversed);
-    let first = exclusive_or_nodes.next().unwrap();
+    let mut exclusive_or_nodes = node!(at inclusive_or_expr in ast_tree ).child_vec.iter().rev();
+    let &first = exclusive_or_nodes.next().unwrap();
     if exclusive_or_nodes.next() == None{
         process_any_expr_inner_node(et_tree, ast_tree, scope_tree, first, scope_node, parent_et_node);
         return;
     }
-    let exclusive_or_nodes = direct_child_nodes!(at inclusive_or_expr in ast_tree);
+    let exclusive_or_nodes = &node!(at inclusive_or_expr in ast_tree).child_vec;
     let mut op_last_ep_inclusive_or_node = None;
     for (index, &exclusive_or_node) in exclusive_or_nodes.iter().enumerate() {
         if index%2 == 1{ continue;}
@@ -419,8 +423,8 @@ fn process_inclusive_or_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:
     }
 }
 fn process_exclusive_or_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, exclusive_or_expr_node:u32, scope_node:u32, parent_et_node:u32) {
-    let mut and_expr_nodes = direct_child_nodes!(at exclusive_or_expr_node in ast_tree iter_reversed);
-    let first = and_expr_nodes.next().unwrap();
+    let mut and_expr_nodes = node!(at exclusive_or_expr_node in ast_tree ).child_vec.iter().rev();
+    let &first = and_expr_nodes.next().unwrap();
     if and_expr_nodes.next() == None{
         process_any_expr_inner_node(et_tree, ast_tree, scope_tree, first, scope_node, parent_et_node);
         return;
@@ -444,8 +448,8 @@ fn process_exclusive_or_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:
     }
 }
 fn process_and_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, and_expr_node:u32, scope_node:u32, parent_et_node:u32) {
-    let mut equality_expr_nodes = direct_child_nodes!(at and_expr_node in ast_tree iter_reversed);
-    let first = equality_expr_nodes.next().unwrap();
+    let mut equality_expr_nodes = node!(at and_expr_node in ast_tree ).child_vec.iter().rev();
+    let &first = equality_expr_nodes.next().unwrap();
     if equality_expr_nodes.next() == None{
         process_any_expr_inner_node(et_tree, ast_tree, scope_tree, first, scope_node, parent_et_node);
         return;
@@ -470,8 +474,8 @@ fn process_and_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTre
 }
 
 fn process_equality_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, equality_expr_node:u32, scope_node:u32, parent_et_node:u32) {
-    let mut relational_exprs = direct_child_nodes!(at equality_expr_node in ast_tree iter_reversed);
-    let first = relational_exprs.next().unwrap();
+    let mut relational_exprs = node!(at equality_expr_node in ast_tree ).child_vec.iter().rev();
+    let &first = relational_exprs.next().unwrap();
     if relational_exprs.next() == None{
         process_any_expr_inner_node(et_tree, ast_tree, scope_tree, first, scope_node, parent_et_node);
         return;
@@ -511,8 +515,8 @@ fn process_equality_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Sco
 }
 
 fn process_relational_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, relational_expr_node:u32, scope_node:u32, parent_et_node:u32) {
-    let mut shift_expr_nodes = direct_child_nodes!(at relational_expr_node in ast_tree iter_reversed);
-    let first = shift_expr_nodes.next().unwrap();
+    let mut shift_expr_nodes = node!(at relational_expr_node in ast_tree ).child_vec.iter().rev();
+    let &first = shift_expr_nodes.next().unwrap();
     if shift_expr_nodes.next() == None{
         process_any_expr_inner_node(et_tree, ast_tree, scope_tree, first, scope_node, parent_et_node);
         return;
@@ -549,8 +553,8 @@ fn process_relational_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&S
 }
 
 fn process_shift_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, shift_expr_node:u32, scope_node:u32, parent_et_node:u32) {
-    let mut additive_expr_nodes = direct_child_nodes!(at shift_expr_node in ast_tree iter_reversed);
-    let first = additive_expr_nodes.next().unwrap();
+    let mut additive_expr_nodes = node!(at shift_expr_node in ast_tree ).child_vec.iter().rev();
+    let &first = additive_expr_nodes.next().unwrap();
     if additive_expr_nodes.next() == None{
         process_any_expr_inner_node(et_tree, ast_tree, scope_tree, first, scope_node, parent_et_node);
         return;
@@ -587,13 +591,13 @@ fn process_shift_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeT
 
 fn process_additive_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTree, additive_expr_node:u32, scope_node:u32, parent_et_node:u32) {
     // debug_info_blue!("process additive expr at {}",additive_expr_node);
-    let mut multiplicative_expr_nodes = direct_child_nodes!(at additive_expr_node in ast_tree iter_reversed);
-    let first = multiplicative_expr_nodes.next().unwrap();
+    let mut multiplicative_expr_nodes = node!(at additive_expr_node in ast_tree ).child_vec.iter().rev();
+    let &first = multiplicative_expr_nodes.next().unwrap();
     if multiplicative_expr_nodes.next() == None{
         process_any_expr_inner_node(et_tree, ast_tree, scope_tree, first, scope_node, parent_et_node);
         return;
     }
-    let multiplicative_expr_nodes = direct_child_nodes!(at additive_expr_node in ast_tree);
+    let multiplicative_expr_nodes = &node!(at additive_expr_node in ast_tree).child_vec;
     let get_expr_node_of_op_node = |op_node_index| {
         let op_node = multiplicative_expr_nodes[op_node_index];
         match term_id!(at op_node in ast_tree) {
@@ -632,14 +636,14 @@ fn process_multiplicative_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tre
     if parent_et_node%30 ==0{
         debug_info_red!("process multiplicaive {}",parent_et_node);
     }
-    let mut cast_expr_nodes = direct_child_nodes!(at multiplicative_expr_node in ast_tree iter_reversed);
-    let first = cast_expr_nodes.next().unwrap();
+    let mut cast_expr_nodes = node!(at multiplicative_expr_node in ast_tree ).child_vec.iter().rev();
+    let &first = cast_expr_nodes.next().unwrap();
     if cast_expr_nodes.next() == None{
         process_any_expr_inner_node(et_tree, ast_tree, scope_tree, first, scope_node, parent_et_node);
         return;
     }
 
-    let cast_expr_nodes = direct_child_nodes!(at multiplicative_expr_node in ast_tree);
+    let cast_expr_nodes = &node!(at multiplicative_expr_node in ast_tree).child_vec;
 
     let get_expr_node_of_op_node = |node_idx| {
         let node = cast_expr_nodes[node_idx];
@@ -680,7 +684,7 @@ fn process_cast_expr(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&ScopeTr
     // 检查 castExpression 节点是否是类型转换的情况
     if let Some(type_name_node) = find!(rule RULE_typeName at cast_expr_node in ast_tree) {
         // 如果存在 typeName，说明是类型转换的情况
-        let type_sym = SymIdx::new(scope_node, node!(at type_name_node in ast_tree).text.clone());
+        let type_sym = SymIdx::new(scope_node, node!(at type_name_node in ast_tree).op_text.clone().unwrap());
         // let cast_node = add_node_with_edge!({EtNodeType::new_op_cast( cast_expr_node).into()} with_edge {EtEdgeType::Direct.into()} from parent_et_node in et_tree);
         // 添加 cast op 节点的左节点，这是个 type symbol
         // add_node_with_edge!({EtNodeType::new_symbol(scope_node,type_sym,DeclOrDefOrUse::Use).into()} with_edge {EtEdgeType::Direct.into()} from cast_node in et_tree);
@@ -807,7 +811,7 @@ fn process_initializer(et_tree:&mut EtTree, ast_tree:&AstTree, scope_tree:&Scope
 /// 会把表达式中的符号添加到 symtab 中
 /// ? 这个过程并不需要符号表，因为符号表是用来检查 def use 是否合法的，比如变量在 定义前被使用了就是非法
 fn process_ident(et_tree:&mut EtTree, ast_tree:&AstTree, _scope_tree:&ScopeTree, ident_node:u32, scope_node:u32, parent_et_node:u32, def_or_use:DeclOrDefOrUse) {
-    let sym_name = node!(at ident_node in ast_tree).text.clone();
+    let sym_name = node!(at ident_node in ast_tree).op_text.clone().unwrap();
     // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 
     let symidx = SymIdx::new(scope_node, sym_name);
@@ -815,7 +819,7 @@ fn process_ident(et_tree:&mut EtTree, ast_tree:&AstTree, _scope_tree:&ScopeTree,
     add_node_with_edge!({EtNodeType::new_symbol(ident_node, symidx.as_rc(), def_or_use).into()} with_edge {EtEdgeType::Direct.into()} from parent_et_node in et_tree);
 }
 fn process_literal(et_tree:&mut EtTree, ast_tree:&AstTree, _scope_tree:&ScopeTree, literal_node:u32, scope_node:u32, parent_et_node:u32) {
-    let sym_name = node!(at literal_node in ast_tree).text.clone();
+    let sym_name = node!(at literal_node in ast_tree).op_text.clone().unwrap();
     // let sym_idx = SymbolIndex::new(scope_node, symbol_name);
 
     let literal_symidx = SymIdx::new(scope_node, sym_name);

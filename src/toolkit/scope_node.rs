@@ -14,14 +14,20 @@ pub static ST_ROOT:u32 = 0;
 #[derive(Clone)]
 pub struct ScopeNode {
     pub ast_node:u32,
-    pub text:String,
+    pub op_text:Option<String>,
     pub scope_type:ScopeType,
 }
 impl ScopeNode {
     pub fn load_ast_node_text(&mut self, ast_tree:&AstTree) {
         let ast_node = self.ast_node;
-        let new_str = node!(at ast_node in ast_tree).text.clone();
-        let _ = mem::replace(&mut self.text, new_str);
+        match node!(at ast_node in ast_tree).op_text.clone(){
+            Some(txt) => {
+                let _ = mem::replace(&mut self.op_text, Some(txt));
+            },
+            None => {
+                // do nothing
+            },
+        }
     }
 }
 // impl ScopeNode{
@@ -42,7 +48,7 @@ impl Debug for ScopeNode {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{} \n {:?} {}",
+            "{} \n {:?} {:?}",
             match self.scope_type {
                 ScopeType::For => "For",
                 ScopeType::While{ op_cfg_while_node } => "While",
@@ -54,7 +60,7 @@ impl Debug for ScopeNode {
                 ScopeType::Case => "Case",
             },
             self.ast_node,
-            self.text
+            self.op_text
         )
     }
 }

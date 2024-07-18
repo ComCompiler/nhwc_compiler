@@ -29,7 +29,7 @@ use super::{
 };
 use super::{cfg_edge::CfgEdgeType, cfg_node::CfgNodeType, field::Field, nhwc_instr::InstrSlab};
 use crate::antlr_parser::clexer::{Identifier, LeftParen};
-use crate::antlr_parser::cparser::{RULE_breakStatement, RULE_breakpointArg, RULE_breakpointStatement, RULE_continueStatement, RULE_initDeclarator, RULE_initDeclaratorList, RULE_returnStatement};
+use crate::antlr_parser::cparser::{RULE_breakStatement, RULE_breakpointArg, RULE_breakpointStatement, RULE_continueStatement, RULE_declarationSpecifier, RULE_initDeclarator, RULE_initDeclaratorList, RULE_returnStatement, RULE_typeSpecifier};
 use crate::toolkit::nhwc_instr::BreakpointArg;
 use crate::toolkit::scope_node::ST_ROOT;
 use crate::{debug_info_blue, debug_info_green, debug_info_red, direct_parent_node};
@@ -172,18 +172,18 @@ fn parse_bb2nhwc(
                             BreakpointArg{
                             symidx: {
                                 let head =  idents[0];
-                                let head_name = node!(at head in ast_tree).text.clone();
+                                let head_name = node!(at head in ast_tree).op_text.clone().unwrap();
                                 SymIdx::new(breakpoint_scope, head_name).as_rc()
                             },
                             op_field_name: {
                                 match idents.get(1) {
-                                    Some(&tail_name) => Some(node!(at tail_name in ast_tree).text.clone()),
+                                    Some(&tail_name) => Some(node!(at tail_name in ast_tree).op_text.clone().unwrap()),
                                     None => None,
                                 } 
                             },
                         } }).collect_vec();
                     let ret_instr = NhwcInstrType::new_breakpoint(
-                        SymIdx::new(breakpoint_scope, node!(at  breakpoint_head_node in ast_tree).text.clone()).as_rc(),
+                        SymIdx::new(breakpoint_scope, node!(at  breakpoint_head_node in ast_tree).op_text.clone().unwrap()).as_rc(),
                         breakpoint_args,
                     ).into();
                     node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
@@ -543,7 +543,7 @@ fn process_symbol(
             let var_type: Type ;
             // 这里有两种可能，一种是数组，一种是普通变量，如果是数组，那么et_node 上一定有 dims 字段
             if let Some(op_dims) = op_dims{
-                var_type = Type::new_array_dims_may_unknown(Type::new(type_ast_node, ast_tree), op_dims.clone())?;
+                var_type = Type::new_array_dims_may_unknown_with_dims_2_pow(Type::new(type_ast_node, ast_tree), op_dims.clone())?;
             }else{
                 var_type = Type::new(type_ast_node, ast_tree);
             }
@@ -1103,13 +1103,13 @@ fn process_call(
     match et_type {
         EtNodeType::Symbol { rc_symidx:_, ast_node, text:_, decldef_def_or_use } => {
             let ast_node = *ast_node;
-            func_name_str = node!(at ast_node in ast_tree).text.clone();
+            func_name_str = node!(at ast_node in ast_tree).op_text.clone();
         }
         _ => {
             return Err(anyhow!("et生成错误，call节点下第一个不是函数名"))
         }
     }
-    let rc_callee_func_symidx = &symtab.get(&SymIdx::new(0, func_name_str.clone()))?.rc_symidx.clone();
+    let rc_callee_func_symidx = &symtab.get(&SymIdx::new(0, func_name_str.clone().unwrap()))?.rc_symidx.clone();
     let callee_func_symidx = rc_callee_func_symidx.as_ref_borrow();
     // 给func call节点的field中添加cor symidx信息
     let rc_caller_func_symidx = node_mut!(at cfg_bb in cfg_graph).get_func_cor_symidx()?.clone();
@@ -1159,7 +1159,7 @@ fn process_call(
         }
         Ok((None,call_instr))
     }else{
-        let tmp_symidx = process_temp_symbol(cfg_graph, symtab, &ret_type, scope_node, cfg_bb,  instr_slab, Some(et_node),et_tree, format!("ret_of_{}",func_name_str).as_str())?;
+        let tmp_symidx = process_temp_symbol(cfg_graph, symtab, &ret_type, scope_node, cfg_bb,  instr_slab, Some(et_node),et_tree, format!("ret_of_{}",func_name_str.unwrap()).as_str())?;
         let call_instr_struct = NhwcInstrType::new_func_call(Some(tmp_symidx.clone()), rc_callee_func_symidx.clone(), rc_para_symidx_vec.clone(), ret_type).into();
         let call_instr = node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(call_instr_struct, instr_slab)?;
         for rc_para_symidx in rc_para_symidx_vec.iter().dedup(){
@@ -1793,11 +1793,12 @@ fn parse_extern_declfunc2nhwc(
     if let Some(&func_scope) = ast2scope.get(&decl_func_ast_node) {
         //获取函数名称
             
-        let func_name = &node!(at func_name_ast_node in ast_tree).text;
+        let func_name = &node!(at func_name_ast_node in ast_tree).op_text.clone().unwrap();
         // let name_symidx = SymIdx::new(0, func_name.to_string());
         //获取返回类型
-        let ast_retype = find!(rule RULE_declarationSpecifiers at decl_func_ast_node in ast_tree).unwrap();
-        let _func_rettype = &node!(at ast_retype in ast_tree).text;
+        let ast_retype = find!(rule RULE_declarationSpecifiers then RULE_declarationSpecifier finally RULE_typeSpecifier at decl_func_ast_node in ast_tree).unwrap();
+        let ast_retype = direct_child_node!(at ast_retype in ast_tree);
+        let _func_rettype = &node!(at ast_retype in ast_tree).op_text;
         //添加到符号表中，
         let rc_func_symidx = process_func_symbol(symtab, func_name,true)?;
         let func_symidx = rc_func_symidx.as_ref_borrow();
@@ -1816,7 +1817,8 @@ fn parse_extern_declfunc2nhwc(
             let ast_func_args = find_nodes!(rule RULE_parameterList finally RULE_parameterDeclaration at para in ast_tree);
             // debug_info_red!("func_args: {:?}",ast_func_args);
             for ast_parameter_decl_node in ast_func_args {
-                let ast_arg_type = find!(rule RULE_declarationSpecifiers at ast_parameter_decl_node in ast_tree).unwrap();
+                let ast_arg_type = find!(rule RULE_declarationSpecifiers then RULE_declarationSpecifier finally RULE_typeSpecifier at ast_parameter_decl_node in ast_tree).unwrap();
+                let ast_arg_type = direct_child_node!(at ast_arg_type in ast_tree);
 
                 let (et_sym_node,ast_sym_name_node) ={
                     let sep_node = gen_et::process_any_stmt(et_tree, ast_tree, scope_tree, ast_parameter_decl_node, func_scope);
@@ -1855,7 +1857,7 @@ fn parse_extern_declfunc2nhwc(
                     }
                     (cur_et_node,ast_sym_name_node)
                 };
-                let sym_name = &node!(at ast_sym_name_node in ast_tree).text;
+                let sym_name = &node!(at ast_sym_name_node in ast_tree).op_text.clone().unwrap();
 
                 let arg_symidx = process_symbol(ast_tree, scope_tree, symtab, instr_slab, &DeclOrDefOrUse::DeclDef { type_ast_node:ast_arg_type , is_const:false}, func_scope, sym_name, cfg_root, cfg_graph,Some(et_sym_node),et_tree)?;
                 arg_syms.push(arg_symidx);
@@ -1951,7 +1953,8 @@ fn parse_declvar2nhwc(
             EtNodeType::Literal { rc_literal_symidx: _, ast_node: _, text: _ } => todo!(),
             EtNodeType::Symbol { rc_symidx, ast_node, text:_, decldef_def_or_use } => {
                 //获得变量类型，做成symidx
-                let type_ast_node = find!(rule RULE_declarationSpecifiers at ast_decl_node in ast_tree).unwrap();
+                let type_ast_node = find!(rule RULE_declarationSpecifiers then RULE_declarationSpecifier finally RULE_typeSpecifier at ast_decl_node in ast_tree).unwrap();
+                let type_ast_node = direct_child_node!(at type_ast_node in ast_tree);
                 let var_type = Type::new(type_ast_node, ast_tree);
                 let var_str = &rc_symidx.as_ref_borrow().symbol_name;
                 let symbol_symidx = process_symbol(ast_tree, scope_tree, symtab,instr_slab, &decldef_def_or_use,  decl_parent_scope,var_str ,cfg_node,cfg_graph,Some(et_item_node),et_tree)?;
@@ -1984,11 +1987,11 @@ fn parse_func2nhwc(
     //获取函数所对应的scopenode
     if let Some(&func_scope) = ast2scope.get(&func_def_ast_node) {
         //获取函数名称
-        let func_name = &node!(at func_name_ast_node in ast_tree).text;
+        let func_name = &node!(at func_name_ast_node in ast_tree).op_text.clone().unwrap();
         // let name_symidx = SymIdx::new(0, func_name.to_string());
         //获取返回类型
-        let ast_retype = find!(rule RULE_declarationSpecifiers at func_def_ast_node in ast_tree).unwrap();
-        let _func_rettype = &node!(at ast_retype in ast_tree).text;
+        let ast_retype = find!(rule RULE_declarationSpecifiers then RULE_declarationSpecifier finally RULE_typeSpecifier at func_def_ast_node in ast_tree).unwrap();
+        let ast_retype = direct_child_node!(at ast_retype in ast_tree);
         //添加到符号表中，
         let rc_func_symidx = process_func_symbol(symtab,  func_name, false)?;
         let func_symidx = rc_func_symidx.as_ref_borrow();
@@ -2054,8 +2057,9 @@ pub fn parse_cfg_into_nhwc_cfg(
             );
             match op_arg_parenthesis{
                 Some(_) => {
-                    let func_name_ast_node = find!(rule RULE_initDeclaratorList then RULE_initDeclarator then RULE_declarator then RULE_directDeclarator finally RULE_directDeclarator at static_ast_node in ast_tree).unwrap();
+                    let func_name_ast_node = find!(rule RULE_initDeclaratorList then RULE_initDeclarator then RULE_declarator then RULE_directDeclarator then RULE_directDeclarator finally term Identifier at static_ast_node in ast_tree).unwrap();
                     // resolve declaration of function 2 nhwc
+                    // println!("{}", func_name_ast_node);
                     parse_extern_declfunc2nhwc(ast_tree, cfg_graph, symtab, et_tree, &ast2scope, static_ast_node, func_name_ast_node, CFG_ROOT, instr_slab,  scope_tree)?;
                 },
                 None => {
@@ -2073,8 +2077,7 @@ pub fn parse_cfg_into_nhwc_cfg(
             CfgNodeType::Entry { ast_node, calls_in_func: _ } => {
                 //查找函数名称所在节点
                 let func_def_ast_node = *ast_node;
-                let func_name_ast_node = find!(rule RULE_declarator then RULE_directDeclarator finally RULE_directDeclarator at func_def_ast_node in ast_tree).unwrap();
-
+                let func_name_ast_node = find!(rule RULE_declarator then RULE_directDeclarator then RULE_directDeclarator finally term Identifier at func_def_ast_node in ast_tree).unwrap();
                 parse_func2nhwc(ast_tree, cfg_graph, symtab,et_tree, ast2scope, func_def_ast_node, func_name_ast_node, cfg_entry, instr_slab,  scope_tree)?;
             }
             _ => return Err(anyhow!("entry不是函数签名,cfg出错")),

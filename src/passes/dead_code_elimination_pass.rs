@@ -1,4 +1,4 @@
-use crate::{ debug_info_blue, debug_info_green, instr_mut, node, reg_field_for_struct, toolkit::{context::NhwcCtx, dot::Config, etc::{_reverse_dfs_with_predicate, generate_png_by_graph_multi_tasks}, gen_dug::parse_dug, nhwc_instr::{JumpOp, NhwcInstr, NhwcInstrType}, pass_manager::Pass, symtab::{SymTab, SymTabEdge, SymTabGraph}}};
+use crate::{ debug_info_blue, debug_info_green, debug_info_yellow, instr_mut, node, reg_field_for_struct, toolkit::{context::NhwcCtx, dot::Config, etc::{_reverse_dfs_with_predicate, generate_png_by_graph_multi_tasks}, gen_dug::parse_dug, nhwc_instr::{JumpOp, NhwcInstr, NhwcInstrType}, pass_manager::Pass, symtab::{SymTab, SymTabEdge, SymTabGraph}}};
 use anyhow::*;
 use crate::instr;
 #[derive(Debug)]
@@ -61,7 +61,7 @@ impl Pass for DeadCodeEliminationPass {
                 NhwcInstrType::Alloc { var_symidx, vartype } => {},
                 NhwcInstrType::Globl { var_symidx, vartype } => {},
                 _ => {
-                    debug_info_blue!("set instr {} to nope {:?}",unvisited_instr, instr!(at unvisited_instr in instr_slab)?);
+                    debug_info_yellow!("set instr {} to nope {:?}",unvisited_instr, instr!(at unvisited_instr in instr_slab)?);
                     *instr_mut!(at unvisited_instr in instr_slab )? = NhwcInstrType::Nope {  }.into();
                 }
             }

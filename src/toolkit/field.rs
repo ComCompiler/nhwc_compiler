@@ -7,7 +7,7 @@ use anyhow::*;
 use regex::{self, Regex};
 
 
-use super::{ast_node::AstTree, scope_node::ST_ROOT, symtab::{SymIdx, WithBorrow}};
+use super::{ast_node::AstTree, scope_node::ST_ROOT, symbol, symtab::{SymIdx, WithBorrow}};
 use super::symtab::RcSymIdx;
 use crate::{debug_info_blue, debug_info_green, debug_info_red, node};
 
@@ -402,8 +402,51 @@ impl Value {
 
         Ok(base * 2f32.powi(exp))
     }
+    pub fn as_i32_to_min_2_power(self) -> Result<Self>{
+        match self{
+            Value::I32(Some(num)) => {
+                if num < 1 {
+                    return Err(anyhow!("you can't get the min 2 power of negative num {}",num))
+                }
+                let mut i = 0;
+                while num > 2_i32.pow(i){
+                    i=i+1;
+                }
+                Ok(Value::new_i32(2_i32.pow(i)))
+            },
+            _ => {Err(anyhow!("you can't get the min 2 power of {:?}",self))}
+        }
+    }
+    pub fn as_i32(self) -> Result<i32>{
+        match self{
+            Value::I32(Some(num)) => {
+                Ok(num)
+            },
+            _ => {Err(anyhow!("you can't get the min 2 power of {:?}",self))}
+        }
+    }
 
-
+    pub fn log_if_is_pow_of_two(self) -> Result<isize>{
+        match self{
+            Value::I32(Some(num)) => {
+                if num > 0 {
+                    let num  = num as usize;
+                    let mut i = 0;
+                    while num < 2_usize.pow(i){
+                        i=i+1;
+                    }
+                    if 2_usize.pow(i) == num {
+                        Ok(i as isize)
+                    }else {
+                        Err(anyhow!("can't log {:?} of 2",self))
+                    }
+                }else {
+                    Err(anyhow!("negative num"))
+                }
+            },
+            _ => {Err(anyhow!("you can't get the min 2 power of {:?}",self))}
+        }
+    }
 
     pub fn to_type(&self)->Type{
         match self{
@@ -490,7 +533,7 @@ impl Type {
     /// 但是无法识别数组类型(只能识别数组的元素类型)
     pub fn new(ast_node:u32, ast_tree:&AstTree) -> Self {
         // 在asttree中找到node的u32所在节点的类型,返回I32或F32
-        let text = node!(at ast_node in ast_tree).text.as_str();
+        let text = node!(at ast_node in ast_tree).op_text.as_ref().unwrap().as_str();
         match text {
             "int" => Type::I32,
             "float" => Type::F32,
@@ -513,6 +556,24 @@ impl Type {
         match &ele_ty{
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
             _=>{}
+        }
+        Ok(Type::Array { dims, ele_ty: Box::new(ele_ty) })
+    }
+    pub fn new_array_dims_may_unknown_with_dims_2_pow(ele_ty:Type,mut dims:Vec<Option<RcSymIdx>>)->Result<Self>{
+        match &ele_ty{
+            Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
+            _=>{}
+        }
+        for op_dim in &mut dims{
+            match op_dim{
+                Some(dim) => {
+                    let symidx:SymIdx = Value::from_symidx(&dim.as_ref_borrow())?.as_i32_to_min_2_power()?.to_symidx()?;
+                    *dim =  symidx.as_rc();
+                },
+                None => {
+                    // do nothing to unknown dim
+                },
+            }
         }
         Ok(Type::Array { dims, ele_ty: Box::new(ele_ty) })
     }
@@ -660,7 +721,7 @@ impl Type {
                     })
             },
             _ => {
-                Err(anyhow!(("you can only transform a ptr 2 arr")))
+                Err(anyhow!("you can only transform a ptr 2 arr"))
             }
         }
     }

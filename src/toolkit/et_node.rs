@@ -511,11 +511,11 @@ impl EtNodeType {
     fn load_ast_node_text(&mut self, ast_tree:&AstTree) -> Result<()> {
         if let EtNodeType::Separator { ast_node, text } = self {
             let ast_node = *ast_node;
-            let _ = mem::replace(text, node!(at ast_node in ast_tree).text.clone());
+            let _ = mem::replace(text, node!(at ast_node in ast_tree).op_text.as_ref().unwrap().clone());
         } else if let EtNodeType::Symbol { rc_symidx: _, ast_node: _, text, decldef_def_or_use: def_or_use } = self {
             if let DeclOrDefOrUse::DeclDef { type_ast_node, is_const } = def_or_use {
                 let type_ast_node = *type_ast_node;
-                let _ = mem::replace(text, node!(at type_ast_node in ast_tree).text.clone());
+                let _ = mem::replace(text, node!(at type_ast_node in ast_tree).op_text.as_ref().unwrap().clone());
             }
         }
         Ok(())

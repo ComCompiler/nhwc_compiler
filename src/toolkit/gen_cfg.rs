@@ -3,8 +3,8 @@ use crate::antlr_parser::cparser::{
 };
 use crate::toolkit::ast_node::AstTree;
 use crate::toolkit::cfg_edge::CfgEdge;
-use crate::{add_edge, add_node, direct_child_node, direct_child_nodes, reg_field_for_struct, rule_id, RULE_compoundStatement, RULE_functionDefinition};
-use crate::{find, find_nodes, node};
+use crate::{add_edge, add_node, node, reg_field_for_struct, rule_id, RULE_compoundStatement, RULE_functionDefinition};
+use crate::{find, find_nodes};
 use anyhow::Result;
 use petgraph::stable_graph::{EdgeIndex, NodeIndex};
 use petgraph::visit::EdgeRef;
@@ -41,7 +41,7 @@ pub fn process_while(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut Sym
 ///处理循环过程的cfg节点处理和连接，返回branch和statement的idx
 pub fn process_iteration(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, current_iteration_node:u32) -> Result<Option<(u32, u32)>> {
     //处理branch的构造
-    let which_iteration_node = direct_child_node!(at current_iteration_node in ast_tree);
+    let which_iteration_node = node!(at current_iteration_node in ast_tree).child_vec[0];
     match (rule_id!(at which_iteration_node in ast_tree), which_iteration_node) {
         (RULE_whileIterationStatement, while_node) => Ok(process_while(cfg_graph, ast_tree, symtab, while_node)?),
         (RULE_forIterationStatement, for_node) => Ok(process_for(cfg_graph, ast_tree, symtab, for_node)?),
@@ -74,7 +74,7 @@ pub fn process_for(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTa
 
 /// 返回 生成CFG nodes 的 Option<(头,尾)>
 pub fn process_stmt(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, current_statement_node:u32) -> Result<Option<(u32, u32)>> {
-    let which_statement = direct_child_node!(at current_statement_node in ast_tree);
+    let which_statement = node!(at current_statement_node in ast_tree).child_vec[0];
     //匹配循环体内部的大括号，单语句，分支语句情况
     match (rule_id!(at which_statement in ast_tree), which_statement) {
         (RULE_compoundStatement, compoundstatement_node) => Ok(process_compound(cfg_graph, ast_tree, symtab, compoundstatement_node)?),
@@ -113,7 +113,7 @@ pub fn process_expression(cfg_graph:&mut CfgGraph, _ast_tree:&AstTree, _symtab:&
 ///处理选择分支节点，内部区分if，switch，head_node连接到branch，gather连接到tail_node
 pub fn process_selection(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut SymTab, current_selection_node:u32) -> Result<Option<(u32, u32)>> {
     //处理if和switch
-    let which_selection_node = direct_child_node!(at current_selection_node in ast_tree);
+    let which_selection_node = node!(at current_selection_node in ast_tree).child_vec[0];
     match (rule_id!(at which_selection_node in ast_tree), which_selection_node) {
         (RULE_ifSelection, if_node) => Ok(process_if(cfg_graph, ast_tree, symtab, if_node)?),
         (RULE_switchSelection, switch_node) => Ok(process_switch(cfg_graph, ast_tree, symtab, switch_node)?),
@@ -269,7 +269,7 @@ pub fn process_compound(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut 
 
     // 这里 rev 是因为 adj 只能返回  rev 的部分
     for blockitem_node in blockitem_nodes {
-        let declare_or_statement_node = direct_child_node!(at blockitem_node in ast_tree);
+        let declare_or_statement_node = node!(at blockitem_node in ast_tree).child_vec[0];
         match (rule_id!(at declare_or_statement_node in ast_tree), declare_or_statement_node) {
             (RULE_statement, stmt_node) => {
                 opt_current_cfg_head_and_tail = {
@@ -314,12 +314,12 @@ pub fn process_compound(cfg_graph:&mut CfgGraph, ast_tree:&AstTree, symtab:&mut 
 pub static AST_ROOT:u32 = 0;
 /// 这个函数依赖 ast
 pub fn parse_ast_to_cfg(ast_tree:&AstTree, cfg_graph:&mut CfgGraph, symtab:&mut SymTab) -> Result<()> {
-    let compilation_unit_node = direct_child_node!(at AST_ROOT in ast_tree);
-    let static_nodes:Vec<u32> = direct_child_nodes!(at compilation_unit_node in ast_tree);
+    let compilation_unit_node = node!(at AST_ROOT in ast_tree).child_vec[0];
+    let static_nodes:&Vec<u32> = &node!(at compilation_unit_node in ast_tree).child_vec;
     let mut static_decl_nodes = vec![];
     let mut funcdef_nodes = vec![];
-    for static_node in static_nodes{
-        let gloabl_var_ast_node = direct_child_node!(at static_node in ast_tree);
+    for &static_node in static_nodes{
+        let gloabl_var_ast_node = node!(at static_node in ast_tree).child_vec[0];
         match (rule_id!(at gloabl_var_ast_node in ast_tree),gloabl_var_ast_node){
             (RULE_declaration,static_decl_node) => {
                 static_decl_nodes.push(static_decl_node);

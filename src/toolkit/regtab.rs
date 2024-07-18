@@ -4,7 +4,7 @@ use anyhow::*;
 use derive_new::new;
 use itertools::Itertools;
 use strum_macros::EnumIs;
-use crate::debug_info_blue;
+use crate::{debug_info_blue, debug_info_yellow};
 use crate::toolkit::field::Field;
 
 use crate::toolkit::symtab::WithBorrow;
@@ -339,7 +339,7 @@ impl RegTab{
         regstat.free_once()?;
         if regstat.is_freed(){
             if reg.is_gpr()&& self.gpr_released_reg_count<5 || reg.is_fpr() && self.fpr_released_reg_count < 5{
-                debug_info_red!("release reg {:?} because not enough",reg);
+                debug_info_blue!("release reg {:?} because not enough",reg);
                 self.release_reg(reg, symtab, asm_sect, store_f)?;
             }
         }
@@ -391,7 +391,7 @@ impl RegTab{
     }
     /// after put the args into arg register, you should call this to inform regtab this info
     pub fn set_freed_reg(&mut self, reg:Register, symidx:&SymIdx, symtab:&mut SymTab) -> Result<()>{
-        debug_info_red!("set_freed_reg:{:?} symidx {:?}",reg, symidx);
+        debug_info_blue!("set_freed_reg:{:?} symidx {:?}",reg, symidx);
         let should_track = RegTab::symidx_should_track(symidx, symtab)?;
         if should_track{
             if symtab.get(symidx)?.has_cur_reg(){
