@@ -1,69 +1,58 @@
-# input: "./demos/demo_declaration.c"
-      global Fn[]->getint_ret_0 getint_0 
-      global Fn[]->getch_ret_0 getch_0 
-      global Fn[zz_array_3]->getarray_ret_0 getarray_0 
-      global Fn[]->getfloat_ret_0 getfloat_0 
-      global Fn[zz_array_5]->getfarray_ret_0 getfarray_0 
-      global Fn[zz_int_6]->putint_ret_0 putint_0 
-      global Fn[zz_ch_7]->putch_ret_0 putch_0 
-      global Fn[x_8, zz_array_8]->putarray_ret_0 putarray_0 
-      global Fn[zz_float_9]->putfloat_ret_0 putfloat_0 
-      global Fn[zz_len_10, zz_farray_10]->putfarray_ret_0 putfarray_0 
-      global Fn[]->putf_ret_0 putf_0 
-      global Fn[]->starttime_ret_0 starttime_0 
-      global Fn[]->stoptime_ret_0 stoptime_0 
-      global Fn[zz_ptr_14, zz_val_14, zz_len_14]->memset_ret_0 memset_0 
-      global Fn[zz_dest_15, zz_ptr_15, zz_len_15]->memcpy_ret_0 memcpy_0 
-      Define main_0 "" -> main_ret_0 
-              alloc ptr->i32 temp_0_array_init_ptr_17 
-              alloc ptr->i32 temp_1_array_init_ptr_17 
-              alloc ptr->i32 temp_2_array_init_ptr_17 
-              alloc ptr->i32 temp_3_array_init_ptr_17 
-              alloc ptr->i32 temp_4_array_init_ptr_17 
-              alloc ptr->i32 temp_5_array_init_ptr_17 
-              alloc ptr->i32 temp_6_array_init_ptr_17 
-              alloc ptr->i32 temp_7_array_init_ptr_17 
-              alloc Array:i32:[Some(3_0), Some(4_0)] a_17 
+# input: "./demos/demo1.c"
+ 15   label global_0: 
+ 0    global Fn[]->getint_ret_0 getint_0 
+ 1    global Fn[]->getch_ret_0 getch_0 
+ 2    global Fn[zz_array_3]->getarray_ret_0 getarray_0 
+ 3    global Fn[]->getfloat_ret_0 getfloat_0 
+ 4    global Fn[zz_array_5]->getfarray_ret_0 getfarray_0 
+ 5    global Fn[zz_int_6]->putint_ret_0 putint_0 
+ 6    global Fn[zz_ch_7]->putch_ret_0 putch_0 
+ 7    global Fn[x_8, zz_array_8]->putarray_ret_0 putarray_0 
+ 8    global Fn[zz_float_9]->putfloat_ret_0 putfloat_0 
+ 9    global Fn[zz_len_10, zz_farray_10]->putfarray_ret_0 putfarray_0 
+ 10   global Fn[]->putf_ret_0 putf_0 
+ 11   global Fn[]->starttime_ret_0 starttime_0 
+ 12   global Fn[]->stoptime_ret_0 stoptime_0 
+ 13   global Fn[zz_ptr_14, zz_val_14, zz_len_14]->memset_ret_0 memset_0 
+ 14   global Fn[zz_dest_15, zz_ptr_15, zz_len_15]->memcpy_ret_0 memcpy_0 
+ 17   Define main_0 "" -> main_ret_0 
+         45   alloc f32 temp_5__28 
+         48   alloc f32 temp_6_ret_of_myabs_28 
+         51   alloc i32 temp_7__29 
           label L0_0: 
-              new_var a_17:Array:i32:[Some(3_0), Some(4_0)] 
-              new_var temp_0_array_init_ptr_17:ptr->i32 
-              temp_0_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [] 
-               Call void memset_0(temp_0_array_init_ptr_17, 0_0, 48_0) 
-              new_var temp_1_array_init_ptr_17:ptr->i32 
-              temp_1_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [Some(1_0), Some(1_0)] 
-              store 6_0:i32 temp_1_array_init_ptr_17:ptr->Array:i32:[Some(4_0)] 
-              mu a_17:24 
-              a_17 = chi a_17:24 
-              new_var temp_2_array_init_ptr_17:ptr->i32 
-              temp_2_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [Some(0_0), Some(3_0)] 
-              store 4_0:i32 temp_2_array_init_ptr_17:ptr->Array:i32:[Some(4_0)] 
-              mu a_17:30 
-              a_17 = chi a_17:30 
-              new_var temp_3_array_init_ptr_17:ptr->i32 
-              temp_3_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [Some(1_0), Some(0_0)] 
-              store 5_0:i32 temp_3_array_init_ptr_17:ptr->Array:i32:[Some(4_0)] 
-              mu a_17:36 
-              a_17 = chi a_17:36 
-              new_var temp_4_array_init_ptr_17:ptr->i32 
-              temp_4_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [Some(0_0), Some(0_0)] 
-              store 1_0:i32 temp_4_array_init_ptr_17:ptr->Array:i32:[Some(4_0)] 
-              mu a_17:42 
-              a_17 = chi a_17:42 
-              new_var temp_5_array_init_ptr_17:ptr->i32 
-              temp_5_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [Some(1_0), Some(2_0)] 
-              store 7_0:i32 temp_5_array_init_ptr_17:ptr->Array:i32:[Some(4_0)] 
-              mu a_17:48 
-              a_17 = chi a_17:48 
-              new_var temp_6_array_init_ptr_17:ptr->i32 
-              temp_6_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [Some(0_0), Some(2_0)] 
-              store 3_0:i32 temp_6_array_init_ptr_17:ptr->Array:i32:[Some(4_0)] 
-              mu a_17:54 
-              a_17 = chi a_17:54 
-              new_var temp_7_array_init_ptr_17:ptr->i32 
-              temp_7_array_init_ptr_17 = getelementptr a_17:Array:i32:[Some(3_0), Some(4_0)] [Some(0_0), Some(1_0)] 
-              store 2_0:i32 temp_7_array_init_ptr_17:ptr->Array:i32:[Some(4_0)] 
-              mu a_17:60 
-              a_17 = chi a_17:60 
+         46   new_var temp_5__28:f32 
+         47   temp_5__28 = sitofp i32 33_0 to f32 
+         49   new_var temp_6_ret_of_myabs_28:f32 
+         50   temp_6_ret_of_myabs_28 =  Call f32 myabs_0(temp_5__28) 
+         52   new_var temp_7__29:i32 
+         53   temp_7__29 = fptosi f32 temp_6_ret_of_myabs_28 to i32 
+         54   ret temp_7__29 
+ 16   Define myabs_0 "num_16," -> myabs_ret_0 
+         19   alloc f32 temp_0__25 
+         25   alloc f32 temp_1__19 
+         28   alloc i1 temp_2_cmp_19 
+         34   alloc f32 temp_3__23 
+         37   alloc i1 temp_4_cmp_23 
+          label L1_0: 
+         26   new_var temp_1__19:f32 
+         27   temp_1__19 = sitofp i32 0_0 to f32 
+         29   new_var temp_2_cmp_19:i1 
+         30   temp_2_cmp_19 = fcmp f32 Ogt num_16, temp_1__19 
+         33   br i1 temp_2_cmp_19, label branch_true_20, label branch_false_20 
+     31   label branch_true_20: 
+         24   ret num_16 
+     32   label branch_false_20: 
+              jump label: L2_0 
+          label L2_0: 
+         35   new_var temp_3__23:f32 
+         36   temp_3__23 = sitofp i32 0_0 to f32 
+         38   new_var temp_4_cmp_23:i1 
+         39   temp_4_cmp_23 = fcmp f32 Olt num_16, temp_3__23 
+         42   br i1 temp_4_cmp_23, label branch_true_24, label branch_false_24 
+     40   label branch_true_24: 
+         20   new_var temp_0__25:f32 
+         21   temp_0__25 = Sub f32 0.0_0, num_16 
+         22   ret temp_0__25 
+     41   label branch_false_24: 
               jump label: exit_2 
-          label exit_2: 
-              ret 0_0 
+     43   label exit_2: 

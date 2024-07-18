@@ -221,11 +221,8 @@ fn parse_bb2nhwc(
                                         let transed_actual_ret_symidx = force_trans_type(cfg_graph, symtab, &type_to_trans, &type_be_trans, &actual_ret_symidx, jump_scope, cfg_bb, instr_slab, None, et_tree)?;
                                         let ret_instr = NhwcInstrType::new_ret(Some(transed_actual_ret_symidx)).into();
                                         // then delete all edges of the node 
-                                        let edges = cfg_graph.edges_directed(node_index(cfg_bb as usize), petgraph::Direction::Outgoing);
-                                        for edge in edges.into_iter().map(|edge| edge.id()).collect_vec() {
-                                            cfg_graph.remove_edge(edge);
-                                        }
-                                        node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
+                                        let ret_instr = node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
+                                        // println!("add new ret {ret_instr}");
                                     }
                                     _=>{
                                         return Err(anyhow!("ret语句下参数数量不正确 et_node:{ret_et_sep}"))
@@ -234,6 +231,10 @@ fn parse_bb2nhwc(
                             }else{
                                 let ret_instr = NhwcInstrType::new_ret(None).into();
                                 node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
+                            }
+                            let edges = cfg_graph.edges_directed(node_index(cfg_bb as usize), petgraph::Direction::Outgoing);
+                            for edge in edges.into_iter().map(|edge| edge.id()).collect_vec() {
+                                cfg_graph.remove_edge(edge);
                             }
                         },
                         (RULE_breakStatement,break_ast) => {

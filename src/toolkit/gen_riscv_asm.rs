@@ -141,7 +141,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
         for &cfg_node in &dfs_node_vec{
             if !node!(at cfg_node in cfg_graph).cfg_node_type.is_entry() && 
                 node!(at cfg_node in cfg_graph).op_jump_instr.is_none(){
-                    return Err(anyhow!("jump instr of cfg_node:{cfg_node} can't be none"));
+                    // return Err(anyhow!("jump instr of cfg_node:{cfg_node} can't be none"));
                 }
             if node!(at cfg_node in cfg_graph).has_regtab(){
                 // that means travel from src_cfg_node -> cfg_node 

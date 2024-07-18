@@ -1,8 +1,0 @@
-      Define main_0 [] -> main_ret_0 
-              alloc i32 a_2 
-          label L0_0: 
-              a_2 = i32 1_0 
-              jump label: L1_0 
-          label L1_0: 
-          label L2_0: 
-              jump label: L1_0 

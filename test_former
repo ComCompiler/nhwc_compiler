@@ -1,5 +1,5 @@
 # 获取路径作为参数，如果没有提供，则使用当前目录
-path="./compiler2022/公开样例与运行时库/functional"
+path="./for_auto_test/00sy"
 
 # 遍历指定路径下的所有文件
 for filename in "$path"/*; do

@@ -1,0 +1,5 @@
+echo "compiling $1"
+gcc $1 -o ./temp
+echo "running ./temp"
+./temp
+echo $?

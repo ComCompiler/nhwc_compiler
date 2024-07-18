@@ -180,15 +180,15 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                             // here we consider it as 2 situation 
                             // 1. when it is an array we should add edge from last def to here because you can't change all things in array in one time
                             // 2. when it is a non-array variable we will not add this edge
-                            // if symtab.get(&lhs.as_ref_borrow().to_src_symidx())?.get_type()?.is_array() 
-                            // ||symtab.get(&lhs.as_ref_borrow().to_src_symidx())?.get_type()?.is_ptr_64(){
+                            if symtab.get(&lhs.as_ref_borrow().to_src_symidx())?.get_type()?.is_array() 
+                            ||symtab.get(&lhs.as_ref_borrow().to_src_symidx())?.get_type()?.is_ptr_64(){
                             let may_def_instr = *may_def_instr;
                             let &dug_cor_node = instr!(at may_def_instr in instr_slab)?.get_dug_cor_def_use_node()?;
                             let &def_dug_node = instr!(at def_instr in instr_slab)?.get_dug_cor_def_use_node()?;
                             let _dug_edge = add_edge!({DefUseEdge::new(rc_use_symidx.clone())} from def_dug_node to dug_cor_node in def_use_graph);
-                            // }else {
+                            }else {
                             //     // do nothing
-                            // }
+                            }
                         }
                         _ => {
                             let &dug_cor_node = cur_instr_struct.get_dug_cor_def_use_node()?;

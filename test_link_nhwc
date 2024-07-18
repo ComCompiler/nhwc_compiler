@@ -7,15 +7,15 @@ path="./out"
 if [ $# -eq 0 ]; then
     # 如果没有传入参数，输出当前目录下的所有文件路径
     # 遍历指定路径下的所有文件
-    for filename in "$path"/*; do
+    for file_name in "$path"/*; do
         # 检查是否为文件
-        echo $filename
-        if [ -f "$filename" ] && [[ "$filename" == *.s ]]; then
+        echo $file_name
+        if [ -f "$file_name" ] && [[ "$file_name" == *.s ]]; then
             # 获取文件的基本名称，没有路径
-            base_name=$(basename "$filename")
+            base_name=$(basename "$file_name")
             # sed -i 's/main/_start/g' $filename
             # 执行编译命令，输出到同一目录
-            riscv64-linux-gnu-as "$filename" -o "./out/${base_name}.o" 
+            riscv64-linux-gnu-as "$file_name" -o "./out/${base_name}.o" 
             riscv64-linux-gnu-gcc --static "./out/${base_name}.o" -lsysy -L./ -o "./out/${base_name}.elf" -lc
             # riscv64-linux-gnu-objcopy -O "./out/${base_name}.elf" "./out/${base_name}.hex"
             # xxd -p -c 4 "./out/${base_name}.bin" "./out/${base_name}.hex"
@@ -27,22 +27,22 @@ if [ $# -eq 0 ]; then
     done
 else
     # 如果传入了参数，输出所有以该字符串开头的文件路径
-     echo "列出所有以'$1'开头的文件："
-     for filename in $(find . -type f -name "$1*"); do
-         if [ -f "$filename" ] && [[ "$filename" == *.s ]]; then
-             # 对每个文件执行命令，这里是例子使用 'ls -l' 命令显示文件详细信息
-             echo $filename
-             base_name=$(basename "$filename")
-             # sed -i 's/main/_start/g' $filename
-             # 执行编译命令，输出到同一目录
-             riscv64-linux-gnu-as "$filename" -o "./out/${base_name}.o" # > ./out/${base_name}.out
-             riscv64-linux-gnu-gcc --static "./out/${base_name}.o" -lsysy -L./ -o "./out/${base_name}.elf" -lc
-             # riscv64-linux-gnu-objcopy -O "./out/${base_name}.elf" "./out/${base_name}.hex"
-             # xxd -p -c 4 "./out/${base_name}.bin" "./out/${base_name}.hex"
-             echo ans_start:
-             qemu-riscv64-static "./out/${base_name}.elf"
-             echo $?
-             echo ans_end:
-         fi
-     done
+    file_name=$1
+    echo "try run $1"
+    if [ -f "$file_name" ] && [[ "$file_name" == *.s ]]; then
+        # 对每个文件执行命令，这里是例子使用 'ls -l' 命令显示文件详细信息
+        echo $file_name
+        base_name=$(basename "$file_name")
+        # sed -i 's/main/_start/g' $filename
+        # 执行编译命令，输出到同一目录
+        riscv64-linux-gnu-as "$file_name" -o "./out/${base_name}.o" # > ./out/${base_name}.out
+        riscv64-linux-gnu-gcc --static "./out/${base_name}.o" -lsysy -L./ -o "./out/${base_name}.elf" -lc
+        # riscv64-linux-gnu-objcopy -O "./out/${base_name}.elf" "./out/${base_name}.hex"
+        # xxd -p -c 4 "./out/${base_name}.bin" "./out/${base_name}.hex"
+        echo ans_start:
+        qemu-riscv64-static "./out/${base_name}.elf" < $2
+        echo $?
+        echo ans_end:
+    fi
+    echo "'$1'运行完毕："
  fi
