@@ -220,10 +220,10 @@ impl SymTab {
     pub fn debug_symtab_graph(&mut self,desc:String, symtab_graph:&mut SymTabGraph,symidx_vec:Vec<&SymIdx>){
         let mut idx = symtab_graph.node_count() as u32;
         if idx==0{
-            add_node!({let mut s = self.clone(); s.load_symtab_text(symidx_vec);s } to symtab_graph);
+            add_node!({let mut s = self.clone(); s.load_symtab_text(symidx_vec).unwrap();s } to symtab_graph);
         }else {//如果已经有节点了,在最后一个节点上加点加边
             idx-=1;
-            add_node_with_edge!({let mut s = self.clone(); s.load_symtab_text(symidx_vec);s } with_edge {SymTabEdge::new(desc)} from idx in symtab_graph);
+            add_node_with_edge!({let mut s = self.clone(); s.load_symtab_text(symidx_vec).unwrap();s } with_edge {SymTabEdge::new(desc)} from idx in symtab_graph);
         }
 
     }

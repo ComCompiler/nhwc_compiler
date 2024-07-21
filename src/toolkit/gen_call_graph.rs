@@ -50,7 +50,7 @@ pub fn parse_func_call_graph(
             for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
                 match &instr!(at instr in instr_slab)?.instr_type{
                     // 只处理Call
-                    NhwcInstrType::Call { op_assigned_symidx:_, func_op } => {
+                    NhwcInstrType::Call { op_lhs:_, func_op } => {
                         callee_func_set.insert(func_op.rc_func_symidx.clone());
                     },
                     _ =>continue,

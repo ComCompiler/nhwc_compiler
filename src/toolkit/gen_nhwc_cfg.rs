@@ -16,7 +16,7 @@ use crate::{add_node, instr, instr_mut};
 use super::cfg_node::{InstrList, CFG_ROOT};
 use super::et_node::ExprOp;
 use super::etc::dfs_with_priority;
-use super::eval_et::{self};
+use super::eval_et::{self, can_eliminate_despite_array_idx_and_call};
 use super::field::{ArrayEleMap, Value};
 use super::gen_et;
 use super::gen_scope::get_while_scope_of_scope_node;
@@ -118,7 +118,7 @@ fn parse_stmt_or_expr2nhwc(
     //将declaration生成et
     let sep_node = gen_et::process_any_stmt(et_tree, ast_tree, scope_tree, ast_stmt_node, stmt_parent_scope);
     // debug_info_red!("parent {}",stmt_parent_scope);
-    eval_et::compress_et(et_tree, sep_node, &symtab,stmt_parent_scope ,scope_tree)?;
+    eval_et::compress_et(et_tree, sep_node,&mut can_eliminate_despite_array_idx_and_call, &symtab,stmt_parent_scope ,scope_tree, true)?;
     // generate_png_by_graph(&et_tree, "et_src".to_string(), &[Config::EdgeNoLabel, Config::Record, Config::Title("et_tree".to_string()),Config::NodeIndexLabel])?;
 
     //如果该节点有子树
@@ -202,7 +202,7 @@ fn parse_bb2nhwc(
                             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
                             if let  Some(ret_expr_ast)= find!(rule RULE_expression at ret_ast in ast_tree){
                                 let ret_et_sep = process_any_stmt(et_tree, ast_tree, scope_tree, ret_expr_ast, jump_parent_scope);
-                                eval_et::compress_et(et_tree, ret_et_sep, &symtab,jump_parent_scope ,scope_tree)?;
+                                eval_et::compress_et(et_tree, ret_et_sep,&mut can_eliminate_despite_array_idx_and_call ,&symtab,jump_parent_scope ,scope_tree, true)?;
 
                                 let ret_sep_child_nodes = direct_child_nodes!(at ret_et_sep in et_tree);
                                 // debug_info_blue!("jump child nodes of {} is {:?}",ret_et_sep , ret_sep_child_nodes);
@@ -1184,7 +1184,7 @@ fn process_et(
     //     }
     // }
     // generate_png_by_graph(et_tree, "debug_et".to_string(), &[Config::NodeIndexLabel]);
-    if node!(at et_node in et_tree).cached_rc_symidx.is_none(){
+    if node!(at et_node in et_tree).gen_nhwc_cached_rc_symidx.is_none(){
         let et_node_ty = &node!(at et_node in et_tree).et_node_type.clone();
         let op_symidx = match &et_node_ty {
             EtNodeType::Operator { op, ast_node, text: _, op_rc_symidx: op_symidx } => {
@@ -1778,10 +1778,10 @@ fn process_et(
             }
             _ => return Err(anyhow!("{}不应出现sep类型的et", et_node)),
         };
-        node_mut!(at et_node in et_tree).cached_rc_symidx = Some(op_symidx.clone());
+        node_mut!(at et_node in et_tree).gen_nhwc_cached_rc_symidx = Some(op_symidx.clone());
         Ok(op_symidx)
     }else {
-        Ok(node!(at et_node in et_tree).cached_rc_symidx.as_ref().unwrap().clone())
+        Ok(node!(at et_node in et_tree).gen_nhwc_cached_rc_symidx.as_ref().unwrap().clone())
     }
 }
 /// add func symbol to symtab and push def_func instr to cfg_root
@@ -1822,7 +1822,7 @@ fn parse_extern_declfunc2nhwc(
 
                 let (et_sym_node,ast_sym_name_node) ={
                     let sep_node = gen_et::process_any_stmt(et_tree, ast_tree, scope_tree, ast_parameter_decl_node, func_scope);
-                    eval_et::compress_et(et_tree, sep_node, symtab, ST_ROOT, scope_tree)?;
+                    eval_et::compress_et(et_tree, sep_node,&mut can_eliminate_despite_array_idx_and_call, symtab, ST_ROOT, scope_tree, true)?;
                     let mut cur_et_node = sep_node;
                     let ast_sym_name_node;
                     loop{
@@ -1896,7 +1896,7 @@ fn parse_declvar2nhwc(
     let detail_et_nodes = direct_child_nodes!(at et_sep_node in et_tree);
     for et_item_node in detail_et_nodes {
         // we move the compress et to here because you may define a number dependently in one line (sep) 
-        eval_et::compress_et(et_tree, et_item_node, symtab, decl_parent_scope, scope_tree)?;
+        eval_et::compress_et(et_tree, et_item_node, &mut can_eliminate_despite_array_idx_and_call ,symtab, decl_parent_scope, scope_tree, true)?;
         let et_node_type = &node!(at et_item_node in et_tree).et_node_type.clone();
         match et_node_type {
             // 先考虑这个语句存在 = 的情况
@@ -2009,7 +2009,7 @@ fn parse_func2nhwc(
                 // let ast_arg_type = find!(rule RULE_declarationSpecifiers at ast_func_arg in ast_tree).unwrap();
                 // let func_arg_str = &node!(at ast_para_node in ast_tree).text;
                 let et_arg_sep = process_any_stmt(et_tree, ast_tree, scope_tree, ast_func_arg, func_scope);
-                eval_et::compress_et(et_tree, et_arg_sep, symtab, ST_ROOT, scope_tree)?;
+                eval_et::compress_et(et_tree, et_arg_sep, &mut can_eliminate_despite_array_idx_and_call,symtab, ST_ROOT, scope_tree, true)?;
                 let arg_symidx = process_et(ast_tree, cfg_graph, et_tree, scope_tree, symtab, direct_child_node!(at et_arg_sep in et_tree), func_scope, direct_child_node!(at cfg_entry in cfg_graph), instr_slab, ast2scope)?.unwrap();
                 arg_syms.push(arg_symidx);
             }
@@ -2198,6 +2198,7 @@ pub fn parse_cfg_into_nhwc_cfg(
     }
     insert_additional_mu_chi_for_call_instr(cfg_graph, instr_slab, symtab)?;
     // debug_info_yellow!("success end");
+
     Ok(())
 }
 
@@ -2230,40 +2231,40 @@ pub fn split_bb_node(cfg_node:u32,cfg_graph:&mut CfgGraph,is_move_instrs:bool) -
 /// 以下条件满足之一可以insert new bb 
 /// 1. cfg_node1 和 cfg_node2 之间是一条 Direct 普通边 或 BodyHead BodyTail
 /// 2. cfg_node1 和 cfg_node2 其中有一个是 BasicBlock
-pub fn insert_bb_between(cfg_node1:u32, cfg_node2:u32, cfg_graph:&mut CfgGraph) -> Result<u32>{
-    let cfg_former_edge_idx = cfg_graph.find_edge(node_index(cfg_node1 as usize), node_index(cfg_node2 as usize)).ok_or(anyhow!("找不到连接 cfg_node[{}] 和 cfg_node[{}]的边",cfg_node1,cfg_node2))
-        .with_context(|| format!("在插入 cfg_node[{}] 和 cfg_node[{}]之间bb 失败",cfg_node1,cfg_node2))?;
+pub fn insert_bb_between(cfg_node_from:u32, cfg_node_to:u32, cfg_graph:&mut CfgGraph) -> Result<u32>{
+    let cfg_former_edge_idx = cfg_graph.find_edge(node_index(cfg_node_from as usize), node_index(cfg_node_to as usize)).ok_or(anyhow!("找不到连接 cfg_node[{}] 和 cfg_node[{}]的边",cfg_node_from,cfg_node_to))
+        .with_context(|| format!("在插入 cfg_node[{}] 和 cfg_node[{}]之间bb 失败",cfg_node_from,cfg_node_to))?;
     // 删除旧的边
     let cfg_former_edge_removed = cfg_graph.remove_edge(cfg_former_edge_idx).unwrap();
-    let (cfg_node_type1, cfg_node_type2) = (&node!(at cfg_node1 in cfg_graph).cfg_node_type,&node!(at cfg_node2 in cfg_graph).cfg_node_type);
+    let (cfg_node_type1, cfg_node_type2) = (&node!(at cfg_node_from in cfg_graph).cfg_node_type,&node!(at cfg_node_to in cfg_graph).cfg_node_type);
     if  cfg_former_edge_removed.cfg_edge_type.is_direct() {
         // 如果这条边本身就是一条普通边，那么就允许insert
         let mut bb_struct = CfgNode::new_bb(vec![]);
-        bb_struct.add_func_cor_symidx(node!(at cfg_node1 in cfg_graph).get_func_cor_symidx()?.clone());
-        let new_bb = add_node_with_edge!({bb_struct} with_edge {cfg_former_edge_removed} from cfg_node1 in cfg_graph);
-        add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node2 in cfg_graph);
+        bb_struct.add_func_cor_symidx(node!(at cfg_node_from in cfg_graph).get_func_cor_symidx()?.clone());
+        let new_bb = add_node_with_edge!({bb_struct} with_edge {cfg_former_edge_removed} from cfg_node_from in cfg_graph);
+        add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node_to in cfg_graph);
         Ok(new_bb)
     } else if cfg_former_edge_removed.cfg_edge_type.is_body_head() ||cfg_former_edge_removed.cfg_edge_type.is_body_tail()  {
         let mut bb_struct = CfgNode::new_bb(vec![]);
-        bb_struct.add_func_cor_symidx(node!(at cfg_node1 in cfg_graph).get_func_cor_symidx()?.clone());
-        let new_bb = add_node_with_edge!({bb_struct} with_edge {CfgEdge::new_direct()} from cfg_node1 in cfg_graph);
-        add_edge!({cfg_former_edge_removed} from new_bb to cfg_node2 in cfg_graph);
+        bb_struct.add_func_cor_symidx(node!(at cfg_node_from in cfg_graph).get_func_cor_symidx()?.clone());
+        let new_bb = add_node_with_edge!({bb_struct} with_edge {CfgEdge::new_direct()} from cfg_node_from in cfg_graph);
+        add_edge!({cfg_former_edge_removed} from new_bb to cfg_node_to in cfg_graph);
         Ok(new_bb)
 
     }else{
         match (cfg_node_type1,cfg_node_type2){
             (_,CfgNodeType::BasicBlock { ast_nodes:_ })=>{
-                let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with_edge {cfg_former_edge_removed} from cfg_node1 in cfg_graph);
-                add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node2 in cfg_graph);
+                let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with_edge {cfg_former_edge_removed} from cfg_node_from in cfg_graph);
+                add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node_to in cfg_graph);
                 Ok(new_bb)
             }
             (CfgNodeType::BasicBlock { ast_nodes:_ },_)=>{
-                let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with_edge {CfgEdge::new_direct()} from cfg_node1 in cfg_graph);
-                add_edge!({cfg_former_edge_removed} from new_bb to cfg_node2 in cfg_graph);
+                let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with_edge {CfgEdge::new_direct()} from cfg_node_from in cfg_graph);
+                add_edge!({cfg_former_edge_removed} from new_bb to cfg_node_to in cfg_graph);
                 Ok(new_bb)
             }
             _ => {
-                Err(anyhow!("两个节点cfg_node[{}] cfg_node[{}]中都不存在bb",cfg_node1,cfg_node2))
+                Err(anyhow!("两个节点cfg_node[{}] cfg_node[{}]中都不存在bb",cfg_node_from,cfg_node_to))
             }
         }
     }
@@ -2620,7 +2621,7 @@ pub fn insert_additional_mu_chi_for_call_instr(cfg_graph:&mut CfgGraph, instr_sl
             let mut flag = false;
             for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
                 match &mut instr_mut!(at instr in instr_slab)?.instr_type{
-                    NhwcInstrType::Call { op_assigned_symidx, func_op } => {
+                    NhwcInstrType::Call { op_lhs: op_assigned_symidx, func_op } => {
                         new_instrs.push(instr);
                         flag = true;
                         let mut chi_set = symtab.get(&func_op.rc_func_symidx.as_ref_borrow())?.get_global_chi_set()?.clone();
@@ -2676,3 +2677,17 @@ pub fn insert_additional_mu_chi_for_call_instr(cfg_graph:&mut CfgGraph, instr_sl
     }
     Ok(())
 }
+
+
+// pub fn remove_redundant_assign(cfg_graph:&mut CfgGraph, instr_slab:&mut InstrSlab<NhwcInstr>){
+//     for (rc_func_symidx,cfg_entry) in symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.clone(){
+//         let dfs_vec = etc::dfs(cfg_graph,cfg_entry);
+//         for cfg_node in dfs_vec{
+//             for instr in cfg_node{
+//                 match instr!(at in instr in instr_slab).instr_type{
+
+//                 }
+//             }
+//         }
+//     }
+// }

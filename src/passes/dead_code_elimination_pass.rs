@@ -34,7 +34,7 @@ impl Pass for DeadCodeEliminationPass {
             let dug_node = dug_node_idx.index() as u32;
             let instr = node!(at dug_node in def_use_graph).instr;
             match &instr!(at instr in instr_slab)?.instr_type {
-                NhwcInstrType::Call { op_assigned_symidx, func_op } => {
+                NhwcInstrType::Call { op_lhs: op_assigned_symidx, func_op } => {
                     relevant_dug_nodes.push(*instr!(at instr in instr_slab)?.get_dug_cor_def_use_node()?);
                 },
                 NhwcInstrType::Jump { jump_op:JumpOp::Ret { op_ret_sym} } => {

@@ -10,9 +10,9 @@ use std::{path::PathBuf, time::Instant};
 use antlr_parser::cparser::{RULE_compoundStatement, RULE_functionDefinition};
 use clap::Parser;
 
-use passes::{ast2cfg_pass::Ast2CfgPass, ast2et_debug_pass::Ast2EtDebugPass, ast2st_pass::Ast2StPass, call_graph_pass::CallGraphPass, cfg2ncfg_pass::Cfg2NcfgPass, code2ast_pass::Code2AstPass, dead_code_elimination_pass::{self, DeadCodeEliminationPass}, nhwc2et_pass::Nhwc2EtPass, nhwc2riscv_pass::Nhwc2RiscvPass, nhwc_dump_pass::NhwcDumpPass, ssa_deconstruction_pass::SsaDeconstructionPass, symtab_debug_pass::SymtabDebugPass};
+use passes::{ast2cfg_pass::Ast2CfgPass, ast2et_debug_pass::Ast2EtDebugPass, ast2st_pass::Ast2StPass, call_graph_pass::CallGraphPass, cfg2ncfg_pass::Cfg2NcfgPass, code2ast_pass::Code2AstPass, dead_code_elimination_pass::{self, DeadCodeEliminationPass}, gvngcm_pass::GvnGcmPass, nhwc2et_pass::Nhwc2EtPass, nhwc2riscv_pass::Nhwc2RiscvPass, nhwc_dump_pass::NhwcDumpPass, ssa_deconstruction_pass::SsaDeconstructionPass, symtab_debug_pass::SymtabDebugPass};
 
-use crate::{passes::{cfg_debug_pass::CfgDebugPass, def_use_chain_debug_pass::DefUseChainDebugPass, mem_alloc_pass::MemAllocPass, ncfg2djg_pass::Ncfg2DjgPass, simulator_debug_pass::SimulatorDebugPass, ssa_pass::SsaPass}, toolkit::{pass_manager::PassManager}};
+use crate::{passes::{cfg_debug_pass::CfgDebugPass, def_use_chain_debug_pass::DefUseChainPass, mem_alloc_pass::MemAllocPass, ncfg2djg_pass::Ncfg2DjgPass, simulator_debug_pass::SimulatorDebugPass, ssa_pass::SsaPass}, toolkit::{pass_manager::PassManager}};
 #[derive(Parser, Clone, Default, Debug)]
 #[command(author, version, about)]
 pub struct Args {
@@ -60,7 +60,7 @@ fn main() {
     let ssa_deconstruction_pass = SsaDeconstructionPass::new(debug, debug);
     let cfg_debug_pass1 = CfgDebugPass::new(debug);
     let cfg_debug_pass2 = CfgDebugPass::new(debug);
-    let def_use_chain_debug_pass: DefUseChainDebugPass = DefUseChainDebugPass::new(debug);
+    let def_use_chain_pass: DefUseChainPass = DefUseChainPass::new(debug);
     let symtab_debug_pass = SymtabDebugPass::new(debug);
     let _simulator_debug_pass = SimulatorDebugPass::new(debug,debug);
     let nhwc_dump_pass = NhwcDumpPass::new(debug);
@@ -69,6 +69,7 @@ fn main() {
     let nhwc2et_pass = Nhwc2EtPass::new(debug);
     let func_call_pass = CallGraphPass::new(debug);
     let dce_pass = DeadCodeEliminationPass::new(debug,debug);
+    let gvngcm_pass = GvnGcmPass::new(debug,debug);
     add_passes!(
         code2ast_pass
         then ast2st_pass
@@ -77,12 +78,13 @@ fn main() {
         then func_call_pass
         then ncfg2djg_pass
         then ssa_pass
-        then def_use_chain_debug_pass
+        // then gvngcm_pass
+        then def_use_chain_pass
         then dce_pass
         // then simulator_debug_pass
         then ast2et_debug_pass
         then symtab_debug_pass
-        then nhwc2et_pass
+        // then nhwc2et_pass
         then ssa_deconstruction_pass
         then nhwc_dump_pass
         then mem_alloc_pass

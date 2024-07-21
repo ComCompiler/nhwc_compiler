@@ -33,3 +33,4 @@ pub mod regtab;
 pub mod gen_instr_et;
 pub mod call_node;
 pub mod gen_call_graph;
+pub mod gvn;

@@ -9,9 +9,8 @@ use super::ast_node::AstTree;
 use super::etc::dfs_with_predicate;
 use super::field::{Fields, Type};
 use super::symtab::{ RcSymIdx, SymIdx, WithBorrow};
-use crate::toolkit::dot::Config;
-use crate::toolkit::etc::generate_png_by_graph;
-use crate::{debug_info_red, direct_child_nodes, node, node_mut};
+use crate::toolkit::etc::rpo_with_predicate;
+use crate::{debug_info_blue, debug_info_red, direct_child_nodes, node, node_mut};
 use petgraph::stable_graph::StableDiGraph;
 
 pub type EtTree = StableDiGraph<EtNode, EtEdge, u32>;
@@ -92,16 +91,17 @@ pub struct EtNode {
     ty:Option<Type>,
     pub et_node_type:EtNodeType,
     pub hash:Option<isize>,
-    pub cached_rc_symidx: Option<Option<RcSymIdx>>,
+    pub gen_nhwc_cached_rc_symidx: Option<Option<RcSymIdx>>,
     pub et_ret_symidx_vec: Option<Vec<RcSymIdx>>,
     pub common_eliminated:bool,
-    pub equivalent_symidx_vec:Vec<RcSymIdx>,
+    pub gvn_evaluated:bool,
+    pub equivalent_symidx_vec:Vec<RcSymIdx>, // for gvn
 }
 pub trait EtHash{
-    fn update_hash(&mut self,et_node:u32) ;
+    fn update_hash(&mut self,et_node:u32) -> Result<()>;
     fn deprecate_hash(&mut self,et_node:u32);
     fn lazy_delete(&mut self,et_node:u32);
-    fn _update_hash(&mut self,et_node:u32);
+    fn _update_hash(&mut self,et_node:u32) -> Option<isize>;
 }
 const ET_HASH_MODULUS:isize =  10000000;
 impl EtHash for EtTree{
@@ -111,163 +111,215 @@ impl EtHash for EtTree{
     fn lazy_delete(&mut self,et_node:u32) {
         node_mut!(at et_node in self).common_eliminated = true;
     }
-    fn _update_hash(&mut self,et_node:u32){
+    fn _update_hash(&mut self,et_node:u32) -> Option<isize>{
         let child_nodes = direct_child_nodes!(at et_node in self with_predicate {|e| !e.weight().et_edge_type.is_deleted()});
         match &node!(at et_node in self).et_node_type{
             EtNodeType::Operator { op, ast_node, text, op_rc_symidx: op_symidx } => {
                 match op{
                     ExprOp::Mul => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1*h2) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1*h2) % ET_HASH_MODULUS );
+                        // println!("mul hash {h1} of {} and {h2} of {}",child_nodes[0],child_nodes[1]);
+                        // println!("mul hash end {hash:?} ");
+                        node_mut!(at et_node in self).hash = hash;
+                        hash
                     },
                     ExprOp::Add => {
                         assert!(child_nodes.len() == 2);
                         // generate_png_by_graph(self,"et_tree".to_string(),&[Config::NodeIndexLabel,Config::Record]);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.with_context(||format!("et_node {} child has no hash",et_node)).unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.with_context(||format!("et_node {} child has no hash",et_node)).unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1+h2) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1+h2+21) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::Sub => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1-h2) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1-h2+234) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::Div => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1*2+h2/2) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1*2+h2/2) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::Assign => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some(((h1*9+h2 + 3)% ET_HASH_MODULUS ) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some(((h1*9+h2 + 24952)% ET_HASH_MODULUS ) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::LogicalOr => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^h2 + 120300) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1^h2 + 120300) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::LogicalAnd => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^h2+13000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1^h2+13000) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::LogicalNot => {
                         assert!(child_nodes.len() == 1);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some(((h1-3243)^10000 + 128311) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let hash = Some(((h1-3243)^10000 + 128311) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::BitwiseOr => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1|h2+20000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1|h2+8332) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::BitwiseAnd => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1&h2+10000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1&h2+32481) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::BitwiseXor => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1+h2+10000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1+h2+32941123) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::BitwiseNot => {
                         assert!(child_nodes.len() == 1);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1+h2+93910) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1+h2+93910) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::Eq => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^h2+10000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1^h2+10000) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::NEq => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^h2-20000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1^h2-392482) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::Less => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^h2+30000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1^h2+93432) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::Greater => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^h2+40000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1^h2+38214) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::LEq => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^h2+50000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1^h2+3842) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::GEq => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^h2+60000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1^h2+32943) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::LShift => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^h2+70000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1^h2+70000) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::RShift => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^h2+80000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1^h2+80000) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::Mod => {
                         assert!(child_nodes.len() == 2);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^h2+9000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some((h1^h2+9000) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::Call => {
-                        node_mut!(at et_node in self).hash = Some({
-                            let rnd:isize = thread_rng().gen();rnd % ET_HASH_MODULUS
-                        });
+                        let hash = Some((et_node as isize + 234)*23425%ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;                     
+                        hash
                     },
                     ExprOp::Negative => {
                         assert!(child_nodes.len() == 1);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^11000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let hash = Some((h1^11000) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::Positive => {
                         assert!(child_nodes.len() == 1);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^12000) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let hash = Some((h1^12000) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
                     ExprOp::ArrayIndex => {
                         // 2 situations 1. array decl in func parameter can be only one 
                         match child_nodes.len(){
                             1 => {
-                                let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                                node_mut!(at et_node in self).hash = Some((h1+100) % ET_HASH_MODULUS);
+                                let h1 = node!(at {child_nodes[0]} in self).hash?;
+                                let hash = Some((h1+932412) % ET_HASH_MODULUS);
+                                node_mut!(at et_node in self).hash =hash;
+                                hash
                             }
                             2 => {
-                                let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                                let h2 = node!(at {child_nodes[1]} in self).hash.unwrap();
-                                node_mut!(at et_node in self).hash = Some((h1^h2+100) % ET_HASH_MODULUS);
+                                let h1 = node!(at {child_nodes[0]} in self).hash?;
+                                let h2 = node!(at {child_nodes[1]} in self).hash?;
+                                let hash = Some((h1^(h2*2)+83721) % ET_HASH_MODULUS);
+                                node_mut!(at et_node in self).hash =hash;
+                                hash
                             }
                             _ => {
                                 panic!()
@@ -275,30 +327,69 @@ impl EtHash for EtTree{
                         }
                     },
                     ExprOp::ArrayWrapper => {
-                        node_mut!(at et_node in self).hash = Some({
+                         let hash = Some({
                             let rnd:isize = thread_rng().gen();
                             rnd % ET_HASH_MODULUS
                         });
+                        node_mut!(at et_node in self).hash = hash;
+                        hash
                     },
                     ExprOp::Cast => {
                         debug_info_red!("find cast? {}",et_node);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^283249) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let hash = Some((h1^283249) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     }
                     ExprOp::AddrOf => todo!(),
                     ExprOp::Deref => {
                         debug_info_red!("find deref? {}",et_node);
-                        let h1 = node!(at {child_nodes[0]} in self).hash.unwrap();
-                        node_mut!(at et_node in self).hash = Some((h1^1823849) % ET_HASH_MODULUS);
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let hash = Some((h1^1823849) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     },
+                    ExprOp::Store => {
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let hash = Some((h1^1333221) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
+                    },
+                    ExprOp::Load => {
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let hash = Some(((h1+1232332)^h2+23100) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
+                    },
+                    // no need to implement
                     ExprOp::DotMember => todo!(),
                     ExprOp::ArrowMember => todo!(),
                     ExprOp::LPlusPlus => todo!(),
                     ExprOp::RPlusPlus => todo!(),
                     ExprOp::LMinusMinus => todo!(),
                     ExprOp::RMinusMinus => todo!(),
-                    _ => {
-                        panic!()
+                    ExprOp::MulAssign => todo!(),
+                    ExprOp::DivAssign => todo!(),
+                    ExprOp::PlusAssign => todo!(),
+                    ExprOp::MinusAssign => todo!(),
+                    ExprOp::TransToI32 => {
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let hash = Some(((h1+1493425)+23314) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
+                    },
+                    ExprOp::TransToF32 => {
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let hash = Some(((h1+239432)+73232) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
+                    },
+                    ExprOp::TransToI1 => {
+                        let h1 = node!(at {child_nodes[0]} in self).hash?;
+                        let hash = Some(((h1+182312)+34821) % ET_HASH_MODULUS);
+                        node_mut!(at et_node in self).hash =hash;
+                        hash
                     }
                 }
             },
@@ -309,30 +400,44 @@ impl EtHash for EtTree{
                     literal_symidx.hash(&mut hasher);
                 }
                 let hash_val = hasher.finish() as isize;
-                node_mut!(at et_node in self).hash = Some(hash_val % ET_HASH_MODULUS);
+                let hash = Some(hash_val % ET_HASH_MODULUS);
+                node_mut!(at et_node in self).hash =hash;
+                hash
             },
             EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } => {
                 let mut hasher = DefaultHasher::new();
                 rc_symidx.as_ref_borrow().hash(&mut hasher);
                 decldef_def_or_use.hash(&mut hasher);
                 let hash_val = hasher.finish() as isize;
-                node_mut!(at et_node in self).hash = Some(hash_val % ET_HASH_MODULUS);
+                let hash = Some(hash_val % ET_HASH_MODULUS);
+                node_mut!(at et_node in self).hash =hash;
+                hash
             },
             EtNodeType::Separator { ast_node, text } => {
                 // do nothing because sep node don't need to hash 
+                let hash = Some({
+                let rnd:isize = thread_rng().gen();
+                    rnd % ET_HASH_MODULUS
+                });
+                node_mut!(at et_node in self).hash = hash;
+                hash
             },
         }
 
     }
     /// you should deprecate hash if you want to update it at second time
-    fn update_hash(&mut self,et_node:u32) {
+    fn update_hash(&mut self,et_node:u32) -> Result<()>{
         // if node!(at et_node in self).hash.is_some() || node!(at et_node in self).common_eliminated{
         //     return 
         // }
-        let dfs_nodes = dfs_with_predicate(self, et_node,|e| !e.weight().et_edge_type.is_deleted());
-        for &child_node in dfs_nodes.iter().rev(){
-            self._update_hash(child_node);
+        let dfs_nodes = rpo_with_predicate(self, et_node,|e| !e.weight().et_edge_type.is_deleted());
+        debug_info_blue!("update_hash order {:?}",dfs_nodes);
+        for &et_node in dfs_nodes.iter(){
+            if self._update_hash(et_node).is_none(){
+                return Err(anyhow!("meet none hash of et_node:{et_node} in et_tree"));
+            }
         }
+        Ok(())
     }
 }
 
@@ -379,6 +484,9 @@ pub enum ExprOp {
     ArrayWrapper,
     Store,
     Load,
+    TransToI32,
+    TransToF32,
+    TransToI1,
 }
 impl Debug for ExprOp {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -424,18 +532,35 @@ impl Debug for ExprOp {
             Self::ArrayWrapper => write!(f, "{{}}"),
             Self::Store => write!(f,"Store"),
             Self::Load => write!(f,"Load"),
+            Self::TransToI32 => write!(f,"TransI32"),
+            Self::TransToF32 => write!(f,"TransF32"),
+            Self::TransToI1 => write!(f,"TransBool"),
         }
     }
 }
 impl From<EtNodeType> for EtNode{
     fn from(et_node_type: EtNodeType) -> Self {
-        Self { et_node_type, hash: None, cached_rc_symidx: None, et_ret_symidx_vec: None ,common_eliminated:false, dims: None, ty: None,equivalent_symidx_vec:vec![] }
+        Self { et_node_type, hash: None, gen_nhwc_cached_rc_symidx: None, et_ret_symidx_vec: None ,common_eliminated:false, dims: None, ty: None,equivalent_symidx_vec:vec![], gvn_evaluated: false }
     }
 }
 
 impl EtNodeType {
     pub fn new_store(ast_node:u32) -> Self{ EtNodeType::Operator { op: ExprOp::Store, ast_node, text:String::new(), op_rc_symidx: None }}
     pub fn new_load(ast_node:u32) -> Self{EtNodeType::Operator { op: ExprOp::Load, ast_node, text: String::new(), op_rc_symidx: None }}
+    pub fn new_trans_to(ast_node:u32, ty:&Type) -> Self{
+        match ty {
+            Type::I32 => {
+                EtNodeType::Operator { op: ExprOp::TransToI32, ast_node, text: String::new(), op_rc_symidx: None }
+            },
+            Type::F32 => {
+                EtNodeType::Operator { op: ExprOp::TransToF32, ast_node, text: String::new(), op_rc_symidx: None }
+            },
+            Type::I1 => {
+                EtNodeType::Operator { op: ExprOp::TransToI1, ast_node, text: String::new(), op_rc_symidx: None }
+            },
+            _ => {panic!()}
+        }
+    }
     pub fn new_op_array_idx(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::ArrayIndex, ast_node, text:String::new(), op_rc_symidx: None } }
     pub fn new_op_array_wrapper(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::ArrayWrapper, ast_node, text:String::new(), op_rc_symidx: None } }
     pub fn new_op_add(ast_node:u32) -> Self { EtNodeType::Operator { op:ExprOp::Add, ast_node, text:String::new() ,op_rc_symidx:None} }
@@ -526,10 +651,10 @@ impl Debug for EtNodeType {
         match self {
             EtNodeType::Operator { op, ast_node: _, text: _, op_rc_symidx: op_symidx } => write!(f, "{:?}", op),
             EtNodeType::Literal { rc_literal_symidx, ast_node: _, text: _, } => {
-                write!(f, "literal {}", rc_literal_symidx.as_ref_borrow().symbol_name)
+                write!(f, "literal {:?}", rc_literal_symidx)
             }
-            EtNodeType::Symbol { rc_symidx: sym_idx, ast_node, text, decldef_def_or_use: def_or_use } => {
-                write!(f, "{:?} symbol {} {} at {}", def_or_use, text, sym_idx.as_ref_borrow().symbol_name,ast_node)
+            EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use: def_or_use } => {
+                write!(f, "{:?} symbol {} {:?}", def_or_use, text, rc_symidx)
             }
             // EtNakedNode::ArraySym { sym_idx, ast_node, text, def_or_use } =>
             // write!(f,"{:?} {} {}",def_or_use,text,sym_idx.symbol_name),
@@ -554,7 +679,14 @@ impl Debug for DeclOrDefOrUse {
 }
 
 impl Debug for EtNode {
-    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{:?} ty {:?} dims {:?} hash:{:?} {}", self.et_node_type, self.dims,self.ty, self.hash, if self.common_eliminated{"eliminated"}else{""}) }
+    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{:?} {} {} {} {} {} ", 
+        self.et_node_type, 
+        if self.dims.is_some() {format!("dims {:?}",self.dims.as_ref().unwrap()) } else { "".to_string()},
+        if self.ty.is_some() {format!("ty {:?}",self.ty.as_ref().unwrap() )} else {"".to_string()},
+        if self.hash.is_some() {format!("hash {}",self.hash.as_ref().unwrap()) } else {"".to_string()}, 
+        if self.common_eliminated{"eliminated"}else{""}, 
+        if self.equivalent_symidx_vec.len()!=0 {format!("eq_symidx:{:?}",self.equivalent_symidx_vec)} else {"".to_string()})
+    }
 }
 
 impl EtNode {

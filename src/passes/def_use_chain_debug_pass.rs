@@ -1,14 +1,14 @@
 use crate::{ reg_field_for_struct, toolkit::{context::NhwcCtx, dot::Config, etc::{generate_png_by_graph_multi_tasks}, gen_dug::{parse_dug}, nhwc_instr::NhwcInstr, pass_manager::Pass, symtab::{SymTab, SymTabEdge, SymTabGraph}}};
 use anyhow::*;
 #[derive(Debug)]
-pub struct DefUseChainDebugPass {
+pub struct DefUseChainPass {
     is_gen_png:bool
 }
-impl DefUseChainDebugPass {
-    pub fn new(is_gen_png:bool) -> Self { DefUseChainDebugPass { is_gen_png } }
+impl DefUseChainPass {
+    pub fn new(is_gen_png:bool) -> Self { DefUseChainPass { is_gen_png } }
 }
 
-impl Pass for DefUseChainDebugPass {
+impl Pass for DefUseChainPass {
     // 运行这个pass
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> { 
         // 先建立一个图 

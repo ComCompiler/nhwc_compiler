@@ -1,7 +1,7 @@
 use crate::{
     add_edge, antlr_parser::cparser::{RULE_declaration, RULE_expression, RULE_forDeclaration, RULE_parameterList}, node, toolkit::{self, ast_node::find_dfs_rule_ast, context::NhwcCtx, dot::Config, et_node::EtNodeType, etc::generate_png_by_graph_multi_tasks, gen_instr_et::parse_instr_list_to_et, pass_manager::Pass, symtab::SymIdx}
 };
-use ahash::{HashMap, HashMapExt};
+use ahash::{HashMap, HashMapExt, HashSet, HashSetExt};
 use anyhow::Result;
 /// 定义额外的信息，这样我们就可以把 add_field 宏加入到符号表或者任何实现了 Fields trait 的地方
 /// 任何一个Pass 都有一个pass_run函数 来进行这个pass 相关的工作，比如说对于 SSAPass 我们要对 一个BasicBlock 中的ExprTree做出转换。
@@ -30,8 +30,8 @@ impl Pass for Nhwc2EtPass {
         let mut child_et_map = HashMap::new();
         let node:u32 = 3;
         let cfg_graph = &mut ctx.cfg_graph;
-        let instrs = &node!(at node in cfg_graph).instrs;
-        parse_instr_list_to_et(instrs, instr_et, &ctx.symtab, &mut child_et_map, &ctx.scope_tree,&ctx.nhwc_instr_slab)?;
+        let instrs = node!(at node in cfg_graph).instrs.iter().cloned();
+        parse_instr_list_to_et(instrs, instr_et, &ctx.symtab, &mut child_et_map, &mut HashMap::new(), &ctx.scope_tree,&ctx.nhwc_instr_slab)?;
         if self.is_gen_png {
             generate_png_by_graph_multi_tasks(&ctx.instr_et.clone(), "instr_et_tree".to_string(), &[Config::Record, Config::Title("instr_et_tree".to_string()),Config::NodeIndexLabel],&mut ctx.io_task_list)?;
         }

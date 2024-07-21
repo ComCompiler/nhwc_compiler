@@ -76,6 +76,6 @@ pub fn parse_as_ast_tree(context:&mut NhwcCtx) {
     }
 
     compress_ast(&mut context.ast_tree);
-    println!("{:?}","finished compress ast");
+    // println!("{:?}","finished compress ast");
     // 更新 context 中的 ast_tree
 }

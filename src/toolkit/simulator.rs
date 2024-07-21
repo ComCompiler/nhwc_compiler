@@ -567,7 +567,7 @@ impl Simulator{
                 let rhs_val = self.simu_symtab.get(&rhs)?.get_simu_val()?.clone();
                 self.simu_add_value(&lhs,rhs_val)?;
             },
-            Call { op_assigned_symidx, func_op } => {
+            Call { op_lhs: op_assigned_symidx, func_op } => {
                 self.push_func_call(op_assigned_symidx.as_ref(),&func_op.rc_func_symidx, &func_op.actual_arg_symidx_vec,  src_symtab)?;
             },
             Jump {  jump_op } => {
@@ -582,7 +582,7 @@ impl Simulator{
                         let t2 = t2.as_ref_borrow();
 
                         let cond_val = self.simu_symtab.get(&cond)?.get_simu_val()?;
-                        if cond_val.clone().to_specific_type(&Type::I1)? == Value::new_i1(true){
+                        if cond_val.clone().trans_to_specific_type(&Type::I1)? == Value::new_i1(true){
                             self.cur_instr_pos = *self.simu_symtab.get_mut(&t1)?.get_simu_label_pos()?;
                         } else {
                             // debug_info_yellow!("{:?} is not equal to {:?}",cond_val,Value::new_i1(true));
@@ -623,7 +623,7 @@ impl Simulator{
                         let float_symidx = float_symidx.as_ref_borrow();
 
                         let float_val = self.simu_symtab.get(&float_symidx)?.get_simu_val()?;
-                        let result = float_val.clone().to_specific_type(&I32)?;
+                        let result = float_val.clone().trans_to_specific_type(&I32)?;
                         self.simu_add_value(&lhs,result.clone())?;
                         result
                     },
@@ -631,7 +631,7 @@ impl Simulator{
                         let int_symidx = int_symidx.as_ref_borrow();
 
                         let int_val = self.simu_symtab.get(&int_symidx)?.get_simu_val()?;
-                        let result = int_val.clone().to_specific_type(&F32)?;
+                        let result = int_val.clone().trans_to_specific_type(&F32)?;
                         self.simu_add_value(&lhs,result.clone())?;
                         result
                     },
@@ -639,7 +639,7 @@ impl Simulator{
                         let bool_symidx = bool_symidx.as_ref_borrow();
 
                         let bool_val = self.simu_symtab.get(&bool_symidx)?.get_simu_val()?;
-                        let result = bool_val.clone().to_specific_type(&I32)?;
+                        let result = bool_val.clone().trans_to_specific_type(&I32)?;
                         self.simu_add_value(&lhs,result.clone())?;
                         result
                     },
@@ -762,7 +762,7 @@ impl Simulator{
                     _ => {return Err(anyhow!("{:?} 不是pointer,无法使用load指令",ptr_symidx))}
                 }
             },
-            GetElementPtr { lhs, array_ty, array_or_ptr_symidx: array_symidx, idx_vec } => {
+            GetElementPtr { lhs, array_ty, ptr_symidx: array_symidx, idx_vec } => {
                 let lhs = lhs.as_ref_borrow();
                 match array_ty{
                     Type::Array { dims, ele_ty } => {

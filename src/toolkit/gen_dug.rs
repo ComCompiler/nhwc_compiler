@@ -40,7 +40,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::Alloc { var_symidx: _, vartype: _ } => {},
                     NhwcInstrType::Arith { lhs: _, rhs: _ } => {},
                     NhwcInstrType::SimpleAssign { lhs: _, rhs: _, vartype: _ } => {},
-                    NhwcInstrType::Call { op_assigned_symidx: _, func_op: _ } => {},
+                    NhwcInstrType::Call { op_lhs: _, func_op: _ } => {},
                     NhwcInstrType::Jump { jump_op } => 
                         match jump_op{
                             JumpOp::Ret { op_ret_sym: _} => {},
@@ -54,7 +54,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::Globl { var_symidx: _, vartype: _ } => {},
                     NhwcInstrType::Load { lhs: _, ptr_symidx: _ptr_symdix, ptr_ty: _ } => {},
                     NhwcInstrType::Store { val_symidx: _value, value_ty: _, ptr_symidx: _, ptr_ty: _ } => {},
-                    NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_or_ptr_symidx: _, idx_vec: _ } => {},
+                    NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, ptr_symidx: _, idx_vec: _ } => {},
                     NhwcInstrType::Nope {  } => {continue;},
                     NhwcInstrType::Mu { may_use_symidx: _, may_use_instr: _ } => {continue;},
                     NhwcInstrType::Chi { lhs: _, rhs: _, may_def_instr: _ } => {continue;},
@@ -116,7 +116,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::Alloc { var_symidx: _, vartype: _ } => continue,
                     NhwcInstrType::Arith { lhs: _, rhs: _ } => {},
                     NhwcInstrType::SimpleAssign { lhs: _, rhs: _, vartype: _ } => {},
-                    NhwcInstrType::Call { op_assigned_symidx: _, func_op: _ } => {},
+                    NhwcInstrType::Call { op_lhs: _, func_op: _ } => {},
                     NhwcInstrType::Jump { jump_op } => 
                         match jump_op{
                             JumpOp::Ret { op_ret_sym: _} => {},
@@ -130,13 +130,13 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::Globl { var_symidx: _, vartype: _ } => continue,
                     NhwcInstrType::Load { lhs: _, ptr_symidx: _ptr_symdix, ptr_ty: _ } => {},
                     NhwcInstrType::Store { val_symidx: _value, value_ty: _, ptr_symidx: _, ptr_ty: _ } => {},
-                    NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_or_ptr_symidx: _, idx_vec: _ } => {},
+                    NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, ptr_symidx: _, idx_vec: _ } => {},
                     NhwcInstrType::Nope {  } => continue,
                     NhwcInstrType::Mu { may_use_symidx: _, may_use_instr: _ } => {},
                     NhwcInstrType::Chi { lhs: _, rhs: _, may_def_instr: _ } => {},
                 }
                 let cur_instr_struct = instr!(at instr in instr_slab)?;
-                for rc_use_symidx in cur_instr_struct.get_ssa_direct_use_symidx_vec() {
+                for &rc_use_symidx in cur_instr_struct.get_ssa_direct_use_symidx_vec().iter().filter(|x| !x.as_ref_borrow().is_literal()) {
                     let use_symidx = rc_use_symidx.as_ref_borrow();
                     let symbol = symtab.get(&use_symidx)?;
                     let &def_instr = if symbol.has_ssa_def_instr(){

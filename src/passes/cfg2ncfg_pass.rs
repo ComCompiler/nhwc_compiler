@@ -32,9 +32,9 @@ impl Pass for Cfg2NcfgPass {
                 Config::Record, 
                 Config::Rounded, Config::CfgBlock,Config::Title("nhwc_cfg_graph".to_string()), Config::NodeIndexLabel],&mut ctx.io_task_list)?;
         }
-        if self.is_gen_symtab_png {
-            generate_png_by_graph_multi_tasks(&ctx.symtab_graph.clone(), "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab, Config::Title("symtab_graph".to_string()),Config::CfgBlock],&mut ctx.io_task_list)?;
-        }
+        // if self.is_gen_symtab_png {
+        //     generate_png_by_graph_multi_tasks(&ctx.symtab_graph.clone(), "symtab_graph".to_string(), &[Config::Record, Config::Rounded, Config::SymTab, Config::Title("symtab_graph".to_string()),Config::CfgBlock],&mut ctx.io_task_list)?;
+        // }
         // generate_png_by_graph(&et_tree, format!("et_tree"), &[Config::EdgeNoLabel, Config::Record, Config::Title("et_tree".to_string()),Config::NodeIndexLabel])?;
         rst?;
         Ok(())

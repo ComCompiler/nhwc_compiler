@@ -321,13 +321,15 @@ impl RegTab{
         }
     }
     pub fn try_release_symidx(&mut self, symidx:&SymIdx, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>) -> Result<()>{
-        if symtab.get(symidx)?.has_cur_reg(){
+        if symtab.has_symbol(symidx) && symtab.get(symidx)?.has_cur_reg(){
             match  symtab.get(symidx)?.get_cur_reg()?{
                 Some(reg) => {
                     self.release_reg(reg.clone(), symtab, asm_sect, store_f)?;
                 },
                 None => {},
             }
+        }else {
+
         }
         Ok(())
     }
@@ -363,9 +365,11 @@ impl RegTab{
             // 3. other freed reg
 
             // - arg reg
-            for i in REG_A_RANGE.clone(){ if self.is_released(&Register::new_a(i)){ return Ok(Register::new_a(i)) } }
-            // - saved reg
-            for i in REG_S_RANGE.clone(){ if self.is_released(&Register::new_s(i)){ return Ok(Register::new_s(i)) } }
+            if self.gpr_released_reg_count>0{
+                for i in REG_A_RANGE.clone(){ if self.is_released(&Register::new_a(i)){ return Ok(Register::new_a(i)) } }
+                // - saved reg
+                for i in REG_S_RANGE.clone(){ if self.is_released(&Register::new_s(i)){ return Ok(Register::new_s(i)) } }
+            }
 
             for i in REG_A_RANGE.clone() { if self.is_temp_freed(&Register::new_a(i)){ return Ok(Register::new_a(i)) } }
             for i in REG_S_RANGE.clone() { if self.is_temp_freed(&Register::new_s(i)){ return Ok(Register::new_s(i)) } }
@@ -375,8 +379,10 @@ impl RegTab{
 
             return Err(anyhow!("no avail(released or freed) reg fo ty {:?},{:?}",sym_ty,self));
         }else if sym_ty.is_f_32(){
-            for i in REG_FA_RANGE.clone(){ if self.is_released(&Register::new_fa(i)){ return Ok(Register::new_fa(i)) } }
-            for i in REG_FS_RANGE.clone(){ if self.is_released(&Register::new_fs(i)){ return Ok(Register::new_fs(i)) } }
+            if self.fpr_released_reg_count>0{
+                for i in REG_FA_RANGE.clone(){ if self.is_released(&Register::new_fa(i)){ return Ok(Register::new_fa(i)) } }
+                for i in REG_FS_RANGE.clone(){ if self.is_released(&Register::new_fs(i)){ return Ok(Register::new_fs(i)) } }
+            }
 
             for i in REG_FA_RANGE.clone() { if self.is_temp_freed(&Register::new_fs(i)){ return Ok(Register::new_fa(i)) } } 
             for i in REG_FS_RANGE.clone() { if self.is_temp_freed(&Register::new_fs(i)){ return Ok(Register::new_fs(i)) } } 

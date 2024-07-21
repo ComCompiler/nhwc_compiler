@@ -300,6 +300,13 @@ macro_rules! direct_child_nodes {
         edges_vec.reverse();
         edges_vec
     }};
+    (at $node:ident in $graph:ident with_predicate $f:block iter_reversed)=> {{
+        use petgraph::visit::EdgeRef;
+        let iter = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing)
+            .filter($f)
+            .map(|e|e.target().index() as u32);
+        iter
+    }};
     (at $node:ident in $graph:ident with_predicate $f:ident )=> {{
         use petgraph::visit::EdgeRef;
         let mut edges_vec:Vec<_> = $graph.edges_directed(petgraph::matrix_graph::NodeIndex::from($node), petgraph::Direction::Outgoing)

@@ -329,7 +329,7 @@ impl Value {
     pub fn new_array(value_map:ArrayEleMap, dims:Vec<RcSymIdx>, ele_ty: Type) -> Self{
         Value::Array { value_map, dims, ele_ty }
     }
-    pub fn to_specific_type(&self,ty:&Type) -> Result<Value>{
+    pub fn trans_to_specific_type(&self,ty:&Type) -> Result<Value>{
         match (&self,&ty) {
             (Value::I32(v), Type::I32) => Ok(Value::new_i32(v.context("没毛病")? as i32)),
             (Value::I32(v), Type::F32) => Ok(Value::new_f32(v.context("I32 to F32 but not a i32")? as f32)),
@@ -564,11 +564,13 @@ impl Type {
             Type::Fn { arg_syms: _, ret_sym: _ } => Err(anyhow!("无法新建函数类型的数组"))?,
             _=>{}
         }
-        for op_dim in &mut dims{
+        for (idx,op_dim) in &mut dims.iter_mut().rev().enumerate(){
             match op_dim{
                 Some(dim) => {
-                    let symidx:SymIdx = Value::from_symidx(&dim.as_ref_borrow())?.as_i32_to_min_2_power()?.to_symidx()?;
-                    *dim =  symidx.as_rc();
+                    if idx < 2 {
+                        let symidx:SymIdx = Value::from_symidx(&dim.as_ref_borrow())?.as_i32_to_min_2_power()?.to_symidx()?;
+                        *dim =  symidx.as_rc();
+                    }
                 },
                 None => {
                     // do nothing to unknown dim
@@ -932,8 +934,8 @@ impl Add for Value{
 
     fn add(self, rhs: Self) -> Self::Output {
         let pub_ty=self.adapt(&rhs).with_context(||format!("无法得出{:?} 和 {:?}的兼容类型",self,rhs))?;
-        let l_val=self.to_specific_type(&pub_ty)?;
-        let r_val=rhs.to_specific_type(&pub_ty)?;
+        let l_val=self.trans_to_specific_type(&pub_ty)?;
+        let r_val=rhs.trans_to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1+v2)),
             (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1+v2)),
@@ -950,8 +952,8 @@ impl Sub for Value{
 
     fn sub(self, rhs: Self) -> Self::Output {
         let pub_ty=self.adapt(&rhs).with_context(||format!("无法得出{:?} 和 {:?}的兼容类型",self,rhs))?;
-        let l_val=self.to_specific_type(&pub_ty)?;
-        let r_val=rhs.to_specific_type(&pub_ty)?;
+        let l_val=self.trans_to_specific_type(&pub_ty)?;
+        let r_val=rhs.trans_to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 - v2)),
             (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1 - v2)),
@@ -968,8 +970,8 @@ impl Mul for Value{
 
     fn mul(self, rhs: Self) -> Self::Output {
         let pub_ty=self.adapt(&rhs).with_context(||format!("无法得出{:?} 和 {:?}的兼容类型",self,rhs))?;
-        let l_val=self.to_specific_type(&pub_ty)?;
-        let r_val=rhs.to_specific_type(&pub_ty)?;
+        let l_val=self.trans_to_specific_type(&pub_ty)?;
+        let r_val=rhs.trans_to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 * v2)),
             (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1 * v2)),
@@ -986,8 +988,8 @@ impl Div for Value{
 
     fn div(self, rhs: Self) -> Self::Output {
         let pub_ty=self.adapt(&rhs).with_context(||format!("无法得出{:?} 和 {:?}的兼容类型",self,rhs))?;
-        let l_val=self.to_specific_type(&pub_ty)?;
-        let r_val=rhs.to_specific_type(&pub_ty)?;
+        let l_val=self.trans_to_specific_type(&pub_ty)?;
+        let r_val=rhs.trans_to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 / v2)),
             (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1 / v2)),
@@ -1004,8 +1006,8 @@ impl Rem for Value{
 
     fn rem(self, rhs: Self) -> Self::Output {
         let pub_ty=self.adapt(&rhs).with_context(||format!("无法得出{:?} 和 {:?}的兼容类型",self,rhs))?;
-        let l_val=self.to_specific_type(&pub_ty)?;
-        let r_val=rhs.to_specific_type(&pub_ty)?;
+        let l_val=self.trans_to_specific_type(&pub_ty)?;
+        let r_val=rhs.trans_to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 % v2)),
             (Value::F32(Some(v1)), Value::F32(Some(v2))) => Ok(Value::new_f32(v1 % v2)),
@@ -1019,8 +1021,8 @@ impl BitAnd for Value{
     type Output = Result<Value>;
     fn bitand(self, rhs: Self) -> Self::Output {
         let pub_ty=self.adapt(&rhs).with_context(||format!("无法得出{:?} 和 {:?}的兼容类型",self,rhs))?;
-        let l_val=self.to_specific_type(&pub_ty)?;
-        let r_val=rhs.to_specific_type(&pub_ty)?;
+        let l_val=self.trans_to_specific_type(&pub_ty)?;
+        let r_val=rhs.trans_to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 & v2)),
             (Value::F32(Some(_v1)), Value::F32(Some(_v2))) => Err(anyhow!("F32 can't bitand")),
@@ -1034,8 +1036,8 @@ impl BitOr for Value{
     type Output = Result<Value>;
     fn bitor(self, rhs: Self) -> Self::Output {
         let pub_ty=self.adapt(&rhs).with_context(||format!("无法得出{:?} 和 {:?}的兼容类型",self,rhs))?;
-        let l_val=self.to_specific_type(&pub_ty)?;
-        let r_val=rhs.to_specific_type(&pub_ty)?;
+        let l_val=self.trans_to_specific_type(&pub_ty)?;
+        let r_val=rhs.trans_to_specific_type(&pub_ty)?;
         match (l_val,r_val) {
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Ok(Value::new_i32(v1 | v2)),
             (Value::F32(Some(_v1)), Value::F32(Some(_v2))) => Err(anyhow!("F32 can't bitor")),

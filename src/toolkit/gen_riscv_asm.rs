@@ -240,7 +240,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     NhwcInstrType::Store { val_symidx: value_symidx, value_ty: _, ptr_symidx, ptr_ty: _ } => {
                         store_from_ptr(asm_sect, &ptr_symidx.as_ref_borrow(), &value_symidx.as_ref_borrow(),regtab, symtab)?;
                     },
-                    NhwcInstrType::GetElementPtr { lhs, array_or_ptr_symidx, array_ty, idx_vec } => {
+                    NhwcInstrType::GetElementPtr { lhs, ptr_symidx: array_or_ptr_symidx, array_ty, idx_vec } => {
                         let lhs = lhs.as_ref_borrow();
                         let array_or_ptr_symidx = array_or_ptr_symidx.as_ref_borrow();
                         // clear s3
@@ -532,7 +532,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                             regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                         }
                     },
-                    NhwcInstrType::Call { op_assigned_symidx, func_op } => {
+                    NhwcInstrType::Call { op_lhs: op_assigned_symidx, func_op } => {
                         let mut fpr_args = vec![];
                         let mut gpr_args = vec![];
                         let func_symidx = &func_op.rc_func_symidx.as_ref_borrow();
@@ -658,7 +658,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 let op_ret_reg = match op_ret_sym{
                                     Some(ret_sym) => {
                                         let ret_sym = ret_sym.as_ref_borrow();
-                                        if symtab.get(&ret_sym)?.get_type()?.is_f_32(){
+                                        let ret_sym_ty = if ret_sym.is_literal(){
+                                            Type::new_from_const_str(&ret_sym.symbol_name)
+                                        }else {
+                                            symtab.get(&ret_sym)?.get_type()?.clone()
+                                        };
+                                        if ret_sym_ty.is_f_32(){
                                             Some(regtab.load_into(Register::new_fa(0), &ret_sym, &Type::F32, symtab, asm_sect, &mut default_store,  &mut default_load)?)
                                         }else{
                                             Some(regtab.load_into(Register::new_a(0), &ret_sym, &Type::I32, symtab, asm_sect, &mut default_store,  &mut default_load)?)

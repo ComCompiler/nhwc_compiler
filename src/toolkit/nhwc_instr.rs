@@ -107,12 +107,14 @@ pub struct FuncOp {
 pub struct PhiPair {
     pub symidx:RcSymIdx,
     pub def_instr:usize,
+    pub comming_cfg_node:u32,
 }
 impl PhiPair{
-    pub fn new(symidx:RcSymIdx ,  def_instr:usize)->Self{
+    pub fn new(symidx:RcSymIdx ,  def_instr:usize, comming_cfg_node:u32)->Self{
         Self{
             symidx,
-            def_instr: def_instr,
+            def_instr,
+            comming_cfg_node,
         }
     }
 }
@@ -169,12 +171,12 @@ pub enum NhwcInstrType {
     Load { lhs:RcSymIdx ,ptr_symidx:RcSymIdx ,ptr_ty:Type},
     Store { val_symidx:RcSymIdx, value_ty:Type, ptr_symidx:RcSymIdx , ptr_ty:Type},
     /// 注意getelementptr 的 ty 必须是一个 数组
-    GetElementPtr { lhs:RcSymIdx  ,array_or_ptr_symidx:RcSymIdx,array_ty:Type, idx_vec:Vec<Option<RcSymIdx>>},
+    GetElementPtr { lhs:RcSymIdx  ,ptr_symidx:RcSymIdx,array_ty:Type, idx_vec:Vec<Option<RcSymIdx>>},
     // 算数运算符 + - * / etc.
     Arith { lhs:RcSymIdx, rhs:ArithOp },
     SimpleAssign { lhs:RcSymIdx, rhs:RcSymIdx ,vartype:Type},
     // 调用函数
-    Call { op_assigned_symidx:Option<RcSymIdx>, func_op:FuncOp },
+    Call { op_lhs:Option<RcSymIdx>, func_op:FuncOp },
     // 跳转  break continue  return  etc.
     Jump { jump_op:JumpOp },
     // phi node
@@ -218,7 +220,7 @@ impl NhwcInstr {
             NhwcInstrType::SimpleAssign { lhs, rhs:_, vartype: _ } => {
                  vec![lhs] 
             },
-            NhwcInstrType::Call { op_assigned_symidx: assigned, func_op:_} => if let  Some(symidx)= assigned{
+            NhwcInstrType::Call { op_lhs: assigned, func_op:_} => if let  Some(symidx)= assigned{
                 vec![symidx]
             }else{
                 vec![]
@@ -227,7 +229,7 @@ impl NhwcInstr {
             NhwcInstrType::Phi { lhs, rhs:_ } => vec![lhs],
             NhwcInstrType::TranType { lhs, op: _ } => vec![lhs],
             NhwcInstrType::BreakPoint { symidx: _breakpoint_symidx, breakpoint_args: _symidx_vec_to_observe } => vec![],
-            NhwcInstrType::GetElementPtr { array_ty: _ty, array_or_ptr_symidx: _, idx_vec: _, lhs } => vec![lhs],
+            NhwcInstrType::GetElementPtr { array_ty: _ty, ptr_symidx: _, idx_vec: _, lhs } => vec![lhs],
             NhwcInstrType::Globl { var_symidx: _, vartype: _, } => vec![],
             // 这几个都认为是没有ssa 层面上的def 
             NhwcInstrType::Alloc { var_symidx: _, vartype: _, } => vec![],
@@ -266,7 +268,7 @@ impl NhwcInstr {
             NhwcInstrType::SimpleAssign { lhs:_, rhs, vartype: _ } => {
                  vec![rhs] 
             },
-            NhwcInstrType::Call { op_assigned_symidx: _assigned, func_op } => {
+            NhwcInstrType::Call { op_lhs: _assigned, func_op } => {
                 func_op.actual_arg_symidx_vec.iter().collect_vec()
             },
             NhwcInstrType::Jump { jump_op } => {
@@ -291,7 +293,7 @@ impl NhwcInstr {
             NhwcInstrType::Globl { var_symidx: _, vartype: _ } => vec![],
             NhwcInstrType::Load { lhs: _, ptr_symidx: ptr_symdix, ptr_ty: _ } => vec![ptr_symdix],
             NhwcInstrType::Store { val_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
-            NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_or_ptr_symidx: array_symidx, idx_vec } => {
+            NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, ptr_symidx: array_symidx, idx_vec } => {
                 // // we will don't seem array_symidx as a kind of `use` in ssa because it will not affect the ptr as the version of a changes
                 idx_vec.iter().filter(|idx|idx.is_some()).map(|idx|idx.as_ref().unwrap()).chain(vec![array_symidx].into_iter()).collect_vec()
             },
@@ -319,7 +321,7 @@ impl NhwcInstr {
             NhwcInstrType::SimpleAssign { lhs, rhs:_, vartype: _ } => {
                  vec![lhs] 
             },
-            NhwcInstrType::Call { op_assigned_symidx: assigned, func_op:_ } => if let  Some(symidx)= assigned{
+            NhwcInstrType::Call { op_lhs: assigned, func_op:_ } => if let  Some(symidx)= assigned{
                 vec![symidx]
             }else{
                 vec![]
@@ -332,7 +334,7 @@ impl NhwcInstr {
             NhwcInstrType::Globl { var_symidx: _, vartype: _ } => vec![],
             NhwcInstrType::Load { lhs, ptr_symidx: _ptr_symdix, ptr_ty: _ } => vec![lhs],
             NhwcInstrType::Store { val_symidx: _value, ptr_symidx: _, ptr_ty: _, value_ty: _ } => vec![],
-            NhwcInstrType::GetElementPtr { lhs, array_ty: _ty, array_or_ptr_symidx: _, idx_vec: _ } => vec![lhs],
+            NhwcInstrType::GetElementPtr { lhs, array_ty: _ty, ptr_symidx: _, idx_vec: _ } => vec![lhs],
             NhwcInstrType::Nope {  } => vec![],
             NhwcInstrType::Mu { may_use_symidx: _ , may_use_instr:_usize} => vec![],
             NhwcInstrType::Chi { lhs, rhs: _ ,may_def_instr:_usize} => vec![lhs],
@@ -365,7 +367,7 @@ impl NhwcInstr {
             NhwcInstrType::SimpleAssign { lhs:_, rhs, vartype: _ } => {
                  vec![rhs] 
             },
-            NhwcInstrType::Call { op_assigned_symidx: _assigned, func_op } => {
+            NhwcInstrType::Call { op_lhs: _assigned, func_op } => {
                 func_op.actual_arg_symidx_vec.iter_mut().collect_vec()
             },
             NhwcInstrType::Jump { jump_op } => {
@@ -390,7 +392,7 @@ impl NhwcInstr {
             NhwcInstrType::Globl { var_symidx: _, vartype: _ } => vec![],
             NhwcInstrType::Load { lhs: _, ptr_symidx: ptr_symdix, ptr_ty: _ } => vec![ptr_symdix],
             NhwcInstrType::Store { val_symidx: value, ptr_symidx, ptr_ty: _, value_ty: _ } => vec![value,ptr_symidx],
-            NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, array_or_ptr_symidx: array_symidx, idx_vec } => idx_vec.iter_mut().filter(|idx|idx.is_some()).map(|idx|idx.as_mut().unwrap()).chain(vec![array_symidx].into_iter()).collect_vec(),
+            NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, ptr_symidx: array_symidx, idx_vec } => idx_vec.iter_mut().filter(|idx|idx.is_some()).map(|idx|idx.as_mut().unwrap()).chain(vec![array_symidx].into_iter()).collect_vec(),
             NhwcInstrType::Nope {  } => vec![],
             NhwcInstrType::Mu { may_use_symidx, may_use_instr: _ } => vec![may_use_symidx],
             NhwcInstrType::Chi { lhs: _, rhs , may_def_instr: _} => vec![rhs],
@@ -538,14 +540,14 @@ impl NhwcInstrType {
     
     pub fn new_assign(lhs:RcSymIdx, rhs:RcSymIdx, vartype:Type) -> Self { Self::SimpleAssign { lhs, rhs, vartype } }
 
-    pub fn new_get_element_ptr(lhs:RcSymIdx, array_symidx:RcSymIdx, array_ty:Type, idx_vec:Vec<Option<RcSymIdx>> ) -> Self { Self::GetElementPtr { lhs, array_or_ptr_symidx: array_symidx, array_ty, idx_vec }}
+    pub fn new_get_element_ptr(lhs:RcSymIdx, array_symidx:RcSymIdx, array_ty:Type, idx_vec:Vec<Option<RcSymIdx>> ) -> Self { Self::GetElementPtr { lhs, ptr_symidx: array_symidx, array_ty, idx_vec }}
     pub fn new_load(lhs:RcSymIdx, ptr_symidx:RcSymIdx, ptr_ty:Type) -> Self { Self::Load { lhs, ptr_symidx, ptr_ty}}
     pub fn new_store(ptr_symidx:RcSymIdx, ptr_ty:Type, value_symidx:RcSymIdx, value_ty:Type,) -> Self { Self::Store { val_symidx: value_symidx, value_ty, ptr_symidx, ptr_ty } }
 
     // Instruction -> Call -> FuncOp
     pub fn new_func_call(assigned:Option<RcSymIdx>, func:RcSymIdx, args:Vec<RcSymIdx>,ret_type:Type) -> Self {
         //也许可以直接传入一个Func结构体
-        Self::Call { op_assigned_symidx: assigned, func_op:FuncOp { rc_func_symidx: func, actual_arg_symidx_vec: args,ret_type } }
+        Self::Call { op_lhs: assigned, func_op:FuncOp { rc_func_symidx: func, actual_arg_symidx_vec: args,ret_type } }
     }
     // Instruction -> Jump ->JumpOp
     pub fn new_ret(op_ret_sym:Option<RcSymIdx>) -> Self { Self::Jump { jump_op:JumpOp::Ret { op_ret_sym } } }
@@ -652,7 +654,7 @@ impl Debug for PhiOp {
         // for 
         let mut s = String::new();
         for phi_pair in self.phi_pairs.iter(){
-            s+=format!("[{:?},instr:{}],",phi_pair.symidx,phi_pair.def_instr).as_str();
+            s+=format!("[{:?},instr:{},cfg_node:{}],",phi_pair.symidx,phi_pair.def_instr, phi_pair.comming_cfg_node).as_str();
         }
         write!(f,"phi {}",s)
     }
@@ -676,7 +678,7 @@ impl Debug for NhwcInstrType {
             }
             NhwcInstrType::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs.as_ref_borrow(), rhs),
             NhwcInstrType::SimpleAssign { lhs, rhs, vartype } => write!(f, "{:?} = {:?} {:?}", lhs.as_ref_borrow(),vartype, rhs.as_ref_borrow()),
-            NhwcInstrType::Call { op_assigned_symidx: assigned, func_op } => match assigned {
+            NhwcInstrType::Call { op_lhs: assigned, func_op } => match assigned {
                 Some(symidx) => write!(f, "{:?} = {:?}",symidx.as_ref_borrow(), func_op),
                 None => write!(f, "{:?}", func_op),
             },
@@ -688,7 +690,7 @@ impl Debug for NhwcInstrType {
             NhwcInstrType::Globl { var_symidx, vartype } => write!(f,"global {:?} {:?}",vartype,var_symidx.as_ref_borrow()),
             NhwcInstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => write!(f,"{:?} = load {:?}:{:?}",lhs.as_ref_borrow(),ptr_symdix.as_ref_borrow(),ptr_ty),
             NhwcInstrType::Store { val_symidx: value, ptr_symidx, ptr_ty, value_ty } => write!(f,"store {:?}:{:?} {:?}:{:?}",value.as_ref_borrow(),value_ty,ptr_symidx.as_ref_borrow(),ptr_ty),
-            NhwcInstrType::GetElementPtr { lhs, array_ty: ty, array_or_ptr_symidx: array_symidx, idx_vec } => write!(f,"{:?} = getelementptr {:?}:{:?} {:?}",lhs.as_ref_borrow(),array_symidx,ty,idx_vec,),
+            NhwcInstrType::GetElementPtr { lhs, array_ty: ty, ptr_symidx: array_symidx, idx_vec } => write!(f,"{:?} = getelementptr {:?}:{:?} {:?}",lhs.as_ref_borrow(),array_symidx,ty,idx_vec,),
             NhwcInstrType::Nope {  } => {write!(f,"(nop)")},
             NhwcInstrType::Mu { may_use_symidx, may_use_instr } => write!(f,"mu {:?}:{}",may_use_symidx, may_use_instr),
             NhwcInstrType::Chi { lhs, rhs, may_def_instr } => write!(f,"{:?} = chi {:?}:{}",lhs,rhs,may_def_instr),
