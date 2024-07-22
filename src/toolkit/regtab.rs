@@ -1,3 +1,4 @@
+use core::panic;
 use std::fmt::Debug;
 use ahash::AHashMap;
 use anyhow::*;
@@ -117,6 +118,7 @@ impl RegTab{
         // if symidx.symbol_name == "ra_intpop"{
         //     return  Err(anyhow!("ra_int"));
         // }
+        assert!(symidx.index_ssa.is_none());
         asm_sect.annotate(format!("occupy {:?} with {:?}",reg,symidx));
         debug_info_blue!("occupy reg {:?} with {:?} tracked:{}",reg,symidx,tracked);
         debug_info_blue!("before occupy reg {:?} with {:?} tracked:{}:{:?}",reg,symidx,tracked,self);
@@ -159,6 +161,7 @@ impl RegTab{
     pub fn find_and_anonymous_occupy(&mut self, symidx:&SymIdx, sym_ty:&TypeDiscriminants,symtab:&mut SymTab, asm_sect:&mut AsmSection,  
         store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
         load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,) -> Result<Register>{
+        assert!(symidx.index_ssa.is_none());
         let reg = self.find_avail_reg_for_ty_and_try_release(sym_ty, symtab, asm_sect, store_f)?;
         self.occupy_reg(reg.clone(), &SymIdx::from_str(format!("_anonymous_of_{:?}",symidx).as_str()), symtab,asm_sect, false)?;
         load_f(symidx.clone(),reg.clone(),symtab,asm_sect,self)?;
@@ -180,6 +183,7 @@ impl RegTab{
         store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
         load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
     )-> Result<Register>{
+        assert!(symidx.index_ssa.is_none());
         // debug_info_green!("{:?}",symtab.get(&SymIdx { scope_node: 41, symbol_name: "get".to_string(), index_ssa: None })?);
         // judge wether it is temp
         let should_track = RegTab::symidx_should_track(symidx,&*symtab)?;
@@ -322,6 +326,7 @@ impl RegTab{
         }
     }
     pub fn try_release_symidx(&mut self, symidx:&SymIdx, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>) -> Result<()>{
+        assert!(symidx.index_ssa.is_none());
         if symtab.has_symbol(symidx) && symtab.get(symidx)?.has_cur_reg(){
             match  symtab.get(symidx)?.get_cur_reg()?{
                 Some(reg) => {
@@ -397,6 +402,7 @@ impl RegTab{
     }
     /// after put the args into arg register, you should call this to inform regtab this info
     pub fn set_freed_reg(&mut self, reg:Register, symidx:&SymIdx, symtab:&mut SymTab) -> Result<()>{
+        assert!(symidx.index_ssa.is_none());
         debug_info_blue!("set_freed_reg:{:?} symidx {:?}",reg, symidx);
         let should_track = RegTab::symidx_should_track(symidx, symtab)?;
         if should_track{
@@ -559,6 +565,7 @@ impl RegTab{
         store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
         load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>
     ,) -> Result<Register>{
+        assert!(symidx.index_ssa.is_none());
         match sym_ty{
             TypeDiscriminants::F32 => {
                 assert!(reg.is_fpr())
@@ -576,6 +583,7 @@ impl RegTab{
         store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
         load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>
     ,) -> Result<Register>{
+        assert!(symidx.index_ssa.is_none());
         match sym_ty{
             TypeDiscriminants::F32 => {
                 assert!(reg.is_fpr())
@@ -642,10 +650,11 @@ impl RegTab{
     }
     /// check whether the symbol shoud be tracked
     pub fn symidx_should_track(symidx:&SymIdx,symtab:&SymTab) -> Result<bool>{
+        assert!(symidx.index_ssa.is_none());
         let should_tracked = symtab.has_symbol(symidx) 
             && !symidx.is_literal()  // lieteral has no memory storage
             && !symidx.is_global_ptr()  // global ptr is a label in asm
-            && !*symtab.get(&symidx.to_src_symidx())?.get_is_global()?; // global variable should always be accessed by ptr 
+            && !*symtab.get(&symidx)?.get_is_global()?; // global variable should always be accessed by ptr 
         Ok(should_tracked)
     }
 }

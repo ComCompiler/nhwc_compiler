@@ -278,6 +278,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                     },
                                     Type::Array { dims, ele_ty } => {
                                         asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(),Register::SP).into());
+                                        assert!(array_or_ptr_symidx.index_ssa.is_none());
                                         let &offset2sp = symtab.get(&array_or_ptr_symidx)?.get_mem_offset2sp()?;
                                         add_literal_to_reg(asm_sect, ptr_reg.clone(), ptr_reg.clone(), regtab, symtab,offset2sp )?;
                                     },
@@ -839,22 +840,6 @@ pub fn load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,regtab:&mut RegTa
 // /// reg value -> sym in memory  
 // /// require symidx to be symbol  
 // /// reg alloc is finished in this scope 
-// pub fn store_sym(asm_sect:&mut AsmSection, symidx:&SymIdx,regtab:&mut RegTab, symtab:&mut SymTab) -> Result<Register>{
-
-//     let ty = symtab.get(symidx)?.get_type()?.clone();
-
-//     let val_reg = regtab.find_and_occupy_reg(symidx,&ty,symtab,false,|symidx,reg|_store_sym(asm_sect, reg, symtab),|symidx,reg|{})?;
-
-//     let &symidx_offset2sp = symtab.get(symidx)?.get_mem_offset2sp()?;
-//     let size = symtab.get(symidx)?.get_type()?.get_ele_size()?;
-//     if val_reg.is_fpr() ^ symtab.get(symidx)?.get_type()?.is_f_32(){
-//         return Err(anyhow!("can't store symidx {:?}:{:?} to register {:?}",symidx,symtab.get(symidx)?.get_type()?,val_reg))
-//     }
-//     asm_sect.asm(Stores::new( size,val_reg.clone(),Register::SP, symidx_offset2sp as isize, val_reg.is_fpr())?.into());
-
-//     regtab.free_reg(val_reg.clone(,asm_sect))?;
-//     Ok(val_reg)
-// }
 /// reg value -> M[ptr_sym]
 /// require ptr_symidx to be symbol 
 /// reg alloc is finished in this scope 
@@ -927,6 +912,7 @@ pub fn _load_sym_or_imm(asm_sect:&mut AsmSection,symidx:&SymIdx,reg:Register,reg
             },
             false => {
                 // as symbol 
+                assert!(symidx.index_ssa.is_none());
                 let &symidx_offset2sp = symtab.get(symidx)?.get_mem_offset2sp()?;
                 let size = symtab.get(symidx)?.get_type()?.get_size()?;
                 let ty = symtab.get(symidx)?.get_type()?.into();
@@ -1014,6 +1000,7 @@ pub fn _store_sym(asm_sect:&mut AsmSection, symidx:&SymIdx,value_reg:Register,re
     // if symidx.is_global_ptr() || (symtab.has_symbol(symidx) && *symtab.get(symidx)?.get_is_global()?){
     //     return Ok(())
     // }
+    assert!(symidx.index_ssa.is_none());
     let symidx_offset2sp = *symtab.get(symidx)?.get_mem_offset2sp()? + additional_mem_offset;
     let size = symtab.get(symidx)?.get_type()?.get_size()?;
     if value_reg.is_fpr() ^ symtab.get(symidx)?.get_type()?.is_f_32(){
