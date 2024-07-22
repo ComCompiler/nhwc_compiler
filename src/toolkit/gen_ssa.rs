@@ -136,7 +136,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                 let mut instr_struct = instr_slab.get_instr(instr)?.clone();
                 // for non-phi-instr i
                 if !instr_struct.is_phi(){
-                    for rc_use_symidx in instr_struct.get_mut_ssa_direct_use_symidx_vec().into_iter().filter(|rc| rc.should_be_ssa()){
+                    for rc_use_symidx in instr_struct.get_mut_direct_use_symidx_vec().into_iter().filter(|rc| rc.should_be_ssa()){
                         let cur_reaching_def = {
                             let use_symidx = rc_use_symidx.as_ref_borrow();
                             assert!(use_symidx.is_src_symidx());
@@ -459,7 +459,7 @@ pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut
                                     phi_pair.comming_cfg_node
                                 };
                                 node_mut!(at target_cfg_node in cfg_graph).push_nhwc_instr(
-                                    NhwcInstrType::new_assign(lhs.as_ref_borrow().to_src_symidx().as_rc()
+                                    NhwcInstrType::new_assign(lhs.clone()
                                     , phi_pair.symidx.clone(), 
                                     symtab.get(&lhs.as_ref_borrow().to_src_symidx())?.get_type()?.clone()).into()
                                     , instr_slab)?;
@@ -476,6 +476,7 @@ pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut
             }
             node_mut!(at cfg_node in cfg_graph).phi_instrs.instr_vec.clear();
         }
+        let dfs_vec = etc::dfs(cfg_graph,cfg_entry);
         for &cfg_node in &dfs_vec{
             for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
                 for rc_symidx in instr_mut!(at instr in instr_slab)?.get_mut_ssa_direct_def_symidx_vec().iter_mut().filter(|rc| !rc.as_ref_borrow().is_literal()){
