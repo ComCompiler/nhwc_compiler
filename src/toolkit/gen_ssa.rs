@@ -136,7 +136,7 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                 let mut instr_struct = instr_slab.get_instr(instr)?.clone();
                 // for non-phi-instr i
                 if !instr_struct.is_phi(){
-                    for rc_use_symidx in instr_struct.get_mut_direct_use_symidx_vec().into_iter().filter(|rc| rc.should_be_ssa()){
+                    for rc_use_symidx in instr_struct.get_mut_ssa_direct_use_symidx_vec().into_iter().filter(|rc| rc.should_be_ssa()){
                         let cur_reaching_def = {
                             let use_symidx = rc_use_symidx.as_ref_borrow();
                             assert!(use_symidx.is_src_symidx());
