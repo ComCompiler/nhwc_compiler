@@ -340,7 +340,7 @@ impl NhwcInstr {
             NhwcInstrType::Chi { lhs, rhs: _ ,may_def_instr:_usize} => vec![lhs],
         }
     }
-    pub fn get_mut_direct_use_symidx_vec(&mut self)->Vec<&mut RcSymIdx>{
+    pub fn get_mut_ssa_direct_use_symidx_vec(&mut self)->Vec<&mut RcSymIdx>{
         match &mut self.instr_type{
             NhwcInstrType::Label { label_symidx:_ } => vec![],
             NhwcInstrType::DefineFunc { func_symidx:_, ret_symidx:_, args: _ } => {

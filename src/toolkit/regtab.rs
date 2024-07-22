@@ -183,7 +183,9 @@ impl RegTab{
         store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
         load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
     )-> Result<Register>{
-        assert!(symidx.index_ssa.is_none());
+        if symidx.index_ssa.is_none(){
+            panic!("{:?} {:?} {}",symidx,symtab.get(symidx)?, asm_sect.dump(true));
+        }
         // debug_info_green!("{:?}",symtab.get(&SymIdx { scope_node: 41, symbol_name: "get".to_string(), index_ssa: None })?);
         // judge wether it is temp
         let should_track = RegTab::symidx_should_track(symidx,&*symtab)?;
