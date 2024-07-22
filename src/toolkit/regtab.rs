@@ -645,7 +645,7 @@ impl RegTab{
         let should_tracked = symtab.has_symbol(symidx) 
             && !symidx.is_literal()  // lieteral has no memory storage
             && !symidx.is_global_ptr()  // global ptr is a label in asm
-            && !*symtab.get(symidx)?.get_is_global()?; // global variable should always be accessed by ptr 
+            && !*symtab.get(&symidx.to_src_symidx())?.get_is_global()?; // global variable should always be accessed by ptr 
         Ok(should_tracked)
     }
 }
