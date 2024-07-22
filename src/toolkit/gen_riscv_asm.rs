@@ -79,6 +79,9 @@ pub fn add_literal_to_reg(asm_sect:&mut AsmSection,rd:Register,rs:Register, regt
         asm_sect.asm(Arithmetic::new_addi(rd, rs, Imm::from_offset(offset)).into());
     }else{
         // offset is large, so we use a intermediate reg 
+        if SymIdx::from(offset).index_ssa.is_some(){
+            panic!("{:?}",&SymIdx::from(offset));
+        }
         let offset_reg = regtab.find_and_occupy_reg(&SymIdx::from(offset), &TypeDiscriminants::I32, symtab, asm_sect, &mut default_store,&mut default_load)?;
         asm_sect.asm(PseudoInstr::new_li(offset_reg.clone(), Imm::new_literal_isize(offset)).into());
         asm_sect.asm(Arithmetic::new_add(rd, offset_reg.clone(),rs).into());
@@ -248,7 +251,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         // s4 * element size 
                         // put array offset to s5
                         // finally plus array offset 
-                        let ptr_reg = regtab.find_and_occupy_reg(&lhs,&TypeDiscriminants::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                        let ptr_reg = regtab.find_and_occupy_reg(&lhs,&TypeDiscriminants::I32, symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                         _load_sym_or_imm(asm_sect, &SymIdx::from_str("0"), ptr_reg.clone(), regtab, symtab)?;
                         for (idx,weight) in idx_vec.iter().zip(array_ty.get_array_dim_weight_vec()?.iter()){
                             let idx = idx.as_ref().unwrap().as_ref_borrow();
@@ -262,7 +265,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         // 2 situations : 1. array is global  2. array is local to stack
                         match symtab.get(&array_or_ptr_symidx)?.has_is_global() &&*symtab.get(&array_or_ptr_symidx)?.get_is_global()?{
                             true => {
-                                let addr_reg = regtab.find_and_occupy_reg(&array_or_ptr_symidx,&TypeDiscriminants::Ptr64, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let addr_reg = regtab.find_and_occupy_reg(&array_or_ptr_symidx,&TypeDiscriminants::Ptr64, symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                 asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(), addr_reg.clone()).into());
                                 regtab.unoccupied_reg(addr_reg,symtab,asm_sect,&mut default_store)?;
                             },
@@ -272,7 +275,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 // judge whether ptr and pointed array is in same function 
                                 match symtab.get(&array_or_ptr_symidx)?.get_type()?{
                                     Type::Ptr64 { ty } => {
-                                        let addr_reg = regtab.find_and_occupy_reg(&array_or_ptr_symidx, &TypeDiscriminants::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                        let addr_reg = regtab.find_and_occupy_reg(&array_or_ptr_symidx, &TypeDiscriminants::I32, symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                         asm_sect.asm(Arithmetic::new_add(ptr_reg.clone(), ptr_reg.clone(),addr_reg.clone()).into());
                                         regtab.unoccupied_reg(addr_reg,symtab, asm_sect,&mut default_store)?;
                                     },
@@ -297,9 +300,9 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 let b = b.as_ref_borrow();
                                 let ty_discriminants = vartype.into();
 
-                                let val_reg1= regtab.find_and_occupy_reg(&a, &ty_discriminants, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(&b, &ty_discriminants, symtab, asm_sect,&mut default_store,&mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &ty_discriminants, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let val_reg1= regtab.find_and_occupy_reg(&a, &ty_discriminants, symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, &ty_discriminants, symtab, asm_sect,&mut default_store,&mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &ty_discriminants, symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                 match vartype.into(){
                                     TypeDiscriminants::I32 => {
                                         asm_sect.asm(Arithmetic::new_add(rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).into());
@@ -320,14 +323,14 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 let ty_discriminants = vartype.into();
                                 match ty_discriminants{
                                     TypeDiscriminants::I32 => {
-                                        let rst_reg= regtab.find_and_occupy_reg(&lhs, &ty_discriminants, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                        let rst_reg= regtab.find_and_occupy_reg(&lhs, &ty_discriminants, symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                         magic_i32_mul(asm_sect, regtab,rst_reg.clone(), &a, &b, symtab)?;
                                         regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                                     },
                                     TypeDiscriminants::F32 => {
-                                        let val_reg1= regtab.find_and_occupy_reg(&a, &ty_discriminants,symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                        let val_reg2= regtab.find_and_occupy_reg(&b, &ty_discriminants, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                        let rst_reg= regtab.find_and_occupy_reg(&lhs, &ty_discriminants, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                        let val_reg1= regtab.find_and_occupy_reg(&a, &ty_discriminants,symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                        let val_reg2= regtab.find_and_occupy_reg(&b, &ty_discriminants, symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                        let rst_reg= regtab.find_and_occupy_reg(&lhs, &ty_discriminants, symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                         asm_sect.asm(Arithmetic::new_fmuls(rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).clone().into());
                                         regtab.unoccupied_reg(val_reg1,symtab,asm_sect,&mut default_store)?;
                                         regtab.unoccupied_reg(val_reg2,symtab,asm_sect,&mut default_store)?;
@@ -340,9 +343,9 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 let a = a.as_ref_borrow();
                                 let b = b.as_ref_borrow();
 
-                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(),symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(&lhs,& vartype.into(), symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(),symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs,& vartype.into(), symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                 match vartype.into(){
                                     TypeDiscriminants::I32 => {
                                         asm_sect.asm(Arithmetic::new_div(rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).into());
@@ -360,9 +363,9 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 let a = a.as_ref_borrow();
                                 let b = b.as_ref_borrow();
 
-                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(&lhs,& vartype.into(), symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs,& vartype.into(), symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                 match vartype.into(){
                                     TypeDiscriminants::I32 => {
                                         asm_sect.annotate(format!("regtab:{:?}\n",regtab));
@@ -384,9 +387,9 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 let a = a.as_ref_borrow();
                                 let b = b.as_ref_borrow();
 
-                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &vartype.into(), symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &vartype.into(), symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                 match vartype.into(){
                                     TypeDiscriminants::I32 => {
                                         asm_sect.asm(Arithmetic::new_rem(rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).clone().clone().into());
@@ -404,9 +407,9 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 let a = a.as_ref_borrow();
                                 let b = b.as_ref_borrow();
 
-                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &TypeDiscriminants::I1, symtab, asm_sect, &mut default_store,&mut no_load)?; 
+                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &TypeDiscriminants::I1, symtab, asm_sect, &mut default_store,&mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?; 
                                 match plan{
                                     super::nhwc_instr::IcmpPlan::Eq => {
                                         // BinOp!(sect asm_sect func_name {Compare::new} args{a,b,1,2,3} with_symtab src_symtab);
@@ -452,9 +455,9 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 let a = a.as_ref_borrow();
                                 let b = b.as_ref_borrow();
 
-                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &TypeDiscriminants::I1, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &TypeDiscriminants::I1, symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                 match plan{
                                     super::nhwc_instr::FcmpPlan::Oeq => {
                                         asm_sect.asm({Compare::new_feq_s} (rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).into());
@@ -484,9 +487,9 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 let a = a.as_ref_borrow();
                                 let b = b.as_ref_borrow();
 
-                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype.into(),symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &vartype.into(),symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype.into(),symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &vartype.into(),symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                 asm_sect.asm(Logical::new_and(rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).into());
                                 regtab.unoccupied_reg(val_reg1,symtab,asm_sect,&mut default_store)?;
                                 regtab.unoccupied_reg(val_reg2,symtab,asm_sect,&mut default_store)?;
@@ -496,9 +499,9 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 let a = a.as_ref_borrow();
                                 let b = b.as_ref_borrow();
 
-                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype.into(),symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &vartype.into(), symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype.into(),symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &vartype.into(), symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                 asm_sect.asm(Logical::new_or(rst_reg.clone(),val_reg1.clone(),val_reg2.clone()).into());
                                 regtab.unoccupied_reg(val_reg1,symtab,asm_sect,&mut default_store)?;
                                 regtab.unoccupied_reg(val_reg2,symtab,asm_sect,&mut default_store)?;
@@ -507,8 +510,8 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                             super::nhwc_instr::ArithOp::LogicNot { a, vartype} => {
                                 let a = a.as_ref_borrow();
 
-                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &vartype.into(), symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype.into(), symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let rst_reg= regtab.find_and_occupy_reg(&lhs, &vartype.into(), symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                 asm_sect.asm(PseudoInstr::new_seqz(rst_reg.clone(), val_reg1.clone()).into());
                                 regtab.unoccupied_reg(val_reg1,symtab,asm_sect,&mut default_store)?;
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
@@ -521,12 +524,12 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         let rhs = rhs.as_ref_borrow();
 
                         if rhs.is_literal(){
-                            let rst_reg= regtab.find_and_occupy_reg(&lhs, &vartype.into(), symtab, asm_sect, &mut default_store, &mut no_load)?;
+                            let rst_reg= regtab.find_and_occupy_reg(&lhs, &vartype.into(), symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                             _load_sym_or_imm(asm_sect, &rhs, rst_reg.clone(), regtab, symtab)?;
                             regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                         }else{
-                            let val_reg1= regtab.find_and_occupy_reg(&rhs, &vartype.into(), symtab, asm_sect, &mut default_store, &mut &mut default_load)?;
-                            let rst_reg= regtab.find_and_occupy_reg(&lhs, &vartype.into(), symtab, asm_sect, &mut default_store, &mut no_load)?;
+                            let val_reg1= regtab.find_and_occupy_reg(&rhs, &vartype.into(), symtab, asm_sect, &mut default_store, &mut &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                            let rst_reg= regtab.find_and_occupy_reg(&lhs, &vartype.into(), symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                             asm_sect.asm(PseudoInstr::new_reg_mv(rst_reg.clone(), val_reg1.clone()).into());
                             regtab.unoccupied_reg(val_reg1,symtab,asm_sect,&mut default_store)?;
                             regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
@@ -550,7 +553,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
 
                                     let actual_arg_ty = symtab.get(actual_arg)?.get_type()?;
                                     // load actual argument 
-                                    let value_reg = regtab.find_and_occupy_reg(actual_arg, &actual_arg_ty.into(), symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                    let value_reg = regtab.find_and_occupy_reg(actual_arg, &actual_arg_ty.into(), symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                     // formal argument 
                                     _store_sym(asm_sect, &formal_arg, value_reg.clone(), regtab, symtab, -(stack_size as isize))?;
                                     regtab.unoccupied_reg(value_reg,symtab, asm_sect,&mut default_store)?;
@@ -693,7 +696,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                 
                                 // *mention* here we occupy reg then free it by design, because we want to the cloned regtab has this field
                                 // this is not redundant !!
-                                let val_reg = regtab.find_and_occupy_reg(&cond, &TypeDiscriminants::I1, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let val_reg = regtab.find_and_occupy_reg(&cond, &TypeDiscriminants::I1, symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                 regtab.unoccupied_reg(val_reg,symtab,asm_sect,&mut default_store)?;
                                 match op_t1_regtab{
                                     Some(target_regtab) => {
@@ -706,7 +709,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                                         // asm_sect.annotation(format!("{:?}",regtab));
                                     },
                                 }
-                                let val_reg = regtab.find_and_occupy_reg(&cond, &TypeDiscriminants::I1, symtab, asm_sect, &mut default_store, &mut default_load)?;
+                                let val_reg = regtab.find_and_occupy_reg(&cond, &TypeDiscriminants::I1, symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                 asm_sect.asm(PseudoInstr::new_bnez(val_reg.clone(),Imm::new_local_label(rc_t1.clone())).into());
                                 regtab.unoccupied_reg(val_reg,symtab,asm_sect,&mut default_store)?;
                                 
@@ -752,16 +755,16 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         match op{
                             super::nhwc_instr::Trans::Fptosi { float_symidx } => {
                                 let float_symidx = float_symidx.as_ref_borrow();
-                                let val_reg =regtab.find_and_occupy_reg(&float_symidx, &TypeDiscriminants::F32, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg = regtab.find_and_occupy_reg(&lhs, &TypeDiscriminants::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let val_reg =regtab.find_and_occupy_reg(&float_symidx, &TypeDiscriminants::F32, symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let rst_reg = regtab.find_and_occupy_reg(&lhs, &TypeDiscriminants::I32, symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                 asm_sect.asm(Trans::new_fcvt_w_s(rst_reg.clone(),val_reg.clone()).into());
                                 regtab.unoccupied_reg(val_reg,symtab,asm_sect,&mut default_store)?;
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
                             },
                             super::nhwc_instr::Trans::Sitofp { int_symidx } => {
                                 let int_symidx = int_symidx.as_ref_borrow();
-                                let val_reg =regtab.find_and_occupy_reg(&int_symidx, &TypeDiscriminants::I32, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg = regtab.find_and_occupy_reg(&lhs, &TypeDiscriminants::F32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let val_reg =regtab.find_and_occupy_reg(&int_symidx, &TypeDiscriminants::I32, symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let rst_reg = regtab.find_and_occupy_reg(&lhs, &TypeDiscriminants::F32, symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                 asm_sect.asm(Trans::new_fcvt_s_w(rst_reg.clone(),val_reg.clone()).into());
                                 regtab.unoccupied_reg(val_reg,symtab,asm_sect,&mut default_store)?;
                                 regtab.unoccupied_reg(rst_reg,symtab,asm_sect,&mut default_store)?;
@@ -769,8 +772,8 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                             super::nhwc_instr::Trans::Zext { bool_symidx } => {
                                 let bool_symidx = bool_symidx.as_ref_borrow();
                                 //b->i
-                                let val_reg =regtab.find_and_occupy_reg(&bool_symidx, &TypeDiscriminants::I1, symtab, asm_sect, &mut default_store, &mut default_load)?;
-                                let rst_reg = regtab.find_and_occupy_reg(&lhs, &TypeDiscriminants::I32, symtab, asm_sect, &mut default_store, &mut no_load)?;
+                                let val_reg =regtab.find_and_occupy_reg(&bool_symidx, &TypeDiscriminants::I1, symtab, asm_sect, &mut default_store, &mut default_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
+                                let rst_reg = regtab.find_and_occupy_reg(&lhs, &TypeDiscriminants::I32, symtab, asm_sect, &mut default_store, &mut no_load).with_context(||format!("err when occupy reg {:?}",instr!(at instr in nhwc_instr_slab)))?;
                                 // asm_sect.asm(Logical::new_andi(rst_reg.clone(),val_reg.clone(),Imm::from_offset(1)).into());
                                 asm_sect.asm(PseudoInstr::new_reg_mv(rst_reg.clone(), val_reg.clone()).into());
                                 regtab.unoccupied_reg(val_reg,symtab,asm_sect,&mut default_store)?;
