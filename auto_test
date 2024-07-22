@@ -7,9 +7,12 @@
 # 有 .in，把 .in 文件输入
 # 没 .in，直接运行 .sy 文件
 
+# 加更,若使用bash auto_test --performance ,则测试./for_auto_test/00performance下的.sy文件,并输出到./for_auto_test/4ours_out/文件夹下
+
 export in_path=./for_auto_test/00in
 export official_path=./for_auto_test/00official_out
 export sy_path=./for_auto_test/00sy
+export performance_sy_path=./for_auto_test/00performance
 
 export s_path=./for_auto_test/1s
 export o_path=./for_auto_test/2o
@@ -38,9 +41,15 @@ files_to_compare=()
 correct_count=0
 incorrect_count=0
 
-# 检查是否提供了单个 .sy 文件作为参数
+# 检查是否提供了单个 .sy 文件作为参数或 --performance 选项
 if [ "$#" -eq 1 ]; then
-    sy_files=("$1")
+    if [ "$1" == "--performance" ]; then
+        sy_files=($performance_sy_path/*.sy)
+        ours_out_path=./for_auto_test/4performance_out
+        mkdir -p $ours_out_path
+    else
+        sy_files=("$1")
+    fi
 else
     sy_files=($sy_path/*.sy)
 fi
@@ -48,7 +57,7 @@ fi
 # 遍历指定路径下的所有文件
 for filename in "${sy_files[@]}"; do
     # 检查是否为文件
-    echo $filename
+    echo "Processing $filename"
     if [ -f "$filename" ] && [[ "$filename" == *.sy ]]; then
         echo "is_file"
         # 获取文件的基本名称，没有路径
@@ -58,11 +67,11 @@ for filename in "${sy_files[@]}"; do
         compile_status=$?
 
         if [ $compile_status -ne 0 ]; then
-            echo -e "$RED Failed to compile $filename $NC" 
+            echo -e "$RED Failed to compile $filename $NC"
             ./target/release/compiler "$filename" -o "$s_path/${base_name}.s" 2>> "$o_path/${base_name}_compiler_error.log"
             continue
         fi
-        
+
         # 使用 gcc 工具链把 .s 文件链接
         riscv64-linux-gnu-as "$s_path/${base_name}.s" -o "$o_path/${base_name}.o"
         riscv64-linux-gnu-gcc --static "$o_path/${base_name}.o" -lsysy -L./ -o "$elf_path/${base_name}.elf" -lc
@@ -74,16 +83,15 @@ for filename in "${sy_files[@]}"; do
         fi
 
         # 如果有对应的 .in 文件，运行 .elf 文件，并将结果输出到 ours_out
-
         timeout $timeout_duration bash -c '
         if [ -f "$in_path/${base_name}.in" ]; then
-            qemu-riscv64-static "$elf_path/${base_name}.elf" < "$in_path/${base_name}.in" > "$ours_out_path/${base_name}.out" 2>&1 
+            qemu-riscv64-static "$elf_path/${base_name}.elf" < "$in_path/${base_name}.in" > "$ours_out_path/${base_name}.out" 2>&1
             echo -e "\n$?" >> "$ours_out_path/${base_name}.out"
         else
-            qemu-riscv64-static "$elf_path/${base_name}.elf" > "$ours_out_path/${base_name}.out" 2>&1 
+            qemu-riscv64-static "$elf_path/${base_name}.elf" > "$ours_out_path/${base_name}.out" 2>&1
             echo -e "\n$?" >> "$ours_out_path/${base_name}.out"
         fi
-        # 删除.out文件的第一行 (时间记录)
+        # 删除 .out 文件的第一行 (时间记录)
         sed -i '1d' "$ours_out_path/${base_name}.out"
         # 添加需要比对的文件路径到数组中
 
