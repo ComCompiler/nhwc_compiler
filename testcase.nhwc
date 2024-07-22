@@ -1,5 +1,14 @@
-# input: "./demos/demo1.c"
- 15   label global_0: 
+# input: "./for_auto_test/00sy/64_calculator.sy"
+ 32   label global_0: 
+ 31   global Array:i32:[Some(16384_0)] get2_0 
+ 29   global Array:i32:[Some(16384_0)] get_0 
+ 27   global i32 c_0 
+ 26   global i32 ii_0 
+ 23   global i32 i_0 
+ 20   global i32 chat_0 
+ 19   global Array:i32:[Some(16384_0)] chas_0 
+ 17   global i32 intt_0 
+ 16   global Array:i32:[Some(16384_0)] ints_0 
  0    global Fn[]->getint_ret_0 getint_0 
  1    global Fn[]->getch_ret_0 getch_0 
  2    global Fn[zz_array_3]->getarray_ret_0 getarray_0 
@@ -15,44 +24,1648 @@
  12   global Fn[]->stoptime_ret_0 stoptime_0 
  13   global Fn[zz_ptr_14, zz_val_14, zz_len_14]->memset_ret_0 memset_0 
  14   global Fn[zz_dest_15, zz_ptr_15, zz_len_15]->memcpy_ret_0 memcpy_0 
- 17   Define main_0 "" -> main_ret_0 
-         45   alloc f32 temp_5__28 
-         48   alloc f32 temp_6_ret_of_myabs_28 
-         51   alloc i32 temp_7__29 
+ 15   new_var ints_0:Array:i32:[Some(16384_0)] 
+ 18   new_var chas_0:Array:i32:[Some(16384_0)] 
+ 21   store 0_0:i32 *i_0:ptr->i32 
+ 22   i_0 = chi i_0:21 
+ 24   store 1_0:i32 *ii_0:ptr->i32 
+ 25   ii_0 = chi ii_0:24 
+ 28   new_var get_0:Array:i32:[Some(16384_0)] 
+ 30   new_var get2_0:Array:i32:[Some(16384_0)] 
+ 43   Define main_0 "" -> main_ret_0 
+         1534 intt_0 = chi intt_0:43 
+         1535 get2_0 = chi get2_0:43 
+         1536 i_0 = chi i_0:43 
+         1537 c_0 = chi c_0:43 
+         1538 chat_0 = chi chat_0:43 
+         1539 ii_0 = chi ii_0:43 
+         321  alloc i32 temp_54_ret_of_getstr_87 
+         325  alloc i32 lengets_87 
+         326  alloc i32 temp_55_value_from_ptr_87 
+         330  alloc ptr->i32 temp_56_index_ptr_87 
+         337  alloc ptr->i32 temp_57_array_ptr_87 
+         340  alloc i32 temp_58_array_ele_87 
+         347  alloc i32 temp_59_value_from_ptr_181 
+         351  alloc i32 temp_60_arithop_181 
+         356  alloc i32 temp_61_value_from_ptr_210 
+         360  alloc ptr->i32 temp_62_array_ptr_210 
+         363  alloc i32 temp_63_array_ele_210 
+         367  alloc i32 temp_64_arithop_210 
+         373  alloc i32 temp_65_value_from_ptr_210 
+         377  alloc i32 temp_66_value_from_ptr_210 
+         381  alloc i32 temp_67_arithop_210 
+         384  alloc i32 temp_68_arithop_210 
+         389  alloc i32 temp_69_value_from_ptr_215 
+         393  alloc i32 temp_70_value_from_ptr_215 
+         397  alloc i32 temp_71_arithop_215 
+         400  alloc ptr->i32 temp_72_array_ptr_215 
+         403  alloc i32 temp_73_array_ele_215 
+         407  alloc i32 temp_74_arithop_215 
+         411  alloc i32 temp_75_value_from_ptr_215 
+         415  alloc i32 temp_76_arithop_215 
+         420  alloc i32 temp_77_ret_of_intpop_184 
+         424  alloc i32 a_184 
+         425  alloc i32 temp_78_ret_of_intpop_184 
+         429  alloc i32 b_184 
+         430  alloc i32 c_184 
+         433  alloc i32 temp_79_ret_of_power_203 
+         437  alloc i32 temp_80_arithop_200 
+         441  alloc i32 temp_81_arithop_197 
+         445  alloc i32 temp_82_arithop_194 
+         449  alloc i32 temp_83_arithop_191 
+         453  alloc i32 temp_84_arithop_188 
+         457  alloc i32 temp_85_ret_of_chapop_172 
+         461  alloc i32 c_172 
+         462  alloc i32 temp_86_value_from_ptr_172 
+         466  alloc ptr->i32 temp_87_index_ptr_172 
+         471  alloc i32 temp_88_value_from_ptr_172 
+         475  alloc i32 temp_89_arithop_172 
+         478  alloc ptr->i32 temp_90_index_ptr_172 
+         483  alloc i32 temp_91_value_from_ptr_172 
+         487  alloc i32 temp_92_arithop_172 
+         492  alloc i32 temp_93_value_from_ptr_99 
+         496  alloc ptr->i32 temp_94_index_ptr_99 
+         501  alloc i32 temp_95_value_from_ptr_99 
+         505  alloc i32 temp_96_arithop_99 
+         510  alloc i32 temp_97_value_from_ptr_93 
+         514  alloc i32 temp_98_arithop_93 
+         524  alloc i32 temp_99_ret_of_chapop_108 
+         529  alloc i32 temp_100_value_from_ptr_112 
+         533  alloc ptr->i32 temp_101_index_ptr_112 
+         538  alloc i32 temp_102_value_from_ptr_112 
+         542  alloc i32 temp_103_arithop_112 
+         545  alloc ptr->i32 temp_104_index_ptr_112 
+         548  alloc i32 temp_105_value_from_ptr_112 
+         554  alloc i32 temp_106_value_from_ptr_112 
+         558  alloc i32 temp_107_arithop_112 
+         563  alloc i32 temp_108_ret_of_chapop_112 
+         570  alloc i32 temp_109_value_from_ptr_96 
+         574  alloc ptr->i32 temp_110_index_ptr_96 
+         577  alloc i32 temp_111_value_from_ptr_96 
+         581  alloc ptr->i32 temp_112_array_ptr_96 
+         584  alloc i32 temp_113_array_ele_96 
+         590  alloc i32 temp_114_value_from_ptr_96 
+         594  alloc i32 temp_115_arithop_96 
+         599  alloc i32 temp_116_value_from_ptr_91 
+         603  alloc i1 temp_117_cmp_91 
+         610  alloc i32 temp_118_value_from_ptr_170 
+         614  alloc i1 temp_119_cmp_170 
+         620  alloc i32 temp_120_value_from_ptr_179 
+         624  alloc ptr->i32 temp_121_array_ptr_179 
+         627  alloc i32 temp_122_array_ele_179 
+         631  alloc i1 temp_123_cmp_179 
+         640  alloc i32 temp_124_value_from_ptr_182 
+         644  alloc ptr->i32 temp_125_array_ptr_182 
+         647  alloc i32 temp_126_array_ele_182 
+         651  alloc i1 temp_127_cmp_182 
+         654  alloc i32 temp_128_value_from_ptr_182 
+         658  alloc ptr->i32 temp_129_array_ptr_182 
+         661  alloc i32 temp_130_array_ele_182 
+         665  alloc i1 temp_131_cmp_182 
+         668  alloc i32 temp_132_value_from_ptr_182 
+         672  alloc ptr->i32 temp_133_array_ptr_182 
+         675  alloc i32 temp_134_array_ele_182 
+         679  alloc i1 temp_135_cmp_182 
+         682  alloc i32 temp_136_value_from_ptr_182 
+         686  alloc ptr->i32 temp_137_array_ptr_182 
+         689  alloc i32 temp_138_array_ele_182 
+         693  alloc i1 temp_139_cmp_182 
+         696  alloc i32 temp_140_value_from_ptr_182 
+         700  alloc ptr->i32 temp_141_array_ptr_182 
+         703  alloc i32 temp_142_array_ele_182 
+         707  alloc i1 temp_143_cmp_182 
+         710  alloc i32 temp_144_value_from_ptr_182 
+         714  alloc ptr->i32 temp_145_array_ptr_182 
+         717  alloc i32 temp_146_array_ele_182 
+         721  alloc i1 temp_147_cmp_182 
+         742  alloc i32 temp_148_value_from_ptr_208 
+         746  alloc ptr->i32 temp_149_array_ptr_208 
+         749  alloc i32 temp_150_array_ele_208 
+         753  alloc i1 temp_151_cmp_208 
+         760  alloc i32 temp_152_value_from_ptr_213 
+         764  alloc i32 temp_153_value_from_ptr_213 
+         768  alloc i32 temp_154_arithop_213 
+         771  alloc ptr->i32 temp_155_array_ptr_213 
+         774  alloc i32 temp_156_array_ele_213 
+         778  alloc i1 temp_157_cmp_213 
+         785  alloc i32 temp_158_value_from_ptr_188 
+         789  alloc ptr->i32 temp_159_array_ptr_188 
+         792  alloc i32 temp_160_array_ele_188 
+         796  alloc i1 temp_161_cmp_188 
+         802  alloc i32 temp_162_value_from_ptr_191 
+         806  alloc ptr->i32 temp_163_array_ptr_191 
+         809  alloc i32 temp_164_array_ele_191 
+         813  alloc i1 temp_165_cmp_191 
+         819  alloc i32 temp_166_value_from_ptr_194 
+         823  alloc ptr->i32 temp_167_array_ptr_194 
+         826  alloc i32 temp_168_array_ele_194 
+         830  alloc i1 temp_169_cmp_194 
+         836  alloc i32 temp_170_value_from_ptr_197 
+         840  alloc ptr->i32 temp_171_array_ptr_197 
+         843  alloc i32 temp_172_array_ele_197 
+         847  alloc i1 temp_173_cmp_197 
+         853  alloc i32 temp_174_value_from_ptr_200 
+         857  alloc ptr->i32 temp_175_array_ptr_200 
+         860  alloc i32 temp_176_array_ele_200 
+         864  alloc i1 temp_177_cmp_200 
+         870  alloc i32 temp_178_value_from_ptr_203 
+         874  alloc ptr->i32 temp_179_array_ptr_203 
+         877  alloc i32 temp_180_array_ele_203 
+         881  alloc i1 temp_181_cmp_203 
+         887  alloc i32 temp_182_value_from_ptr_94 
+         891  alloc ptr->i32 temp_183_array_ptr_94 
+         894  alloc i32 temp_184_array_ele_94 
+         898  alloc i32 temp_185_ret_of_isdigit_94 
+         901  alloc i1 temp_186_cmp_94 
+         907  alloc i32 temp_187_value_from_ptr_100 
+         911  alloc ptr->i32 temp_188_array_ptr_100 
+         914  alloc i32 temp_189_array_ele_100 
+         918  alloc i1 temp_190_cmp_100 
+         924  alloc i32 temp_191_value_from_ptr_103 
+         928  alloc ptr->i32 temp_192_array_ptr_103 
+         931  alloc i32 temp_193_array_ele_103 
+         935  alloc i1 temp_194_cmp_103 
+         941  alloc i32 temp_195_value_from_ptr_106 
+         945  alloc ptr->i32 temp_196_array_ptr_106 
+         948  alloc i32 temp_197_array_ele_106 
+         952  alloc i1 temp_198_cmp_106 
+         958  alloc i32 temp_199_value_from_ptr_117 
+         962  alloc ptr->i32 temp_200_array_ptr_117 
+         965  alloc i32 temp_201_array_ele_117 
+         969  alloc i1 temp_202_cmp_117 
+         975  alloc i32 temp_203_value_from_ptr_127 
+         979  alloc ptr->i32 temp_204_array_ptr_127 
+         982  alloc i32 temp_205_array_ele_127 
+         986  alloc i1 temp_206_cmp_127 
+         992  alloc i32 temp_207_value_from_ptr_137 
+         996  alloc ptr->i32 temp_208_array_ptr_137 
+         999  alloc i32 temp_209_array_ele_137 
+         1003 alloc i1 temp_210_cmp_137 
+         1009 alloc i32 temp_211_value_from_ptr_147 
+         1013 alloc ptr->i32 temp_212_array_ptr_147 
+         1016 alloc i32 temp_213_array_ele_147 
+         1020 alloc i1 temp_214_cmp_147 
+         1026 alloc i32 temp_215_value_from_ptr_157 
+         1030 alloc ptr->i32 temp_216_array_ptr_157 
+         1033 alloc i32 temp_217_array_ele_157 
+         1037 alloc i1 temp_218_cmp_157 
+         1044 alloc i32 temp_219_value_from_ptr_160 
+         1048 alloc ptr->i32 temp_220_array_ptr_160 
+         1051 alloc i32 temp_221_array_ele_160 
+         1055 alloc i1 temp_222_cmp_160 
+         1058 alloc i32 temp_223_value_from_ptr_160 
+         1062 alloc ptr->i32 temp_224_array_ptr_160 
+         1065 alloc i32 temp_225_array_ele_160 
+         1069 alloc i1 temp_226_cmp_160 
+         1072 alloc i32 temp_227_value_from_ptr_160 
+         1076 alloc ptr->i32 temp_228_array_ptr_160 
+         1079 alloc i32 temp_229_array_ele_160 
+         1083 alloc i1 temp_230_cmp_160 
+         1086 alloc i32 temp_231_value_from_ptr_160 
+         1090 alloc ptr->i32 temp_232_array_ptr_160 
+         1093 alloc i32 temp_233_array_ele_160 
+         1097 alloc i1 temp_234_cmp_160 
+         1112 alloc i32 temp_235_ret_of_find_163 
+         1115 alloc i1 temp_236_cmp_163 
+         1121 alloc i32 temp_237_value_from_ptr_150 
+         1125 alloc ptr->i32 temp_238_array_ptr_150 
+         1128 alloc i32 temp_239_array_ele_150 
+         1132 alloc i1 temp_240_cmp_150 
+         1135 alloc i32 temp_241_value_from_ptr_150 
+         1139 alloc ptr->i32 temp_242_array_ptr_150 
+         1142 alloc i32 temp_243_array_ele_150 
+         1146 alloc i1 temp_244_cmp_150 
+         1149 alloc i32 temp_245_value_from_ptr_150 
+         1153 alloc ptr->i32 temp_246_array_ptr_150 
+         1156 alloc i32 temp_247_array_ele_150 
+         1160 alloc i1 temp_248_cmp_150 
+         1163 alloc i32 temp_249_value_from_ptr_150 
+         1167 alloc ptr->i32 temp_250_array_ptr_150 
+         1170 alloc i32 temp_251_array_ele_150 
+         1174 alloc i1 temp_252_cmp_150 
+         1189 alloc i32 temp_253_ret_of_find_153 
+         1192 alloc i1 temp_254_cmp_153 
+         1198 alloc i32 temp_255_value_from_ptr_140 
+         1202 alloc ptr->i32 temp_256_array_ptr_140 
+         1205 alloc i32 temp_257_array_ele_140 
+         1209 alloc i1 temp_258_cmp_140 
+         1212 alloc i32 temp_259_value_from_ptr_140 
+         1216 alloc ptr->i32 temp_260_array_ptr_140 
+         1219 alloc i32 temp_261_array_ele_140 
+         1223 alloc i1 temp_262_cmp_140 
+         1226 alloc i32 temp_263_value_from_ptr_140 
+         1230 alloc ptr->i32 temp_264_array_ptr_140 
+         1233 alloc i32 temp_265_array_ele_140 
+         1237 alloc i1 temp_266_cmp_140 
+         1240 alloc i32 temp_267_value_from_ptr_140 
+         1244 alloc ptr->i32 temp_268_array_ptr_140 
+         1247 alloc i32 temp_269_array_ele_140 
+         1251 alloc i1 temp_270_cmp_140 
+         1266 alloc i32 temp_271_ret_of_find_143 
+         1269 alloc i1 temp_272_cmp_143 
+         1275 alloc i32 temp_273_value_from_ptr_130 
+         1279 alloc ptr->i32 temp_274_array_ptr_130 
+         1282 alloc i32 temp_275_array_ele_130 
+         1286 alloc i1 temp_276_cmp_130 
+         1289 alloc i32 temp_277_value_from_ptr_130 
+         1293 alloc ptr->i32 temp_278_array_ptr_130 
+         1296 alloc i32 temp_279_array_ele_130 
+         1300 alloc i1 temp_280_cmp_130 
+         1303 alloc i32 temp_281_value_from_ptr_130 
+         1307 alloc ptr->i32 temp_282_array_ptr_130 
+         1310 alloc i32 temp_283_array_ele_130 
+         1314 alloc i1 temp_284_cmp_130 
+         1317 alloc i32 temp_285_value_from_ptr_130 
+         1321 alloc ptr->i32 temp_286_array_ptr_130 
+         1324 alloc i32 temp_287_array_ele_130 
+         1328 alloc i1 temp_288_cmp_130 
+         1331 alloc i32 temp_289_value_from_ptr_130 
+         1335 alloc ptr->i32 temp_290_array_ptr_130 
+         1338 alloc i32 temp_291_array_ele_130 
+         1342 alloc i1 temp_292_cmp_130 
+         1345 alloc i32 temp_293_value_from_ptr_130 
+         1349 alloc ptr->i32 temp_294_array_ptr_130 
+         1352 alloc i32 temp_295_array_ele_130 
+         1356 alloc i1 temp_296_cmp_130 
+         1377 alloc i32 temp_297_ret_of_find_133 
+         1380 alloc i1 temp_298_cmp_133 
+         1386 alloc i32 temp_299_value_from_ptr_120 
+         1390 alloc ptr->i32 temp_300_array_ptr_120 
+         1393 alloc i32 temp_301_array_ele_120 
+         1397 alloc i1 temp_302_cmp_120 
+         1400 alloc i32 temp_303_value_from_ptr_120 
+         1404 alloc ptr->i32 temp_304_array_ptr_120 
+         1407 alloc i32 temp_305_array_ele_120 
+         1411 alloc i1 temp_306_cmp_120 
+         1414 alloc i32 temp_307_value_from_ptr_120 
+         1418 alloc ptr->i32 temp_308_array_ptr_120 
+         1421 alloc i32 temp_309_array_ele_120 
+         1425 alloc i1 temp_310_cmp_120 
+         1428 alloc i32 temp_311_value_from_ptr_120 
+         1432 alloc ptr->i32 temp_312_array_ptr_120 
+         1435 alloc i32 temp_313_array_ele_120 
+         1439 alloc i1 temp_314_cmp_120 
+         1442 alloc i32 temp_315_value_from_ptr_120 
+         1446 alloc ptr->i32 temp_316_array_ptr_120 
+         1449 alloc i32 temp_317_array_ele_120 
+         1453 alloc i1 temp_318_cmp_120 
+         1456 alloc i32 temp_319_value_from_ptr_120 
+         1460 alloc ptr->i32 temp_320_array_ptr_120 
+         1463 alloc i32 temp_321_array_ele_120 
+         1467 alloc i1 temp_322_cmp_120 
+         1488 alloc i32 temp_323_ret_of_find_123 
+         1491 alloc i1 temp_324_cmp_123 
+         1497 alloc i32 temp_325_value_from_ptr_110 
+         1501 alloc i1 temp_326_cmp_110 
           label L0_0: 
-         46   new_var temp_5__28:f32 
-         47   temp_5__28 = sitofp i32 33_0 to f32 
-         49   new_var temp_6_ret_of_myabs_28:f32 
-         50   temp_6_ret_of_myabs_28 =  Call f32 myabs_0(temp_5__28) 
-         52   new_var temp_7__29:i32 
-         53   temp_7__29 = fptosi f32 temp_6_ret_of_myabs_28 to i32 
-         54   ret temp_7__29 
- 16   Define myabs_0 "num_16," -> myabs_ret_0 
-         19   alloc f32 temp_0__25 
-         25   alloc f32 temp_1__19 
-         28   alloc i1 temp_2_cmp_19 
-         34   alloc f32 temp_3__23 
-         37   alloc i1 temp_4_cmp_23 
+         317  store 0_0:i32 *intt_0:ptr->i32 
+         318  intt_0 = chi intt_0:317 
+         319  store 0_0:i32 *chat_0:ptr->i32 
+         320  chat_0 = chi chat_0:319 
+         322  new_var temp_54_ret_of_getstr_87:i32 
+         323  temp_54_ret_of_getstr_87 =  Call i32 getstr_0(*get_0) 
+         1540 mu get_0:323 
+         1541 get_0 = chi get_0:323 
+         324  lengets_87 = i32 temp_54_ret_of_getstr_87 
+              jump label: while.head_92 
+     606  label while.head_92: 
+         600  new_var temp_116_value_from_ptr_91:i32 
+         601  temp_116_value_from_ptr_91 = load *i_0:ptr->i32 
+         602  mu i_0:601 
+         604  new_var temp_117_cmp_91:i1 
+         605  temp_117_cmp_91 = icmp i32 Slt temp_116_value_from_ptr_91, lengets_87 
+         609  br i1 temp_117_cmp_91, label while.body_92, label while.exit_92 
+     607  label while.body_92: 
+         888  new_var temp_182_value_from_ptr_94:i32 
+         889  temp_182_value_from_ptr_94 = load *i_0:ptr->i32 
+         890  mu i_0:889 
+         892  new_var temp_183_array_ptr_94:ptr->i32 
+         893  temp_183_array_ptr_94 = getelementptr *get_0:Array:i32:[None] [Some(temp_182_value_from_ptr_94)] 
+         895  new_var temp_184_array_ele_94:i32 
+         896  temp_184_array_ele_94 = load temp_183_array_ptr_94:ptr->i32 
+         897  mu get_0:896 
+         899  new_var temp_185_ret_of_isdigit_94:i32 
+         900  temp_185_ret_of_isdigit_94 =  Call i32 isdigit_0(temp_184_array_ele_94) 
+         902  new_var temp_186_cmp_94:i1 
+         903  temp_186_cmp_94 = icmp i32 Eq temp_185_ret_of_isdigit_94, 1_0 
+         906  br i1 temp_186_cmp_94, label branch_true_95, label branch_false_95 
+     904  label branch_true_95: 
+         571  new_var temp_109_value_from_ptr_96:i32 
+         572  temp_109_value_from_ptr_96 = load *ii_0:ptr->i32 
+         573  mu ii_0:572 
+         575  new_var temp_110_index_ptr_96:ptr->i32 
+         576  temp_110_index_ptr_96 = getelementptr *get2_0:ptr->i32 [Some(temp_109_value_from_ptr_96)] 
+         578  new_var temp_111_value_from_ptr_96:i32 
+         579  temp_111_value_from_ptr_96 = load *i_0:ptr->i32 
+         580  mu i_0:579 
+         582  new_var temp_112_array_ptr_96:ptr->i32 
+         583  temp_112_array_ptr_96 = getelementptr *get_0:Array:i32:[None] [Some(temp_111_value_from_ptr_96)] 
+         585  new_var temp_113_array_ele_96:i32 
+         586  temp_113_array_ele_96 = load temp_112_array_ptr_96:ptr->i32 
+         587  mu get_0:586 
+         588  store temp_113_array_ele_96:i32 temp_110_index_ptr_96:ptr->i32 
+         589  get2_0 = chi get2_0:588 
+         591  new_var temp_114_value_from_ptr_96:i32 
+         592  temp_114_value_from_ptr_96 = load *ii_0:ptr->i32 
+         593  mu ii_0:592 
+         595  new_var temp_115_arithop_96:i32 
+         596  temp_115_arithop_96 = Add i32 temp_114_value_from_ptr_96, 1_0 
+         597  store temp_115_arithop_96:i32 *ii_0:ptr->i32 
+         598  ii_0 = chi ii_0:597 
+              jump label: gather_93 
+     1043 label gather_93: 
+              jump label: L1_0 
           label L1_0: 
-         26   new_var temp_1__19:f32 
-         27   temp_1__19 = sitofp i32 0_0 to f32 
-         29   new_var temp_2_cmp_19:i1 
-         30   temp_2_cmp_19 = fcmp f32 Ogt num_16, temp_1__19 
-         33   br i1 temp_2_cmp_19, label branch_true_20, label branch_false_20 
-     31   label branch_true_20: 
-         24   ret num_16 
-     32   label branch_false_20: 
+         511  new_var temp_97_value_from_ptr_93:i32 
+         512  temp_97_value_from_ptr_93 = load *i_0:ptr->i32 
+         513  mu i_0:512 
+         515  new_var temp_98_arithop_93:i32 
+         516  temp_98_arithop_93 = Add i32 temp_97_value_from_ptr_93, 1_0 
+         517  store temp_98_arithop_93:i32 *i_0:ptr->i32 
+         518  i_0 = chi i_0:517 
+              jump label: while.head_92 
+     905  label branch_false_95: 
+         908  new_var temp_187_value_from_ptr_100:i32 
+         909  temp_187_value_from_ptr_100 = load *i_0:ptr->i32 
+         910  mu i_0:909 
+         912  new_var temp_188_array_ptr_100:ptr->i32 
+         913  temp_188_array_ptr_100 = getelementptr *get_0:Array:i32:[None] [Some(temp_187_value_from_ptr_100)] 
+         915  new_var temp_189_array_ele_100:i32 
+         916  temp_189_array_ele_100 = load temp_188_array_ptr_100:ptr->i32 
+         917  mu get_0:916 
+         919  new_var temp_190_cmp_100:i1 
+         920  temp_190_cmp_100 = icmp i32 Eq temp_189_array_ele_100, 40_0 
+         923  br i1 temp_190_cmp_100, label branch_true_101, label branch_false_101 
+     921  label branch_true_101: 
+         569   Call void chapush_0(40_0) 
+         1542 mu chat_0:569 
+         1543 chat_0 = chi chat_0:569 
+         1544 chas_0 = chi chas_0:569 
+              jump label: branch_false_101 
+     922  label branch_false_101: 
               jump label: L2_0 
           label L2_0: 
-         35   new_var temp_3__23:f32 
-         36   temp_3__23 = sitofp i32 0_0 to f32 
-         38   new_var temp_4_cmp_23:i1 
-         39   temp_4_cmp_23 = fcmp f32 Olt num_16, temp_3__23 
-         42   br i1 temp_4_cmp_23, label branch_true_24, label branch_false_24 
-     40   label branch_true_24: 
-         20   new_var temp_0__25:f32 
-         21   temp_0__25 = Sub f32 0.0_0, num_16 
-         22   ret temp_0__25 
-     41   label branch_false_24: 
-              jump label: exit_2 
-     43   label exit_2: 
+         925  new_var temp_191_value_from_ptr_103:i32 
+         926  temp_191_value_from_ptr_103 = load *i_0:ptr->i32 
+         927  mu i_0:926 
+         929  new_var temp_192_array_ptr_103:ptr->i32 
+         930  temp_192_array_ptr_103 = getelementptr *get_0:Array:i32:[None] [Some(temp_191_value_from_ptr_103)] 
+         932  new_var temp_193_array_ele_103:i32 
+         933  temp_193_array_ele_103 = load temp_192_array_ptr_103:ptr->i32 
+         934  mu get_0:933 
+         936  new_var temp_194_cmp_103:i1 
+         937  temp_194_cmp_103 = icmp i32 Eq temp_193_array_ele_103, 94_0 
+         940  br i1 temp_194_cmp_103, label branch_true_104, label branch_false_104 
+     938  label branch_true_104: 
+         568   Call void chapush_0(94_0) 
+         1545 mu chat_0:568 
+         1546 chat_0 = chi chat_0:568 
+         1547 chas_0 = chi chas_0:568 
+              jump label: branch_false_104 
+     939  label branch_false_104: 
+              jump label: L3_0 
+          label L3_0: 
+         942  new_var temp_195_value_from_ptr_106:i32 
+         943  temp_195_value_from_ptr_106 = load *i_0:ptr->i32 
+         944  mu i_0:943 
+         946  new_var temp_196_array_ptr_106:ptr->i32 
+         947  temp_196_array_ptr_106 = getelementptr *get_0:Array:i32:[None] [Some(temp_195_value_from_ptr_106)] 
+         949  new_var temp_197_array_ele_106:i32 
+         950  temp_197_array_ele_106 = load temp_196_array_ptr_106:ptr->i32 
+         951  mu get_0:950 
+         953  new_var temp_198_cmp_106:i1 
+         954  temp_198_cmp_106 = icmp i32 Eq temp_197_array_ele_106, 41_0 
+         957  br i1 temp_198_cmp_106, label branch_true_107, label branch_false_107 
+     955  label branch_true_107: 
+         525  new_var temp_99_ret_of_chapop_108:i32 
+         526  temp_99_ret_of_chapop_108 =  Call i32 chapop_0() 
+         1548 mu chas_0:526 
+         1549 mu chat_0:526 
+         1550 chat_0 = chi chat_0:526 
+         527  store temp_99_ret_of_chapop_108:i32 *c_0:ptr->i32 
+         528  c_0 = chi c_0:527 
+              jump label: while.head_111 
+     1504 label while.head_111: 
+         1498 new_var temp_325_value_from_ptr_110:i32 
+         1499 temp_325_value_from_ptr_110 = load *c_0:ptr->i32 
+         1500 mu c_0:1499 
+         1502 new_var temp_326_cmp_110:i1 
+         1503 temp_326_cmp_110 = icmp i32 Ne temp_325_value_from_ptr_110, 40_0 
+         1506 br i1 temp_326_cmp_110, label while.body_111, label branch_false_107 
+     1505 label while.body_111: 
+         530  new_var temp_100_value_from_ptr_112:i32 
+         531  temp_100_value_from_ptr_112 = load *ii_0:ptr->i32 
+         532  mu ii_0:531 
+         534  new_var temp_101_index_ptr_112:ptr->i32 
+         535  temp_101_index_ptr_112 = getelementptr *get2_0:ptr->i32 [Some(temp_100_value_from_ptr_112)] 
+         536  store 32_0:i32 temp_101_index_ptr_112:ptr->i32 
+         537  get2_0 = chi get2_0:536 
+         539  new_var temp_102_value_from_ptr_112:i32 
+         540  temp_102_value_from_ptr_112 = load *ii_0:ptr->i32 
+         541  mu ii_0:540 
+         543  new_var temp_103_arithop_112:i32 
+         544  temp_103_arithop_112 = Add i32 temp_102_value_from_ptr_112, 1_0 
+         546  new_var temp_104_index_ptr_112:ptr->i32 
+         547  temp_104_index_ptr_112 = getelementptr *get2_0:ptr->i32 [Some(temp_103_arithop_112)] 
+         549  new_var temp_105_value_from_ptr_112:i32 
+         550  temp_105_value_from_ptr_112 = load *c_0:ptr->i32 
+         551  mu c_0:550 
+         552  store temp_105_value_from_ptr_112:i32 temp_104_index_ptr_112:ptr->i32 
+         553  get2_0 = chi get2_0:552 
+         555  new_var temp_106_value_from_ptr_112:i32 
+         556  temp_106_value_from_ptr_112 = load *ii_0:ptr->i32 
+         557  mu ii_0:556 
+         559  new_var temp_107_arithop_112:i32 
+         560  temp_107_arithop_112 = Add i32 temp_106_value_from_ptr_112, 2_0 
+         561  store temp_107_arithop_112:i32 *ii_0:ptr->i32 
+         562  ii_0 = chi ii_0:561 
+         564  new_var temp_108_ret_of_chapop_112:i32 
+         565  temp_108_ret_of_chapop_112 =  Call i32 chapop_0() 
+         1551 mu chas_0:565 
+         1552 mu chat_0:565 
+         1553 chat_0 = chi chat_0:565 
+         566  store temp_108_ret_of_chapop_112:i32 *c_0:ptr->i32 
+         567  c_0 = chi c_0:566 
+              jump label: while.head_111 
+     956  label branch_false_107: 
+              jump label: L4_0 
+          label L4_0: 
+         959  new_var temp_199_value_from_ptr_117:i32 
+         960  temp_199_value_from_ptr_117 = load *i_0:ptr->i32 
+         961  mu i_0:960 
+         963  new_var temp_200_array_ptr_117:ptr->i32 
+         964  temp_200_array_ptr_117 = getelementptr *get_0:Array:i32:[None] [Some(temp_199_value_from_ptr_117)] 
+         966  new_var temp_201_array_ele_117:i32 
+         967  temp_201_array_ele_117 = load temp_200_array_ptr_117:ptr->i32 
+         968  mu get_0:967 
+         970  new_var temp_202_cmp_117:i1 
+         971  temp_202_cmp_117 = icmp i32 Eq temp_201_array_ele_117, 43_0 
+         974  br i1 temp_202_cmp_117, label branch_true_118, label branch_false_118 
+     972  label branch_true_118: 
+         1387 new_var temp_299_value_from_ptr_120:i32 
+         1388 temp_299_value_from_ptr_120 = load *chat_0:ptr->i32 
+         1389 mu chat_0:1388 
+         1391 new_var temp_300_array_ptr_120:ptr->i32 
+         1392 temp_300_array_ptr_120 = getelementptr *chas_0:Array:i32:[None] [Some(temp_299_value_from_ptr_120)] 
+         1394 new_var temp_301_array_ele_120:i32 
+         1395 temp_301_array_ele_120 = load temp_300_array_ptr_120:ptr->i32 
+         1396 mu chas_0:1395 
+         1398 new_var temp_302_cmp_120:i1 
+         1399 temp_302_cmp_120 = icmp i32 Eq temp_301_array_ele_120, 43_0 
+         1487 br i1 temp_302_cmp_120, label branch_short_circuit_c_true_1075, label branch_short_circuit_p_false_1047 
+     1470 label branch_short_circuit_c_true_1075: 
+         1489 new_var temp_323_ret_of_find_123:i32 
+         1490 temp_323_ret_of_find_123 =  Call i32 find_0() 
+         1554 mu c_0:1490 
+         1555 mu chat_0:1490 
+         1556 mu ii_0:1490 
+         1557 get2_0 = chi get2_0:1490 
+         1558 ii_0 = chi ii_0:1490 
+         1559 c_0 = chi c_0:1490 
+         1492 new_var temp_324_cmp_123:i1 
+         1493 temp_324_cmp_123 = icmp i32 Eq temp_323_ret_of_find_123, 0_0 
+         1496 br i1 temp_324_cmp_123, label branch_true_124, label branch_false_124 
+     1494 label branch_true_124: 
+              jump label: branch_short_circuit_c_false_1075 
+     1471 label branch_short_circuit_c_false_1075: 
+         523   Call void chapush_0(43_0) 
+         1560 mu chat_0:523 
+         1561 chat_0 = chi chat_0:523 
+         1562 chas_0 = chi chas_0:523 
+              jump label: branch_false_118 
+     973  label branch_false_118: 
+              jump label: L5_0 
+          label L5_0: 
+         976  new_var temp_203_value_from_ptr_127:i32 
+         977  temp_203_value_from_ptr_127 = load *i_0:ptr->i32 
+         978  mu i_0:977 
+         980  new_var temp_204_array_ptr_127:ptr->i32 
+         981  temp_204_array_ptr_127 = getelementptr *get_0:Array:i32:[None] [Some(temp_203_value_from_ptr_127)] 
+         983  new_var temp_205_array_ele_127:i32 
+         984  temp_205_array_ele_127 = load temp_204_array_ptr_127:ptr->i32 
+         985  mu get_0:984 
+         987  new_var temp_206_cmp_127:i1 
+         988  temp_206_cmp_127 = icmp i32 Eq temp_205_array_ele_127, 45_0 
+         991  br i1 temp_206_cmp_127, label branch_true_128, label branch_false_128 
+     989  label branch_true_128: 
+         1276 new_var temp_273_value_from_ptr_130:i32 
+         1277 temp_273_value_from_ptr_130 = load *chat_0:ptr->i32 
+         1278 mu chat_0:1277 
+         1280 new_var temp_274_array_ptr_130:ptr->i32 
+         1281 temp_274_array_ptr_130 = getelementptr *chas_0:Array:i32:[None] [Some(temp_273_value_from_ptr_130)] 
+         1283 new_var temp_275_array_ele_130:i32 
+         1284 temp_275_array_ele_130 = load temp_274_array_ptr_130:ptr->i32 
+         1285 mu chas_0:1284 
+         1287 new_var temp_276_cmp_130:i1 
+         1288 temp_276_cmp_130 = icmp i32 Eq temp_275_array_ele_130, 43_0 
+         1376 br i1 temp_276_cmp_130, label branch_short_circuit_c_true_1039, label branch_short_circuit_p_false_1011 
+     1359 label branch_short_circuit_c_true_1039: 
+         1378 new_var temp_297_ret_of_find_133:i32 
+         1379 temp_297_ret_of_find_133 =  Call i32 find_0() 
+         1563 mu c_0:1379 
+         1564 mu chat_0:1379 
+         1565 mu ii_0:1379 
+         1566 get2_0 = chi get2_0:1379 
+         1567 ii_0 = chi ii_0:1379 
+         1568 c_0 = chi c_0:1379 
+         1381 new_var temp_298_cmp_133:i1 
+         1382 temp_298_cmp_133 = icmp i32 Eq temp_297_ret_of_find_133, 0_0 
+         1385 br i1 temp_298_cmp_133, label branch_true_134, label branch_false_134 
+     1383 label branch_true_134: 
+              jump label: branch_short_circuit_c_false_1039 
+     1360 label branch_short_circuit_c_false_1039: 
+         522   Call void chapush_0(45_0) 
+         1569 mu chat_0:522 
+         1570 chat_0 = chi chat_0:522 
+         1571 chas_0 = chi chas_0:522 
+              jump label: branch_false_128 
+     990  label branch_false_128: 
+              jump label: L6_0 
+          label L6_0: 
+         993  new_var temp_207_value_from_ptr_137:i32 
+         994  temp_207_value_from_ptr_137 = load *i_0:ptr->i32 
+         995  mu i_0:994 
+         997  new_var temp_208_array_ptr_137:ptr->i32 
+         998  temp_208_array_ptr_137 = getelementptr *get_0:Array:i32:[None] [Some(temp_207_value_from_ptr_137)] 
+         1000 new_var temp_209_array_ele_137:i32 
+         1001 temp_209_array_ele_137 = load temp_208_array_ptr_137:ptr->i32 
+         1002 mu get_0:1001 
+         1004 new_var temp_210_cmp_137:i1 
+         1005 temp_210_cmp_137 = icmp i32 Eq temp_209_array_ele_137, 42_0 
+         1008 br i1 temp_210_cmp_137, label branch_true_138, label branch_false_138 
+     1006 label branch_true_138: 
+         1199 new_var temp_255_value_from_ptr_140:i32 
+         1200 temp_255_value_from_ptr_140 = load *chat_0:ptr->i32 
+         1201 mu chat_0:1200 
+         1203 new_var temp_256_array_ptr_140:ptr->i32 
+         1204 temp_256_array_ptr_140 = getelementptr *chas_0:Array:i32:[None] [Some(temp_255_value_from_ptr_140)] 
+         1206 new_var temp_257_array_ele_140:i32 
+         1207 temp_257_array_ele_140 = load temp_256_array_ptr_140:ptr->i32 
+         1208 mu chas_0:1207 
+         1210 new_var temp_258_cmp_140:i1 
+         1211 temp_258_cmp_140 = icmp i32 Eq temp_257_array_ele_140, 42_0 
+         1265 br i1 temp_258_cmp_140, label branch_short_circuit_c_true_1003, label branch_short_circuit_p_false_989 
+     1254 label branch_short_circuit_c_true_1003: 
+         1267 new_var temp_271_ret_of_find_143:i32 
+         1268 temp_271_ret_of_find_143 =  Call i32 find_0() 
+         1572 mu c_0:1268 
+         1573 mu chat_0:1268 
+         1574 mu ii_0:1268 
+         1575 get2_0 = chi get2_0:1268 
+         1576 ii_0 = chi ii_0:1268 
+         1577 c_0 = chi c_0:1268 
+         1270 new_var temp_272_cmp_143:i1 
+         1271 temp_272_cmp_143 = icmp i32 Eq temp_271_ret_of_find_143, 0_0 
+         1274 br i1 temp_272_cmp_143, label branch_true_144, label branch_false_144 
+     1272 label branch_true_144: 
+              jump label: branch_short_circuit_c_false_1003 
+     1255 label branch_short_circuit_c_false_1003: 
+         521   Call void chapush_0(42_0) 
+         1578 mu chat_0:521 
+         1579 chat_0 = chi chat_0:521 
+         1580 chas_0 = chi chas_0:521 
+              jump label: branch_false_138 
+     1007 label branch_false_138: 
+              jump label: L7_0 
+          label L7_0: 
+         1010 new_var temp_211_value_from_ptr_147:i32 
+         1011 temp_211_value_from_ptr_147 = load *i_0:ptr->i32 
+         1012 mu i_0:1011 
+         1014 new_var temp_212_array_ptr_147:ptr->i32 
+         1015 temp_212_array_ptr_147 = getelementptr *get_0:Array:i32:[None] [Some(temp_211_value_from_ptr_147)] 
+         1017 new_var temp_213_array_ele_147:i32 
+         1018 temp_213_array_ele_147 = load temp_212_array_ptr_147:ptr->i32 
+         1019 mu get_0:1018 
+         1021 new_var temp_214_cmp_147:i1 
+         1022 temp_214_cmp_147 = icmp i32 Eq temp_213_array_ele_147, 47_0 
+         1025 br i1 temp_214_cmp_147, label branch_true_148, label branch_false_148 
+     1023 label branch_true_148: 
+         1122 new_var temp_237_value_from_ptr_150:i32 
+         1123 temp_237_value_from_ptr_150 = load *chat_0:ptr->i32 
+         1124 mu chat_0:1123 
+         1126 new_var temp_238_array_ptr_150:ptr->i32 
+         1127 temp_238_array_ptr_150 = getelementptr *chas_0:Array:i32:[None] [Some(temp_237_value_from_ptr_150)] 
+         1129 new_var temp_239_array_ele_150:i32 
+         1130 temp_239_array_ele_150 = load temp_238_array_ptr_150:ptr->i32 
+         1131 mu chas_0:1130 
+         1133 new_var temp_240_cmp_150:i1 
+         1134 temp_240_cmp_150 = icmp i32 Eq temp_239_array_ele_150, 42_0 
+         1188 br i1 temp_240_cmp_150, label branch_short_circuit_c_true_981, label branch_short_circuit_p_false_967 
+     1177 label branch_short_circuit_c_true_981: 
+         1190 new_var temp_253_ret_of_find_153:i32 
+         1191 temp_253_ret_of_find_153 =  Call i32 find_0() 
+         1581 mu c_0:1191 
+         1582 mu chat_0:1191 
+         1583 mu ii_0:1191 
+         1584 get2_0 = chi get2_0:1191 
+         1585 ii_0 = chi ii_0:1191 
+         1586 c_0 = chi c_0:1191 
+         1193 new_var temp_254_cmp_153:i1 
+         1194 temp_254_cmp_153 = icmp i32 Eq temp_253_ret_of_find_153, 0_0 
+         1197 br i1 temp_254_cmp_153, label branch_true_154, label branch_false_154 
+     1195 label branch_true_154: 
+              jump label: branch_short_circuit_c_false_981 
+     1178 label branch_short_circuit_c_false_981: 
+         520   Call void chapush_0(47_0) 
+         1587 mu chat_0:520 
+         1588 chat_0 = chi chat_0:520 
+         1589 chas_0 = chi chas_0:520 
+              jump label: branch_false_148 
+     1024 label branch_false_148: 
+              jump label: L8_0 
+          label L8_0: 
+         1027 new_var temp_215_value_from_ptr_157:i32 
+         1028 temp_215_value_from_ptr_157 = load *i_0:ptr->i32 
+         1029 mu i_0:1028 
+         1031 new_var temp_216_array_ptr_157:ptr->i32 
+         1032 temp_216_array_ptr_157 = getelementptr *get_0:Array:i32:[None] [Some(temp_215_value_from_ptr_157)] 
+         1034 new_var temp_217_array_ele_157:i32 
+         1035 temp_217_array_ele_157 = load temp_216_array_ptr_157:ptr->i32 
+         1036 mu get_0:1035 
+         1038 new_var temp_218_cmp_157:i1 
+         1039 temp_218_cmp_157 = icmp i32 Eq temp_217_array_ele_157, 37_0 
+         1042 br i1 temp_218_cmp_157, label branch_true_158, label branch_false_158 
+     1040 label branch_true_158: 
+         1045 new_var temp_219_value_from_ptr_160:i32 
+         1046 temp_219_value_from_ptr_160 = load *chat_0:ptr->i32 
+         1047 mu chat_0:1046 
+         1049 new_var temp_220_array_ptr_160:ptr->i32 
+         1050 temp_220_array_ptr_160 = getelementptr *chas_0:Array:i32:[None] [Some(temp_219_value_from_ptr_160)] 
+         1052 new_var temp_221_array_ele_160:i32 
+         1053 temp_221_array_ele_160 = load temp_220_array_ptr_160:ptr->i32 
+         1054 mu chas_0:1053 
+         1056 new_var temp_222_cmp_160:i1 
+         1057 temp_222_cmp_160 = icmp i32 Eq temp_221_array_ele_160, 42_0 
+         1111 br i1 temp_222_cmp_160, label branch_short_circuit_c_true_959, label branch_short_circuit_p_false_945 
+     1100 label branch_short_circuit_c_true_959: 
+         1113 new_var temp_235_ret_of_find_163:i32 
+         1114 temp_235_ret_of_find_163 =  Call i32 find_0() 
+         1590 mu c_0:1114 
+         1591 mu chat_0:1114 
+         1592 mu ii_0:1114 
+         1593 get2_0 = chi get2_0:1114 
+         1594 ii_0 = chi ii_0:1114 
+         1595 c_0 = chi c_0:1114 
+         1116 new_var temp_236_cmp_163:i1 
+         1117 temp_236_cmp_163 = icmp i32 Eq temp_235_ret_of_find_163, 0_0 
+         1120 br i1 temp_236_cmp_163, label branch_true_164, label branch_false_164 
+     1118 label branch_true_164: 
+              jump label: branch_short_circuit_c_false_959 
+     1101 label branch_short_circuit_c_false_959: 
+         519   Call void chapush_0(37_0) 
+         1596 mu chat_0:519 
+         1597 chat_0 = chi chat_0:519 
+         1598 chas_0 = chi chas_0:519 
+              jump label: branch_false_158 
+     1041 label branch_false_158: 
+              jump label: L9_0 
+          label L9_0: 
+         493  new_var temp_93_value_from_ptr_99:i32 
+         494  temp_93_value_from_ptr_99 = load *ii_0:ptr->i32 
+         495  mu ii_0:494 
+         497  new_var temp_94_index_ptr_99:ptr->i32 
+         498  temp_94_index_ptr_99 = getelementptr *get2_0:ptr->i32 [Some(temp_93_value_from_ptr_99)] 
+         499  store 32_0:i32 temp_94_index_ptr_99:ptr->i32 
+         500  get2_0 = chi get2_0:499 
+         502  new_var temp_95_value_from_ptr_99:i32 
+         503  temp_95_value_from_ptr_99 = load *ii_0:ptr->i32 
+         504  mu ii_0:503 
+         506  new_var temp_96_arithop_99:i32 
+         507  temp_96_arithop_99 = Add i32 temp_95_value_from_ptr_99, 1_0 
+         508  store temp_96_arithop_99:i32 *ii_0:ptr->i32 
+         509  ii_0 = chi ii_0:508 
+              jump label: gather_93 
+     1119 label branch_false_164: 
+              jump label: branch_true_158 
+     1108 label branch_short_circuit_p_false_945: 
+         1059 new_var temp_223_value_from_ptr_160:i32 
+         1060 temp_223_value_from_ptr_160 = load *chat_0:ptr->i32 
+         1061 mu chat_0:1060 
+         1063 new_var temp_224_array_ptr_160:ptr->i32 
+         1064 temp_224_array_ptr_160 = getelementptr *chas_0:Array:i32:[None] [Some(temp_223_value_from_ptr_160)] 
+         1066 new_var temp_225_array_ele_160:i32 
+         1067 temp_225_array_ele_160 = load temp_224_array_ptr_160:ptr->i32 
+         1068 mu chas_0:1067 
+         1070 new_var temp_226_cmp_160:i1 
+         1071 temp_226_cmp_160 = icmp i32 Eq temp_225_array_ele_160, 47_0 
+         1110 br i1 temp_226_cmp_160, label branch_short_circuit_c_true_959, label branch_short_circuit_p_false_952 
+     1105 label branch_short_circuit_p_false_952: 
+         1073 new_var temp_227_value_from_ptr_160:i32 
+         1074 temp_227_value_from_ptr_160 = load *chat_0:ptr->i32 
+         1075 mu chat_0:1074 
+         1077 new_var temp_228_array_ptr_160:ptr->i32 
+         1078 temp_228_array_ptr_160 = getelementptr *chas_0:Array:i32:[None] [Some(temp_227_value_from_ptr_160)] 
+         1080 new_var temp_229_array_ele_160:i32 
+         1081 temp_229_array_ele_160 = load temp_228_array_ptr_160:ptr->i32 
+         1082 mu chas_0:1081 
+         1084 new_var temp_230_cmp_160:i1 
+         1085 temp_230_cmp_160 = icmp i32 Eq temp_229_array_ele_160, 37_0 
+         1107 br i1 temp_230_cmp_160, label branch_short_circuit_c_true_959, label branch_short_circuit_p_false_959 
+     1102 label branch_short_circuit_p_false_959: 
+         1087 new_var temp_231_value_from_ptr_160:i32 
+         1088 temp_231_value_from_ptr_160 = load *chat_0:ptr->i32 
+         1089 mu chat_0:1088 
+         1091 new_var temp_232_array_ptr_160:ptr->i32 
+         1092 temp_232_array_ptr_160 = getelementptr *chas_0:Array:i32:[None] [Some(temp_231_value_from_ptr_160)] 
+         1094 new_var temp_233_array_ele_160:i32 
+         1095 temp_233_array_ele_160 = load temp_232_array_ptr_160:ptr->i32 
+         1096 mu chas_0:1095 
+         1098 new_var temp_234_cmp_160:i1 
+         1099 temp_234_cmp_160 = icmp i32 Eq temp_233_array_ele_160, 94_0 
+         1104 br i1 temp_234_cmp_160, label branch_short_circuit_c_true_959, label branch_short_circuit_c_false_959 
+     1196 label branch_false_154: 
+              jump label: branch_true_148 
+     1185 label branch_short_circuit_p_false_967: 
+         1136 new_var temp_241_value_from_ptr_150:i32 
+         1137 temp_241_value_from_ptr_150 = load *chat_0:ptr->i32 
+         1138 mu chat_0:1137 
+         1140 new_var temp_242_array_ptr_150:ptr->i32 
+         1141 temp_242_array_ptr_150 = getelementptr *chas_0:Array:i32:[None] [Some(temp_241_value_from_ptr_150)] 
+         1143 new_var temp_243_array_ele_150:i32 
+         1144 temp_243_array_ele_150 = load temp_242_array_ptr_150:ptr->i32 
+         1145 mu chas_0:1144 
+         1147 new_var temp_244_cmp_150:i1 
+         1148 temp_244_cmp_150 = icmp i32 Eq temp_243_array_ele_150, 47_0 
+         1187 br i1 temp_244_cmp_150, label branch_short_circuit_c_true_981, label branch_short_circuit_p_false_974 
+     1182 label branch_short_circuit_p_false_974: 
+         1150 new_var temp_245_value_from_ptr_150:i32 
+         1151 temp_245_value_from_ptr_150 = load *chat_0:ptr->i32 
+         1152 mu chat_0:1151 
+         1154 new_var temp_246_array_ptr_150:ptr->i32 
+         1155 temp_246_array_ptr_150 = getelementptr *chas_0:Array:i32:[None] [Some(temp_245_value_from_ptr_150)] 
+         1157 new_var temp_247_array_ele_150:i32 
+         1158 temp_247_array_ele_150 = load temp_246_array_ptr_150:ptr->i32 
+         1159 mu chas_0:1158 
+         1161 new_var temp_248_cmp_150:i1 
+         1162 temp_248_cmp_150 = icmp i32 Eq temp_247_array_ele_150, 37_0 
+         1184 br i1 temp_248_cmp_150, label branch_short_circuit_c_true_981, label branch_short_circuit_p_false_981 
+     1179 label branch_short_circuit_p_false_981: 
+         1164 new_var temp_249_value_from_ptr_150:i32 
+         1165 temp_249_value_from_ptr_150 = load *chat_0:ptr->i32 
+         1166 mu chat_0:1165 
+         1168 new_var temp_250_array_ptr_150:ptr->i32 
+         1169 temp_250_array_ptr_150 = getelementptr *chas_0:Array:i32:[None] [Some(temp_249_value_from_ptr_150)] 
+         1171 new_var temp_251_array_ele_150:i32 
+         1172 temp_251_array_ele_150 = load temp_250_array_ptr_150:ptr->i32 
+         1173 mu chas_0:1172 
+         1175 new_var temp_252_cmp_150:i1 
+         1176 temp_252_cmp_150 = icmp i32 Eq temp_251_array_ele_150, 94_0 
+         1181 br i1 temp_252_cmp_150, label branch_short_circuit_c_true_981, label branch_short_circuit_c_false_981 
+     1273 label branch_false_144: 
+              jump label: branch_true_138 
+     1262 label branch_short_circuit_p_false_989: 
+         1213 new_var temp_259_value_from_ptr_140:i32 
+         1214 temp_259_value_from_ptr_140 = load *chat_0:ptr->i32 
+         1215 mu chat_0:1214 
+         1217 new_var temp_260_array_ptr_140:ptr->i32 
+         1218 temp_260_array_ptr_140 = getelementptr *chas_0:Array:i32:[None] [Some(temp_259_value_from_ptr_140)] 
+         1220 new_var temp_261_array_ele_140:i32 
+         1221 temp_261_array_ele_140 = load temp_260_array_ptr_140:ptr->i32 
+         1222 mu chas_0:1221 
+         1224 new_var temp_262_cmp_140:i1 
+         1225 temp_262_cmp_140 = icmp i32 Eq temp_261_array_ele_140, 47_0 
+         1264 br i1 temp_262_cmp_140, label branch_short_circuit_c_true_1003, label branch_short_circuit_p_false_996 
+     1259 label branch_short_circuit_p_false_996: 
+         1227 new_var temp_263_value_from_ptr_140:i32 
+         1228 temp_263_value_from_ptr_140 = load *chat_0:ptr->i32 
+         1229 mu chat_0:1228 
+         1231 new_var temp_264_array_ptr_140:ptr->i32 
+         1232 temp_264_array_ptr_140 = getelementptr *chas_0:Array:i32:[None] [Some(temp_263_value_from_ptr_140)] 
+         1234 new_var temp_265_array_ele_140:i32 
+         1235 temp_265_array_ele_140 = load temp_264_array_ptr_140:ptr->i32 
+         1236 mu chas_0:1235 
+         1238 new_var temp_266_cmp_140:i1 
+         1239 temp_266_cmp_140 = icmp i32 Eq temp_265_array_ele_140, 37_0 
+         1261 br i1 temp_266_cmp_140, label branch_short_circuit_c_true_1003, label branch_short_circuit_p_false_1003 
+     1256 label branch_short_circuit_p_false_1003: 
+         1241 new_var temp_267_value_from_ptr_140:i32 
+         1242 temp_267_value_from_ptr_140 = load *chat_0:ptr->i32 
+         1243 mu chat_0:1242 
+         1245 new_var temp_268_array_ptr_140:ptr->i32 
+         1246 temp_268_array_ptr_140 = getelementptr *chas_0:Array:i32:[None] [Some(temp_267_value_from_ptr_140)] 
+         1248 new_var temp_269_array_ele_140:i32 
+         1249 temp_269_array_ele_140 = load temp_268_array_ptr_140:ptr->i32 
+         1250 mu chas_0:1249 
+         1252 new_var temp_270_cmp_140:i1 
+         1253 temp_270_cmp_140 = icmp i32 Eq temp_269_array_ele_140, 94_0 
+         1258 br i1 temp_270_cmp_140, label branch_short_circuit_c_true_1003, label branch_short_circuit_c_false_1003 
+     1384 label branch_false_134: 
+              jump label: branch_true_128 
+     1373 label branch_short_circuit_p_false_1011: 
+         1290 new_var temp_277_value_from_ptr_130:i32 
+         1291 temp_277_value_from_ptr_130 = load *chat_0:ptr->i32 
+         1292 mu chat_0:1291 
+         1294 new_var temp_278_array_ptr_130:ptr->i32 
+         1295 temp_278_array_ptr_130 = getelementptr *chas_0:Array:i32:[None] [Some(temp_277_value_from_ptr_130)] 
+         1297 new_var temp_279_array_ele_130:i32 
+         1298 temp_279_array_ele_130 = load temp_278_array_ptr_130:ptr->i32 
+         1299 mu chas_0:1298 
+         1301 new_var temp_280_cmp_130:i1 
+         1302 temp_280_cmp_130 = icmp i32 Eq temp_279_array_ele_130, 45_0 
+         1375 br i1 temp_280_cmp_130, label branch_short_circuit_c_true_1039, label branch_short_circuit_p_false_1018 
+     1370 label branch_short_circuit_p_false_1018: 
+         1304 new_var temp_281_value_from_ptr_130:i32 
+         1305 temp_281_value_from_ptr_130 = load *chat_0:ptr->i32 
+         1306 mu chat_0:1305 
+         1308 new_var temp_282_array_ptr_130:ptr->i32 
+         1309 temp_282_array_ptr_130 = getelementptr *chas_0:Array:i32:[None] [Some(temp_281_value_from_ptr_130)] 
+         1311 new_var temp_283_array_ele_130:i32 
+         1312 temp_283_array_ele_130 = load temp_282_array_ptr_130:ptr->i32 
+         1313 mu chas_0:1312 
+         1315 new_var temp_284_cmp_130:i1 
+         1316 temp_284_cmp_130 = icmp i32 Eq temp_283_array_ele_130, 42_0 
+         1372 br i1 temp_284_cmp_130, label branch_short_circuit_c_true_1039, label branch_short_circuit_p_false_1025 
+     1367 label branch_short_circuit_p_false_1025: 
+         1318 new_var temp_285_value_from_ptr_130:i32 
+         1319 temp_285_value_from_ptr_130 = load *chat_0:ptr->i32 
+         1320 mu chat_0:1319 
+         1322 new_var temp_286_array_ptr_130:ptr->i32 
+         1323 temp_286_array_ptr_130 = getelementptr *chas_0:Array:i32:[None] [Some(temp_285_value_from_ptr_130)] 
+         1325 new_var temp_287_array_ele_130:i32 
+         1326 temp_287_array_ele_130 = load temp_286_array_ptr_130:ptr->i32 
+         1327 mu chas_0:1326 
+         1329 new_var temp_288_cmp_130:i1 
+         1330 temp_288_cmp_130 = icmp i32 Eq temp_287_array_ele_130, 47_0 
+         1369 br i1 temp_288_cmp_130, label branch_short_circuit_c_true_1039, label branch_short_circuit_p_false_1032 
+     1364 label branch_short_circuit_p_false_1032: 
+         1332 new_var temp_289_value_from_ptr_130:i32 
+         1333 temp_289_value_from_ptr_130 = load *chat_0:ptr->i32 
+         1334 mu chat_0:1333 
+         1336 new_var temp_290_array_ptr_130:ptr->i32 
+         1337 temp_290_array_ptr_130 = getelementptr *chas_0:Array:i32:[None] [Some(temp_289_value_from_ptr_130)] 
+         1339 new_var temp_291_array_ele_130:i32 
+         1340 temp_291_array_ele_130 = load temp_290_array_ptr_130:ptr->i32 
+         1341 mu chas_0:1340 
+         1343 new_var temp_292_cmp_130:i1 
+         1344 temp_292_cmp_130 = icmp i32 Eq temp_291_array_ele_130, 37_0 
+         1366 br i1 temp_292_cmp_130, label branch_short_circuit_c_true_1039, label branch_short_circuit_p_false_1039 
+     1361 label branch_short_circuit_p_false_1039: 
+         1346 new_var temp_293_value_from_ptr_130:i32 
+         1347 temp_293_value_from_ptr_130 = load *chat_0:ptr->i32 
+         1348 mu chat_0:1347 
+         1350 new_var temp_294_array_ptr_130:ptr->i32 
+         1351 temp_294_array_ptr_130 = getelementptr *chas_0:Array:i32:[None] [Some(temp_293_value_from_ptr_130)] 
+         1353 new_var temp_295_array_ele_130:i32 
+         1354 temp_295_array_ele_130 = load temp_294_array_ptr_130:ptr->i32 
+         1355 mu chas_0:1354 
+         1357 new_var temp_296_cmp_130:i1 
+         1358 temp_296_cmp_130 = icmp i32 Eq temp_295_array_ele_130, 94_0 
+         1363 br i1 temp_296_cmp_130, label branch_short_circuit_c_true_1039, label branch_short_circuit_c_false_1039 
+     1495 label branch_false_124: 
+              jump label: branch_true_118 
+     1484 label branch_short_circuit_p_false_1047: 
+         1401 new_var temp_303_value_from_ptr_120:i32 
+         1402 temp_303_value_from_ptr_120 = load *chat_0:ptr->i32 
+         1403 mu chat_0:1402 
+         1405 new_var temp_304_array_ptr_120:ptr->i32 
+         1406 temp_304_array_ptr_120 = getelementptr *chas_0:Array:i32:[None] [Some(temp_303_value_from_ptr_120)] 
+         1408 new_var temp_305_array_ele_120:i32 
+         1409 temp_305_array_ele_120 = load temp_304_array_ptr_120:ptr->i32 
+         1410 mu chas_0:1409 
+         1412 new_var temp_306_cmp_120:i1 
+         1413 temp_306_cmp_120 = icmp i32 Eq temp_305_array_ele_120, 45_0 
+         1486 br i1 temp_306_cmp_120, label branch_short_circuit_c_true_1075, label branch_short_circuit_p_false_1054 
+     1481 label branch_short_circuit_p_false_1054: 
+         1415 new_var temp_307_value_from_ptr_120:i32 
+         1416 temp_307_value_from_ptr_120 = load *chat_0:ptr->i32 
+         1417 mu chat_0:1416 
+         1419 new_var temp_308_array_ptr_120:ptr->i32 
+         1420 temp_308_array_ptr_120 = getelementptr *chas_0:Array:i32:[None] [Some(temp_307_value_from_ptr_120)] 
+         1422 new_var temp_309_array_ele_120:i32 
+         1423 temp_309_array_ele_120 = load temp_308_array_ptr_120:ptr->i32 
+         1424 mu chas_0:1423 
+         1426 new_var temp_310_cmp_120:i1 
+         1427 temp_310_cmp_120 = icmp i32 Eq temp_309_array_ele_120, 42_0 
+         1483 br i1 temp_310_cmp_120, label branch_short_circuit_c_true_1075, label branch_short_circuit_p_false_1061 
+     1478 label branch_short_circuit_p_false_1061: 
+         1429 new_var temp_311_value_from_ptr_120:i32 
+         1430 temp_311_value_from_ptr_120 = load *chat_0:ptr->i32 
+         1431 mu chat_0:1430 
+         1433 new_var temp_312_array_ptr_120:ptr->i32 
+         1434 temp_312_array_ptr_120 = getelementptr *chas_0:Array:i32:[None] [Some(temp_311_value_from_ptr_120)] 
+         1436 new_var temp_313_array_ele_120:i32 
+         1437 temp_313_array_ele_120 = load temp_312_array_ptr_120:ptr->i32 
+         1438 mu chas_0:1437 
+         1440 new_var temp_314_cmp_120:i1 
+         1441 temp_314_cmp_120 = icmp i32 Eq temp_313_array_ele_120, 47_0 
+         1480 br i1 temp_314_cmp_120, label branch_short_circuit_c_true_1075, label branch_short_circuit_p_false_1068 
+     1475 label branch_short_circuit_p_false_1068: 
+         1443 new_var temp_315_value_from_ptr_120:i32 
+         1444 temp_315_value_from_ptr_120 = load *chat_0:ptr->i32 
+         1445 mu chat_0:1444 
+         1447 new_var temp_316_array_ptr_120:ptr->i32 
+         1448 temp_316_array_ptr_120 = getelementptr *chas_0:Array:i32:[None] [Some(temp_315_value_from_ptr_120)] 
+         1450 new_var temp_317_array_ele_120:i32 
+         1451 temp_317_array_ele_120 = load temp_316_array_ptr_120:ptr->i32 
+         1452 mu chas_0:1451 
+         1454 new_var temp_318_cmp_120:i1 
+         1455 temp_318_cmp_120 = icmp i32 Eq temp_317_array_ele_120, 37_0 
+         1477 br i1 temp_318_cmp_120, label branch_short_circuit_c_true_1075, label branch_short_circuit_p_false_1075 
+     1472 label branch_short_circuit_p_false_1075: 
+         1457 new_var temp_319_value_from_ptr_120:i32 
+         1458 temp_319_value_from_ptr_120 = load *chat_0:ptr->i32 
+         1459 mu chat_0:1458 
+         1461 new_var temp_320_array_ptr_120:ptr->i32 
+         1462 temp_320_array_ptr_120 = getelementptr *chas_0:Array:i32:[None] [Some(temp_319_value_from_ptr_120)] 
+         1464 new_var temp_321_array_ele_120:i32 
+         1465 temp_321_array_ele_120 = load temp_320_array_ptr_120:ptr->i32 
+         1466 mu chas_0:1465 
+         1468 new_var temp_322_cmp_120:i1 
+         1469 temp_322_cmp_120 = icmp i32 Eq temp_321_array_ele_120, 94_0 
+         1474 br i1 temp_322_cmp_120, label branch_short_circuit_c_true_1075, label branch_short_circuit_c_false_1075 
+     608  label while.exit_92: 
+         611  new_var temp_118_value_from_ptr_170:i32 
+         612  temp_118_value_from_ptr_170 = load *chat_0:ptr->i32 
+         613  mu chat_0:612 
+         615  new_var temp_119_cmp_170:i1 
+         616  temp_119_cmp_170 = icmp i32 Sgt temp_118_value_from_ptr_170, 0_0 
+         619  br i1 temp_119_cmp_170, label while.body_171, label while.exit_171 
+     617  label while.body_171: 
+         458  new_var temp_85_ret_of_chapop_172:i32 
+         459  temp_85_ret_of_chapop_172 =  Call i32 chapop_0() 
+         1599 mu chas_0:459 
+         1600 mu chat_0:459 
+         1601 chat_0 = chi chat_0:459 
+         460  c_172 = i32 temp_85_ret_of_chapop_172 
+         463  new_var temp_86_value_from_ptr_172:i32 
+         464  temp_86_value_from_ptr_172 = load *ii_0:ptr->i32 
+         465  mu ii_0:464 
+         467  new_var temp_87_index_ptr_172:ptr->i32 
+         468  temp_87_index_ptr_172 = getelementptr *get2_0:ptr->i32 [Some(temp_86_value_from_ptr_172)] 
+         469  store 32_0:i32 temp_87_index_ptr_172:ptr->i32 
+         470  get2_0 = chi get2_0:469 
+         472  new_var temp_88_value_from_ptr_172:i32 
+         473  temp_88_value_from_ptr_172 = load *ii_0:ptr->i32 
+         474  mu ii_0:473 
+         476  new_var temp_89_arithop_172:i32 
+         477  temp_89_arithop_172 = Add i32 temp_88_value_from_ptr_172, 1_0 
+         479  new_var temp_90_index_ptr_172:ptr->i32 
+         480  temp_90_index_ptr_172 = getelementptr *get2_0:ptr->i32 [Some(temp_89_arithop_172)] 
+         481  store c_172:i32 temp_90_index_ptr_172:ptr->i32 
+         482  get2_0 = chi get2_0:481 
+         484  new_var temp_91_value_from_ptr_172:i32 
+         485  temp_91_value_from_ptr_172 = load *ii_0:ptr->i32 
+         486  mu ii_0:485 
+         488  new_var temp_92_arithop_172:i32 
+         489  temp_92_arithop_172 = Add i32 temp_91_value_from_ptr_172, 2_0 
+         490  store temp_92_arithop_172:i32 *ii_0:ptr->i32 
+         491  ii_0 = chi ii_0:490 
+              jump label: while.exit_92 
+     618  label while.exit_171: 
+         327  new_var temp_55_value_from_ptr_87:i32 
+         328  temp_55_value_from_ptr_87 = load *ii_0:ptr->i32 
+         329  mu ii_0:328 
+         331  new_var temp_56_index_ptr_87:ptr->i32 
+         332  temp_56_index_ptr_87 = getelementptr *get2_0:ptr->i32 [Some(temp_55_value_from_ptr_87)] 
+         333  store 64_0:i32 temp_56_index_ptr_87:ptr->i32 
+         334  get2_0 = chi get2_0:333 
+         335  store 1_0:i32 *i_0:ptr->i32 
+         336  i_0 = chi i_0:335 
+              jump label: while.head_180 
+     634  label while.head_180: 
+         621  new_var temp_120_value_from_ptr_179:i32 
+         622  temp_120_value_from_ptr_179 = load *i_0:ptr->i32 
+         623  mu i_0:622 
+         625  new_var temp_121_array_ptr_179:ptr->i32 
+         626  temp_121_array_ptr_179 = getelementptr *get2_0:Array:i32:[None] [Some(temp_120_value_from_ptr_179)] 
+         628  new_var temp_122_array_ele_179:i32 
+         629  temp_122_array_ele_179 = load temp_121_array_ptr_179:ptr->i32 
+         630  mu get2_0:629 
+         632  new_var temp_123_cmp_179:i1 
+         633  temp_123_cmp_179 = icmp i32 Ne temp_122_array_ele_179, 64_0 
+         637  br i1 temp_123_cmp_179, label while.body_180, label while.exit_180 
+     635  label while.body_180: 
+         641  new_var temp_124_value_from_ptr_182:i32 
+         642  temp_124_value_from_ptr_182 = load *i_0:ptr->i32 
+         643  mu i_0:642 
+         645  new_var temp_125_array_ptr_182:ptr->i32 
+         646  temp_125_array_ptr_182 = getelementptr *get2_0:Array:i32:[None] [Some(temp_124_value_from_ptr_182)] 
+         648  new_var temp_126_array_ele_182:i32 
+         649  temp_126_array_ele_182 = load temp_125_array_ptr_182:ptr->i32 
+         650  mu get2_0:649 
+         652  new_var temp_127_cmp_182:i1 
+         653  temp_127_cmp_182 = icmp i32 Eq temp_126_array_ele_182, 43_0 
+         741  br i1 temp_127_cmp_182, label branch_short_circuit_c_true_848, label branch_short_circuit_p_false_820 
+     724  label branch_short_circuit_c_true_848: 
+         421  new_var temp_77_ret_of_intpop_184:i32 
+         422  temp_77_ret_of_intpop_184 =  Call i32 intpop_0() 
+         1602 mu ints_0:422 
+         1603 mu intt_0:422 
+         1604 intt_0 = chi intt_0:422 
+         423  a_184 = i32 temp_77_ret_of_intpop_184 
+         426  new_var temp_78_ret_of_intpop_184:i32 
+         427  temp_78_ret_of_intpop_184 =  Call i32 intpop_0() 
+         1605 mu ints_0:427 
+         1606 mu intt_0:427 
+         1607 intt_0 = chi intt_0:427 
+         428  b_184 = i32 temp_78_ret_of_intpop_184 
+         431  new_var c_184:i32 
+              jump label: L10_0 
+          label L10_0: 
+         786  new_var temp_158_value_from_ptr_188:i32 
+         787  temp_158_value_from_ptr_188 = load *i_0:ptr->i32 
+         788  mu i_0:787 
+         790  new_var temp_159_array_ptr_188:ptr->i32 
+         791  temp_159_array_ptr_188 = getelementptr *get2_0:Array:i32:[None] [Some(temp_158_value_from_ptr_188)] 
+         793  new_var temp_160_array_ele_188:i32 
+         794  temp_160_array_ele_188 = load temp_159_array_ptr_188:ptr->i32 
+         795  mu get2_0:794 
+         797  new_var temp_161_cmp_188:i1 
+         798  temp_161_cmp_188 = icmp i32 Eq temp_160_array_ele_188, 43_0 
+         801  br i1 temp_161_cmp_188, label branch_true_189, label branch_false_189 
+     799  label branch_true_189: 
+         454  new_var temp_84_arithop_188:i32 
+         455  temp_84_arithop_188 = Add i32 a_184, b_184 
+         456  c_184 = i32 temp_84_arithop_188 
+              jump label: branch_false_189 
+     800  label branch_false_189: 
+              jump label: L11_0 
+          label L11_0: 
+         803  new_var temp_162_value_from_ptr_191:i32 
+         804  temp_162_value_from_ptr_191 = load *i_0:ptr->i32 
+         805  mu i_0:804 
+         807  new_var temp_163_array_ptr_191:ptr->i32 
+         808  temp_163_array_ptr_191 = getelementptr *get2_0:Array:i32:[None] [Some(temp_162_value_from_ptr_191)] 
+         810  new_var temp_164_array_ele_191:i32 
+         811  temp_164_array_ele_191 = load temp_163_array_ptr_191:ptr->i32 
+         812  mu get2_0:811 
+         814  new_var temp_165_cmp_191:i1 
+         815  temp_165_cmp_191 = icmp i32 Eq temp_164_array_ele_191, 45_0 
+         818  br i1 temp_165_cmp_191, label branch_true_192, label branch_false_192 
+     816  label branch_true_192: 
+         450  new_var temp_83_arithop_191:i32 
+         451  temp_83_arithop_191 = Sub i32 b_184, a_184 
+         452  c_184 = i32 temp_83_arithop_191 
+              jump label: branch_false_192 
+     817  label branch_false_192: 
+              jump label: L12_0 
+          label L12_0: 
+         820  new_var temp_166_value_from_ptr_194:i32 
+         821  temp_166_value_from_ptr_194 = load *i_0:ptr->i32 
+         822  mu i_0:821 
+         824  new_var temp_167_array_ptr_194:ptr->i32 
+         825  temp_167_array_ptr_194 = getelementptr *get2_0:Array:i32:[None] [Some(temp_166_value_from_ptr_194)] 
+         827  new_var temp_168_array_ele_194:i32 
+         828  temp_168_array_ele_194 = load temp_167_array_ptr_194:ptr->i32 
+         829  mu get2_0:828 
+         831  new_var temp_169_cmp_194:i1 
+         832  temp_169_cmp_194 = icmp i32 Eq temp_168_array_ele_194, 42_0 
+         835  br i1 temp_169_cmp_194, label branch_true_195, label branch_false_195 
+     833  label branch_true_195: 
+         446  new_var temp_82_arithop_194:i32 
+         447  temp_82_arithop_194 = Mul i32 a_184, b_184 
+         448  c_184 = i32 temp_82_arithop_194 
+              jump label: branch_false_195 
+     834  label branch_false_195: 
+              jump label: L13_0 
+          label L13_0: 
+         837  new_var temp_170_value_from_ptr_197:i32 
+         838  temp_170_value_from_ptr_197 = load *i_0:ptr->i32 
+         839  mu i_0:838 
+         841  new_var temp_171_array_ptr_197:ptr->i32 
+         842  temp_171_array_ptr_197 = getelementptr *get2_0:Array:i32:[None] [Some(temp_170_value_from_ptr_197)] 
+         844  new_var temp_172_array_ele_197:i32 
+         845  temp_172_array_ele_197 = load temp_171_array_ptr_197:ptr->i32 
+         846  mu get2_0:845 
+         848  new_var temp_173_cmp_197:i1 
+         849  temp_173_cmp_197 = icmp i32 Eq temp_172_array_ele_197, 47_0 
+         852  br i1 temp_173_cmp_197, label branch_true_198, label branch_false_198 
+     850  label branch_true_198: 
+         442  new_var temp_81_arithop_197:i32 
+         443  temp_81_arithop_197 = Div i32 b_184, a_184 
+         444  c_184 = i32 temp_81_arithop_197 
+              jump label: branch_false_198 
+     851  label branch_false_198: 
+              jump label: L14_0 
+          label L14_0: 
+         854  new_var temp_174_value_from_ptr_200:i32 
+         855  temp_174_value_from_ptr_200 = load *i_0:ptr->i32 
+         856  mu i_0:855 
+         858  new_var temp_175_array_ptr_200:ptr->i32 
+         859  temp_175_array_ptr_200 = getelementptr *get2_0:Array:i32:[None] [Some(temp_174_value_from_ptr_200)] 
+         861  new_var temp_176_array_ele_200:i32 
+         862  temp_176_array_ele_200 = load temp_175_array_ptr_200:ptr->i32 
+         863  mu get2_0:862 
+         865  new_var temp_177_cmp_200:i1 
+         866  temp_177_cmp_200 = icmp i32 Eq temp_176_array_ele_200, 37_0 
+         869  br i1 temp_177_cmp_200, label branch_true_201, label branch_false_201 
+     867  label branch_true_201: 
+         438  new_var temp_80_arithop_200:i32 
+         439  temp_80_arithop_200 = Mod i32 b_184, a_184 
+         440  c_184 = i32 temp_80_arithop_200 
+              jump label: branch_false_201 
+     868  label branch_false_201: 
+              jump label: L15_0 
+          label L15_0: 
+         871  new_var temp_178_value_from_ptr_203:i32 
+         872  temp_178_value_from_ptr_203 = load *i_0:ptr->i32 
+         873  mu i_0:872 
+         875  new_var temp_179_array_ptr_203:ptr->i32 
+         876  temp_179_array_ptr_203 = getelementptr *get2_0:Array:i32:[None] [Some(temp_178_value_from_ptr_203)] 
+         878  new_var temp_180_array_ele_203:i32 
+         879  temp_180_array_ele_203 = load temp_179_array_ptr_203:ptr->i32 
+         880  mu get2_0:879 
+         882  new_var temp_181_cmp_203:i1 
+         883  temp_181_cmp_203 = icmp i32 Eq temp_180_array_ele_203, 94_0 
+         886  br i1 temp_181_cmp_203, label branch_true_204, label branch_false_204 
+     884  label branch_true_204: 
+         434  new_var temp_79_ret_of_power_203:i32 
+         435  temp_79_ret_of_power_203 =  Call i32 power_0(b_184, a_184) 
+         436  c_184 = i32 temp_79_ret_of_power_203 
+              jump label: branch_false_204 
+     885  label branch_false_204: 
+              jump label: L16_0 
+          label L16_0: 
+         432   Call void intpush_0(c_184) 
+         1608 mu intt_0:432 
+         1609 ints_0 = chi ints_0:432 
+         1610 intt_0 = chi intt_0:432 
+              jump label: gather_126 
+     759  label gather_126: 
+              jump label: L17_0 
+          label L17_0: 
+         348  new_var temp_59_value_from_ptr_181:i32 
+         349  temp_59_value_from_ptr_181 = load *i_0:ptr->i32 
+         350  mu i_0:349 
+         352  new_var temp_60_arithop_181:i32 
+         353  temp_60_arithop_181 = Add i32 temp_59_value_from_ptr_181, 1_0 
+         354  store temp_60_arithop_181:i32 *i_0:ptr->i32 
+         355  i_0 = chi i_0:354 
+              jump label: while.head_180 
+     738  label branch_short_circuit_p_false_820: 
+         655  new_var temp_128_value_from_ptr_182:i32 
+         656  temp_128_value_from_ptr_182 = load *i_0:ptr->i32 
+         657  mu i_0:656 
+         659  new_var temp_129_array_ptr_182:ptr->i32 
+         660  temp_129_array_ptr_182 = getelementptr *get2_0:Array:i32:[None] [Some(temp_128_value_from_ptr_182)] 
+         662  new_var temp_130_array_ele_182:i32 
+         663  temp_130_array_ele_182 = load temp_129_array_ptr_182:ptr->i32 
+         664  mu get2_0:663 
+         666  new_var temp_131_cmp_182:i1 
+         667  temp_131_cmp_182 = icmp i32 Eq temp_130_array_ele_182, 45_0 
+         740  br i1 temp_131_cmp_182, label branch_short_circuit_c_true_848, label branch_short_circuit_p_false_827 
+     735  label branch_short_circuit_p_false_827: 
+         669  new_var temp_132_value_from_ptr_182:i32 
+         670  temp_132_value_from_ptr_182 = load *i_0:ptr->i32 
+         671  mu i_0:670 
+         673  new_var temp_133_array_ptr_182:ptr->i32 
+         674  temp_133_array_ptr_182 = getelementptr *get2_0:Array:i32:[None] [Some(temp_132_value_from_ptr_182)] 
+         676  new_var temp_134_array_ele_182:i32 
+         677  temp_134_array_ele_182 = load temp_133_array_ptr_182:ptr->i32 
+         678  mu get2_0:677 
+         680  new_var temp_135_cmp_182:i1 
+         681  temp_135_cmp_182 = icmp i32 Eq temp_134_array_ele_182, 42_0 
+         737  br i1 temp_135_cmp_182, label branch_short_circuit_c_true_848, label branch_short_circuit_p_false_834 
+     732  label branch_short_circuit_p_false_834: 
+         683  new_var temp_136_value_from_ptr_182:i32 
+         684  temp_136_value_from_ptr_182 = load *i_0:ptr->i32 
+         685  mu i_0:684 
+         687  new_var temp_137_array_ptr_182:ptr->i32 
+         688  temp_137_array_ptr_182 = getelementptr *get2_0:Array:i32:[None] [Some(temp_136_value_from_ptr_182)] 
+         690  new_var temp_138_array_ele_182:i32 
+         691  temp_138_array_ele_182 = load temp_137_array_ptr_182:ptr->i32 
+         692  mu get2_0:691 
+         694  new_var temp_139_cmp_182:i1 
+         695  temp_139_cmp_182 = icmp i32 Eq temp_138_array_ele_182, 47_0 
+         734  br i1 temp_139_cmp_182, label branch_short_circuit_c_true_848, label branch_short_circuit_p_false_841 
+     729  label branch_short_circuit_p_false_841: 
+         697  new_var temp_140_value_from_ptr_182:i32 
+         698  temp_140_value_from_ptr_182 = load *i_0:ptr->i32 
+         699  mu i_0:698 
+         701  new_var temp_141_array_ptr_182:ptr->i32 
+         702  temp_141_array_ptr_182 = getelementptr *get2_0:Array:i32:[None] [Some(temp_140_value_from_ptr_182)] 
+         704  new_var temp_142_array_ele_182:i32 
+         705  temp_142_array_ele_182 = load temp_141_array_ptr_182:ptr->i32 
+         706  mu get2_0:705 
+         708  new_var temp_143_cmp_182:i1 
+         709  temp_143_cmp_182 = icmp i32 Eq temp_142_array_ele_182, 37_0 
+         731  br i1 temp_143_cmp_182, label branch_short_circuit_c_true_848, label branch_short_circuit_p_false_848 
+     726  label branch_short_circuit_p_false_848: 
+         711  new_var temp_144_value_from_ptr_182:i32 
+         712  temp_144_value_from_ptr_182 = load *i_0:ptr->i32 
+         713  mu i_0:712 
+         715  new_var temp_145_array_ptr_182:ptr->i32 
+         716  temp_145_array_ptr_182 = getelementptr *get2_0:Array:i32:[None] [Some(temp_144_value_from_ptr_182)] 
+         718  new_var temp_146_array_ele_182:i32 
+         719  temp_146_array_ele_182 = load temp_145_array_ptr_182:ptr->i32 
+         720  mu get2_0:719 
+         722  new_var temp_147_cmp_182:i1 
+         723  temp_147_cmp_182 = icmp i32 Eq temp_146_array_ele_182, 94_0 
+         728  br i1 temp_147_cmp_182, label branch_short_circuit_c_true_848, label branch_short_circuit_c_false_848 
+     725  label branch_short_circuit_c_false_848: 
+         743  new_var temp_148_value_from_ptr_208:i32 
+         744  temp_148_value_from_ptr_208 = load *i_0:ptr->i32 
+         745  mu i_0:744 
+         747  new_var temp_149_array_ptr_208:ptr->i32 
+         748  temp_149_array_ptr_208 = getelementptr *get2_0:Array:i32:[None] [Some(temp_148_value_from_ptr_208)] 
+         750  new_var temp_150_array_ele_208:i32 
+         751  temp_150_array_ele_208 = load temp_149_array_ptr_208:ptr->i32 
+         752  mu get2_0:751 
+         754  new_var temp_151_cmp_208:i1 
+         755  temp_151_cmp_208 = icmp i32 Ne temp_150_array_ele_208, 32_0 
+         758  br i1 temp_151_cmp_208, label branch_true_209, label branch_false_209 
+     756  label branch_true_209: 
+         357  new_var temp_61_value_from_ptr_210:i32 
+         358  temp_61_value_from_ptr_210 = load *i_0:ptr->i32 
+         359  mu i_0:358 
+         361  new_var temp_62_array_ptr_210:ptr->i32 
+         362  temp_62_array_ptr_210 = getelementptr *get2_0:Array:i32:[None] [Some(temp_61_value_from_ptr_210)] 
+         364  new_var temp_63_array_ele_210:i32 
+         365  temp_63_array_ele_210 = load temp_62_array_ptr_210:ptr->i32 
+         366  mu get2_0:365 
+         368  new_var temp_64_arithop_210:i32 
+         369  temp_64_arithop_210 = Sub i32 temp_63_array_ele_210, 48_0 
+         370   Call void intpush_0(temp_64_arithop_210) 
+         1611 mu intt_0:370 
+         1612 ints_0 = chi ints_0:370 
+         1613 intt_0 = chi intt_0:370 
+         371  store 1_0:i32 *ii_0:ptr->i32 
+         372  ii_0 = chi ii_0:371 
+              jump label: while.head_214 
+     781  label while.head_214: 
+         761  new_var temp_152_value_from_ptr_213:i32 
+         762  temp_152_value_from_ptr_213 = load *i_0:ptr->i32 
+         763  mu i_0:762 
+         765  new_var temp_153_value_from_ptr_213:i32 
+         766  temp_153_value_from_ptr_213 = load *ii_0:ptr->i32 
+         767  mu ii_0:766 
+         769  new_var temp_154_arithop_213:i32 
+         770  temp_154_arithop_213 = Add i32 temp_152_value_from_ptr_213, temp_153_value_from_ptr_213 
+         772  new_var temp_155_array_ptr_213:ptr->i32 
+         773  temp_155_array_ptr_213 = getelementptr *get2_0:Array:i32:[None] [Some(temp_154_arithop_213)] 
+         775  new_var temp_156_array_ele_213:i32 
+         776  temp_156_array_ele_213 = load temp_155_array_ptr_213:ptr->i32 
+         777  mu get2_0:776 
+         779  new_var temp_157_cmp_213:i1 
+         780  temp_157_cmp_213 = icmp i32 Ne temp_156_array_ele_213, 32_0 
+         784  br i1 temp_157_cmp_213, label while.body_214, label while.exit_214 
+     782  label while.body_214: 
+         390  new_var temp_69_value_from_ptr_215:i32 
+         391  temp_69_value_from_ptr_215 = load *i_0:ptr->i32 
+         392  mu i_0:391 
+         394  new_var temp_70_value_from_ptr_215:i32 
+         395  temp_70_value_from_ptr_215 = load *ii_0:ptr->i32 
+         396  mu ii_0:395 
+         398  new_var temp_71_arithop_215:i32 
+         399  temp_71_arithop_215 = Add i32 temp_69_value_from_ptr_215, temp_70_value_from_ptr_215 
+         401  new_var temp_72_array_ptr_215:ptr->i32 
+         402  temp_72_array_ptr_215 = getelementptr *get2_0:Array:i32:[None] [Some(temp_71_arithop_215)] 
+         404  new_var temp_73_array_ele_215:i32 
+         405  temp_73_array_ele_215 = load temp_72_array_ptr_215:ptr->i32 
+         406  mu get2_0:405 
+         408  new_var temp_74_arithop_215:i32 
+         409  temp_74_arithop_215 = Sub i32 temp_73_array_ele_215, 48_0 
+         410   Call void intadd_0(temp_74_arithop_215) 
+         1614 mu intt_0:410 
+         1615 mu ints_0:410 
+         1616 ints_0 = chi ints_0:410 
+         412  new_var temp_75_value_from_ptr_215:i32 
+         413  temp_75_value_from_ptr_215 = load *ii_0:ptr->i32 
+         414  mu ii_0:413 
+         416  new_var temp_76_arithop_215:i32 
+         417  temp_76_arithop_215 = Add i32 temp_75_value_from_ptr_215, 1_0 
+         418  store temp_76_arithop_215:i32 *ii_0:ptr->i32 
+         419  ii_0 = chi ii_0:418 
+              jump label: while.head_214 
+     783  label while.exit_214: 
+         374  new_var temp_65_value_from_ptr_210:i32 
+         375  temp_65_value_from_ptr_210 = load *i_0:ptr->i32 
+         376  mu i_0:375 
+         378  new_var temp_66_value_from_ptr_210:i32 
+         379  temp_66_value_from_ptr_210 = load *ii_0:ptr->i32 
+         380  mu ii_0:379 
+         382  new_var temp_67_arithop_210:i32 
+         383  temp_67_arithop_210 = Add i32 temp_65_value_from_ptr_210, temp_66_value_from_ptr_210 
+         385  new_var temp_68_arithop_210:i32 
+         386  temp_68_arithop_210 = Sub i32 temp_67_arithop_210, 1_0 
+         387  store temp_68_arithop_210:i32 *i_0:ptr->i32 
+         388  i_0 = chi i_0:387 
+              jump label: branch_false_209 
+     757  label branch_false_209: 
+              jump label: gather_126 
+     636  label while.exit_180: 
+         338  new_var temp_57_array_ptr_87:ptr->i32 
+         339  temp_57_array_ptr_87 = getelementptr *ints_0:Array:i32:[None] [Some(1_0)] 
+         341  new_var temp_58_array_ele_87:i32 
+         342  temp_58_array_ele_87 = load temp_57_array_ptr_87:ptr->i32 
+         343  mu ints_0:342 
+         344   Call void putint_0(temp_58_array_ele_87) 
+         1617 mu intt_0:346 
+         1618 mu get2_0:346 
+         1619 mu i_0:346 
+         1620 mu c_0:346 
+         1621 mu chat_0:346 
+         1622 mu ii_0:346 
+         346  ret 0_0 
+ 42   Define find_0 "" -> find_ret_0 
+         1522 get2_0 = chi get2_0:42 
+         1523 ii_0 = chi ii_0:42 
+         1524 c_0 = chi c_0:42 
+         262  alloc i32 temp_43_ret_of_chapop_77 
+         267  alloc i32 temp_44_value_from_ptr_77 
+         271  alloc ptr->i32 temp_45_index_ptr_77 
+         276  alloc i32 temp_46_value_from_ptr_77 
+         280  alloc i32 temp_47_arithop_77 
+         283  alloc ptr->i32 temp_48_index_ptr_77 
+         286  alloc i32 temp_49_value_from_ptr_77 
+         292  alloc i32 temp_50_value_from_ptr_77 
+         296  alloc i32 temp_51_arithop_77 
+         305  alloc i32 temp_52_value_from_ptr_82 
+         309  alloc i1 temp_53_cmp_82 
+          label L18_0: 
+         263  new_var temp_43_ret_of_chapop_77:i32 
+         264  temp_43_ret_of_chapop_77 =  Call i32 chapop_0() 
+         1525 mu chas_0:264 
+         1526 mu chat_0:264 
+         1527 chat_0 = chi chat_0:264 
+         265  store temp_43_ret_of_chapop_77:i32 *c_0:ptr->i32 
+         266  c_0 = chi c_0:265 
+         268  new_var temp_44_value_from_ptr_77:i32 
+         269  temp_44_value_from_ptr_77 = load *ii_0:ptr->i32 
+         270  mu ii_0:269 
+         272  new_var temp_45_index_ptr_77:ptr->i32 
+         273  temp_45_index_ptr_77 = getelementptr *get2_0:ptr->i32 [Some(temp_44_value_from_ptr_77)] 
+         274  store 32_0:i32 temp_45_index_ptr_77:ptr->i32 
+         275  get2_0 = chi get2_0:274 
+         277  new_var temp_46_value_from_ptr_77:i32 
+         278  temp_46_value_from_ptr_77 = load *ii_0:ptr->i32 
+         279  mu ii_0:278 
+         281  new_var temp_47_arithop_77:i32 
+         282  temp_47_arithop_77 = Add i32 temp_46_value_from_ptr_77, 1_0 
+         284  new_var temp_48_index_ptr_77:ptr->i32 
+         285  temp_48_index_ptr_77 = getelementptr *get2_0:ptr->i32 [Some(temp_47_arithop_77)] 
+         287  new_var temp_49_value_from_ptr_77:i32 
+         288  temp_49_value_from_ptr_77 = load *c_0:ptr->i32 
+         289  mu c_0:288 
+         290  store temp_49_value_from_ptr_77:i32 temp_48_index_ptr_77:ptr->i32 
+         291  get2_0 = chi get2_0:290 
+         293  new_var temp_50_value_from_ptr_77:i32 
+         294  temp_50_value_from_ptr_77 = load *ii_0:ptr->i32 
+         295  mu ii_0:294 
+         297  new_var temp_51_arithop_77:i32 
+         298  temp_51_arithop_77 = Add i32 temp_50_value_from_ptr_77, 2_0 
+         299  store temp_51_arithop_77:i32 *ii_0:ptr->i32 
+         300  ii_0 = chi ii_0:299 
+              jump label: L19_0 
+          label L19_0: 
+         306  new_var temp_52_value_from_ptr_82:i32 
+         307  temp_52_value_from_ptr_82 = load *chat_0:ptr->i32 
+         308  mu chat_0:307 
+         310  new_var temp_53_cmp_82:i1 
+         311  temp_53_cmp_82 = icmp i32 Eq temp_52_value_from_ptr_82, 0_0 
+         314  br i1 temp_53_cmp_82, label branch_true_83, label branch_false_83 
+     312  label branch_true_83: 
+         1528 mu get2_0:304 
+         1529 mu ii_0:304 
+         1530 mu c_0:304 
+         304  ret 0_0 
+     313  label branch_false_83: 
+              jump label: L20_0 
+          label L20_0: 
+         1531 mu get2_0:302 
+         1532 mu ii_0:302 
+         1533 mu c_0:302 
+         302  ret 1_0 
+ 41   Define intadd_0 "x_71," -> intadd_ret_0 
+         1520 ints_0 = chi ints_0:41 
+         214  alloc i32 temp_31_value_from_ptr_73 
+         218  alloc ptr->i32 temp_32_index_ptr_73 
+         221  alloc i32 temp_33_value_from_ptr_73 
+         225  alloc ptr->i32 temp_34_array_ptr_73 
+         228  alloc i32 temp_35_array_ele_73 
+         232  alloc i32 temp_36_arithop_73 
+         237  alloc i32 temp_37_value_from_ptr_73 
+         241  alloc ptr->i32 temp_38_index_ptr_73 
+         244  alloc i32 temp_39_value_from_ptr_73 
+         248  alloc ptr->i32 temp_40_array_ptr_73 
+         251  alloc i32 temp_41_array_ele_73 
+         255  alloc i32 temp_42_arithop_73 
+          label L21_0: 
+         215  new_var temp_31_value_from_ptr_73:i32 
+         216  temp_31_value_from_ptr_73 = load *intt_0:ptr->i32 
+         217  mu intt_0:216 
+         219  new_var temp_32_index_ptr_73:ptr->i32 
+         220  temp_32_index_ptr_73 = getelementptr *ints_0:ptr->i32 [Some(temp_31_value_from_ptr_73)] 
+         222  new_var temp_33_value_from_ptr_73:i32 
+         223  temp_33_value_from_ptr_73 = load *intt_0:ptr->i32 
+         224  mu intt_0:223 
+         226  new_var temp_34_array_ptr_73:ptr->i32 
+         227  temp_34_array_ptr_73 = getelementptr *ints_0:Array:i32:[None] [Some(temp_33_value_from_ptr_73)] 
+         229  new_var temp_35_array_ele_73:i32 
+         230  temp_35_array_ele_73 = load temp_34_array_ptr_73:ptr->i32 
+         231  mu ints_0:230 
+         233  new_var temp_36_arithop_73:i32 
+         234  temp_36_arithop_73 = Mul i32 temp_35_array_ele_73, 10_0 
+         235  store temp_36_arithop_73:i32 temp_32_index_ptr_73:ptr->i32 
+         236  ints_0 = chi ints_0:235 
+         238  new_var temp_37_value_from_ptr_73:i32 
+         239  temp_37_value_from_ptr_73 = load *intt_0:ptr->i32 
+         240  mu intt_0:239 
+         242  new_var temp_38_index_ptr_73:ptr->i32 
+         243  temp_38_index_ptr_73 = getelementptr *ints_0:ptr->i32 [Some(temp_37_value_from_ptr_73)] 
+         245  new_var temp_39_value_from_ptr_73:i32 
+         246  temp_39_value_from_ptr_73 = load *intt_0:ptr->i32 
+         247  mu intt_0:246 
+         249  new_var temp_40_array_ptr_73:ptr->i32 
+         250  temp_40_array_ptr_73 = getelementptr *ints_0:Array:i32:[None] [Some(temp_39_value_from_ptr_73)] 
+         252  new_var temp_41_array_ele_73:i32 
+         253  temp_41_array_ele_73 = load temp_40_array_ptr_73:ptr->i32 
+         254  mu ints_0:253 
+         256  new_var temp_42_arithop_73:i32 
+         257  temp_42_arithop_73 = Add i32 temp_41_array_ele_73, x_71 
+         258  store temp_42_arithop_73:i32 temp_38_index_ptr_73:ptr->i32 
+         259  ints_0 = chi ints_0:258 
+              jump label: exit_32 
+     261  label exit_32: 
+         1521 mu ints_0:260 
+         260  ret 
+ 40   Define chapop_0 "" -> chapop_ret_0 
+         1518 chat_0 = chi chat_0:40 
+         187  alloc i32 temp_25_value_from_ptr_68 
+         191  alloc i32 temp_26_arithop_68 
+         197  alloc i32 temp_27_value_from_ptr_68 
+         201  alloc i32 temp_28_arithop_68 
+         204  alloc ptr->i32 temp_29_array_ptr_68 
+         207  alloc i32 temp_30_array_ele_68 
+          label L22_0: 
+         188  new_var temp_25_value_from_ptr_68:i32 
+         189  temp_25_value_from_ptr_68 = load *chat_0:ptr->i32 
+         190  mu chat_0:189 
+         192  new_var temp_26_arithop_68:i32 
+         193  temp_26_arithop_68 = Sub i32 temp_25_value_from_ptr_68, 1_0 
+         194  store temp_26_arithop_68:i32 *chat_0:ptr->i32 
+         195  chat_0 = chi chat_0:194 
+         198  new_var temp_27_value_from_ptr_68:i32 
+         199  temp_27_value_from_ptr_68 = load *chat_0:ptr->i32 
+         200  mu chat_0:199 
+         202  new_var temp_28_arithop_68:i32 
+         203  temp_28_arithop_68 = Add i32 temp_27_value_from_ptr_68, 1_0 
+         205  new_var temp_29_array_ptr_68:ptr->i32 
+         206  temp_29_array_ptr_68 = getelementptr *chas_0:Array:i32:[None] [Some(temp_28_arithop_68)] 
+         208  new_var temp_30_array_ele_68:i32 
+         209  temp_30_array_ele_68 = load temp_29_array_ptr_68:ptr->i32 
+         210  mu chas_0:209 
+         1519 mu chat_0:211 
+         211  ret temp_30_array_ele_68 
+ 39   Define intpop_0 "" -> intpop_ret_0 
+         1516 intt_0 = chi intt_0:39 
+         160  alloc i32 temp_19_value_from_ptr_64 
+         164  alloc i32 temp_20_arithop_64 
+         170  alloc i32 temp_21_value_from_ptr_64 
+         174  alloc i32 temp_22_arithop_64 
+         177  alloc ptr->i32 temp_23_array_ptr_64 
+         180  alloc i32 temp_24_array_ele_64 
+          label L23_0: 
+         161  new_var temp_19_value_from_ptr_64:i32 
+         162  temp_19_value_from_ptr_64 = load *intt_0:ptr->i32 
+         163  mu intt_0:162 
+         165  new_var temp_20_arithop_64:i32 
+         166  temp_20_arithop_64 = Sub i32 temp_19_value_from_ptr_64, 1_0 
+         167  store temp_20_arithop_64:i32 *intt_0:ptr->i32 
+         168  intt_0 = chi intt_0:167 
+         171  new_var temp_21_value_from_ptr_64:i32 
+         172  temp_21_value_from_ptr_64 = load *intt_0:ptr->i32 
+         173  mu intt_0:172 
+         175  new_var temp_22_arithop_64:i32 
+         176  temp_22_arithop_64 = Add i32 temp_21_value_from_ptr_64, 1_0 
+         178  new_var temp_23_array_ptr_64:ptr->i32 
+         179  temp_23_array_ptr_64 = getelementptr *ints_0:Array:i32:[None] [Some(temp_22_arithop_64)] 
+         181  new_var temp_24_array_ele_64:i32 
+         182  temp_24_array_ele_64 = load temp_23_array_ptr_64:ptr->i32 
+         183  mu ints_0:182 
+         1517 mu intt_0:184 
+         184  ret temp_24_array_ele_64 
+ 38   Define chapush_0 "x_58," -> chapush_ret_0 
+         1512 chat_0 = chi chat_0:38 
+         1513 chas_0 = chi chas_0:38 
+         140  alloc i32 temp_15_value_from_ptr_60 
+         144  alloc i32 temp_16_arithop_60 
+         149  alloc i32 temp_17_value_from_ptr_60 
+         153  alloc ptr->i32 temp_18_index_ptr_60 
+          label L24_0: 
+         141  new_var temp_15_value_from_ptr_60:i32 
+         142  temp_15_value_from_ptr_60 = load *chat_0:ptr->i32 
+         143  mu chat_0:142 
+         145  new_var temp_16_arithop_60:i32 
+         146  temp_16_arithop_60 = Add i32 temp_15_value_from_ptr_60, 1_0 
+         147  store temp_16_arithop_60:i32 *chat_0:ptr->i32 
+         148  chat_0 = chi chat_0:147 
+         150  new_var temp_17_value_from_ptr_60:i32 
+         151  temp_17_value_from_ptr_60 = load *chat_0:ptr->i32 
+         152  mu chat_0:151 
+         154  new_var temp_18_index_ptr_60:ptr->i32 
+         155  temp_18_index_ptr_60 = getelementptr *chas_0:ptr->i32 [Some(temp_17_value_from_ptr_60)] 
+         156  store x_58:i32 temp_18_index_ptr_60:ptr->i32 
+         157  chas_0 = chi chas_0:156 
+              jump label: exit_23 
+     159  label exit_23: 
+         1514 mu chat_0:158 
+         1515 mu chas_0:158 
+         158  ret 
+ 37   Define intpush_0 "x_53," -> intpush_ret_0 
+         1508 ints_0 = chi ints_0:37 
+         1509 intt_0 = chi intt_0:37 
+         120  alloc i32 temp_11_value_from_ptr_55 
+         124  alloc i32 temp_12_arithop_55 
+         129  alloc i32 temp_13_value_from_ptr_55 
+         133  alloc ptr->i32 temp_14_index_ptr_55 
+          label L25_0: 
+         121  new_var temp_11_value_from_ptr_55:i32 
+         122  temp_11_value_from_ptr_55 = load *intt_0:ptr->i32 
+         123  mu intt_0:122 
+         125  new_var temp_12_arithop_55:i32 
+         126  temp_12_arithop_55 = Add i32 temp_11_value_from_ptr_55, 1_0 
+         127  store temp_12_arithop_55:i32 *intt_0:ptr->i32 
+         128  intt_0 = chi intt_0:127 
+         130  new_var temp_13_value_from_ptr_55:i32 
+         131  temp_13_value_from_ptr_55 = load *intt_0:ptr->i32 
+         132  mu intt_0:131 
+         134  new_var temp_14_index_ptr_55:ptr->i32 
+         135  temp_14_index_ptr_55 = getelementptr *ints_0:ptr->i32 [Some(temp_13_value_from_ptr_55)] 
+         136  store x_53:i32 temp_14_index_ptr_55:ptr->i32 
+         137  ints_0 = chi ints_0:136 
+              jump label: exit_20 
+     139  label exit_20: 
+         1510 mu ints_0:138 
+         1511 mu intt_0:138 
+         138  ret 
+ 36   Define getstr_0 "get_41," -> getstr_ret_0 
+         83   alloc i32 temp_5_ret_of_getch_43 
+         87   alloc i32 x_43 
+         89   alloc i32 length_43 
+         92   alloc ptr->i32 temp_6_index_ptr_48 
+         97   alloc i32 temp_7_arithop_48 
+         101  alloc i32 temp_8_ret_of_getch_48 
+         105  alloc i1 temp_9_cmp_46 
+         108  alloc i1 temp_10_cmp_46 
+          label L26_0: 
+         35   new_var get_41:ptr->i32 
+         84   new_var temp_5_ret_of_getch_43:i32 
+         85   temp_5_ret_of_getch_43 =  Call i32 getch_0() 
+         86   x_43 = i32 temp_5_ret_of_getch_43 
+         88   (nop) 
+         1730 length_43 = i32 0_0 
+              jump label: while.head_47 
+     116  label while.head_47: 
+         106  new_var temp_9_cmp_46:i1 
+         107  temp_9_cmp_46 = icmp i32 Ne x_43, 13_0 
+         117  br i1 temp_9_cmp_46, label branch_short_circuit_p_true_318, label branch_short_circuit_c_false_318 
+     113  label branch_short_circuit_p_true_318: 
+         109  new_var temp_10_cmp_46:i1 
+         110  temp_10_cmp_46 = icmp i32 Ne x_43, 10_0 
+         115  br i1 temp_10_cmp_46, label branch_short_circuit_c_true_318, label branch_short_circuit_c_false_318 
+     111  label branch_short_circuit_c_true_318: 
+         93   new_var temp_6_index_ptr_48:ptr->i32 
+         94   temp_6_index_ptr_48 = getelementptr get_41:ptr->i32 [Some(length_43)] 
+         95   store x_43:i32 temp_6_index_ptr_48:ptr->i32 
+         96   get_41 = chi get_41:95 
+         98   new_var temp_7_arithop_48:i32 
+         99   temp_7_arithop_48 = Add i32 length_43, 1_0 
+         100  length_43 = i32 temp_7_arithop_48 
+         102  new_var temp_8_ret_of_getch_48:i32 
+         103  temp_8_ret_of_getch_48 =  Call i32 getch_0() 
+         104  x_43 = i32 temp_8_ret_of_getch_48 
+              jump label: while.head_47 
+     112  label branch_short_circuit_c_false_318: 
+         1507 mu get_41:91 
+         91   ret length_43 
+ 34   Define power_0 "b_31,a_31," -> power_ret_0 
+         63   alloc i32 result_33 
+         66   alloc i32 temp_2_arithop_37 
+         70   alloc i32 temp_3_arithop_37 
+         74   alloc i1 temp_4_cmp_35 
+          label L27_0: 
+         62   (nop) 
+         1729 result_33 = i32 1_0 
+              jump label: while.head_36 
+     77   label while.head_36: 
+         75   new_var temp_4_cmp_35:i1 
+         76   temp_4_cmp_35 = icmp i32 Ne a_31, 0_0 
+         80   br i1 temp_4_cmp_35, label while.body_36, label while.exit_36 
+     78   label while.body_36: 
+         67   new_var temp_2_arithop_37:i32 
+         68   temp_2_arithop_37 = Mul i32 result_33, b_31 
+         69   result_33 = i32 temp_2_arithop_37 
+         71   new_var temp_3_arithop_37:i32 
+         72   temp_3_arithop_37 = Sub i32 a_31, 1_0 
+         73   a_31 = i32 temp_3_arithop_37 
+              jump label: while.head_36 
+     79   label while.exit_36: 
+         65   ret result_33 
+ 33   Define isdigit_0 "x_24," -> isdigit_ret_0 
+         48   alloc i1 temp_0_cmp_27 
+         51   alloc i1 temp_1_cmp_27 
+          label L28_0: 
+         49   new_var temp_0_cmp_27:i1 
+         50   temp_0_cmp_27 = icmp i32 Sge x_24, 48_0 
+         59   br i1 temp_0_cmp_27, label branch_short_circuit_p_true_240, label branch_short_circuit_c_false_240 
+     56   label branch_short_circuit_p_true_240: 
+         52   new_var temp_1_cmp_27:i1 
+         53   temp_1_cmp_27 = icmp i32 Sle x_24, 57_0 
+         58   br i1 temp_1_cmp_27, label branch_short_circuit_c_true_240, label branch_short_circuit_c_false_240 
+     54   label branch_short_circuit_c_true_240: 
+         47   ret 1_0 
+     55   label branch_short_circuit_c_false_240: 
+              jump label: L29_0 
+          label L29_0: 
+         45   ret 0_0 

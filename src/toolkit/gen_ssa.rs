@@ -459,7 +459,7 @@ pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut
                                     phi_pair.comming_cfg_node
                                 };
                                 node_mut!(at target_cfg_node in cfg_graph).push_nhwc_instr(
-                                    NhwcInstrType::new_assign(lhs.clone()
+                                    NhwcInstrType::new_assign(lhs.as_ref_borrow().to_src_symidx().as_rc()
                                     , phi_pair.symidx.clone(), 
                                     symtab.get(&lhs.as_ref_borrow().to_src_symidx())?.get_type()?.clone()).into()
                                     , instr_slab)?;
