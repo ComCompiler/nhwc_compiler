@@ -240,7 +240,7 @@ pub fn parse_instr_list_to_et(instrs:impl Iterator<Item = usize>, instr_et:&mut 
                                 process_arith_et(rc_lhs,a, b,instr,arith_et_struct,instr_et,rc_symidx_et_node_map,scope_tree,instr_et_node_map );
                             },
                             super::nhwc_instr::IcmpPlan::Sge => {
-                                let arith_et_struct:EtNode = EtNodeType::new_op_less_than(0).into();
+                                let arith_et_struct:EtNode = EtNodeType::new_op_greater_than_or_equal(0).into();
                                 process_arith_et(rc_lhs,a, b,instr,arith_et_struct,instr_et,rc_symidx_et_node_map,scope_tree,instr_et_node_map );
                             },
                             super::nhwc_instr::IcmpPlan::Slt => {

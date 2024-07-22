@@ -10,6 +10,7 @@ use crate::toolkit::field::Field;
 use crate::toolkit::symtab::WithBorrow;
 use crate::{debug_info_red, make_field_trait_for_struct, reg_field_for_struct};
 
+use super::field::TypeDiscriminants;
 use super::rv64_instr::{REG_A_RANGE, REG_FA_RANGE, REG_FS_RANGE, REG_S_RANGE, REG_T_RANGE};
 
 use super::symtab::SymIdx;
@@ -155,7 +156,7 @@ impl RegTab{
         }
     }
     /// occupy a anonymous reg
-    pub fn find_and_anonymous_occupy(&mut self, symidx:&SymIdx, sym_ty:&Type,symtab:&mut SymTab, asm_sect:&mut AsmSection,  
+    pub fn find_and_anonymous_occupy(&mut self, symidx:&SymIdx, sym_ty:&TypeDiscriminants,symtab:&mut SymTab, asm_sect:&mut AsmSection,  
         store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
         load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,) -> Result<Register>{
         let reg = self.find_avail_reg_for_ty_and_try_release(sym_ty, symtab, asm_sect, store_f)?;
@@ -175,7 +176,7 @@ impl RegTab{
     /// if symidx's value is not in reg, it will run load_f to load it, the load_f is exec after the reg occupied
     /// *Mention*
     /// literal symidx must be temp 
-    pub fn find_and_occupy_reg(&mut self, symidx:&SymIdx, sym_ty:&Type,symtab:&mut SymTab, asm_sect:&mut AsmSection,  
+    pub fn find_and_occupy_reg(&mut self, symidx:&SymIdx, sym_ty:&TypeDiscriminants,symtab:&mut SymTab, asm_sect:&mut AsmSection,  
         store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
         load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
     )-> Result<Register>{
@@ -347,17 +348,16 @@ impl RegTab{
         }
         Ok(())
     }
-    pub fn find_avail_reg_for_ty_and_try_release(&mut self, sym_ty:&Type, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self)-> Result<()>) -> Result<Register>{
+    pub fn find_avail_reg_for_ty_and_try_release(&mut self, sym_ty:&TypeDiscriminants, symtab:&mut SymTab,asm_sect:&mut AsmSection, store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self)-> Result<()>) -> Result<Register>{
         let reg = self.find_avail_reg_for_ty(sym_ty)?;
         self.try_release_reg(reg.clone(), symtab, asm_sect, store_f)?;
         Ok(reg)
     }
     /// ret a Released register or Freed register of sym_ty
     /// should keep one released reg always  
-    pub fn find_avail_reg_for_ty(&mut self, sym_ty:&Type) -> Result<Register> {
+    pub fn find_avail_reg_for_ty(&mut self, sym_ty:&TypeDiscriminants) -> Result<Register> {
         // find tail in priority 
         // only use s register when meet i32 or ptr or i1
-        let sym_ty = sym_ty.get_ele_ty();
         if sym_ty.is_i_32() || sym_ty.is_i_1() || sym_ty.is_ptr_64(){
             // alloc priority:
             // 1. released reg
@@ -473,7 +473,7 @@ impl RegTab{
                             self.release_reg(reg.clone(), symtab, asm_sect, store_f)?;
                         };
                         if *tracked2{
-                            let ty = symtab.get(&symidx2)?.get_type()?.clone();
+                            let ty = symtab.get(&symidx2)?.get_type()?.into();
                             // placeholder 
                             self.load_into(reg.clone(), &symidx2, &ty, symtab, asm_sect, store_f, load_f)?;
                         }else {
@@ -488,7 +488,7 @@ impl RegTab{
                 },
                 (RegState::Released,RegState::Freed { symidx, tracked }) => {
                     if *tracked{
-                        let ty = symtab.get(symidx)?.get_type()?.clone();
+                        let ty = symtab.get(symidx)?.get_type()?.into();
                         self.load_into(reg.clone(), &symidx, &ty, symtab, asm_sect, store_f, load_f)?;
                     }else {
                         return Err(anyhow!("target regtab should have no temp variable in suit"))
@@ -555,12 +555,12 @@ impl RegTab{
         Ok(())
     }
     /// load a symbol into specified register should track
-    pub fn load_into(&mut self,reg:Register,symidx:&SymIdx,sym_ty:&Type,symtab:&mut SymTab,asm_sect:&mut AsmSection,
+    pub fn load_into(&mut self,reg:Register,symidx:&SymIdx,sym_ty:&TypeDiscriminants,symtab:&mut SymTab,asm_sect:&mut AsmSection,
         store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
         load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>
     ,) -> Result<Register>{
         match sym_ty{
-            Type::F32 => {
+            TypeDiscriminants::F32 => {
                 assert!(reg.is_fpr())
             },
             _ => {}
@@ -572,12 +572,12 @@ impl RegTab{
         load_f(symidx.clone(),reg.clone(),symtab,asm_sect,self)?;
         Ok(reg)
     }
-    pub fn anonymous_load_into(&mut self,reg:Register,symidx:&SymIdx,sym_ty:&Type,symtab:&mut SymTab,asm_sect:&mut AsmSection,
+    pub fn anonymous_load_into(&mut self,reg:Register,symidx:&SymIdx,sym_ty:&TypeDiscriminants,symtab:&mut SymTab,asm_sect:&mut AsmSection,
         store_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>,
         load_f:&mut impl FnMut(SymIdx,Register,&mut SymTab,&mut AsmSection,&mut Self) -> Result<()>
     ,) -> Result<Register>{
         match sym_ty{
-            Type::F32 => {
+            TypeDiscriminants::F32 => {
                 assert!(reg.is_fpr())
             },
             _ => {}

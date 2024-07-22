@@ -1,13 +1,14 @@
 use std::fs;
 use std::io::Write;
+use std::rc::Rc;
 
 
 use crate::toolkit::cfg_node::CFG_ROOT;
 use crate::toolkit::gen_nhwc_cfg;
 use crate::toolkit::nhwc_instr::NhwcInstrType;
 use crate::toolkit::scope_node::ST_ROOT;
-use crate::toolkit::symtab::RcSymIdx;
-use crate::{direct_child_node, instr, node_mut};
+use crate::toolkit::symtab::{RcSymIdx, WithBorrow};
+use crate::{direct_child_node, instr, instr_mut, node_mut};
 
 use crate::{node, toolkit::{cfg_edge::CfgEdgeType, context::NhwcCtx, etc::dfs_with_priority, pass_manager::Pass}};
 use anyhow::*;
@@ -49,8 +50,7 @@ impl Pass for NhwcDumpPass {
         let mut anonymous_label_count = 0;
         for &cfg_node in dfs_node_vec.iter(){
             let cfg_node_struct = node_mut!(at cfg_node in cfg_graph);
-            if !(cfg_node_struct.cfg_node_type.is_exit() || 
-                cfg_node_struct.cfg_node_type.is_entry() ||
+            if !( cfg_node_struct.cfg_node_type.is_entry() ||
                 cfg_node_struct.cfg_node_type.is_root()) && cfg_node_struct.op_label_instr.is_none(){
                     let anonymous_label_symidx = gen_nhwc_cfg::process_label_symbol(cfg_node,ST_ROOT,format!("L{}",anonymous_label_count),symtab)?;
                     let anonymous_label= NhwcInstrType::new_label(anonymous_label_symidx).into();
@@ -74,6 +74,31 @@ impl Pass for NhwcDumpPass {
                         }
                     }
                 }
+            }
+        }
+        for &cfg_node in dfs_node_vec.iter(){
+            if cfg_node == CFG_ROOT|| node!(at cfg_node in cfg_graph).cfg_node_type.is_entry(){continue;}
+            // println!("{:?}",node!(at cfg_node in cfg_graph));
+            let &jump_instr = node!(at cfg_node in cfg_graph).op_jump_instr.as_ref().unwrap();
+            match &instr!(at jump_instr in instr_slab)?.instr_type{
+                NhwcInstrType::Jump { jump_op } => {
+                    match jump_op{
+                        crate::toolkit::nhwc_instr::JumpOp::Br { cond, t1, t2 } => {
+                            // if cond is constant then replace it 
+                            if cond.as_ref_borrow().symbol_name == "false"{
+                                let jump_instr_struct = NhwcInstrType::new_jump(t2.clone()).into();
+                                let jump_instr = instr_slab.insert_instr(jump_instr_struct);
+                                node_mut!(at cfg_node in cfg_graph).op_jump_instr = Some(jump_instr);
+                            }else if cond.as_ref_borrow().symbol_name == "true"{
+                                let jump_instr_struct = NhwcInstrType::new_jump(t1.clone()).into();
+                                let jump_instr = instr_slab.insert_instr(jump_instr_struct);
+                                node_mut!(at cfg_node in cfg_graph).op_jump_instr = Some(jump_instr);
+                            }
+                        },
+                        _ => {}
+                    }
+                },
+                _ => {}
             }
         }
         for cfg_node in dfs_node_vec{

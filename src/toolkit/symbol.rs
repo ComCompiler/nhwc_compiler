@@ -18,7 +18,7 @@ pub struct Symbol {
     pub rc_symidx:RcSymIdx,
 }
 impl Debug for Symbol {
-    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{{{:?} fields:{:?}}}", self.rc_symidx.as_ref_borrow().symbol_name, self.fields) }
+    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{{{:?} fields:{:?}}}", self.rc_symidx.as_ref_borrow(), self.fields) }
 }
 /* 引用计数 */
 /* 符号的类型 */

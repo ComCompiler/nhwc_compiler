@@ -11,6 +11,7 @@ use std::borrow::Borrow;
 use std::cell::RefCell;
 use std::mem;
 use std::rc::Rc;
+use crate::toolkit::field::TypeDiscriminants;
 use crate::{add_node, instr, instr_mut};
 
 use super::cfg_node::{InstrList, CFG_ROOT};
@@ -18,7 +19,7 @@ use super::et_node::ExprOp;
 use super::etc::dfs_with_priority;
 use super::eval_et::{self, can_eliminate_despite_array_idx_and_call};
 use super::field::{ArrayEleMap, Value};
-use super::gen_et;
+use super::{gen_et, symtab};
 use super::gen_scope::get_while_scope_of_scope_node;
 use super::mem_layout::MemLayout;
 use super::nhwc_instr::{CmpPlan, JumpOp};
@@ -78,7 +79,7 @@ reg_field_for_struct!(Symbol {
         LOCAL_MU_SET:HashSet<RcSymIdx>,
         LOCAL_CHI_SET:HashSet<RcSymIdx>,
     } with_fields fields);
-/// global_mu_call_set stores all mu to global variable in 
+// global_mu_call_set stores all mu to global variable in 
 // for compilation unit symbol
 reg_field_for_struct!(Symbol {
         ALL_CFG_FUNC_SYMIDX_ENTRY_TUPLES:Vec<(RcSymIdx,u32)>,
@@ -213,12 +214,10 @@ fn parse_bb2nhwc(
                                         let rc_func_symidx = node!(at cfg_bb in cfg_graph).get_func_cor_symidx()?;
                                         let func_type = symtab.get(&rc_func_symidx.as_ref_borrow())?.get_type()?;
                                         let formal_ret_symidx = match func_type{
-                                            Type::Fn { arg_syms, ret_sym: formal_ret_sym } => formal_ret_sym,
+                                            Type::Fn { arg_syms, ret_sym: formal_ret_sym } => formal_ret_sym.clone(),
                                             _ => {panic!()}
                                         };
-                                        let type_to_trans = symtab.get(&formal_ret_symidx.as_ref_borrow())?.get_type()?.clone();
-                                        let type_be_trans = symtab.get(&actual_ret_symidx.as_ref_borrow())?.get_type()?.clone();
-                                        let transed_actual_ret_symidx = force_trans_type(cfg_graph, symtab, &type_to_trans, &type_be_trans, &actual_ret_symidx, jump_scope, cfg_bb, instr_slab, None, et_tree)?;
+                                        let transed_actual_ret_symidx = force_trans_type(cfg_graph, symtab, &formal_ret_symidx, &actual_ret_symidx, jump_scope, cfg_bb, instr_slab, None, et_tree)?;
                                         let ret_instr = NhwcInstrType::new_ret(Some(transed_actual_ret_symidx)).into();
                                         // then delete all edges of the node 
                                         let ret_instr = node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(ret_instr, instr_slab)?;
@@ -302,8 +301,7 @@ fn parse_whileloop2nhwc(
                 }
                 let r2bool_symidx;
                 if let Some(symidx) = &ret_vec[0]{
-                    let result_type = symtab.get(&symidx.as_ref_borrow())?.get_type()?.clone();
-                    r2bool_symidx = force_trans_type(cfg_graph, symtab, &Type::I1,  &result_type,&symidx, ast_expr_node, cfg_whileloop,  instr_slab, None,et_tree)?;
+                    r2bool_symidx = force_trans_type_discriminant(cfg_graph, symtab, TypeDiscriminants::I1,  &symidx, ast_expr_node, cfg_whileloop,  instr_slab, None,et_tree)?;
                     // 添加 br 语句
                     let cfg_body_head_node = direct_child_node!(at cfg_whileloop in cfg_graph with_predicate {|e| e.weight().cfg_edge_type.is_body_head() });
                     let cfg_exit_node = get_exit_node_of_while_or_for_node(cfg_whileloop, cfg_graph)?;
@@ -383,7 +381,7 @@ fn parse_forloop2nhwc(
             // push before instr label
             let cfg_for_parent_node = etc::element_remained_after_exclusion_in_vec(direct_parent_nodes!(at cfg_forloop in cfg_graph), cfg_body_tail_node)?;
             // debug_info_yellow!("{:?}",direct_parent_nodes!(at cfg_forloop in cfg_graph));
-            let cfg_new_bb_node = insert_bb_between(cfg_for_parent_node, cfg_forloop, cfg_graph)?;
+            let cfg_new_bb_node = insert_bb_between(cfg_for_parent_node, cfg_forloop, cfg_graph, symtab,instr_slab)?;
 
             let label_before_symidx = process_label_symbol(cfg_for_parent_node,*ast2scope.get(&ast_before_node).unwrap(), "for.before:".to_string(), symtab)?;
             let label_before_instr = NhwcInstrType::new_label(label_before_symidx).into();
@@ -412,8 +410,7 @@ fn parse_forloop2nhwc(
                     return Err(anyhow!("条件表达式错误，返回类型不能转为bool"))
                 }
                 if let Some(rst_symidx) =&ret_vec[0]{
-                    let result_type = symtab.get(&rst_symidx.as_ref_borrow())?.get_type()?.clone();
-                    let r2bool_symidx = force_trans_type(cfg_graph, symtab, &Type::I1,  &result_type,&rst_symidx, ast_mid_node, cfg_forloop,  instr_slab, None, et_tree)?;
+                    let r2bool_symidx = force_trans_type_discriminant(cfg_graph, symtab, TypeDiscriminants::I1,  &rst_symidx, ast_mid_node, cfg_forloop,  instr_slab, None, et_tree)?;
                     node_mut!(at cfg_forloop in cfg_graph).add_jump_det(r2bool_symidx);
                 } else{
                     return Err(anyhow!("for mid_expr can't be void type"));
@@ -428,7 +425,7 @@ fn parse_forloop2nhwc(
         RULE_forAfterExpression => {
             // push before instr label
 
-            let cfg_new_bb_node = insert_bb_between(cfg_body_tail_node, cfg_forloop, cfg_graph)?;
+            let cfg_new_bb_node = insert_bb_between(cfg_body_tail_node, cfg_forloop, cfg_graph, symtab, instr_slab)?;
 
             let label_after_symidx = process_label_symbol(cfg_new_bb_node,*ast2scope.get(&ast_after_node).unwrap(),"for.after:".to_string(), symtab)?;
             let label_after_instr = NhwcInstrType::new_label(label_after_symidx).into();
@@ -460,9 +457,8 @@ fn parse_branch2nhwc(
                     return Err(anyhow!("{:?} number of ret value is not 1",ret_vec))
                 }
                 let r2bool_symidx;
-                if let Some(result_symidx) = &ret_vec[0]{
-                    let result_type = symtab.get(&result_symidx.as_ref_borrow())?.get_type()?.clone();
-                    r2bool_symidx = force_trans_type(cfg_graph, symtab, &Type::I1,  &result_type,&result_symidx, expr_node, cfg_branch_node,  instr_slab, None,et_tree)?;
+                if let Some(rst_symidx) = &ret_vec[0]{
+                    r2bool_symidx = force_trans_type_discriminant(cfg_graph, symtab, TypeDiscriminants::I1,  &rst_symidx, expr_node, cfg_branch_node,  instr_slab, None,et_tree)?;
                 }else{
                     return Err(anyhow!("条件表达式错误，返回类型不能转为bool"))
                 }
@@ -501,7 +497,7 @@ fn process_literal(symtab:&mut SymTab, const_literal:&String, ) -> Result<RcSymI
         Err(_) => {
             add_symbol!({Symbol::new(0, const_literal.clone())} 
                 // with_field USE_COUNTER:{UseCounter{ use_count: 1}} 
-                with_field TYPE:{Type::new_from_const_str(const_literal)} 
+                with_field TYPE:{TypeDiscriminants::new_from_const_str(const_literal).into()} 
                 with_field IS_TEMP:{false}
                 with_field IS_LITERAL:{true}
             to symtab );
@@ -700,60 +696,62 @@ fn process_temp_symbol(
 }
 ///具有赋值性质的会将value的类型强制转换为var的类型，返回转换后的symidx
 fn force_trans_type(
-    cfg_graph:&mut CfgGraph, symtab:&mut SymTab, type_to_trans_to:&Type, type_be_transed:&Type, symidx:&RcSymIdx, scope_node:u32, cfg_bb:u32, instr_slab:&mut InstrSlab<NhwcInstr>,
+    cfg_graph:&mut CfgGraph, symtab:&mut SymTab, symidx_trans_to:&RcSymIdx,  symidx_be_transed:&RcSymIdx, scope_node:u32, cfg_bb:u32, instr_slab:&mut InstrSlab<NhwcInstr>,
     op_et_node:Option<u32>,et_tree:&mut EtTree,
 ) -> Result<RcSymIdx> {
-    if type_be_transed.direct_suits(type_to_trans_to){
+    let ty_be_transed = symtab.get(&symidx_be_transed.as_ref_borrow())?.get_type()?;
+    let ty_trans_to = symtab.get(&symidx_trans_to.as_ref_borrow())?.get_type()?;
+    if ty_be_transed.direct_suits(ty_trans_to){
         // suit
-        debug_info_blue!("{:?} suits from {:?} to {:?} ",symidx,type_be_transed,type_to_trans_to);
-        return Ok(symidx.clone());
+        debug_info_blue!("{:?} suits from {:?} to {:?} ",symidx_be_transed,ty_be_transed,ty_trans_to);
+        return Ok(symidx_be_transed.clone());
     }
     // if type_be_transed == type_to_trans_to {
     //     return Ok(symidx.clone());
     // }
-    match (type_be_transed, type_to_trans_to) {
-        (Type::I32, Type::F32) => {
+    match (ty_be_transed.into(), ty_trans_to.into()) {
+        (TypeDiscriminants::I32, TypeDiscriminants::F32) => {
             //创建f32类型的临时变量
             let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
-            let i2f_instr = NhwcInstrType::new_int2float(symidx.clone(), ftmp_type_symidx.clone()).into();
+            let i2f_instr = NhwcInstrType::new_int2float(symidx_be_transed.clone(), ftmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(i2f_instr, instr_slab)?;
             return Ok(ftmp_type_symidx);
         }
-        (Type::I32, Type::I1) => {
+        (TypeDiscriminants::I32, TypeDiscriminants::I1) => {
             //创建i1类型的变临时量
             let btmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
             let izero_symidx = process_literal(symtab, &"0".to_string())?;
-            let i2b_instr = NhwcInstrType::new_icmp(btmp_type_symidx.clone(), IcmpPlan::Ne, symidx.clone(), izero_symidx, Type::I32).into();
+            let i2b_instr = NhwcInstrType::new_icmp(btmp_type_symidx.clone(), IcmpPlan::Ne, symidx_be_transed.clone(), izero_symidx, Type::I32).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(i2b_instr, instr_slab)?;
             return Ok(btmp_type_symidx);
         }
-        (Type::F32, Type::I32) => {
+        (TypeDiscriminants::F32, TypeDiscriminants::I32) => {
             //创建i32类型的临时变量
             let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
-            let f2i_instr = NhwcInstrType::new_float2int(symidx.clone(), itmp_type_symidx.clone()).into();
+            let f2i_instr = NhwcInstrType::new_float2int(symidx_be_transed.clone(), itmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(f2i_instr, instr_slab)?;
             return Ok(itmp_type_symidx);
         }
-        (Type::F32, Type::I1) => {
+        (TypeDiscriminants::F32, TypeDiscriminants::I1) => {
             //创建i1类型临时变量
             let btmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), )?;
-            let f2b_instr = NhwcInstrType::new_fcmp(btmp_type_symidx.clone(), FcmpPlan::One, symidx.clone(), fzero_symidx, Type::F32).into();
+            let f2b_instr = NhwcInstrType::new_fcmp(btmp_type_symidx.clone(), FcmpPlan::One, symidx_be_transed.clone(), fzero_symidx, Type::F32).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(f2b_instr, instr_slab)?;
             return Ok(btmp_type_symidx);
         }
-        (Type::I1, Type::I32) => {
+        (TypeDiscriminants::I1, TypeDiscriminants::I32) => {
             //创建i1类型临时变量
             let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;            
-            let b2i_instr = NhwcInstrType::new_bool2int(symidx.clone(), itmp_type_symidx.clone()).into();
+            let b2i_instr = NhwcInstrType::new_bool2int(symidx_be_transed.clone(), itmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(b2i_instr, instr_slab)?;
             return Ok(itmp_type_symidx);
         }
-        (Type::I1, Type::F32) => {
+        (TypeDiscriminants::I1, TypeDiscriminants::F32) => {
             //i1转f32分两步，第一步i1转i32，第二步i32转f32
             //第一步
             let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
-            let b2i_instr = NhwcInstrType::new_bool2int(symidx.clone(), itmp_type_symidx.clone()).into();
+            let b2i_instr = NhwcInstrType::new_bool2int(symidx_be_transed.clone(), itmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(b2i_instr, instr_slab)?;
             //第二步
             let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
@@ -761,13 +759,80 @@ fn force_trans_type(
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(i2f_instr, instr_slab)?;
             return Ok(ftmp_type_symidx);
         }
-        (Type::Ptr64 { ty },Type::I32) => {
-            return Ok(symidx.clone())
+        (TypeDiscriminants::Ptr64 ,TypeDiscriminants::I32) => {
+            return Ok(symidx_be_transed.clone())
         }
-        (Type::Array { dims, ele_ty },Type::I32) => {
-            return Ok(symidx.clone())
+        (TypeDiscriminants::Array ,TypeDiscriminants::I32) => {
+            return Ok(symidx_be_transed.clone())
         }
-        _ => return Err(anyhow!("{:?}=>{:?}该类型不支持强制转化",type_be_transed,type_to_trans_to)),
+        _ => return Err(anyhow!("{:?}=>{:?}该类型不支持强制转化",ty_be_transed,ty_trans_to)),
+    }
+}
+fn force_trans_type_discriminant(
+    cfg_graph:&mut CfgGraph, symtab:&mut SymTab, ty_trans_to:TypeDiscriminants,  symidx_be_transed:&RcSymIdx, scope_node:u32, cfg_bb:u32, instr_slab:&mut InstrSlab<NhwcInstr>,
+    op_et_node:Option<u32>,et_tree:&mut EtTree,
+) -> Result<RcSymIdx> {
+    let ty_be_transed = symtab.get(&symidx_be_transed.as_ref_borrow())?.get_type()?.into();
+    if ty_be_transed == ty_trans_to {
+        return Ok(symidx_be_transed.clone());
+    }
+    match (ty_be_transed, ty_trans_to) {
+        (TypeDiscriminants::I32, TypeDiscriminants::F32) => {
+            //创建f32类型的临时变量
+            let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
+            let i2f_instr = NhwcInstrType::new_int2float(symidx_be_transed.clone(), ftmp_type_symidx.clone()).into();
+            node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(i2f_instr, instr_slab)?;
+            return Ok(ftmp_type_symidx);
+        }
+        (TypeDiscriminants::I32, TypeDiscriminants::I1) => {
+            //创建i1类型的变临时量
+            let btmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
+            let izero_symidx = process_literal(symtab, &"0".to_string())?;
+            let i2b_instr = NhwcInstrType::new_icmp(btmp_type_symidx.clone(), IcmpPlan::Ne, symidx_be_transed.clone(), izero_symidx, Type::I32).into();
+            node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(i2b_instr, instr_slab)?;
+            return Ok(btmp_type_symidx);
+        }
+        (TypeDiscriminants::F32, TypeDiscriminants::I32) => {
+            //创建i32类型的临时变量
+            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
+            let f2i_instr = NhwcInstrType::new_float2int(symidx_be_transed.clone(), itmp_type_symidx.clone()).into();
+            node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(f2i_instr, instr_slab)?;
+            return Ok(itmp_type_symidx);
+        }
+        (TypeDiscriminants::F32, TypeDiscriminants::I1) => {
+            //创建i1类型临时变量
+            let btmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
+            let fzero_symidx = process_literal(symtab, &"0.0".to_string(), )?;
+            let f2b_instr = NhwcInstrType::new_fcmp(btmp_type_symidx.clone(), FcmpPlan::One, symidx_be_transed.clone(), fzero_symidx, Type::F32).into();
+            node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(f2b_instr, instr_slab)?;
+            return Ok(btmp_type_symidx);
+        }
+        (TypeDiscriminants::I1, TypeDiscriminants::I32) => {
+            //创建i1类型临时变量
+            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;            
+            let b2i_instr = NhwcInstrType::new_bool2int(symidx_be_transed.clone(), itmp_type_symidx.clone()).into();
+            node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(b2i_instr, instr_slab)?;
+            return Ok(itmp_type_symidx);
+        }
+        (TypeDiscriminants::I1, TypeDiscriminants::F32) => {
+            //i1转f32分两步，第一步i1转i32，第二步i32转f32
+            //第一步
+            let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
+            let b2i_instr = NhwcInstrType::new_bool2int(symidx_be_transed.clone(), itmp_type_symidx.clone()).into();
+            node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(b2i_instr, instr_slab)?;
+            //第二步
+            let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
+            let i2f_instr = NhwcInstrType::new_int2float(itmp_type_symidx.clone(), ftmp_type_symidx.clone()).into();
+            node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(i2f_instr, instr_slab)?;
+            return Ok(ftmp_type_symidx);
+        }
+        (TypeDiscriminants::Ptr64 ,TypeDiscriminants::I32) => {
+            return Ok(symidx_be_transed.clone())
+        }
+        (TypeDiscriminants::Array ,TypeDiscriminants::I32) => {
+            return Ok(symidx_be_transed.clone())
+        }
+        _ => return Err(anyhow!("{:?}=>{:?}该类型不支持强制转化",ty_be_transed,ty_trans_to)),
     }
 }
 ///算数运算符自动类型转换，返回转换后两个操作符的symidx
@@ -776,36 +841,36 @@ fn autotrans_arith_type(
     op_et_node:Option<u32>,et_tree:&mut EtTree
 ) -> Result<(RcSymIdx, RcSymIdx)> {
     //adapt函数会去除掉不能进行运算的类型情况
-    match (l_type.clone(), r_type.clone()) {
-        (Type::I32, Type::F32) => {
+    match (l_type.into(), r_type.into()) {
+        (TypeDiscriminants::I32, TypeDiscriminants::F32) => {
             //i32自动转换为f32
             let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::F32, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
             let i2f_instr = NhwcInstrType::new_int2float(l_symidx.clone(), ftmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(i2f_instr, instr_slab)?;
             return Ok((ftmp_type_symidx, r_symidx.clone()));
         }
-        (Type::F32, Type::I32) => {
+        (TypeDiscriminants::F32, TypeDiscriminants::I32) => {
             //i32转f32
             let ftmp_type_symidx = process_temp_symbol(cfg_graph, symtab,&Type::F32, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
             let i2f_instr = NhwcInstrType::new_int2float(r_symidx.clone(), ftmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(i2f_instr, instr_slab)?;
             return Ok((l_symidx.clone(), ftmp_type_symidx));
         }
-        (Type::I1, Type::I32) => {
+        (TypeDiscriminants::I1, TypeDiscriminants::I32) => {
             //i1转i32
             let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
             let b2i_instr = NhwcInstrType::new_bool2int(l_symidx.clone(), itmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph).push_nhwc_instr(b2i_instr, instr_slab)?;
             return Ok((itmp_type_symidx, r_symidx.clone()));
         }
-        (Type::I32, Type::I1) => {
+        (TypeDiscriminants::I32, TypeDiscriminants::I1) => {
             //i1转i32
             let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
             let b2i_instr = NhwcInstrType::new_bool2int(r_symidx.clone(), itmp_type_symidx.clone()).into();
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(b2i_instr, instr_slab)?;
             return Ok((l_symidx.clone(), itmp_type_symidx));
         }
-        (Type::I1, Type::F32) => {
+        (TypeDiscriminants::I1, TypeDiscriminants::F32) => {
             //先i1转i32
             let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
             let b2i_instr = NhwcInstrType::new_bool2int(l_symidx.clone(), itmp_type_symidx.clone()).into();
@@ -816,7 +881,7 @@ fn autotrans_arith_type(
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2f_instr, instr_slab)?;
             return Ok((ftmp_type_symidx, r_symidx.clone()));
         }
-        (Type::F32, Type::I1) => {
+        (TypeDiscriminants::F32, TypeDiscriminants::I1) => {
             //i1转i32
             let itmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I32, scope_node, cfg_bb,  instr_slab, op_et_node,et_tree, "")?;
             let b2i_instr = NhwcInstrType::new_bool2int(r_symidx.clone(), itmp_type_symidx.clone()).into();
@@ -827,7 +892,7 @@ fn autotrans_arith_type(
             node_mut!(at cfg_bb in cfg_graph ).push_nhwc_instr(i2f_instr, instr_slab)?;
             return Ok((l_symidx.clone(), ftmp2_type_symidx));
         }
-        (Type::I32, Type::I32) | (Type::F32, Type::F32) | (Type::I1, Type::I1) => {
+        (TypeDiscriminants::I32, TypeDiscriminants::I32) | (TypeDiscriminants::F32, TypeDiscriminants::F32) | (TypeDiscriminants::I1, TypeDiscriminants::I1) => {
             //相同不用转换
             return Ok((l_symidx.clone(), r_symidx.clone()));
         }
@@ -840,8 +905,8 @@ fn autotrans_logic_type(
     op_et_node:Option<u32>,et_tree:&mut EtTree
 ) -> Result<(RcSymIdx, RcSymIdx)> {
     //adapt函数会去除掉不能进行运算的类型情况
-    match (l_type.clone(), r_type.clone()) {
-        (Type::I32, Type::F32) => {
+    match (l_type.into(), r_type.into()) {
+        (TypeDiscriminants::I32, TypeDiscriminants::F32) => {
             //i32转i1
             //由于除了i1都要转为i1，这里变量名中ltmp指左操作符转换后的临时symidx，rtmp指右操作符
             //处理左操作数，i32转i1
@@ -857,7 +922,7 @@ fn autotrans_logic_type(
             node_mut!(at cfg_node2 in cfg_graph ).push_nhwc_instr(f2b_instr, instr_slab)?;
             return Ok((ltmp_type_symidx, rtmp_type_symidx));
         }
-        (Type::F32, Type::I32) => {
+        (TypeDiscriminants::F32, TypeDiscriminants::I32) => {
             //左操作数f32转i1
             let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_node1,  instr_slab, op_et_node,et_tree, "f32_to_bool")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), )?;
@@ -870,7 +935,7 @@ fn autotrans_logic_type(
             node_mut!(at cfg_node2 in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
             return Ok(( ltmp_type_symidx, rtmp_type_symidx));
         }
-        (Type::I1, Type::I32) => {
+        (TypeDiscriminants::I1, TypeDiscriminants::I32) => {
             //处理右操作数i32转i1
             let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_node2,  instr_slab, op_et_node,et_tree, "i32_to_bool")?;
             let izero_symidx = process_literal(symtab, &"0".to_string(), )?;
@@ -878,7 +943,7 @@ fn autotrans_logic_type(
             node_mut!(at cfg_node2 in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
             return Ok((l_symidx.clone(), rtmp_type_symidx));
         }
-        (Type::I32, Type::I1) => {
+        (TypeDiscriminants::I32, TypeDiscriminants::I1) => {
             //处理左操作数i32转i1
             let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_node1,  instr_slab, op_et_node,et_tree, "i32_to_bool")?;
             let izero_symidx = process_literal(symtab, &"0".to_string(), )?;
@@ -886,7 +951,7 @@ fn autotrans_logic_type(
             node_mut!(at cfg_node1 in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
             return Ok((ltmp_type_symidx.clone(), r_symidx.clone()));
         }
-        (Type::I1, Type::F32) => {
+        (TypeDiscriminants::I1, TypeDiscriminants::F32) => {
             //处理右操作数f32转i1
             let rtmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_node2,  instr_slab, op_et_node,et_tree, "f32_to_bool")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), )?;
@@ -894,7 +959,7 @@ fn autotrans_logic_type(
             node_mut!(at cfg_node2 in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
             return Ok((l_symidx.clone(), rtmp_type_symidx.clone()));
         }
-        (Type::F32, Type::I1) => {
+        (TypeDiscriminants::F32, TypeDiscriminants::I1) => {
             //左操作数f32转i1
             let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_node1,  instr_slab, op_et_node,et_tree, "f32_to_bool")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), )?;
@@ -902,7 +967,7 @@ fn autotrans_logic_type(
             node_mut!(at cfg_node1 in cfg_graph ).push_nhwc_instr(i2b_instr, instr_slab)?;
             return Ok((ltmp_type_symidx.clone(), r_symidx.clone()));
         }
-        (Type::F32, Type::F32) => {
+        (TypeDiscriminants::F32, TypeDiscriminants::F32) => {
             //左操作数f32转i1
             let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_node1,  instr_slab, op_et_node,et_tree, "f32_to_bool")?;
             let fzero_symidx = process_literal(symtab, &"0.0".to_string(), )?;
@@ -914,7 +979,7 @@ fn autotrans_logic_type(
             node_mut!(at cfg_node2 in cfg_graph ).push_nhwc_instr(rf2b_instr, instr_slab)?;
             return Ok((ltmp_type_symidx, rtmp_type_symidx));
         }
-        (Type::I32, Type::I32) => {
+        (TypeDiscriminants::I32, TypeDiscriminants::I32) => {
             //左操作数i32转i1
             let ltmp_type_symidx = process_temp_symbol(cfg_graph, symtab, &Type::I1, scope_node, cfg_node1,  instr_slab, op_et_node,et_tree, "i32_to_bool")?;
             let izero_symidx = process_literal(symtab, &"0".to_string(), )?;
@@ -926,7 +991,7 @@ fn autotrans_logic_type(
             node_mut!(at cfg_node2 in cfg_graph ).push_nhwc_instr(ri2b_instr, instr_slab)?;
             return Ok((ltmp_type_symidx, rtmp_type_symidx));
         }
-        (Type::I1, Type::I1) => return Ok((l_symidx.clone(), r_symidx.clone())),
+        (TypeDiscriminants::I1, TypeDiscriminants::I1) => return Ok((l_symidx.clone(), r_symidx.clone())),
         _ => return Err(anyhow!("操作数无法进行逻辑计算")),
     }
 }
@@ -1139,9 +1204,7 @@ fn process_call(
         //检查形参和实参是否一致
         if rc_para_symidx_vec.len() == arg_syms.len(){
             for arg_idx in 0..arg_syms.len(){
-                let type_to_trans_to = symtab.get(&arg_syms[arg_idx].as_ref_borrow())?.get_type()?.clone();
-                let type_be_transed = symtab.get(&rc_para_symidx_vec[arg_idx].as_ref_borrow())?.get_type()?.clone();
-                let transed_symidx = force_trans_type(cfg_graph, symtab, &type_to_trans_to, &type_be_transed, &rc_para_symidx_vec[arg_idx],scope_node, cfg_bb, instr_slab,  Some(et_node), et_tree)?;
+                let transed_symidx = force_trans_type(cfg_graph, symtab, &arg_syms[arg_idx], &rc_para_symidx_vec[arg_idx], scope_node, cfg_bb, instr_slab,  Some(et_node), et_tree)?;
                 *rc_para_symidx_vec.get_mut(arg_idx).unwrap() = transed_symidx; 
             }
         }else{
@@ -1676,7 +1739,7 @@ fn process_et(
                         //如果结果和变量类型不同，添加自动转化instr
                         match (&l_type,&r_type){
                             (Type::Ptr64 { ty:l_deref_var_type },_)=> {
-                                let transed_value_symidx = force_trans_type(cfg_graph, symtab, &l_deref_var_type, &r_type, &rc_r_symidx, scope_node, cfg_node, instr_slab, Some(et_node),et_tree)?;
+                                let transed_value_symidx = force_trans_type_discriminant(cfg_graph, symtab, l_deref_var_type.as_ref().into(),  &rc_r_symidx, scope_node, cfg_node, instr_slab, Some(et_node),et_tree)?;
                                 let store_instr_struct = NhwcInstrType::new_store(rc_l_symidx.clone(), l_type.clone(),  transed_value_symidx, *l_deref_var_type.clone()).into();
                                 node_mut!(at et_node in et_tree).add_type(*l_deref_var_type.clone());
                                 let pointed_symidx = symtab.get(&l_symidx)?.get_pointed_symidx()?;
@@ -1741,7 +1804,7 @@ fn process_et(
                             },
                             _ => {
                                 if *symtab.get(&l_symidx)?.get_is_global()?{
-                                    let new_value_symidx = force_trans_type(cfg_graph, symtab, &l_type, &r_type, &rc_r_symidx, scope_node, cfg_node, instr_slab, Some(et_node),et_tree)?;
+                                    let new_value_symidx = force_trans_type_discriminant(cfg_graph, symtab, l_type.into(),  &rc_r_symidx, scope_node, cfg_node, instr_slab, Some(et_node),et_tree)?;
 
                                     let rc_l_ptr_symidx = &symtab.get(&l_symidx.to_globl_ptr()?)?.rc_symidx;
                                     let l_ptr_symidx = rc_l_ptr_symidx.as_ref_borrow();
@@ -1753,9 +1816,9 @@ fn process_et(
                                     node_mut!(at cfg_node in cfg_graph ).push_nhwc_instr(NhwcInstrType::new_chi(rc_l_symidx.clone(), rc_l_symidx.clone(), store_instr).into(), instr_slab)?;
                                     Some(rc_l_symidx.clone())
                                 }else{
-                                    let new_value_symidx = force_trans_type(cfg_graph, symtab, &l_type, &r_type, &rc_r_symidx, scope_node, cfg_node, instr_slab, Some(et_node),et_tree)?;
+                                    let new_value_symidx = force_trans_type_discriminant(cfg_graph, symtab, (&l_type).into(),  &rc_r_symidx, scope_node, cfg_node, instr_slab, Some(et_node),et_tree)?;
                                     let assign_instr_struct = NhwcInstrType::new_assign(rc_l_symidx.clone(), new_value_symidx, l_type.clone()).into();
-                                    node_mut!(at et_node in et_tree).add_type(l_type.clone());
+                                    node_mut!(at et_node in et_tree).add_type(l_type);
                                     node_mut!(at cfg_node in cfg_graph ).push_nhwc_instr(assign_instr_struct, instr_slab)?;
                                     Some(rc_l_symidx.clone())
                                 }
@@ -2226,25 +2289,63 @@ pub fn split_bb_node(cfg_node:u32,cfg_graph:&mut CfgGraph,is_move_instrs:bool) -
     let new_edge = add_edge!({CfgEdge::new_direct()} from cfg_new_bb to cfg_node in cfg_graph);
     Ok((cfg_new_bb,new_edge))
 }
+/// update the label of former cfg_node
+pub fn update_jump_instr_of_parents_of_cfg_node(cfg_node:u32, cfg_graph:&mut CfgGraph, instr_slab:&mut InstrSlab<NhwcInstr>) -> Result<()>{
+    let direct_parents = direct_parent_nodes!(at cfg_node in cfg_graph);
+    for parent_cfg_node in direct_parents{
+        if let Some(jump_instr) = node!(at parent_cfg_node in cfg_graph).op_jump_instr{
+            match &instr!(at jump_instr in instr_slab)?.instr_type{
+                NhwcInstrType::Jump { jump_op } => { 
+                    match &jump_op{
+                        JumpOp::Ret { op_ret_sym } => {
+                            panic!("you can't insert node after ret")
+                        },
+                        JumpOp::Br { cond, t1, t2 } => {
+                            update_br_instr_of_branch(parent_cfg_node, cfg_graph, instr_slab)?;
+                        },
+                        JumpOp::Switch { cond, default, compared } => {
+                            todo!()
+                        },
+                        JumpOp::DirectJump { label_symidx } => {
+                            panic!("you can't insert direct jump before the nhwc dump pass")
+                        },
+                    }
+                }
+                _ => {
+
+                }
+            }
+        }
+    }
+    Ok(())
+}
 
 /// 在两个cfg node 之间插入一个bb ，并保留 边的属性，函数会自动判断究竟把带属性的边放到哪里(因为插入一个bb会多生成一条Direct边，需要判断把这条边放在什么位置)
 /// 以下条件满足之一可以insert new bb 
 /// 1. cfg_node1 和 cfg_node2 之间是一条 Direct 普通边 或 BodyHead BodyTail
 /// 2. cfg_node1 和 cfg_node2 其中有一个是 BasicBlock
-pub fn insert_bb_between(cfg_node_from:u32, cfg_node_to:u32, cfg_graph:&mut CfgGraph) -> Result<u32>{
+pub fn insert_bb_between(cfg_node_from:u32, cfg_node_to:u32, cfg_graph:&mut CfgGraph, symtab:&mut SymTab,instr_slab:&mut InstrSlab<NhwcInstr>) -> Result<u32>{
     let cfg_former_edge_idx = cfg_graph.find_edge(node_index(cfg_node_from as usize), node_index(cfg_node_to as usize)).ok_or(anyhow!("找不到连接 cfg_node[{}] 和 cfg_node[{}]的边",cfg_node_from,cfg_node_to))
         .with_context(|| format!("在插入 cfg_node[{}] 和 cfg_node[{}]之间bb 失败",cfg_node_from,cfg_node_to))?;
     // 删除旧的边
     let cfg_former_edge_removed = cfg_graph.remove_edge(cfg_former_edge_idx).unwrap();
     let (cfg_node_type1, cfg_node_type2) = (&node!(at cfg_node_from in cfg_graph).cfg_node_type,&node!(at cfg_node_to in cfg_graph).cfg_node_type);
-    if  cfg_former_edge_removed.cfg_edge_type.is_direct() {
+    let rst = if  cfg_former_edge_removed.cfg_edge_type.is_direct() {
         // 如果这条边本身就是一条普通边，那么就允许insert
         let mut bb_struct = CfgNode::new_bb(vec![]);
         bb_struct.add_func_cor_symidx(node!(at cfg_node_from in cfg_graph).get_func_cor_symidx()?.clone());
         let new_bb = add_node_with_edge!({bb_struct} with_edge {cfg_former_edge_removed} from cfg_node_from in cfg_graph);
         add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node_to in cfg_graph);
         Ok(new_bb)
-    } else if cfg_former_edge_removed.cfg_edge_type.is_body_head() ||cfg_former_edge_removed.cfg_edge_type.is_body_tail()  {
+    } else if cfg_former_edge_removed.cfg_edge_type.is_body_head() 
+    || cfg_former_edge_removed.cfg_edge_type.is_if_true() 
+    || cfg_former_edge_removed.cfg_edge_type.is_if_false() {
+        let mut bb_struct = CfgNode::new_bb(vec![]);
+        bb_struct.add_func_cor_symidx(node!(at cfg_node_from in cfg_graph).get_func_cor_symidx()?.clone());
+        let new_bb = add_node_with_edge!({bb_struct} with_edge {cfg_former_edge_removed} from cfg_node_from in cfg_graph);
+        add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node_to in cfg_graph);
+        Ok(new_bb)
+    }else if cfg_former_edge_removed.cfg_edge_type.is_body_tail()  {
         let mut bb_struct = CfgNode::new_bb(vec![]);
         bb_struct.add_func_cor_symidx(node!(at cfg_node_from in cfg_graph).get_func_cor_symidx()?.clone());
         let new_bb = add_node_with_edge!({bb_struct} with_edge {CfgEdge::new_direct()} from cfg_node_from in cfg_graph);
@@ -2267,7 +2368,20 @@ pub fn insert_bb_between(cfg_node_from:u32, cfg_node_to:u32, cfg_graph:&mut CfgG
                 Err(anyhow!("两个节点cfg_node[{}] cfg_node[{}]中都不存在bb",cfg_node_from,cfg_node_to))
             }
         }
-    }
+    };
+    match &rst{
+        Result::Ok(cfg_node) => {
+            let cfg_node = *cfg_node;
+            if node!(at cfg_node in cfg_graph).op_label_instr.is_none(){
+                let label = process_label_symbol(cfg_node, ST_ROOT, format!("UP_{}",cfg_node), symtab)?;
+                let label_instr_struct = NhwcInstrType::new_label(label).into();
+                node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(label_instr_struct, instr_slab)?;
+            }
+            update_jump_instr_of_parents_of_cfg_node(cfg_node, cfg_graph, instr_slab)?;
+        },
+        Err(_) => {},
+    };
+    rst
 }
 
 ///用于处理if条件表达式中逻辑运算符的短路运算符的cfg扩展，里面会根据传入的是&&还是||进行两种扩展
@@ -2368,7 +2482,7 @@ pub fn process_short_logic(cfg_node:u32,cfg_graph:&mut CfgGraph,logic_op:&ExprOp
         }
     }
 }
-pub fn refresh_br_instr_of_branch(cfg_branch_node:u32,cfg_graph:&mut CfgGraph, instr_slab:&mut InstrSlab<NhwcInstr>) -> Result<()>{
+pub fn update_br_instr_of_branch(cfg_branch_node:u32,cfg_graph:&mut CfgGraph, instr_slab:&mut InstrSlab<NhwcInstr>) -> Result<()>{
     // first assert that the cfg_branch has 2 edges 
     let mut edges = cfg_graph.edges_directed(node_index(cfg_branch_node as usize), Outgoing).into_iter().map(|e|(e.weight().clone(),e.target().index() as u32)).collect_vec();
     if edges.len() != 2 {
@@ -2378,6 +2492,9 @@ pub fn refresh_br_instr_of_branch(cfg_branch_node:u32,cfg_graph:&mut CfgGraph, i
         match e.cfg_edge_type{
             CfgEdgeType::IfFalse {  } => { 2 },
             CfgEdgeType::IfTrue {  } => { 1 },
+            CfgEdgeType::Direct {  } => { 2 },
+            CfgEdgeType::BodyHead {  } => { 1 },
+            // CfgEdgeType::IfTrue {  } => { 1 },
             _ => panic!("unacceptable edge of branch_node")
         }
     });
@@ -2539,7 +2656,7 @@ pub fn array_initialize( et_tree:&mut EtTree, array_ele_map:&mut ArrayEleMap, el
                 let r_symidx = rc_r_symidx.as_ref_borrow();
                 // only 2 types should be considered, f32 & i32
                 let r_type = symtab.get(&r_symidx)?.get_type()?.clone();
-                let new_value_symidx = force_trans_type(cfg_graph, symtab, l_type, &r_type, &rc_r_symidx, scope_node, cfg_bb, instr_slab, Some(et_node),et_tree)?;
+                let new_value_symidx = force_trans_type_discriminant(cfg_graph, symtab, l_type.into(),  &rc_r_symidx, scope_node, cfg_bb, instr_slab, Some(et_node),et_tree)?;
                 array_ele_map.insert_ele(*array_offset, Value::new_ref(new_value_symidx, r_type))?;
                 *array_offset +=1;
             },

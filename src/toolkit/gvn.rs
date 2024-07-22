@@ -36,6 +36,7 @@ pub fn gvn(instr_et:&mut EtTree,dom_tree:&mut DjGraph, cfg_graph:&mut CfgGraph, 
                 for rc_symidx in &et_node_struct.equivalent_symidx_vec{
                     let mut symidx = rc_symidx.as_ref_borrow_mut();
                     if !symidx.is_literal(){
+                        symidx.clone().as_rc().clone_into(&mut symtab.get_mut(&symidx.to_src_symidx())?.rc_symidx);
                         let &def_instr = symtab.get(&symidx)?.get_ssa_def_instr()?;
                         *instr_mut!(at def_instr in instr_slab)? = NhwcInstrType::Nope {  }.into();
                         *symidx = match &et_node_struct.et_node_type{
@@ -43,7 +44,7 @@ pub fn gvn(instr_et:&mut EtTree,dom_tree:&mut DjGraph, cfg_graph:&mut CfgGraph, 
                                 rc_literal_symidx.as_ref_borrow().clone()
                             },
                             _ => {panic!()}
-                        }
+                        };
                     }
                 }
             }

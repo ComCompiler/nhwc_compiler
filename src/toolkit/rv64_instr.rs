@@ -7,7 +7,7 @@ use strum_macros::EnumIs;
 
 use crate::{passes::ast2st_pass::Ast2StPass, toolkit::{field::{Type, Value}, symtab::WithBorrow}};
 
-use super::symtab::{RcSymIdx, SymIdx};
+use super::{field::TypeDiscriminants, symtab::{RcSymIdx, SymIdx}};
 
 
 // #[derive(Clone)]
@@ -73,18 +73,18 @@ impl Debug for Imm{
                 write!(f,"{}",&symidx.as_ref_borrow().symbol_name)
             },
             Self::Literal { symidx } => {
-                match &Type::new_from_const_str(&symidx.as_ref_borrow().symbol_name) {
-                    Type::I32 => {
+                match &TypeDiscriminants::new_from_const_str(&symidx.as_ref_borrow().symbol_name) {
+                    TypeDiscriminants::I32 => {
                         write!(f,"{}", symidx.as_ref_borrow())
                     },
-                    Type::F32 => {
+                    TypeDiscriminants::F32 => {
                         let f_val:f32 = match Value::from_string_with_specific_type(&symidx.as_ref_borrow().symbol_name, &Type::F32).unwrap(){
                             Value::F32(Some(f_val)) => f_val,
                             _ => panic!()
                         };
                         write!(f,"{}", f_val.to_bits())
                     },
-                    Type::I1 => {
+                    TypeDiscriminants::I1 => {
                         if symidx.as_ref_borrow().symbol_name == "true"{
                             write!(f,"{}", 1)
                         }else {

@@ -78,7 +78,7 @@ fn main() {
         then func_call_pass
         then ncfg2djg_pass
         then ssa_pass
-        // then gvngcm_pass
+        then gvngcm_pass
         then def_use_chain_pass
         then dce_pass
         // then simulator_debug_pass

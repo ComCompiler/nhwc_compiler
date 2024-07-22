@@ -32,7 +32,7 @@ impl Pass for MemAllocPass {
                 let mut reg_args = vec![]; let mut overflowed_args = vec![];
                 for (idx,rc_symidx) in arg_symidx_vec.iter().enumerate(){
                     let symidx = rc_symidx.as_ref_borrow();
-                    if symtab.get(&symidx)?.get_type()?.is_f_32(){
+                    if symtab.get(&symidx.to_src_symidx())?.get_type()?.is_f_32(){
                         if fpu_cnt >= 8{
                             overflowed_args.push((idx,rc_symidx.clone()));
                         }else{
@@ -87,7 +87,7 @@ impl Pass for MemAllocPass {
                 match &instr!(at instr in instr_slab)?.instr_type{
                     crate::toolkit::nhwc_instr::NhwcInstrType::DefineFunc { func_symidx: _, ret_symidx: _, args } => {
                         for arg in args{
-                            calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &symtab.get(&arg.as_ref_borrow().to_src_symidx())?.rc_symidx.clone())?;
+                            calculate_mem_offset2sp(cfg_graph, cfg_entry, symtab, &arg)?;
                         }
                     },
                     crate::toolkit::nhwc_instr::NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
@@ -114,7 +114,7 @@ impl Pass for MemAllocPass {
 pub fn calculate_mem_offset2sp(cfg_graph:&mut CfgGraph,cfg_entry:u32,symtab:&mut SymTab,rc_symidx:&RcSymIdx) -> Result<()>{
     let mem_layout = node!(at cfg_entry in cfg_graph).get_mem_layout()?;
     let symidx = rc_symidx.as_ref_borrow();
-    let mem_offset2sp = (mem_layout.get_mem_len() - *symtab.get(&symidx)?.get_mem_offset2s0()? as usize - symtab.get(&symidx)?.get_type()?.get_mem_len()?) as isize;
+    let mem_offset2sp = (mem_layout.get_mem_len() - *symtab.get(&symidx.to_src_symidx())?.get_mem_offset2s0()? as usize - symtab.get(&symidx)?.get_type()?.get_mem_len()?) as isize;
     symtab.get_mut(&symidx)?.add_mem_offset2sp(mem_offset2sp);
     Ok(())
 }
@@ -125,7 +125,7 @@ pub fn alloc_stack_mem_for_cfg_entry(cfg_graph:&mut CfgGraph,cfg_entry:u32,symta
     let symidx = rc_symidx.as_ref_borrow();
 
     let cfg_node_struct = node_mut!(at cfg_entry in cfg_graph);
-    let symbol_struct = symtab.get_mut(&symidx)?;
+    let symbol_struct = symtab.get_mut(&symidx.to_src_symidx())?;
     if !cfg_node_struct.has_mem_layout(){
         cfg_node_struct.add_mem_layout(MemLayout::new())
     }

@@ -1,7 +1,7 @@
-use std::cmp::Ordering;
+use std::{cmp::Ordering, collections::{HashMap, HashSet}};
 
 use crate::{add_field, add_symbol, debug_info_blue, debug_info_green, debug_info_red, debug_info_yellow, direct_child_nodes, direct_parent_nodes, instr, instr_mut, node, node_mut, reg_field_for_struct};
-use ahash::{HashSet, HashSetExt};
+use ahash::{ HashSetExt};
 use itertools::Itertools;
 use super::{cfg_node::{CfgGraph, CfgInstrIdx, InCfgNodeInstrPos, InstrList, CFG_ROOT}, context::DjGraph, etc, gen_nhwc_cfg::insert_bb_between, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType, PhiPair}, symbol::Symbol, symtab::{self, RcSymIdx, SymIdx, SymTab, WithBorrow}};
 use anyhow::{anyhow, Result, Context};
@@ -433,24 +433,35 @@ pub fn is_critical_edge(cfg_node_from:u32,cfg_node_to:u32, cfg_graph:&CfgGraph) 
     }
 }
 
+
 pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab<NhwcInstr>)->Result<()>{
     update_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
-    for (_func_symidx,cfg_entry) in symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.iter(){
-        let dfs_vec = etc::dfs(cfg_graph,*cfg_entry);
+    let all_cfg_func_symidx_entry_tuple = symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.clone();
+    for (_func_symidx,cfg_entry) in all_cfg_func_symidx_entry_tuple{
+        let dfs_vec = etc::dfs(cfg_graph,cfg_entry);
         for &cfg_node in &dfs_vec{
+            let mut target_node_map  = HashMap::new();
             for &phi_instr in node!(at cfg_node in cfg_graph).phi_instrs.clone().iter(){
                 match &instr!(at phi_instr in instr_slab)?.instr_type.clone(){
                     NhwcInstrType::Phi { lhs, rhs } => {
                         for phi_pair in &rhs.phi_pairs{
                             if phi_pair.symidx.as_ref_borrow().to_src_symidx() != lhs.as_ref_borrow().to_src_symidx(){
                                 let target_cfg_node = if is_critical_edge(phi_pair.comming_cfg_node, cfg_node, cfg_graph){
-                                    insert_bb_between(cfg_node, phi_pair.comming_cfg_node, cfg_graph)?
+                                    // 检查 comming_cfg_node 是否已有备胎
+                                    if let Some(&inserted) = target_node_map.get(&phi_pair.comming_cfg_node){
+                                        inserted
+                                    }else {
+                                        let inserted = insert_bb_between(phi_pair.comming_cfg_node, cfg_node, cfg_graph,symtab, instr_slab)?;
+                                        target_node_map.insert(phi_pair.comming_cfg_node, inserted);
+                                        inserted
+                                    }
                                 }else {
                                     phi_pair.comming_cfg_node
                                 };
                                 node_mut!(at target_cfg_node in cfg_graph).push_nhwc_instr(
-                                    NhwcInstrType::new_assign(lhs.clone(), phi_pair.symidx.clone(), 
-                                    symtab.get(&lhs.as_ref_borrow())?.get_type()?.clone()).into()
+                                    NhwcInstrType::new_assign(lhs.clone()
+                                    , phi_pair.symidx.clone(), 
+                                    symtab.get(&lhs.as_ref_borrow().to_src_symidx())?.get_type()?.clone()).into()
                                     , instr_slab)?;
                             }
                         }
@@ -468,16 +479,10 @@ pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut
         for &cfg_node in &dfs_vec{
             for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
                 for rc_symidx in instr_mut!(at instr in instr_slab)?.get_mut_ssa_direct_def_symidx_vec().iter_mut().filter(|rc| !rc.as_ref_borrow().is_literal()){
-                    if !rc_symidx.as_ref_borrow().is_literal(){
-                        let src_rc_symidx = symtab.get(&rc_symidx.as_ref_borrow().to_src_symidx())?.rc_symidx.clone();
-                        **rc_symidx = src_rc_symidx;
-                    }
+                    rc_symidx.as_ref_borrow_mut().index_ssa = None;
                 }
                 for rc_symidx in instr_mut!(at instr in instr_slab)?.get_mut_direct_use_symidx_vec().iter_mut(){
-                    if !rc_symidx.as_ref_borrow().is_literal(){
-                        let src_rc_symidx = symtab.get(&rc_symidx.as_ref_borrow().to_src_symidx())?.rc_symidx.clone();
-                        **rc_symidx = src_rc_symidx;
-                    }
+                    rc_symidx.as_ref_borrow_mut().index_ssa = None;
                 }
             }
         }

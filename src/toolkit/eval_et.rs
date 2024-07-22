@@ -64,7 +64,7 @@ fn _eval_et(et_tree:&mut EtTree, et_node:u32) {
                     }
                 }
             }
-            match op.eval(&et_ret_symidx_vec){
+            match op.eval(&et_ret_symidx_vec,true){
                 Ok(val) => {
                     let rc_literal_symidx = val.to_symidx().unwrap().as_rc();
                     let literal_et_node_ty = EtNodeType::new_literal(AST_ROOT, rc_literal_symidx.clone()).into();
@@ -532,7 +532,7 @@ pub fn reducation(et_node:u32,et_tree:&mut EtTree, is_keep_hash_equivalent:bool)
     }
 }
 impl ExprOp{
-    pub fn eval(&self, vec:&Vec<RcSymIdx>) -> Result<Value>{
+    pub fn eval(&self, vec:&Vec<RcSymIdx>, is_ssa_form_bool:bool) -> Result<Value>{
         match self{
             ExprOp::Mul |
             ExprOp::Add |
@@ -564,14 +564,53 @@ impl ExprOp{
             ExprOp::LogicalAnd => (Value::from_symidx( &vec[0].as_ref_borrow())?.logical_and(&Value::from_symidx( &vec[1].as_ref_borrow())?))?,
             ExprOp::BitwiseOr => (Value::from_symidx( &vec[0].as_ref_borrow())?|Value::from_symidx( &vec[1].as_ref_borrow())?)?,
             ExprOp::BitwiseAnd => (Value::from_symidx( &vec[0].as_ref_borrow())?&Value::from_symidx( &vec[1].as_ref_borrow())?)?,
-            ExprOp::NEq => (Value::from_symidx( &vec[0].as_ref_borrow())?.logical_neq(&Value::from_symidx( &vec[1].as_ref_borrow())?))?,
-            ExprOp::Less => (Value::from_symidx( &vec[0].as_ref_borrow())?.less_than(&Value::from_symidx( &vec[1].as_ref_borrow())?))?,
-            ExprOp::Greater => (Value::from_symidx( &vec[0].as_ref_borrow())?.greater_than(&Value::from_symidx( &vec[1].as_ref_borrow())?))?,
-            ExprOp::LEq => (Value::from_symidx( &vec[0].as_ref_borrow())?.less_than_or_equal(&Value::from_symidx( &vec[1].as_ref_borrow())?))?,
-            ExprOp::GEq => (Value::from_symidx( &vec[0].as_ref_borrow())?.greater_than_or_equal(&Value::from_symidx( &vec[1].as_ref_borrow())?))?,
-            ExprOp::Mod => (Value::from_symidx( &vec[0].as_ref_borrow())?%Value::from_symidx( &vec[1].as_ref_borrow())?)?,
+
+            ExprOp::NEq => {
+                if is_ssa_form_bool && vec[0] == vec[1]{
+                    Value::I1(Some(false))
+                }else {
+                    (Value::from_symidx( &vec[0].as_ref_borrow())?.logical_neq(&Value::from_symidx( &vec[1].as_ref_borrow())?))?
+                }
+            } ,
+            ExprOp::Less => {
+                if is_ssa_form_bool && vec[0] == vec[1]{
+                    Value::I1(Some(false))
+                }else {
+                    (Value::from_symidx( &vec[0].as_ref_borrow())?.less_than(&Value::from_symidx( &vec[1].as_ref_borrow())?))?
+                }
+            },
+            ExprOp::Greater => {
+                if is_ssa_form_bool && vec[0] == vec[1]{
+                    Value::I1(Some(false))
+                }else {
+                    (Value::from_symidx( &vec[0].as_ref_borrow())?.greater_than(&Value::from_symidx( &vec[1].as_ref_borrow())?))?
+                }
+            },
+            ExprOp::LEq => {
+                if is_ssa_form_bool && vec[0] == vec[1]{
+                    Value::I1(Some(true))
+                }else {
+                    (Value::from_symidx( &vec[0].as_ref_borrow())?.less_than_or_equal(&Value::from_symidx( &vec[1].as_ref_borrow())?))?
+                }
+            },
+            ExprOp::GEq => {
+                if is_ssa_form_bool && vec[0] == vec[1]{
+                    Value::I1(Some(true))
+                }else {
+                    (Value::from_symidx( &vec[0].as_ref_borrow())?.greater_than_or_equal(&Value::from_symidx( &vec[1].as_ref_borrow())?))?
+                }
+            },
             // ExprOp::BitwiseXor => (Value::from_symidx( &vec[0].as_ref_borrow())?^Value::from_symidx( &vec[1].as_ref_borrow())?)?,
-            // ExprOp::Eq => ((Value::from_symidx(&vec[0].as_ref_borrow())?.less_than_or_equal((&Value::from_symidx( &vec[1].as_ref_borrow())?)))?,
+            ExprOp::Eq => {
+                if is_ssa_form_bool && vec[0] == vec[1]{
+                    Value::I1(Some(true))
+                }else {
+                    (Value::from_symidx(&vec[0].as_ref_borrow())?.equal(&Value::from_symidx( &vec[1].as_ref_borrow())?))?
+                }
+            },
+            ExprOp::Mod => {
+                (Value::from_symidx( &vec[0].as_ref_borrow())?%Value::from_symidx( &vec[1].as_ref_borrow())?)?
+            },
             // ExprOp::LShift => (Value::from_symidx( &vec[0].as_ref_borrow())?<<Value::from_symidx( &vec[1].as_ref_borrow())?)?,
             // ExprOp::RShift => (Value::from_symidx( &vec[0].as_ref_borrow())?>>Value::from_symidx( &vec[1].as_ref_borrow())?)?,
             ExprOp::BitwiseNot => (!Value::from_symidx( &vec[0].as_ref_borrow())?)?, //一元运算符

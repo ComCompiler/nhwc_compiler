@@ -1,8 +1,10 @@
-use std::{any::Any, cell::RefCell, collections::{hash_map::Iter, HashMap}, fmt::Debug, ops::{Add, BitAnd, BitOr, Div, Mul, Neg, Not, Rem, Sub}, rc::Rc };
+use core::panic;
+use std::{any::Any, cell::RefCell, collections::{hash_map::Iter, HashMap}, fmt::Debug, ops::{Add, BitAnd, BitOr, Div, Mul, Neg, Not, Rem, Sub}, rc::Rc, vec };
 
 use ahash::AHashMap;
 use itertools::Itertools;
 use strum_macros::EnumIs;
+use strum_macros::EnumDiscriminants;
 use anyhow::*;
 use regex::{self, Regex};
 
@@ -145,7 +147,9 @@ impl PartialOrd for ArrayEleMap{
     }
 }
 
-#[derive(Clone,EnumIs,PartialOrd,PartialEq,Eq)]
+
+#[derive(Clone,EnumIs,PartialOrd,PartialEq,Eq, EnumDiscriminants)]
+#[strum_discriminants(derive(EnumIs))]
 pub enum Type {
     I32,
     F32,
@@ -275,6 +279,17 @@ impl Value {
             }
         })
     }
+    pub fn equal(&self,val:&Value) -> Result<Value>{
+        Ok(match (self,val){
+            (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1==*v2),
+            (Value::I32(Some(v1)), Value::F32(Some(v2))) => Value::new_i1((*v1 as f32)==*v2),
+            (Value::F32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1==(*v2 as f32)),
+            (Value::F32(Some(v1)), Value::F32(Some(v2))) => Value::new_i1(*v1==*v2),
+            _ => {
+                return Err(anyhow!("can't lessthan {self:?} with {val:?}"))
+            }
+        })
+    }
     pub fn greater_than_or_equal(&self,val:&Value) -> Result<Value>{
         Ok(match (self,val){
             (Value::I32(Some(v1)), Value::I32(Some(v2))) => Value::new_i1(*v1>=*v2),
@@ -354,7 +369,29 @@ impl Value {
     // }
     pub fn from_string_with_specific_type(s:&String,ty:&Type)->Result<Value>{
         Ok(match &ty{
-            Type::I32 => Value::new_i32(s.parse().with_context(||format!("when parsing {} to i32",s)).or(i32::from_str_radix(&s.trim_start_matches("0x"), 16)).with_context(||format!("can't trans {}",s))?),
+            Type::I32 => Value::new_i32(
+                match (s.parse().with_context(||format!("when parsing {} to i32",s)),s.starts_with("0x"), s.starts_with("0")) {
+                    (Result::Ok(i), false, false) => {
+                        i
+                    },
+                    (_, true, _) => {
+                        i32::from_str_radix(&s.trim_start_matches("0x"), 16)?
+                    },
+                    (Result::Ok(i), false, true) => {
+                        if i!=0{
+                            i32::from_str_radix(&s.trim_start_matches("0"), 8)?
+                        }else {
+                            0
+                        }
+                    },
+                    (Err(_), false, false) => {
+                        panic!()
+                    },
+                    (Err(_), false, true) => todo!(),
+                    
+                }
+            ),
+
             Type::F32 => Value::new_f32(s.parse().with_context(||format!("when parsing {} to f32",s)).or(Value::parse_hex_float(s))?),
             Type::I1 => Value::new_i1(s.parse().with_context(||format!("when parsing {} to i1",s))?),
             Type::Void => Err(anyhow!("不能从string 转化为 Void 类型的value"))?,
@@ -467,7 +504,7 @@ impl Value {
     }
 
     pub fn from_symidx(symidx:&SymIdx) -> Result<Value>{
-        Ok(Self::from_string_with_specific_type(&symidx.symbol_name, &Type::new_from_const_str(&symidx.symbol_name))?)
+        Ok(Self::from_string_with_specific_type(&symidx.symbol_name, &TypeDiscriminants::new_from_const_str(&symidx.symbol_name).into())?)
     }
     pub fn to_symidx(&self)->Result<SymIdx>{
         match self{
@@ -778,21 +815,6 @@ impl Type {
         }
     }
 
-    pub fn new_from_const_str(const_str:&String) -> Self {
-        if const_str.contains("true") || const_str.contains("false"){
-            Type::I1
-        }else if const_str.contains(".") && (const_str.chars().next().map_or(false, |x|x.is_numeric()|| x=='-' || x=='.')) {
-            Type::F32
-        } else if const_str.chars().next().map_or(false, |x|x.is_numeric() || x=='-') && (const_str.contains("e")|| const_str.contains("E")){
-            Type::F32
-        }else if const_str.chars().next().map_or(false, |x|x.is_numeric() || x=='-'){
-            Type::I32
-        }else if const_str.starts_with("{"){
-            Type::Array { dims: vec!(), ele_ty: Box::new(Type::Unknown) }
-        }else{
-            Type::Unknown
-        } 
-    }
 
     pub fn new_from_string(ty_str:&str) -> Result<Self>{
         match ty_str{
@@ -1089,3 +1111,52 @@ impl Debug for UseCounter {
 pub fn unwrap_vec<T:Clone>(v:&Vec<Option<T>>)  -> Vec<T>{
     v.clone().into_iter().map(|x| x.unwrap()).collect_vec()
 }
+impl TypeDiscriminants{
+    pub fn new_from_const_str(const_str:&String) -> Self {
+        if const_str.contains("true") || const_str.contains("false"){
+            TypeDiscriminants::I1
+        }else if const_str.contains(".") && (const_str.chars().next().map_or(false, |x|x.is_numeric()|| x=='-' || x=='.')) {
+            TypeDiscriminants::F32
+        } else if const_str.chars().next().map_or(false, |x|x.is_numeric() || x=='-') && (const_str.contains("e")|| const_str.contains("E")){
+            TypeDiscriminants::F32
+        }else if const_str.chars().next().map_or(false, |x|x.is_numeric() || x=='-'){
+            TypeDiscriminants::I32
+        }else if const_str.starts_with("{"){
+            TypeDiscriminants::Array 
+        }else{
+            TypeDiscriminants::Unknown
+        } 
+    }
+}
+impl From<TypeDiscriminants> for Type{
+    fn from(value: TypeDiscriminants) -> Self {
+        match value {
+            TypeDiscriminants::I32 => Type::I32,
+            TypeDiscriminants::F32 => Type::F32,
+            TypeDiscriminants::I1 => Type::I1,
+            TypeDiscriminants::Void => Type::Void,
+            TypeDiscriminants::Label => Type::Label,
+            TypeDiscriminants::Ref => Type::Ref,
+            TypeDiscriminants::Ptr64 => Type::Unknown,
+            TypeDiscriminants::Array => Type::Array { dims: vec![], ele_ty: Box::new(Type::Unknown) },
+            TypeDiscriminants::Fn => panic!(),
+            TypeDiscriminants::Unknown => Type::Unknown,
+        }
+    }
+}
+// impl From<&Type> for TypeDiscriminants{
+//     fn from(value: &Type) -> Self {
+//         match value {
+//             Type::I32 => TypeDiscriminants::I32,
+//             Type::F32 => TypeDiscriminants::F32 ,
+//             Type::I1 => TypeDiscriminants::I1 ,
+//             Type::Void => TypeDiscriminants::Void ,
+//             Type::Label => TypeDiscriminants::Label,
+//             Type::Ref => TypeDiscriminants::Ref,
+//             Type::Ptr64 { ty } => TypeDiscriminants::Ptr64,
+//             Type::Array { dims, ele_ty } => TypeDiscriminants::Array,
+//             Type::Fn { arg_syms, ret_sym } => TypeDiscriminants::Fn,
+//             Type::Unknown => TypeDiscriminants::Unknown,
+//         }
+//     }
+// }

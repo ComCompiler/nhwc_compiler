@@ -1,4 +1,4 @@
-use super::{context::COMPILATION_UNIT, field::{Type, Value}, symbol::Symbol};
+use super::{context::COMPILATION_UNIT, field::{Type, TypeDiscriminants, Value}, symbol::Symbol};
 use crate::{add_node, add_node_with_edge };
 use core::fmt::Debug;
 use ahash::{AHashMap};
@@ -102,7 +102,7 @@ impl SymIdx {
         self.symbol_name.starts_with('*')
     }
     pub fn is_literal(&self) -> bool{
-        !Type::new_from_const_str(&self.symbol_name).is_unknown()
+        !TypeDiscriminants::new_from_const_str(&self.symbol_name).is_unknown()
     }
     pub fn as_deglobal_ptr(mut self) -> Result<Self>{
         if !self.is_global_ptr(){
