@@ -3,8 +3,8 @@ use std::{rc, thread::scope};
 use ahash::{HashMap, HashSet};
 use petgraph::graph::Edge;
 
-use crate::{add_edge, add_node, add_node_with_edge, debug_info_blue, debug_info_red, get_ast_from_symidx, node, node_mut, passes::symtab_debug_pass, toolkit::{et_node::DeclOrDefOrUse, field::Type, gen_nhwc_cfg::IS_LITERAL, nhwc_instr::NhwcInstrType, symbol, symtab::WithBorrow}};
-use anyhow::Result;
+use crate::{add_edge, add_node, add_node_with_edge, debug_info_blue, debug_info_red, direct_child_node, direct_child_nodes, get_ast_from_symidx, node, node_mut, passes::symtab_debug_pass, toolkit::{et_node::DeclOrDefOrUse, field::Type, gen_nhwc_cfg::IS_LITERAL, nhwc_instr::NhwcInstrType, symbol, symtab::WithBorrow}};
+use anyhow::{anyhow, Ok, Result};
 use super::{et_node::{EtEdgeType, EtNode, EtNodeType, EtTree}, nhwc_instr::{ArithOp, InstrSlab, NhwcInstr}, scope_node::ScopeTree, symtab::{self, RcSymIdx, SymIdx, SymTab}};
 
 pub fn process_arith_et(rc_lhs:&RcSymIdx,rc_a:&RcSymIdx, rc_b:&RcSymIdx,instr:usize, mut arith_et_struct:EtNode, instr_et:&mut EtTree,rc_symidx_et_node_map:&mut HashMap<RcSymIdx,u32>,scope_tree:&ScopeTree, instr_et_node_map:&mut HashMap<usize,u32>){
@@ -463,5 +463,253 @@ pub fn parse_instr_list_to_et(instrs:impl Iterator<Item = usize>, instr_et:&mut 
             _ => {},
         }
     };
+    Ok(())
+}
+
+pub fn process_child_instr_et(instr_et_node:u32,instr_et:&mut EtTree)->Result<(&RcSymIdx,&RcSymIdx,&Type)>{
+    let instr_etnode_children = direct_child_nodes!(at instr_et_node in instr_et);
+    let a_etnode = instr_etnode_children[0];
+    let b_etnode = instr_etnode_children[1];
+    let symidx_type = node!(at a_etnode in instr_et).get_type()?;
+    let a_rcsymidx = if let EtNodeType::Symbol { rc_symidx, ast_node:_, text:_,decldef_def_or_use:_ } = &node!(at a_etnode in instr_et).et_node_type{
+        rc_symidx
+    }else{
+        return Err(anyhow!("?"));
+    };
+    let b_rcsymidx = if let EtNodeType::Symbol { rc_symidx, ast_node:_, text:_, decldef_def_or_use:_ } = &node!(at b_etnode in instr_et).et_node_type{
+        rc_symidx
+    }else{
+        return Err(anyhow!("?"));
+    };
+    Ok((a_rcsymidx,b_rcsymidx,symidx_type))
+}
+
+pub fn process_instr_et(instr_et_node:u32,instr_et:&mut EtTree) -> Result<()>{
+    match &node!(at instr_et_node in instr_et).et_node_type{
+        EtNodeType::Operator { op, ast_node, text, op_rc_symidx } => {
+            let lhs_rcsymidx = &node!(at instr_et_node in instr_et).equivalent_symidx_vec[0].clone();
+            match op{
+                super::et_node::ExprOp::Mul =>{
+                    let (a_rcsymidx,b_rcsymidx,symidx_type) = process_child_instr_et(instr_et_node, instr_et)?;
+                    let new_instr:NhwcInstr = NhwcInstrType::new_mul(lhs_rcsymidx.clone(), a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                    println!("{:?}",new_instr);
+                },
+                super::et_node::ExprOp::Add => {
+                    let (a_rcsymidx,b_rcsymidx,symidx_type) = process_child_instr_et(instr_et_node, instr_et)?;
+                    let new_instr:NhwcInstr = NhwcInstrType::new_add(lhs_rcsymidx.clone(), a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                    println!("{:?}",new_instr);
+                },
+                super::et_node::ExprOp::Sub => {
+                    let (a_rcsymidx,b_rcsymidx,symidx_type) = process_child_instr_et(instr_et_node, instr_et)?;
+                    let new_instr:NhwcInstr = NhwcInstrType::new_sub(lhs_rcsymidx.clone(), a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                    println!("{:?}",new_instr);
+                },
+                super::et_node::ExprOp::Div => {
+                    let (a_rcsymidx,b_rcsymidx,symidx_type) = process_child_instr_et(instr_et_node, instr_et)?;
+                    let new_instr:NhwcInstr = NhwcInstrType::new_div(lhs_rcsymidx.clone(), a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                    println!("{:?}",new_instr);
+                },
+                super::et_node::ExprOp::Assign => todo!(),
+                super::et_node::ExprOp::LogicalOr => {
+                    let (a_rcsymidx,b_rcsymidx,symidx_type) = process_child_instr_et(instr_et_node, instr_et)?;
+                    let new_instr:NhwcInstr = NhwcInstrType::new_logic_or(lhs_rcsymidx.clone(), a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                    println!("{:?}",new_instr);
+                },
+                super::et_node::ExprOp::LogicalAnd => {
+                    let (a_rcsymidx,b_rcsymidx,symidx_type) = process_child_instr_et(instr_et_node, instr_et)?;
+                    let new_instr:NhwcInstr = NhwcInstrType::new_logic_and(lhs_rcsymidx.clone(), a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                    println!("{:?}",new_instr);
+                },
+                super::et_node::ExprOp::LogicalNot => {
+                    let child_etnode = direct_child_node!(at instr_et_node in instr_et);
+                    let var_type = node!(at child_etnode in instr_et).get_type()?;
+                    let a_rcsymidx = if let EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } = &node!(at child_etnode in instr_et).et_node_type{
+                        rc_symidx
+                    }else{
+                        return Err(anyhow!("?"));
+                    };
+                    let new_instr = NhwcInstrType::new_logic_not(lhs_rcsymidx.clone(), a_rcsymidx.clone(), var_type.clone());
+                    println!("{:?}",new_instr);
+                },
+                // super::et_node::ExprOp::BitwiseOr => todo!(),
+                // super::et_node::ExprOp::BitwiseAnd => todo!(),
+                // super::et_node::ExprOp::BitwiseXor => todo!(),
+                // super::et_node::ExprOp::BitwiseNot => todo!(),
+                super::et_node::ExprOp::Eq => {
+                    let (a_rcsymidx,b_rcsymidx,symidx_type) = process_child_instr_et(instr_et_node, instr_et)?;
+                    match symidx_type{
+                        Type::I32 => {
+                            let new_instr:NhwcInstr = NhwcInstrType::new_icmp(lhs_rcsymidx.clone(), crate::toolkit::nhwc_instr::IcmpPlan::Eq,a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        Type::F32 =>{
+                            let new_instr:NhwcInstr = NhwcInstrType::new_fcmp(lhs_rcsymidx.clone(), crate::toolkit::nhwc_instr::FcmpPlan::Oeq,a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        _ => todo!(),
+                    }
+                },
+                super::et_node::ExprOp::NEq =>{
+                    let (a_rcsymidx,b_rcsymidx,symidx_type) = process_child_instr_et(instr_et_node, instr_et)?;
+                    match symidx_type{
+                        Type::I32 => {
+                            let new_instr:NhwcInstr = NhwcInstrType::new_icmp(lhs_rcsymidx.clone(), crate::toolkit::nhwc_instr::IcmpPlan::Ne,a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        Type::F32 =>{
+                            let new_instr:NhwcInstr = NhwcInstrType::new_fcmp(lhs_rcsymidx.clone(), crate::toolkit::nhwc_instr::FcmpPlan::One,a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        _ => todo!(),
+                    }
+                },
+                super::et_node::ExprOp::Less => {
+                    let (a_rcsymidx,b_rcsymidx,symidx_type) = process_child_instr_et(instr_et_node, instr_et)?;
+                    match symidx_type{
+                        Type::I32 => {
+                            let new_instr:NhwcInstr = NhwcInstrType::new_icmp(lhs_rcsymidx.clone(), crate::toolkit::nhwc_instr::IcmpPlan::Slt,a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        Type::F32 =>{
+                            let new_instr:NhwcInstr = NhwcInstrType::new_fcmp(lhs_rcsymidx.clone(), crate::toolkit::nhwc_instr::FcmpPlan::Olt,a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        _ => todo!(),
+                    }
+                },
+                super::et_node::ExprOp::Greater => {
+                    let (a_rcsymidx,b_rcsymidx,symidx_type) = process_child_instr_et(instr_et_node, instr_et)?;
+                    match symidx_type{
+                        Type::I32 => {
+                            let new_instr:NhwcInstr = NhwcInstrType::new_icmp(lhs_rcsymidx.clone(), crate::toolkit::nhwc_instr::IcmpPlan::Sgt,a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        Type::F32 =>{
+                            let new_instr:NhwcInstr = NhwcInstrType::new_fcmp(lhs_rcsymidx.clone(), crate::toolkit::nhwc_instr::FcmpPlan::Ogt,a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        _ => todo!(),
+                    }
+                },
+                super::et_node::ExprOp::LEq => {
+                    let (a_rcsymidx,b_rcsymidx,symidx_type) = process_child_instr_et(instr_et_node, instr_et)?;
+                    match symidx_type{
+                        Type::I32 => {
+                            let new_instr:NhwcInstr = NhwcInstrType::new_icmp(lhs_rcsymidx.clone(), crate::toolkit::nhwc_instr::IcmpPlan::Sle,a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        Type::F32 =>{
+                            let new_instr:NhwcInstr = NhwcInstrType::new_fcmp(lhs_rcsymidx.clone(), crate::toolkit::nhwc_instr::FcmpPlan::Ole,a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        _ => todo!(),
+                    }
+                },
+                super::et_node::ExprOp::GEq => {
+                    let (a_rcsymidx,b_rcsymidx,symidx_type) = process_child_instr_et(instr_et_node, instr_et)?;
+                    match symidx_type{
+                        Type::I32 => {
+                            let new_instr:NhwcInstr = NhwcInstrType::new_icmp(lhs_rcsymidx.clone(), crate::toolkit::nhwc_instr::IcmpPlan::Sgt,a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        Type::F32 =>{
+                            let new_instr:NhwcInstr = NhwcInstrType::new_fcmp(lhs_rcsymidx.clone(), crate::toolkit::nhwc_instr::FcmpPlan::Ogt,a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        _ => todo!(),
+                    }
+                },
+                // super::et_node::ExprOp::LShift => todo!(),
+                // super::et_node::ExprOp::RShift => todo!(),
+                super::et_node::ExprOp::Mod => {
+                    let (a_rcsymidx,b_rcsymidx,symidx_type) = process_child_instr_et(instr_et_node, instr_et)?;
+                    let new_instr:NhwcInstr = NhwcInstrType::new_mod(lhs_rcsymidx.clone(), a_rcsymidx.clone(), b_rcsymidx.clone(),symidx_type.clone()).into();
+                    println!("{:?}",new_instr);
+                },
+                // super::et_node::ExprOp::Cast => todo!(),
+                super::et_node::ExprOp::Call => {
+                    // let a = node!(at instr_et_node in instr_et).
+                    // let new_instr = NhwcInstrType::new_func_call(assigned, func, args, ret_type)
+                },
+                // super::et_node::ExprOp::Negative => todo!(),
+                // super::et_node::ExprOp::Positive => todo!(),
+                // super::et_node::ExprOp::AddrOf => todo!(),
+                // super::et_node::ExprOp::Deref => todo!(),
+                // super::et_node::ExprOp::DotMember => todo!(),
+                // super::et_node::ExprOp::ArrowMember => todo!(),
+                // super::et_node::ExprOp::LPlusPlus => todo!(),
+                // super::et_node::ExprOp::RPlusPlus => todo!(),
+                // super::et_node::ExprOp::LMinusMinus => todo!(),
+                // super::et_node::ExprOp::RMinusMinus => todo!(),
+                // super::et_node::ExprOp::MulAssign => todo!(),
+                // super::et_node::ExprOp::DivAssign => todo!(),
+                // super::et_node::ExprOp::PlusAssign => todo!(),
+                // super::et_node::ExprOp::MinusAssign => todo!(),
+                super::et_node::ExprOp::ArrayIndex => todo!(),
+                super::et_node::ExprOp::ArrayWrapper => todo!(),
+                super::et_node::ExprOp::Store => {
+
+                },
+                super::et_node::ExprOp::Load => {
+
+                },
+                super::et_node::ExprOp::TransToI32 => {
+                    let child_etnode = direct_child_node!(at instr_et_node in instr_et);
+                    match node!(at child_etnode in instr_et).get_type()?{
+                        Type::F32 => {
+                            let float_rcsymidx = if let EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } = &node!(at child_etnode in instr_et).et_node_type{
+                                rc_symidx
+                            }else{
+                                return Err(anyhow!("?"));
+                            };
+                            let new_instr:NhwcInstr = NhwcInstrType::new_float2int(float_rcsymidx.clone(), lhs_rcsymidx.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        Type::I1 => {
+                            let bool_rcsymidx = if let EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } = &node!(at child_etnode in instr_et).et_node_type{
+                                rc_symidx
+                            }else{
+                                return Err(anyhow!("?"));
+                            };
+                            let new_instr:NhwcInstr = NhwcInstrType::new_bool2int(bool_rcsymidx.clone(), lhs_rcsymidx.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        _ => todo!()
+                    }
+                },
+                super::et_node::ExprOp::TransToF32 => {
+                    let child_etnode = direct_child_node!(at instr_et_node in instr_et);
+                    match node!(at child_etnode in instr_et).get_type()?{
+                        Type::I32 => {
+                            let int_rcsymidx = if let EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } = &node!(at child_etnode in instr_et).et_node_type{
+                                rc_symidx
+                            }else{
+                                return Err(anyhow!("?"));
+                            };
+                            let new_instr:NhwcInstr = NhwcInstrType::new_int2float(int_rcsymidx.clone(), lhs_rcsymidx.clone()).into();
+                            println!("{:?}",new_instr);
+                        },
+                        // Type::I1 => {
+                        //     let bool_rcsymidx = if let EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } = &node!(at child_etnode in instr_et).et_node_type{
+                        //         rc_symidx
+                        //     }else{
+                        //         return Err(anyhow!("?"));
+                        //     };
+                        //     let new_instr1:NhwcInstr = NhwcInstrType::new_bool2int(bool_rcsymidx.clone(), lhs_rcsymidx.clone()).into();
+                        //     println!("{:?}",new_instr1);
+                        //     let new_instr2:NhwcInstr = NhwcInstrType::new_int2float(bool_rcsymidx.clone(), lhs_rcsymidx.clone()).into();
+                        //     println!("{:?}",new_instr2);
+                        // },
+                        _ => todo!()
+                    }
+                },
+                super::et_node::ExprOp::TransToI1 => todo!(),
+                _ => todo!()
+            }
+        },
+        EtNodeType::Literal { rc_literal_symidx, ast_node, text } => todo!(),
+        EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } => todo!(),
+        EtNodeType::Separator { ast_node, text } => todo!(),
+    }
     Ok(())
 }
