@@ -1,8 +1,4 @@
-use std::{rc, thread::scope};
-
-use ahash::{HashMap, HashSet};
-use petgraph::graph::Edge;
-
+use ahash::HashMap ;
 use crate::{add_edge, add_node, add_node_with_edge, debug_info_blue, debug_info_red, get_ast_from_symidx, node, node_mut, passes::symtab_debug_pass, toolkit::{et_node::DeclOrDefOrUse, field::Type, gen_nhwc_cfg::IS_LITERAL, nhwc_instr::NhwcInstrType, symbol, symtab::WithBorrow}};
 use anyhow::Result;
 use super::{et_node::{EtEdgeType, EtNode, EtNodeType, EtTree}, nhwc_instr::{ArithOp, InstrSlab, NhwcInstr}, scope_node::ScopeTree, symtab::{self, RcSymIdx, SymIdx, SymTab}};
@@ -376,7 +372,6 @@ pub fn parse_instr_list_to_et(instrs:impl Iterator<Item = usize>, instr_et:&mut 
                 // todo!();
             },
             super::nhwc_instr::NhwcInstrType::Jump { jump_op } => {
-
             },
             super::nhwc_instr::NhwcInstrType::Phi { lhs: rc_lhs, rhs } => {
                 if let Some(&lhs_et_node) = rc_symidx_et_node_map.get(&rc_lhs){

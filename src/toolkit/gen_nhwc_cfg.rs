@@ -539,7 +539,7 @@ fn process_symbol(
             let var_type: Type ;
             // 这里有两种可能，一种是数组，一种是普通变量，如果是数组，那么et_node 上一定有 dims 字段
             if let Some(op_dims) = op_dims{
-                var_type = Type::new_array_dims_may_unknown_with_dims_2_pow(Type::new(type_ast_node, ast_tree), op_dims.clone())?;
+                var_type = Type::new_array_dims_may_unknown(Type::new(type_ast_node, ast_tree), op_dims.clone())?;
             }else{
                 var_type = Type::new(type_ast_node, ast_tree);
             }

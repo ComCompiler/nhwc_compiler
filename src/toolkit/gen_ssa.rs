@@ -438,8 +438,7 @@ pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut
     update_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
     let all_cfg_func_symidx_entry_tuple = symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.clone();
     for (_func_symidx,cfg_entry) in all_cfg_func_symidx_entry_tuple{
-        let dfs_vec = etc::dfs(cfg_graph,cfg_entry);
-        for &cfg_node in &dfs_vec{
+        for cfg_node in etc::dfs(cfg_graph,cfg_entry){
             let mut target_node_map  = HashMap::new();
             for &phi_instr in node!(at cfg_node in cfg_graph).phi_instrs.clone().iter(){
                 match &instr!(at phi_instr in instr_slab)?.instr_type.clone(){
@@ -476,8 +475,7 @@ pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut
             }
             node_mut!(at cfg_node in cfg_graph).phi_instrs.instr_vec.clear();
         }
-        let dfs_vec = etc::dfs(cfg_graph,cfg_entry);
-        for &cfg_node in &dfs_vec{
+        for cfg_node in etc::dfs(cfg_graph,cfg_entry){
             for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
                 for rc_symidx in instr_mut!(at instr in instr_slab)?.get_mut_ssa_direct_def_symidx_vec().iter_mut().filter(|rc| !rc.as_ref_borrow().is_literal()){
                     rc_symidx.as_ref_borrow_mut().index_ssa = None;

@@ -469,7 +469,7 @@ impl Value {
                 if num > 0 {
                     let num  = num as usize;
                     let mut i = 0;
-                    while num < 2_usize.pow(i){
+                    while num > 2_usize.pow(i){
                         i=i+1;
                     }
                     if 2_usize.pow(i) == num {

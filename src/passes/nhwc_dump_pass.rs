@@ -8,7 +8,7 @@ use crate::toolkit::gen_nhwc_cfg;
 use crate::toolkit::nhwc_instr::NhwcInstrType;
 use crate::toolkit::scope_node::ST_ROOT;
 use crate::toolkit::symtab::{RcSymIdx, WithBorrow};
-use crate::{direct_child_node, instr, instr_mut, node_mut};
+use crate::{direct_child_node, direct_child_nodes, instr, instr_mut, node_mut};
 
 use crate::{node, toolkit::{cfg_edge::CfgEdgeType, context::NhwcCtx, etc::dfs_with_priority, pass_manager::Pass}};
 use anyhow::*;
@@ -77,7 +77,7 @@ impl Pass for NhwcDumpPass {
             }
         }
         for &cfg_node in dfs_node_vec.iter(){
-            if cfg_node == CFG_ROOT|| node!(at cfg_node in cfg_graph).cfg_node_type.is_entry(){continue;}
+            if cfg_node == CFG_ROOT|| node!(at cfg_node in cfg_graph).cfg_node_type.is_entry() || direct_child_nodes!(at cfg_node in cfg_graph).len()==0{continue;}
             // println!("{:?}",node!(at cfg_node in cfg_graph));
             let &jump_instr = node!(at cfg_node in cfg_graph).op_jump_instr.as_ref().unwrap();
             match &instr!(at jump_instr in instr_slab)?.instr_type{

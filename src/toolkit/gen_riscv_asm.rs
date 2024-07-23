@@ -1056,14 +1056,26 @@ pub fn magic_i32_mul(asm_sect:&mut AsmSection,regtab:& mut RegTab,rst_reg:Regist
         match (a.try_log_two_as_i32(),b.try_log_two_as_i32()){
             (Result::Ok(_), Result::Ok(_)) => panic!(),
             (Result::Ok(bit_offset), Err(_)) => {
-                let val_reg2= regtab.find_and_occupy_reg(&b, &vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
-                asm_sect.asm(Shifts::new_slli(rst_reg.clone(),val_reg2.clone(),Imm::from_offset(bit_offset)).into());
-                regtab.unoccupied_reg(val_reg2,symtab,asm_sect,&mut default_store)?;
+                if bit_offset != 0 {
+                    let val_reg2= regtab.find_and_occupy_reg(&b, &vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
+                    asm_sect.asm(Shifts::new_slli(rst_reg.clone(),val_reg2.clone(),Imm::from_offset(bit_offset)).into());
+                    regtab.unoccupied_reg(val_reg2,symtab,asm_sect,&mut default_store)?;
+                }else {
+                    let val_reg2= regtab.find_and_occupy_reg(&b, &vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
+                    asm_sect.asm(PseudoInstr::new_reg_mv(rst_reg.clone(),val_reg2.clone()).into());
+                    regtab.unoccupied_reg(val_reg2,symtab,asm_sect,&mut default_store)?;
+                }
             },
             (Err(_), Result::Ok(bit_offset)) => {
-                let val_reg1= regtab.find_and_occupy_reg(&a, &vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
-                asm_sect.asm(Shifts::new_slli(rst_reg.clone(),val_reg1.clone(),Imm::from_offset(bit_offset)).into());
-                regtab.unoccupied_reg(val_reg1,symtab,asm_sect,&mut default_store)?;
+                if bit_offset != 0 {
+                    let val_reg1= regtab.find_and_occupy_reg(&a, &vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
+                    asm_sect.asm(Shifts::new_slli(rst_reg.clone(),val_reg1.clone(),Imm::from_offset(bit_offset)).into());
+                    regtab.unoccupied_reg(val_reg1,symtab,asm_sect,&mut default_store)?;
+                }else {
+                    let val_reg1= regtab.find_and_occupy_reg(&a, &vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
+                    asm_sect.asm(PseudoInstr::new_reg_mv(rst_reg.clone(),val_reg1.clone()).into());
+                    regtab.unoccupied_reg(val_reg1,symtab,asm_sect,&mut default_store)?;
+                }
             },
             (Err(_), Err(_)) => {
                 let val_reg1= regtab.find_and_occupy_reg(&a, &vartype,symtab, asm_sect, &mut default_store, &mut default_load)?;
