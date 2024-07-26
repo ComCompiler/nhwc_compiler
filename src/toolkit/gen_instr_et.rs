@@ -1,11 +1,11 @@
-use std::{rc, thread::scope};
+use std::{any::Any, rc, thread::scope};
 
 use ahash::{HashMap, HashSet};
 use petgraph::graph::Edge;
 
 use crate::{add_edge, add_node, add_node_with_edge, debug_info_blue, debug_info_red, direct_child_node, direct_child_nodes, get_ast_from_symidx, node, node_mut, passes::symtab_debug_pass, toolkit::{et_node::DeclOrDefOrUse, field::Type, gen_nhwc_cfg::IS_LITERAL, nhwc_instr::NhwcInstrType, symbol, symtab::WithBorrow}};
 use anyhow::{anyhow, Ok, Result};
-use super::{et_node::{EtEdgeType, EtNode, EtNodeType, EtTree}, nhwc_instr::{ArithOp, InstrSlab, NhwcInstr}, scope_node::ScopeTree, symtab::{self, RcSymIdx, SymIdx, SymTab}};
+use super::{et_node::{EtEdgeType, EtNode, EtNodeType, EtTree}, field::Value, nhwc_instr::{ArithOp, InstrSlab, NhwcInstr}, scope_node::ScopeTree, symtab::{self, RcSymIdx, SymIdx, SymTab}};
 
 pub fn process_arith_et(rc_lhs:&RcSymIdx,rc_a:&RcSymIdx, rc_b:&RcSymIdx,instr:usize, mut arith_et_struct:EtNode, instr_et:&mut EtTree,rc_symidx_et_node_map:&mut HashMap<RcSymIdx,u32>,scope_tree:&ScopeTree, instr_et_node_map:&mut HashMap<usize,u32>){
     arith_et_struct.equivalent_symidx_vec.push(rc_lhs.clone());
@@ -628,8 +628,38 @@ pub fn process_instr_et(instr_et_node:u32,instr_et:&mut EtTree) -> Result<()>{
                 },
                 // super::et_node::ExprOp::Cast => todo!(),
                 super::et_node::ExprOp::Call => {
-                    // let a = node!(at instr_et_node in instr_et).
-                    // let new_instr = NhwcInstrType::new_func_call(assigned, func, args, ret_type)
+                    let return_rcsymidxs = &node!(at instr_et_node in instr_et).equivalent_symidx_vec;
+                    let assigned_rcsymidx:Option<RcSymIdx>;
+                    let ret_type :Type;
+                    if return_rcsymidxs.is_empty(){
+                        assigned_rcsymidx = None;
+                        ret_type = Value::new_void().to_type();
+                    }else{
+                        assigned_rcsymidx = Some(return_rcsymidxs[0]);
+                        ret_type = node!(at instr_et_node in instr_et).get_type()?.clone();
+                    }
+                    let func_name_and_args = direct_child_nodes!(at instr_et_node in instr_et);
+                    let func_name_node = func_name_and_args[0];
+                    let func_name_rcsymidx = if let EtNodeType::Literal { rc_literal_symidx, ast_node, text } = &node!(at func_name_node in instr_et).et_node_type{
+                        rc_literal_symidx
+                    }else if let EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } = &node!(at func_name_node in instr_et).et_node_type{
+                        rc_symidx
+                    }else{
+                        todo!()
+                    };
+                    let mut args = vec![];
+                    for arg_etnode in &func_name_and_args[1..]{
+                        let arg_etnode = *arg_etnode;
+                        let arg_rcsymidx = if let EtNodeType::Literal { rc_literal_symidx, ast_node, text } = &node!(at arg_etnode in instr_et).et_node_type{
+                            rc_literal_symidx
+                        }else if let EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } = &node!(at arg_etnode in instr_et).et_node_type{
+                            rc_symidx
+                        }else{
+                            todo!()
+                        };
+                        args.push(arg_rcsymidx.clone());
+                    }
+                    let new_instr:NhwcInstr = NhwcInstrType::new_func_call(assigned_rcsymidx, func_name_rcsymidx.clone(), args, ret_type).into();
                 },
                 // super::et_node::ExprOp::Negative => todo!(),
                 // super::et_node::ExprOp::Positive => todo!(),

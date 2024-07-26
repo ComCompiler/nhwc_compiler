@@ -4,9 +4,9 @@ int main(){
     while(i<5){
         int j = 0;
         while(j<3){
-            a+=1;
-            j+=1;
+            a=a+1;
+            j=j+1;
         }
-        i+=1;
+        i=i+1;
     }
 }
