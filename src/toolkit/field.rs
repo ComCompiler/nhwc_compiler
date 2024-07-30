@@ -774,6 +774,19 @@ impl Type {
             _ => panic!()
         }
     }
+    pub fn try_arr2ptr(&self) -> Result<Type>{
+        match self{
+            Type::Array { dims, ele_ty } => {
+                let mut ty = self.clone();
+                ty.pop_dim()?;
+                Ok(Self::Ptr64 { ty:Box::new(ty)  })
+            },
+            Type::Ptr64 { ty } => {
+                Ok(self.clone())
+            }
+            _ => panic!()
+        }
+    }
 
     /// self could be an array or ptr
     pub fn get_array_dim_weight_vec(&self)->Result<Vec<SymIdx>>{

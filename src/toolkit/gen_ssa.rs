@@ -1,10 +1,13 @@
-use std::{cmp::Ordering, collections::{HashMap, HashSet}};
+use std::{cmp::Ordering};
 
-use crate::{add_field, add_symbol, debug_info_blue, debug_info_green, debug_info_red, debug_info_yellow, direct_child_nodes, direct_parent_nodes, instr, instr_mut, node, node_mut, reg_field_for_struct};
-use ahash::{ HashSetExt};
+use crate::{add_field, add_symbol, debug_info_blue, debug_info_green, debug_info_red, debug_info_yellow, direct_child_nodes, direct_parent_nodes, instr, instr_mut, make_field_trait_for_struct, node, node_mut, reg_field_for_struct};
+use ahash::{ AHashMap, AHashSet, HashMap, HashMapExt, HashSet, HashSetExt};
+use bimap::BiMap;
 use itertools::Itertools;
-use super::{cfg_node::{CfgGraph, CfgInstrIdx, InCfgNodeInstrPos, InstrList, CFG_ROOT}, context::DjGraph, etc, gen_nhwc_cfg::insert_bb_between, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType, PhiPair}, symbol::Symbol, symtab::{self, RcSymIdx, SymIdx, SymTab, WithBorrow}};
+use super::{cfg_node::{CfgGraph, CfgInstrIdx, CfgNode, InCfgNodeInstrPos, InstrList, CFG_ROOT}, context::DjGraph, et_node::EtTree, etc, field::Type, gen_nhwc_cfg::{insert_bb_between, process_temp_symbol}, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType, PhiPair}, symbol::Symbol, symtab::{self, RcSymIdx, SymIdx, SymTab, WithBorrow}};
 use anyhow::{anyhow, Result, Context};
+
+use crate::toolkit::field::Field;
 
 
 reg_field_for_struct!(Symbol {
@@ -18,6 +21,12 @@ reg_field_for_struct!(Symbol {
 reg_field_for_struct!(Symbol {
     SSA_DEF_INSTR:usize,
 } with_fields fields);
+
+// this is a map from rhs(to copy into) to lhs(to be copied )
+reg_field_for_struct!(CfgNode {
+    PARALLEL_COPY_MAP:HashMap<RcSymIdx, RcSymIdx>,
+} with_fields info);
+make_field_trait_for_struct!(HashMap<RcSymIdx,RcSymIdx>);
 
 pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab<NhwcInstr> )->Result<()>{
     update_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
@@ -44,7 +53,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
                 }
             ).collect();
             // defs of the variable 
-            let def_cfg_nodes:Vec<u32> = cfg_node_instr_groups.iter().map(|x|x.0).collect();
+            let def_cfg_nodes= cfg_node_instr_groups.iter().map(|x|x.0).collect_vec();
             while !cfg_node_instr_groups.is_empty(){
                 let (cfg_node,_instr) = cfg_node_instr_groups.pop().unwrap();
                 let domiance_frontiers = node!(at cfg_node in cfg_graph).get_domiance_frontier_cfg_nodes()?.clone();
@@ -434,7 +443,7 @@ pub fn is_critical_edge(cfg_node_from:u32,cfg_node_to:u32, cfg_graph:&CfgGraph) 
 }
 
 
-pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab<NhwcInstr>)->Result<()>{
+pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab<NhwcInstr>,et_tree:&mut EtTree)->Result<()>{
     update_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
     let all_cfg_func_symidx_entry_tuple = symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.clone();
     for (_func_symidx,cfg_entry) in all_cfg_func_symidx_entry_tuple{
@@ -450,18 +459,26 @@ pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut
                                     if let Some(&inserted) = target_node_map.get(&phi_pair.comming_cfg_node){
                                         inserted
                                     }else {
-                                        let inserted = insert_bb_between(phi_pair.comming_cfg_node, cfg_node, cfg_graph,symtab, instr_slab)?;
-                                        target_node_map.insert(phi_pair.comming_cfg_node, inserted);
-                                        inserted
+                                        let inserted_bb = insert_bb_between(phi_pair.comming_cfg_node, cfg_node, cfg_graph,symtab, instr_slab)?;
+                                        target_node_map.insert(phi_pair.comming_cfg_node, inserted_bb);
+                                        inserted_bb
                                     }
                                 }else {
                                     phi_pair.comming_cfg_node
                                 };
-                                node_mut!(at target_cfg_node in cfg_graph).push_nhwc_instr(
-                                    NhwcInstrType::new_assign(lhs.clone()
-                                    , phi_pair.symidx.clone(), 
-                                    symtab.get(&lhs.as_ref_borrow().to_src_symidx())?.get_type()?.clone()).into()
-                                    , instr_slab)?;
+                                // if phi_pair.symidx.as_ref_borrow().is_literal(){
+                                //     node_mut!(at target_cfg_node in cfg_graph).push_nhwc_instr(
+                                //         NhwcInstrType::new_assign(lhs.clone()
+                                //         , phi_pair.symidx.clone(), 
+                                //         lhs.as_ref_borrow().get_ty(symtab)?.clone()).into()
+                                //         , instr_slab)?;
+                                // }else {
+                                let inserted_bb_struct = node_mut!(at target_cfg_node in cfg_graph);
+                                if !inserted_bb_struct.has_parallel_copy_map(){ inserted_bb_struct.add_parallel_copy_map(HashMap::new()); }
+                                // this is a map from rhs(to copy into) to lhs(to be copied )
+                                let parallel_copy_map = inserted_bb_struct.get_mut_parallel_copy_map()?;
+                                assert!(parallel_copy_map.get(&lhs).is_none());
+                                parallel_copy_map.insert( lhs.as_ref_borrow().to_src_symidx().as_rc(),phi_pair.symidx.as_ref_borrow().to_src_symidx().as_rc(),);
                             }
                         }
                     }
@@ -474,6 +491,115 @@ pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut
                 }
             }
             node_mut!(at cfg_node in cfg_graph).phi_instrs.instr_vec.clear();
+        }
+        // now unwrap all parallel_copy_map into seq  ref: ssabook page 265
+        for cfg_node in etc::dfs(cfg_graph,cfg_entry){
+            // if the cfg_node has this parallel copy map
+            if node!(at cfg_node in cfg_graph).has_parallel_copy_map(){
+                let parallel_copy_map = node!(at cfg_node in cfg_graph).get_parallel_copy_map()?.clone();
+                let mut val_pos_bimap = BiMap::new();
+                let mut todo = vec![];
+                for (dst,src) in parallel_copy_map.iter(){
+                    if !src.as_ref_borrow().is_literal(){
+                        // println!("insert bimap of dst:{:?} src:{:?}",dst,src);
+                        val_pos_bimap.insert(src.clone(), src.clone());
+                        todo.push(dst.clone());
+                    }
+                }
+
+                let mut ready = vec![];
+                for (dst,src) in parallel_copy_map.iter(){
+                    if !src.as_ref_borrow().is_literal(){
+                        // println!("insert ready of {:?}",src);
+                        if val_pos_bimap.get_by_left(dst).is_none(){
+                            // we thought this pos is available now
+                            ready.push(dst.clone());
+                        }
+                    }
+                }
+                debug_info_red!("ready list {:?}",ready);
+                debug_info_red!("todo list {:?}",todo);
+                let mut op_tmp = None;
+                loop {
+                    // debug_info_red!("bimap{:?}",val_pos_bimap);
+                    while let Some(dst) = ready.pop() {
+                        debug_info_yellow!("dst {:?}",dst);
+                        if parallel_copy_map.get(&dst) == val_pos_bimap.get_by_right(&dst)  {
+                            debug_info_yellow!("dst continue {:?}",dst);
+                            continue;
+                        }
+                        let target_val = parallel_copy_map.get(&dst).unwrap();
+                        // node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(instr, instr_slab)
+
+                        // println!("read pos of {:?}",val);
+                        let pos_of_val = val_pos_bimap.get_by_left(target_val).unwrap().clone();
+                        node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(
+                            NhwcInstrType::new_assign(dst.clone()
+                            , pos_of_val.clone(), 
+                            dst.as_ref_borrow().get_ty(symtab)?.clone()).into()
+                            , instr_slab)?;
+                        // update the pos of val because copied to dst
+                        debug_info_yellow!("copy pos:{:?} of val:{:?} into {:?} when parsing all ready",pos_of_val,target_val,dst);
+                        todo.swap_remove(todo.iter().position(|x| x == &dst).unwrap());
+                        match val_pos_bimap.insert(target_val.clone(), dst.clone()){
+                            bimap::Overwritten::Neither => todo!(),
+                            bimap::Overwritten::Left(l, r) => {
+                                debug_info_yellow!("val pos map:{:?}",val_pos_bimap);
+                                if let Some(val) = parallel_copy_map.get(&r) {
+                                    if !val.as_ref_borrow().is_literal() && todo.contains(&r){
+                                        debug_info_red!("pushed {:?}",r);
+                                        ready.push(r);
+                                    }
+                                }
+                            },
+                            bimap::Overwritten::Right(_, _) => todo!(),
+                            bimap::Overwritten::Pair(_, _) => todo!(),
+                            bimap::Overwritten::Both(_, _) => todo!(),
+                        }
+                    }
+                    if let Some(todo_dst) = todo.last(){
+                        // if target value is not in target pos then mv the cor value of target pos to tmp
+                        if &val_pos_bimap.get_by_left(parallel_copy_map.get(&todo_dst).unwrap()).unwrap() != &todo_dst{
+                            let tmp_pos = op_tmp.get_or_insert_with(||{
+                                process_temp_symbol(cfg_graph, symtab, &Type::I32, 0, cfg_node, instr_slab, None, et_tree, "swap").unwrap()
+                            });
+                            // mv value of cur destination to tmp then insert value 
+                            node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(
+                                NhwcInstrType::new_assign(tmp_pos.clone()
+                                , todo_dst.clone(), 
+                                todo_dst.as_ref_borrow().get_ty(symtab)?.clone()).into()
+                                , instr_slab)?;
+                            // replace (todo_dst, value) pair with (tmp_pos, value) pair
+                            let dst_cur_val =val_pos_bimap.get_by_right(&todo_dst).unwrap().clone();
+                            println!("copy pos:{:?} of val:{:?} into {:?}",todo_dst,dst_cur_val,tmp_pos);
+                            match val_pos_bimap.insert(dst_cur_val,tmp_pos.clone() ){
+                                bimap::Overwritten::Neither => {todo!() },
+                                bimap::Overwritten::Left(_, _) => {
+                                    if parallel_copy_map.get(&todo_dst).is_some(){
+                                        ready.push(todo_dst.clone());
+                                    }
+                                },
+                                bimap::Overwritten::Right(_, _) => {todo!() },
+                                bimap::Overwritten::Pair(_, _) => todo!(),
+                                bimap::Overwritten::Both(_, _) => todo!(),
+                            }
+                            ready.push(todo_dst.clone());
+                        }
+                    }else {
+                        break;
+                    }
+                }
+                for (dst,src) in parallel_copy_map.iter(){
+                    if src.as_ref_borrow().is_literal(){
+                        node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(
+                            NhwcInstrType::new_assign(dst.clone()
+                            , src.clone(), 
+                            src.as_ref_borrow().get_ty(symtab)?.clone()).into()
+                            , instr_slab)?;
+                    }
+                }
+
+            }
         }
         for cfg_node in etc::dfs(cfg_graph,cfg_entry){
             for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
@@ -569,4 +695,38 @@ impl SSACheck for SymIdx{
         // debug_info_red!("should be ssa {:?} {}",&self,!(self.is_literal() || self.is_global_ptr()));
         !(self.is_literal() || self.is_global_ptr())
     }
+}
+
+
+pub fn update_ssa_def_instr(cfg_graph:&CfgGraph, symtab:&mut SymTab, instr_slab:&InstrSlab<NhwcInstr>) -> Result<()>{
+    for (rc_func_symidx,cfg_entry) in symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.clone().iter(){
+        let cfg_entry = *cfg_entry;
+        for cfg_node in etc::dfs(cfg_graph,cfg_entry){
+            for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
+                for rc_symidx in instr!(at instr in instr_slab)?.get_ssa_direct_def_symidx_vec(){
+                    if symtab.has_symbol(&rc_symidx.as_ref_borrow()){
+                        symtab.get_mut(&rc_symidx.as_ref_borrow())?.add_ssa_def_instr(instr)
+                    }
+                }
+                match &instr!(at instr in instr_slab)?.instr_type{
+                    NhwcInstrType::Mu { may_use_symidx, may_use_instr } => {
+                    },
+                    NhwcInstrType::Chi { lhs, rhs, may_def_instr } => {
+                        symtab.get_mut(&lhs.as_ref_borrow())?.add_ssa_def_instr(*may_def_instr)
+                    },
+                    _ => {
+
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+
+pub fn ssa_index_correct(cfg_graph:&CfgGraph, symtab:&mut SymTab, instr_slab:&InstrSlab<NhwcInstr>){
+
+    // process_temp_symbol(cfg_graph, symtab, &Type::I32, 0, cfg_node, instr_slab, None, et_tree, "swap").unwrap()
 }

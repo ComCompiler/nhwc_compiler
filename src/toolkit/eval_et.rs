@@ -1,11 +1,13 @@
 
+use std::borrow::BorrowMut;
+
 use super::{et_node::{DeclOrDefOrUse, EtEdge, EtHash, EtNode, EtNodeType, EtTree, ExprOp}, etc::{self, dfs, rpo}, field::{Type, Value}, scope_node::ScopeTree, symtab::SymTab};
 use crate::{add_edge, add_node_with_edge, debug_info_blue, debug_info_green, debug_info_red, direct_child_node, direct_child_nodes, direct_parent_node, node, node_mut, toolkit::{dot::Config, et_node::EtEdgeType, etc::{dfs_with_predicate, generate_png_by_graph, generate_png_by_graph_multi_tasks, rpo_with_predicate}, gen_cfg::AST_ROOT, scope_node::ST_ROOT, symtab::{RcSymIdx, SymIdx, WithBorrow}}};
 use ahash::{HashMap, HashMapExt};
 use anyhow::Result;
 use anyhow::anyhow;
 use itertools::Itertools;
-use petgraph::{graph::{node_index, NodeIndex}, visit::{EdgeRef, NodeRef}, Direction::Outgoing};
+use petgraph::{graph::{node_index, NodeIndex}, visit::{EdgeRef, IntoEdgesDirected, NodeRef}, Direction::{Incoming, Outgoing}};
 use syn::ExprAssignOp;
 ///
 /// pattern 
@@ -37,7 +39,7 @@ fn eval_et(et_tree:&mut EtTree, et_node:u32) {
     for et_node in rpo_et_nodes{
         if !node!(at et_node in et_tree).gvn_evaluated{
             _eval_et(et_tree, et_node);
-            node_mut!(at et_node in et_tree).gvn_evaluated = false;
+            node_mut!(at et_node in et_tree).gvn_evaluated = true;
         }
     }
 }
@@ -357,7 +359,7 @@ fn recursive_replace_const_symbol(et_tree:&mut EtTree,et_node:u32,symtab:&SymTab
 /// 1. replace const (optional)
 /// 2. eval_et
 /// the input et_sep_node should always be a sep_node
-pub fn compress_et(et_tree:&mut EtTree, et_sep_node:u32, can_eliminate_f:&mut impl FnMut(u32,&EtTree)->bool,symtab:&SymTab, scope_node:u32, scope_tree:&ScopeTree, replace_const:bool ) -> Result<()> {
+pub fn compress_et_for_gen_nhwc(et_tree:&mut EtTree, et_sep_node:u32, can_eliminate_f:&mut impl FnMut(Option<u32>,u32,&EtTree)->bool,symtab:&SymTab, scope_node:u32, scope_tree:&ScopeTree, replace_const:bool ) -> Result<()> {
     debug_info_red!("exec compress_et on {}",et_sep_node);
     if replace_const{ recursive_replace_const_symbol(et_tree, et_sep_node, symtab, scope_node, scope_tree)?;}
     eval_et(et_tree, et_sep_node);
@@ -374,9 +376,8 @@ pub fn compress_et(et_tree:&mut EtTree, et_sep_node:u32, can_eliminate_f:&mut im
     Ok(())
 }
 /// the input et_node can't be  separator and you should also provide a expr_hash_map
-pub fn _compress_et(et_tree:&mut EtTree, et_node:u32, can_eliminate_f:&mut impl FnMut(u32,&EtTree)->bool,symtab:&SymTab, scope_node:u32, scope_tree:&ScopeTree,expr_hash_map:&mut HashMap<isize,u32>, replace_const:bool ) -> Result<()> {
+pub fn compress_et_for_gvn(et_tree:&mut EtTree, et_node:u32, can_eliminate_f:&mut impl FnMut(Option<u32>,u32,&EtTree)->bool,symtab:&SymTab, scope_node:u32, scope_tree:&ScopeTree,expr_hash_map:&mut HashMap<isize,u32>) -> Result<()> {
     debug_info_red!("exec compress_et on {}",et_node);
-    if replace_const{ recursive_replace_const_symbol(et_tree, et_node, symtab, scope_node, scope_tree)?;}
     eval_et(et_tree, et_node);
     et_tree.update_hash(et_node)?;
     debug_info_blue!("hash expr eliminate on {}",et_node);
@@ -390,12 +391,12 @@ pub fn _compress_et(et_tree:&mut EtTree, et_node:u32, can_eliminate_f:&mut impl 
 }
 
 /// given a et_node make this tree into a dag
-pub fn hash_expr_elimination(et_node:u32,et_tree:&mut EtTree, can_eliminate_f:&mut impl FnMut(u32,&EtTree)->bool) -> Result<()>{
+pub fn hash_expr_elimination(et_node:u32,et_tree:&mut EtTree, can_eliminate_f:&mut impl FnMut(Option<u32>,u32,&EtTree)->bool) -> Result<()>{
     let mut map = HashMap::new();
     // map hash into et_node
     _common_expr_elimination_by_hash(et_node, et_tree, &mut map, can_eliminate_f)
 }
-pub fn _hash_expr_elimination(et_node:u32,expr_hash_map:&mut HashMap<isize,u32>,et_tree:&mut EtTree, can_eliminate_f:&mut impl FnMut(u32,&EtTree)->bool) -> Result<()>{
+pub fn _hash_expr_elimination(et_node:u32,expr_hash_map:&mut HashMap<isize,u32>,et_tree:&mut EtTree, can_eliminate_f:&mut impl FnMut(Option<u32>,u32,&EtTree)->bool) -> Result<()>{
     // map hash into et_node
     let dfs_nodes = dfs_with_predicate(et_tree, et_node, |e|!e.weight().et_edge_type.is_deleted());
     for &et_node in dfs_nodes.iter().rev(){
@@ -403,13 +404,14 @@ pub fn _hash_expr_elimination(et_node:u32,expr_hash_map:&mut HashMap<isize,u32>,
     }
     Ok(())
 }
-pub fn _common_expr_elimination_by_hash(et_node:u32,et_tree:&mut EtTree, map:&mut HashMap<isize,u32>, can_eliminate_f:&mut impl FnMut(u32,&EtTree)->bool) -> Result<()>{
+/// founded_et_node & et_node & et_tree the closure is 
+pub fn _common_expr_elimination_by_hash(et_node:u32,et_tree:&mut EtTree, map:&mut HashMap<isize,u32>, can_eliminate_f:&mut impl FnMut(Option<u32>,u32,&EtTree)->bool) -> Result<()>{
     // map hash into et_node
     // debug_info_blue!("et_ndoe:::::: {}",et_node);
     et_tree._update_hash(et_node).unwrap();
     let &hash = node!(at et_node in et_tree).hash.as_ref().unwrap();
     if let Some(&found_et_node) = map.get(&hash){
-        if found_et_node != et_node && can_eliminate_f(et_node, et_tree){
+        if found_et_node != et_node && can_eliminate_f(Some(found_et_node),et_node, et_tree){
             // clone all edges that it has 
             let mut edge_weight_tuple_vec = vec![];
             let op_parent_et_node = direct_et_parent_node!(at et_node in et_tree ret_option);
@@ -436,16 +438,23 @@ pub fn _common_expr_elimination_by_hash(et_node:u32,et_tree:&mut EtTree, map:&mu
             let equivalent_symidx_vec_to_move = std::mem::take(&mut node_mut!(at et_node in et_tree).equivalent_symidx_vec);
             node_mut!(at found_et_node in et_tree).equivalent_symidx_vec.extend(equivalent_symidx_vec_to_move.into_iter());
             node_mut!(at et_node in et_tree).common_eliminated = true;
+
+            // let edges = et_tree.edges_directed(node_index(et_node as usize), Outgoing).map(|edge| edge.id()).collect_vec();
+            // for edge in edges{
+            //     // let weight = et_tree.edge_weight_mut(edge).unwrap();
+            //     // *weight = EtEdgeType::Deleted.into();
+            //     et_tree.remove_edge(edge);
+            // }
         }
     }else {
-        if can_eliminate_f(et_node, et_tree){
+        if can_eliminate_f(None,et_node, et_tree){
             map.insert(hash, et_node);
             // debug_info_blue!("after insert map {:?}",map);
         }
     }
     Ok(())
 }
-pub fn can_eliminate_despite_array_idx_and_call(et_node:u32, et_tree:&EtTree) -> bool{
+pub fn can_eliminate_despite_array_idx_and_call(op_found_et_node:Option<u32>,et_node:u32, et_tree:&EtTree) -> bool{
     let parent_node =direct_et_parent_node!(at et_node in et_tree);
     match (&node!(at et_node in et_tree).et_node_type,&node!(at parent_node in et_tree).et_node_type){
         // (EtNodeType::Operator { op: op1, ast_node: ast_node1, text:_, op_symidx:_ } ,

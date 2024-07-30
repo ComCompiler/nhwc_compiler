@@ -15,7 +15,7 @@ use crate::{add_edge, add_node, add_node_with_edge, debug_info_blue, debug_info_
 
 use super::et_node::{DeclOrDefOrUse, EtEdgeType, EtNodeType, EtTree};
 use super::etc::dfs;
-use super::eval_et::{compress_et};
+use super::eval_et::{compress_et_for_gen_nhwc};
 use super::gen_cfg::AST_ROOT;
 use super::symtab::SymIdx;
 use super::{ast_node::AstTree, scope_node::ScopeTree};

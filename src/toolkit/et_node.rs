@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Context, Result};
 use rand::{thread_rng, Rng};
-use strum_macros::EnumIs;
+use strum_macros::{EnumDiscriminants, EnumIs};
 use std::fmt::Debug;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::{mem, u32};
@@ -22,7 +22,9 @@ pub struct EtEdge{
 #[derive(Clone,EnumIs)]
 pub enum EtEdgeType{
     Direct,
-    Deleted
+    Deleted,
+    Chi,
+    Mu,
 }
 
 impl Debug for EtEdgeType{
@@ -30,6 +32,8 @@ impl Debug for EtEdgeType{
         match self {
             Self::Direct => write!(f, ""),
             Self::Deleted => write!(f, "Deleted"),
+            Self::Chi => write!(f, "Chi"),
+            Self::Mu => write!(f, "Mu"),
         }
     }
 }
@@ -50,7 +54,7 @@ impl From<EtEdgeType> for EtEdge{
         Self { et_edge_type }
     }
 }
-#[derive(Clone,EnumIs)]
+#[derive(Clone,EnumIs,EnumDiscriminants)]
 pub enum EtNodeType {
     // et 树的terminal 要么是一个 literal ，要么是一个 SymbolIndex
     // 而 et 树的 non-terminal node 要么是 root 要么是一个 op
@@ -94,7 +98,9 @@ pub struct EtNode {
     pub gen_nhwc_cached_rc_symidx: Option<Option<RcSymIdx>>,
     pub et_ret_symidx_vec: Option<Vec<RcSymIdx>>,
     pub common_eliminated:bool,
+    pub can_be_common_eliminated:bool,
     pub gvn_evaluated:bool,
+    pub gvn_instr_generated:bool,
     pub equivalent_symidx_vec:Vec<RcSymIdx>, // for gvn
 }
 pub trait EtHash{
@@ -317,7 +323,7 @@ impl EtHash for EtTree{
                             2 => {
                                 let h1 = node!(at {child_nodes[0]} in self).hash?;
                                 let h2 = node!(at {child_nodes[1]} in self).hash?;
-                                let hash = Some((h1^(h2*2)+83721) % ET_HASH_MODULUS);
+                                let hash = Some((h1^(h2*2+23411)+32483721) % ET_HASH_MODULUS);
                                 node_mut!(at et_node in self).hash =hash;
                                 hash
                             }
@@ -351,11 +357,17 @@ impl EtHash for EtTree{
                     },
                     ExprOp::Store => {
                         let h1 = node!(at {child_nodes[0]} in self).hash?;
-                        let hash = Some((h1^1333221) % ET_HASH_MODULUS);
+                        let h2 = node!(at {child_nodes[1]} in self).hash?;
+                        let h3 = node!(at {child_nodes[2]} in self).hash?;
+                        let hash = Some((h1^328482 + h2 ^2934234 + h3 ^2398423 + 3123 ) % ET_HASH_MODULUS);
                         node_mut!(at et_node in self).hash =hash;
                         hash
                     },
                     ExprOp::Load => {
+                        if child_nodes.get(0) == None {
+                            debug_info_red!("can't find first child node of et_node:{et_node}");
+                            return None;
+                        }
                         let h1 = node!(at {child_nodes[0]} in self).hash?;
                         let h2 = node!(at {child_nodes[1]} in self).hash?;
                         let hash = Some(((h1+1232332)^h2+23100) % ET_HASH_MODULUS);
@@ -375,19 +387,19 @@ impl EtHash for EtTree{
                     ExprOp::MinusAssign => todo!(),
                     ExprOp::TransToI32 => {
                         let h1 = node!(at {child_nodes[0]} in self).hash?;
-                        let hash = Some(((h1+1493425)+23314) % ET_HASH_MODULUS);
+                        let hash = Some(((h1^1493425)+23314) % ET_HASH_MODULUS);
                         node_mut!(at et_node in self).hash =hash;
                         hash
                     },
                     ExprOp::TransToF32 => {
                         let h1 = node!(at {child_nodes[0]} in self).hash?;
-                        let hash = Some(((h1+239432)+73232) % ET_HASH_MODULUS);
+                        let hash = Some(((h1^239432)+73232) % ET_HASH_MODULUS);
                         node_mut!(at et_node in self).hash =hash;
                         hash
                     },
                     ExprOp::TransToI1 => {
                         let h1 = node!(at {child_nodes[0]} in self).hash?;
-                        let hash = Some(((h1+182312)+34821) % ET_HASH_MODULUS);
+                        let hash = Some(((h1^182312)+34821) % ET_HASH_MODULUS);
                         node_mut!(at et_node in self).hash =hash;
                         hash
                     }
@@ -535,12 +547,13 @@ impl Debug for ExprOp {
             Self::TransToI32 => write!(f,"TransI32"),
             Self::TransToF32 => write!(f,"TransF32"),
             Self::TransToI1 => write!(f,"TransBool"),
+            // Self::Chi => write!(f,"Chi"),
         }
     }
 }
 impl From<EtNodeType> for EtNode{
     fn from(et_node_type: EtNodeType) -> Self {
-        Self { et_node_type, hash: None, gen_nhwc_cached_rc_symidx: None, et_ret_symidx_vec: None ,common_eliminated:false, dims: None, ty: None,equivalent_symidx_vec:vec![], gvn_evaluated: false }
+        Self { et_node_type, hash: None, gen_nhwc_cached_rc_symidx: None, et_ret_symidx_vec: None ,common_eliminated:false, dims: None, ty: None,equivalent_symidx_vec:vec![], gvn_evaluated: false, gvn_instr_generated: false, can_be_common_eliminated: true }
     }
 }
 
@@ -679,12 +692,13 @@ impl Debug for DeclOrDefOrUse {
 }
 
 impl Debug for EtNode {
-    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{:?} {} {} {} {} {} ", 
+    fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{:?} {} {} {} {} {} {}", 
         self.et_node_type, 
         if self.dims.is_some() {format!("dims {:?}",self.dims.as_ref().unwrap()) } else { "".to_string()},
         if self.ty.is_some() {format!("ty {:?}",self.ty.as_ref().unwrap() )} else {"".to_string()},
         if self.hash.is_some() {format!("hash {}",self.hash.as_ref().unwrap()) } else {"".to_string()}, 
         if self.common_eliminated{"eliminated"}else{""}, 
+        if self.gvn_instr_generated{"instr_generated"}else{""}, 
         if self.equivalent_symidx_vec.len()!=0 {format!("eq_symidx:{:?}",self.equivalent_symidx_vec)} else {"".to_string()})
     }
 }

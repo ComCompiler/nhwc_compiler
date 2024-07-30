@@ -39,6 +39,9 @@ pub struct Args {
 
     #[arg(short, value_name = "annotation", default_value = "false")]
     pub annotation:bool,
+
+    #[arg(short, value_name = "test", default_value = "false")]
+    pub test:bool,
 }
 
 
@@ -71,6 +74,7 @@ fn main() {
     let func_call_pass = CallGraphPass::new(debug);
     let dce_pass = DeadCodeEliminationPass::new(debug,debug);
     let gvngcm_pass = GvnGcmPass::new(debug,debug);
+    if pass_manager.ctx.args.test{
     add_passes!(
         code2ast_pass
         then ast2st_pass
@@ -79,9 +83,10 @@ fn main() {
         then func_call_pass
         then ncfg2djg_pass
         then ssa_pass
+
         then gvngcm_pass
-        then def_use_chain_pass
-        then dce_pass
+        // then def_use_chain_pass
+        // then dce_pass
         // then simulator_debug_pass
         then ast2et_debug_pass
         then symtab_debug_pass
@@ -94,6 +99,33 @@ fn main() {
         to pass_manager
         
     );
+
+    }else {
+    add_passes!(
+        code2ast_pass
+        then ast2st_pass
+        then ast2cfg_pass
+        then cfg2ncfg_pass
+        then func_call_pass
+        then ncfg2djg_pass
+        then ssa_pass
+
+        // then gvngcm_pass
+        // then def_use_chain_pass
+        // then dce_pass
+        // then simulator_debug_pass
+        then ast2et_debug_pass
+        then symtab_debug_pass
+        // then nhwc2et_pass
+        then ssa_deconstruction_pass
+        then nhwc_dump_pass
+        then mem_alloc_pass
+        then cfg_debug_pass2
+        then nhwc2riscv_pass
+        to pass_manager
+        
+    );
+    }
     let err_flag;
     timeit!({ err_flag = pass_manager.execute_passes(); }, "all passed finish");
     timeit!({ pass_manager.await_all_io_tasks() }, "all io tasks finish");

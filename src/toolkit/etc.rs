@@ -1,10 +1,11 @@
 use std::{
-    env, fmt::Debug, fs::File, io::{Read, Write}, process::Command, thread::{spawn, JoinHandle}
+    env, fmt::Debug, fs::File, io::{Read, Write}, process::Command, thread::{spawn, AccessError, JoinHandle}
 };
 use std::time::Instant;
 
 use colored::Colorize;
 use log::info;
+use strum_macros::EnumIs;
 use crate::{direct_parent_nodes, instr, timeit};
 
 use crate::{
@@ -175,6 +176,31 @@ where
     }
     rpo_vec.push(start_node);
 }
+pub fn rpo_with_priority<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, mut predicate:impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->isize)-> Vec<u32>
+where
+    Ty: EdgeType,
+{
+    let mut visited:Vec<bool> = vec![false; graph.node_count()*3];
+    let mut rpo_vec:Vec<u32> = vec![];
+    visited[start_node as usize] = true;
+    // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
+    _rpo_with_priority(graph, start_node, &mut visited, &mut rpo_vec, &mut predicate);
+    rpo_vec
+}
+pub fn _rpo_with_priority<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, rpo_vec:&mut Vec<u32>, priority:&mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->isize)
+where
+    Ty: EdgeType,
+{
+    visited[start_node as usize] = true;
+    let nodes = direct_child_nodes!(at start_node in graph with_priority {|e|priority(e)});
+    // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
+    for node in nodes {
+        if !visited[node as usize] {
+            _rpo_with_priority(graph, node, visited, rpo_vec, priority);
+        }
+    }
+    rpo_vec.push(start_node);
+}
 /// dfs the graph.
 /// if the closure ret val < 0 then don't access the edge 
 /// access with low closure ret value in priority
@@ -188,6 +214,36 @@ where
     // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
     _dfs_with_priority(graph, start_node, &mut visited, &mut dfs_vec, &mut predicate);
     dfs_vec
+}
+#[derive(EnumIs,Debug)]
+pub enum AccessState {
+    Enter,Exit
+}
+pub fn dfs_with_priority_enter_exit<N, E, Ty>(graph:&mut StableGraph<N, E, Ty, u32>, start_node:u32, mut predicate:impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->isize)-> Vec<(u32,AccessState)>
+where
+    Ty: EdgeType,
+{
+    let mut visited:Vec<bool> = vec![false; graph.node_count()*3];
+    let mut dfs_vec_enter_exit:Vec<(u32,AccessState)> = vec![];
+    visited[start_node as usize] = true;
+    // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
+    _dfs_with_priority_enter_exit(graph, start_node, &mut visited, &mut dfs_vec_enter_exit, &mut predicate);
+    dfs_vec_enter_exit
+}
+pub fn _dfs_with_priority_enter_exit<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, dfs_vec_enter_exit:&mut Vec<(u32,AccessState)>, priority:&mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>) -> isize)
+where
+    Ty: EdgeType,
+{
+    dfs_vec_enter_exit.push((start_node,AccessState::Enter));
+    visited[start_node as usize] = true;
+    let nodes = direct_child_nodes!(at start_node in graph with_priority {|e|priority(e)});
+    // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
+    for node in nodes {
+        if !visited[node as usize] {
+            _dfs_with_priority_enter_exit(graph, node, visited, dfs_vec_enter_exit, priority);
+        }
+    }
+    dfs_vec_enter_exit.push((start_node,AccessState::Exit));
 }
 pub fn _dfs_with_priority<N, E, Ty>(graph:&StableGraph<N, E, Ty, u32>, start_node:u32, visited:&mut Vec<bool>, dfs_vec:&mut Vec<u32>, priority:&mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>)->isize)
 where

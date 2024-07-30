@@ -365,7 +365,7 @@ impl RegTab{
     pub fn find_avail_reg_for_ty(&mut self, sym_ty:&TypeDiscriminants) -> Result<Register> {
         // find tail in priority 
         // only use s register when meet i32 or ptr or i1
-        if sym_ty.is_i_32() || sym_ty.is_i_1() || sym_ty.is_ptr_64(){
+        if sym_ty.is_i_32() || sym_ty.is_i_1() || sym_ty.is_ptr_64()|| sym_ty.is_array(){
             // alloc priority:
             // 1. released reg
             // 2. temp freed reg

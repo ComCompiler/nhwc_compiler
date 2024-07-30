@@ -668,7 +668,7 @@ impl Simulator{
 
                 let simu_symtab = &mut self.simu_symtab;
                 let src_var_symidx = var_symidx.to_src_symidx();
-                let rc_src_var_symidx = &src_symtab.get(&src_var_symidx)?.rc_symidx;
+                let rc_src_var_symidx = &src_var_symidx.clone().as_rc();
                 if !simu_symtab.has_symbol(&src_var_symidx){
                     add_symbol!({src_var_symidx.clone().into_symbol()}
                         with_field SIMU_VAL:{Value::new_unsure_from_specific_type(&vartype)}
