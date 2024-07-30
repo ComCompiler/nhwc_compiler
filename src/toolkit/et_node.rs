@@ -133,6 +133,11 @@ impl EtHash for EtTree{
                         hash
                     },
                     ExprOp::Add => {
+                        if child_nodes.len() > 2{
+                            for &child_node in &child_nodes{
+                                println!("{:?}",node!(at child_node in self));
+                            }
+                        }
                         assert!(child_nodes.len() == 2);
                         // generate_png_by_graph(self,"et_tree".to_string(),&[Config::NodeIndexLabel,Config::Record]);
                         let h1 = node!(at {child_nodes[0]} in self).hash?;

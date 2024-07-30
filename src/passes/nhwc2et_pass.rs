@@ -32,7 +32,7 @@ impl Pass for Nhwc2EtPass {
         let node:u32 = 3;
         let cfg_graph = &mut ctx.cfg_graph;
         let instrs = node!(at node in cfg_graph).instrs.iter().cloned();
-        parse_instr_list_to_et(instrs, instr_et, &ctx.symtab, &mut child_et_map, &mut BiHashMap::new(), &ctx.scope_tree,&ctx.nhwc_instr_slab)?;
+        parse_instr_list_to_et(instrs, instr_et, &ctx.symtab, &mut child_et_map, &mut BiHashMap::new(), &ctx.scope_tree,&mut ctx.nhwc_instr_slab)?;
         if self.is_gen_png {
             generate_png_by_graph_multi_tasks(&ctx.instr_et.clone(), "instr_et_tree".to_string(), &[Config::Record, Config::Title("instr_et_tree".to_string()),Config::NodeIndexLabel],&mut ctx.io_task_list)?;
         }

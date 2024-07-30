@@ -178,9 +178,10 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     let &def_instr = if symbol.has_ssa_def_instr(){
                         symbol.get_ssa_def_instr()?
                     }else{
-                        // println!("{:?} didn't has ssa_def_instr",rc_use_symidx);
+                        println!("{:?} didn't has ssa_def_instr",rc_use_symidx);
                         continue;
                     };
+                    if instr!(at def_instr in instr_slab)?.instr_type.is_nope(){ continue;}
                     let def_cfg_node = instr_slab.get_instr(def_instr)?.get_cfg_instr_idx()?.cfg_node;
                     match &cur_instr_struct.instr_type{
                         // NhwcInstrType::Phi { lhs: _, rhs: _ } => {
@@ -208,19 +209,23 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                         // },
                         NhwcInstrType::Mu { may_use_symidx, may_use_instr } => {
                             let may_use_instr = *may_use_instr;
-                            let &dug_cor_node = instr!(at may_use_instr in instr_slab)?.get_dug_cor_def_use_node()?;
+                            if instr!(at may_use_instr in instr_slab)?.instr_type.is_nope(){ continue;}
+                            let &dug_cor_node = instr!(at may_use_instr in instr_slab)?.get_dug_cor_def_use_node()
+                                .with_context(||format!("can't find dug_cor_def_use_node of def_instr {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
                             let &def_dug_node = instr!(at def_instr in instr_slab)?.get_dug_cor_def_use_node()
                                 .with_context(||format!("can't find dug_cor_def_use_node of def_instr {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
                             let _dug_edge = add_edge!({DefUseEdge::new(rc_use_symidx.clone())} from def_dug_node to dug_cor_node in def_use_graph);
                         },
                         NhwcInstrType::Chi { lhs, rhs, may_def_instr } => {
+                            let may_def_instr = *may_def_instr;
+                            // if instr!(at may_def_instr in instr_slab)?.instr_type.is_nope(){ continue;}
                             // here we consider it as 2 situation 
                             // 1. when it is an array we should add edge from last def to here because you can't change all things in array in one time
                             // 2. when it is a non-array variable we will not add this edge
                             if symtab.get(&lhs.as_ref_borrow().to_src_symidx())?.get_type()?.is_array() 
                             ||symtab.get(&lhs.as_ref_borrow().to_src_symidx())?.get_type()?.is_ptr_64(){
-                            let may_def_instr = *may_def_instr;
-                            let &dug_cor_node = instr!(at may_def_instr in instr_slab)?.get_dug_cor_def_use_node()?;
+                            let &dug_cor_node = instr!(at may_def_instr in instr_slab)?.get_dug_cor_def_use_node()
+                                .with_context(||format!("can't find dug_cor_def_use_node of def_instr {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
                             let &def_dug_node = instr!(at def_instr in instr_slab)?.get_dug_cor_def_use_node()
                                 .with_context(||format!("can't find dug_cor_def_use_node of def_instr {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
                             let _dug_edge = add_edge!({DefUseEdge::new(rc_use_symidx.clone())} from def_dug_node to dug_cor_node in def_use_graph);
@@ -229,7 +234,8 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                             }
                         }
                         _ => {
-                            let &dug_cor_node = cur_instr_struct.get_dug_cor_def_use_node()?;
+                            let &dug_cor_node = cur_instr_struct.get_dug_cor_def_use_node()
+                                .with_context(||format!("can't find dug_cor_def_use_node of def_instr {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
                             let &def_dug_node = instr_slab.get_instr(def_instr)?.get_dug_cor_def_use_node()
                                 .with_context(||format!("can't find dug_cor_def_use_node of def_instr {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
                             let _dug_edge = add_edge!({DefUseEdge::new(rc_use_symidx.clone())} from def_dug_node to dug_cor_node in def_use_graph);

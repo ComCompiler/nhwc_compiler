@@ -380,7 +380,7 @@ pub fn compress_et_for_gvn(et_tree:&mut EtTree, et_node:u32, can_eliminate_f:&mu
     debug_info_red!("exec compress_et on {}",et_node);
     eval_et(et_tree, et_node);
     et_tree.update_hash(et_node)?;
-    debug_info_blue!("hash expr eliminate on {}",et_node);
+    debug_info_blue!("hash expr try eliminate on {}",et_node);
     _hash_expr_elimination(et_node,expr_hash_map, et_tree, can_eliminate_f)?;
     let rpo_nodes = rpo_with_predicate(&et_tree, et_node, |e|!e.weight().et_edge_type.is_deleted());
     for et_node in rpo_nodes{
@@ -412,6 +412,7 @@ pub fn _common_expr_elimination_by_hash(et_node:u32,et_tree:&mut EtTree, map:&mu
     let &hash = node!(at et_node in et_tree).hash.as_ref().unwrap();
     if let Some(&found_et_node) = map.get(&hash){
         if found_et_node != et_node && can_eliminate_f(Some(found_et_node),et_node, et_tree){
+            debug_info_blue!("merge insert et_node:{et_node} with found_et_node:{found_et_node} with map {:?}",map);
             // clone all edges that it has 
             let mut edge_weight_tuple_vec = vec![];
             let op_parent_et_node = direct_et_parent_node!(at et_node in et_tree ret_option);
@@ -436,8 +437,10 @@ pub fn _common_expr_elimination_by_hash(et_node:u32,et_tree:&mut EtTree, map:&mu
                 }
             }
             let equivalent_symidx_vec_to_move = std::mem::take(&mut node_mut!(at et_node in et_tree).equivalent_symidx_vec);
+            debug_info_red!("before extend {:?} in {}",node_mut!(at found_et_node in et_tree).equivalent_symidx_vec, et_node);
             node_mut!(at found_et_node in et_tree).equivalent_symidx_vec.extend(equivalent_symidx_vec_to_move.into_iter());
             node_mut!(at et_node in et_tree).common_eliminated = true;
+            debug_info_red!("after extend {:?} in {}",node_mut!(at found_et_node in et_tree).equivalent_symidx_vec, et_node);
 
             // let edges = et_tree.edges_directed(node_index(et_node as usize), Outgoing).map(|edge| edge.id()).collect_vec();
             // for edge in edges{
@@ -449,7 +452,7 @@ pub fn _common_expr_elimination_by_hash(et_node:u32,et_tree:&mut EtTree, map:&mu
     }else {
         if can_eliminate_f(None,et_node, et_tree){
             map.insert(hash, et_node);
-            // debug_info_blue!("after insert map {:?}",map);
+            debug_info_blue!("after insert et_node:{et_node} map {:?}",map);
         }
     }
     Ok(())

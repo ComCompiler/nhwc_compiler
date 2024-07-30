@@ -577,7 +577,7 @@ pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut
                                 , instr_slab)?;
                             // replace (todo_dst, value) pair with (tmp_pos, value) pair
                             let dst_cur_val =val_pos_bimap.get_by_right(&todo_dst).unwrap().clone();
-                            println!("copy pos:{:?} of val:{:?} into {:?}",todo_dst,dst_cur_val,tmp_pos);
+                            // println!("copy pos:{:?} of val:{:?} into {:?}",todo_dst,dst_cur_val,tmp_pos);
                             match val_pos_bimap.insert(dst_cur_val,tmp_pos.clone() ){
                                 bimap::Overwritten::Neither => {todo!() },
                                 bimap::Overwritten::Left(_, _) => {

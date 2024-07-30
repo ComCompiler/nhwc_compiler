@@ -804,7 +804,7 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                         asm_sect.annotate(format!("regtab:{:?}\n",regtab));
                     },
                     NhwcInstrType::Nope {  } => {
-                        asm_sect.asm(PseudoInstr::new_nop().into());
+                        // asm_sect.asm(PseudoInstr::new_nop().into());
                     },
                     NhwcInstrType::Mu { may_use_symidx: _, may_use_instr: _ } => {},
                     NhwcInstrType::Chi { lhs: _, rhs: _, may_def_instr: _ } => {},
