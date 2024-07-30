@@ -217,6 +217,9 @@ pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&m
                     if let NhwcInstrType::Phi { lhs: rc_lhs, rhs } = &mut phi_instr_struct.instr_type{
                         let lhs = rc_lhs.as_ref_borrow();
                         let phi_def_symidx =  lhs.to_src_symidx();
+
+                        update_reaching_def(*node!(at cfg_node in cfg_graph).iter_all_instrs().last().unwrap(), &phi_def_symidx, symtab, cfg_graph, dj_graph, instr_slab)?;
+
                         debug_info_yellow!("transform {:?} to {:?}",phi_def_symidx,symtab.get(&phi_def_symidx)?.get_ssa_reaching_def()?);
                         let rc_phi_use_symidx = symtab.get(&phi_def_symidx)?.get_ssa_reaching_def()?.clone().context(anyhow!("这个symbol {:?} 的reaching def = None",symtab.get(&phi_def_symidx)?))?;
                         let phi_use_symidx = rc_phi_use_symidx.as_ref_borrow();
@@ -242,7 +245,7 @@ pub fn update_reaching_def(instr:usize,src_symidx:&SymIdx,symtab:&mut SymTab,cfg
     let mut count = 0;
     while r != None && {
         let &instr2 = symtab.get(&r.as_ref().unwrap().as_ref_borrow())?.get_ssa_def_instr()?;
-        if instr_is_dominated_by(instr,instr2, cfg_graph, dj_graph, instr_slab)?{
+        if instr_is_dominated_by(instr,instr2, cfg_graph, dj_graph, instr_slab)? {
             debug_info_blue!("{:?} is_dominated_by {:?}",instr!(at instr in instr_slab)?, instr!(at instr2 in instr_slab)?);
             false
         }else {
@@ -254,9 +257,10 @@ pub fn update_reaching_def(instr:usize,src_symidx:&SymIdx,symtab:&mut SymTab,cfg
             true
         }
     }
+
     {
         r = symtab.get(&r.unwrap().as_ref_borrow())?.get_ssa_reaching_def()?.as_ref();
-        debug_info_blue!("while_executed_set {:?} to {:?}",r,symtab.get(&r.as_ref().unwrap().as_ref_borrow())?.get_ssa_reaching_def()?.clone());
+        // debug_info_blue!("while_executed_set {:?} to {:?}",r,symtab.get(&r.as_ref().unwrap().as_ref_borrow())?.get_ssa_reaching_def()?.clone());
     }
     debug_info_blue!("update {:?}'s reaching_def to {:?}",src_symidx,r);
     *symtab.get_mut(&src_symidx)?.get_mut_ssa_reaching_def()? = r.cloned();
@@ -374,6 +378,8 @@ pub fn find_all_defs_in_instr_vec(instrs:&InstrList,symidx:&SymIdx,instr_slab:&m
 
 /// 判断 instr1 是否被 instr2 支配
 pub fn instr_is_dominated_by(instr1:usize, instr2:usize, cfg_graph:&CfgGraph, dj_graph:&DjGraph, instr_slab:&InstrSlab<NhwcInstr>)->Result<bool>{
+    // 如果instr1 == instr2 这里是非严格支配
+    if instr1 == instr2 {return Ok(true)}
     // 这里分两种情况，一种是instr1 和 instr2 在同一节点中，一种instr1所在的cfg_node1 支配 instr2 所在的cfg_node2
     debug_info_blue!("check_whether instr {} is dominated by instr {}",instr1,instr2);
     let cfg_instr_idx1 = instr_slab.get_instr(instr1)?.get_cfg_instr_idx()?;
