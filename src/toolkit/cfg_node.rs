@@ -88,6 +88,18 @@ pub struct CfgNode {
     pub info:Fields,
     // instructions of this basic block (第二步才生成这个 instrs)
 }
+#[derive(Debug,Clone)]
+pub struct LoopInfo{
+    pub loop_symidx:RcSymIdx,
+    // pub start_value:u32,
+    // pub step_value:u32,
+    // pub stop_value:u32,
+}
+impl LoopInfo{
+    pub fn new_loop_info(loop_rcsymidx:RcSymIdx)->Self{
+        Self { loop_symidx: loop_rcsymidx}
+    }
+}
 #[derive(Clone,Default)]
 pub struct InstrList{
     pub instr_vec:Vec<usize>,

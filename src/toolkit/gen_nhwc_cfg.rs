@@ -14,7 +14,7 @@ use std::rc::Rc;
 use crate::toolkit::field::TypeDiscriminants;
 use crate::{add_node, instr, instr_mut};
 
-use super::cfg_node::{InstrList, CFG_ROOT};
+use super::cfg_node::{InstrList, LoopInfo, CFG_ROOT};
 use super::et_node::ExprOp;
 use super::etc::dfs_with_priority;
 use super::eval_et::{self, can_eliminate_despite_array_idx_and_call};
@@ -56,7 +56,8 @@ make_field_trait_for_struct!(
     Type,
     CfgInstrIdx,
     MemLayout,
-    HashSet<RcSymIdx>
+    HashSet<RcSymIdx>,
+    LoopInfo
 );
 
 // reg_field_for_struct!(EtNode {
@@ -95,6 +96,7 @@ reg_field_for_struct!(Symbol {
 reg_field_for_struct!(CfgNode {
     FUNC_COR_SYMIDX:RcSymIdx,
     DEF_SYMIDX_INSTR_TUPLE_VEC:Vec<(RcSymIdx,usize)>,
+    LOOP_INFO:LoopInfo,
 } with_fields info);
 // for Instruction
 reg_field_for_struct!(NhwcInstr {
