@@ -1,0 +1,48 @@
+# 从.c到.s
+# riscv64-unknown-elf-gcc -S ./for_auto_test/00sy/38_light2d.c -o ./for_auto_test/1s/light2dccc.s
+# 从.s到.o
+# riscv64-linux-gnu-as ./for_auto_test/5test/light2d_with_gcc.s -o ./for_auto_test/5test/light2d_with_gcc.o
+# 链接sylib库并输出elf文件
+# riscv64-linux-gnu-gcc --static  ./for_auto_test/5test/light2d_with_gcc.o -lsysy -L./ -o ./for_auto_test/5test/light2d_with_gcc.elf -lc
+# qemu模拟运行
+# qemu-riscv64-static ./for_auto_test/5test/light2d_with_gcc.elf
+
+# 本脚本用于 使用官方的gcc-riscv64工具链把.sy文件编译成汇编代码,并保存输出结果,结合脚本auto_test使用
+#!/bin/bash
+
+# 检查是否输入了.c文件
+if [ -z "$1" ]; then
+    echo "请提供一个.sy文件作为输入"
+    exit 1
+fi
+
+# 获取文件名和目录
+input_sy_file=$1
+file_name=$(basename "$input_sy_file" .sy)
+
+# 创建需要的目录
+mkdir -p ./for_auto_test/1s
+mkdir -p ./for_auto_test/2o
+mkdir -p ./for_auto_test/3elf
+mkdir -p ./for_auto_test/4ours_out
+
+# 删除原有的以gcc_开头的文件
+rm -f ./for_auto_test/1s/gcc_*.s
+rm -f ./for_auto_test/2o/gcc_*.o
+rm -f ./for_auto_test/3elf/gcc_*.elf
+rm -f ./for_auto_test/4ours_out/gcc_*.out
+
+# 从.sy到.s，明确指定文件类型为C
+riscv64-unknown-elf-gcc -x c -S "$input_sy_file" -o "./for_auto_test/1s/gcc_${file_name}.s"
+
+
+# 从.s到.o
+riscv64-linux-gnu-as "./for_auto_test/1s/gcc_${file_name}.s" -o "./for_auto_test/2o/gcc_${file_name}.o"
+
+# 链接sylib库并输出elf文件
+riscv64-linux-gnu-gcc --static "./for_auto_test/2o/gcc_${file_name}.o" -lsysy -L./ -o "./for_auto_test/3elf/gcc_${file_name}.elf" -lc
+
+# qemu模拟运行，并将结果输出到.out文件
+qemu-riscv64-static "./for_auto_test/3elf/gcc_${file_name}.elf" > "./for_auto_test/4ours_out/gcc_${file_name}.out"
+
+echo "模拟运行完成，结果保存在 ./for_auto_test/4ours_out/gcc_${file_name}.out"
