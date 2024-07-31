@@ -628,38 +628,38 @@ pub fn process_instr_et(instr_et_node:u32,instr_et:&mut EtTree) -> Result<()>{
                 },
                 // super::et_node::ExprOp::Cast => todo!(),
                 super::et_node::ExprOp::Call => {
-                    let return_rcsymidxs = &node!(at instr_et_node in instr_et).equivalent_symidx_vec;
-                    let assigned_rcsymidx:Option<RcSymIdx>;
-                    let ret_type :Type;
-                    if return_rcsymidxs.is_empty(){
-                        assigned_rcsymidx = None;
-                        ret_type = Value::new_void().to_type();
-                    }else{
-                        assigned_rcsymidx = Some(return_rcsymidxs[0]);
-                        ret_type = node!(at instr_et_node in instr_et).get_type()?.clone();
-                    }
-                    let func_name_and_args = direct_child_nodes!(at instr_et_node in instr_et);
-                    let func_name_node = func_name_and_args[0];
-                    let func_name_rcsymidx = if let EtNodeType::Literal { rc_literal_symidx, ast_node, text } = &node!(at func_name_node in instr_et).et_node_type{
-                        rc_literal_symidx
-                    }else if let EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } = &node!(at func_name_node in instr_et).et_node_type{
-                        rc_symidx
-                    }else{
-                        todo!()
-                    };
-                    let mut args = vec![];
-                    for arg_etnode in &func_name_and_args[1..]{
-                        let arg_etnode = *arg_etnode;
-                        let arg_rcsymidx = if let EtNodeType::Literal { rc_literal_symidx, ast_node, text } = &node!(at arg_etnode in instr_et).et_node_type{
-                            rc_literal_symidx
-                        }else if let EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } = &node!(at arg_etnode in instr_et).et_node_type{
-                            rc_symidx
-                        }else{
-                            todo!()
-                        };
-                        args.push(arg_rcsymidx.clone());
-                    }
-                    let new_instr:NhwcInstr = NhwcInstrType::new_func_call(assigned_rcsymidx, func_name_rcsymidx.clone(), args, ret_type).into();
+                    // let return_rcsymidxs = &node!(at instr_et_node in instr_et).equivalent_symidx_vec;
+                    // let assigned_rcsymidx:Option<RcSymIdx>;
+                    // let ret_type :Type;
+                    // if return_rcsymidxs.is_empty(){
+                    //     assigned_rcsymidx = None;
+                    //     ret_type = Value::new_void().to_type();
+                    // }else{
+                    //     assigned_rcsymidx = Some(return_rcsymidxs[0]);
+                    //     ret_type = node!(at instr_et_node in instr_et).get_type()?.clone();
+                    // }
+                    // let func_name_and_args = direct_child_nodes!(at instr_et_node in instr_et);
+                    // let func_name_node = func_name_and_args[0];
+                    // let func_name_rcsymidx = if let EtNodeType::Literal { rc_literal_symidx, ast_node, text } = &node!(at func_name_node in instr_et).et_node_type{
+                    //     rc_literal_symidx
+                    // }else if let EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } = &node!(at func_name_node in instr_et).et_node_type{
+                    //     rc_symidx
+                    // }else{
+                    //     todo!()
+                    // };
+                    // let mut args = vec![];
+                    // for arg_etnode in &func_name_and_args[1..]{
+                    //     let arg_etnode = *arg_etnode;
+                    //     let arg_rcsymidx = if let EtNodeType::Literal { rc_literal_symidx, ast_node, text } = &node!(at arg_etnode in instr_et).et_node_type{
+                    //         rc_literal_symidx
+                    //     }else if let EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } = &node!(at arg_etnode in instr_et).et_node_type{
+                    //         rc_symidx
+                    //     }else{
+                    //         todo!()
+                    //     };
+                    //     args.push(arg_rcsymidx.clone());
+                    // }
+                    // let new_instr:NhwcInstr = NhwcInstrType::new_func_call(assigned_rcsymidx, func_name_rcsymidx.clone(), args, ret_type).into();
                 },
                 // super::et_node::ExprOp::Negative => todo!(),
                 // super::et_node::ExprOp::Positive => todo!(),

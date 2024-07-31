@@ -1,15 +1,18 @@
-int main(){
-    // float temp = 1;
-    // float input = 2;
-    // while (temp - input / temp > 1e-6 || temp - input / temp < -1e-6){
-    //     temp = (temp+input/temp)/2;
-    // }
-    // return temp;
-    int sum = 0;
+
+void init(int a[][3]){
     int i = 0;
-    while(i<10){
-        sum = sum + i;
-        i = i + 1;
+    while(i<3){
+        int k = 0;
+        while(k<3){
+            a[i][k] = k;
+            k = k+1;
+        }
+        i = i+1;
     }
-    return sum;
+}
+
+int main(){
+    int a[3][3];
+    init(a);
+    return 0;
 }
