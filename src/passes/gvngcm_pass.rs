@@ -20,10 +20,6 @@ impl GvnGcmPass {
     pub fn new(is_gen_instr_et:bool, is_gen_gvngcm_cfg:bool) -> Self { GvnGcmPass { is_gen_instr_et, is_gen_gvngcm_cfg } }
 }
 
-reg_field_for_struct!(CfgNode { cor_instr_et_node_set:HashMap<usize,u32>, } with_fields info);
-make_field_trait_for_struct!(
-    HashMap<usize,u32>
-);
 
 impl Pass for GvnGcmPass {
     // 运行这个pass
@@ -42,15 +38,15 @@ impl Pass for GvnGcmPass {
 
         if self.is_gen_gvngcm_cfg{
             for (idx,instr_struct) in ctx.nhwc_instr_slab.iter_mut(){
-                // instr_struct.text.clear();
-                // instr_struct.load_idx_text(idx);
+                instr_struct.text.clear();
+                instr_struct.load_idx_text(idx);
             }
             for cfg_node_struct in ctx.cfg_graph.node_weights_mut() {
                 cfg_node_struct.clear_text();
                 cfg_node_struct.load_ast_node_text(&ctx.ast_tree)?;
                 cfg_node_struct.load_instrs_text(&ctx.nhwc_instr_slab)?;
             }
-            generate_png_by_graph_multi_tasks(&ctx.cfg_graph.clone(), "gvngcm_cfg".to_string(), &[Config::Record, Config::Rounded, Config::Title("ssa_cfg".to_string()), Config::NodeIndexLabel, Config::CfgBlock],&mut ctx.io_task_list)?
+            generate_png_by_graph_multi_tasks(&ctx.cfg_graph.clone(), "gvngcm_cfg".to_string(), &[Config::Record, Config::Rounded, Config::Title("gvngcm_cfg".to_string()), Config::NodeIndexLabel, Config::CfgBlock],&mut ctx.io_task_list)?
         }
         if self.is_gen_instr_et {
             generate_png_by_graph_multi_tasks(&ctx.instr_et.clone(), "instr_et".to_string(), &[Config::Record, Config::Title("instr_et_tree".to_string()),Config::NodeIndexLabel],&mut ctx.io_task_list)?;

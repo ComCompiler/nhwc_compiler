@@ -167,6 +167,20 @@ impl SymIdx {
             Err(anyhow!("can't turn {:?} into log of two",self))
         }
     }
+    pub fn get_ty(&self,symtab:&SymTab) -> Result<Type>{
+        if self.is_literal(){
+            Ok(Value::from_symidx(&self)?.to_type())
+        }else {
+            symtab.get(&self.to_src_symidx())?.get_type().cloned()
+        }
+    }
+    pub fn is_temp(&self,symtab:&SymTab) -> Result<bool>{
+        if self.is_literal(){
+            Ok(false)
+        }else {
+            symtab.get(&self.to_src_symidx())?.get_is_temp().cloned()
+        }
+    }
 }
 // macro_rules! make_get_field_func {
 //     ($($functionname:ident $field_name:ident:$field_type:ident),*) => {

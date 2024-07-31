@@ -671,10 +671,11 @@ impl Debug for NhwcInstrType {
                 write!(f, "Define {:?} {:?} -> {:?}", func_symidx.as_ref_borrow(), args, ret_symidx.as_ref_borrow())
             }
             NhwcInstrType::DefineVar { var_symidx, vartype, op_value } => {
-                match op_value{
-                    Some(value) => write!(f, "new_var {:?}:{:?} = {:?}",  var_symidx.as_ref_borrow(), vartype, value.as_ref_borrow()),
-                    None => write!(f, "new_var {:?}:{:?}",  var_symidx.as_ref_borrow(), vartype),
-                }
+                // match op_value{
+                //     Some(value) => write!(f, "new_var {:?}:{:?} = {:?}",  var_symidx.as_ref_borrow(), vartype, value.as_ref_borrow()),
+                //     None => write!(f, "new_var {:?}:{:?}",  var_symidx.as_ref_borrow(), vartype),
+                // }
+                write!(f, "")
             }
             NhwcInstrType::Arith { lhs, rhs } => write!(f, "{:?} = {:?}", lhs.as_ref_borrow(), rhs),
             NhwcInstrType::SimpleAssign { lhs, rhs, vartype } => write!(f, "{:?} = {:?} {:?}", lhs.as_ref_borrow(),vartype, rhs.as_ref_borrow()),
@@ -690,7 +691,7 @@ impl Debug for NhwcInstrType {
             NhwcInstrType::Globl { var_symidx, vartype } => write!(f,"global {:?} {:?}",vartype,var_symidx.as_ref_borrow()),
             NhwcInstrType::Load { lhs, ptr_symidx: ptr_symdix, ptr_ty } => write!(f,"{:?} = load {:?}:{:?}",lhs.as_ref_borrow(),ptr_symdix.as_ref_borrow(),ptr_ty),
             NhwcInstrType::Store { val_symidx: value, ptr_symidx, ptr_ty, value_ty } => write!(f,"store {:?}:{:?} {:?}:{:?}",value.as_ref_borrow(),value_ty,ptr_symidx.as_ref_borrow(),ptr_ty),
-            NhwcInstrType::GetElementPtr { lhs, array_ty: ty, ptr_symidx: array_symidx, idx_vec } => write!(f,"{:?} = getelementptr {:?}:{:?} {:?}",lhs.as_ref_borrow(),array_symidx,ty,idx_vec,),
+            NhwcInstrType::GetElementPtr { lhs, array_ty: ty, ptr_symidx: array_symidx, idx_vec } => write!(f,"{:?} = GEP {:?}:{:?} {:?}",lhs.as_ref_borrow(),array_symidx,ty,idx_vec,),
             NhwcInstrType::Nope {  } => {write!(f,"(nop)")},
             NhwcInstrType::Mu { may_use_symidx, may_use_instr } => write!(f,"mu {:?}:{}",may_use_symidx, may_use_instr),
             NhwcInstrType::Chi { lhs, rhs, may_def_instr } => write!(f,"{:?} = chi {:?}:{}",lhs,rhs,may_def_instr),

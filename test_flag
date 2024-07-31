@@ -1,0 +1,4 @@
+cargo run     -- $1 -o testcase.s -d -a -t
+bash test_link_nhwc ./testcase.s empty_in > out_test
+cargo run     -- $1 -o testcase.s -d -a
+bash test_link_nhwc ./testcase.s empty_in > out_normal
