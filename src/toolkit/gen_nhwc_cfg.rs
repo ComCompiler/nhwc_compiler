@@ -675,7 +675,7 @@ pub fn process_temp_symbol(
         let temp_symidx = rc_temp_symidx.as_ref_borrow();
 
         *symtab.get_mut_global_info().get_mut_temp_counter()? += 1;
-        let temp_def_instr = NhwcInstrType::new_def_var(temp_type.clone(), rc_temp_symidx.clone(), None).into();
+        // let temp_def_instr = NhwcInstrType::new_def_var(temp_type.clone(), rc_temp_symidx.clone(), None).into();
         if node_mut!(at cfg_node in cfg_graph).has_func_cor_symidx(){
             // when the variable is local to function 
             let rc_func_symidx = node_mut!(at cfg_node in cfg_graph).get_func_cor_symidx()?.clone();
@@ -685,14 +685,14 @@ pub fn process_temp_symbol(
             let alloc_instr = NhwcInstrType::new_alloc(temp_type.clone(), rc_temp_symidx.clone()).into();
             let cfg_entry = get_cfg_entry_by_cfg_node(cfg_graph, symtab, cfg_node)?.ok_or(anyhow!("这个cfg node:{} 没有对应的entry节点",cfg_node))?;
             node_mut!(at cfg_entry in cfg_graph).push_nhwc_instr(alloc_instr, instr_slab)?;
-            node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(temp_def_instr, instr_slab)?;
+            // node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(temp_def_instr, instr_slab)?;
 
             if let Some(et_node) = op_et_node{
                 node_mut!(at et_node in et_tree).add_type(symtab.get(&temp_symidx)?.get_type()?.clone());
             }
         }else{
             // when the variable is global 
-            node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(temp_def_instr, instr_slab)?;
+            // node_mut!(at cfg_node in cfg_graph).push_nhwc_instr(temp_def_instr, instr_slab)?;
         }
         Ok(rc_temp_symidx.clone())
 }
@@ -1986,7 +1986,7 @@ fn parse_declvar2nhwc(
 
                 // 加入 defvar 指令 给变量赋值
                 // let defvar_instr = InstrType::new_def_var(var_type.clone(), var_symidx.clone(), Some(transed_value_symidx.clone())).into();
-                // node_mut!(at cfg_node in cfg_graph ).push_nhwc_instr(defvar_instr, instr_slab)??;
+                // node_mut!(at cfg_node in cfg_gsaph ).push_nhwc_instr(defvar_instr, instr_slab)??;
             }
             // 考虑这个语句的 et_sep_item_node 不是 = 的情况
             EtNodeType::Operator { op: ExprOp::ArrayIndex , ast_node: _, text: _, op_rc_symidx: op_symidx } => {

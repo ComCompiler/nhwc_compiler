@@ -44,7 +44,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     NhwcInstrType::DefineVar { var_symidx: _, vartype: _, op_value: _ } => {},
                     NhwcInstrType::Alloc { var_symidx: _, vartype: _ } => {},
                     NhwcInstrType::Arith { lhs: _, rhs: _ } => {},
-                    NhwcInstrType::SimpleAssign { lhs: _, rhs: _, vartype: _ } => {continue;},
+                    NhwcInstrType::SimpleAssign { lhs: _, rhs: _, vartype: _ } => {},
                     NhwcInstrType::Call { op_lhs: _, func_op: _ } => {},
                     NhwcInstrType::Jump { jump_op } => 
                         match jump_op{
@@ -178,10 +178,13 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     let &def_instr = if symbol.has_ssa_def_instr(){
                         symbol.get_ssa_def_instr()?
                     }else{
-                        println!("{:?} didn't has ssa_def_instr",rc_use_symidx);
+                        if !use_symidx.is_global_ptr(){
+                            println!("{:?} didn't has ssa_def_instr",rc_use_symidx);
+                            panic!()
+                        }
                         continue;
                     };
-                    if instr!(at def_instr in instr_slab)?.instr_type.is_nope(){ continue;}
+                    // if instr!(at def_instr in instr_slab)?.instr_type.is_nope(){ continue;}
                     let def_cfg_node = instr_slab.get_instr(def_instr)?.get_cfg_instr_idx()?.cfg_node;
                     match &cur_instr_struct.instr_type{
                         // NhwcInstrType::Phi { lhs: _, rhs: _ } => {
@@ -235,7 +238,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                         }
                         _ => {
                             let &dug_cor_node = cur_instr_struct.get_dug_cor_def_use_node()
-                                .with_context(||format!("can't find dug_cor_def_use_node of def_instr {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
+                                .with_context(||format!("can't find dug_cor_def_use_node of cur_instr_struct  {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
                             let &def_dug_node = instr_slab.get_instr(def_instr)?.get_dug_cor_def_use_node()
                                 .with_context(||format!("can't find dug_cor_def_use_node of def_instr {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
                             let _dug_edge = add_edge!({DefUseEdge::new(rc_use_symidx.clone())} from def_dug_node to dug_cor_node in def_use_graph);

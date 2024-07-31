@@ -622,16 +622,19 @@ impl Type {
                 dims.len() == dims2.len() && ele_ty == ele_ty2
             },
             (Type::Array { dims, ele_ty },Type::Ptr64 { ty }) if !ty.is_array() => {
-                ele_ty == ty && dims.len()==1
+                ele_ty == ty // && dims.len()==1
             },
             (Type::Array { dims, ele_ty },Type::Ptr64 { ty }) if ty.is_array() => {
                 match ty.as_ref(){
                     Type::Array { dims: another_dims, ele_ty } => {
-                        ele_ty.as_ref() == &ty.get_ele_ty() && another_dims.len()==  dims.len() -1
+                        ele_ty.as_ref() == &ty.get_ele_ty() // && another_dims.len()==  dims.len() -1
                     },
                     _ =>panic!()
                 }
             },
+            (Type::Ptr64 { ty:ty1 }, Type::Ptr64 { ty:ty2 }) => {
+                true
+            }
             _ => {
                 self == another_type
             }

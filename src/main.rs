@@ -42,6 +42,7 @@ pub struct Args {
 
     #[arg(short, value_name = "test", default_value = "false")]
     pub test:bool,
+    
 }
 
 
