@@ -12,7 +12,7 @@ pub trait Pass {
 pub struct PassManager {
     /// 其中放置 所有pass 的运行顺序的string
     passes:Vec<Box<dyn Pass>>,
-    ctx:super::context::NhwcCtx,
+    pub ctx:super::context::NhwcCtx,
 }
 impl PassManager {
     pub fn new(args:Args) -> Self { PassManager { passes:vec![], ctx:super::context::NhwcCtx::new(args).unwrap() } }

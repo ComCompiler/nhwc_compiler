@@ -1,4 +1,6 @@
 
+use std::iter;
+
 use crate::toolkit::cfg_edge::CfgEdgeType;
 use crate::toolkit::etc::dfs_with_predicate;
 use crate::{add_edge, add_node, direct_child_node, instr, instr_mut, node, node_mut, reg_field_for_struct};
@@ -8,6 +10,7 @@ use crate::toolkit::cfg_node::CfgNodeType::{Gather,WhileLoop};
 use super::cfg_node::CFG_ROOT;
 use super::context::DjGraph;
 use super::etc::InstrAnyhow;
+use super::gen_ssa::update_ssa_def_instr;
 use super::nhwc_instr::NhwcInstr;
 use super::symbol::Symbol;
 use super::symtab;
@@ -24,14 +27,16 @@ reg_field_for_struct!(Symbol {
 
 pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,symtab:&mut SymTab,def_use_graph:&mut DefUseGraph,_dj_graph:&DjGraph) -> Result<()>{
     // add global label instr 
+    update_ssa_def_instr(cfg_graph, symtab, instr_slab)?;
     {
         let instr = node!(at CFG_ROOT in cfg_graph).op_label_instr.unwrap();
         let dug_node = add_node!({DefUseNode::new(instr)} to def_use_graph);
         let instr_struct = instr_mut!(at instr in instr_slab)?;
         instr_struct.add_dug_cor_def_use_node(dug_node);
     }
-    for (_func_symidx,cfg_entry) in symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?{
-        for &cfg_node in etc::dfs(cfg_graph, *cfg_entry).iter(){
+    for cfg_entry in symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.iter().map(|tuple|tuple.1)
+        {
+        for &cfg_node in etc::dfs(cfg_graph, cfg_entry).iter(){
             for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
                 match &instr!(at instr in instr_slab)?.instr_type{
                     NhwcInstrType::Label { label_symidx: _ } => continue,
@@ -64,6 +69,37 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                 instr_struct.add_dug_cor_def_use_node(dug_node);
             }
         }
+    }
+    for &instr in node!(at CFG_ROOT in cfg_graph).iter_all_instrs(){
+        match &instr!(at instr in instr_slab)?.instr_type{
+            NhwcInstrType::Label { label_symidx: _ } => continue,
+            NhwcInstrType::DefineFunc { func_symidx: _, ret_symidx: _, args: _ } => {},
+            NhwcInstrType::DefineVar { var_symidx: _, vartype: _, op_value: _ } => {},
+            NhwcInstrType::Alloc { var_symidx: _, vartype: _ } => {},
+            NhwcInstrType::Arith { lhs: _, rhs: _ } => {},
+            NhwcInstrType::SimpleAssign { lhs: _, rhs: _, vartype: _ } => {},
+            NhwcInstrType::Call { op_lhs: _, func_op: _ } => {},
+            NhwcInstrType::Jump { jump_op } => 
+                match jump_op{
+                    JumpOp::Ret { op_ret_sym: _} => {},
+                    JumpOp::Br { cond: _, t1: _, t2: _ } => {},
+                    JumpOp::Switch { cond: _, default: _, compared: _ } => continue,
+                    JumpOp::DirectJump { label_symidx: _ } => continue,
+                },
+            NhwcInstrType::Phi { lhs: _, rhs: _ } => {},
+            NhwcInstrType::TranType { lhs: _, op: _ } => {},
+            NhwcInstrType::BreakPoint { symidx: _, breakpoint_args: _ } => continue,
+            NhwcInstrType::Globl { var_symidx: _, vartype: _ } => {},
+            NhwcInstrType::Load { lhs: _, ptr_symidx: _ptr_symdix, ptr_ty: _ } => {},
+            NhwcInstrType::Store { val_symidx: _value, value_ty: _, ptr_symidx: _, ptr_ty: _ } => {},
+            NhwcInstrType::GetElementPtr { lhs: _, array_ty: _ty, ptr_symidx: _, idx_vec: _ } => {},
+            NhwcInstrType::Nope {  } => {continue;},
+            NhwcInstrType::Mu { may_use_symidx: _, may_use_instr: _ } => {continue;},
+            NhwcInstrType::Chi { lhs: _, rhs: _, may_def_instr: _ } => {continue;},
+        }
+        let dug_node = add_node!({DefUseNode::new(instr)} to def_use_graph);
+        let instr_struct = instr_mut!(at instr in instr_slab)?;
+        instr_struct.add_dug_cor_def_use_node(dug_node);
     }
     // 加入边之间刷新一下 instruction struct 与 cfg graph 之间的定位关系
     update_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
@@ -142,9 +178,13 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                     let &def_instr = if symbol.has_ssa_def_instr(){
                         symbol.get_ssa_def_instr()?
                     }else{
-                        // println!("{:?} didn't has ssa_def_instr",rc_use_symidx);
+                        if !use_symidx.is_global_ptr(){
+                            println!("{:?} didn't has ssa_def_instr",rc_use_symidx);
+                            panic!()
+                        }
                         continue;
                     };
+                    // if instr!(at def_instr in instr_slab)?.instr_type.is_nope(){ continue;}
                     let def_cfg_node = instr_slab.get_instr(def_instr)?.get_cfg_instr_idx()?.cfg_node;
                     match &cur_instr_struct.instr_type{
                         // NhwcInstrType::Phi { lhs: _, rhs: _ } => {
@@ -172,27 +212,35 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
                         // },
                         NhwcInstrType::Mu { may_use_symidx, may_use_instr } => {
                             let may_use_instr = *may_use_instr;
-                            let &dug_cor_node = instr!(at may_use_instr in instr_slab)?.get_dug_cor_def_use_node()?;
-                            let &def_dug_node = instr!(at def_instr in instr_slab)?.get_dug_cor_def_use_node()?;
+                            if instr!(at may_use_instr in instr_slab)?.instr_type.is_nope(){ continue;}
+                            let &dug_cor_node = instr!(at may_use_instr in instr_slab)?.get_dug_cor_def_use_node()
+                                .with_context(||format!("can't find dug_cor_def_use_node of def_instr {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
+                            let &def_dug_node = instr!(at def_instr in instr_slab)?.get_dug_cor_def_use_node()
+                                .with_context(||format!("can't find dug_cor_def_use_node of def_instr {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
                             let _dug_edge = add_edge!({DefUseEdge::new(rc_use_symidx.clone())} from def_dug_node to dug_cor_node in def_use_graph);
                         },
                         NhwcInstrType::Chi { lhs, rhs, may_def_instr } => {
+                            let may_def_instr = *may_def_instr;
+                            // if instr!(at may_def_instr in instr_slab)?.instr_type.is_nope(){ continue;}
                             // here we consider it as 2 situation 
                             // 1. when it is an array we should add edge from last def to here because you can't change all things in array in one time
                             // 2. when it is a non-array variable we will not add this edge
                             if symtab.get(&lhs.as_ref_borrow().to_src_symidx())?.get_type()?.is_array() 
                             ||symtab.get(&lhs.as_ref_borrow().to_src_symidx())?.get_type()?.is_ptr_64(){
-                            let may_def_instr = *may_def_instr;
-                            let &dug_cor_node = instr!(at may_def_instr in instr_slab)?.get_dug_cor_def_use_node()?;
-                            let &def_dug_node = instr!(at def_instr in instr_slab)?.get_dug_cor_def_use_node()?;
+                            let &dug_cor_node = instr!(at may_def_instr in instr_slab)?.get_dug_cor_def_use_node()
+                                .with_context(||format!("can't find dug_cor_def_use_node of def_instr {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
+                            let &def_dug_node = instr!(at def_instr in instr_slab)?.get_dug_cor_def_use_node()
+                                .with_context(||format!("can't find dug_cor_def_use_node of def_instr {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
                             let _dug_edge = add_edge!({DefUseEdge::new(rc_use_symidx.clone())} from def_dug_node to dug_cor_node in def_use_graph);
                             }else {
                             //     // do nothing
                             }
                         }
                         _ => {
-                            let &dug_cor_node = cur_instr_struct.get_dug_cor_def_use_node()?;
-                            let &def_dug_node = instr_slab.get_instr(def_instr)?.get_dug_cor_def_use_node()?;
+                            let &dug_cor_node = cur_instr_struct.get_dug_cor_def_use_node()
+                                .with_context(||format!("can't find dug_cor_def_use_node of cur_instr_struct  {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
+                            let &def_dug_node = instr_slab.get_instr(def_instr)?.get_dug_cor_def_use_node()
+                                .with_context(||format!("can't find dug_cor_def_use_node of def_instr {:?} when parsing {:?}",instr!(at def_instr in instr_slab), instr!(at instr in instr_slab)))?;
                             let _dug_edge = add_edge!({DefUseEdge::new(rc_use_symidx.clone())} from def_dug_node to dug_cor_node in def_use_graph);
                         }
                     }
@@ -243,6 +291,22 @@ pub fn update_src_symdix_alloc_global_instr_info(symtab:&mut SymTab, cfg_graph:&
                 }
                 _ => {}
             }
+        }
+    }
+    for &instr in node!(at CFG_ROOT in cfg_graph).instrs.iter(){
+        match &instr!(at instr in instr_slab)?.instr_type {
+            NhwcInstrType::Alloc { var_symidx, vartype: _ } => {
+                symtab.get_mut(&var_symidx.as_ref_borrow().to_src_symidx())?.add_mem_alloc_instr(instr);
+            },
+            NhwcInstrType::Globl { var_symidx, vartype: _ } => {
+                symtab.get_mut(&var_symidx.as_ref_borrow().to_src_symidx())?.add_mem_alloc_instr(instr);
+            },
+            NhwcInstrType::DefineFunc { func_symidx, ret_symidx, args } => {
+                for arg in args {
+                    symtab.get_mut(&arg.as_ref_borrow().to_src_symidx())?.add_mem_alloc_instr(instr);
+                }
+            }
+            _ => {}
         }
     }
     Ok(())

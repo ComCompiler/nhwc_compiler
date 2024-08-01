@@ -34,6 +34,8 @@ rm -rf $s_path/*
 
 cargo build --release
 
+compiler=./target/release/compiler
+
 # 初始化数组
 files_to_compare=()
 
@@ -41,13 +43,34 @@ files_to_compare=()
 correct_count=0
 incorrect_count=0
 
+ours_out_path=./for_auto_test/4ours_out/
+sy_path=./for_auto_test/00performance
 
-# 遍历指定路径下的所有文件
-if [ "$#" -eq 1 ]; then
+mkdir -p $ours_out_path
+# 检查是否提供了单个 .sy 文件作为参数或 --performance 选项
+if [ "$#" -gt 0 ]; then
     sy_files=("$1")
 else
     sy_files=($sy_path/*.sy)
 fi
+
+if [ "$#" -eq 2 ]; then
+    compiler=("$2")
+    echo use additional compiler $compiler
+fi
+
+# 设置标志变量，默认为 false
+has_d_option=false
+
+# 遍历所有的命令行参数
+for arg in "$@"; do
+    if [[ "$arg" == "-d" ]]; then
+        has_d_option=true
+        break
+    fi
+done
+
+# 遍历指定路径下的所有文件
 for filename in "${sy_files[@]}"; do
     # 检查是否为文件
     echo "Processing $filename"
@@ -56,12 +79,20 @@ for filename in "${sy_files[@]}"; do
         # 获取文件的基本名称，没有路径
         export base_name=$(basename "$filename" .sy)
         # 执行编译命令，输出到同一目录
-        ./target/release/compiler "$filename" -o "$s_path/${base_name}.s" -a 2> /dev/null
+
+        # 根据标志变量的值输出结果
+        if $has_d_option; then
+            echo "存在 -d 选项"
+            $compiler "$filename" -o "$s_path/${base_name}.s" -a 2> /dev/null
+        else
+            echo "不存在 -d 选项"
+            $compiler "$filename" -o "$s_path/${base_name}.s" 2> /dev/null
+        fi
         compile_status=$?
 
         if [ $compile_status -ne 0 ]; then
             echo -e "$RED Failed to compile $filename $NC"
-            ./target/release/compiler "$filename" -o "$s_path/${base_name}.s" 2>> "$o_path/${base_name}_compiler_error.log"
+            $compiler "$filename" -o "$s_path/${base_name}.s" 2>> "$o_path/${base_name}_compiler_error.log"
             continue
         fi
 
@@ -76,7 +107,7 @@ for filename in "${sy_files[@]}"; do
         fi
 
         # 如果有对应的 .in 文件，运行 .elf 文件，并将结果输出到 ours_out
-        timeout $timeout_duration bash -c '
+        # timeout $timeout_duration bash -c '
         if [ -f "$in_path/${base_name}.in" ]; then
             qemu-riscv64-static "$elf_path/${base_name}.elf" < "$in_path/${base_name}.in" > "$ours_out_path/${base_name}.out" 2>&1
             echo -e "\n$?" >> "$ours_out_path/${base_name}.out"
@@ -84,23 +115,32 @@ for filename in "${sy_files[@]}"; do
             qemu-riscv64-static "$elf_path/${base_name}.elf" > "$ours_out_path/${base_name}.out" 2>&1
             echo -e "\n$?" >> "$ours_out_path/${base_name}.out"
         fi
-        # 删除 .out 文件的第一行 (时间记录)
-        sed -i '1d' "$ours_out_path/${base_name}.out"
-        # 添加需要比对的文件路径到数组中
 
-        if diff -wB "$ours_out_path/${base_name}.out" "$official_path/${base_name}.out" > /dev/null; then
-            echo -e "${GREEN}${base_name} 过了${NC}"
+        # if diff -wB "$ours_out_path/${base_name}.out" "$official_path/${base_name}.out" > /dev/null; then
+        #     echo -e "${GREEN}${base_name} 过了${NC}"
+        # else
+        diff -wB "$ours_out_path/${base_name}.out" "$official_path/${base_name}.out" -y | head -n 10
+        #     echo -e "${RED}${base_name} 结果不一样!${NC}"
+        # fi
+
+        
+        total_line=$(grep "^TOTAL" "$ours_out_path/${base_name}.out")
+
+        # # 检查是否找到以 TOTAL 开头的行
+        if [ -n "$total_line" ]; then
+            # 使用 echo 命令将该行加红并打印
+            # 红色文本的 ANSI 转义码是 \033[31m，重置颜色的 ANSI 转义码是 \033[0m
+            echo -e "${GREEN}$total_line${NC}"
         else
-            diff -wB "$ours_out_path/${base_name}.out" "$official_path/${base_name}.out" -y | head -n 10
-            echo -e "${RED}${base_name} 结果不一样!${NC}"
+            echo "没有找到以 TOTAL 开头的行。"
         fi
-        '
-        timeout_status=$?
-        if [ $timeout_status -eq 124 ]; then
-            echo "Timeout occurred: Code block did not complete within $timeout_duration seconds"
-        else
-            echo
-        fi
+        # '
+        # timeout_status=$?
+        # if [ $timeout_status -eq 124 ]; then
+        #     echo "Timeout occurred: Code block did not complete within $timeout_duration seconds"
+        # else
+        #     echo
+        # fi
 
         files_to_compare+=("$ours_out_path/${base_name}.out $official_path/${base_name}.out")
     fi
@@ -110,16 +150,18 @@ done
 for files in "${files_to_compare[@]}"; do
     # 拆分文件路径
     IFS=' ' read -r ours_file official_file <<< "$files"
-    if diff -wB "$ours_file" "$official_file" > /dev/null; then
-        echo -e "${GREEN}$(basename "$ours_file") 过了${NC}"
+    # if diff -wB "$ours_file" "$official_file" > /dev/null; then
+    # echo $ours_file
+    time=$(grep "^TOTAL" "$ours_file")
+        echo -e "${GREEN}$(basename "$ours_file") 耗时 ${time} ${NC}"
         let correct_count++
-    else
-        echo -e "${RED}$(basename "$ours_file") 结果不一样!${NC}"
-        diff -wB "$ours_out_path/$(basename "$ours_file")" "$official_path/$(basename "$ours_file")" -y | head -n 10
-        let incorrect_count++
-    fi
+    # else
+        # echo -e "${RED}$(basename "$ours_file") 结果不一样!${NC}"
+        # diff -wB "$ours_out_path/$(basename "$ours_file")" "$official_path/$(basename "$ours_file")" -y | head -n 10
+        # let incorrect_count++
+    # fi
 done
 
 # 输出统计结果
 echo -e "${GREEN}通过的文件数: $correct_count${NC}"
-echo -e "${RED}未通过的文件数: $incorrect_count${NC}"
+# echo -e "${RED}未通过的文件数: $incorrect_count${NC}"

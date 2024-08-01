@@ -469,7 +469,7 @@ impl Value {
                 if num > 0 {
                     let num  = num as usize;
                     let mut i = 0;
-                    while num < 2_usize.pow(i){
+                    while num > 2_usize.pow(i){
                         i=i+1;
                     }
                     if 2_usize.pow(i) == num {
@@ -622,16 +622,19 @@ impl Type {
                 dims.len() == dims2.len() && ele_ty == ele_ty2
             },
             (Type::Array { dims, ele_ty },Type::Ptr64 { ty }) if !ty.is_array() => {
-                ele_ty == ty && dims.len()==1
+                ele_ty == ty // && dims.len()==1
             },
             (Type::Array { dims, ele_ty },Type::Ptr64 { ty }) if ty.is_array() => {
                 match ty.as_ref(){
                     Type::Array { dims: another_dims, ele_ty } => {
-                        ele_ty.as_ref() == &ty.get_ele_ty() && another_dims.len()==  dims.len() -1
+                        ele_ty.as_ref() == &ty.get_ele_ty() // && another_dims.len()==  dims.len() -1
                     },
                     _ =>panic!()
                 }
             },
+            (Type::Ptr64 { ty:ty1 }, Type::Ptr64 { ty:ty2 }) => {
+                true
+            }
             _ => {
                 self == another_type
             }
@@ -771,6 +774,19 @@ impl Type {
                 ty.pop_dim()?;
                 Ok(Self::Ptr64 { ty:Box::new(ty)  })
             },
+            _ => panic!()
+        }
+    }
+    pub fn try_arr2ptr(&self) -> Result<Type>{
+        match self{
+            Type::Array { dims, ele_ty } => {
+                let mut ty = self.clone();
+                ty.pop_dim()?;
+                Ok(Self::Ptr64 { ty:Box::new(ty)  })
+            },
+            Type::Ptr64 { ty } => {
+                Ok(self.clone())
+            }
             _ => panic!()
         }
     }

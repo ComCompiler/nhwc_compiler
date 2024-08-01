@@ -16,7 +16,7 @@ use crate::{instr, toolkit::ast_node::AstTree};
 use crate::{ reg_field_for_struct, node};
 
 use super::field::Fields;
-use super::nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType};
+use super::nhwc_instr::{ArithOp, InstrSlab, NhwcInstr, NhwcInstrType};
 
 //use crate::toolkit::ast_node::AstNode;
 pub static CFG_ROOT:u32 = 0;
@@ -91,13 +91,12 @@ pub struct CfgNode {
 #[derive(Debug,Clone)]
 pub struct LoopInfo{
     pub loop_symidx:RcSymIdx,
-    // pub start_value:u32,
-    // pub step_value:u32,
-    // pub stop_value:u32,
+    pub arith:ArithOp,
+    pub step:u32,
 }
 impl LoopInfo{
-    pub fn new_loop_info(loop_rcsymidx:RcSymIdx)->Self{
-        Self { loop_symidx: loop_rcsymidx}
+    pub fn new_loop_info(loop_rcsymidx:RcSymIdx,arith:ArithOp,step:u32)->Self{
+        Self { loop_symidx: loop_rcsymidx,arith,step}
     }
 }
 #[derive(Clone,Default)]

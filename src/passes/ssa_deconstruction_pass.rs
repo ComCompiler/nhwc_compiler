@@ -10,7 +10,7 @@ impl SsaDeconstructionPass {
 impl Pass for SsaDeconstructionPass {
    // 运行这个pass
     fn run(&mut self, ctx:&mut crate::toolkit::context::NhwcCtx) -> Result<()> { 
-        let ssa_deconstruction_rst = ssa_deconstruction(&mut ctx.cfg_graph, &mut ctx.dj_graph, &mut ctx.symtab, &mut ctx.nhwc_instr_slab);
+        let ssa_deconstruction_rst = ssa_deconstruction(&mut ctx.cfg_graph, &mut ctx.dj_graph, &mut ctx.symtab, &mut ctx.nhwc_instr_slab, &mut ctx.et_tree);
         if self.is_gen_ssa_cfg_png{
             for (idx,instr_struct) in ctx.nhwc_instr_slab.iter_mut(){
                 instr_struct.text.clear();

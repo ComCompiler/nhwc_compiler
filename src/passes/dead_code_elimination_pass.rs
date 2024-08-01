@@ -1,5 +1,6 @@
-use crate::{ debug_info_blue, debug_info_green, debug_info_yellow, instr_mut, node, reg_field_for_struct, toolkit::{context::NhwcCtx, dot::Config, etc::{_reverse_dfs_with_predicate, generate_png_by_graph_multi_tasks}, gen_dug::parse_dug, nhwc_instr::{JumpOp, NhwcInstr, NhwcInstrType}, pass_manager::Pass, symtab::{SymTab, SymTabEdge, SymTabGraph}}};
+use crate::{ debug_info_blue, debug_info_green, debug_info_yellow, instr_mut, node, reg_field_for_struct, toolkit::{cfg_node::CFG_ROOT, context::NhwcCtx, dot::Config, etc::{_reverse_dfs_with_predicate, generate_png_by_graph_multi_tasks}, gen_dug::parse_dug, nhwc_instr::{JumpOp, NhwcInstr, NhwcInstrType}, pass_manager::Pass, symtab::{SymTab, SymTabEdge, SymTabGraph}}};
 use anyhow::*;
+use itertools::Itertools;
 use crate::instr;
 #[derive(Debug)]
 pub struct DeadCodeEliminationPass {
@@ -50,9 +51,13 @@ impl Pass for DeadCodeEliminationPass {
         }
         let mut visited_array:Vec<bool> = vec![false; def_use_graph.node_count()];
         for dug_node in relevant_dug_nodes{
+            let instr = node!(at dug_node in def_use_graph).instr;
+            debug_info_yellow!(" dfs start from {:?} at dug_node:{}", instr!(at instr in instr_slab)?, dug_node);
             _reverse_dfs_with_predicate(def_use_graph, dug_node, &mut visited_array, &mut vec![], &mut |x| true)
         }
+        debug_info_yellow!("{:?}",visited_array.iter().enumerate().collect_vec());
         for dug_node in visited_array.iter().enumerate().filter(|(idx,b)|!*b).map(|(idx,b)| idx as u32){
+            debug_info_yellow!("unvisit dug_node {:?}",dug_node);
             let unvisited_instr = node!(at dug_node in def_use_graph).instr;
             match &instr!(at unvisited_instr in instr_slab)?.instr_type{
                 NhwcInstrType::Label { label_symidx } => {},
@@ -61,8 +66,10 @@ impl Pass for DeadCodeEliminationPass {
                 NhwcInstrType::Alloc { var_symidx, vartype } => {},
                 NhwcInstrType::Globl { var_symidx, vartype } => {},
                 _ => {
-                    debug_info_yellow!("set instr {} to nope {:?}",unvisited_instr, instr!(at unvisited_instr in instr_slab)?);
-                    *instr_mut!(at unvisited_instr in instr_slab )? = NhwcInstrType::Nope {  }.into();
+                    if instr!(at unvisited_instr in instr_slab)?.get_cfg_instr_idx()?.cfg_node!= CFG_ROOT{
+                        debug_info_yellow!("set instr {} {:?} to nope ",unvisited_instr, instr!(at unvisited_instr in instr_slab)?);
+                        *instr_mut!(at unvisited_instr in instr_slab )? = NhwcInstrType::Nope {  }.into();
+                    }
                 }
             }
         }
