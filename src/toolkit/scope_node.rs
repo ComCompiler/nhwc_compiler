@@ -16,6 +16,7 @@ pub struct ScopeNode {
     pub ast_node:u32,
     pub op_text:Option<String>,
     pub scope_type:ScopeType,
+    pub loop_level:u32,
 }
 impl ScopeNode {
     pub fn load_ast_node_text(&mut self, ast_tree:&AstTree) {
@@ -48,7 +49,7 @@ impl Debug for ScopeNode {
     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{} \n {:?} {:?}",
+            "{} \n {:?} {:?}\n loop_level:{}",
             match self.scope_type {
                 ScopeType::For => "For",
                 ScopeType::While{ op_cfg_while_node } => "While",
@@ -60,7 +61,8 @@ impl Debug for ScopeNode {
                 ScopeType::Case => "Case",
             },
             self.ast_node,
-            self.op_text
+            self.op_text,
+            self.loop_level
         )
     }
 }

@@ -16,53 +16,51 @@
  13   global Fn[zz_ptr_14, zz_val_14, zz_len_14]->memset_ret_0 memset_0 
  14   global Fn[zz_dest_15, zz_ptr_15, zz_len_15]->memcpy_ret_0 memcpy_0 
  18   Define main_0 "" -> main_ret_0 
-         52   alloc Array:i32:[Some(4_0), Some(4_0)] a_31 
-         53   alloc ptr->Array:i32:[Some(4_0)] temp_5_array_ele_ptr_31 
+         47   alloc Array:i32:[Some(3_0), Some(3_0)] a_31 
+         48   alloc ptr->Array:i32:[Some(3_0)] temp_5_ele_ptr_of_a_31_31 
           label L0_0: 
-         51   new_var a_31:Array:i32:[Some(4_0), Some(4_0)] 
-         54   new_var temp_5_array_ele_ptr_31:ptr->Array:i32:[Some(4_0)] 
-         55   temp_5_array_ele_ptr_31 = getelementptr a_31:Array:i32:[Some(4_0), Some(4_0)] [] 
-         56    Call void init_0(temp_5_array_ele_ptr_31) 
-         58   ret 0_0 
+         46    
+         49   temp_5_ele_ptr_of_a_31_31 = GEP a_31:Array:i32:[Some(3_0), Some(3_0)] [] 
+         50    Call void init_0(temp_5_ele_ptr_of_a_31_31) 
+         56   mu a_31:50 
+         57   a_31 = chi a_31:50 
+         52   ret 0_0 
  17   Define init_0 "a_16," -> init_ret_0 
          20   alloc i32 i_18 
          22   alloc i32 k_22 
          23   alloc i32 temp_0_arithop_22 
-         27   alloc ptr->i32 temp_1_index_ptr_26 
-         32   alloc i32 temp_2_arithop_26 
-         36   alloc i1 temp_3_cmp_20 
-         44   alloc i1 temp_4_cmp_24 
+         26   alloc ptr->i32 temp_1_ptr_of_a_16_26 
+         30   alloc i32 temp_2_arithop_26 
+         33   alloc i1 temp_3_cmp_20 
+         40   alloc i1 temp_4_cmp_24 
           label L1_0: 
-         16   new_var a_16:ptr->Array:i32:[Some(4_0)] 
+         16    
          19   (nop) 
-         66   i_18 = i32 0_0 
+         62   i_18 = i32 0_0 
               jump label: while.head_21 
-     39   label while.head_21: 
-         37   new_var temp_3_cmp_20:i1 
-         38   temp_3_cmp_20 = icmp i32 Slt i_18, 3_0 
-         42   br i1 temp_3_cmp_20, label while.body_21, label while.exit_21 
-     40   label while.body_21: 
+     35   label while.head_21: 
+         34   temp_3_cmp_20 = icmp i32 Slt i_18, 3_0 
+         38   br i1 temp_3_cmp_20, label while.body_21, label while.exit_21 
+     36   label while.body_21: 
          21   (nop) 
-         67   k_22 = i32 0_0 
+         63   k_22 = i32 0_0 
               jump label: while.head_25 
-     47   label while.head_25: 
-         45   new_var temp_4_cmp_24:i1 
-         46   temp_4_cmp_24 = icmp i32 Slt k_22, 3_0 
-         50   br i1 temp_4_cmp_24, label while.body_25, label while.exit_25 
-     48   label while.body_25: 
-         28   new_var temp_1_index_ptr_26:ptr->i32 
-         29   temp_1_index_ptr_26 = getelementptr a_16:ptr->Array:i32:[Some(4_0)] [Some(i_18), Some(k_22)] 
-         30   store k_22:i32 temp_1_index_ptr_26:ptr->i32 
-         31   a_16 = chi a_16:30 
-         33   new_var temp_2_arithop_26:i32 
-         34   temp_2_arithop_26 = Add i32 k_22, 1_0 
-         35   k_22 = i32 temp_2_arithop_26 
+     42   label while.head_25: 
+         41   temp_4_cmp_24 = icmp i32 Slt k_22, 3_0 
+         45   br i1 temp_4_cmp_24, label while.body_25, label while.exit_25 
+     43   label while.body_25: 
+         27   temp_1_ptr_of_a_16_26 = GEP a_16:ptr->Array:i32:[Some(3_0)] [Some(i_18), Some(k_22)] 
+         28   store k_22:i32 temp_1_ptr_of_a_16_26:ptr->i32 
+         29   a_16 = chi a_16:28 
+         31   temp_2_arithop_26 = Add i32 k_22, 1_0 
+         32   (nop) 
+         64   k_22 = i32 temp_2_arithop_26 
               jump label: while.head_25 
-     49   label while.exit_25: 
-         24   new_var temp_0_arithop_22:i32 
-         25   temp_0_arithop_22 = Add i32 i_18, 1_0 
-         26   i_18 = i32 temp_0_arithop_22 
+     44   label while.exit_25: 
+         24   temp_0_arithop_22 = Add i32 i_18, 1_0 
+         25   (nop) 
+         65   i_18 = i32 temp_0_arithop_22 
               jump label: while.head_21 
-     41   label while.exit_21: 
-         61   mu a_16:43 
-         43   ret 
+     37   label while.exit_21: 
+         55   mu a_16:39 
+         39   ret 
