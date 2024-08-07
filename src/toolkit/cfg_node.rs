@@ -87,6 +87,8 @@ pub struct CfgNode {
     pub text:String,
     pub info:Fields,
     // instructions of this basic block (第二步才生成这个 instrs)
+
+    pub loop_level:usize,
 }
 #[derive(Debug,Clone)]
 pub struct LoopInfo{
@@ -95,7 +97,7 @@ pub struct LoopInfo{
     pub step:u32,
 }
 impl LoopInfo{
-    pub fn new_loop_info(loop_rcsymidx:RcSymIdx,arith:ArithOp,step:u32)->Self{
+    pub fn new_loop_info(loop_rcsymidx:RcSymIdx,arith:ArithOp,step:u32,loop_level:usize)->Self{
         Self { loop_symidx: loop_rcsymidx,arith,step}
     }
 }
@@ -259,17 +261,17 @@ impl CfgNode {
     pub fn clear_text(&mut self){
         self.text = String::new();
     }
-    pub fn new_bb(ast_nodes:Vec<u32>) -> Self { 
-        let mut cfg_node_struct = Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(), phi_instrs: InstrList::new(), cfg_node_type: CfgNodeType::BasicBlock { ast_nodes ,},op_label_instr:None, op_jump_instr: None, asms: InstrSlab::new() } ;
+    pub fn new_bb(ast_nodes:Vec<u32>,loop_level:usize) -> Self { 
+        let mut cfg_node_struct = Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(), phi_instrs: InstrList::new(), cfg_node_type: CfgNodeType::BasicBlock { ast_nodes ,},op_label_instr:None, op_jump_instr: None, asms: InstrSlab::new() ,loop_level} ;
         cfg_node_struct.add_def_symidx_instr_tuple_vec(vec![]);
         cfg_node_struct
     }
-    pub fn new_gather() -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type: CfgNodeType::Gather {},op_label_instr:None, phi_instrs: InstrList::new(),  op_jump_instr: None, asms: InstrSlab::new() } }
-    pub fn new_root(ast_nodes:Vec<u32>) -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Root {static_ast_nodes:ast_nodes},op_label_instr:None, phi_instrs: InstrList::new(),  op_jump_instr: None, asms: InstrSlab::new() } }
-    pub fn new_branch(ast_node:u32) -> Self {
-        Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Branch { ast_expr_node:ast_node, },op_label_instr:None, phi_instrs: InstrList::new(),  op_jump_instr: None, asms: InstrSlab::new() }
+    pub fn new_gather(loop_level:usize) -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type: CfgNodeType::Gather {},op_label_instr:None, phi_instrs: InstrList::new(),  op_jump_instr: None, asms: InstrSlab::new() ,loop_level} }
+    pub fn new_root(ast_nodes:Vec<u32>,loop_level:usize) -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Root {static_ast_nodes:ast_nodes},op_label_instr:None, phi_instrs: InstrList::new(),  op_jump_instr: None, asms: InstrSlab::new(),loop_level } }
+    pub fn new_branch(ast_node:u32,loop_level:usize) -> Self {
+        Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Branch { ast_expr_node:ast_node, },op_label_instr:None, phi_instrs: InstrList::new(),  op_jump_instr: None, asms: InstrSlab::new(),loop_level }
     }
-    pub fn new_for( ast_before_node:u32, ast_mid_node:u32, ast_after_node:u32,) -> Self {
+    pub fn new_for( ast_before_node:u32, ast_mid_node:u32, ast_after_node:u32,loop_level:usize) -> Self {
         Self {
             text:String::new(),
             instrs:InstrList::new(),
@@ -278,18 +280,19 @@ impl CfgNode {
             op_label_instr: None,
             op_jump_instr: None,
             asms: InstrSlab::new(),
+            loop_level
         }
     }
     pub fn new_while(
-        ast_expr_node:u32,
+        ast_expr_node:u32,loop_level:usize
     ) -> Self {
-        Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::WhileLoop { ast_expr_node, }, phi_instrs: InstrList::new(), op_label_instr:None, op_jump_instr: None, asms: InstrSlab::new() }
+        Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::WhileLoop { ast_expr_node, }, phi_instrs: InstrList::new(), op_label_instr:None, op_jump_instr: None, asms: InstrSlab::new(),loop_level }
     }
-    pub fn new_switch(ast_expr_node:u32) -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Switch { ast_expr_node ,}, phi_instrs: InstrList::new(), op_label_instr: None, op_jump_instr: None, asms: InstrSlab::new() } }
-    pub fn new_entry(ast_node:u32, _instr:usize) -> Self {
-        Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Entry { ast_node, calls_in_func:vec![] ,}, phi_instrs: InstrList::new(), op_label_instr: None, op_jump_instr: None, asms: InstrSlab::new() }
+    pub fn new_switch(ast_expr_node:u32,loop_level:usize) -> Self { Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Switch { ast_expr_node ,}, phi_instrs: InstrList::new(), op_label_instr: None, op_jump_instr: None, asms: InstrSlab::new(),loop_level } }
+    pub fn new_entry(ast_node:u32, _instr:usize,loop_level:usize) -> Self {
+        Self { instrs:InstrList::new(), text:String::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Entry { ast_node, calls_in_func:vec![] ,}, phi_instrs: InstrList::new(), op_label_instr: None, op_jump_instr: None, asms: InstrSlab::new(),loop_level }
     }
-    pub fn new_exit(ast_node:u32) -> Self { Self { text:String::new(), instrs:InstrList::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Exit { ast_node }, phi_instrs: InstrList::new(), op_label_instr: None,  op_jump_instr: None, asms: InstrSlab::new() } }
+    pub fn new_exit(ast_node:u32,loop_level:usize) -> Self { Self { text:String::new(), instrs:InstrList::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Exit { ast_node }, phi_instrs: InstrList::new(), op_label_instr: None,  op_jump_instr: None, asms: InstrSlab::new(),loop_level } }
     pub fn iter_all_instrs(&self)->impl Iterator<Item=&usize>+'_{
         self.op_label_instr.iter().chain(self.phi_instrs.iter().chain(self.instrs.iter().chain(self.op_jump_instr.iter())))
     }
@@ -320,38 +323,38 @@ impl Debug for CfgNode {
         match &self.cfg_node_type {
             // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::Entry { ast_node, calls_in_func: _ } => {
-                write!(f, " #{} {} \n {} $ @ # {} \n {:#?} $  ", "Entry\n", ast_node, self.text, "Fields", self.info)
+                write!(f, " #{} {} \n {} $ @ # {} \n {:#?} \n loop_level:{} $  ", "Entry\n", ast_node, self.text, "Fields", self.info,self.loop_level)
             }
             // 4元  输出为4格 {{1 @ 1} @ { 1 @ 1}}
             CfgNodeType::Exit { ast_node: _ } => {
-                write!(f, " # {} \n {} $ @ # {} \n{:#?} $", "Exit\n", self.text, "Fields", self.info)
+                write!(f, " # {} \n {} $ @ # {} \n{:#?} \n loop_level:{} $", "Exit\n", self.text, "Fields", self.info,self.loop_level)
             }
             // 5元  输出为4格 {{2 @ 1} @ { 1 @ 1}}
             CfgNodeType::Branch {
                 ast_expr_node,
                 // op_true_head_tail_nodes: _true_head_tail_nodes, op_false_head_tail_nodes: _false_head_tail_nodes,
             } => {
-                write!(f,  " # {} {} \n {} $ @ # {} \n {:#?} $ ", "Branch\n", ast_expr_node, self.text, "Fields", self.info)
+                write!(f,  " # {} {} \n {} $ @ # {} \n {:#?} \n loop_level:{} $ ", "Branch\n", ast_expr_node, self.text, "Fields", self.info,self.loop_level)
             }
             // 3元  输出为3格 {1 | 1 | 1}
-            CfgNodeType::Gather {} => write!(f, " # {} {} $ @ # {}\n {:#?} $", "Gather\n", self.text ,"Fields", self.info),
+            CfgNodeType::Gather {} => write!(f, " # {} {} $ @ # {}\n {:#?} \n loop_level:{} $", "Gather\n", self.text ,"Fields", self.info,self.loop_level),
             // 4元  输出为4格 {{1 | 1} | { 1 | 1}}
             CfgNodeType::BasicBlock { ast_nodes: _ast_node_idxes } => {
-                write!(f, " # {} \n {} $ @ # {} \n{:#?} $", "BasicBlock\n", self.text, "Fields", self.info)
+                write!(f, " # {} \n {} $ @ # {} \n{:#?} \n loop_level:{} $", "BasicBlock\n", self.text, "Fields", self.info,self.loop_level)
             }
             // 3元  输出为3格 {1 | 1 | 1}
-            CfgNodeType::Root {static_ast_nodes: _} => write!(f, " {} {} @ {}\n {:#?} ", "root\n", self.text,"Fields", self.info),
+            CfgNodeType::Root {static_ast_nodes: _} => write!(f, " {} {} @ {}\n {:#?} \n loop_level:{}  ", "root\n", self.text,"Fields", self.info,self.loop_level),
             // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::ForLoop { ast_before_node, ast_mid_node: _, ast_after_node: _ } => {
-                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} $ ", "For\n", ast_before_node, self.text, "Fields", self.info)
+                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} \n loop_level:{} $ ", "For\n", ast_before_node, self.text, "Fields", self.info,self.loop_level)
             }
             // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::WhileLoop { ast_expr_node } => {
-                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} $ ", "While\n", ast_expr_node, self.text, "Fields", self.info)
+                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} \n loop_level:{} $ ", "While\n", ast_expr_node, self.text, "Fields", self.info,self.loop_level)
             }
             // 5元  输出为4格 {{2 | 1} | { 1 | 1}}
             CfgNodeType::Switch { ast_expr_node } => {
-                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} $ ", "Switch\n", ast_expr_node, self.text, "Fields", self.info)
+                write!(f,  " #{} {} \n {} $ @ # {} \n {:#?} \n loop_level:{} $ ", "Switch\n", ast_expr_node, self.text, "Fields", self.info,self.loop_level)
             }
         }
     }

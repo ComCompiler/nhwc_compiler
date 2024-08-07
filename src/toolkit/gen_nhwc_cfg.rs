@@ -9,6 +9,7 @@ use petgraph::{
 use core::panic;
 use std::borrow::Borrow;
 use std::cell::RefCell;
+use std::cmp::min;
 use std::mem;
 use std::rc::Rc;
 use crate::toolkit::field::TypeDiscriminants;
@@ -2278,7 +2279,8 @@ pub fn split_bb_node(cfg_node:u32,cfg_graph:&mut CfgGraph,is_move_instrs:bool) -
         return Err(anyhow!("bb分割操作不能用于bb外的节点{}",cfg_node))
     }
     // add new bb cfg node 
-    let mut bb_struct = CfgNode::new_bb(vec![]);
+    let loop_level = node!(at cfg_node in cfg_graph).loop_level;
+    let mut bb_struct = CfgNode::new_bb(vec![],loop_level);
     bb_struct.add_func_cor_symidx(node!(at cfg_node in cfg_graph).get_func_cor_symidx()?.clone()); 
     bb_struct.op_label_instr = node_mut!(at cfg_node in cfg_graph).op_label_instr.take();
     bb_struct.instrs = mem::take(&mut node_mut!(at cfg_node in cfg_graph).instrs);
@@ -2329,6 +2331,7 @@ pub fn update_jump_instr_of_parents_of_cfg_node(cfg_node:u32, cfg_graph:&mut Cfg
 /// 1. cfg_node1 和 cfg_node2 之间是一条 Direct 普通边 或 BodyHead BodyTail
 /// 2. cfg_node1 和 cfg_node2 其中有一个是 BasicBlock
 pub fn insert_bb_between(cfg_node_from:u32, cfg_node_to:u32, cfg_graph:&mut CfgGraph, symtab:&mut SymTab,instr_slab:&mut InstrSlab<NhwcInstr>) -> Result<u32>{
+    let loop_level = min(node!(at cfg_node_to in cfg_graph).loop_level,node!(at cfg_node_from in cfg_graph).loop_level);
     let cfg_former_edge_idx = cfg_graph.find_edge(node_index(cfg_node_from as usize), node_index(cfg_node_to as usize)).ok_or(anyhow!("找不到连接 cfg_node[{}] 和 cfg_node[{}]的边",cfg_node_from,cfg_node_to))
         .with_context(|| format!("在插入 cfg_node[{}] 和 cfg_node[{}]之间bb 失败",cfg_node_from,cfg_node_to))?;
     // 删除旧的边
@@ -2336,7 +2339,7 @@ pub fn insert_bb_between(cfg_node_from:u32, cfg_node_to:u32, cfg_graph:&mut CfgG
     let (cfg_node_type1, cfg_node_type2) = (&node!(at cfg_node_from in cfg_graph).cfg_node_type,&node!(at cfg_node_to in cfg_graph).cfg_node_type);
     let rst = if  cfg_former_edge_removed.cfg_edge_type.is_direct() {
         // 如果这条边本身就是一条普通边，那么就允许insert
-        let mut bb_struct = CfgNode::new_bb(vec![]);
+        let mut bb_struct = CfgNode::new_bb(vec![],loop_level);
         bb_struct.add_func_cor_symidx(node!(at cfg_node_from in cfg_graph).get_func_cor_symidx()?.clone());
         let new_bb = add_node_with_edge!({bb_struct} with_edge {cfg_former_edge_removed} from cfg_node_from in cfg_graph);
         add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node_to in cfg_graph);
@@ -2344,13 +2347,13 @@ pub fn insert_bb_between(cfg_node_from:u32, cfg_node_to:u32, cfg_graph:&mut CfgG
     } else if cfg_former_edge_removed.cfg_edge_type.is_body_head() 
     || cfg_former_edge_removed.cfg_edge_type.is_if_true() 
     || cfg_former_edge_removed.cfg_edge_type.is_if_false() {
-        let mut bb_struct = CfgNode::new_bb(vec![]);
+        let mut bb_struct = CfgNode::new_bb(vec![],loop_level);
         bb_struct.add_func_cor_symidx(node!(at cfg_node_from in cfg_graph).get_func_cor_symidx()?.clone());
         let new_bb = add_node_with_edge!({bb_struct} with_edge {cfg_former_edge_removed} from cfg_node_from in cfg_graph);
         add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node_to in cfg_graph);
         Ok(new_bb)
     }else if cfg_former_edge_removed.cfg_edge_type.is_body_tail()  {
-        let mut bb_struct = CfgNode::new_bb(vec![]);
+        let mut bb_struct = CfgNode::new_bb(vec![],loop_level);
         bb_struct.add_func_cor_symidx(node!(at cfg_node_from in cfg_graph).get_func_cor_symidx()?.clone());
         let new_bb = add_node_with_edge!({bb_struct} with_edge {CfgEdge::new_direct()} from cfg_node_from in cfg_graph);
         add_edge!({cfg_former_edge_removed} from new_bb to cfg_node_to in cfg_graph);
@@ -2359,12 +2362,12 @@ pub fn insert_bb_between(cfg_node_from:u32, cfg_node_to:u32, cfg_graph:&mut CfgG
     }else{
         match (cfg_node_type1,cfg_node_type2){
             (_,CfgNodeType::BasicBlock { ast_nodes:_ })=>{
-                let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with_edge {cfg_former_edge_removed} from cfg_node_from in cfg_graph);
+                let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![],loop_level)} with_edge {cfg_former_edge_removed} from cfg_node_from in cfg_graph);
                 add_edge!({CfgEdge::new_direct()} from new_bb to cfg_node_to in cfg_graph);
                 Ok(new_bb)
             }
             (CfgNodeType::BasicBlock { ast_nodes:_ },_)=>{
-                let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![])} with_edge {CfgEdge::new_direct()} from cfg_node_from in cfg_graph);
+                let new_bb = add_node_with_edge!({CfgNode::new_bb(vec![],loop_level)} with_edge {CfgEdge::new_direct()} from cfg_node_from in cfg_graph);
                 add_edge!({cfg_former_edge_removed} from new_bb to cfg_node_to in cfg_graph);
                 Ok(new_bb)
             }
@@ -2392,12 +2395,13 @@ pub fn insert_bb_between(cfg_node_from:u32, cfg_node_to:u32, cfg_graph:&mut CfgG
 /// &&是在原br和true边的bb中见添加的，新br的true指向内部bb，false指向原br指向的gather
 /// 两种扩展都是向下扩展，然后返回原br节点和新扩展的br节点
 pub fn process_short_logic(cfg_node:u32,cfg_graph:&mut CfgGraph,logic_op:&ExprOp, instr_slab:&mut InstrSlab<NhwcInstr>)->Result<(u32,u32)>{
+    let loop_level = node!(at cfg_node in cfg_graph).loop_level;
     match (&node!(at cfg_node in cfg_graph).cfg_node_type,cfg_node){
         (CfgNodeType::Branch { ast_expr_node},br_node) => {
             let ast_expr_node = *ast_expr_node;
             let br_outedges = cfg_graph.edges_directed(node_index(br_node as usize),petgraph::Direction::Outgoing);
             let edge_weights: Vec<(EdgeIndex, CfgEdge)> = br_outedges.map(|edge| (edge.id(), edge.weight().clone())).collect();
-            let mut new_br_struct = CfgNode::new_branch(ast_expr_node);
+            let mut new_br_struct = CfgNode::new_branch(ast_expr_node,loop_level);
             let (true_edge_idx,true_edge,false_edge_idx,false_edge) = {
                 let (edge_idx,edge_type) = &edge_weights[0];
                 if edge_type.cfg_edge_type.is_if_false(){
@@ -2439,7 +2443,7 @@ pub fn process_short_logic(cfg_node:u32,cfg_graph:&mut CfgGraph,logic_op:&ExprOp
             let ast_expr_node = *ast_expr_node;
             let br_outedges = cfg_graph.edges_directed(node_index(while_node as usize),petgraph::Direction::Outgoing);
             let edge_weights: Vec<(EdgeIndex, CfgEdge)> = br_outedges.map(|edge| (edge.id(), edge.weight().clone())).collect();
-            let mut new_br_struct = CfgNode::new_branch(ast_expr_node);
+            let mut new_br_struct = CfgNode::new_branch(ast_expr_node,loop_level);
             let (body_head_edge_idx,body_head_edge,direct_edge_idx,direct_edge) = {
                 let (edge_idx,edge_type) = &edge_weights[0];
                 if edge_type.cfg_edge_type.is_direct(){
