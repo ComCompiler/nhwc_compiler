@@ -35,3 +35,4 @@ pub mod call_node;
 pub mod gen_call_graph;
 pub mod gvn;
 pub mod loop_unrolling;
+pub mod gcm;

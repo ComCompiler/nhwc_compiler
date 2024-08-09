@@ -63,7 +63,7 @@ impl Pass for DeadCodeEliminationPass {
                 NhwcInstrType::Label { label_symidx } => {},
                 NhwcInstrType::DefineFunc { func_symidx, ret_symidx, args } => {},
                 NhwcInstrType::DefineVar { var_symidx, vartype, op_value } => {},
-                NhwcInstrType::Alloc { var_symidx, vartype } => {},
+                NhwcInstrType::Alloc { var_symidx_vec: var_symidx, vartype } => {},
                 NhwcInstrType::Globl { var_symidx, vartype } => {},
                 _ => {
                     if instr!(at unvisited_instr in instr_slab)?.get_cfg_instr_idx()?.cfg_node!= CFG_ROOT{

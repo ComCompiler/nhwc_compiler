@@ -2,9 +2,9 @@ use std::vec;
 
 use petgraph::{adj::NodeIndex, algo::dominators::simple_fast, graph::node_index};
 
-use crate::{add_edge, add_node, debug_info_red, direct_child_nodes, direct_parent_nodes, node, node_mut, reg_field_for_struct, toolkit::{dj_edge::DjEdge, dj_node::DjNode}};
+use crate::{add_edge, add_node, debug_info_red, direct_child_nodes, direct_parent_node, direct_parent_nodes, node, node_mut, reg_field_for_struct, toolkit::{dj_edge::DjEdge, dj_node::DjNode}};
 
-use super::{cfg_node::{CfgGraph, CfgNode, CFG_ROOT}, context::DjGraph, etc::{dfs, dfs_with_priority, remove_isolate_nodes_from_dfs}};
+use super::{cfg_node::{CfgGraph, CfgNode, CFG_ROOT}, context::DjGraph, dj_node, etc::{dfs, dfs_with_priority, remove_isolate_nodes_from_dfs}};
 use super::symtab::{SymTab,SymTabEdge,SymTabGraph};
 use anyhow::{Result,Context};
 
@@ -108,4 +108,28 @@ pub fn mark_depth(current_depth:u32,cur_node:u32, dj_graph:&mut DjGraph )->Resul
        mark_depth(current_depth+1 , child, dj_graph)?;
     }
     Ok(())
+}
+
+pub fn lca(mut dj_node1:u32,mut dj_node2:u32, dj_graph:&mut DjGraph) -> Result<u32> {
+    {
+        let depth_1 = node!(at dj_node1 in dj_graph).get_depth()?;
+        let depth_2 = node!(at dj_node2 in dj_graph).get_depth()?;
+        if  depth_1> depth_2 {
+            let bias = depth_1 - depth_2;
+            for i in 0..bias {
+                dj_node1 = direct_parent_node!(at dj_node1 in dj_graph with_predicate {|e| e.weight().is_dom()});
+            }
+        }else {
+            let bias = depth_2 - depth_1;
+            for i in 0..bias {
+                dj_node2 = direct_parent_node!(at dj_node2 in dj_graph with_predicate {|e| e.weight().is_dom()});
+            }
+        }
+    }
+
+    while dj_node1 != dj_node2 {
+        dj_node1 = direct_parent_node!(at dj_node1 in dj_graph with_predicate {|e| e.weight().is_dom()});
+        dj_node2 = direct_parent_node!(at dj_node2 in dj_graph with_predicate {|e| e.weight().is_dom()});
+    }
+    Ok(dj_node1)
 }

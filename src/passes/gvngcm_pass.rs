@@ -1,4 +1,4 @@
-use crate::{make_field_trait_for_struct, node, node_mut, reg_field_for_struct, toolkit::{cfg_node::{CfgNode, CFG_ROOT}, context::NhwcCtx, dot::Config, etc::{dfs, dfs_with_priority, generate_png_by_graph_multi_tasks}, eval_et, gen_instr_et::parse_instr_list_to_et, gvn::gvn, pass_manager::Pass}};
+use crate::{make_field_trait_for_struct, node, node_mut, reg_field_for_struct, toolkit::{cfg_node::{CfgNode, CFG_ROOT}, context::NhwcCtx, dot::Config, etc::{dfs, dfs_with_priority, generate_png_by_graph_multi_tasks}, eval_et, gcm::gcm, gen_instr_et::parse_instr_list_to_et, gvn::gvn, pass_manager::Pass}};
 use ahash::{HashMap, HashMapExt, HashSet, HashSetExt};
 use anyhow::*;
 use crate::toolkit::field::Field;
@@ -34,8 +34,11 @@ impl Pass for GvnGcmPass {
         let instr_et = &mut ctx.instr_et;
         let &dj_root = node!(at CFG_ROOT in cfg_graph).get_cor_dj_node()?;
 
-        let rst= gvn(instr_et,dom_tree, cfg_graph, symtab, instr_slab, scope_tree);
+        let rst=gcm(instr_et,  cfg_graph, symtab, instr_slab, scope_tree, &dom_tree)
+            .and(gvn(instr_et,dom_tree, cfg_graph, symtab, instr_slab, scope_tree));
 
+        // let rst=gcm(instr_et,  cfg_graph, symtab, instr_slab, scope_tree, &dom_tree);
+        // let rst = gvn(instr_et,dom_tree, cfg_graph, symtab, instr_slab, scope_tree);
         if self.is_gen_gvngcm_cfg{
             for (idx,instr_struct) in ctx.nhwc_instr_slab.iter_mut(){
                 instr_struct.text.clear();

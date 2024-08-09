@@ -4,7 +4,7 @@ use ahash::{HashMap, HashSet};
 use bimap::BiMap;
 use petgraph::graph::Edge;
 
-use crate::{add_edge, add_node, add_node_with_edge, debug_info_blue, debug_info_red, direct_child_node, direct_child_nodes, direct_parent_node, direct_parent_nodes, get_ast_from_symidx, instr_mut, node, node_mut, passes::symtab_debug_pass, toolkit::{et_node::DeclOrDefOrUse, field::{Type, Value}, gen_nhwc_cfg::IS_LITERAL, gvn::cor_instr_et_node_bimap, nhwc_instr::NhwcInstrType, symbol, symtab::WithBorrow}};
+use crate::{add_edge, add_node, add_node_with_edge, debug_info_blue, debug_info_red, direct_child_node, direct_child_nodes, direct_parent_node, direct_parent_nodes, get_ast_from_symidx, instr_mut, node, node_mut, passes::symtab_debug_pass, toolkit::{et_node::DeclOrDefOrUse, field::{Type, Value}, gen_nhwc_cfg::IS_LITERAL, gvn::COR_INSTR_ET_NODE_BIMAP, nhwc_instr::NhwcInstrType, symbol, symtab::WithBorrow}};
 use anyhow::{anyhow, Ok, Result};
 use anyhow::*;
 use super::cfg_node::InstrList;
@@ -71,7 +71,7 @@ pub fn process_arith_et(rc_lhs:&RcSymIdx,rc_a:&RcSymIdx, rc_b:&RcSymIdx,instr:us
             add_edge!({EtEdgeType::Direct.into()} from arith_et_node to literal_et_node in instr_et);
             rc_symidx_et_node_map.insert(rc_a.clone(), literal_et_node);
         }else {
-            panic!();
+            panic!("{} symbol {:?} is not defined ",instr,a);
         }
     }
     if let Some(&b_node) = rc_symidx_et_node_map.get(&rc_b){
@@ -161,7 +161,7 @@ pub fn parse_instr_list_to_et(instrs:impl Iterator<Item = usize>, instr_et:&mut 
                 instr_et_node_bimap.insert(instr,sym_et_node);
                 instr_mut!(at instr in instr_slab)?.add_cor_instr_et_node(sym_et_node);
             },
-            super::nhwc_instr::NhwcInstrType::Alloc { var_symidx, vartype } => {},
+            super::nhwc_instr::NhwcInstrType::Alloc { var_symidx_vec: var_symidx, vartype } => {},
             super::nhwc_instr::NhwcInstrType::Globl { var_symidx, vartype } => todo!(),
             super::nhwc_instr::NhwcInstrType::Load { lhs: rc_lhs, ptr_symidx: rc_ptr_symidx, ptr_ty } => {
                 let ptr_symidx = rc_ptr_symidx.as_ref_borrow();
@@ -420,8 +420,8 @@ pub fn parse_instr_list_to_et(instrs:impl Iterator<Item = usize>, instr_et:&mut 
                         panic!();
                     }
                 };
-                rhs;
-                lhs;
+                drop(rhs);
+                drop(lhs);
                 instr_mut!(at instr in instr_slab)?.add_cor_instr_et_node(et_node);
             },
             super::nhwc_instr::NhwcInstrType::Call { op_lhs, func_op } => {

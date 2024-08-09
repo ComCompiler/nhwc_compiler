@@ -12,10 +12,9 @@ use super::{cfg_node::{CfgGraph, CfgNode}, context::DjGraph, et_node::{ EtEdge, 
 use anyhow::*;
 
 
-reg_field_for_struct!(CfgNode { cor_instr_et_node_bimap:BiHashMap<usize,u32>,gvn_while_cor_expr_hash_map:HashMap<isize,u32>, } with_fields info);
+reg_field_for_struct!(CfgNode { COR_INSTR_ET_NODE_BIMAP:BiHashMap<usize,u32>,GVN_WHILE_COR_EXPR_HASH_MAP:HashMap<isize,u32>, } with_fields info);
 make_field_trait_for_struct!(
-    BiHashMap<usize,u32>,
-    HashMap<isize,u32>
+    BiHashMap<usize,u32>
 );
 
 pub fn gvn(instr_et:&mut EtTree,dom_tree:&mut DjGraph, cfg_graph:&mut CfgGraph, symtab: &mut SymTab, instr_slab: &mut InstrSlab<NhwcInstr>,scope_tree:&mut ScopeTree)-> Result<()>{
@@ -50,41 +49,42 @@ pub fn gvn(instr_et:&mut EtTree,dom_tree:&mut DjGraph, cfg_graph:&mut CfgGraph, 
                             // if instr_et.edges_directed(node_index(et_node as usize), Incoming).count() == 0{
                                 // println!("compress_et_at {et_node}");
                                 eval_et::compress_et_for_gvn(instr_et, et_node, &mut |op_found_et_node,et_node,et_tree|{
-                                    if let Some(found_et_node) = op_found_et_node{
-                                        match &node!(at found_et_node in et_tree).et_node_type{
-                                            super::et_node::EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } => {
-                                                // if found et's first symidx is temp then true
-                                                first_rc_symidx_in_et_node(found_et_node, et_tree).unwrap().as_ref_borrow().is_temp(symtab).unwrap()
-                                            },
-                                            super::et_node::EtNodeType::Operator { op, ast_node, text, op_rc_symidx } => {
-                                                match first_rc_symidx_in_et_node(et_node, et_tree){
-                                                    Result::Ok(rc_symidx) => {
-                                                        rc_symidx.as_ref_borrow().is_temp(symtab).unwrap()
-                                                    },
-                                                    Err(_) => {true},
-                                                }
-                                            },
-                                            super::et_node::EtNodeType::Literal { rc_literal_symidx, ast_node, text } => true,
-                                            super::et_node::EtNodeType::Separator { ast_node, text } => todo!(),
-                                        }
-                                    }else {
-                                        match &node!(at et_node in et_tree).et_node_type{
-                                            super::et_node::EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } => {
-                                                // if found et's first symidx is temp then true
-                                                first_rc_symidx_in_et_node(et_node, et_tree).unwrap().as_ref_borrow().is_temp(symtab).unwrap()
-                                            },
-                                            super::et_node::EtNodeType::Operator { op, ast_node, text, op_rc_symidx } => {
-                                                match first_rc_symidx_in_et_node(et_node, et_tree){
-                                                    Result::Ok(rc_symidx) => {
-                                                        rc_symidx.as_ref_borrow().is_temp(symtab).unwrap()
-                                                    },
-                                                    Err(_) => {true},
-                                                }
-                                            },
-                                            super::et_node::EtNodeType::Literal { rc_literal_symidx, ast_node, text } => true,
-                                            super::et_node::EtNodeType::Separator { ast_node, text } => todo!(),
-                                        }
-                                    }
+                                    true
+                                    // if let Some(found_et_node) = op_found_et_node{
+                                    //     match &node!(at found_et_node in et_tree).et_node_type{
+                                    //         super::et_node::EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } => {
+                                    //             // if found et's first symidx is temp then true
+                                    //             first_rc_symidx_in_et_node(found_et_node, et_tree).unwrap().as_ref_borrow().is_temp(symtab).unwrap()
+                                    //         },
+                                    //         super::et_node::EtNodeType::Operator { op, ast_node, text, op_rc_symidx } => {
+                                    //             match first_rc_symidx_in_et_node(et_node, et_tree){
+                                    //                 Result::Ok(rc_symidx) => {
+                                    //                     rc_symidx.as_ref_borrow().is_temp(symtab).unwrap()
+                                    //                 },
+                                    //                 Err(_) => {true},
+                                    //             }
+                                    //         },
+                                    //         super::et_node::EtNodeType::Literal { rc_literal_symidx, ast_node, text } => true,
+                                    //         super::et_node::EtNodeType::Separator { ast_node, text } => todo!(),
+                                    //     }
+                                    // }else {
+                                    //     match &node!(at et_node in et_tree).et_node_type{
+                                    //         super::et_node::EtNodeType::Symbol { rc_symidx, ast_node, text, decldef_def_or_use } => {
+                                    //             // if found et's first symidx is temp then true
+                                    //             first_rc_symidx_in_et_node(et_node, et_tree).unwrap().as_ref_borrow().is_temp(symtab).unwrap()
+                                    //         },
+                                    //         super::et_node::EtNodeType::Operator { op, ast_node, text, op_rc_symidx } => {
+                                    //             match first_rc_symidx_in_et_node(et_node, et_tree){
+                                    //                 Result::Ok(rc_symidx) => {
+                                    //                     rc_symidx.as_ref_borrow().is_temp(symtab).unwrap()
+                                    //                 },
+                                    //                 Err(_) => {true},
+                                    //             }
+                                    //         },
+                                    //         super::et_node::EtNodeType::Literal { rc_literal_symidx, ast_node, text } => true,
+                                    //         super::et_node::EtNodeType::Separator { ast_node, text } => todo!(),
+                                    //     }
+                                    // }
                                 } ,symtab, 0, scope_tree, &mut expr_hash_map)?;
 
                                 // if !node!(at et_node in instr_et).gvn_instr_generated{
@@ -172,7 +172,7 @@ pub fn gvn(instr_et:&mut EtTree,dom_tree:&mut DjGraph, cfg_graph:&mut CfgGraph, 
                 let first_symidx = first_rc_symidx_in_et_node(et_node, instr_et)?.as_ref_borrow().clone();
                 // if symidx is temp then rename all equivalent symidx to temp 
                 // because temp symbol is never redefined in our compiler's context, it's legal
-                if *symtab.get(&first_symidx.to_src_symidx())?.get_is_temp()?{
+                // if *symtab.get(&first_symidx.to_src_symidx())?.get_is_temp()?{
                     for rc_symidx in &et_node_struct.equivalent_symidx_vec[1..]{
                         // println!("access {rc_symidx:?}");
                         let mut symidx = rc_symidx.as_ref_borrow_mut();
@@ -182,7 +182,7 @@ pub fn gvn(instr_et:&mut EtTree,dom_tree:&mut DjGraph, cfg_graph:&mut CfgGraph, 
                         *instr_mut!(at def_instr in instr_slab)? = NhwcInstrType::Nope {  }.into();
                         *symidx = first_symidx.clone()
                     }
-                }
+                // }
             },
             super::et_node::EtNodeType::Literal { rc_literal_symidx, ast_node, text } => {
                 let first_symidx = first_rc_symidx_in_et_node_may_literal(et_node, instr_et)?.as_ref_borrow().clone();

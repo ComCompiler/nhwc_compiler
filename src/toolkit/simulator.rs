@@ -649,18 +649,20 @@ impl Simulator{
                 };
             },
             BreakPoint { symidx:_, breakpoint_args: _ } => {},
-            Alloc { var_symidx, vartype} => {
+            Alloc { var_symidx_vec: var_symidx_vec, vartype} => {
                 // 这是内存分配指令， 我们在内存分配的时候加入 src 变量
-                let simu_symtab = &mut self.simu_symtab;
-                let var_symidx = var_symidx.as_ref_borrow();
-                let src_var_symidx = var_symidx.to_src_symidx();
-                if !simu_symtab.has_symbol(&src_var_symidx){
-                    add_symbol!({src_var_symidx.into_symbol()}
-                        with_field SIMU_VAL:{Value::new_unsure_from_specific_type(&vartype)}
-                        with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
-                        to simu_symtab
-                    );
-                }
+                // let simu_symtab = &mut self.simu_symtab;
+                // for var_symidx in var_symidx
+                // let var_symidx = var_symidx.as_ref_borrow();
+                // let src_var_symidx = var_symidx.to_src_symidx();
+                // if !simu_symtab.has_symbol(&src_var_symidx){
+                //     add_symbol!({src_var_symidx.into_symbol()}
+                //         with_field SIMU_VAL:{Value::new_unsure_from_specific_type(&vartype)}
+                //         with_field SIMU_OP_LAST_DEF_INSTR:{Some(instr)}
+                //         to simu_symtab
+                //     );
+                // }
+                panic!();
             },
             Globl { var_symidx, vartype } => {
                 // 全局变量
@@ -808,6 +810,7 @@ impl Simulator{
             Nope {  } => {},
             Mu { may_use_symidx: _, may_use_instr: _ } => {},
             Chi { lhs: _, rhs: _, may_def_instr: _ } => {},
+            Untrack { symidx } => {},
         }
         Ok(instr_struct.clone())
     }
