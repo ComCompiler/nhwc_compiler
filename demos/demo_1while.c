@@ -9,6 +9,19 @@ void init(int a[][3]){
         }
         i = i+1;
     }
+    while(i<10){
+        int a = 10;
+        int sum = 0;
+        while(a>=0){
+            sum = sum + a+i;
+            a = a-1;
+        }
+        while(a>5){
+            sum = sum - a;
+            a = a - 1;
+        }
+        i = i+1;
+    }
 }
 
 int main(){
