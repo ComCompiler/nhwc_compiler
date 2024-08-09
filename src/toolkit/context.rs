@@ -10,6 +10,7 @@ use crate::{add_symbol, Args};
 use crate::toolkit::symtab::WithBorrow;
 use super::cfg_node::InstrList;
 use super::asm_struct::AsmStructure;
+use super::loop_node::LoopTree;
 use super::nhwc_instr::NhwcInstr;
 use super::call_node::CallGraph;
 use super::rv64_instr::RV64Instr;
@@ -39,6 +40,7 @@ pub struct NhwcCtx {
     pub collected_nhwc_ir: InstrList,
     pub io_task_list: Vec<JoinHandle<Result<()>>>,
     pub call_graph: CallGraph,
+    pub loop_tree:LoopTree,
 }
 pub(crate) static COMPILATION_UNIT:&str = "!compilation_unit";
 impl NhwcCtx {
@@ -70,6 +72,7 @@ impl NhwcCtx {
             collected_nhwc_ir: InstrList::new(),
             instr_et: EtTree::new(),
             call_graph: CallGraph::new(),
+            loop_tree:LoopTree::new(),
         })
     }
 }

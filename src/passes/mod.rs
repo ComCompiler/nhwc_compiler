@@ -21,3 +21,4 @@ pub mod ssa_deconstruction_pass;
 pub mod dead_code_elimination_pass;
 pub mod gvngcm_pass;
 pub mod chi_mu_insertion_pass;
+pub mod cfg2lpt_pass;

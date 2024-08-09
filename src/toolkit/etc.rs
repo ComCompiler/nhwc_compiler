@@ -11,7 +11,7 @@ use crate::{direct_parent_nodes, instr, timeit};
 use crate::{
     direct_child_nodes, toolkit::dot::{Config, Dot}
 };
-use petgraph::{ graph::{node_index, NodeIndex}, stable_graph::StableGraph, visit::Dfs, EdgeType};
+use petgraph::{ graph::{node_index, NodeIndex}, stable_graph::{EdgeReference, StableGraph}, visit::{Dfs, EdgeRef}, EdgeType};
 use anyhow::*;
 use anyhow::Context;
 

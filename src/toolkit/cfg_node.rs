@@ -92,13 +92,13 @@ pub struct CfgNode {
 }
 #[derive(Debug,Clone)]
 pub struct LoopInfo{
-    pub loop_symidx:RcSymIdx,
+    pub rcsymidx:RcSymIdx,
     pub arith:ArithOp,
-    pub step:u32,
+    pub stride:isize,
 }
 impl LoopInfo{
-    pub fn new_loop_info(loop_rcsymidx:RcSymIdx,arith:ArithOp,step:u32,loop_level:usize)->Self{
-        Self { loop_symidx: loop_rcsymidx,arith,step}
+    pub fn new_loop_info(rcsymidx:RcSymIdx,arith:ArithOp,stride:isize)->Self{
+        Self { rcsymidx,arith,stride}
     }
 }
 #[derive(Clone,Default)]

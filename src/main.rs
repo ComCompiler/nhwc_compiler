@@ -10,7 +10,7 @@ use std::{path::PathBuf, time::Instant};
 use antlr_parser::cparser::{RULE_compoundStatement, RULE_functionDefinition};
 use clap::Parser;
 
-use passes::{ast2cfg_pass::Ast2CfgPass, ast2et_debug_pass::Ast2EtDebugPass, ast2st_pass::Ast2StPass, call_graph_pass::CallGraphPass, cfg2ncfg_pass::Cfg2NcfgPass, chi_mu_insertion_pass::ChiMuInsertionPass, code2ast_pass::Code2AstPass, dead_code_elimination_pass::{self, DeadCodeEliminationPass}, gvngcm_pass::GvnGcmPass, nhwc2et_pass::Nhwc2EtPass, nhwc2riscv_pass::Nhwc2RiscvPass, nhwc_dump_pass::NhwcDumpPass, ssa_deconstruction_pass::SsaDeconstructionPass, symtab_debug_pass::SymtabDebugPass};
+use passes::{ast2cfg_pass::Ast2CfgPass, ast2et_debug_pass::Ast2EtDebugPass, ast2st_pass::Ast2StPass, call_graph_pass::CallGraphPass, cfg2lpt_pass::Cfg2LptPass, cfg2ncfg_pass::Cfg2NcfgPass, chi_mu_insertion_pass::ChiMuInsertionPass, code2ast_pass::Code2AstPass, dead_code_elimination_pass::{self, DeadCodeEliminationPass}, gvngcm_pass::GvnGcmPass, nhwc2et_pass::Nhwc2EtPass, nhwc2riscv_pass::Nhwc2RiscvPass, nhwc_dump_pass::NhwcDumpPass, ssa_deconstruction_pass::SsaDeconstructionPass, symtab_debug_pass::SymtabDebugPass};
 use toolkit::symtab::SymIdx;
 
 use crate::{passes::{cfg_debug_pass::CfgDebugPass, def_use_chain_debug_pass::DefUseChainPass, mem_alloc_pass::MemAllocPass, ncfg2djg_pass::Ncfg2DjgPass, simulator_debug_pass::SimulatorDebugPass, ssa_pass::SsaPass}, toolkit::{pass_manager::PassManager}};
@@ -57,6 +57,7 @@ fn main() {
     let mut pass_manager = PassManager::new(args);
     let code2ast_pass = Code2AstPass::new(debug);
     let ast2cfg_pass = Ast2CfgPass::new(debug);
+    let cfg2lpt_pass = Cfg2LptPass::new(debug);
     let cfg2ncfg_pass = Cfg2NcfgPass::new(debug,debug);
     let ast2et_debug_pass = Ast2EtDebugPass::new(debug);
     let ast2st_pass = Ast2StPass::new(debug);
@@ -82,6 +83,7 @@ fn main() {
             then ast2st_pass
             then ast2cfg_pass
             then cfg2ncfg_pass
+            // then cfg2lpt_pass
             then func_call_pass
             then chi_mu_insertion_pass
             then ncfg2djg_pass
@@ -108,6 +110,7 @@ fn main() {
             then ast2st_pass
             then ast2cfg_pass
             then cfg2ncfg_pass
+            // then cfg2lpt_pass
             then func_call_pass
             then chi_mu_insertion_pass
             then ncfg2djg_pass
