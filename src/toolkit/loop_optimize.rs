@@ -7,7 +7,7 @@ use crate::toolkit::cfg_node::CFG_ROOT;
 ///判断是否为可优化的循环，如果是的可优化的，则返回两个循环变量(一个用于比较的版本，一个用于自增)的option
 ///1.while条件表达式左边的是单一变量，不是表达式，右边是常量或者常数
 ///2.while循环体中的bb中只有一个对于循环变量的改变instr
-pub fn can_be_optimized(cfg_node:u32,cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,symtab:&SymTab) -> Result<Option<(RcSymIdx,RcSymIdx)>>{
+pub fn can_get_loop_info(cfg_node:u32,cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,symtab:&SymTab) -> Result<Option<(RcSymIdx,RcSymIdx)>>{
     let while_loop_node = node!(at cfg_node in cfg_graph);
     let while_instr_vec = &while_loop_node.instrs.instr_vec;
     let comp_instr = while_instr_vec[while_instr_vec.len()-1];
@@ -31,7 +31,7 @@ pub fn can_be_optimized(cfg_node:u32,cfg_graph:&mut CfgGraph,instr_slab:&mut Ins
 
 ///判断循环变量的方式：
 pub fn get_while_loop_info(cfg_node:u32,cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,symtab:&SymTab)->Result<()>{
-    if let Some((loop_rcsymidx,mut_loop_rcsymidx)) = can_be_optimized(cfg_node, cfg_graph, instr_slab, symtab)?{
+    if let Some((loop_rcsymidx,mut_loop_rcsymidx)) = can_get_loop_info(cfg_node, cfg_graph, instr_slab, symtab)?{
         //查找whiletail的bb
         let while_outgoing_edges = cfg_graph.edges_directed(node_index(cfg_node as usize), petgraph::Direction::Incoming);
         let edge_weights: Vec<(EdgeIndex, CfgEdge)> = while_outgoing_edges.map(|edge| (edge.id(), edge.weight().clone())).collect();
@@ -112,7 +112,25 @@ pub fn can_be_exchanged(while_node_vec:Vec<u32>,cfg_graph:&mut CfgGraph,instr_sl
     Ok(None)
 }
 
+///目前打算做优化有循环交换，循环展开
 pub fn parse_loop_optimize(cfg_graph:&mut CfgGraph){
+    //寻找
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     //先遍历cfg，找出所有whilenode和while嵌套结构，一个while嵌套做成一个vec进行优化分析，
     let mut all_nest_while_vec: Vec<u32> = vec![];
     let cfg_funcs = direct_child_nodes!(at CFG_ROOT in cfg_graph);

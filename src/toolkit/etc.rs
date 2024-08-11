@@ -260,6 +260,48 @@ where
     }
 }
 
+pub fn dfs_with_priority_and_condition<N, E, Ty>(
+    graph: &StableGraph<N, E, Ty, u32>,
+    start_node: u32,
+    mut predicate: impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>) -> isize,
+    stop_condition: impl Fn(u32) -> bool, // 新增的停止条件
+) -> Vec<u32>
+where
+    Ty: EdgeType,
+{
+    let mut visited: Vec<bool> = vec![false; graph.node_count() * 3];
+    let mut dfs_vec: Vec<u32> = vec![];
+    visited[start_node as usize] = true;
+    _dfs_with_priority_and_condition(graph, start_node, &mut visited, &mut dfs_vec, &mut predicate, &stop_condition);
+    dfs_vec
+}
+
+pub fn _dfs_with_priority_and_condition<N, E, Ty>(
+    graph: &StableGraph<N, E, Ty, u32>,
+    start_node: u32,
+    visited: &mut Vec<bool>,
+    dfs_vec: &mut Vec<u32>,
+    priority: &mut impl FnMut(&petgraph::stable_graph::EdgeReference<'_, E>) -> isize,
+    stop_condition: &impl Fn(u32) -> bool, // 新增的停止条件
+) where
+    Ty: EdgeType,
+{
+    // 如果满足停止条件，直接返回
+    if stop_condition(start_node) {
+        return;
+    }
+
+    dfs_vec.push(start_node);
+    visited[start_node as usize] = true;
+    let nodes = direct_child_nodes!(at start_node in graph with_priority {|e|priority(e)});
+
+    for node in nodes {
+        if !visited[node as usize] {
+            _dfs_with_priority_and_condition(graph, node, visited, dfs_vec, priority, stop_condition);
+        }
+    }
+}
+
 pub fn element_remained_after_exclusion_in_vec<T:PartialEq+Clone>(v:Vec<T>,element1:T) -> Result<T>{
     if v.len()!=2 { return Err(anyhow!("待排除的Vec元素数目不为2")) }
     if v[0] == element1{
