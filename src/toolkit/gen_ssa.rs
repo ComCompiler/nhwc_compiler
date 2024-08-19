@@ -789,7 +789,7 @@ pub fn update_ssa_def_instr_of_entry(cfg_graph:&CfgGraph, symtab:&mut SymTab, in
 
 
 static mut untrack_num:i32= 0;
-static mut untrack_max:i32= 15;
+static mut untrack_max:i32= 3;
 pub fn gen_untrack_instr(symtab:&mut SymTab, cfg_graph:&mut CfgGraph, instr_slab:&mut InstrSlab<NhwcInstr>, dj_graph:&DjGraph) -> Result<()>{
     update_cfg_instr_idx_in_cfg_graph(cfg_graph, instr_slab)?;
     last_use_and_first_def_analysis(symtab, cfg_graph,  instr_slab, dj_graph)?;
@@ -872,6 +872,7 @@ pub fn last_use_and_first_def_analysis(symtab:&mut SymTab, cfg_graph:&mut CfgGra
     for (rc_func_symidx,cfg_entry) in symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.clone().iter(){
         let cfg_entry = *cfg_entry;
         let &dj_entry = node!(at cfg_entry in cfg_graph).get_cor_dj_node()?;
+        // merge the first time
         for dj_node in etc::rpo_with_predicate(dj_graph, dj_entry, |e|e.weight().is_dom() ){
             let cfg_node = node!(at dj_node in dj_graph).cor_cfg_node;
             let dj_childs = direct_child_nodes!(at dj_node in dj_graph with_predicate {|e|e.weight().is_dom()});
@@ -882,7 +883,7 @@ pub fn last_use_and_first_def_analysis(symtab:&mut SymTab, cfg_graph:&mut CfgGra
                 for (use_symidx,op_last_use_instr) in node!(at child_cfg_node in cfg_graph).get_last_use_map()?{
                     match hash_map.get_mut(use_symidx){
                         Some(op_instr) => {
-                            *op_instr = None;// 发生支配树合并
+                            *op_instr = None;// 发生支配树分支合并
                         },
                         None => {
                             hash_map.insert(use_symidx.clone(), op_last_use_instr.clone());
@@ -906,6 +907,8 @@ pub fn last_use_and_first_def_analysis(symtab:&mut SymTab, cfg_graph:&mut CfgGra
             }
             node_mut!(at cfg_node in cfg_graph).add_last_use_map(hash_map);
         }
+
+
         for dj_node in etc::dfs_with_predicate(dj_graph, dj_entry, |e|e.weight().is_dom() ){
             let cfg_node = node!(at dj_node in dj_graph).cor_cfg_node;
             for &instr in node!(at cfg_node in cfg_graph).instrs.iter(){
@@ -920,6 +923,59 @@ pub fn last_use_and_first_def_analysis(symtab:&mut SymTab, cfg_graph:&mut CfgGra
                 }
                 
             }
+        }
+    }
+    // cross the join edge 
+    let join_src_set = {
+        let mut hash_set = AHashSet::new();
+        for join_edge_ref in dj_graph.edge_indices().into_iter().filter(|e| dj_graph.edge_weight(*e).unwrap().is_join()){
+            let (s,t) = dj_graph.edge_endpoints(join_edge_ref).unwrap();
+            let target_cfg_node = dj_graph.node_weight(t).unwrap().cor_cfg_node;
+            let src_cfg_node = dj_graph.node_weight(s).unwrap().cor_cfg_node;
+            hash_set.insert(src_cfg_node);
+        }
+        hash_set
+    };
+    for &cfg_node in join_src_set.iter(){
+        let mut last_use_map = node!(at cfg_node in cfg_graph).get_last_use_map()?.clone();
+        for child_cfg_node in direct_child_nodes!(at cfg_node in cfg_graph){
+            for (k,v) in node!(at child_cfg_node in cfg_graph).get_last_use_map()?{
+                match last_use_map.get_mut(k){
+                    Some(op_instr) => {
+                        *op_instr = None;// 发生支配树分支合并
+                    },
+                    None => {
+                        last_use_map.insert(k.clone(), v.clone());
+                    },
+                }
+            }
+        }
+        node_mut!(at cfg_node in cfg_graph).add_last_use_map(last_use_map);
+    }
+    for (rc_func_symidx,cfg_entry) in symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.clone().iter(){
+        let cfg_entry = *cfg_entry;
+        let &dj_entry = node!(at cfg_entry in cfg_graph).get_cor_dj_node()?;
+        // get the join source set, we need to update it 
+        // merge the second time
+        for dj_node in etc::rpo_with_predicate(dj_graph, dj_entry, |e|e.weight().is_dom() ){
+            let cfg_node = node!(at dj_node in dj_graph).cor_cfg_node;
+            let dj_childs = direct_child_nodes!(at dj_node in dj_graph with_predicate {|e|e.weight().is_dom()});
+            let mut hash_map = node!(at cfg_node in cfg_graph).get_last_use_map()?.clone();
+            for &child_dj_node in &dj_childs{
+                let child_cfg_node = node!(at child_dj_node in dj_graph).cor_cfg_node;
+                assert!(node!(at child_cfg_node in cfg_graph).has_last_use_map());
+                for (use_symidx,op_last_use_instr) in node!(at child_cfg_node in cfg_graph).get_last_use_map()?{
+                    match hash_map.get_mut(use_symidx){
+                        Some(op_instr) => {
+                            *op_instr = None;// 发生支配树分支合并
+                        },
+                        None => {
+                            hash_map.insert(use_symidx.clone(), op_last_use_instr.clone());
+                        },
+                    }
+                }
+            }
+            node_mut!(at cfg_node in cfg_graph).add_last_use_map(hash_map);
         }
     }
     Ok(())
