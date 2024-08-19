@@ -108,7 +108,7 @@ fn no_store(symidx:SymIdx,reg:Register,symtab:&mut SymTab,asm_sect:& mut AsmSect
             // asm_sect.asm(PseudoInstr::new_f(reg, Imm::(10000)).into());
         },
         _ => {
-            asm_sect.asm(PseudoInstr::new_li(reg, Imm::new_literal_isize(11451)).into());
+            // asm_sect.asm(PseudoInstr::new_li(reg, Imm::new_literal_isize(11451)).into());
         }
     }
     Ok(())
