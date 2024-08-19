@@ -788,8 +788,8 @@ pub fn update_ssa_def_instr_of_entry(cfg_graph:&CfgGraph, symtab:&mut SymTab, in
 
 
 
-static mut untrack_num:i32= 0;
-static mut untrack_max:i32= 100;
+// static mut untrack_num:i32= 0;
+// static mut untrack_max:i32= 100;
 pub fn gen_untrack_instr(symtab:&mut SymTab, cfg_graph:&mut CfgGraph, instr_slab:&mut InstrSlab<NhwcInstr>, dj_graph:&DjGraph) -> Result<()>{
     update_cfg_instr_idx_in_cfg_graph(cfg_graph, instr_slab)?;
     last_use_and_first_def_analysis(symtab, cfg_graph,  instr_slab, dj_graph)?;
@@ -812,17 +812,17 @@ pub fn gen_untrack_instr(symtab:&mut SymTab, cfg_graph:&mut CfgGraph, instr_slab
                         match cfg_instr_idx.in_cfg_instr_pos{
                             InCfgNodeInstrPos::InPhi { phi_instr_pos } => panic!(),
                             InCfgNodeInstrPos::InInstrs { instr_pos } => {
-                                unsafe{
-                                    if untrack_num < untrack_max{
+                                // unsafe{
+                                //     if untrack_num < untrack_max{
                                         let untrack_instr = node_mut!(at cfg_node in cfg_graph).insert_nhwc_instr(
                                             NhwcInstrType::Untrack { symidx: rc_symidx.clone() }.into(), instr_pos+1, instr_slab)?;
                                         // println!("insert {:?} at {}:pos:{}",instr!(at untrack_instr in instr_slab),cfg_node,instr_pos+1);
                                         update_cfg_instr_idx_in_cfg_node(cfg_graph, cfg_node, instr_slab)?;
                                         untrack_processed_set.insert(rc_symidx);
                                         
-                                        untrack_num += 1;
-                                    }
-                                }
+                                //         untrack_num += 1;
+                                //     }
+                                // }
                             },
                             InCfgNodeInstrPos::InLabel {  } => panic!(),
                             InCfgNodeInstrPos::InJump {  } => {
@@ -844,14 +844,14 @@ pub fn gen_untrack_instr(symtab:&mut SymTab, cfg_graph:&mut CfgGraph, instr_slab
                     if !untrack_processed_set.contains(rc_symidx) && def_loop_level == node!(at child_cfg_node in cfg_graph).loop_level{
                         // assert!()
                         unsafe{
-                            if untrack_num < untrack_max{
+                            // if untrack_num < untrack_max{
                                 let untrack_instr = node_mut!(at child_cfg_node in cfg_graph).insert_nhwc_instr(NhwcInstrType::Untrack { symidx: rc_symidx.clone() }.into(), 0, instr_slab)?;
                                 // println!("insert {:?} at {}",instr!(at untrack_instr in instr_slab),child_cfg_node);
                                 let def_loop_level = get_loop_level_of_instr(first_def_instr, cfg_graph, instr_slab)?;
                                 // if child
 
-                                untrack_num += 1;
-                            }
+                            //     untrack_num += 1;
+                            // }
                         }
                     }
                 }
@@ -936,15 +936,25 @@ pub fn last_use_and_first_def_analysis(symtab:&mut SymTab, cfg_graph:&mut CfgGra
         }
         hash_set
     };
+    // println!("join src set: {:?}",join_src_set);
     for &cfg_node in join_src_set.iter(){
         let mut last_use_map = node!(at cfg_node in cfg_graph).get_last_use_map()?.clone();
         for child_cfg_node in direct_child_nodes!(at cfg_node in cfg_graph){
+            if cfg_node == 38 {
+                println!("visit {child_cfg_node}");
+            }
             for (k,v) in node!(at child_cfg_node in cfg_graph).get_last_use_map()?{
                 match last_use_map.get_mut(k){
                     Some(op_instr) => {
+                        // if cfg_node == 38 {
+                        //     println!("visit {k:?} set {op_instr:?} none");
+                        // }
                         *op_instr = None;// 发生支配树分支合并
                     },
                     None => {
+                        // if cfg_node == 38 {
+                        //     println!("insert {k:?} {v:?}");
+                        // }
                         last_use_map.insert(k.clone(), v.clone());
                     },
                 }
@@ -959,7 +969,7 @@ pub fn last_use_and_first_def_analysis(symtab:&mut SymTab, cfg_graph:&mut CfgGra
         // merge the second time
         for dj_node in etc::rpo_with_predicate(dj_graph, dj_entry, |e|e.weight().is_dom() ){
             let cfg_node = node!(at dj_node in dj_graph).cor_cfg_node;
-            let dj_childs = direct_child_nodes!(at dj_node in dj_graph with_predicate {|e|e.weight().is_dom()});
+            let dj_childs = direct_child_nodes!(at dj_node in dj_graph with_predicate {|e| true});
             let mut hash_map = node!(at cfg_node in cfg_graph).get_last_use_map()?.clone();
             for &child_dj_node in &dj_childs{
                 let child_cfg_node = node!(at child_dj_node in dj_graph).cor_cfg_node;
