@@ -13,6 +13,9 @@ impl Pass for UntrackInsertionPass {
     // 运行这个pass
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> { 
         let rst = gen_ssa::gen_untrack_instr(&mut ctx.symtab, &mut ctx.cfg_graph, &mut ctx.nhwc_instr_slab, &mut ctx.dj_graph);
+        for cfg_node in ctx.cfg_graph.node_weights_mut(){
+            cfg_node.remove_last_use_map();
+        }
         if self.is_gen_ssa_cfg{
             for (idx,instr_struct) in ctx.nhwc_instr_slab.iter_mut(){
                 instr_struct.text.clear();

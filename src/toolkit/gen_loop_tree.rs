@@ -23,11 +23,11 @@ pub fn process_loop_node(cfg_loop_node:u32,out_loop_node:u32,parent_loop_node:u3
     //从while内的bodyhead的边的节点开始
     let inner_start = direct_child_node!(at cfg_loop_node in cfg_graph with_predicate { |e:&EdgeReference<CfgEdge>| e.weight().cfg_edge_type.is_body_head()});
     let inner_cfgnode_vec = dfs_inner_while_struct(inner_start,cfg_loop_node,out_loop_node,cfg_graph);
-    println!("内层：{:?}",inner_cfgnode_vec);
+    // println!("内层：{:?}",inner_cfgnode_vec);
     for window_nodes in inner_cfgnode_vec.windows(2){
         let current_inner_cfgnode = window_nodes[0];
         let next_inner_cfgnode = window_nodes[1];
-        println!("当前节点：{}",current_inner_cfgnode);
+        // println!("当前节点：{}",current_inner_cfgnode);
         let cfg_type = &node!(at current_inner_cfgnode in cfg_graph).cfg_node_type;
         if let CfgNodeType::WhileLoop { ast_expr_node:_ } = cfg_type.clone(){
             let loop_node = add_node_with_edge!({LoopNode::new_loop_node()} from parent_loop_node in loop_tree);
@@ -66,7 +66,7 @@ pub fn parse_cfg2loop_tree(loop_tree:&mut LoopTree,cfg_graph:&CfgGraph) -> Resul
             CfgEdgeType::IfTrue {  } => 7,
             CfgEdgeType::BodyTail {  } => -1,
         });
-        println!("最外层：{:?}",dfs_vec);
+        // println!("最外层：{:?}",dfs_vec);
         for windows_nodes in dfs_vec.windows(2) {
             let current_cfg_node = windows_nodes[0];
             let next_cfg_node = windows_nodes[1];

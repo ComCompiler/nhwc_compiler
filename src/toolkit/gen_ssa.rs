@@ -789,7 +789,7 @@ pub fn update_ssa_def_instr_of_entry(cfg_graph:&CfgGraph, symtab:&mut SymTab, in
 
 
 static mut untrack_num:i32= 0;
-static mut untrack_max:i32= 3;
+static mut untrack_max:i32= 15;
 pub fn gen_untrack_instr(symtab:&mut SymTab, cfg_graph:&mut CfgGraph, instr_slab:&mut InstrSlab<NhwcInstr>, dj_graph:&DjGraph) -> Result<()>{
     update_cfg_instr_idx_in_cfg_graph(cfg_graph, instr_slab)?;
     last_use_and_first_def_analysis(symtab, cfg_graph,  instr_slab, dj_graph)?;
@@ -816,7 +816,7 @@ pub fn gen_untrack_instr(symtab:&mut SymTab, cfg_graph:&mut CfgGraph, instr_slab
                                     if untrack_num < untrack_max{
                                         let untrack_instr = node_mut!(at cfg_node in cfg_graph).insert_nhwc_instr(
                                             NhwcInstrType::Untrack { symidx: rc_symidx.clone() }.into(), instr_pos+1, instr_slab)?;
-                                        // println!("insert {:?} at {}:pos:{}",instr!(at untrack_instr in instr_slab),cfg_node,instr_pos+1);
+                                        println!("insert {:?} at {}:pos:{}",instr!(at untrack_instr in instr_slab),cfg_node,instr_pos+1);
                                         update_cfg_instr_idx_in_cfg_node(cfg_graph, cfg_node, instr_slab)?;
                                         untrack_processed_set.insert(rc_symidx);
                                         
@@ -846,10 +846,10 @@ pub fn gen_untrack_instr(symtab:&mut SymTab, cfg_graph:&mut CfgGraph, instr_slab
                         unsafe{
                             if untrack_num < untrack_max{
                                 let untrack_instr = node_mut!(at child_cfg_node in cfg_graph).insert_nhwc_instr(NhwcInstrType::Untrack { symidx: rc_symidx.clone() }.into(), 0, instr_slab)?;
-                                // println!("insert {:?} at {}",instr!(at untrack_instr in instr_slab),child_cfg_node);
+                                println!("insert {:?} at {}",instr!(at untrack_instr in instr_slab),child_cfg_node);
                                 let def_loop_level = get_loop_level_of_instr(first_def_instr, cfg_graph, instr_slab)?;
                                 // if child
-
+                                
                                 untrack_num += 1;
                             }
                         }
