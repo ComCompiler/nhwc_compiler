@@ -1,7 +1,7 @@
-use std::{cmp::Ordering, collections::hash_set};
+use std::{cmp::Ordering, collections::{hash_set, HashSet}};
 
 use crate::{add_field, add_symbol, debug_info_blue, debug_info_green, debug_info_red, debug_info_yellow, direct_child_nodes, direct_parent_nodes, instr, instr_mut, make_field_trait_for_struct, node, node_mut, reg_field_for_struct};
-use ahash::{ AHashMap, AHashSet, HashMap, HashMapExt, HashSet, HashSetExt};
+use ahash::{ AHashMap, AHashSet, HashMap, HashMapExt,  HashSetExt};
 use bimap::BiMap;
 use itertools::Itertools;
 use super::{cfg_node::{CfgGraph, CfgInstrIdx, CfgNode, InCfgNodeInstrPos, InstrList, CFG_ROOT}, context::DjGraph, et_node::EtTree, etc, field::Type, gen_nhwc_cfg::{insert_bb_between, process_temp_symbol}, nhwc_instr::{InstrSlab, NhwcInstr, NhwcInstrType, PhiPair}, symbol::Symbol, symtab::{self, RcSymIdx, SymIdx, SymTab, WithBorrow}};
@@ -20,6 +20,7 @@ reg_field_for_struct!(Symbol {
 // reg_field_name!(INSTR);
 reg_field_for_struct!(Symbol {
     SSA_DEF_INSTR:usize,
+    NON_SSA_FIRST_DEF:usize,
 } with_fields fields);
 // 对应每一个src_symidx 对应的symbol 都有一个字段存储它所有的 ssa version
 reg_field_for_struct!(Symbol {
@@ -28,14 +29,14 @@ reg_field_for_struct!(Symbol {
 
 // parallel_copy_map is a map from rhs(to copy into) to lhs(to be copied )
 // last_use_set is a set to check wether this path contains last use of symidx
-make_field_trait_for_struct!(AHashSet<RcSymIdx>,HashMap<isize,u32,>,HashMap<RcSymIdx,RcSymIdx>);
+make_field_trait_for_struct!(AHashMap<RcSymIdx,Option<usize>>,HashMap<isize,u32,>,HashMap<RcSymIdx,RcSymIdx>);
 reg_field_for_struct!(CfgNode {
     PARALLEL_COPY_MAP:HashMap<RcSymIdx, RcSymIdx>,
-    LAST_USE_SET:AHashSet<RcSymIdx>,
+    LAST_USE_MAP:AHashMap<RcSymIdx,Option<usize>>,
 } with_fields info);
 
 pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab<NhwcInstr> )->Result<()>{
-    update_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
+    update_cfg_instr_idx_in_cfg_graph(cfg_graph,  instr_slab)?;
     update_def_instr_vec_of_defined_symbol(cfg_graph,  symtab, instr_slab)?;
 
     let global_vars = symtab.get_global_info().get_global_vars()?.clone();
@@ -83,7 +84,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
                         let phi_instr_struct = NhwcInstrType::new_phi_node(rc_variable.clone(), vec![]).into();
                         let new_phi_instr = node_mut!(at cfg_df_node in cfg_graph).push_nhwc_instr(phi_instr_struct, instr_slab)?;
                         symtab.get_mut(&variable)?.get_mut_def_instrs_vec()?.push(new_phi_instr);
-                        update_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph, cfg_df_node, symtab, instr_slab)?;
+                        update_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph, cfg_df_node,  instr_slab)?;
 
                         // 如果 def_cfg_nodes 不包含 这个 cfg_node ，那么需要把这个cfg_node 添加到 work_list 中，进行phi_node的再生产 reproduction
                         if !def_cfg_nodes.contains(&cfg_df_node) {
@@ -107,7 +108,7 @@ pub fn add_phi_nodes(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut S
     Ok(())
 }
 pub fn variable_renaming(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab<NhwcInstr>)->Result<()>{
-    update_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
+    update_cfg_instr_idx_in_cfg_graph(cfg_graph,  instr_slab)?;
     // 添加 ssa_index 0 作为NULl ，一开始所有变量的 reaching_def 都是 None
     // init ssa_reaching_def and ssa_max_ssa_idx
     for (rc_func_symidx,_cfg_func_entry) in symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.clone().iter(){
@@ -463,7 +464,7 @@ pub fn is_critical_edge(cfg_node_from:u32,cfg_node_to:u32, cfg_graph:&CfgGraph) 
 
 
 pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut SymTab,instr_slab:&mut InstrSlab<NhwcInstr>,et_tree:&mut EtTree)->Result<()>{
-    update_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
+    update_cfg_instr_idx_in_cfg_graph(cfg_graph,  instr_slab)?;
     let all_cfg_func_symidx_entry_tuple = symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.clone();
     for (_func_symidx,cfg_entry) in all_cfg_func_symidx_entry_tuple{
         for cfg_node in etc::dfs(cfg_graph,cfg_entry){
@@ -643,18 +644,19 @@ pub fn ssa_deconstruction(cfg_graph:&mut CfgGraph, dj_graph:&DjGraph,symtab:&mut
             }
         }
     }
+    // gen_untrack_instr(symtab, cfg_graph, instr_slab, dj_graph)?;
     Ok(())
 }
 
-pub fn update_cfg_instr_idx_in_cfg_graph(cfg_graph:&mut CfgGraph,symtab:&SymTab,instr_slab:&mut InstrSlab<NhwcInstr>)->Result<()>{
+pub fn update_cfg_instr_idx_in_cfg_graph(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>)->Result<()>{
     for cfg_node in etc::dfs(cfg_graph, 0) {
-        update_cfg_instr_idx_in_cfg_node(cfg_graph, cfg_node, symtab, instr_slab)?;
+        update_cfg_instr_idx_in_cfg_node(cfg_graph, cfg_node,  instr_slab)?;
     }
     Ok(())
 }
-pub fn update_cfg_instr_idx_in_cfg_node(cfg_graph:&mut CfgGraph,cfg_node:u32,symtab:&SymTab,instr_slab:&mut InstrSlab<NhwcInstr>)->Result<()>{
-    update_cfg_instr_idx_in_cfg_node_instrs(cfg_graph, cfg_node, symtab, instr_slab)?;
-    update_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph, cfg_node, symtab, instr_slab)?;
+pub fn update_cfg_instr_idx_in_cfg_node(cfg_graph:&mut CfgGraph,cfg_node:u32,instr_slab:&mut InstrSlab<NhwcInstr>)->Result<()>{
+    update_cfg_instr_idx_in_cfg_node_instrs(cfg_graph, cfg_node, instr_slab)?;
+    update_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph, cfg_node,  instr_slab)?;
     for &instr in node_mut!(at cfg_node in cfg_graph).op_label_instr.iter() {
         instr_slab.get_mut_instr(instr).unwrap().add_cfg_instr_idx(CfgInstrIdx::new(cfg_node, InCfgNodeInstrPos::InLabel {  } ));   
     }
@@ -663,7 +665,7 @@ pub fn update_cfg_instr_idx_in_cfg_node(cfg_graph:&mut CfgGraph,cfg_node:u32,sym
     }
     Ok(())
 }
-fn update_cfg_instr_idx_in_cfg_node_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,_symtab:&SymTab,instr_slab:&mut InstrSlab<NhwcInstr>)->Result<()>{
+fn update_cfg_instr_idx_in_cfg_node_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,instr_slab:&mut InstrSlab<NhwcInstr>)->Result<()>{
     let outdated = &mut node_mut!(at cfg_node in cfg_graph).instrs.outdated ;
     // 只有当instrList 是outdated 状态才进行操作
     if !*outdated {
@@ -678,7 +680,7 @@ fn update_cfg_instr_idx_in_cfg_node_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,
     }
     Ok(())
 }
-fn update_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,_symtab:&SymTab,instr_slab:&mut InstrSlab<NhwcInstr>)->Result<()>{
+fn update_cfg_instr_idx_in_cfg_node_phi_instrs(cfg_graph:&mut CfgGraph,cfg_node:u32,instr_slab:&mut InstrSlab<NhwcInstr>)->Result<()>{
     let outdated = &mut node_mut!(at cfg_node in cfg_graph).phi_instrs.outdated ;
     // 只有当instrList 是outdated 状态才进行操作
     if !*outdated {
@@ -786,24 +788,124 @@ pub fn update_ssa_def_instr_of_entry(cfg_graph:&CfgGraph, symtab:&mut SymTab, in
 
 
 
-pub fn gen_untrack_instr() -> Result<()>{
-    
+pub fn gen_untrack_instr(symtab:&mut SymTab, cfg_graph:&mut CfgGraph, instr_slab:&mut InstrSlab<NhwcInstr>, dj_graph:&DjGraph) -> Result<()>{
+    update_cfg_instr_idx_in_cfg_graph(cfg_graph, instr_slab)?;
+    last_use_and_first_def_analysis(symtab, cfg_graph,  instr_slab, dj_graph)?;
+    for (rc_func_symidx,cfg_entry) in symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.clone().iter(){
+        let cfg_entry = *cfg_entry;
+        // append untrack instr for each cfg_node 
+        for cfg_node in etc::dfs(cfg_graph, cfg_entry ){
+            let cur_last_use_map = node!(at cfg_node in cfg_graph).get_last_use_map()?.clone();
+            let cur_keys:HashSet<&RcSymIdx> = cur_last_use_map.keys().collect();
+
+            let mut untrack_processed_set = AHashSet::new();
+
+            for (rc_symidx, op_last_use_instr) in &cur_last_use_map{
+                let &first_def_instr = symtab.get(&rc_symidx.as_ref_borrow())?.get_non_ssa_first_def()?;
+                let def_loop_level = get_loop_level_of_instr(first_def_instr, cfg_graph, instr_slab)?;
+
+                if let Some(&last_use_instr) = op_last_use_instr.as_ref(){
+                    let cfg_instr_idx = instr!(at last_use_instr in instr_slab)?.get_cfg_instr_idx()?;
+                    if cfg_instr_idx.cfg_node == cfg_node &&  def_loop_level == node!(at cfg_node in cfg_graph).loop_level{
+                        match cfg_instr_idx.in_cfg_instr_pos{
+                            InCfgNodeInstrPos::InPhi { phi_instr_pos } => panic!(),
+                            InCfgNodeInstrPos::InInstrs { instr_pos } => {
+                                let untrack_instr = node_mut!(at cfg_node in cfg_graph).insert_nhwc_instr(
+                                    NhwcInstrType::Untrack { symidx: rc_symidx.clone() }.into(), instr_pos+1, instr_slab)?;
+                                // println!("insert {:?} at {}:pos:{}",instr!(at untrack_instr in instr_slab),cfg_node,instr_pos+1);
+                                update_cfg_instr_idx_in_cfg_node(cfg_graph, cfg_node, instr_slab)?;
+                                untrack_processed_set.insert(rc_symidx);
+                            },
+                            InCfgNodeInstrPos::InLabel {  } => panic!(),
+                            InCfgNodeInstrPos::InJump {  } => {
+                                // do nothing
+                            },
+                        }
+                    }
+                }
+            }
+
+            for child_cfg_node in direct_child_nodes!(at cfg_node in cfg_graph){
+                let child_last_use_map = node!(at child_cfg_node in cfg_graph).get_last_use_map()?.clone();
+                let child_keys:HashSet<&RcSymIdx> = child_last_use_map.keys().collect(); 
+                // 找到所有当前 node 中有 而 child node 没有use 的symidx
+                // 如果没有就加入 
+                for &rc_symidx in cur_keys.difference(&child_keys){
+                    let &first_def_instr = symtab.get(&rc_symidx.as_ref_borrow())?.get_non_ssa_first_def()?;
+                    let def_loop_level = get_loop_level_of_instr(first_def_instr, cfg_graph, instr_slab)?;
+                    if !untrack_processed_set.contains(rc_symidx) && def_loop_level == node!(at child_cfg_node in cfg_graph).loop_level{
+                        // assert!()
+                        let untrack_instr = node_mut!(at child_cfg_node in cfg_graph).insert_nhwc_instr(NhwcInstrType::Untrack { symidx: rc_symidx.clone() }.into(), 0, instr_slab)?;
+                        // println!("insert {:?} at {}",instr!(at untrack_instr in instr_slab),child_cfg_node);
+                        let def_loop_level = get_loop_level_of_instr(first_def_instr, cfg_graph, instr_slab)?;
+                        // if child
+                    }
+                }
+                update_cfg_instr_idx_in_cfg_node(cfg_graph, child_cfg_node, instr_slab)?;
+            }
+        }
+    }
+
     Ok(())
 }
-pub fn untrack_analysis_preprocess(cfg_graph:&mut CfgGraph,cfg_node:u32, instr_slab:&InstrSlab<NhwcInstr>) -> Result<()>{
-    let child_vec = direct_child_nodes!(at cfg_node in cfg_graph);
-    let mut hash_set_merge = AHashSet::new();
+pub fn get_loop_level_of_instr(instr:usize,cfg_graph:&CfgGraph, instr_slab:&mut InstrSlab<NhwcInstr>)->Result<usize>{
+    let cfg_node = instr!(at instr in instr_slab)?.get_cfg_instr_idx()?.cfg_node;
+    Ok(node!(at cfg_node in cfg_graph).loop_level)
+}
+pub fn last_use_and_first_def_analysis(symtab:&mut SymTab, cfg_graph:&mut CfgGraph, instr_slab:&InstrSlab<NhwcInstr>, dj_graph:&DjGraph) -> Result<()>{
     // first merge all direct nodes' analysis
-    for child in child_vec{
-        // 如果成环则需要另外的
-        if child == cfg_node { continue; }
-        let child_hash_set = node_mut!(at child in cfg_graph).get_last_use_set()?;
-        hash_set_merge = hash_set_merge.union(child_hash_set).cloned().collect();
-    }
-    // then consider itself
-    for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs(){
-        for symidx in instr!(at instr in instr_slab)?.get_ssa_direct_def_symidx_vec(){
-            
+    // 对支配树进行 rpo 序
+    for (rc_func_symidx,cfg_entry) in symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.clone().iter(){
+        let cfg_entry = *cfg_entry;
+        let &dj_entry = node!(at cfg_entry in cfg_graph).get_cor_dj_node()?;
+        for dj_node in etc::rpo_with_predicate(dj_graph, dj_entry, |e|e.weight().is_dom() ){
+            let cfg_node = node!(at dj_node in dj_graph).cor_cfg_node;
+            let dj_childs = direct_child_nodes!(at dj_node in dj_graph with_predicate {|e|e.weight().is_dom()});
+            let mut hash_map = AHashMap::new();
+            for &child_dj_node in &dj_childs{
+                let child_cfg_node = node!(at child_dj_node in dj_graph).cor_cfg_node;
+                assert!(node!(at child_cfg_node in cfg_graph).has_last_use_map());
+                for (use_symidx,op_last_use_instr) in node!(at child_cfg_node in cfg_graph).get_last_use_map()?{
+                    match hash_map.get_mut(use_symidx){
+                        Some(op_instr) => {
+                            *op_instr = None;// 发生支配树合并
+                        },
+                        None => {
+                            hash_map.insert(use_symidx.clone(), op_last_use_instr.clone());
+                        },
+                    }
+                }
+            }
+            // after processed all child we process all instrs in this bb
+            assert!(node!(at cfg_node in cfg_graph).phi_instrs.len() == 0 );
+            for &instr in node!(at cfg_node in cfg_graph).iter_all_instrs_rev(){
+                for use_symidx in instr!(at instr in instr_slab)?.get_ssa_direct_use_symidx_vec(){
+                    if !use_symidx.as_ref_borrow().is_literal() && !symtab.get(&use_symidx.as_ref_borrow().to_src_symidx())?.get_type()?.is_array()
+                        && !*symtab.get(&use_symidx.as_ref_borrow().to_src_symidx())?.get_is_global()?{
+                        if hash_map.get(use_symidx).is_none(){
+                            hash_map.insert(use_symidx.clone(), Some(instr));
+                        }
+                    }else {
+                        // do nothing 
+                    }
+                }
+            }
+            node_mut!(at cfg_node in cfg_graph).add_last_use_map(hash_map);
+        }
+        for dj_node in etc::dfs_with_predicate(dj_graph, dj_entry, |e|e.weight().is_dom() ){
+            let cfg_node = node!(at dj_node in dj_graph).cor_cfg_node;
+            for &instr in node!(at cfg_node in cfg_graph).instrs.iter(){
+                for def_symidx in instr!(at instr in instr_slab)?.get_ssa_direct_def_symidx_vec(){
+                    if !def_symidx.as_ref_borrow().is_literal() && !symtab.get(&def_symidx.as_ref_borrow().to_src_symidx())?.get_type()?.is_array()
+                        && !*symtab.get(&def_symidx.as_ref_borrow().to_src_symidx())?.get_is_global()?{
+                        let def_symbol = symtab.get_mut(&def_symidx.as_ref_borrow())?;
+                        if !def_symbol.has_non_ssa_first_def(){
+                            def_symbol.add_non_ssa_first_def(instr);
+                        }
+                    }
+                }
+                
+            }
         }
     }
     Ok(())

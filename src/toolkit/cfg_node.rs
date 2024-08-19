@@ -296,6 +296,9 @@ impl CfgNode {
     pub fn iter_all_instrs(&self)->impl Iterator<Item=&usize>+'_{
         self.op_label_instr.iter().chain(self.phi_instrs.iter().chain(self.instrs.iter().chain(self.op_jump_instr.iter())))
     }
+    pub fn iter_all_instrs_rev(&self)->impl Iterator<Item=&usize>+'_{
+        self.op_jump_instr.iter().chain(self.instrs.iter().rev().chain(self.phi_instrs.iter().rev().chain(self.op_label_instr.iter())))
+    }
 }
 trait CfgNodeTypeTrait {
     // 3元

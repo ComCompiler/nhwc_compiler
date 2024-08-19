@@ -102,6 +102,17 @@ fn no_load(symidx:SymIdx,reg:Register,symtab:&mut SymTab,asm_sect:& mut AsmSecti
 fn default_store(symidx:SymIdx,reg:Register,symtab:&mut SymTab,asm_sect:& mut AsmSection, regtab:& mut RegTab) -> Result<()> {
     _store_sym(asm_sect, &symidx, reg, regtab,symtab,0)
 }
+fn no_store(symidx:SymIdx,reg:Register,symtab:&mut SymTab,asm_sect:& mut AsmSection, regtab:& mut RegTab) -> Result<()> {
+    match symtab.get(&symidx.to_src_symidx())?.get_type()?{
+        Type::F32 => {
+            // asm_sect.asm(PseudoInstr::new_f(reg, Imm::(10000)).into());
+        },
+        _ => {
+            asm_sect.asm(PseudoInstr::new_li(reg, Imm::new_literal_isize(11451)).into());
+        }
+    }
+    Ok(())
+}
 
 /// convert `cfg_entry_node` into riscv 
 /// assume first instr be func_def instr while others are alloc instr
@@ -808,7 +819,9 @@ fn parse_funcs2riscv(cfg_graph:&mut CfgGraph, nhwc_instr_slab:&mut InstrSlab<Nhw
                     },
                     NhwcInstrType::Mu { may_use_symidx: _, may_use_instr: _ } => {},
                     NhwcInstrType::Chi { lhs: _, rhs: _, may_def_instr: _ } => {},
-                    NhwcInstrType::Untrack { symidx } => {},
+                    NhwcInstrType::Untrack { symidx } => {
+                        regtab.try_release_symidx(&symidx.as_ref_borrow(), symtab, asm_sect, &mut no_store)?;
+                    },
                 }
             }
         }

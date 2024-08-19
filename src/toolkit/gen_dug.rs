@@ -104,7 +104,7 @@ pub fn parse_dug(cfg_graph:&mut CfgGraph,instr_slab:&mut InstrSlab<NhwcInstr>,sy
         instr_struct.add_dug_cor_def_use_node(dug_node);
     }
     // 加入边之间刷新一下 instruction struct 与 cfg graph 之间的定位关系
-    update_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
+    update_cfg_instr_idx_in_cfg_graph(cfg_graph, instr_slab)?;
     update_src_symdix_alloc_global_instr_info(symtab, cfg_graph, instr_slab)?;
     // 然后加入边
     for (_func_symidx,cfg_entry) in symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?{

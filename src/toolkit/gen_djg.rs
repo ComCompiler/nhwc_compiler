@@ -21,6 +21,7 @@ reg_field_for_struct!(DjNode { DOMIANCE_FRONTIER_DJ_NODES:Vec<u32>,  } with_fiel
 pub fn parse_ncfg2dj_graph(cfg_graph:&mut CfgGraph,dj_graph:&mut DjGraph)->Result<()>{
     remove_isolate_nodes_from_dfs(cfg_graph, CFG_ROOT);
     let cfg_nodes = dfs(cfg_graph, CFG_ROOT);
+    dj_graph.clear();
     for &cfg_node in cfg_nodes.iter() {
         let dj_node = add_node!({DjNode::new(cfg_node) } to dj_graph);
         node_mut!(at cfg_node in cfg_graph).add_cor_dj_node(dj_node);

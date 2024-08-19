@@ -1,4 +1,5 @@
 use anyhow::*;
+
 use crate::toolkit::gen_ssa::{update_ssa_def_instr, update_ssa_def_instr_of_entry};
 use crate::{debug_info_blue, direct_parent_node, node_mut};
 use crate::toolkit::nhwc_instr::NhwcInstrType;
@@ -194,7 +195,7 @@ pub fn gcm(instr_et:&mut EtTree, cfg_graph:&mut CfgGraph
                         },
                         None => {},
                     }
-                    update_cfg_instr_idx_in_cfg_node(cfg_graph, selected_cfg_node, symtab, instr_slab)?;
+                    update_cfg_instr_idx_in_cfg_node(cfg_graph, selected_cfg_node,  instr_slab)?;
                     update_ssa_def_instr_of_entry(cfg_graph, symtab, instr_slab, cfg_entry)?;
                 }
             }

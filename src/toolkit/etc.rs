@@ -18,7 +18,7 @@ use anyhow::Context;
 use super::nhwc_instr::{InstrSlab, NhwcInstr};
 /// 传入C文件(带有.c后缀),生成.s汇编文件,  
 /// 生成在./assembly_repo/目录下
-pub fn generate_s_by_c(cfile_path:String) -> Result<()>{
+pub fn generate_s_file_by_c_file(cfile_path:String) -> Result<()>{
     // let c_name = cfile_path.split("/").last().unwrap().split(".").next().unwrap();
     let _output = Command::new("./llvm/c2s.sh").args([cfile_path]).output().with_context(||".c文件转.s文件失败")?;
     Ok(())
