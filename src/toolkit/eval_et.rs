@@ -398,10 +398,10 @@ pub fn hash_expr_elimination(et_node:u32,et_tree:&mut EtTree, can_eliminate_f:&m
 }
 pub fn _hash_expr_elimination(et_node:u32,expr_hash_map:&mut HashMap<isize,u32>,et_tree:&mut EtTree, can_eliminate_f:&mut impl FnMut(Option<u32>,u32,&EtTree)->bool) -> Result<()>{
     // map hash into et_node
-    let dfs_nodes = dfs_with_predicate(et_tree, et_node, |e|!e.weight().et_edge_type.is_deleted());
-    for &et_node in dfs_nodes.iter().rev(){
-        _common_expr_elimination_by_hash(et_node, et_tree, expr_hash_map, can_eliminate_f)?;
-    }
+    // let dfs_nodes = dfs_with_predicate(et_tree, et_node, |e|!e.weight().et_edge_type.is_deleted());
+    // for &et_node in dfs_nodes.iter().rev(){
+    _common_expr_elimination_by_hash(et_node, et_tree, expr_hash_map, can_eliminate_f)?;
+    // }
     Ok(())
 }
 /// founded_et_node & et_node & et_tree the closure is 

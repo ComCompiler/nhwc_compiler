@@ -35,7 +35,7 @@ impl Pass for GvnGcmPass {
         let &dj_root = node!(at CFG_ROOT in cfg_graph).get_cor_dj_node()?;
 
         let rst=gcm(instr_et,  cfg_graph, symtab, instr_slab, scope_tree, &dom_tree)
-            .and(gvn(instr_et,dom_tree, cfg_graph, symtab, instr_slab, scope_tree));
+            .and(gvn(instr_et,dom_tree, cfg_graph, symtab, instr_slab, scope_tree)).and(gcm(instr_et,  cfg_graph, symtab, instr_slab, scope_tree, &dom_tree));
 
         // let rst=gcm(instr_et,  cfg_graph, symtab, instr_slab, scope_tree, &dom_tree);
         // let rst = gvn(instr_et,dom_tree, cfg_graph, symtab, instr_slab, scope_tree);
