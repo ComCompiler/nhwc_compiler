@@ -29,7 +29,7 @@ macro_rules! direct_dj_dom_parent_node {
 pub fn gcm(instr_et:&mut EtTree, cfg_graph:&mut CfgGraph
     , symtab: &mut SymTab, instr_slab: &mut InstrSlab<NhwcInstr>,scope_tree:&mut ScopeTree
     , dj_graph:&DjGraph)-> Result<()>{
-    let mut move_count = 0;
+    let mut move_count = 100000;
     for (rc_func_symidx,cfg_entry) in symtab.get_global_info().get_all_cfg_func_symidx_entry_tuples()?.clone(){
         // debug_info_yellow!("{} :neighbors {:?}", start_node, nodes);
 
@@ -178,20 +178,21 @@ pub fn gcm(instr_et:&mut EtTree, cfg_graph:&mut CfgGraph
                     cur_dj_node = direct_dj_dom_parent_node!(at cur_dj_node in dj_graph);
                 }
 
-                if cfg_node == selected_cfg_node || move_count > 0{
+                if cfg_node == selected_cfg_node {
                     // do nothing
                     // println!("can't move instr to {}",selected_cfg_node);
                 }else {
+                    // panic!();
                     let idx = node_mut!(at cfg_node in cfg_graph).instrs.iter().enumerate().find(|(idx,x)| **x == instr).unwrap().0;
                     // println!("move instr to {} from {} with move_count:{}",selected_cfg_node,cfg_node,move_count);
-                    // node_mut!(at cfg_node in cfg_graph).instrs.remove(idx);
-                    move_count +=1;
-                    // node_mut!(at selected_cfg_node in cfg_graph).instrs.push(instr);
+                    node_mut!(at cfg_node in cfg_graph).instrs.remove(idx);
+                    // move_count -=1;
+                    node_mut!(at selected_cfg_node in cfg_graph).instrs.push(instr);
                     match op_additional_instr{
                         Some(additional_instr) => {
                             let idx = node_mut!(at cfg_node in cfg_graph).instrs.iter().enumerate().find(|(idx,x)| **x == additional_instr).unwrap().0;
-                            // node_mut!(at cfg_node in cfg_graph).instrs.remove(idx);
-                            // node_mut!(at selected_cfg_node in cfg_graph).instrs.push(additional_instr);
+                            node_mut!(at cfg_node in cfg_graph).instrs.remove(idx);
+                            node_mut!(at selected_cfg_node in cfg_graph).instrs.push(additional_instr);
                         },
                         None => {},
                     }
