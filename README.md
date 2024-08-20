@@ -3,6 +3,8 @@
 nhwc compiler 的目标是成为一个简化版的类llvm的编译器框架，用于生成 nhwc ir、riscv assembly。
 这个项目专注于代码可读性，因此使用了大量贴合英语语法的宏和 graphviz 的可视化功能生成图样来更好的debug
 
+# The nhwc_compiler Project is under the Apache License v2.0
+
 # nhwc 是什么意思？
 
 nhwc 的意思是 Never Happy When Coding ，出自动画「BanG Dream! It's Mygo!!!」中台词:"我从来没有觉得玩乐队开心过。"
@@ -200,3 +202,4 @@ impl Pass for Code2AstPass{
 <p align="center"><img src="./report/cfg2nhwc_cfg.png"></p>
 
 <p align="center"><img src="./report/ast2scope_tree.png"></p> -->
+
