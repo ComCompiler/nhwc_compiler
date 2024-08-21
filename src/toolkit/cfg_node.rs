@@ -92,13 +92,13 @@ pub struct CfgNode {
 }
 #[derive(Debug,Clone)]
 pub struct LoopInfo{
-    pub loop_symidx:RcSymIdx,
+    pub rcsymidx:RcSymIdx,
     pub arith:ArithOp,
-    pub step:u32,
+    pub stride:isize,
 }
 impl LoopInfo{
-    pub fn new_loop_info(loop_rcsymidx:RcSymIdx,arith:ArithOp,step:u32,loop_level:usize)->Self{
-        Self { loop_symidx: loop_rcsymidx,arith,step}
+    pub fn new_loop_info(rcsymidx:RcSymIdx,arith:ArithOp,stride:isize)->Self{
+        Self { rcsymidx,arith,stride}
     }
 }
 #[derive(Clone,Default)]
@@ -295,6 +295,9 @@ impl CfgNode {
     pub fn new_exit(ast_node:u32,loop_level:usize) -> Self { Self { text:String::new(), instrs:InstrList::new(), info:Fields::new(),cfg_node_type:CfgNodeType::Exit { ast_node }, phi_instrs: InstrList::new(), op_label_instr: None,  op_jump_instr: None, asms: InstrSlab::new(),loop_level } }
     pub fn iter_all_instrs(&self)->impl Iterator<Item=&usize>+'_{
         self.op_label_instr.iter().chain(self.phi_instrs.iter().chain(self.instrs.iter().chain(self.op_jump_instr.iter())))
+    }
+    pub fn iter_all_instrs_rev(&self)->impl Iterator<Item=&usize>+'_{
+        self.op_jump_instr.iter().chain(self.instrs.iter().rev().chain(self.phi_instrs.iter().rev().chain(self.op_label_instr.iter())))
     }
 }
 trait CfgNodeTypeTrait {

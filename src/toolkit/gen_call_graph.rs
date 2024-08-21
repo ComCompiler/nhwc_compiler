@@ -67,7 +67,7 @@ pub fn parse_func_call_graph(
         symtab.get_mut(&caller_func_symidx)?.add_callee_func_set(callee_func_set);
     }
     // 加入边之间刷新一下 instruction struct 与 cfg graph 之间的定位关系
-    update_cfg_instr_idx_in_cfg_graph(cfg_graph, symtab, instr_slab)?;
+    update_cfg_instr_idx_in_cfg_graph(cfg_graph, instr_slab)?;
     // 加入边
     Ok(())
 }

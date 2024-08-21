@@ -34,4 +34,7 @@ pub mod gen_instr_et;
 pub mod call_node;
 pub mod gen_call_graph;
 pub mod gvn;
-pub mod loop_unrolling;
+pub mod gcm;
+pub mod loop_optimize;
+pub mod loop_node;
+pub mod gen_loop_tree;

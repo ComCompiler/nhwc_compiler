@@ -36,9 +36,11 @@ impl NhwcDumpPass {
 impl Pass for NhwcDumpPass {
     // 运行这个pass
     fn run(&mut self, ctx:&mut NhwcCtx) -> Result<()> { 
+
         let mut nhwc_ir_vec = vec![];
-        
+
         let (args,symtab,instr_slab,cfg_graph,nhwc_ir_list) = (&ctx.args,&mut ctx.symtab,&mut ctx.nhwc_instr_slab,&mut ctx.cfg_graph, &mut ctx.collected_nhwc_ir);
+
         let dfs_node_vec = dfs_with_priority(cfg_graph,CFG_ROOT,|e| match &e.weight().cfg_edge_type{
             CfgEdgeType::BodyHead {  } => 1,
             CfgEdgeType::IfFalse {  } => 2,

@@ -1,4 +1,4 @@
-# input: "./demos/demo_1while.c"
+# input: "./compiler2022/公开样例与运行时库/hidden_functional/04_break_continue.sy"
  15   label global_0: 
  0    global Fn[]->getint_ret_0 getint_0 
  1    global Fn[]->getch_ret_0 getch_0 
@@ -15,52 +15,138 @@
  12   global Fn[]->stoptime_ret_0 stoptime_0 
  13   global Fn[zz_ptr_14, zz_val_14, zz_len_14]->memset_ret_0 memset_0 
  14   global Fn[zz_dest_15, zz_ptr_15, zz_len_15]->memcpy_ret_0 memcpy_0 
- 18   Define main_0 "" -> main_ret_0 
-         47   alloc Array:i32:[Some(3_0), Some(3_0)] a_31 
-         48   alloc ptr->Array:i32:[Some(3_0)] temp_5_ele_ptr_of_a_31_31 
+ 16   Define main_0 "" -> main_ret_0 
+         18   alloc i32 sum_17 
+         20   alloc i32 i_17 
+         24   alloc i32 j_22 
+         25   alloc i32 temp_0_arithop_22 
+         29   alloc i32 k_26 
+         30   alloc i32 temp_1_arithop_26 
+         33   alloc i32 temp_2_arithop_26 
+         37   alloc i32 m_30 
+         38   alloc i32 temp_3_arithop_30 
+         42   alloc i32 n_34 
+         43   alloc i32 temp_4_arithop_34 
+         46   alloc i32 temp_5_arithop_34 
+         49   alloc i32 temp_6_arithop_54 
+         52   alloc i32 temp_7_arithop_54 
+         55   alloc i1 temp_8_cmp_20 
+         63   alloc i1 temp_9_cmp_24 
+         69   alloc i1 temp_10_cmp_28 
+         75   alloc i1 temp_11_cmp_32 
+         81   alloc i1 temp_12__1139 
+         86   alloc i1 temp_13__1168 
+         91   alloc i32 temp_14_arithop_35 
+         93   alloc i1 temp_15_cmp_35 
+         98   alloc i1 temp_16_cmp_52 
+         104  alloc i1 temp_17__757 
+         109  alloc i1 temp_18_booltrans_39 
+         111  alloc i1 temp_19_logicnot_39 
+         113  alloc i1 temp_20_i32_to_bool_39 
+         121  alloc i32 temp_21_arithop_41 
+         123  alloc i1 temp_22_cmp_41 
           label L0_0: 
-         46    
-         49   temp_5_ele_ptr_of_a_31_31 = GEP a_31:Array:i32:[Some(3_0), Some(3_0)] [] 
-         50    Call void init_0(temp_5_ele_ptr_of_a_31_31) 
-         56   mu a_31:50 
-         57   a_31 = chi a_31:50 
-         52   ret 0_0 
- 17   Define init_0 "a_16," -> init_ret_0 
-         20   alloc i32 i_18 
-         22   alloc i32 k_22 
-         23   alloc i32 temp_0_arithop_22 
-         26   alloc ptr->i32 temp_1_ptr_of_a_16_26 
-         30   alloc i32 temp_2_arithop_26 
-         33   alloc i1 temp_3_cmp_20 
-         40   alloc i1 temp_4_cmp_24 
-          label L1_0: 
-         16    
+         17   (nop) 
          19   (nop) 
-         62   i_18 = i32 0_0 
+         137  i_17 = i32 0_0 
+         138  sum_17 = i32 0_0 
               jump label: while.head_21 
-     35   label while.head_21: 
-         34   temp_3_cmp_20 = icmp i32 Slt i_18, 3_0 
-         38   br i1 temp_3_cmp_20, label while.body_21, label while.exit_21 
-     36   label while.body_21: 
-         21   (nop) 
-         63   k_22 = i32 0_0 
+     57   label while.head_21: 
+         56   temp_8_cmp_20 = icmp i32 Slt i_17, 20_0 
+         60   br i1 temp_8_cmp_20, label while.body_21, label while.exit_21 
+     58   label while.body_21: 
+         23   (nop) 
+         139  j_22 = i32 0_0 
               jump label: while.head_25 
-     42   label while.head_25: 
-         41   temp_4_cmp_24 = icmp i32 Slt k_22, 3_0 
-         45   br i1 temp_4_cmp_24, label while.body_25, label while.exit_25 
-     43   label while.body_25: 
-         27   temp_1_ptr_of_a_16_26 = GEP a_16:ptr->Array:i32:[Some(3_0)] [Some(i_18), Some(k_22)] 
-         28   store k_22:i32 temp_1_ptr_of_a_16_26:ptr->i32 
-         29   a_16 = chi a_16:28 
-         31   temp_2_arithop_26 = Add i32 k_22, 1_0 
+     65   label while.head_25: 
+         64   temp_9_cmp_24 = icmp i32 Slt j_22, 10_0 
+         68   br i1 temp_9_cmp_24, label while.body_25, label while.exit_25 
+     66   label while.body_25: 
+         28   (nop) 
+         140  k_26 = i32 0_0 
+              jump label: while.head_29 
+     71   label while.head_29: 
+         70   temp_10_cmp_28 = icmp i32 Slt k_26, 5_0 
+         74   br i1 temp_10_cmp_28, label while.body_29, label while.exit_29 
+     72   label while.body_29: 
+         36   (nop) 
+         141  m_30 = i32 0_0 
+              jump label: while.head_33 
+     77   label while.head_33: 
+         76   temp_11_cmp_32 = icmp i32 Slt m_30, 3_0 
+         80   br i1 temp_11_cmp_32, label while.body_33, label while.exit_33 
+     78   label while.body_33: 
+         92   temp_14_arithop_35 = Add i32 m_30, 1_0 
+         94   temp_15_cmp_35 = icmp i32 Sge temp_14_arithop_35, 3_0 
+         97   br i1 temp_15_cmp_35, label branch_true_36, label branch_false_36 
+     95   label branch_true_36: 
+         105  temp_17__757 = icmp i32 Ne m_30, 0_0 
+         108  br i1 temp_17__757, label branch_true_38, label branch_false_38 
+     106  label branch_true_38: 
+         114  (nop) 
+         120  br i1 temp_17__757, label branch_short_circuit_c_true_218, label branch_short_circuit_p_false_218 
+     115  label branch_short_circuit_c_true_218: 
+         122  temp_21_arithop_41 = Sub i32 m_30, -1_0 
+         124  temp_22_cmp_41 = icmp i32 Sge temp_21_arithop_41, 3_0 
+         127  br i1 temp_22_cmp_41, label branch_true_42, label branch_false_42 
+     125  label branch_true_42: 
+              jump label: while.exit_33 
+     79   label while.exit_33: 
+         82   (nop) 
+              jump label: while.body_62 
+     83   label while.body_62: 
+         87   (nop) 
+              jump label: while.body_65 
+     88   label while.body_65: 
+              jump label: while.exit_65 
+     89   label while.exit_65: 
+              jump label: while.exit_62 
+     84   label while.exit_62: 
+         39   temp_3_arithop_30 = Add i32 k_26, 1_0 
+         40   (nop) 
+         142  k_26 = i32 temp_3_arithop_30 
+              jump label: while.head_29 
+     126  label branch_false_42: 
+              jump label: branch_short_circuit_c_false_218 
+     116  label branch_short_circuit_c_false_218: 
+              jump label: branch_false_38 
+     107  label branch_false_38: 
+              jump label: branch_false_36 
+     96   label branch_false_36: 
+              jump label: L1_0 
+          label L1_0: 
+         41   (nop) 
+         143  n_34 = i32 0_0 
+              jump label: while.head_53 
+     100  label while.head_53: 
+         99   temp_16_cmp_52 = icmp i32 Slt n_34, 2_0 
+         103  br i1 temp_16_cmp_52, label while.body_53, label while.exit_53 
+     101  label while.body_53: 
+         50   temp_6_arithop_54 = Add i32 n_34, 1_0 
+         51   (nop) 
+         144  n_34 = i32 temp_6_arithop_54 
+              jump label: while.head_53 
+     102  label while.exit_53: 
+         44   (nop) 
+         45   (nop) 
+         47   temp_5_arithop_34 = Add i32 sum_17, 1_0 
+         48   (nop) 
+         145  m_30 = i32 temp_14_arithop_35 
+         146  sum_17 = i32 temp_5_arithop_34 
+              jump label: while.head_33 
+     117  label branch_short_circuit_p_false_218: 
+         110  (nop) 
+         112  temp_19_logicnot_39 = xor i1 temp_17__757, true 
+         119  br i1 temp_19_logicnot_39, label branch_short_circuit_c_true_218, label branch_short_circuit_c_false_218 
+     73   label while.exit_29: 
+         31   temp_1_arithop_26 = Add i32 j_22, 1_0 
          32   (nop) 
-         64   k_22 = i32 temp_2_arithop_26 
+         147  j_22 = i32 temp_1_arithop_26 
               jump label: while.head_25 
-     44   label while.exit_25: 
-         24   temp_0_arithop_22 = Add i32 i_18, 1_0 
-         25   (nop) 
-         65   i_18 = i32 temp_0_arithop_22 
+     67   label while.exit_25: 
+         26   temp_0_arithop_22 = Add i32 i_17, 1_0 
+         27   (nop) 
+         148  i_17 = i32 temp_0_arithop_22 
               jump label: while.head_21 
-     37   label while.exit_21: 
-         55   mu a_16:39 
-         39   ret 
+     59   label while.exit_21: 
+         22   ret sum_17 
