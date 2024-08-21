@@ -56,7 +56,8 @@ for filename in "${sy_files[@]}"; do
         # 获取文件的基本名称，没有路径
         export base_name=$(basename "$filename" .sy)
         # 执行编译命令，输出到同一目录
-        ./target/release/compiler "$filename" -o "$s_path/${base_name}.s" -a 2> /dev/null
+        # -d 是生成含有nhwc汇编代码的.nhwc文件
+        ./target/release/compiler "$filename" -o "$s_path/${base_name}.s" -a -d 2> /dev/null
         compile_status=$?
 
         if [ $compile_status -ne 0 ]; then
