@@ -118,7 +118,7 @@ impl Pass for Code2AstPass{
 
 <!-- ## 1. 定义cfg node和cfg edge,把ast转化成cfg(control flow graph)控制流程图 -->
 
-# ast 
+<!-- # ast 
 
 <p align="center"><img src="./report/ast_tree.png"></p>
 
@@ -144,7 +144,7 @@ impl Pass for Code2AstPass{
 
 # simulator_graph
 
-<p align="center"><img src="./report/simulator_graph.png"></p>
+<p align="center"><img src="./report/simulator_graph.png"></p> -->
 
 <!-- #  -->
 
