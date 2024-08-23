@@ -1,0 +1,33 @@
+      global Fn[]->getint_ret_0 getint_0 
+      global Fn[]->getch_ret_0 getch_0 
+      global Fn[a_3]->getarray_ret_0 getarray_0 
+      global Fn[]->getfloat_ret_0 getfloat_0 
+      global Fn[a_5]->getfarray_ret_0 getfarray_0 
+      global Fn[x_6]->putint_ret_0 putint_0 
+      global Fn[x_7]->putch_ret_0 putch_0 
+      global Fn[x_8, a_8]->putarray_ret_0 putarray_0 
+      global Fn[x_9]->putfloat_ret_0 putfloat_0 
+      global Fn[x_10, a_10]->putfarray_ret_0 putfarray_0 
+      global Fn[]->putf_ret_0 putf_0 
+      global Fn[]->starttime_ret_0 starttime_0 
+      global Fn[]->stoptime_ret_0 stoptime_0 
+      global Fn[s_14, c_14, n_14]->memset_ret_0 memset_0 
+      global Fn[dest_15, src_15, n_15]->memcpy_ret_0 memcpy_0 
+      Define main_0 [] -> main_ret_0 
+              alloc i32 temp_0_17 
+              alloc i32 a_17 
+              alloc i32 temp_1_17 
+              alloc i32 temp_2_17 
+              alloc f32 temp_3_17 
+              alloc f32 b_17 
+          label L0_0: 
+              new_var temp_0_17:i32 
+              temp_0_17 = Sub i32 0_0, 4_0 
+              a_17 = i32 temp_0_17 
+              new_var temp_1_17:i32 
+              temp_1_17 = Sub i32 0_0, 5_0 
+              new_var temp_2_17:i32 
+              temp_2_17 = Mul i32 3_0, temp_1_17 
+              new_var temp_3_17:f32 
+              temp_3_17 = sitofp i32 temp_2_17 to f32 
+              b_17 = f32 temp_3_17 
